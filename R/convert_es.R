@@ -1,0 +1,573 @@
+#' @name convert_es
+#' @rdname convert_es
+#'
+#' @title Convert effect sizes and compute confidence intervals
+#'
+#' @description
+#' This function converts a variety of effect sizes to either correlations or Cohen's \emph{d} values. The function also computes and prints confidence intervals for the output effect sizes.
+#'
+#' @param es Vector of effect sizes to convert.
+#' @param input_es Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, and Fisher \emph{z}.
+#' @param output_es Metric of output effect sizes. Currently supports correlations and Cohen's \emph{d}.
+#' @param n1 Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.
+#' @param n2 Vector of sample sizes of group 2 of the two groups being contrasted.
+#' @param df1 Vector of input test statistic degrees of freedom (for \emph{t} and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \emph{F}).
+#' @param df2 Vector of input test statistic within-group degrees of freedom (for \emph{F}).
+#' @param correct_bias Logical argument that determines whether to correct output effect sizes and error-variance estimates for small-sample bias (\code{TRUE}) or not (\code{FALSE}) when computing confidence intervals.
+#' @param conf_level Confidence level that defines the width of the confidence interval (default = .95).
+#'
+#' @return A \pkg{psychmeta} effect size \code{es} object containing:
+#' \item{meta_input}{A matrix of converted effect sizes and adjusted sample sizes for use in subsequent meta-anlayses.}
+#' \item{original_es}{The input data.}
+#' \item{confidence}{The output data with computed confidence intervals (for printing).}
+#'
+#' @section Notes:
+#' To use converted effect sizes in a meta-analysis, add the values from \code{es$meta_input} to your meta-analytic input data frame.
+#'
+#' @export
+#'
+#' @importFrom stats qchisq
+#' @importFrom stats qf
+#' @importFrom stats qt
+#'
+#' @references
+#' Chinn, S. (2000).
+#' A simple method for converting an odds ratio to effect size for use in meta-analysis.
+#' \emph{Statistics in Medicine, 19}(22), 3127–3131. \url{https://doi.org/10/c757hm}
+#'
+#' Lipsey, M. W., & Wilson, D. B. (2001).
+#' \emph{Practical meta-analysis}.
+#' Thousand Oaks, CA: SAGE.
+#'
+#' #' Schmidt, F. L., & Hunter, J. E. (2015).
+#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
+#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}
+#'
+#' @examples
+#' ## To convert a statistic to r or d metric:
+#' convert_es(es = 1,  input_es="d", output_es="r", n1=100)
+#' convert_es(es = 1, input_es="d", output_es="r", n1=50, n2 = 50)
+#' convert_es(es = .2, input_es="r", output_es="d",  n1=100, n2=150)
+#' convert_es(es = -1.3, input_es="t", output_es="r", n1 = 100, n2 = 140)
+#' convert_es(es = 10.3, input_es="F", output_es="d", n1 = 100, n2 = 150)
+#' convert_es(es = 1.3, input_es="chisq", output_es="r", n1 = 100, n2 = 100)
+#' convert_es(es = .021, input_es="p.chisq", output_es="d", n1 = 100, n2 = 100)
+#' convert_es(es = 4.37, input_es="or", output_es="r", n1=100, n2=100)
+#' convert_es(es = 4.37, input_es="or", output_es="d", n1=100, n2=100)
+#' convert_es(es = 1.47, input_es="lor", output_es="r", n1=100, n2=100)
+#' convert_es(es = 1.47, input_es="lor", output_es="d", n1=100, n2=100)
+#'
+#' ## To simply compute a confidence interval for r or d:
+#' convert_es(es = .3,  input_es="r", output_es="r", n1=100)
+#' convert_es(es = .8,  input_es="d", output_es="d", n1=64, n2=36)
+convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","z"), output_es=c("r","d"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, correct_bias=TRUE, conf_level=.95){
+     input_es <- match.arg(input_es, c("r","d","t","p.t","F","p.F","chisq","p.chisq","or","lor","z"))
+     input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, correct_bias=correct_bias, conf_level=conf_level)
+
+     arg_lengths <- unlist(lapply(list(n1=n1, n2=n1, df1=df1, df2=df2), length))
+     nonnull_nonscalar <- arg_lengths[arg_lengths > 1]
+     if(any(nonnull_nonscalar != nonnull_nonscalar[1]))
+          stop("All arguments that are not NULL or of length 1 must be of equal length", call. = FALSE)
+
+     if(input_es == "r")       .screen_r(es)
+     if(input_es == "t")       .screen_t(es, n1, n2, df1)
+     if(input_es == "p.t")     .screen_pt(es, n1, n2, df1)
+     if(input_es == "F")       .screen_F(es, n1, n2, df1, df2)
+     if(input_es == "p.F")     .screen_pF(es, n1, n2, df1, df2)
+     if(input_es == "chisq")   .screen_chisq(es, df1)
+     if(input_es == "p.chisq") .screen_pchisq(es, df1)
+     if(input_es == "or")      .screen_or(es)
+
+     x <- list(es = es, n1=n1, n2=n2, df1=df1, df2=df2)
+     # Compute sample sizes and df as needed
+     if(is.null(n1) & is.null(n2)) {
+          x$p   <- .5
+          x$n1 <- NA
+          x$n2 <- NA
+          if(input_es %in% c("t", "p.t")) {
+               x$n <- df1 + 2
+          } else {
+               if(input_es %in% c("F", "p.F")) {
+                    x$n <- df2 + 2
+               } else {
+                    x$n <- NA
+               }
+          }
+          if(output_es == "r")
+               if(input_es %in% c("d", "or", "lor"))
+                    warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
+          if(output_es == "d")
+               if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
+                    warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
+     }else if(!is.null(n2)) {
+          x$n <- n1 + n2
+          x$p <- n1 / x$n
+     } else {
+          x$n <- n1
+          x$n2 <- NA
+          x$p   <- .5
+     }
+     subset_id <- is.na(x$n) & !is.na(x$n1)
+     x$n[subset_id] <- x$n1[subset_id]
+
+     subset_id <- is.na(x$n1) & !is.na(x$n2)
+     x$n1[subset_id] <- x$n2[subset_id] / 2
+     x$n2[subset_id] <- x$n2[subset_id] / 2
+
+     subset_id <- !is.na(x$n1) & is.na(x$n2)
+     x$n2[subset_id] <- x$n1[subset_id] / 2
+     x$n1[subset_id] <- x$n1[subset_id] / 2
+
+     if(input_es=="t" & is.null(df1)) x$df1 <- x$n - 2
+     if(input_es=="F" & is.null(df2)) x$df2 <- x$n - 2
+
+     if(grepl(x = input_es, pattern = "p.")){
+          class(x) <- paste(gsub(x = input_es, pattern = "p.", replacement = "p_"), "to", output_es, sep = "_")
+     }else{
+          class(x) <- paste("q", input_es, "to", output_es, sep = "_")
+     }
+
+     .convert <- function(x){
+          UseMethod(generic = "convert_es", object = x)
+     }
+
+     if(output_es == "d"){
+          d <- .convert(x = x)
+          n <- x$n
+          n1 <- x$n1
+          n2 <- x$n2
+
+          d.ci <- if(correct_bias) correct_d_bias(d, n) else d
+
+          if(input_es == "delta" | input_es == "g"){
+               if(input_es == "delta"){
+                    n_effective <- adjust_n_d(d = d, var_e = var_error_delta(delta = d, nc = n1, ne = n2, correct_bias = FALSE))
+               }
+               if(input_es == "g"){
+                    n_effective <- adjust_n_d(d = d.ci, var_e = var_error_g(g = d.ci, n1 = n1, n2 = n2))
+               }
+          }else{
+               n_effective <- n
+          }
+
+
+          V.d <- rep(NA, length(d.ci))
+          V.d[is.na(n2)] <- var_error_d(d=d.ci[is.na(n2)], n1=n[is.na(n2)], correct_bias=correct_bias)
+          V.d[!is.na(n2)] <- var_error_d(d=d.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)], correct_bias=correct_bias)
+
+          CI <- confidence(d, se=sqrt(V.d), conf_level=conf_level)
+          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
+          names(original_es)[1] <- input_es
+          meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
+          conf_int <- data.frame(d=d.ci, n_total=n, n1=n1, n2=n2, CI)
+     }
+
+     if(output_es == "r"){
+          r <- .convert(x = x)
+          n <- x$n
+          n1 <- x$n1
+          n2 <- x$n2
+
+          r.ci <- if(correct_bias) correct_r_bias(r, n) else r
+
+          if(input_es == "delta" | input_es == "g"){
+               if(input_es == "delta"){
+                    n_effective <- adjust_n_d(d = x$es, var_e = var_error_delta(delta = x$es, nc = n1, ne = n2, correct_bias = FALSE))
+               }
+               if(input_es == "g"){
+                    d.ci <- convert_es.q_g_to_d(x = x)
+                    n_effective <- adjust_n_d(d = d.ci, var_e = var_error_g(g = d.ci, n1 = n1, n2 = n2))
+               }
+          }else{
+               n_effective <- n
+          }
+
+          V.r <- var_error_r(r.ci, n, correct_bias)
+          CI <- confidence(r, se=sqrt(V.r), conf_level=conf_level)
+          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
+          names(original_es)[1] <- input_es
+          meta_input <- data.frame(r = r, n_effective=n_effective)
+          conf_int <- data.frame(r=r.ci, n_effective=n, CI)
+     }
+
+     warning_out <- record_warnings()
+
+     out <- list(meta_input = meta_input,
+                 original_es = original_es,
+                 conf_int = conf_int,
+                 messages = warning_out)
+
+     class(out) <- c("psychmeta", "es", output_es)
+     return(out)
+
+}
+
+
+.screen_r <- function(es){
+     if(any(abs(es) > 1)){
+          stop("Value supplied for r is not a correlation.", call. = FALSE)
+     }
+}
+
+.screen_t <- function(es, n1, n2, df1){
+     if(is.null(c(n1, n2, df1))){
+          stop("Error: Sample size or df not supplied.", call. = FALSE)
+     }
+}
+
+.screen_pt <- function(es, n1, n2, df1){
+     if(is.null(c(n1, n2, df1))){
+          stop("Error: Sample size or df not supplied.", call.=FALSE)
+     }else{
+          if(any(es < 0 | es > 1)){
+               stop("Value supplied for p is not a probability", call.=FALSE)
+          }
+     }
+}
+
+.screen_F <- function(es, n1, n2, df1, df2){
+     if(is.null(c(n1, n2, df2))) {
+          stop("Error: Sample size or df not supplied.", call. = FALSE)
+     } else {
+          if(any(es < 0)){
+               stop("Value supplied for F is negative", call. = FALSE)
+          }else{
+               if(!is.null(df1)){
+                    if(df1 != 1){
+                         stop("This function can only convert One-Way ANOVA results for two groups.", call. = FALSE)
+                    }
+               }
+          }
+     }
+}
+
+.screen_pF <- function(es, n1, n2, df1, df2){
+     if(any(es < 0 | es > 1)) {
+          stop("Value supplied for p is not a probability", call. = FALSE)
+     } else {
+          if(is.null(c(n1, n2, df2))){
+               stop("Error: Sample size or df not supplied.", call. = FALSE)
+          } else{
+               if(!is.null(df1)){
+                    if(df1 != 1){
+                         stop("This function can only convert One-Way ANOVA results for two groups.", call. = FALSE)
+                    }
+               }
+          }
+     }
+}
+
+.screen_chisq <- function(es, df1){
+     if(any(es < 0)){
+          stop("Value supplied for chi squared is negative", call. = FALSE)
+     }else{
+          if(!is.null(df1)){
+               if(df1 != 1){
+                    stop("This function can only convert results for a chi squared from a 2x2 frequency table (1 df).", call. = FALSE)
+               }
+          }
+     }
+}
+
+.screen_pchisq <- function(es, df1){
+     if(any(es < 0 | es > 1)){
+          stop("Value supplied for p is not a probability", call. = FALSE)
+     }else{
+          if(!is.null(df1)){
+               if(df1 != 1){
+                    stop("This function can only convert results for a chi squared from a 2x2 frequency table (1 df).", call. = FALSE)
+               }
+          }
+     }
+}
+
+.screen_or <- function(es){
+     if(any(es < 0)){
+          stop("Value supplied for odds ratio is negative", call. = FALSE)
+     }
+}
+
+
+"convert_es.q_r_to_r" <- function(r, x = NULL) {
+     if(!is.null(x)){
+          r <- x$es
+     }
+
+     r
+}
+
+
+"convert_es.q_d_to_d" <- function(d, x = NULL) {
+     if(!is.null(x)){
+          d <- x$es
+     }
+
+     d
+}
+
+"convert_es.q_delta_to_d" <- function(d, x = NULL) {
+     if(!is.null(x)){
+          d <- x$es
+     }
+
+     d
+}
+
+"convert_es.q_g_to_d" <- function(g, n, x = NULL) {
+     if(!is.null(x)){
+          g <- x$es
+          n <- x$n
+     }
+
+     g / (1 - 3 / (4 * (n - 2 - 1)))
+}
+
+
+"convert_es.q_d_to_r" <- function(d, p, x = NULL) {
+     if(!is.null(x)){
+          d <- x$es
+          p <- x$p
+     }
+
+     a <- 1 / (p * (1-p))
+     return(d / sqrt(a + d^2))
+}
+
+
+"convert_es.q_delta_to_r" <- function(d, p, x = NULL) {
+     if(!is.null(x)){
+          d <- x$es
+          p <- x$p
+     }
+
+     convert_es.q_d_to_r(d = d, p = p)
+}
+
+"convert_es.q_g_to_r" <- function(g, n, p, x = NULL) {
+     if(!is.null(x)){
+          g <- x$es
+          n <- x$n
+          p <- x$p
+     }
+
+     d <- g / (1 - 3 / (4 * (n - 2 - 1)))
+     convert_es.q_d_to_r(d = d, p = p)
+
+}
+
+
+"convert_es.q_t_to_r" <- function(t, df1, x = NULL) {
+     if(!is.null(x)){
+          t <- x$es
+          df1 <- x$df1
+     }
+
+     if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
+
+     return( t / sqrt(t^2 + df1) )
+}
+
+"convert_es.p_t_to_r" <- function(p.t, df1, x = NULL) {
+     if(!is.null(x)){
+          p.t <- x$es
+          df1 <- x$df1
+     }
+
+     if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
+     t <- qt(p.t, df1, lower.tail = FALSE)
+     warning("t values computed from p values. Check effect direction coding.", call.=FALSE)
+     return( convert_es.q_t_to_r(t, df1) )
+}
+
+"convert_es.q_F_to_r" <- function(F, df2, x = NULL) {
+     if(!is.null(x)){
+          F <- x$es
+          df2 <- x$df2
+     }
+
+     if(is.null(df2)) stop("Error: df2 for F statistic could not be determined.", call.=FALSE)
+     return( sqrt(F / (F + df2)) )
+}
+
+"convert_es.p_F_to_r" <- function(p.F, df2, x = NULL) {
+     if(!is.null(x)){
+          p.F <- x$es
+          df2 <- x$df2
+     }
+
+     F <- qf(p.F, 1, df2, lower.tail = FALSE)
+     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     return( convert_es.q_F_to_r(F, df2) )
+}
+
+"convert_es.q_chisq_to_r" <- function(chisq, n, x = NULL) {
+     if(!is.null(x)){
+          chisq <- x$es
+          n <- x$n
+     }
+
+     r <- sqrt(chisq / n)
+     if(any(abs(r) > 1))
+          stop("Impossible values supplied for chi squared and n", call.=FALSE)
+     return(r)
+}
+
+"convert_es.p_chisq_to_r" <- function(p.chisq, n, x = NULL) {
+     if(!is.null(x)){
+          p.chisq <- x$es
+          n <- x$n
+     }
+
+     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     chisq <- qchisq(p.chisq, 1)
+     return( convert_es.q_chisq_to_r(chisq, n) )
+}
+
+"convert_es.q_or_to_r" <- function(or, p, x = NULL) {
+     if(!is.null(x)){
+          or <- x$es
+          p <- x$p
+     }
+
+     d <- log(or) * sqrt(3) / pi
+     return( convert_es.q_d_to_r(d, p) )
+}
+
+"convert_es.q_lor_to_r" <- function(lor, p, x = NULL) {
+     if(!is.null(x)){
+          lor <- x$es
+          p <- x$p
+     }
+
+     d <- lor * sqrt(3) / pi
+     return( convert_es.q_d_to_r(d, p))
+}
+
+"convert_es.q_z_to_r" <- function(z, x = NULL) {
+     if(!is.null(x)){
+          z <- x$es
+     }
+
+     return( (exp(2 * z) - 1) / (1 + exp(2 * z)) )
+}
+
+"convert_es.q_r_to_z" <- function(r, x = NULL) {
+     if(!is.null(x)){
+          r <- x$es
+     }
+
+     if(any(abs(r) > 1))
+          stop("Value supplied for r is not a correlation.", call.=FALSE)
+     return(.5 * log( (1+r) / (1-r) ))
+}
+
+"convert_es.q_r_to_d" <- function(r, p, x = NULL) {
+     if(!is.null(x)){
+          r <- x$es
+          p <- x$p
+     }
+
+     if(any(abs(r) > 1))
+          stop("Value supplied for r is not a correlation", call.=FALSE)
+     a   <- 1 / (p * (1-p))
+     return((sqrt(a) * r) / sqrt(1 - r^2))
+}
+
+"convert_es.q_t_to_d" <- function(t, df1, p, x = NULL) {
+     if(!is.null(x)){
+          t <- x$es
+          df1 <- x$df1
+          p <- x$p
+     }
+
+     a <- 1 / (p * (1-p))
+     n <- df1 + 2
+     return( t * sqrt(a / n) )
+}
+
+"convert_es.p_t_to_d" <- function(p.t, df1, p, x = NULL) {
+     if(!is.null(x)){
+          p.t <- x$es
+          df1 <- x$df1
+          p <- x$p
+     }
+
+     if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
+     t <- qt(p.t, df1, lower.tail = FALSE)
+     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     return( convert_es.q_t_to_d(t, df1, p) )
+}
+
+"convert_es.q_F_to_d" <- function(F, df2, p, x = NULL) {
+     if(!is.null(x)){
+          F <- x$es
+          df2 <- x$df2
+          p <- x$p
+     }
+
+     a <- 1 / (p * (1-p))
+     n <- df2 + 2
+     warning("F values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     return( sqrt(F * a / n) )
+}
+
+"convert_es.p_F_to_d" <- function(p.F, df2, p, x = NULL) {
+     if(!is.null(x)){
+          p.F <- x$es
+          df2 <- x$df2
+          p <- x$p
+     }
+
+     F <- qf(p.F, 1, df2, lower.tail = FALSE)
+     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     return( convert_es.q_F_to_d(F, df2, p) )
+}
+
+"convert_es.q_chisq_to_d" <- function(chisq, n, p, x = NULL) {
+     if(!is.null(x)){
+          chisq <- x$es
+          n <- x$n
+          p <- x$p
+     }
+
+     r <- convert_es.q_chisq_to_r(chisq, n)
+     return( convert_es.q_r_to_d(r, p))
+}
+
+"convert_es.p_chisq_to_d" <- function(p.chisq, n, p, x = NULL) {
+     if(!is.null(x)){
+          p.chisq <- x$es
+          n <- x$n
+          p <- x$p
+     }
+
+     r <- convert_es.p_chisq_to_r(p.chisq, n)
+     return( convert_es.q_r_to_d(r, p))
+}
+
+"convert_es.q_or_to_d" <- function(or, x = NULL) {
+     if(!is.null(x)){
+          or <- x$es
+     }
+
+     return( log(or) * sqrt(3) / pi )
+}
+
+"convert_es.q_lor_to_d" <- function(lor, x = NULL) {
+     if(!is.null(x)){
+          lor <- x$es
+     }
+
+     return( lor * sqrt(3) / pi )
+}
+
+"convert_es.q_z_to_d" <- function(z, p, x = NULL) {
+     if(!is.null(x)){
+          z <- x$es
+          p <- x$p
+     }
+
+     r <- convert_es.q_z_to_r(z)
+     return( convert_es.q_r_to_d(r, p) )
+}
+

@@ -1,0 +1,28 @@
+Package: psychmeta
+Type: Package
+Title: Psychometric Meta-Analysis Toolkit
+Version: 0.1.0
+Date: 2017-08-15
+Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
+                     email = "dahlk068@umn.edu"),
+              person("Brenton M.", "Wiernik", role = "aut", email = "psychmeta@wiernik.org"),
+              person("Michael T.", "Brannick", role = "ctb"),
+              person("Jack", "Kostal", role = "ctb"),
+              person("Sean", "Potter", role = "ctb"),
+              person("Yuejia (Mandy)", "Teng", role = "ctb"))
+Maintainer: Jeffrey A. Dahlke <dahlk068@umn.edu>
+Description: Tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and d values. Includes tools for converting effect sizes, computing sporadic artifact corrections, reshaping meta-analytic databases, computing multivariate corrections for range variation, and more. 
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Imports: MASS, boot, tmvtnorm, tibble, reshape2, ggplot2, dplyr, stats,
+        metafor
+RoxygenNote: 6.0.1
+NeedsCompilation: no
+Packaged: 2017-08-16 16:11:52 UTC; dahlk068
+Author: Jeffrey A. Dahlke [aut, cre],
+  Brenton M. Wiernik [aut],
+  Michael T. Brannick [ctb],
+  Jack Kostal [ctb],
+  Sean Potter [ctb],
+  Yuejia (Mandy) Teng [ctb]
