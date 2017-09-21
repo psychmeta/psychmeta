@@ -55,6 +55,14 @@ convert_ma <- function(ma_obj){
                pa_vec <- unlist(lapply(ma_obj_i$barebones$escalc_list, function(x) wt_mean(x = x$pa, wt = x$weight)))
           }
 
+          if(is.null(ma_obj_i$barebones$escalc_list[[1]]$pa_ad)){
+               pa_ad_list <- lapply(ma_obj_i$barebones$escalc_list, function(x) rep(.5, nrow(x)))
+               pa_ad_vec <- rep(.5, length(k))
+          }else{
+               pa_ad_list <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$pa_ad)
+               pa_ad_vec <- unlist(lapply(ma_obj_i$barebones$escalc_list, function(x) wt_mean(x = x$pa_ad, wt = x$weight)))
+          }
+
           correction_names_r <- c("true_score", "validity_generalization_x", "validity_generalization_y")
           correction_names_d <- c("latentGroup_latentY", "observedGroup_latentY", "latentGroup_observedY")
 
@@ -79,9 +87,9 @@ convert_ma <- function(ma_obj){
                }
 
                if(any(class(ma_obj_i) == "ma_ad")){
-                    ma_obj_i$artifact_distribution$true_score <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$true_score, p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-                    ma_obj_i$artifact_distribution$validity_generalization_x <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$validity_generalization_x, p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-                    ma_obj_i$artifact_distribution$validity_generalization_y <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$validity_generalization_y, p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+                    ma_obj_i$artifact_distribution$true_score <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$true_score, p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+                    ma_obj_i$artifact_distribution$validity_generalization_x <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$validity_generalization_x, p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+                    ma_obj_i$artifact_distribution$validity_generalization_y <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$validity_generalization_y, p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
                }
 
                if(any(class(ma_obj_i) == "ma_ic")){
@@ -150,9 +158,9 @@ convert_ma <- function(ma_obj){
                }
 
                if(any(class(ma_obj_i) == "ma_ad")){
-                    ma_obj_i$artifact_distribution$latentGroup_latentY <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$latentGroup_latentY, p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-                    ma_obj_i$artifact_distribution$observedGroup_latentY <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$observedGroup_latentY, p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-                    ma_obj_i$artifact_distribution$latentGroup_observedY <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$latentGroup_observedY, p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+                    ma_obj_i$artifact_distribution$latentGroup_latentY <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$latentGroup_latentY, p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+                    ma_obj_i$artifact_distribution$observedGroup_latentY <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$observedGroup_latentY, p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+                    ma_obj_i$artifact_distribution$latentGroup_observedY <- .convert_ma(ma_table = ma_obj_i$artifact_distribution$latentGroup_observedY, p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
                }
 
                if(any(class(ma_obj_i) == "ma_ic")){
@@ -355,7 +363,7 @@ convert_ma <- function(ma_obj){
 #'
 #' @keywords internal
 convert_pq_to_p <- function(pq){
-     if(pq > .25) stop("Supplied 'pq' value is not a valid dichotomous variance", call. = FALSE)
+     if(any(pq > .25)) stop("Supplied 'pq' value is not a valid dichotomous variance", call. = FALSE)
      .5 * (1 - sqrt(1 - 4 * pq))
 }
 

@@ -200,6 +200,9 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
 
      construct_mat <- cbind(construct_x, construct_y)
      construct_dat <- as.data.frame(construct_mat)
+
+     if(!is.null(use_as_x)) use_as_x <- as.character(use_as_x)
+     if(!is.null(use_as_y)) use_as_y <- as.character(use_as_y)
      if(is.null(construct_order)) construct_order <- c(use_as_x, use_as_y)
      if(!is.null(construct_order)){
           if(!is.null(construct_x)) construct_dat[,"construct_x"] <- factor(construct_dat[,"construct_x"], levels = construct_order)

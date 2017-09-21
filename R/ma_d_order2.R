@@ -61,7 +61,7 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
           if(deparse(substitute(sample_id)) != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
-          if(deparse(substitute(moderators)) != "NULL")
+          if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = data)
 
           if(deparse(substitute(construct_x)) != "NULL")

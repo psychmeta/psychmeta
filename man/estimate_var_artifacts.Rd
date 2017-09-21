@@ -14,31 +14,35 @@
 \alias{estimate_var_ryyi}
 \title{Taylor series approximations for the variances of estimates artifact distributions.}
 \usage{
-estimate_var_qxi(qxa, var_qxa = 0, ux, var_ux = 0, ux_observed = TRUE,
-  indirect_rr = TRUE)
+estimate_var_qxi(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0,
+  ux_observed = TRUE, indirect_rr = TRUE)
 
-estimate_var_qxa(qxi, var_qxi = 0, ux, var_ux = 0, ux_observed = TRUE,
-  indirect_rr = TRUE)
+estimate_var_qxa(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0,
+  ux_observed = TRUE, indirect_rr = TRUE)
 
-estimate_var_rxxi(rxxa, var_rxxa = 0, ux, var_ux = 0, ux_observed = TRUE,
-  indirect_rr = TRUE)
+estimate_var_rxxi(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 0,
+  ux_observed = TRUE, indirect_rr = TRUE)
 
-estimate_var_rxxa(rxxi, var_rxxi = 0, ux, var_ux = 0, ux_observed = TRUE,
-  indirect_rr = TRUE)
+estimate_var_rxxa(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 0,
+  ux_observed = TRUE, indirect_rr = TRUE)
 
-estimate_var_ut(rxx, var_rxx = 0, ux, var_ux = 0, rxx_restricted = TRUE,
-  rxx_as_qx = FALSE)
+estimate_var_ut(rxx, var_rxx = 0, ux, var_ux = 0, cor_rxx_ux = 0,
+  rxx_restricted = TRUE, rxx_as_qx = FALSE)
 
-estimate_var_ux(rxx, var_rxx = 0, ut, var_ut = 0, rxx_restricted = TRUE,
-  rxx_as_qx = FALSE)
+estimate_var_ux(rxx, var_rxx = 0, ut, var_ut = 0, cor_rxx_ut = 0,
+  rxx_restricted = TRUE, rxx_as_qx = FALSE)
 
-estimate_var_ryya(ryyi, var_ryyi = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
+estimate_var_ryya(ryyi, var_ryyi = 0, rxyi, var_rxyi = 0, ux, var_ux = 0,
+  cor_ryyi_rxyi = 0, cor_ryyi_ux = 0, cor_rxyi_ux = 0)
 
-estimate_var_qya(qyi, var_qyi = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
+estimate_var_qya(qyi, var_qyi = 0, rxyi, var_rxyi = 0, ux, var_ux = 0,
+  cor_qyi_rxyi = 0, cor_qyi_ux = 0, cor_rxyi_ux = 0)
 
-estimate_var_qyi(qya, var_qya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
+estimate_var_qyi(qya, var_qya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0,
+  cor_qya_rxyi = 0, cor_qya_ux = 0, cor_rxyi_ux = 0)
 
-estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
+estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0,
+  cor_ryya_rxyi = 0, cor_ryya_ux = 0, cor_rxyi_ux = 0)
 }
 \arguments{
 \item{qxa}{Square-root of applicant reliability estimate.}
@@ -49,6 +53,8 @@ estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
 
 \item{var_ux}{Variance of observed-score u ratio.}
 
+\item{cor_qxa_ux}{Correlation between qxa and ux.}
+
 \item{ux_observed}{Logical vector determining whether u ratios are observed-score u ratios (\code{TRUE}) or true-score u ratios (\code{FALSE}).}
 
 \item{indirect_rr}{Logical vector determining whether reliability values are associated with indirect range restriction (\code{TRUE}) or direct range restriction (\code{FALSE}).}
@@ -57,17 +63,25 @@ estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
 
 \item{var_qxi}{Variance of square-root of incumbent reliability estimate.}
 
+\item{cor_qxi_ux}{Correlation between qxi and ux.}
+
 \item{rxxa}{Incumbent reliability value.}
 
 \item{var_rxxa}{Variance of incumbent reliability values.}
+
+\item{cor_rxxa_ux}{Correlation between rxxa and ux.}
 
 \item{rxxi}{Incumbent reliability value.}
 
 \item{var_rxxi}{Variance of incumbent reliability values.}
 
+\item{cor_rxxi_ux}{Correlation between rxxi and ux.}
+
 \item{rxx}{Generic argument for a reliability estimate (whether this is a reliability or the square root of a reliability is clarified by the \code{rxx_as_qx} argument).}
 
 \item{var_rxx}{Generic argument for the variance of reliability estimates (whether this pertains to reliabilities or the square roots of reliabilities is clarified by the \code{rxx_as_qx} argument).}
+
+\item{cor_rxx_ux}{Correlation between rxx and ux.}
 
 \item{rxx_restricted}{Logical vector determining whether reliability estimates were incumbent reliabilities (\code{TRUE}) or applicant reliabilities (\code{FALSE}).}
 
@@ -77,6 +91,8 @@ estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
 
 \item{var_ut}{Variance of true-score u ratio.}
 
+\item{cor_rxx_ut}{Correlation between rxx and ut.}
+
 \item{ryyi}{Incumbent reliability value.}
 
 \item{var_ryyi}{Variance of incumbent reliability values.}
@@ -85,17 +101,35 @@ estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0)
 
 \item{var_rxyi}{Variance of incumbent correlations.}
 
+\item{cor_ryyi_rxyi}{Correlation between ryyi and rxyi.}
+
+\item{cor_ryyi_ux}{Correlation between ryyi and ux.}
+
+\item{cor_rxyi_ux}{Correlation between rxyi and ux.}
+
 \item{qyi}{Square-root of incumbent reliability estimate.}
 
 \item{var_qyi}{Variance of square-root of incumbent reliability estimate.}
+
+\item{cor_qyi_rxyi}{Correlation between qyi and rxyi.}
+
+\item{cor_qyi_ux}{Correlation between qyi and ux.}
 
 \item{qya}{Square-root of applicant reliability estimate.}
 
 \item{var_qya}{Variance of square-root of applicant reliability estimate.}
 
+\item{cor_qya_rxyi}{Correlation between qya and rxyi.}
+
+\item{cor_qya_ux}{Correlation between qya and ux.}
+
 \item{ryya}{Applicant reliability value.}
 
 \item{var_ryya}{Variance of applicant reliability values.}
+
+\item{cor_ryya_rxyi}{Correlation between ryya and rxyi.}
+
+\item{cor_ryya_ux}{Correlation between ryya and ux.}
 }
 \description{
 Taylor series approximations to estimate the variances of artifacts that have been estimated from other artifacts.

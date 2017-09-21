@@ -4,10 +4,12 @@
 \alias{check_wt_type}
 \title{Check whether wt_type argument is valid and determine which package to use for weights}
 \usage{
-check_wt_type(wt_type)
+check_wt_type(wt_type, generic = FALSE)
 }
 \arguments{
 \item{wt_type}{wt_type argument passed to a meta-analysis function}
+
+\item{generic}{Logical scalar determining whether the effect size is generic (TRUE) or one for which the meta-analysis function estimates error variances (FALSE).}
 }
 \value{
 Character object determining which package should be used to compute weights

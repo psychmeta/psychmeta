@@ -4,6 +4,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
 
      class_ma <- class(ma_obj)
 
+     if(any(class_ma == "ma_generic")) es_type <- "es"
      if(any(class_ma == "ma_r_as_r" | class_ma == "ma_r_as_d")) es_type <- "r"
      if(any(class_ma == "ma_d_as_d" | class_ma == "ma_d_as_r")) es_type <- "d"
 
@@ -26,6 +27,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
           record_call <- TRUE
      }
 
+     ma_obj_i <- ma_obj
      ma_list <- lapply(ma_list, function(ma_obj_i){
           if(any(class(ma_obj_i) == "ma_ic")){
                ma_arg_list <- ma_obj_i$individual_correction$inputs
@@ -34,6 +36,14 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
           }
 
           k_analyses <- nrow(ma_obj_i$barebones$meta_table)
+          if(es_type == "es"){
+               sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
+               yi <-   lapply(ma_obj_i$barebones$escalc_list, function(x) x$yi)
+               n <-     lapply(ma_obj_i$barebones$escalc_list, function(x) x$n)
+               vi_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
+               wt_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
+          }
+
           if(es_type == "r"){
                sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
                rxy <-   lapply(ma_obj_i$barebones$escalc_list, function(x) x$rxy)
@@ -118,6 +128,11 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                conf_method <- ma_obj$barebones$inputs$conf_method
                cred_method <- ma_obj$barebones$inputs$cred_method
 
+               if(es_type == "es"){
+                    es_data <- data.frame(sample_id = sample_id[[i]],
+                                          yi = yi[[i]],
+                                          n = n[[i]])
+               }
                if(es_type == "r"){
                     es_data <- data.frame(sample_id = sample_id[[i]],
                                           rxy = rxy[[i]],
@@ -149,6 +164,12 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                     if(any(class_ma == "ma_ic")){
 
                          bb_mat <- ma_obj$barebones$meta_table[i,]
+
+                         if(es_type == "es"){
+                              es_data$vi <- vi_xy[[i]]
+                              es_data$weight <- wt_xy[[i]]
+                              bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
+                         }
 
                          if(es_type == "r"){
                               es_data$vi <- vi_xy[[i]]
@@ -274,6 +295,12 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                }else{
                     if(any(class_ma == "ma_bb")){
                          bb_mat <- ma_obj$barebones$meta_table[i,]
+
+                         if(es_type == "es"){
+                              es_data$vi <- vi_xy[[i]]
+                              es_data$weight <- wt_xy[[i]]
+                              bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
+                         }
 
                          if(es_type == "r"){
                               es_data$vi <- vi_xy[[i]]

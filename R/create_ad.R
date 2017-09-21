@@ -304,7 +304,7 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 
      ad_contents <- paste(c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr", "ux", "ut")
                         [c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)], collapse = " + ")
-     if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "Null"
+     if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
 
      class(out) <- c("psychmeta", "ad_obj", "ad_int", ad_contents = ad_contents)
      out
@@ -883,7 +883,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           "ux", "ut")
                         [c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr,
                            valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)], collapse = " + ")
-     if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "Null"
+     if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
      class(out) <- c("psychmeta", "ad_obj", "ad_tsa", ad_contents = ad_contents)
      out
 }
@@ -915,6 +915,11 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 create_ad_int_group <- function(rGg = NULL, wt_rGg = rep(1, length(rGg)),
                                 pi = NULL, pa = NULL, wt_p = rep(1, length(pi)),
                                 ...){
+
+     if(!is.null(pi))
+          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
+     if(!is.null(pa))
+          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
 
      ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
      if(!is.null(rGg)){
@@ -976,6 +981,11 @@ create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
                                 mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
                                 pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
                                 var_unbiased = TRUE, ...){
+
+     if(!is.null(pi))
+          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
+     if(!is.null(pa))
+          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
 
      ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
      if(!is.null(rGg)){
@@ -1237,6 +1247,11 @@ create_ad_group <- function(ad_type = "tsa",
                             var_unbiased = TRUE, ...){
 
      ad_type <- match.arg(ad_type, c("tsa", "int"))
+
+     if(!is.null(pi))
+          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
+     if(!is.null(pa))
+          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
 
      if(ad_type == "tsa"){
           out <- create_ad_tsa_group(rGg = rGg, n_rGg = n_rGg, wt_rGg = wt_rGg,

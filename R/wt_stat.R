@@ -27,8 +27,8 @@ wt_dist <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
      if(length(x) != length(wt)) stop("Lengths of x and wt differ")
      x[is.na(wt)] <- NA
      wt[is.na(x)] <- NA
-     mean_x <- sum(x * wt, na.rm = TRUE) / sum(wt, na.rm = TRUE)
-     var_x <- sum((x - mean_x)^2 * wt, na.rm = TRUE) / sum(wt, na.rm = TRUE)
+     mean_x <- sum(as.numeric(x * wt), na.rm = TRUE) / sum(as.numeric(wt), na.rm = TRUE)
+     var_x <- sum(as.numeric((x - mean_x)^2 * wt), na.rm = TRUE) / sum(as.numeric(wt), na.rm = TRUE)
      if(unbiased){
           if(length(x) == 1){
                var_x <- 0
@@ -48,7 +48,7 @@ wt_mean <- function(x, wt = rep(1, length(x))){
      if(length(x) != length(wt)) stop("Lengths of x and wt differ")
      x[is.na(wt)] <- NA
      wt[is.na(x)] <- NA
-     sum(x * wt, na.rm = TRUE) / sum(wt, na.rm = TRUE)
+     sum(as.numeric(x * wt), na.rm = TRUE) / sum(as.numeric(wt), na.rm = TRUE)
 }
 
 #' @rdname wt_dist
@@ -59,8 +59,8 @@ wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
      if(length(x) != length(wt)) stop("Lengths of x and wt differ")
      x[is.na(wt)] <- NA
      wt[is.na(x)] <- NA
-     mean_x <- sum(x * wt, na.rm = TRUE) / sum(wt, na.rm = TRUE)
-     var_x <- sum((x - mean_x)^2 * wt, na.rm = TRUE) / sum(wt, na.rm = TRUE)
+     mean_x <- sum(as.numeric(x * wt), na.rm = TRUE) / sum(as.numeric(wt), na.rm = TRUE)
+     var_x <- sum(as.numeric((x - mean_x)^2 * wt), na.rm = TRUE) / sum(as.numeric(wt), na.rm = TRUE)
      if(unbiased){
           if(length(x) == 1){
                var_x <- 0

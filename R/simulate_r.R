@@ -134,6 +134,8 @@ simulate_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_case
 #'
 #' @param n Number of cases to simulate before performing selection. If \code{Inf}, function will simulate parameter values.
 #' @param rho_mat Matrix of true-score correlations.
+#' @param mu_vec Vector of means.
+#' @param sigma_vec Vector of observed-score standard deviations.
 #' @param rel_vec Vector of reliabilities corresponding to the variables in \code{rho_mat.}
 #' @param sr_vec Vector of selection ratios corresponding to the variables in \code{rho_mat}
 #' (set selection ratios to 1 for variables that should not be used in selection).
@@ -141,6 +143,7 @@ simulate_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_case
 #' @param sr_composites Optional vector selection ratios for composite variables. If not \code{NULL}, \code{sr_composites} must have as many elements as there are columns in \code{wt_mat}.
 #' @param var_names Vector of variable names corresponding to the variables in \code{rho_mat}.
 #' @param composite_names Optional vector of names for composite variables.
+#' @param n_as_ni Logical argument determining whether n specifies the incumbent sample size (TRUE) or the applicant sample size (FALSE; default). This can only be TRUE when only one variable is involved in selection.
 #' @param ... Further arguments.
 #'
 #' @return A list of study information, including correlations, reliabilities, standard deviations, means, and \emph{u} ratios for true scores and for observed scores.
@@ -179,29 +182,45 @@ simulate_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_case
 #'                 rel_vec = rep(.8, 5), sr_vec = c(1, 1, 1, 1, .5),
 #'                 wt_mat = cbind(c(0, 0, 0, .3, 1), c(1, .3, 0, 0, 0)), sr_composites = c(.7, .5))
 simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
-                       sr_vec = rep(1, ncol(rho_mat)),
-                       wt_mat = NULL, sr_composites = NULL,
-                       var_names = NULL, composite_names = NULL, ...){
+                              mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
+                              sr_vec = rep(1, ncol(rho_mat)),
+                              wt_mat = NULL, sr_composites = NULL,
+                              var_names = NULL, composite_names = NULL, n_as_ni = FALSE, ...){
 
-     args <- .simulate_r_sample_screen(n = n, rho_mat = rho_mat, rel_vec = rel_vec,
-                                sr_vec = sr_vec, wt_mat = wt_mat, sr_composites = sr_composites,
-                                var_names = var_names, composite_names = composite_names)
+     args <- .simulate_r_sample_screen(n = n, rho_mat = rho_mat,
+                                       mu_vec = mu_vec, sigma_vec = sigma_vec,
+                                       rel_vec = rel_vec, sr_vec = sr_vec,
+                                       wt_mat = wt_mat, sr_composites = sr_composites,
+                                       var_names = var_names, composite_names = composite_names)
 
-     if(is.finite(n)){
-          .simulate_r_sample_stats(n = args$n, rho_mat = args$rho_mat, rel_vec = args$rel_vec,
-                            sr_vec = args$sr_vec, wt_mat = args$wt_mat, sr_composites = args$sr_composites,
-                            var_names = args$var_names, composite_names = args$composite_names)
+     if(is.finite(args$n)){
+          if(n_as_ni){
+               if(sum(c(sr_vec, sr_composites) < 1) > 1){
+                    stop("'n_as_ni' must be FALSE when selection is to be performed on multiple variables", call. = FALSE)
+               }else{
+                    args$n <- ceiling(args$n / c(args$sr_vec, args$sr_composites)[c(args$sr_vec, args$sr_composites) < 1])
+               }
+          }
+
+          .simulate_r_sample_stats(n = args$n, rho_mat = args$rho_mat,
+                                   mu_vec = args$mu_vec, sigma_vec = args$sigma_vec,
+                                   rel_vec = args$rel_vec, sr_vec = args$sr_vec,
+                                   wt_mat = args$wt_mat, sr_composites = args$sr_composites,
+                                   var_names = args$var_names, composite_names = args$composite_names)
      }else{
-          .simulate_r_sample_params(n = args$n, rho_mat = args$rho_mat, rel_vec = args$rel_vec,
-                             sr_vec = args$sr_vec, wt_mat = args$wt_mat, sr_composites = args$sr_composites,
-                             var_names = args$var_names, composite_names = args$composite_names)
+          .simulate_r_sample_params(n = args$n, rho_mat = args$rho_mat,
+                                    mu_vec = args$mu_vec, sigma_vec = args$sigma_vec,
+                                    rel_vec = args$rel_vec, sr_vec = args$sr_vec,
+                                    wt_mat = args$wt_mat, sr_composites = args$sr_composites,
+                                    var_names = args$var_names, composite_names = args$composite_names)
      }
 }
 
-.simulate_r_sample_screen <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
-                               sr_vec = rep(1, ncol(rho_mat)),
-                               wt_mat = NULL, sr_composites = NULL,
-                               var_names = NULL, composite_names = NULL, ...){
+.simulate_r_sample_screen <- function(n, rho_mat,
+                                      mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
+                                      rel_vec = rep(1, ncol(rho_mat)), sr_vec = rep(1, ncol(rho_mat)),
+                                      wt_mat = NULL, sr_composites = NULL,
+                                      var_names = NULL, composite_names = NULL, ...){
 
      ## Sanity check for rho_mat
      if(!is.matrix(rho_mat)) stop("rho_mat must be a matrix", call. = FALSE)
@@ -216,12 +235,31 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      }
      rel_vec <- c(rel_vec)
      sr_vec <- c(sr_vec)
+
+     if(!is.numeric(n)) stop("n must be numeric", call. = FALSE)
+     if(any(!is.numeric(rho_mat))) stop("rho_mat must be numeric", call. = FALSE)
+     if(!is.numeric(mu_vec)) stop("mu_vec must be numeric", call. = FALSE)
+     if(!is.numeric(sigma_vec)) stop("sigma_vec must be numeric", call. = FALSE)
      if(!is.numeric(rel_vec)) stop("rel_vec must be numeric", call. = FALSE)
      if(!is.numeric(sr_vec)) stop("sr_vec must be numeric", call. = FALSE)
+
+     if(is.na(n)) stop("n cannot be NA", call. = FALSE)
+     if(any(is.na(rho_mat))) stop("rho_mat cannot be NA", call. = FALSE)
+     if(any(is.na(mu_vec))) stop("mu_vec cannot be NA", call. = FALSE)
+     if(any(is.na(sigma_vec))) stop("sigma_vec cannot be NA", call. = FALSE)
+     if(any(is.na(rel_vec))) stop("rel_vec cannot be NA", call. = FALSE)
+     if(any(is.na(sr_vec))) stop("sr_vec cannot be NA", call. = FALSE)
+
+     if(any(is.infinite(rho_mat))) stop("rho_mat must be finite", call. = FALSE)
+     if(any(is.infinite(mu_vec))) stop("mu_vec must be finite", call. = FALSE)
+     if(any(is.infinite(sigma_vec))) stop("sigma_vec must be finite", call. = FALSE)
      if(any(is.infinite(rel_vec))) stop("rel_vec must be finite", call. = FALSE)
      if(any(is.infinite(sr_vec))) stop("sr_vec must be finite", call. = FALSE)
+
+     if(is.finite(n)) if(n <= 0) stop("n must be positive", call. = FALSE)
      if(any(rel_vec <= 0)) stop("rel_vec must be positive", call. = FALSE)
      if(any(sr_vec < 0)) stop("sr_vec must be non-negative", call. = FALSE)
+
      if(ncol(rho_mat) != length(rel_vec)) stop("rel_vec must have as many elements as rho_mat has variables", call. = FALSE)
      if(ncol(rho_mat) != length(sr_vec)) stop("sr_vec must have as many elements as rho_mat has variables", call. = FALSE)
      if(!is.null(var_names)){
@@ -232,7 +270,9 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      }
      if(!is.null(wt_mat)){
           if(!is.numeric(wt_mat)) stop("wt_mat must be numeric", call. = FALSE)
+          if(any(is.na(wt_mat))) stop("wt_mat cannot be NA", call. = FALSE)
           if(any(is.infinite(wt_mat))) stop("wt_vec must be finite", call. = FALSE)
+
           if(is.null(dim(wt_mat))){
                if(ncol(rho_mat) != length(wt_mat)) stop("To be used as a vector, wt_mat must have as many elements as rho_mat has variables", call. = FALSE)
                wt_mat <- as.matrix(wt_mat)
@@ -241,6 +281,8 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           }
           if(is.null(sr_composites)){
                sr_composites <- rep(1, ncol(wt_mat))
+          }else{
+               if(any(is.na(sr_composites))) stop("sr_composites cannot be NA", call. = FALSE)
           }
           if(is.null(composite_names)){
                composite_names <- paste("composite", 1:ncol(wt_mat), sep = "")
@@ -252,14 +294,14 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      as.list(environment())
 }
 
-.simulate_r_sample_stats <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
-                              sr_vec = rep(1, ncol(rho_mat)),
-                              wt_mat = NULL, sr_composites = NULL,
-                              var_names = NULL, composite_names = NULL, obs_only = FALSE, ...){
+.simulate_r_sample_stats <- function(n, rho_mat,
+                                     mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
+                                     rel_vec = rep(1, ncol(rho_mat)), sr_vec = rep(1, ncol(rho_mat)),
+                                     wt_mat = NULL, sr_composites = NULL,
+                                     var_names = NULL, composite_names = NULL, obs_only = FALSE, ...){
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")
      }
-
 
      if(!is.null(wt_mat)){
           if(is.null(composite_names))
@@ -267,11 +309,11 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      }
 
      ## Create matrix of true-score covariances
-     S <- diag(rel_vec^.5) %*% rho_mat %*% diag(rel_vec^.5)
+     S <- diag(sigma_vec) %*% diag(rel_vec^.5) %*% rho_mat %*% diag(rel_vec^.5) %*% diag(sigma_vec)
 
      ## Generate true-score, error-score, and observed-score data
-     true_scores_a <- MASS::mvrnorm(n = n, mu = rep(0, ncol(rho_mat)), Sigma = S)
-     error_scores_a <- MASS::mvrnorm(n = n, mu = rep(0, ncol(rho_mat)), Sigma = diag(1 - rel_vec))
+     true_scores_a <- MASS::mvrnorm(n = n, mu = mu_vec, Sigma = S)
+     error_scores_a <- MASS::mvrnorm(n = n, mu = rep(0, ncol(rho_mat)), Sigma = diag(sigma_vec^2 - sigma_vec^2 * rel_vec))
 
      if(!is.null(wt_mat)){
           true_scores_a <- cbind(true_scores_a, Composite = true_scores_a %*% wt_mat)
@@ -406,9 +448,9 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                       descriptives_true = desc_mat_true,
                       descriptives_error = desc_mat_error,
 
-                      data_obs = data.frame(selected = select_vec, obs_scores_a),
-                      data_true = data.frame(selected = select_vec, true_scores_a),
-                      data_error = data.frame(selected = select_vec, error_scores_a))
+                      data_obs = data.frame(obs_scores_a, selected = select_vec),
+                      data_true = data.frame(true_scores_a, selected = select_vec),
+                      data_error = data.frame(error_scores_a, selected = select_vec))
      }else{
           S_xy_a <- cov(obs_scores_a)
           S_xy_i <- cov(obs_scores_a[select_vec,])
@@ -447,14 +489,14 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      out
 }
 
-.simulate_r_sample_params <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
-                               sr_vec = rep(1, ncol(rho_mat)),
-                               wt_mat = NULL, sr_composites = NULL,
-                               var_names = NULL, composite_names = NULL, ...){
+.simulate_r_sample_params <- function(n, rho_mat,
+                                      mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
+                                      rel_vec = rep(1, ncol(rho_mat)), sr_vec = rep(1, ncol(rho_mat)),
+                                      wt_mat = NULL, sr_composites = NULL,
+                                      var_names = NULL, composite_names = NULL, ...){
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")
      }
-
 
      if(!is.null(wt_mat)){
           if(is.null(composite_names))
@@ -470,15 +512,16 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      err_mat <- zero_mat <- diag(1 - rel_vec)
      diag(zero_mat) <- 0
 
-     rho_mat_offdiag <- rho_mat
-     rho_mat_offdiag <- rho_mat %*% rel_mat^.5
-
      rho_cov_mat <- r_mat
      diag(rho_cov_mat) <- rel_vec
 
      S_complete_a <- rbind(cbind(r_mat, rho_cov_mat, err_mat),
                            cbind(rho_cov_mat, rho_cov_mat, zero_mat),
                            cbind(err_mat, zero_mat, err_mat))
+
+     S_complete_a <- diag(c(sigma_vec, sigma_vec, sigma_vec)) %*% S_complete_a %*% diag(c(sigma_vec, sigma_vec, sigma_vec))
+
+     mu_complete_a <- c(mu_vec, mu_vec, rep(0, length(mu_vec)))
 
      if(!is.null(wt_mat)){
           zero_mat <- wt_mat
@@ -496,9 +539,11 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           comb_cov <- t(wt_mat_comp) %*% S_complete_a
           comb_var <- comb_cov %*% wt_mat_comp
 
+          mu_composites <- t(wt_mat_comp) %*% mu_complete_a
+          mu_complete_a <- c(mu_complete_a, mu_composites)[id_vec]
+
           S_complete_a <- cbind(rbind(S_complete_a, comb_cov), rbind(t(comb_cov), comb_var))
           S_complete_a <- S_complete_a[id_vec, id_vec]
-
 
           sr_vec <- c(sr_vec, sr_composites)
           var_names <- c(var_names, composite_names)
@@ -507,27 +552,29 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      x_col <- which(sr_vec < 1)
      if(length(x_col) > 0){
           if(length(x_col) == 1){
-               cut_scores <- qnorm(sr_vec[x_col], sd = S_complete_a[x_col,x_col]^.5)
-               s_mat_i <- truncate_var(a = cut_scores, sd = S_complete_a[x_col,x_col]^.5)
-               means_x_i <- truncate_mean(a = cut_scores, sd = S_complete_a[x_col,x_col]^.5)
+               cut_scores <- qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5, lower.tail = FALSE)
+               s_mat_i <- truncate_var(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
+               means_x_i <- truncate_mean(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
                sr_overall <- sr_vec[x_col]
           }else{
                if(zapsmall(det(S_complete_a[x_col,x_col])) == 0)
                     stop("Covariance matrix among selection variables is not positive definite: Selection cannot be performed", call. = FALSE)
-               dat_i <- mtmvnorm(sigma = S_complete_a[x_col,x_col], lower = qnorm(sr_vec[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE))
+               tmvtnorm::ptmvnorm
+               dat_i <- mtmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
+                                 lower = qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE))
                means_x_i <- dat_i$tmean
                s_mat_i <- dat_i$tvar
                s_mat_i <- zapsmall((s_mat_i + t(s_mat_i)) / 2)
-               sr_overall <- ptmvnorm(sigma = S_complete_a[x_col,x_col],
+               sr_overall <- ptmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
                                       lowerx = qnorm(sr_vec[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE),
                                       upperx = rep(Inf, length(x_col)))[1]
           }
           S_complete_i <- correct_matrix_mvrr(Sigma_i = S_complete_a, Sigma_xx_a = s_mat_i, x_col = x_col, standardize = FALSE)
-          means_i <- correct_means_mvrr(Sigma = S_complete_a, means_x_a = means_x_i, x_col = x_col, as_correction = FALSE)
+          means_i <- correct_means_mvrr(Sigma = S_complete_a, means_i = mu_complete_a, means_x_a = means_x_i, x_col = x_col)
      }else{
           sr_overall <- 1
           S_complete_i <- S_complete_a
-          means_i <- rep(0, nrow(S_complete_a))
+          means_i <- mu_complete_a
      }
 
      var_names_obs <- paste("Obs_", var_names, sep = "")
@@ -547,7 +594,12 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      rel_a <- diag(R_complete_a[var_names_obs, var_names_true])^2
      rel_i <- diag(R_complete_i[var_names_obs, var_names_true])^2
 
-     mean_obs_a <- mean_true_a <- mean_error_a <- rep(0, length(rel_a))
+     names(mu_complete_a) <- colnames(S_complete_a)
+
+     mean_obs_a <- mu_complete_a[var_names_obs]
+     mean_true_a <- mu_complete_a[var_names_true]
+     mean_error_a <- mu_complete_a[var_names_error]
+
      mean_mat_i <- matrix(means_i, nrow = 3, byrow = T)
      mean_obs_i <- mean_mat_i[1,]
      mean_true_i <- mean_mat_i[2,]
@@ -622,15 +674,17 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 
 #' Simulate correlation databases of primary studies
 #'
-#' The \code{simulate_r_database} function generates databases of psychometric correlation data from sample-size parameters, correlation parameters, reliability parameters, and selection-ratio paramters.
+#' The \code{simulate_r_database} function generates databases of psychometric correlation data from sample-size parameters, correlation parameters, reliability parameters, and selection-ratio parameters.
 #' The output database can be provided in either a long format or a wide format.
 #' If composite variables are to be formed, parameters can also be defined for the weights used to form the composites as well as the selection ratios applied to the composites.
 #' This function will return a database of statistics as well as a database of parameters - the parameter database contains the actual study parameters for each simulated samples (without sampleing error) to allow comparisons between meta-analytic results computed from the statistics and the actual means and variances of parameters.
-#' The \code{\link{merge_simdat_r}} function can be used to merge multiple simulated databasesa and the \code{\link{sparsify_simdat_r}} function can be used to randomly delete artifact information (a procedure commonly done in simulations of artifact-distribution methods).
+#' The \code{\link{merge_simdat_r}} function can be used to merge multiple simulated databases and the \code{\link{sparsify_simdat_r}} function can be used to randomly delete artifact information (a procedure commonly done in simulations of artifact-distribution methods).
 #'
 #' @param k Number of studies to simulate.
 #' @param n_params Parameter distribution (or data-generation function; see details) for sample size.
 #' @param rho_params List of parameter distributions (or data-generation functions; see details) for correlations.
+#' @param mu_params List of parameter distributions (or data-generation functions; see details) for means.
+#' @param sigma_params List of parameter distributions (or data-generation functions; see details) for standard deviations.
 #' @param rel_params List of parameter distributions (or data-generation functions; see details) for reliabilities.
 #' @param sr_params List of parameter distributions (or data-generation functions; see details) for selection ratios.
 #' @param wt_params List of parameter distributions (or data-generation functions; see details) to create weights for use in forming composites.
@@ -639,6 +693,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #' @param sr_composite_params Parameter distributions (or data-generation functions; see details) for composite selection ratios.
 #' @param var_names Optional vector of variable names for all non-composite variables.
 #' @param composite_names Optional vector of names for composite variables.
+#' @param n_as_ni Logical argument determining whether n specifies the incumbent sample size (TRUE) or the applicant sample size (FALSE; default). This can only be TRUE when only one variable is involved in selection.
 #' @param show_applicant Should applicant data be shown for sample statistics (\code{TRUE}) or suppressed (\code{FALSE})?
 #' @param keep_vars Optional vector of variable names to be extracted from the simulation and returned in the output object. All variables are returned by default. Use this argument when
 #' only some variables are of interest and others are generated solely to serve as selection variables.
@@ -652,6 +707,8 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #' \item A vector of values from which study parameters should be sampled.
 #' \item A vector containing a mean with a variance or standard deviation. These values must be named "mean," "var," and "sd", respectively, for the program to recognize which value is which.
 #' \item A matrix containing a row of values (this row must be named "values") from which study parameters should be sampled and a row of weights (this row must be labeled 'weights') associated
+#' with the values to be sampled.
+#' \item A matrix containing a column of values (this column must be named "values") from which study parameters should be sampled and a column of weights (this column must be labeled 'weights') associated
 #' with the values to be sampled.
 #' \item A function that is configured to generate data using only one argument that definines the number of cases to generate, e.g., \code{fun(n = 10)}.
 #' }
@@ -679,7 +736,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #'                       rbind(value = c(1, 2, 3), weight = c(1, 2, 1))),
 #'                  list(c(1, 2, 3),
 #'                       c(mean = 2, sd = .25),
-#'                       rbind(value = c(1, 2, 3), weight = c(1, 2, 1))))
+#'                       cbind(value = c(1, 2, 3), weight = c(1, 2, 1))))
 #'
 #' ## Simultate with long format
 #' simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
@@ -692,9 +749,11 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #'                   rel_params = rel_params, sr_params = sr_params,
 #'                   sr_composite_params = sr_composite_params, wt_params = wt_params,
 #'                   var_names = c("X", "Y", "Z"), format = "wide")
-simulate_r_database <- function(k, n_params, rho_params, rel_params, sr_params,
+simulate_r_database <- function(k, n_params, rho_params,
+                                mu_params = 0, sigma_params = 1,
+                                rel_params, sr_params,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL, var_names = NULL, composite_names = NULL,
-                                show_applicant = FALSE, keep_vars = "all", decimals = 2,
+                                n_as_ni = FALSE, show_applicant = FALSE, keep_vars = "all", decimals = 2,
                                 format = "long", max_iter = 100){
      inputs <- as.list(environment())
      call <- match.call()
@@ -716,12 +775,12 @@ simulate_r_database <- function(k, n_params, rho_params, rel_params, sr_params,
      }
      if(keep_vars[1] != "all" | length(keep_vars) > 1){
           if(any(!(keep_vars %in% c(var_names, composite_names)))){
-               stop("If 'keep_vars' is a value other than 'all', all values in 'show_var' must correspond to variable names supplied as 'var_names' and 'composite_names' arguments", call. = FALSE)
+               stop("If 'keep_vars' is a value other than 'all', all values in 'keep_vars' must correspond to variable names supplied as 'var_names' and 'composite_names' arguments", call. = FALSE)
           }
      }
 
      if(keep_vars[1] != "all" & length(keep_vars) == 1){
-          stop("If 'keep_vars' is a value other than 'all', 'show_var' must contain at least two variable names", call. = FALSE)
+          stop("If 'keep_vars' is a value other than 'all', 'keep_vars' must contain at least two variable names", call. = FALSE)
      }
 
      if(is.null(max_iter)) stop("'max_iter' cannot be NULL", call. = FALSE)
@@ -730,24 +789,62 @@ simulate_r_database <- function(k, n_params, rho_params, rel_params, sr_params,
      if(is.infinite(max_iter)) stop("'max_iter' must be finite", call. = FALSE)
      max_iter <- round(max_iter)
 
-     n_as_desc <- ifelse(any(names(n_params) == "mean") & (any(names(n_params) == "var") | any(names(n_params) == "sd")), TRUE, FALSE)
-     rho_as_desc <- lapply(rho_params, function(x) ifelse(any(names(x) == "mean") & (any(names(x) == "var") | any(names(x) == "sd")), TRUE, FALSE))
-     rel_as_desc <- lapply(rel_params, function(x) ifelse(any(names(x) == "mean") & (any(names(x) == "var") | any(names(x) == "sd")), TRUE, FALSE))
-     sr_as_desc <- lapply(sr_params, function(x) ifelse(any(names(x) == "mean") & (any(names(x) == "var") | any(names(x) == "sd")), TRUE, FALSE))
+     .check_desc <- function(x) ifelse(any(names(x) == "mean") & (any(names(x) == "var") | any(names(x) == "sd")), TRUE, FALSE)
+     .check_weights_rows <- function(x) ifelse(any(rownames(x) == "value") & any(rownames(x) == "weight"), TRUE, FALSE)
+     .check_weights_cols <- function(x) ifelse(any(colnames(x) == "value") & any(colnames(x) == "weight"), TRUE, FALSE)
+     .check_fun <- function(x) ifelse(is.function(x), TRUE, FALSE)
 
-     n_as_weights <- ifelse(any(rownames(n_params) == "value") & any(rownames(n_params) == "weight"), TRUE, FALSE)
-     rho_as_weights <- lapply(rho_params, function(x) ifelse(any(rownames(x) == "value") & any(rownames(x) == "weight"), TRUE, FALSE))
-     rel_as_weights <- lapply(rel_params, function(x) ifelse(any(rownames(x) == "value") & any(rownames(x) == "weight"), TRUE, FALSE))
-     sr_as_weights <- lapply(sr_params, function(x) ifelse(any(rownames(x) == "value") & any(rownames(x) == "weight"), TRUE, FALSE))
+     n_as_desc <- .check_desc(n_params)
+     rho_as_desc <- lapply(rho_params, .check_desc)
+     if(length(mu_params) > 1) mu_as_desc <- lapply(mu_params, .check_desc)
+     if(length(sigma_params) > 1) sigma_as_desc <- lapply(sigma_params, .check_desc)
+     rel_as_desc <- lapply(rel_params, .check_desc)
+     sr_as_desc <- lapply(sr_params, .check_desc)
 
-     n_as_fun <- ifelse(is.function(n_params), TRUE, FALSE)
-     rho_as_fun <- lapply(rho_params, function(x) ifelse(is.function(x), TRUE, FALSE))
-     rel_as_fun <- lapply(rel_params, function(x) ifelse(is.function(x), TRUE, FALSE))
-     sr_as_fun <- lapply(sr_params, function(x) ifelse(is.function(x), TRUE, FALSE))
+     n_as_weights_rows <- .check_weights_rows(n_params)
+     rho_as_weights_rows <- lapply(rho_params, .check_weights_rows)
+     if(length(mu_params) > 1) mu_as_weights_rows <- lapply(mu_params, .check_weights_rows)
+     if(length(sigma_params) > 1) sigma_as_weights_rows <- lapply(sigma_params, .check_weights_rows)
+     rel_as_weights_rows <- lapply(rel_params, .check_weights_rows)
+     sr_as_weights_rows <- lapply(sr_params, .check_weights_rows)
 
-     n_vec <- c(sample_params(param_list = list(n_params), k = k, as_desc = list(n_as_desc), as_weights = list(n_as_weights), as_fun = n_as_fun, param_type = "n", max_iter = max_iter))
-     rel_mat <- sample_params(param_list = rel_params, k = k, as_desc = rel_as_desc, as_weights = rel_as_weights, as_fun = rel_as_fun, param_type = "rel", max_iter = max_iter)
-     sr_mat <- sample_params(param_list = sr_params, k = k, as_desc = sr_as_desc, as_weights = sr_as_weights, as_fun = sr_as_fun, param_type = "sr", max_iter = max_iter)
+     n_as_weights_cols <- .check_weights_cols(n_params)
+     rho_as_weights_cols <- lapply(rho_params, .check_weights_cols)
+     if(length(mu_params) > 1) mu_as_weights_cols <- lapply(mu_params, .check_weights_cols)
+     if(length(sigma_params) > 1) sigma_as_weights_cols <- lapply(sigma_params, .check_weights_cols)
+     rel_as_weights_cols <- lapply(rel_params, .check_weights_cols)
+     sr_as_weights_cols <- lapply(sr_params, .check_weights_cols)
+
+     n_as_fun <- .check_fun(n_params)
+     rho_as_fun <- lapply(rho_params, .check_fun)
+     if(length(mu_params) > 1) mu_as_fun <- lapply(mu_params, .check_fun)
+     if(length(sigma_params) > 1) sigma_as_fun <- lapply(sigma_params, .check_fun)
+     rel_as_fun <- lapply(rel_params, .check_fun)
+     sr_as_fun <- lapply(sr_params, .check_fun)
+
+     n_vec <- c(sample_params(param_list = list(n_params), k = k, as_desc = list(n_as_desc), as_weights_rows = list(n_as_weights_rows),
+                              as_weights_cols = list(n_as_weights_cols), as_fun = n_as_fun, param_type = "n", max_iter = max_iter))
+     rel_mat <- sample_params(param_list = rel_params, k = k, as_desc = rel_as_desc, as_weights_rows = rel_as_weights_rows,
+                              as_weights_cols = rel_as_weights_cols, as_fun = rel_as_fun, param_type = "rel", max_iter = max_iter)
+     sr_mat <- sample_params(param_list = sr_params, k = k, as_desc = sr_as_desc, as_weights_rows = sr_as_weights_rows,
+                             as_weights_cols = sr_as_weights_cols, as_fun = sr_as_fun, param_type = "sr", max_iter = max_iter)
+
+     if(is.numeric(mu_params) & length(mu_params) == 1){
+          mu_mat <- rel_mat
+          mu_mat[1:length(mu_mat)] <- mu_params
+     }else{
+          mu_mat <- sample_params(param_list = mu_params, k = k, as_desc = mu_as_desc, as_weights_rows = mu_as_weights_rows,
+                                  as_weights_cols = mu_as_weights_cols, as_fun = mu_as_fun, param_type = "mu", max_iter = max_iter)
+     }
+
+     if(is.numeric(sigma_params) & length(sigma_params) == 1){
+          sigma_mat <- rel_mat
+          sigma_mat[1:length(sigma_mat)] <- sigma_params
+     }else{
+          sigma_mat <- sample_params(param_list = sigma_params, k = k, as_desc = sigma_as_desc, as_weights_rows = sigma_as_weights_rows,
+                                     as_weights_cols = sigma_as_weights_cols, as_fun = sigma_as_fun, param_type = "sigma", max_iter = max_iter)
+     }
+
 
      wt_mat <- NULL
      if(!is.null(wt_params)){
@@ -757,35 +854,37 @@ simulate_r_database <- function(k, n_params, rho_params, rel_params, sr_params,
                for(i in 1:length(wt_params_orig)) wt_params <- append(wt_params, wt_params_orig[[i]])
           }
 
-          wt_as_desc <- lapply(wt_params, function(x) ifelse(any(names(x) == "mean") & (any(names(x) == "var") | any(names(x) == "sd")), TRUE, FALSE))
-          wt_as_weights <- lapply(wt_params, function(x) ifelse(any(rownames(x) == "value") & any(rownames(x) == "weight"), TRUE, FALSE))
-          wt_as_weights <- lapply(wt_params, function(x) ifelse(is.function(x), TRUE, FALSE))
+          wt_as_desc <- lapply(wt_params, .check_desc)
+          wt_as_weights_rows <- lapply(wt_params, .check_weights_rows)
+          wt_as_weights_cols <- lapply(wt_params, .check_weights_cols)
+          wt_as_ful <- lapply(wt_params, .check_fun)
 
-          wt_mat <- sample_params(param_list = wt_params, k = k, as_desc = wt_as_desc, as_weights = wt_as_weights,
-                                  as_fun = wt_as_weights, param_type = "wt", allow_neg_wt = allow_neg_wt, max_iter = max_iter)
+          wt_mat <- sample_params(param_list = wt_params, k = k, as_desc = wt_as_desc, as_weights_rows = wt_as_weights_rows,
+                                  as_weights_cols = wt_as_weights_cols, as_fun = wt_as_ful, param_type = "wt", allow_neg_wt = allow_neg_wt, max_iter = max_iter)
      }
 
      sr_composite_mat <- NULL
      if(!is.null(sr_composite_params)){
-          srcomp_as_desc <- lapply(sr_composite_params, function(x) ifelse(any(names(x) == "mean") & (any(names(x) == "var") | any(names(x) == "sd")), TRUE, FALSE))
-          srcomp_as_weights <- lapply(sr_composite_params, function(x) ifelse(any(rownames(x) == "value") & any(rownames(x) == "weight"), TRUE, FALSE))
-          srcomp_as_weights <- lapply(sr_composite_params, function(x) ifelse(is.function(x), TRUE, FALSE))
+          srcomp_as_desc <- lapply(sr_composite_params, .check_desc)
+          srcomp_as_weights_rows <- lapply(sr_composite_params, .check_weights_rows)
+          srcomp_as_weights_cols <- lapply(sr_composite_params, .check_weights_cols)
+          srcomp_as_fun <- lapply(sr_composite_params, .check_fun)
 
           if(!is.list(sr_composite_params)) sr_composite_params <- list(sr_composite_params)
-          sr_composite_mat <- sample_params(param_list = sr_composite_params, k = k, as_desc = srcomp_as_desc, as_weights = srcomp_as_weights,
-                                            as_fun = srcomp_as_weights, param_type = "sr", max_iter = max_iter)
+          sr_composite_mat <- sample_params(param_list = sr_composite_params, k = k, as_desc = srcomp_as_desc, as_weights_rows = srcomp_as_weights_rows,
+                                            as_weights_cols = srcomp_as_weights_cols, as_fun = srcomp_as_fun, param_type = "sr", max_iter = max_iter)
      }
 
-     if(is.null(var_names)) var_names <- paste("x", 1:length(rho_params), sep = "")
+     if(is.null(var_names)) var_names <- paste("x", 1:length(rel_params), sep = "")
      colnames(rel_mat) <- colnames(sr_mat) <- var_names
 
-     sim_rho_mat <- function(params){
+     sim_rho_mat <- function(rho_params, rho_as_desc, rho_as_weights_rows, rho_as_weights_cols, rho_as_fun, max_iter){
           valid_mat <- FALSE
           iter <- 0
           while(!valid_mat){
                iter <- iter + 1
-               rho_vec <- c(sample_params(param_list = rho_params, k = 1, as_desc = rho_as_desc, as_weights = rho_as_weights,
-                                          as_fun = rho_as_fun, param_type = "rho", max_iter = max_iter))
+               rho_vec <- c(sample_params(param_list = rho_params, k = 1, as_desc = rho_as_desc, as_weights_rows = rho_as_weights_rows,
+                                          as_weights_cols = rho_as_weights_cols, as_fun = rho_as_fun, param_type = "rho", max_iter = max_iter))
                rho_mat <- reshape_vec2mat(cov = rho_vec)
                valid_mat <- zapsmall(det(rho_mat)) > 0
 
@@ -808,7 +907,10 @@ simulate_r_database <- function(k, n_params, rho_params, rel_params, sr_params,
                wt_mat_i <- NULL
           }
           param_list[[i]] <- list(n = n_vec[i],
-                                  rho_mat = sim_rho_mat(params = rho_params),
+                                  rho_mat = sim_rho_mat(rho_params = rho_params, rho_as_desc = rho_as_desc, rho_as_weights_rows = rho_as_weights_rows,
+                                                        rho_as_weights_cols = rho_as_weights_cols, rho_as_fun = rho_as_fun, max_iter = max_iter),
+                                  mu_vec = mu_mat[i,],
+                                  sigma_vec = sigma_mat[i,],
                                   rel_vec = c(rel_mat[i,]),
                                   sr_vec = c(sr_mat[i,]),
                                   wt_mat = wt_mat_i,
@@ -816,23 +918,37 @@ simulate_r_database <- function(k, n_params, rho_params, rel_params, sr_params,
      }
 
      .simulate_r_sample_screen(n = param_list[[1]][["n"]], rho_mat = param_list[[1]][["rho_mat"]],
-                        rel_vec = param_list[[1]][["rel_vec"]], sr_vec = param_list[[1]][["sr_vec"]],
-                        wt_mat = param_list[[1]][["wt_mat"]], sr_composites = param_list[[1]][["sr_composites"]],
-                        var_names = var_names, composite_names = composite_names)
+                               mu_vec = param_list[[1]][["mu_vec"]], sigma_vec = param_list[[1]][["sigma_vec"]],
+                               rel_vec = param_list[[1]][["rel_vec"]], sr_vec = param_list[[1]][["sr_vec"]],
+                               wt_mat = param_list[[1]][["wt_mat"]], sr_composites = param_list[[1]][["sr_composites"]],
+                               var_names = var_names, composite_names = composite_names)
+
+     if(n_as_ni){
+          if(any(unlist(lapply(param_list, function(x) sum(c(x[["sr_vec"]], x[["sr_composites"]]) < 1) > 1)))){
+               stop("'n_as_ni' must be FALSE when selection is to be performed on multiple variables", call. = FALSE)
+          }else{
+               param_list <- lapply(param_list, function(x){
+                    x[["n"]] <- ceiling(x[["n"]] / c(x[["sr_vec"]], x[["sr_composites"]])[c(x[["sr_vec"]], x[["sr_composites"]]) < 1])
+                    x
+               })
+          }
+     }
 
      sim_dat_stats <- lapply(param_list, function(x){
           .simulate_r_sample_stats(n = x[["n"]], rho_mat = x[["rho_mat"]],
-                            rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
-                            wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                            var_names = var_names, composite_names = composite_names)
+                                   mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
+                                   rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
+                                   wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
+                                   var_names = var_names, composite_names = composite_names)
      })
 
 
      sim_dat_params <- lapply(param_list, function(x){
           .simulate_r_sample_params(n = Inf, rho_mat = x[["rho_mat"]],
-                             rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
-                             wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                             var_names = var_names, composite_names = composite_names)
+                                    mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
+                                    rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
+                                    wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
+                                    var_names = var_names, composite_names = composite_names)
      })
 
      if(keep_vars[1] != "all"){
@@ -884,7 +1000,7 @@ simulate_r_database <- function(k, n_params, rho_params, rel_params, sr_params,
 
 
 ## Internal function to sample parameters when generating databases
-sample_params <- function(param_list, k, as_desc, as_weights, as_fun, param_type, allow_neg_wt = FALSE, max_iter = 100){
+sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_cols, as_fun, param_type, allow_neg_wt = FALSE, max_iter = 100){
      out <- NULL
      for(i in 1:length(param_list)){
           if(as_desc[[i]]){
@@ -919,12 +1035,46 @@ sample_params <- function(param_list, k, as_desc, as_weights, as_fun, param_type
                                                  sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
                          invalid <- FALSE
                     }
-
+                    if(param_type == "mu"){
+                         out_i[invalid] <- rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                                                 sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
+                         invalid <- FALSE
+                    }
+                    if(param_type == "sigma"){
+                         out_i[invalid] <- rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                                                 sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
+                         invalid <- zapsmall(out_i) <= 0
+                    }
                     if(any(invalid) & iter == max_iter)
                          stop("Maximum interations reached without convergence for parameter '", param_type, "': Please check parameter distributions", call. = FALSE)
                }
-          }else if(as_weights[[i]]){
-               out_i <- sample(param_list[[i]]["value",], k, replace = TRUE, prob = param_list[[i]]["weight",] / sum(param_list[[i]]["weight",]))
+          }else if(as_weights_rows[[i]] | as_weights_cols[[i]]){
+               if(as_weights_rows[[i]]){
+                    values <- param_list[[i]]["value",]
+                    weights <- param_list[[i]]["weight",]
+               }else{
+                    values <- param_list[[i]][,"value"]
+                    weights <- param_list[[i]][,"weight"]
+               }
+
+               if(any(is.na(weights))) stop("Parameters defined using weighted distributions cannot have NA weights", call. = FALSE)
+               if(any(is.na(values))) stop("Parameters defined using weighted distributions cannot have NA values", call. = FALSE)
+
+               if(any(is.infinite(weights))) stop("Parameters defined using weighted distributions cannot have infinite weights", call. = FALSE)
+               if(any(is.infinite(values))) stop("Parameters defined using weighted distributions cannot have infinite values", call. = FALSE)
+
+               if(any(weights < 0)) stop("Parameters defined using weighted distributions cannot have negative weights", call. = FALSE)
+
+               if(param_type == "n") if(any(values < 3)) stop("n parameters defined using weighted distributions cannot be samller than 3", call. = FALSE)
+               if(param_type == "rel") if(any(zapsmall(values) == 0)) stop("Reliability parameters defined using weighted distributions cannot be zero", call. = FALSE)
+               if(param_type == "sr") if(any(zapsmall(values) == 0)) stop("Selection-ratio parameters defined using weighted distributions cannot be zero", call. = FALSE)
+               if(param_type == "p") if(any(zapsmall(values) == 0)) stop("Proportion parameters defined using weighted distributions cannot be zero", call. = FALSE)
+               if(param_type == "rho") if(any(abs(values) > 1)) stop("rho parameters defined using weighted distributions cannot exceed 1 in absolute value", call. = FALSE)
+               if(param_type == "wt") if(!allow_neg_wt) if(any(values < 0)) stop("When 'allow_neg_wt' is FALSE, weight parameters defined using weighted distributions cannot be negative", call. = FALSE)
+               if(param_type == "sigma") if(any(zapsmall(values) <= 0)) stop("sigma parameters defined using weighted distributions cannot be less than or equal to zero", call. = FALSE)
+
+               out_i <- sample(values, k, replace = TRUE, prob = weights / sum(weights))
+
           }else if(as_fun[[i]]){
                invalid <- TRUE
                out_i <- rep(NA, k)
@@ -938,6 +1088,8 @@ sample_params <- function(param_list, k, as_desc, as_weights, as_fun, param_type
                     if(param_type == "rho") invalid <- abs(out_i) > 1
                     if(param_type == "wt") if(!allow_neg_wt) invalid <- out_i < 0
                     if(param_type == "d") invalid <- FALSE
+                    if(param_type == "mu") invalid <- FALSE
+                    if(param_type == "sigma") invalid <- zapsmall(out_i) <= 0
 
                     if(any(invalid) & iter == max_iter)
                          stop("Maximum interations reached without convergence for parameter '", param_type, "': Please check parameter distributions", call. = FALSE)

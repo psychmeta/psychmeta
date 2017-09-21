@@ -307,6 +307,11 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                                individual_correction = NULL))
           }
 
+          if(ma_type == "bb" & es_type == "r"){
+               if(any(colnames(x) == "pi")) results$barebones$data$pi <- x$pi
+               if(any(colnames(x) == "pa")) results$barebones$data$pa <- x$pa
+          }
+
           if(ma_type == "r_order2" | ma_type == "d_order2"){
                if(!is.null(results$barebones))
                     results$barebones$meta <- cbind(x[1,analysis_id_variables], results$barebones$meta)

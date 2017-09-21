@@ -6,7 +6,7 @@
 \usage{
 ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
   correction_method = "auto", use_ic_ads = "tsa", correct_rGg = FALSE,
-  correct_ryy = TRUE, correct_rr_g = FALSE, correct_rr_y = TRUE,
+  correct_ryy = TRUE, correct_rr_g = TRUE, correct_rr_y = TRUE,
   indirect_rr_g = TRUE, indirect_rr_y = TRUE, residual_ads = TRUE,
   sign_rgz = 1, sign_ryz = 1, decimals = 2, ...)
 }

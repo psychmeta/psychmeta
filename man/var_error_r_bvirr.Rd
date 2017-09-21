@@ -4,16 +4,23 @@
 \alias{var_error_r_bvirr}
 \title{Taylor series approximation of the sampling variance of correlations corrected using the Case V correction for indirect range restriction}
 \usage{
-var_error_r_bvirr(rxyi, var_e, n, ux, uy, qx, qx_restricted = TRUE, qy,
-  qy_restricted = TRUE, sign_rxz = 1, sign_ryz = 1,
-  r_deriv_only = FALSE)
+var_error_r_bvirr(rxyi, var_e = NULL, ni, na = NA, ux, uy, qx,
+  qx_restricted = TRUE, qy, qy_restricted = TRUE, mean_rxyi = NULL,
+  mean_ux = NULL, mean_uy = NULL, mean_qxa = NULL, mean_qya = NULL,
+  var_rxyi = NULL, var_ux = NULL, var_uy = NULL, var_qxa = NULL,
+  var_qya = NULL, cor_rxyi_ux = 0, cor_rxyi_uy = 0, cor_rxyi_qxa = 0,
+  cor_rxyi_qya = 0, cor_ux_uy = 0, cor_ux_qxa = 0, cor_ux_qya = 0,
+  cor_uy_qxa = 0, cor_uy_qya = 0, cor_qxa_qya = 0, sign_rxz = 1,
+  sign_ryz = 1, r_deriv_only = FALSE)
 }
 \arguments{
 \item{rxyi}{Vector of observed correlations.}
 
 \item{var_e}{Vector of estimated sampling variances for rxyi values.}
 
-\item{n}{Vector of sample sizes.}
+\item{ni}{Vector of incumbent sample sizes (necessary when variances of correlations/artifacts are not supplied).}
+
+\item{na}{Optional vector of applicant sample sizes (for estimating error variance of u ratios and applicant reliabilities).}
 
 \item{ux}{Vector of observed-score u ratios for X.}
 
@@ -26,6 +33,46 @@ var_error_r_bvirr(rxyi, var_e, n, ux, uy, qx, qx_restricted = TRUE, qy,
 \item{qy}{Vector of square roots of reliability estimates for X.}
 
 \item{qy_restricted}{Logical vector determining whether each element of qy is derived from an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
+
+\item{mean_rxyi}{Mean observed correlation.}
+
+\item{mean_ux}{Mean observed-score u ratio for X (for use in estimating sampling errors in the context of a meta-analysis).}
+
+\item{mean_uy}{Mean observed-score u ratio for Y (for use in estimating sampling errors in the context of a meta-analysis).}
+
+\item{mean_qxa}{Mean square-root applicant reliability estimate for X (for use in estimating sampling errors in the context of a meta-analysis).}
+
+\item{mean_qya}{Mean square-root applicant reliability estimate for Y (for use in estimating sampling errors in the context of a meta-analysis).}
+
+\item{var_rxyi}{Optional pre-specified variance of correlations.}
+
+\item{var_ux}{Optional pre-specified variance of observed-score u ratios for X.}
+
+\item{var_uy}{Optional pre-specified variance of observed-score u ratios for Y.}
+
+\item{var_qxa}{Optional pre-specified variance of square-root applicant reliability estimate for X.}
+
+\item{var_qya}{Optional pre-specified variance of square-root applicant reliability estimate for Y.}
+
+\item{cor_rxyi_ux}{Correlation between rxyi and ux (zero by default).}
+
+\item{cor_rxyi_uy}{Correlation between rxyi and uy (zero by default).}
+
+\item{cor_rxyi_qxa}{Correlation between rxyi and qxa (zero by default).}
+
+\item{cor_rxyi_qya}{Correlation between rxyi and qya (zero by default).}
+
+\item{cor_ux_uy}{Correlation between ux and uy (zero by default).}
+
+\item{cor_ux_qxa}{Correlation between ux and qxa (zero by default).}
+
+\item{cor_ux_qya}{Correlation between ux and qya (zero by default).}
+
+\item{cor_uy_qxa}{Correlation between uy and qxa (zero by default).}
+
+\item{cor_uy_qya}{Correlation between uy and qya (zero by default).}
+
+\item{cor_qxa_qya}{Correlation between qxa and qya (zero by default).}
 
 \item{sign_rxz}{Sign of the relationship between X and the selection mechanism.}
 
@@ -59,7 +106,7 @@ where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, \eqn{b_{4}}{b4}, and \e
 \deqn{b_{5}=\frac{\partial\rho_{TP_{a}}}{\partial\rho_{XY_{i}}}=\frac{u_{X}u_{Y}}{q_{X_{a}}q_{Y_{a}}}}{b5 = (ux * uy) / (qxa * qya)}
 }
 \examples{
-var_error_r_bvirr(rxyi = .3, var_e = var_error_r(r = .3, n = 100), n = 100,
+var_error_r_bvirr(rxyi = .3, var_e = var_error_r(r = .3, n = 100), ni = 100,
                 ux = .8, uy = .8,
                 qx = .9, qx_restricted = TRUE,
                 qy = .9, qy_restricted = TRUE,

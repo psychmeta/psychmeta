@@ -87,7 +87,7 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
           if(deparse(substitute(sample_id)) != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
-          if(deparse(substitute(moderators)) != "NULL")
+          if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = data)
 
           if(deparse(substitute(construct_x)) != "NULL")
@@ -225,7 +225,7 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
           dat <- data.frame(r = r_vec, var_r = var_r_vec, k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r)
      }
 
-     k <- sum(k_vec)
+     k <- sum(k_vec[!is.na(wt_vec) & !is.na(r_vec)])
      conf_int <- confidence(mean = mean_r, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)
      cred_int <- credibility(mean = mean_r, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))
@@ -297,7 +297,7 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      }
 
 
-     k <- sum(k_vec)
+     k <- sum(k_vec[!is.na(wt_vec) & !is.na(rho_vec)])
      conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
      cred_int <- credibility(mean = var_r_c, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))
@@ -370,7 +370,7 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
           dat <- data.frame(r = r_vec, rho = rho_vec, var_r = var_r_vec, k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
      }
 
-     k <- sum(k_vec)
+     k <- sum(k_vec[!is.na(wt_vec)])
      conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
      cred_int <- credibility(mean = var_r_c, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))

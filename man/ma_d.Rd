@@ -9,9 +9,9 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   correction_method = "auto", group_id = NULL, group_order = NULL,
   construct_y = NULL, measure_y = NULL, construct_order = NULL,
   wt_type = "inv_var_mean", error_type = "mean", correct_bias = TRUE,
-  correct_rGg = FALSE, correct_ryy = TRUE, correct_rr_g = FALSE,
+  correct_rGg = FALSE, correct_ryy = TRUE, correct_rr_g = TRUE,
   correct_rr_y = TRUE, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
-  rGg = NULL, pi = NULL, pa = 0.5, ryy = NULL, ryy_restricted = TRUE,
+  rGg = NULL, pi = NULL, pa = NULL, ryy = NULL, ryy_restricted = TRUE,
   uy = NULL, uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1,
   conf_level = 0.95, cred_level = 0.8, conf_method = "t",
   cred_method = "t", var_unbiased = TRUE, moderators = NULL,
@@ -44,7 +44,7 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 be used when interative artifact distributions are provided). See "Details" of \code{/link{ma_d_ad}} for descriptions of the available methods.}
 
-\item{group_id}{Vector of construct names for construct initially designated as X.}
+\item{group_id}{Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).}
 
 \item{group_order}{Vector indicating the order in which group_ids should be arranged.}
 

@@ -191,11 +191,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           if(deparse(substitute(sample_id)) != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
 
-          if(deparse(substitute(moderators)) != "NULL" & deparse(substitute(moderators)) != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
+          if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators)) != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = data)
      }
 
-     if(!is.null(moderators)){
+     if(length(moderators) > 0){
           moderator_levels <- lapply(data.frame(data.frame(moderators)[,cat_moderators]), function(x){
                lvls <- levels(x)
                if(is.null(lvls)) lvls <- levels(factor(x))
@@ -203,7 +203,10 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           })
      }else{
           moderator_levels <- NULL
+          if(deparse(substitute(moderators)) == ".psychmeta_reserved_internal_mod_aabbccddxxyyzz") moderators <- NULL
      }
+
+
 
      ## Clear up discrepancies between arguments and feasible corrections
      if(is.null(rxx)){correct_rxx <- FALSE}else{if(all(is.na(rxx))){correct_rxx <- FALSE}}
@@ -675,14 +678,16 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      a_vec[do_uvdrr_y] <- .refine_var_rr(ux = uy_vec[do_uvdrr_y], rxyi = rxyi[do_uvdrr_y], indirect_rr = FALSE, ux_observed = TRUE, rxx_restricted = FALSE)
      a_vec[do_uvirr_y] <- .refine_var_rr(ux = up_vec[do_uvirr_y], rxyi = rxyi[do_uvirr_y], indirect_rr = TRUE, ux_observed = FALSE, rxx_restricted = FALSE)
 
-     A_vec_tp[!do_bvirr & !do_bvdrr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr & !do_bvdrr], r_corrected = rtpa_vec[!do_bvirr & !do_bvdrr])
-     A_vec_xp[!do_bvirr & !do_bvdrr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr & !do_bvdrr], r_corrected = rxpa_vec[!do_bvirr & !do_bvdrr])
-     A_vec_ty[!do_bvirr & !do_bvdrr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr & !do_bvdrr], r_corrected = rtya_vec[!do_bvirr & !do_bvdrr])
-
+     A_vec_tp[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rtpa_vec[!do_bvirr])
+     A_vec_xp[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rxpa_vec[!do_bvirr])
+     A_vec_ty[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rtya_vec[!do_bvirr])
 
      ## Determine pseudo attenuation factors for additive corrections
-     if(any(do_bvdrr | do_bvirr)){
+     if(any(do_bvirr)){
           ## Prepare for bivariate estimates
+          bvirr_art_id <- do_bvirr
+          if(!is.null(presorted_data)) bvirr_art_id <- presorted_data[,"Analysis_ID"] == 1 & do_bvirr
+
           rxx_tsa <- rxx
           rxx_restricted_tsa <- rxx_restricted
           rxx_restricted_tsa[is.na(rxx_tsa)] <- FALSE
@@ -693,67 +698,46 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           ryy_restricted_tsa[is.na(ryy_tsa)] <- FALSE
           ryy_tsa[is.na(ryy_tsa)] <- ryya_vec[is.na(ryy_tsa)]
 
-          if(any(do_bvirr)){
-               ## Determine pseudo attenuation factors for the indirect bivariate correction
-               ## (bivariate corrections are additive functions, which prevents the traditional attenuation factor from having a meaningful interpretation)
-               var_e_bvirr <- var_error_r(r = rxyi[do_bvirr], n = n[do_bvirr])
-               A_vec_tp[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
-                                                                          var_e = var_e_bvirr,
-                                                                          n = n[do_bvirr],
-                                                                          ux = ux_vec[do_bvirr],
-                                                                          uy = uy_vec[do_bvirr],
-                                                                          qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
-                                                                          qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
-                                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz))
+          mean_rxyi <- wt_mean(x = rxyi, wt = n)
+          mean_qxa <- wt_mean(x = rxxa_vec[bvirr_art_id]^.5, wt = n[bvirr_art_id])
+          mean_qya <- wt_mean(x = ryya_vec[bvirr_art_id]^.5, wt = n[bvirr_art_id])
+          mean_ux <- wt_mean(x = ux_vec[bvirr_art_id], wt = n[bvirr_art_id])
+          mean_uy <- wt_mean(x = uy_vec[bvirr_art_id], wt = n[bvirr_art_id])
 
-               A_vec_xp[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
-                                                                          var_e = var_e_bvirr,
-                                                                          n = n[do_bvirr],
-                                                                          ux = ux_vec[do_bvirr],
-                                                                          uy = uy_vec[do_bvirr],
-                                                                          qx = 1, qx_restricted = FALSE,
-                                                                          qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
-                                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz))
+          ## Determine pseudo attenuation factors for the indirect bivariate correction
+          ## (bivariate corrections are additive functions, which prevents the traditional attenuation factor from having a meaningful interpretation)
+          var_e_bvirr <- var_error_r(r = mean_rxyi, n = n[do_bvirr])
+          A_vec_tp[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
+                                                                     var_e = var_e_bvirr,
+                                                                     ni = n[do_bvirr],
+                                                                     ux = ux_vec[do_bvirr],
+                                                                     uy = uy_vec[do_bvirr],
+                                                                     qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
+                                                                     qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
+                                                                     mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
+                                                                     sign_rxz = sign_rxz, sign_ryz = sign_ryz))
 
-               A_vec_ty[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
-                                                                          var_e = var_e_bvirr,
-                                                                          n = n[do_bvirr],
-                                                                          ux = ux_vec[do_bvirr],
-                                                                          uy = uy_vec[do_bvirr],
-                                                                          qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
-                                                                          qy = 1, qy_restricted = FALSE,
-                                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz))
-          }
+          A_vec_xp[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
+                                                                     var_e = var_e_bvirr,
+                                                                     ni = n[do_bvirr],
+                                                                     ux = ux_vec[do_bvirr],
+                                                                     uy = uy_vec[do_bvirr],
+                                                                     qx = 1, qx_restricted = FALSE,
+                                                                     qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
+                                                                     mean_rxyi = mean_rxyi, mean_qxa = 1, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
+                                                                     sign_rxz = sign_rxz, sign_ryz = sign_ryz))
 
-          if(any(do_bvdrr)){
-               ## Determine pseudo attenuation factors for the direct bivariate correction
-               ## (bivariate corrections are additive functions, which prevents the traditional attenuation factor from having a meaningful interpretation)
-               var_e_bvdrr <- var_error_r(r = rxyi[do_bvdrr], n = n[do_bvdrr])
-               A_vec_tp[do_bvdrr] <- sqrt(var_e_bvdrr / var_error_r_bvdrr(rxyi = rxyi[do_bvdrr],
-                                                                          var_e = var_e_bvdrr,
-                                                                          n = n[do_bvdrr],
-                                                                          ux = ux_vec[do_bvdrr],
-                                                                          uy = uy_vec[do_bvdrr],
-                                                                          qx = rxx_tsa[do_bvdrr]^.5, qx_restricted = rxx_restricted_tsa[do_bvdrr],
-                                                                          qy = ryy_tsa[do_bvdrr]^.5, qy_restricted = ryy_restricted_tsa[do_bvdrr]))
-
-               A_vec_xp[do_bvdrr] <- sqrt(var_e_bvdrr / var_error_r_bvdrr(rxyi = rxyi[do_bvdrr],
-                                                                          var_e = var_e_bvdrr,
-                                                                          n = n[do_bvdrr],
-                                                                          ux = ux_vec[do_bvdrr],
-                                                                          uy = uy_vec[do_bvdrr],
-                                                                          qx = 1, qx_restricted = FALSE,
-                                                                          qy = ryy_tsa[do_bvdrr]^.5, qy_restricted = ryy_restricted_tsa[do_bvdrr]))
-
-               A_vec_ty[do_bvdrr] <- sqrt(var_e_bvdrr / var_error_r_bvdrr(rxyi = rxyi[do_bvdrr],
-                                                                          var_e = var_e_bvdrr,
-                                                                          n = n[do_bvdrr],
-                                                                          ux = ux_vec[do_bvdrr],
-                                                                          uy = uy_vec[do_bvdrr],
-                                                                          qx = rxx_tsa[do_bvdrr]^.5, qx_restricted = rxx_restricted_tsa[do_bvdrr],
-                                                                          qy = 1, qy_restricted = FALSE))
-          }
+          A_vec_ty[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
+                                                                     var_e = var_e_bvirr,
+                                                                     ni = n[do_bvirr],
+                                                                     ux = ux_vec[do_bvirr],
+                                                                     uy = uy_vec[do_bvirr],
+                                                                     qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
+                                                                     qy = 1, qy_restricted = FALSE,
+                                                                     mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = 1, mean_ux = mean_ux, mean_uy = mean_uy,
+                                                                     sign_rxz = sign_rxz, sign_ryz = sign_ryz))
      }
+
 
      ## If a compound attenuation factor is missing, it means division by zero has occured and that the missing values should be set to unity
      A_vec_tp[is.na(A_vec_tp)] <- A_vec_xp[is.na(A_vec_xp)] <- A_vec_ty[is.na(A_vec_ty)] <- 1
@@ -807,6 +791,19 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      }
      es_data <- cbind(sample_id = sample_id, es_data)
      es_data$n_adj <- n_adj
+
+     if(!is.null(d)){
+          if(any(do_uvdrr_y | do_uvirr_y)){
+               uy_temp <- uy_vec
+               uy_temp[!is.na(up_vec)] <- up_vec[!is.na(up_vec)]
+               rxpi <- rxyi
+               rxpi[do_uvirr_y] <- rxyi[do_uvirr_y] / ryyi_vec[do_uvirr_y]^.5
+               pqa <- pi[do_uvdrr_y | do_uvirr_y] * (1 - pi[do_uvdrr_y | do_uvirr_y]) * ((1 / uy_temp[do_uvdrr_y | do_uvirr_y]^2 - 1) * rxpi[do_uvdrr_y | do_uvirr_y]^2 + 1)
+               pqa[pqa > .25] <- .25
+               pa[do_uvdrr_y | do_uvirr_y] <- convert_pq_to_p(pq = pqa)
+          }
+          if(any(do_meas | correction_type == "None")) pa[do_meas | correction_type == "None"] <- pi[do_meas | correction_type == "None"]
+     }
      es_data$d <- d
      es_data$n1 <- n1
      es_data$n2 <- n2
@@ -885,7 +882,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           var_e_xy_vec <- convert_vard_to_varr(d = out$barebones$data[,"d"], var = out$barebones$data[,"var_e_raw"], p = data$pi)
           out$barebones$data$vi <- convert_vard_to_varr(d = out$barebones$data$yi, var = out$barebones$data$vi, p = data$pi)
           out$barebones$data$yi <- convert_es.q_d_to_r(d = out$barebones$data$yi, p = data$pi)
-          out$barebones$meta <- .convert_ma(ma_table = out$barebones$meta, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+          out$barebones$meta <- .convert_ma(ma_table = out$barebones$meta, p_vec = wt_mean(x = data$pi, wt = data$n_adj), conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
      }else{
           out <- .ma_r_bb(data = data, ma_arg_list = ma_arg_list)
           var_e_xy_vec <- out$barebones$data[,"var_e_raw"]
@@ -905,8 +902,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      }else{
           n_adj[is.na(n_adj)] <- n[is.na(n_adj)]
      }
-
-     N <- sum(n)
 
      wt_source <- check_wt_type(wt_type = wt_type)
      if(type == "ts" | type == "all"){
@@ -1066,7 +1061,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           if(run_lean){
                escalc_ty <- NULL
           }else{
-               escalc_ty <- data.frame( yi = rtya_vec,
+               escalc_ty <- data.frame(yi = rtya_vec,
                                         vi = var_e_ty_vec, correction_type = correction_type,
                                         n_adj = adjust_n_r(r = rtya_vec, var_e = var_e_ty_vec),
                                         weight = wt_vec_ty,

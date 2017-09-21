@@ -19,7 +19,7 @@ screen_r <- function(r_vec, n_vec){
 
      if(!is.numeric(r_vec)) stop("Correlations must be numeric", call. = FALSE)
      if(any(is.infinite(r_vec[!is.na(r_vec)]))) stop("Correlations cannot be infinite", call. = FALSE)
-     if(any(abs(r_vec[!is.na(r_vec)]) > 1)) stop("Correlations cannot be exceed 1 in absolute value", call. = FALSE)
+     if(any(abs(r_vec[!is.na(r_vec)]) > 1)) stop("Correlations cannot exceed 1 in absolute value", call. = FALSE)
 
      if(!is.numeric(n_vec)) stop("Sample sizes must be numeric", call. = FALSE)
      if(any(is.infinite(n_vec[!is.na(n_vec)]))) stop("Sample sizes cannot be infinite", call. = FALSE)
@@ -48,7 +48,7 @@ filter_r <- function(r_vec, n_vec){
 
      if(!is.numeric(r_vec)) stop("Correlations must be numeric", call. = FALSE)
      if(any(is.infinite(r_vec))) stop("Correlations cannot be infinite", call. = FALSE)
-     if(any(abs(r_vec[!is.na(r_vec)]) > 1)) stop("Correlations cannot be exceed 1 in absolute value", call. = FALSE)
+     if(any(abs(r_vec[!is.na(r_vec)]) > 1)) stop("Correlations cannot exceed 1 in absolute value", call. = FALSE)
 
      if(!is.numeric(n_vec)) stop("Sample sizes must be numeric", call. = FALSE)
      if(any(is.infinite(n_vec))) stop("Sample sizes cannot be infinite", call. = FALSE)
@@ -444,12 +444,17 @@ interval_warning <- function(interval, interval_name = NULL, default){
 #' Check whether wt_type argument is valid and determine which package to use for weights
 #'
 #' @param wt_type wt_type argument passed to a meta-analysis function
+#' @param generic Logical scalar determining whether the effect size is generic (TRUE) or one for which the meta-analysis function estimates error variances (FALSE).
 #'
 #' @return Character object determining which package should be used to compute weights
 #'
 #' @keywords internal
-check_wt_type <- function(wt_type){
-     psychmeta_wt_options <- c("sample_size", "inv_var_mean", "inv_var_sample")
+check_wt_type <- function(wt_type, generic = FALSE){
+     if(generic){
+          psychmeta_wt_options <- c("sample_size", "inv_var")
+     }else{
+          psychmeta_wt_options <- c("sample_size", "inv_var_mean", "inv_var_sample")
+     }
      metafor_wt_options <- c("DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM")
 
      psychmeta_wt <- wt_type %in% psychmeta_wt_options

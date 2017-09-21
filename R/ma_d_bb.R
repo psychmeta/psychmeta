@@ -83,7 +83,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           if(deparse(substitute(sample_id)) != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
 
-          if(deparse(substitute(moderators)) != "NULL")
+          if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = data)
      }
 
@@ -247,8 +247,8 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      sd_res[is.na(sd_res)] <- 0
 
      ## Compute cumulative sample size and cumulative adjusted sample size
-     N <- sum(n_vec)
-     k <- length(n_vec)
+     N <- sum(n_vec[!is.na(wt_vec) & !is.na(d)])
+     k <- sum(!is.na(wt_vec) & !is.na(d))
 
      ## Compute uncertainty intervals
      if(k == 1){

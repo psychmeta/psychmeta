@@ -1,4 +1,20 @@
-Changes in Version 1.0-0 (2017-08)
+Changes in Version 0.1.1 (2017-09-21)
+=====================================
+
+o We have added a suite of simulation function for d values (see the “simulate_d_sample” and “simulate_d_database” functions).
+
+o Methods for meta-analyzing d values have been updated to better account for subgroup proportions when converting between the r and d metrics. The escalc objects that accompany a meta-analysis of d values now include more detailed information about incumbent and applicant subgroup proportions and the default for the “pa” argument (i.e., applicant proportions) is now NULL rather than .5 to prevent unintended corrections for range restriction.
+
+o A new “ma_generic” function has been added that allow users to do a psychmeta-style meta-analysis for any effect size for which the user has error-variance estimates. This function is supported by psychmeta’s sensitivity() and heterogeneity() functions.
+
+o Taylor series methods for estimating the variance of converted artifact values (e.g., a rxxi distribution converted to a rxxa distribution) have been expanded to account for the correlation between artifact distributions when such information is available. Correlations among  artifacts’ sampling distributions can also be passed to the var_error_r_bvirr() function when it is called outside of a meta-analysis routine. 
+
+o The implementation of corrections of bivariate range restriction in individual-correction meta-analyses have been updated. Corrections for bivariate direct range restriction now use conventional compound attenuation factors, while the attenuation factors for bivariate indirect range restriction are now computed using mean effect sizes and artifacts to estimate sampling variances.
+
+o Assorted bugs have been fixed (e.g., an error that occurred when running multi-construct meta-analyses without specifying moderators; filters to retain valid correlations did not screen construct names, sample ids, or measure names; subgroup proportions were not being retained when d values were meta-analyzed as correlations).
+
+
+Changes in Version 0.1.0 (2017-08-15)
 =====================================
 
 o psychmeta has officially launched for public beta!

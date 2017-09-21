@@ -70,7 +70,13 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 .plot_forest <-function(ma_mat, ma_vec = NULL, analysis = "leave1out"){
      label <- ma_mat[,1]
 
-     es_type <- ifelse("mean_r" %in% colnames(ma_mat), "r", "d")
+     es_type <- ifelse("mean_r" %in% colnames(ma_mat), "r",
+                       ifelse("mean_d" %in% colnames(ma_mat), "d", "es"))
+
+     if(es_type == "es"){
+          mean.value <- ma_mat$mean_es
+          sd.value <- ma_mat$sd_res
+     }
 
      if(es_type == "r"){
           if("mean_rho" %in% colnames(ma_mat)){
@@ -101,6 +107,10 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      }
 
      if(!is.null(ma_vec)){
+          if(es_type == "es"){
+               grand_mean <- ma_vec$mean_es
+               grand_sd <- ma_vec$sd_res
+          }
           if(es_type == "r"){
                if("mean_rho" %in% colnames(ma_vec)){
                     grand_mean <- ma_vec$mean_rho
@@ -109,7 +119,8 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
                     grand_mean <- ma_vec$mean_r
                     grand_sd <- ma_vec$sd_res
                }
-          }else{
+          }
+          if(es_type == "d"){
                if("mean_delta" %in% colnames(ma_vec)){
                     grand_mean <- ma_vec$mean_delta
                     grand_sd <- ma_vec$sd_delta
@@ -151,6 +162,11 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           plot.df[,1] <- factor(plot.df[,1], levels = plot.df[,1])
      }
 
+
+     if(es_type == "es"){
+          mean_ylab <- bquote("Mean Effect Size"~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+          sd_ylab <- "Residual SD of Effect Sizes"
+     }
 
      if(es_type == "r"){
           if("mean_rho" %in% colnames(ma_mat)){

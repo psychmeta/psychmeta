@@ -185,6 +185,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      es_type <- NULL
      class_ma <- class(ma_obj)
 
+     if(any(class_ma == "ma_generic")) es_type <- "es"
      if(any(class_ma == "ma_r_as_r" | class_ma == "ma_d_as_r")) es_type <- "r"
      if(any(class_ma == "ma_d_as_d" | class_ma == "ma_r_as_d")) es_type <- "d"
      if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)

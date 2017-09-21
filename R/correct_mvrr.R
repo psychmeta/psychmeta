@@ -60,7 +60,7 @@ correct_matrix_mvrr <- function(Sigma_i, Sigma_xx_a, x_col, y_col = NULL, standa
      }else{
           if(any(duplicated(c(y_col, x_col))))
                stop("Collectively, the values in x_col and y_col may not be duplicated", call. = FALSE)
-          if(length(y_col) + length(y_col) >ncol(Sigma_i))
+          if(length(x_col) + length(y_col) >ncol(Sigma_i))
                stop("The sum of elements x_col and y_col cannot exceed the number of variables in Sigma_i", call. = FALSE)
      }
 
@@ -107,7 +107,6 @@ correct_matrix_mvrr <- function(Sigma_i, Sigma_xx_a, x_col, y_col = NULL, standa
 #' @param means_x_a The vector of unrestricted (range-restricted) means of selection variables
 #' @param x_col The row/column indices of the variables in \code{Sigma} that correspond, in order, to the variables in means_x_a
 #' @param y_col Optional: The variables in \code{Sigma} not listed in \code{x_col} that are to be manipuated by the multivariate range-restriction formula.
-#' @param as_correction Should the function correct the means for the effects of selection (\code{TRUE}) or induce selection (\code{FALSE})?
 #' @param var_names Optional vector of names for the variables in \code{Sigma}, in order of appearance in the matrix.
 #'
 #' @return A vector of means that has been manipuated by the multivariate range-restriction formula.
@@ -126,8 +125,8 @@ correct_matrix_mvrr <- function(Sigma_i, Sigma_xx_a, x_col, y_col = NULL, standa
 #' Sigma <- Sigma + t(Sigma)
 #' diag(Sigma) <- 1
 #' correct_means_mvrr(Sigma = Sigma, means_i = c(.3, .3, .1, .1),
-#' means_x_a = c(-.1, -.1), x_col = 1:2, as_correction = FALSE)
-correct_means_mvrr <- function(Sigma, means_i = rep(0, ncol(Sigma)), means_x_a, x_col, y_col = NULL, as_correction = TRUE, var_names = NULL){
+#' means_x_a = c(-.1, -.1), x_col = 1:2)
+correct_means_mvrr <- function(Sigma, means_i = rep(0, ncol(Sigma)), means_x_a, x_col, y_col = NULL, var_names = NULL){
      Sigma <- as.matrix(Sigma)
 
      if (!is.numeric(Sigma))
@@ -153,7 +152,7 @@ correct_means_mvrr <- function(Sigma, means_i = rep(0, ncol(Sigma)), means_x_a, 
      }else{
           if(any(duplicated(c(y_col, x_col))))
                stop("Collectively, the values in x_col and y_col may not be duplicated", call. = FALSE)
-          if(length(y_col) + length(y_col) >ncol(Sigma))
+          if(length(x_col) + length(y_col) > ncol(Sigma))
                stop("The sum of elements x_col and y_col cannot exceed the number of variables in Sigma", call. = FALSE)
      }
 
@@ -161,14 +160,9 @@ correct_means_mvrr <- function(Sigma, means_i = rep(0, ncol(Sigma)), means_x_a, 
 
      s_xx_i <- as.matrix(Sigma[x_col, x_col])
      s_xy_i <- Sigma[x_col, y_col]
-
      wt_mat <- solve(s_xx_i) %*% s_xy_i
+     means_out <- c(means_x_a, means_i[y_col] + (means_x_a - means_i[-y_col]) %*% wt_mat)
 
-     if(as_correction){
-          means_out <- c(means_x_a, means_i[y_col] - means_x_a %*% wt_mat)
-     }else{
-          means_out <- c(means_x_a, means_i[y_col] + means_x_a %*% wt_mat)
-     }
 
      if(is.null(var_names)){
           if(!is.null(colnames(Sigma))){

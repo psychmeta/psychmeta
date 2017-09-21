@@ -173,9 +173,6 @@
                indirect_rr_y <- data_y$indirect_rr_y
           }
 
-          n_comp <- wt_mean(x = es_data$n[i], wt = es_data$n_adj[i])
-          n_adj_comp <- wt_mean(x = es_data$n_adj[i], wt = es_data$n_adj[i])
-
           if(collapse_method == "average") {
                if(es_metric=="r"){
                     es_comp <- wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i])
@@ -297,6 +294,19 @@
                rxx_restricted_comp <- ryy_restricted_comp <- ux_observed_comp <- uy_observed_comp <-
                correct_rr_x <- correct_rr_y <- indirect_rr_x <- indirect_rr_y <- NULL
 
+          n_comp <- wt_mean(x = es_data$n[i], wt = es_data$n_adj[i])
+          n_adj_comp <- wt_mean(x = es_data$n_adj[i], wt = es_data$n_adj[i])
+
+          if(all(c("d", "n1", "n2", "pi", "pa") %in% colnames(es_data))){
+               n1_comp <- wt_mean(x = es_data$n1[i], wt = es_data$n_adj[i])
+               n2_comp <- wt_mean(x = es_data$n2[i], wt = es_data$n_adj[i])
+               pi_comp <- wt_mean(x = es_data$pi[i], wt = es_data$n_adj[i])
+               pa_comp <- wt_mean(x = es_data$pa[i], wt = es_data$n_adj[i])
+               d_comp <- convert_r_to_d(r = es_comp, p = pi_comp)
+          }else{
+               n1_comp <- n2_comp <- pi_comp <- pa_comp <- d_comp <- NULL
+          }
+
           out <- list(sample_id = sample_id[i][1],
                       es_comp = es_comp, n_comp = n_comp, n_adj_comp = n_adj_comp,
                       rxx_comp = rxx_comp, ryy_comp = ryy_comp,
@@ -310,7 +320,9 @@
                       correct_rr_y = correct_rr_y[i][1],
 
                       indirect_rr_x = indirect_rr_x[i][1],
-                      indirect_rr_y = indirect_rr_y[i][1])
+                      indirect_rr_y = indirect_rr_y[i][1],
+
+                      d_comp = d_comp, n1_comp = n1_comp, n2_comp = n2_comp, pi_comp = pi_comp, pa_comp = pa_comp)
 
           if(!is.null(correct_rr_x))
                if(length(correct_rr_x) > 1){
@@ -351,7 +363,12 @@
                           sample_id = unlist(lapply(out, function(x) x$sample_id)),
                           es = unlist(lapply(out, function(x) x$es_comp)),
                           n = unlist(lapply(out, function(x) x$n_comp)),
-                          n_adj = unlist(lapply(out, function(x) x$n_adj_comp)))
+                          n_adj = unlist(lapply(out, function(x) x$n_adj_comp)),
+                          d = unlist(lapply(out, function(x) x$d_comp)),
+                          n1 = unlist(lapply(out, function(x) x$n1_comp)),
+                          n2 = unlist(lapply(out, function(x) x$n2_comp)),
+                          pi = unlist(lapply(out, function(x) x$pi_comp)),
+                          pa = unlist(lapply(out, function(x) x$pa_comp)))
 
      data_x_list <- list(rxx = unlist(lapply(out, function(x) x$rxx_comp)),
                          ux = unlist(lapply(out, function(x) x$ux_comp)),

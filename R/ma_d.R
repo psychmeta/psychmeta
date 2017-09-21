@@ -18,7 +18,7 @@
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{/link{ma_d_ad}} for descriptions of the available methods.
-#' @param group_id Vector of construct names for construct initially designated as X.
+#' @param group_id Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).
 #' @param group_order Vector indicating the order in which group_ids should be arranged.
 #' @param construct_y Vector of construct names for construct initially designated as Y.
 #' @param measure_y Vector of names names for measures associated with constructs initially designated as "Y".
@@ -117,9 +117,9 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  wt_type = "inv_var_mean", error_type = "mean",
                  correct_bias = TRUE,
                  correct_rGg = FALSE, correct_ryy = TRUE,
-                 correct_rr_g = FALSE, correct_rr_y = TRUE,
+                 correct_rr_g = TRUE, correct_rr_y = TRUE,
                  indirect_rr_g = TRUE, indirect_rr_y = TRUE,
-                 rGg = NULL, pi = NULL, pa = .5,
+                 rGg = NULL, pi = NULL, pa = NULL,
                  ryy = NULL, ryy_restricted = TRUE,
                  uy = NULL, uy_observed = TRUE,
                  sign_rgz = 1, sign_ryz = 1,
@@ -195,7 +195,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
           if(deparse(substitute(sample_id)) != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], data = data)
 
-          if(deparse(substitute(moderators)) != "NULL")
+          if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], data = data)
 
           if(deparse(substitute(correct_rr_g)) != "NULL")
@@ -209,6 +209,12 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 
           if(deparse(substitute(indirect_rr_y)) != "NULL")
                indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y",  names(call_full))]], data = data)
+          
+          if(deparse(substitute(pi)) != "NULL")
+               pi <- match_variables(call = call_full[[match("pi",  names(call_full))]], data = data)
+          
+          if(deparse(substitute(pa)) != "NULL")
+               pa <- match_variables(call = call_full[[match("pa",  names(call_full))]], data = data)
      }
 
      if(!is.null(group_id)){
@@ -231,7 +237,6 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      }
 
      if(!is.null(pi)){
-          if(length(pi) == 1) pi <- rep(pi, length(d))
           if(length(pi) > 1 & length(pi) < length(d)){
                if(is.null(names(pi))){
                     pi <- pi[group_id]
@@ -239,12 +244,14 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                     stop("If pi has more than one element but fewer elements than d, its elements must be named so as to be matched with group_id values", call. = FALSE)
                }
           }
+          if(length(pi) == 1) pi <- rep(pi, length(d))
      }else{
           pi <- rep(NA, length(d))
      }
 
+     if(all(!correct_rr_g)) pa <- NULL
+
      if(!is.null(pa)){
-          if(length(pa) == 1) pa <- rep(pa, length(d))
           if(length(pa) > 1 & length(pa) < length(d)){
                if(is.null(names(pa))){
                     pa <- pa[group_id]
@@ -252,9 +259,16 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                     stop("If pa has more than one element but fewer elements than d, its elements must be named so as to be matched with group_id values", call. = FALSE)
                }
           }
+          if(length(pa) == 1) pa <- rep(pa, length(d))
      }else{
+          correct_rr_g <- FALSE
           pa <- rep(NA, length(d))
      }
+
+     if(any(correct_rr_g)) pa[!correct_rr_g] <- NA
+
+     if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
+     if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
 
      if(is.null(n2)) n2 <- rep(NA, length(n1))
      n <- n1
@@ -270,12 +284,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      rxyi <- convert_es.q_d_to_r(d = d, p = pi)
 
      ## The variance of a dichotomous variable is pq = p(1-p), so we will estimate u ratios accordingly
-     if(!is.null(pi) & !is.null(pa)){
-          ux <- sqrt((pi * (1 - pi)) / (pa * (1 - pa)))
-     }else{
-          if(is.null(pa)) pa <- rep(.5, length(d))
-          ux <- rep(NA, length(d))
-     }
+     ux <- sqrt((pi * (1 - pi)) / (pa * (1 - pa)))
+     pa[is.na(pa)] <- pi[is.na(pa)]
 
      ## Compute meta-analysis
      out <- ma_r(ma_method = ma_method, ad_type = ad_type, correction_method = correction_method,

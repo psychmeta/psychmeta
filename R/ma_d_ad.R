@@ -72,7 +72,7 @@
 #' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
 ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method = "auto", use_ic_ads = "tsa",
                     correct_rGg = FALSE, correct_ryy = TRUE,
-                    correct_rr_g = FALSE, correct_rr_y = TRUE,
+                    correct_rr_g = TRUE, correct_rr_y = TRUE,
                     indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                     residual_ads = TRUE, sign_rgz = 1, sign_ryz = 1, decimals = 2, ...){
 
@@ -144,11 +144,85 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                }
           }
 
-          .ma_r_ad(ma_r_obj = ma_obj_i, ad_obj_x = ad_obj_g_i, ad_obj_y = ad_obj_y_i, correction_method = correction_method, use_ic_ads = use_ic_ads,
-                   correct_rxx = correct_rGg, correct_ryy = correct_ryy,
-                   correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
-                   indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
-                   residual_ads = residual_ads, sign_rxz = sign_rgz, sign_ryz = sign_ryz, decimals = decimals, ...)
+          out <- .ma_r_ad(ma_r_obj = ma_obj_i, ad_obj_x = ad_obj_g_i, ad_obj_y = ad_obj_y_i, correction_method = correction_method, use_ic_ads = use_ic_ads,
+                          correct_rxx = correct_rGg, correct_ryy = correct_ryy,
+                          correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
+                          indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
+                          residual_ads = residual_ads, sign_rxz = sign_rgz, sign_ryz = sign_ryz, decimals = decimals, ...)
+
+          ad_method <- out$artifact_distribution$method_details["ad_method"]
+          rr_method <- out$artifact_distribution$method_details["range_restriction"]
+
+          if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)" |
+             rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)" |
+             rr_method == "Made no corrections for range restriction"){
+
+               if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)"){
+                    if(ad_method == "Interactive method"){
+                         uy <- ad_obj_y[["ux"]]
+                         uy <- wt_mean(x = uy[,"Value"], wt = uy[,"Weight"])
+                    }else{
+                         uy <- ad_obj_y["ux", "mean"]
+                    }
+                    rxyi <- out$barebones$meta_table$mean_r
+                    for(i in 1:length(out$barebones$escalc_list)){
+                         pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
+                         pqa <- pi * (1 - pi) * ((1 / uy^2 - 1) * rxyi[i]^2 + 1)
+                         pqa[pqa > .25] <- .25
+                         out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
+                    }
+               }
+
+               if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
+                    if(ad_method == "Interactive method"){
+                         up <- ad_obj_y[["ut"]]
+                         up <- wt_mean(x = up[,"Value"], wt = up[,"Weight"])
+
+                         qyi <- ad_obj_y[["qxi"]]
+                         qyi <- wt_mean(x = qyi[,"Value"], wt = qyi[,"Weight"])
+                    }else{
+                         up <- ad_obj_y["ut", "mean"]
+                         qyi <- ad_obj_y["qxi", "mean"]
+                    }
+                    rxpi <- out$barebones$meta_table$mean_r / qyi
+                    for(i in 1:length(out$barebones$escalc_list)){
+                         pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
+                         pqa <- pi * (1 - pi) * ((1 / up^2 - 1) * rxpi[i]^2 + 1)
+                         pqa[pqa > .25] <- .25
+                         out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
+                    }
+               }
+
+               if(rr_method == "Made no corrections for range restriction"){
+                    for(i in 1:length(out$barebones$escalc_list))
+                         out$barebones$escalc_list[[i]]$pa_ad <- out$barebones$escalc_list[[i]]$pi
+               }
+          }else{
+               if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
+                    if(ad_method == "Interactive method"){
+                         ug <- ad_obj_g[["ut"]]
+                         ug <- wt_mean(x = ug[,"Value"], wt = ug[,"Weight"])
+                    }else{
+                         ug <- ad_obj_g["ut", "mean"]
+                    }
+               }else{
+                    if(ad_method == "Interactive method"){
+                         ug <- ad_obj_g[["ux"]]
+                         ug <- wt_mean(x = ug[,"Value"], wt = ug[,"Weight"])
+                    }else{
+                         ug <- ad_obj_g["ux", "mean"]
+                    }
+               }
+
+               for(i in 1:length(out$barebones$escalc_list)){
+                    pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
+                    pqa <- 1 / ug^2 * pi * (1 - pi)
+                    pqa[pqa > .25] <- .25
+                    out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
+               }
+          }
+
+          out
      })
 
      if(any(class(ma_obj) == "ma_master")){

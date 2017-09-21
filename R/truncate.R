@@ -17,7 +17,7 @@
 #' truncate_mean(a = 1, b = Inf, mean = 0, sd = 1)
 #' truncate_mean(a = c(-1, 1), b = c(3, Inf), mean = 0, sd = 1)
 truncate_mean <- function(a = -Inf, b = Inf, mean = 0, sd = 1){
-     if(a >= b) stop("'a' must be less than 'b'")
+     if(any(a >= b)) stop("'a' must be less than 'b'")
      alpha <- (a - mean) / sd
      beta <- (b - mean) / sd
 
@@ -47,7 +47,7 @@ truncate_mean <- function(a = -Inf, b = Inf, mean = 0, sd = 1){
 #' truncate_var(a = 1, b = Inf, mean = 0, sd = 1)
 #' truncate_var(a = c(-1, 1), b = c(3, Inf), mean = 0, sd = 1)
 truncate_var <- function(a = -Inf, b = Inf, mean = 0, sd = 1){
-     if(a >= b) stop("'a' must be less than 'b'")
+     if(any(a >= b)) stop("'a' must be less than 'b'")
      alpha <- (a - mean) / sd
      beta <- (b - mean) / sd
 
@@ -83,7 +83,7 @@ truncate_var <- function(a = -Inf, b = Inf, mean = 0, sd = 1){
 #' truncate_dist(a = 1, b = Inf, mean = 0, sd = 1)
 #' truncate_dist(a = c(-1, 1), b = c(3, Inf), mean = 0, sd = 1)
 truncate_dist <- function(a = -Inf, b = Inf, mean = 0, sd = 1){
-     if(a >= b) stop("'a' must be less than 'b'")
+     if(any(a >= b)) stop("'a' must be less than 'b'")
      alpha <- (a - mean) / sd
      beta <- (b - mean) / sd
 

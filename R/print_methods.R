@@ -50,6 +50,24 @@ round2char <- function(x, digits = 3, na_replace = ""){
 print.psychmeta <- function(x, ..., digits = 3){
      cat("\n")
 
+     if(any(class(x) == "ma_generic")){
+          cat("Results of meta-analyses of effect sizes \n")
+          cat("----------------------------------------\n")
+          cat("\n")
+
+          cat("Most recent function call performed on this meta-analysis object:\n")
+          cat("\n")
+          print(x$call_history[[length(x$call_history)]])
+
+          print.psychmeta.ma_generic(x, ..., digits = digits)
+
+          if(any(names(x) == "follow_up_analyses")){
+               cat("\n")
+               cat("Follow-up analyses are available in ma_obj$follow_up_analyses. Currently, these include:\n",
+                   paste(names(x$follow_up_analyses), collapse = ", "))
+          }
+     }
+
      if((any(class(x) == "ma_r_as_r") | any(class(x) == "ma_d_as_r")) & all(class(x) != "ma_order2") & all(class(x) != "ma_master")){
           if(any(class(x) == "ma_r_as_r")){
                cat("Results of meta-analyses of correlations \n")
@@ -196,6 +214,10 @@ print.psychmeta <- function(x, ..., digits = 3){
           }
      }
 
+     if(any(class(x) == "simulate_psych")){
+          print.psychmeta.simulate_psych(x, ..., digits = digits)
+     }
+
      if(any(class(x) == "simulate_r")){
           print.psychmeta.simulate_r(x, ..., digits = digits)
      }
@@ -280,6 +302,41 @@ print.psychmeta <- function(x, ..., digits = 3){
      }
 
 }
+
+
+
+#### Print first-order ma_generic from basic functions ####
+#' print method for bare-bones meta-analyses of correlations
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.ma_generic <- function(x, ..., digits = 3){
+     cat("\n")
+     cat("\n")
+
+     cat("Bare-Bones Results\n")
+     cat("-----------------------------\n")
+
+     cat("\n")
+     cat("Result of bare-bones meta-analysis of correlations:\n")
+     print.data.frame(x$barebones$meta_table[,!grepl(x = colnames(x$barebones$meta_table), pattern = "var_")], digits = digits)
+
+     if(!is.null(x$barebones$messages$warnings) | !is.null(x$barebones$messages$fyi))
+          cat("\n")
+     if(!is.null(x$barebones$messages$warnings))
+          cat("Warning messages were present in the computing environment: See ma_obj$barebones$messages$warnings \n")
+     if(!is.null(x$barebones$messages$fyi))
+          cat("FYI messages were generated within meta-analyses: See ma_obj$barebones$messages$fyi \n")
+}
+
+
+
 
 
 #### Print first-order ma_r from basic functions ####
@@ -945,12 +1002,58 @@ print.psychmeta.correct_d <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.simulate_r <- function(x, ..., digits = 3){
-     cat("Results of Simulated Study\n")
+print.psychmeta.simulate_psych <- function(x, ..., digits = 3){
+     cat("Data from a Simulated Study of", nrow(x$obs), "Cases\n")
      cat("--------------------------\n")
      cat("\n")
 
-     cat("Simulated ", x$n_a, " applicant cases and selected ", x$n_i, " incumbent cases for a selection ratio of ", round(x$sr, 3) * 100, "%.\n", sep = "")
+     cat("Overview of simulated data:\n")
+     cat("\n")
+     if(nrow(x$obs) > 5){
+          cat("Preview of observed scores (first 10 rows):\n")
+          print.data.frame(x$obs[1:5,], digits = digits)
+
+          cat("Preview of true scores (first 10 rows):\n")
+          print.data.frame(x$true[1:5,], digits = digits)
+
+          cat("Preview of error scores (first 10 rows):\n")
+          print.data.frame(x$error[1:5,], digits = digits)
+     }else{
+          cat("Observed scores:\n")
+          print.data.frame(x$obs, digits = digits)
+
+          cat("True scores:\n")
+          print.data.frame(x$true, digits = digits)
+
+          cat("Error scores:\n")
+          print.data.frame(x$error, digits = digits)
+     }
+
+}
+
+
+#' print method for simulated psychometric studies
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.simulate_r <- function(x, ..., digits = 3){
+     if(is.infinite(x$na)){
+          type <- "(Parameters)"
+     }else{
+          type <- "(Statistics)"
+     }
+
+     cat("Results of Simulated Study", type, "\n")
+     cat("--------------------------\n")
+     cat("\n")
+
+     cat("Simulated ", x$na, " applicant cases and selected ", x$ni, " incumbent cases for a selection ratio of ", round(x$sr, 3) * 100, "%.\n", sep = "")
      cat("\n")
 
      cat("Observed Applicant Correlations:\n")
@@ -1055,11 +1158,20 @@ print.psychmeta.describe_simdat_r <- function(x, ..., digits = 3){
 #'
 #' @keywords internal
 print.psychmeta.simulate_d <- function(x, ..., digits = 3){
-     cat("Results of Simulated Study\n")
+     if(is.null(x$data) & is.null(x$overall_results$observed$ni1) & is.null(x$overall_results$observed$ni2)){
+          type <- "(Parameters)"
+     }else{
+          type <- "(Statistics)"
+     }
+     cat("Results of Simulated Study with", length(x$group_results), "Groups", type, "\n")
      cat("--------------------------\n")
      cat("\n")
 
-     print.data.frame(x, digits = digits)
+     cat("Simulated ", x$proportions$na[nrow(x$proportions)], " applicant cases and selected ", x$proportions$ni[nrow(x$proportions)], " incumbent cases for an overall selection ratio of ", round(x$proportions$sr[nrow(x$proportions)], 3) * 100, "%.\n", sep = "")
+     cat("\n")
+
+
+     print.data.frame(x$overall_results$observed, digits = digits)
 }
 
 
@@ -1097,6 +1209,16 @@ print.psychmeta.simdat_d <- function(x, ..., digits = 3){
           print.data.frame(x[["statistics"]], digits = digits)
      }
      cat("\n")
+
+     cat("Overview of simulated parameters (i.e., results without sampling error):\n")
+     cat("\n")
+     if(nrow(x[["parameters"]]) > 10){
+          cat("Preview of parameter database (first 10 rows):\n")
+          print.data.frame(x[["parameters"]][1:10,], digits = digits)
+     }else{
+          cat("Parameter database:\n")
+          print.data.frame(x[["parameters"]], digits = digits)
+     }
 }
 
 

@@ -5,7 +5,7 @@
 \title{Multivariate select/correction for vectors of means}
 \usage{
 correct_means_mvrr(Sigma, means_i = rep(0, ncol(Sigma)), means_x_a, x_col,
-  y_col = NULL, as_correction = TRUE, var_names = NULL)
+  y_col = NULL, var_names = NULL)
 }
 \arguments{
 \item{Sigma}{The complete covariance matrix to be used to manipulate means: This matrix may be entirely unrestricted or entirely range restricted,
@@ -18,8 +18,6 @@ as the regression weights estimated from this matrix are expected to be invarian
 \item{x_col}{The row/column indices of the variables in \code{Sigma} that correspond, in order, to the variables in means_x_a}
 
 \item{y_col}{Optional: The variables in \code{Sigma} not listed in \code{x_col} that are to be manipuated by the multivariate range-restriction formula.}
-
-\item{as_correction}{Should the function correct the means for the effects of selection (\code{TRUE}) or induce selection (\code{FALSE})?}
 
 \item{var_names}{Optional vector of names for the variables in \code{Sigma}, in order of appearance in the matrix.}
 }
@@ -35,7 +33,7 @@ Sigma[lower.tri(Sigma)] <- c(.2, .3, .4, .3, .4, .4)
 Sigma <- Sigma + t(Sigma)
 diag(Sigma) <- 1
 correct_means_mvrr(Sigma = Sigma, means_i = c(.3, .3, .1, .1),
-means_x_a = c(-.1, -.1), x_col = 1:2, as_correction = FALSE)
+means_x_a = c(-.1, -.1), x_col = 1:2)
 }
 \references{
 Aitken, A. C. (1934). Note on selection from a multivariate normal population.

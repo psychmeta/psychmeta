@@ -493,22 +493,22 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
           rtyi$n_effective <- adjust_n_r(r = rtyi[,1], var_e = var_e * (rtyi[,1] / rxyi[,1])^2)
           rtpi$n_effective <- adjust_n_r(r = rtpi[,1], var_e = var_e * (rtpi[,1] / rxyi[,1])^2)
 
-          rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, n = n,
+          rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
                                                                                  qx = 1, qx_restricted = TRUE,
                                                                                  qy = 1, qy_restricted = TRUE,
                                                                                  sign_rxz = sign_rxz, sign_ryz = sign_ryz))
-          rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, n = n,
+          rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
                                                                                  qx = 1, qx_restricted = TRUE,
                                                                                  qy = ryyi^.5, qy_restricted = TRUE,
                                                                                  sign_rxz = sign_rxz, sign_ryz = sign_ryz))
-          rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, n = n,
+          rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
                                                                                  qx = rxxi^.5, qx_restricted = TRUE,
                                                                                  qy = 1, qy_restricted = TRUE,
                                                                                  sign_rxz = sign_rxz, sign_ryz = sign_ryz))
-          rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, n = n,
+          rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
                                                                                  qx = rxxi^.5, qx_restricted = TRUE,
                                                                                  qy = ryyi^.5, qy_restricted = TRUE,
@@ -621,22 +621,10 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
           rtyi$n_effective <- adjust_n_r(r = rtyi[,1], var_e = var_e * (rtyi[,1] / rxyi[,1])^2)
           rtpi$n_effective <- adjust_n_r(r = rtpi[,1], var_e = var_e * (rtpi[,1] / rxyi[,1])^2)
 
-          rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_error_r_bvdrr(rxyi = rxyi[,1], var_e = var_e, n = n,
-                                                                                 ux = ux, uy = uy,
-                                                                                 qx = 1, qx_restricted = TRUE,
-                                                                                 qy = 1, qy_restricted = TRUE))
-          rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_error_r_bvdrr(rxyi = rxyi[,1], var_e = var_e, n = n,
-                                                                                 ux = ux, uy = uy,
-                                                                                 qx = 1, qx_restricted = TRUE,
-                                                                                 qy = ryyi^.5, qy_restricted = TRUE))
-          rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_error_r_bvdrr(rxyi = rxyi[,1], var_e = var_e, n = n,
-                                                                                 ux = ux, uy = uy,
-                                                                                 qx = rxxi^.5, qx_restricted = TRUE,
-                                                                                 qy = 1, qy_restricted = TRUE))
-          rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_error_r_bvdrr(rxyi = rxyi[,1], var_e = var_e, n = n,
-                                                                                 ux = ux, uy = uy,
-                                                                                 qx = rxxi^.5, qx_restricted = TRUE,
-                                                                                 qy = ryyi^.5, qy_restricted = TRUE))
+          rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_e * (rxya[,1] / rxyi[,1])^2)
+          rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_e * (rxpa[,1] / rxyi[,1])^2)
+          rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_e * (rtya[,1] / rxyi[,1])^2)
+          rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_e * (rtpa[,1] / rxyi[,1])^2)
 
           out <- list(correlations = list(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                           rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa),

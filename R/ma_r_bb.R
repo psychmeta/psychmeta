@@ -95,7 +95,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL,
           if(deparse(substitute(sample_id)) != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
 
-          if(deparse(substitute(moderators)) != "NULL")
+          if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = data)
      }
 
@@ -255,7 +255,10 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL,
      sd_res <- var_res^.5
      sd_res[is.na(sd_res)] <- 0
 
-     k <- length(n)
+     ## Compute cumulative sample size and cumulative adjusted sample size
+     N <- sum(n[!is.na(wt_vec) & !is.na(r)])
+     k <- sum(!is.na(wt_vec) & !is.na(r))
+
      if(k == 1){
           ci <- confidence(mean = mean_r_xy, sd = sd_e, k = 1, conf_level = conf_level, conf_method = conf_method)
      }else{
@@ -264,8 +267,6 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL,
      cv <- credibility(mean = mean_r_xy, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      ci <- setNames(c(ci), colnames(ci))
      cv <- setNames(c(cv), colnames(cv))
-
-     N <- sum(n)
 
      list(barebones = list(meta = data.frame(t(c(k = k,
                                                  N = N,

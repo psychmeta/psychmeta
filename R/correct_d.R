@@ -190,6 +190,31 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
           ux <- NULL
      }
 
+     if(is.null(pa) & !is.null(pi)){
+          if(correction == "uvdrr" | correction == "uvirr"){
+               uy_temp <- uy
+               if(length(uy_observed) == 1) uy_observed <- rep(uy_observed, length(d))
+               if(length(ryy_restricted) == 1) ryy_restricted <- rep(ryy_restricted, length(d))
+               if(correction == "uvdrr"){
+                    uy_temp[!uy_observed] <- estimate_ux(ut = uy_temp[!uy_observed], rxx = ryy[!uy_observed], rxx_restricted = ryy_restricted[!uy_observed])
+                    rxpi <- rxyi
+               }
+               if(correction == "uvirr"){
+                    ryyi_temp <- ryy
+                    uy_temp[uy_observed] <- estimate_ut(ux = uy_temp[uy_observed], rxx = ryy[uy_observed], rxx_restricted = ryy_restricted[uy_observed])
+                    ryyi_temp[ryy_restricted] <- estimate_rxxa(rxxi = ryy[ryy_restricted], ux = uy[ryy_restricted], ux_observed = uy_observed[ryy_restricted], indirect_rr = TRUE)
+                    rxpi <- rxyi / ryyi_temp^.5
+               }
+               pqa <- pi * (1 - pi) * ((1 / uy_temp^2 - 1) * rxpi^2 + 1)
+               pqa[pqa > .25] <- .25
+               pa <- convert_pq_to_p(pq = pqa)
+          }else{
+               pa <- pi
+          }
+     }
+
+     if(is.null(pi)) pi <- .5
+     if(is.null(pa)) pa <- pi
 
      out <- correct_r(correction = correction,
                       rxyi = rxyi, ux = ux, uy = uy,
@@ -201,9 +226,9 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
 
      if(is.data.frame(out[["correlations"]])){
           if(!is.null(pi)){
-               out[["correlations"]] <- convert_es.q_r_to_d(r = out[["correlations"]], p = matrix(pi, nrow(out[["correlations"]]), ncol(out[["correlations"]])))
+               out[["correlations"]] <- convert_es.q_r_to_d(r = out[["correlations"]], p = matrix(pa, nrow(out[["correlations"]]), ncol(out[["correlations"]])))
           }else{
-               out[["correlations"]] <- convert_es.q_r_to_d(r = out[["correlations"]], p = .5)
+               out[["correlations"]] <- convert_es.q_r_to_d(r = out[["correlations"]], p = pa)
           }
           new_names <- colnames(out[["correlations"]])
           new_names <- gsub(x = new_names, pattern = "r", replacement = "d")
@@ -214,9 +239,9 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
           out_names <- names(out[["correlations"]])
           for(i in out_names){
                if(!is.null(pi)){
-                    out[["correlations"]][[i]][,1:3] <- convert_es.q_r_to_d(r = out[["correlations"]][[i]][,1:3], p = matrix(pi, nrow(out[["correlations"]][[i]]), 3))
+                    out[["correlations"]][[i]][,1:3] <- convert_es.q_r_to_d(r = out[["correlations"]][[i]][,1:3], p = matrix(pa, nrow(out[["correlations"]][[i]]), 3))
                }else{
-                    out[["correlations"]][[i]][,1:3] <- convert_es.q_r_to_d(r = out[["correlations"]][[i]][,1:3], p = .5)
+                    out[["correlations"]][[i]][,1:3] <- convert_es.q_r_to_d(r = out[["correlations"]][[i]][,1:3], p = pa)
                }
           }
           new_names <- gsub(x = out_names, pattern = "r", replacement = "d")
