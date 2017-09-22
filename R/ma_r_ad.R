@@ -166,7 +166,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL, correction_method 
                }
           }
 
-          .ma_r_ad(ma_r_obj = ma_obj_i, ad_obj_x = ad_obj_x_i, ad_obj_y = ad_obj_y, correction_method = correction_method, use_ic_ads = use_ic_ads,
+          .ma_r_ad(ma_r_obj = ma_obj_i, ad_obj_x = ad_obj_x_i, ad_obj_y = ad_obj_y_i, correction_method = correction_method, use_ic_ads = use_ic_ads,
                    correct_rxx = correct_rxx, correct_ryy = correct_ryy,
                    correct_rr_x = correct_rr_x, correct_rr_y = correct_rr_y,
                    indirect_rr_x = indirect_rr_x, indirect_rr_y = indirect_rr_y,

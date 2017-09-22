@@ -190,66 +190,66 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      if(!is.null(data)){
           data <- data.frame(data)
 
-          rxyi <- match_variables(call = call_full[[match("rxyi",  names(call_full))]], data = data)
+          rxyi <- match_variables(call = call_full[[match("rxyi", names(call_full))]], arg = rxyi, data = data)
 
-          n <- match_variables(call = call_full[[match("n",  names(call_full))]], data = data)
+          n <- match_variables(call = call_full[[match("n", names(call_full))]], arg = n, data = data)
 
           if(deparse(substitute(n_adj)) != "NULL")
-               n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], data = data)
+               n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, data = data)
 
           if(deparse(substitute(construct_x)) != "NULL")
-               construct_x <- match_variables(call = call_full[[match("construct_x",  names(call_full))]], data = data)
+               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, data = data)
 
           if(deparse(substitute(construct_y)) != "NULL")
-               construct_y <- match_variables(call = call_full[[match("construct_y",  names(call_full))]], data = data)
+               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
 
           if(deparse(substitute(measure_x)) != "NULL")
-               measure_x <- match_variables(call = call_full[[match("measure_x",  names(call_full))]], data = data)
+               measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, data = data)
 
           if(deparse(substitute(measure_y)) != "NULL")
-               measure_y <- match_variables(call = call_full[[match("measure_y",  names(call_full))]], data = data)
+               measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, data = data)
 
           if(deparse(substitute(rxx)) != "NULL")
-               rxx <- match_variables(call = call_full[[match("rxx",  names(call_full))]], data = data)
+               rxx <- match_variables(call = call_full[[match("rxx", names(call_full))]], arg = rxx, data = data)
 
           if(deparse(substitute(rxx_restricted)) != "NULL")
-               rxx_restricted <- match_variables(call = call_full[[match("rxx_restricted",  names(call_full))]], data = data)
+               rxx_restricted <- match_variables(call = call_full[[match("rxx_restricted", names(call_full))]], arg = rxx_restricted, data = data)
 
           if(deparse(substitute(ryy)) != "NULL")
-               ryy <- match_variables(call = call_full[[match("ryy",  names(call_full))]], data = data)
+               ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, data = data)
 
           if(deparse(substitute(ryy_restricted)) != "NULL")
-               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted",  names(call_full))]], data = data)
+               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted", names(call_full))]], arg = ryy_restricted, data = data)
 
           if(deparse(substitute(ux)) != "NULL")
-               ux <- match_variables(call = call_full[[match("ux",  names(call_full))]], data = data)
+               ux <- match_variables(call = call_full[[match("ux", names(call_full))]], arg = ux, data = data)
 
           if(deparse(substitute(ux_observed)) != "NULL")
-               ux_observed <- match_variables(call = call_full[[match("ux_observed",  names(call_full))]], data = data)
+               ux_observed <- match_variables(call = call_full[[match("ux_observed", names(call_full))]], arg = ux_observed, data = data)
 
           if(deparse(substitute(uy)) != "NULL")
-               uy <- match_variables(call = call_full[[match("uy",  names(call_full))]], data = data)
+               uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, data = data)
 
           if(deparse(substitute(uy_observed)) != "NULL")
-               uy_observed <- match_variables(call = call_full[[match("uy_observed",  names(call_full))]], data = data)
+               uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, data = data)
 
           if(deparse(substitute(sample_id)) != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], data = data)
+               sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], data = data)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = data)
 
           if(deparse(substitute(correct_rr_x)) != "NULL")
-               correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x",  names(call_full))]], data = data)
+               correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x", names(call_full))]], arg = correct_rr_x, data = data)
 
           if(deparse(substitute(correct_rr_y)) != "NULL")
-               correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y",  names(call_full))]], data = data)
+               correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y", names(call_full))]], arg = correct_rr_y, data = data)
 
           if(deparse(substitute(indirect_rr_x)) != "NULL")
-               indirect_rr_x <- match_variables(call = call_full[[match("indirect_rr_x",  names(call_full))]], data = data)
+               indirect_rr_x <- match_variables(call = call_full[[match("indirect_rr_x", names(call_full))]], arg = indirect_rr_x, data = data)
 
           if(deparse(substitute(indirect_rr_y)) != "NULL")
-               indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y",  names(call_full))]], data = data)
+               indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y", names(call_full))]], arg = indirect_rr_y, data = data)
      }
 
      if(!is.null(moderators)){

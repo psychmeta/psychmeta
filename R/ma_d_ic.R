@@ -121,48 +121,48 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      if(!is.null(data)){
           data <- data.frame(data)
 
-          d <- match_variables(call = call_full[[match("d",  names(call_full))]], data = data)
+          d <- match_variables(call = call_full[[match("d",  names(call_full))]], arg = d, data = data)
 
-          n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], data = data)
+          n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], arg = n1, data = data)
 
           if(deparse(substitute(n2)) != "NULL")
-               n2 <- match_variables(call = call_full[[match("n2",  names(call_full))]], data = data)
+               n2 <- match_variables(call = call_full[[match("n2",  names(call_full))]], arg = n2, data = data)
 
           if(deparse(substitute(n_adj)) != "NULL")
-               n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], data = data)
+               n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], arg = n_adj, data = data)
 
           if(deparse(substitute(rGg)) != "NULL")
-               rGg <- match_variables(call = call_full[[match("rGg",  names(call_full))]], data = data)
+               rGg <- match_variables(call = call_full[[match("rGg",  names(call_full))]], arg = rGg, data = data)
 
           if(deparse(substitute(ryy)) != "NULL")
-               ryy <- match_variables(call = call_full[[match("ryy",  names(call_full))]], data = data)
+               ryy <- match_variables(call = call_full[[match("ryy",  names(call_full))]], arg = ryy, data = data)
 
           if(deparse(substitute(ryy_restricted)) != "NULL")
-               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted",  names(call_full))]], data = data)
+               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted",  names(call_full))]], arg = ryy_restricted, data = data)
 
           if(deparse(substitute(uy)) != "NULL")
-               uy <- match_variables(call = call_full[[match("uy",  names(call_full))]], data = data)
+               uy <- match_variables(call = call_full[[match("uy",  names(call_full))]], arg = uy, data = data)
 
           if(deparse(substitute(uy_observed)) != "NULL")
-               uy_observed <- match_variables(call = call_full[[match("uy_observed",  names(call_full))]], data = data)
+               uy_observed <- match_variables(call = call_full[[match("uy_observed",  names(call_full))]], arg = uy_observed, data = data)
 
           if(deparse(substitute(sample_id)) != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], data = data)
+               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], data = data)
+               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = data)
 
           if(deparse(substitute(correct_rr_g)) != "NULL")
-               correct_rr_g <- match_variables(call = call_full[[match("correct_rr_g",  names(call_full))]], data = data)
+               correct_rr_g <- match_variables(call = call_full[[match("correct_rr_g",  names(call_full))]], arg = correct_rr_g, data = data)
 
           if(deparse(substitute(correct_rr_y)) != "NULL")
-               correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y",  names(call_full))]], data = data)
+               correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y",  names(call_full))]], arg = correct_rr_y, data = data)
 
           if(deparse(substitute(indirect_rr_g)) != "NULL")
-               indirect_rr_g <- match_variables(call = call_full[[match("indirect_rr_g",  names(call_full))]], data = data)
+               indirect_rr_g <- match_variables(call = call_full[[match("indirect_rr_g",  names(call_full))]], arg = indirect_rr_g, data = data)
 
           if(deparse(substitute(indirect_rr_y)) != "NULL")
-               indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y",  names(call_full))]], data = data)
+               indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y",  names(call_full))]], arg = indirect_rr_y, data = data)
      }
 
      ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
