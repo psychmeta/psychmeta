@@ -43,7 +43,7 @@ Meta-analysis results can be viewed by passing an ma object to \code{print}(). B
 
 \section{Simulating psychometric meta-analyses}{
 
-\pkg{psychmeta} can be used to run Monte Carlo simulations for different meta-analytic models. \code{\link{simulate_r_sample}} simulates samples of correlations with measurement error and/or range restriction artifacts. \code{\link{simulate_r_database}} can be used to simulate full meta-analytic databases of sample correlations and artifacts. Example datasets fitting different meta-analytic models simulated using these functions are available (\code{\link{data_r_meas}}, \code{\link{data_r_uvdrr}}, \code{\link{data_r_uvirr}}, \code{\link{data_r_bvdrr}}, \code{\link{data_r_bvirr}}, \code{\link{data_r_meas_multi}}, and \code{\link{data_d_meas_multi}}). Additional simulate functions are also available and more are slated for development.
+\pkg{psychmeta} can be used to run Monte Carlo simulations for different meta-analytic models. \code{\link{simulate_r_sample}} and \code{\link{simulate_d_sample}} simulate samples of correlations and \emph{d} values, respectively, with measurement error and/or range restriction artifacts. \code{\link{simulate_r_database}} and \code{\link{simulate_d_database}} can be used to simulate full meta-analytic databases of sample correlations and \emph{d} values, respecitively, with artifacts. Example datasets fitting different meta-analytic models simulated using these functions are available (\code{\link{data_r_meas}}, \code{\link{data_r_uvdrr}}, \code{\link{data_r_uvirr}}, \code{\link{data_r_bvdrr}}, \code{\link{data_r_bvirr}}, \code{\link{data_r_meas_multi}}, and \code{\link{data_d_meas_multi}}). Additional simulation functions are also available.
 }
 
 \author{

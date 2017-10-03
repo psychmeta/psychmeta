@@ -19,7 +19,7 @@ Imports: MASS, boot, tmvtnorm, tibble, reshape2, ggplot2, dplyr, stats,
         metafor, nor1mix
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-09-22 16:46:31 UTC; dahlk068
+Packaged: 2017-10-03 04:37:15 UTC; dahlk068
 Author: Jeffrey A. Dahlke [aut, cre],
   Brenton M. Wiernik [aut],
   Michael T. Brannick [ctb],

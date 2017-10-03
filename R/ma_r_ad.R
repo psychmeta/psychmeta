@@ -142,6 +142,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL, correction_method 
      residual_ads <- scalar_arg_warning(arg = residual_ads, arg_name = "residual_ads")
      decimals <- scalar_arg_warning(arg = decimals, arg_name = "decimals")
 
+     ma_obj_i <- ma_list[[1]]
      ma_list <- lapply(ma_list, function(ma_obj_i){
           if(is.null(ad_obj_x) | is.null(ad_obj_y)){
                if(any(class(ma_obj_i) == "ma_ic")){
@@ -295,6 +296,9 @@ gather_ma_ad <- function(x){
      use_ic_ads <- scalar_arg_warning(arg = use_ic_ads, arg_name = "use_ic_ads")
      residual_ads <- scalar_arg_warning(arg = residual_ads, arg_name = "residual_ads")
      decimals <- scalar_arg_warning(arg = decimals, arg_name = "decimals")
+
+     force_method <- grepl(x = correction_method, pattern = "_force")
+     correction_method <- gsub(x = correction_method, pattern = "_force", replacement = "")
 
      datadump <- !is.null(list(...)$.psychmeta_internal_request_datadump)
 
@@ -527,88 +531,90 @@ gather_ma_ad <- function(x){
                if(!any(correction_method %in% valid_options))
                     stop("'correction_method' must be one of the following methods: ", paste(valid_options, collapse = ", "), call. = FALSE)
 
-               invalid_meas <- c("qxi or qxa", "qyi or qya")[c(correct_rxx & !valid_qxi & !valid_qxa, correct_ryy & !valid_qyi & !valid_qya)]
+               if(!force_method){
+                    invalid_meas <- c("qxi or qxa", "qyi or qya")[c(correct_rxx & !valid_qxi & !valid_qxa, correct_ryy & !valid_qyi & !valid_qya)]
 
-               invalid_uvdrr_x <- c("qxa", "qyi", "ux")[c(correct_rxx & !valid_qxa, correct_ryy & !valid_qyi, !valid_ux)]
-               invalid_uvdrr_y <- c("qxi", "qya", "uy")[c(correct_rxx & !valid_qxi, correct_ryy & !valid_qya, !valid_uy)]
+                    invalid_uvdrr_x <- c("qxa", "qyi", "ux")[c(correct_rxx & !valid_qxa, correct_ryy & !valid_qyi, !valid_ux)]
+                    invalid_uvdrr_y <- c("qxi", "qya", "uy")[c(correct_rxx & !valid_qxi, correct_ryy & !valid_qya, !valid_uy)]
 
-               invalid_uvirr_x <- c("qxi", "qyi", "ut")[c(correct_rxx & !valid_qxi, correct_ryy & !valid_qyi, !valid_ut)]
-               invalid_uvirr_y <- c("qxi", "qyi", "up")[c(correct_rxx & !valid_qxi, correct_ryy & !valid_qyi, !valid_up)]
+                    invalid_uvirr_x <- c("qxi", "qyi", "ut")[c(correct_rxx & !valid_qxi, correct_ryy & !valid_qyi, !valid_ut)]
+                    invalid_uvirr_y <- c("qxi", "qyi", "up")[c(correct_rxx & !valid_qxi, correct_ryy & !valid_qyi, !valid_up)]
 
-               invalid_bvdrr <- invalid_bvirr <- c("qxa", "qya", "ux", "uy")[c(correct_rxx & !valid_qxa, correct_ryy & !valid_qyi, !valid_ux, !valid_uy)]
+                    invalid_bvdrr <- invalid_bvirr <- c("qxa", "qya", "ux", "uy")[c(correct_rxx & !valid_qxa, correct_ryy & !valid_qyi, !valid_ux, !valid_uy)]
 
-               if(correction_method == "meas"){
-                    if(!correct_rxx & !correct_ryy)
-                         stop("To use correction_method 'meas', correct_rxx and/or correct_ryy must be TRUE", call. = FALSE)
+                    if(correction_method == "meas"){
+                         if(!correct_rxx & !correct_ryy)
+                              stop("To use correction_method 'meas', correct_rxx and/or correct_ryy must be TRUE", call. = FALSE)
 
-                    if(length(invalid_meas) > 0)
-                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_meas, collapse = ", "))
-               }
-
-               if(any(correction_method == c("uvdrr", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj"))){
-                    if(correct_rr_x & correct_rr_y)
-                         stop("To use correction_method '", correction_method, "', either correct_rr_x OR correct_rr_y must be TRUE, but not both:
-                              To correct for bivariate direct range restriction, use correction_method 'bvdrr' instead", call. = FALSE)
-
-                    if(correct_rr_x){
-                         if(indirect_rr_x)
-                              stop("To apply correction_method '", correction_method, "' to variable X, indirect_rr_x must be FALSE", call. = FALSE)
-
-                         if(length(invalid_uvdrr_x) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_x, collapse = ", "))
+                         if(length(invalid_meas) > 0)
+                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_meas, collapse = ", "))
                     }
 
-                    if(correct_rr_y){
-                         if(indirect_rr_y)
-                              stop("To apply correction_method '", correction_method, "' to variable Y, indirect_rr_y must be FALSE", call. = FALSE)
+                    if(any(correction_method == c("uvdrr", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj"))){
+                         if(correct_rr_x & correct_rr_y)
+                              stop("To use correction_method '", correction_method, "', either correct_rr_x OR correct_rr_y must be TRUE, but not both:
+                                   To correct for bivariate direct range restriction, use correction_method 'bvdrr' instead", call. = FALSE)
 
-                         if(length(invalid_uvdrr_y) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_y, collapse = ", "))
+                         if(correct_rr_x){
+                              if(indirect_rr_x)
+                                   stop("To apply correction_method '", correction_method, "' to variable X, indirect_rr_x must be FALSE", call. = FALSE)
+
+                              if(length(invalid_uvdrr_x) > 0)
+                                   stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_x, collapse = ", "))
+                         }
+
+                         if(correct_rr_y){
+                              if(indirect_rr_y)
+                                   stop("To apply correction_method '", correction_method, "' to variable Y, indirect_rr_y must be FALSE", call. = FALSE)
+
+                              if(length(invalid_uvdrr_y) > 0)
+                                   stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_y, collapse = ", "))
+                         }
                     }
-               }
 
-               if(correction_method == "uvirr"){
-                    if(correct_rr_x & correct_rr_y)
-                         stop("To use correction_method '", correction_method, "', either correct_rr_x OR correct_rr_y must be TRUE, but not both:
-                              To correct for bivariate indirect range restriction, use correction_method 'bvirr' instead", call. = FALSE)
+                    if(correction_method == "uvirr"){
+                         if(correct_rr_x & correct_rr_y)
+                              stop("To use correction_method '", correction_method, "', either correct_rr_x OR correct_rr_y must be TRUE, but not both:
+                                   To correct for bivariate indirect range restriction, use correction_method 'bvirr' instead", call. = FALSE)
 
-                    if(correct_rr_x){
-                         if(!indirect_rr_x)
-                              stop("To apply correction_method '", correction_method, "' to variable X, indirect_rr_x must be TRUE", call. = FALSE)
+                         if(correct_rr_x){
+                              if(!indirect_rr_x)
+                                   stop("To apply correction_method '", correction_method, "' to variable X, indirect_rr_x must be TRUE", call. = FALSE)
 
-                         if(length(invalid_uvirr_x) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_x, collapse = ", "))
+                              if(length(invalid_uvirr_x) > 0)
+                                   stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_x, collapse = ", "))
+                         }
+
+                         if(correct_rr_y){
+                              if(!indirect_rr_y)
+                                   stop("To apply correction_method '", correction_method, "' to variable Y, indirect_rr_y must be TRUE", call. = FALSE)
+
+                              if(length(invalid_uvirr_y) > 0)
+                                   stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_y, collapse = ", "))
+                         }
                     }
 
-                    if(correct_rr_y){
-                         if(!indirect_rr_y)
-                              stop("To apply correction_method '", correction_method, "' to variable Y, indirect_rr_y must be TRUE", call. = FALSE)
+                    if(correction_method == "bvdrr"){
+                         if(!correct_rr_x | !correct_rr_y)
+                              stop("To use correction_method '", correction_method, "', both correct_rr_x AND correct_rr_y must be TRUE", call. = FALSE)
 
-                         if(length(invalid_uvirr_y) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_y, collapse = ", "))
+                         if(indirect_rr_x | indirect_rr_y)
+                              stop("To use correction_method '", correction_method, "', both indirect_rr_x AND indirect_rr_y must be FALSE", call. = FALSE)
+
+                         if(length(invalid_bvdrr) > 0)
+                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvdrr, collapse = ", "))
                     }
-               }
 
-               if(correction_method == "bvdrr"){
-                    if(!correct_rr_x | !correct_rr_y)
-                         stop("To use correction_method '", correction_method, "', both correct_rr_x AND correct_rr_y must be TRUE", call. = FALSE)
+                    if(correction_method == "bvirr"){
+                         if(!correct_rr_x | !correct_rr_y)
+                              stop("To use correction_method '", correction_method, "', both correct_rr_x AND correct_rr_y must be TRUE", call. = FALSE)
 
-                    if(indirect_rr_x | indirect_rr_y)
-                         stop("To use correction_method '", correction_method, "', both indirect_rr_x AND indirect_rr_y must be FALSE", call. = FALSE)
+                         if(!indirect_rr_x | !indirect_rr_y)
+                              stop("To use correction_method '", correction_method, "', both indirect_rr_x AND indirect_rr_y must be TRUE", call. = FALSE)
 
-                    if(length(invalid_bvdrr) > 0)
-                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvdrr, collapse = ", "))
-               }
-
-               if(correction_method == "bvirr"){
-                    if(!correct_rr_x | !correct_rr_y)
-                         stop("To use correction_method '", correction_method, "', both correct_rr_x AND correct_rr_y must be TRUE", call. = FALSE)
-
-                    if(!indirect_rr_x | !indirect_rr_y)
-                         stop("To use correction_method '", correction_method, "', both indirect_rr_x AND indirect_rr_y must be TRUE", call. = FALSE)
-
-                    if(length(invalid_bvirr) > 0)
-                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvirr, collapse = ", "))
+                         if(length(invalid_bvirr) > 0)
+                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvirr, collapse = ", "))
+                    }
                }
      }
 

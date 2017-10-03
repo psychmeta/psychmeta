@@ -824,9 +824,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      out$individual_correction$artifact_distributions <- list(ad_x_int = ad_x_int, ad_x_tsa = ad_x_tsa, ad_y_int = ad_y_int, ad_y_tsa = ad_y_tsa)
 
      neg_var_res <- sum(out$barebones$meta_table$var_res < 0)
-     neg_var_rtpa <- sum(out$barebones$meta_table$var_res < 0)
-     neg_var_rxpa <- sum(out$barebones$meta_table$var_res < 0)
-     neg_var_rtya <- sum(out$barebones$meta_table$var_res < 0)
+     neg_var_rtpa <- sum(out$individual_correction$true_score$meta_table$var_rho < 0)
+     neg_var_rxpa <- sum(out$individual_correction$validity_generalization_x$meta_table$var_rho < 0)
+     neg_var_rtya <- sum(out$individual_correction$validity_generalization_y$meta_table$var_rho < 0)
 
      out$barebones$messages <- list(warnings = NULL,
                                     fyi = record_fyis(neg_var_res = neg_var_res))
