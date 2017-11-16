@@ -47,7 +47,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                                       wt_type = "sample_size", error_type = "mean", correct_bias = FALSE,
                                       conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                                       moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
-
+     warn_obj1 <- record_warnings()
      call <- match.call()
 
      if(hs_override){
@@ -118,7 +118,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
      out <- append(list(call_history = list(call)), out)
 
-     out$barebones$messages <- list(warnings = record_warnings(),
+     out$barebones$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                     fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0)))
 
      class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")

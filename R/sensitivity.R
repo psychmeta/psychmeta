@@ -15,6 +15,8 @@
 #' @param boot_conf_level Width of confidence intervals to be constructed for all bootstrapped statistics.
 #' @param boot_ci_type Type of bootstrapped confidence interval (see "type" options for boot::boot.ci for possible arguments). Default is "bca".
 #' @param ... Additional arguments.
+#' 
+#' @importFrom tibble add_column
 #'
 #' @return An updated meta-analysis object with sensitivity analyses added.
 #' \itemize{
@@ -257,6 +259,12 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #' ## Analysis TBD
 #' @keywords internal
 .ma_leave1out <- function(data, ma_fun_boot, ma_arg_list){
+     if(is.null(data$sample_id)) {
+          if(!is.null(row.names(data))) {
+               data$sample_id <- paste("Study", row.names(data))
+          } else data$sample_id <- paste("Study", 1:nrow(data))
+     }
+     
      .leave1out <- function(data, fun, ma_arg_list){
           k <- nrow(data)
           rows <- 1:k
@@ -266,7 +274,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           }
           as.data.frame(out)
      }
-     cbind(study_left_out = data[,1], suppressWarnings(.leave1out(data = data, fun = ma_fun_boot, ma_arg_list = ma_arg_list)))
+     cbind(study_left_out = data$sample_id, suppressWarnings(.leave1out(data = data, fun = ma_fun_boot, ma_arg_list = ma_arg_list)))
 }
 
 
@@ -287,6 +295,12 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      if(sort_method == "n")       data <- data[order(data$n_adj, decreasing = TRUE),]
      if(sort_method == "inv_var") data <- data[order(1 / data$vi, decreasing = TRUE),]
      if(sort_method == "weight")  data <- data[order(data$weight, decreasing = TRUE),]
+
+     if(is.null(data$sample_id)) {
+          if(!is.null(row.names(data))) {
+               data$sample_id <- paste("Study", row.names(data))
+          } else data$sample_id <- paste("Study", 1:nrow(data))
+     }
 
      .cumulative <- function(data, fun, ma_arg_list){
           k <- nrow(data)

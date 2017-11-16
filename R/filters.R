@@ -490,3 +490,37 @@ manage_arglength <- function(x, y){
      x
 }
 
+
+
+#' Clean warnings and remove warnings present in the environment before running the function of interest
+#'
+#' @param warn_obj1 Initial warning object.
+#' @param warn_obj2 Second warning object.
+#'
+#' @return Cleaned warning table
+#'
+#' @keywords internal
+clean_warning <- function(warn_obj1, warn_obj2){
+     if(!is.null(warn_obj1) & !is.null(warn_obj2)){
+          colnames(warn_obj1)[2] <- "Frequency1"
+          colnames(warn_obj2)[2] <- "Frequency2"
+          warn_obj <- suppressMessages(suppressWarnings(full_join(warn_obj1, warn_obj2)))
+          warn_obj$Frequency1[is.na(warn_obj$Frequency1)] <- 0
+          warn_obj$Frequency2[is.na(warn_obj$Frequency2)] <- 0
+          warn_obj$difference <- warn_obj$Frequency2 - warn_obj$Frequency1
+          if(any(warn_obj$difference > 0)){
+               warn_obj <- filter(warn_obj, difference > 0)
+               warn_obj$Frequency1 <- warn_obj$difference <- NULL
+               colnames(warn_obj)[2] <- "Frequency"
+          }else{
+               warn_obj <- NULL
+          }
+     }else{
+          if(!is.null(warn_obj1)){
+               warn_obj <- NULL
+          }else{
+               warn_obj <- warn_obj2
+          }
+     }
+     warn_obj
+}

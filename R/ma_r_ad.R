@@ -280,6 +280,7 @@ gather_ma_ad <- function(x){
                      indirect_rr_x = TRUE, indirect_rr_y = TRUE,
                      residual_ads = TRUE, sign_rxz = 1, sign_ryz = 1, decimals = Inf, ...){
 
+     warn_obj1 <- record_warnings()
      inputs <- as.list(environment())
 
      fyi_messages <- NULL
@@ -686,7 +687,7 @@ gather_ma_ad <- function(x){
                neg_var_rxpa <- sum(ma_r_obj$artifact_distribution$validity_generalization_x$var_rho < 0)
                neg_var_rtya <- sum(ma_r_obj$artifact_distribution$validity_generalization_x$var_rho < 0)
 
-               ma_r_obj$artifact_distribution$messages <- list(warnings = record_warnings(),
+               ma_r_obj$artifact_distribution$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                                fyi = record_fyis(fyi_messages = fyi_messages,
                                                                                  neg_var_res = neg_var_res,
                                                                                  neg_var_rtpa = neg_var_rtpa,

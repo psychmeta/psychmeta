@@ -26,7 +26,7 @@
 ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
                         conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE, hs_override = FALSE, data = NULL){
-
+     warn_obj1 <- record_warnings()
      call <- match.call()
 
      if(hs_override){
@@ -137,7 +137,7 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
 
      out <- append(list(call = call, inputs = inputs), out)
 
-     out$messages <- list(warnings = record_warnings(),
+     out$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                           fyi = record_fyis(es_metric = "d_order2",
                                             neg_var_d_order2 = sum(out$barebones$meta_table$var_d_bar < 0),
                                             neg_var_delta_ic_order2 = sum(out$individual_correction$meta_table$var_delta_bar < 0),

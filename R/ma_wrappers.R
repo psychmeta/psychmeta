@@ -69,8 +69,20 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      temp_mat <- as.data.frame(temp_mat)
 
      ## Organize the matrix - first by moderator levels, then by constructs
-     if(!is.null(moderator_matrix)) temp_mat <- arrange_(temp_mat, .dots = colnames(moderator_matrix))
-     if(!is.null(construct_mat_initial)) temp_mat <- arrange_(temp_mat, .dots = colnames(construct_mat_initial))
+     if(!is.null(moderator_matrix)){
+          orig_names <- colnames(moderator_matrix)
+          temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
+          colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
+          temp_mat <- arrange_(temp_mat, .dots = temp_names)
+          colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
+     }
+     if(!is.null(construct_mat_initial)){
+          orig_names <- colnames(construct_mat_initial)
+          temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
+          colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
+          temp_mat <- arrange_(temp_mat, .dots = colnames(construct_mat_initial))
+          colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
+     }
 
      ## Pull out the re-organized data
      es_data <- temp_mat[,colnames(es_data)]
@@ -90,7 +102,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
 
      organize_moderators_null <- function(moderator_matrix, es_data){
           if(is.null(moderator_matrix)){
-               data.frame(Analysis_Type = "Overall", es_data)
+               cbind(Analysis_Type = "Overall", es_data)
           }else{
                moderator_vars <- colnames(moderator_matrix)
                if(is.null(moderator_vars)){
@@ -104,7 +116,8 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                moderator_matrix_new <- matrix("All Levels", nrow(moderator_matrix), ncol(moderator_matrix))
 
                colnames(moderator_matrix_new) <- moderator_vars
-               data.frame(Analysis_Type = "Overall", cbind(moderator_matrix_new, es_data))
+               moderator_matrix_new <- as_tibble(moderator_matrix_new)
+               cbind(Analysis_Type = "Overall", cbind(moderator_matrix_new, es_data))
           }
      }
 
@@ -127,9 +140,10 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                moderator_matrix_new <- rbind(moderator_matrix_new, moderator_matrix_i)
                es_data_new <- rbind(es_data_new, es_data)
           }
+          moderator_matrix_new <- as_tibble(moderator_matrix_new)
 
           colnames(moderator_matrix_new) <- moderator_vars
-          data.frame(Analysis_Type = "Simple Moderator", cbind(moderator_matrix_new, es_data_new))
+          cbind(Analysis_Type = "Simple Moderator", cbind(moderator_matrix_new, es_data_new))
      }
 
      organize_moderators_full_hierarchical <- function(moderator_matrix, es_data){
@@ -143,7 +157,9 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                colnames(moderator_matrix) <- moderator_vars
           }
           if(ncol(moderator_matrix) > 1){
-               data.frame(Analysis_Type = "Fully Hierarchical Moderator", cbind(moderator_matrix, es_data))
+               moderator_matrix_new <- as_tibble(moderator_matrix_new)
+
+               cbind(Analysis_Type = "Fully Hierarchical Moderator", cbind(moderator_matrix, es_data))
           }else{
                NULL
           }
@@ -180,8 +196,9 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                     moderator_matrix_new <- rbind(moderator_matrix_new, hierachical_list[[i]])
                     es_data_new <- rbind(es_data_new, es_data)
                }
+               moderator_matrix_new <- as_tibble(moderator_matrix_new)
 
-               data.frame(Analysis_Type = "Partial Hierarchical Moderator", cbind(moderator_matrix_new, es_data_new))
+               cbind(Analysis_Type = "Partial Hierarchical Moderator", cbind(moderator_matrix_new, es_data_new))
           }else{
                NULL
           }

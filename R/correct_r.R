@@ -19,9 +19,167 @@
 #' correct_r_bias(r = .3, n = 300)
 #' correct_r_bias(r = .3, n = 3000)
 correct_r_bias <- function(r, n){
-     r / ((2 * n - 2) / (2 * n - 1))
+     out <- r
+     out[!is.na(n)] <- r[!is.na(n)] / ((2 * n[!is.na(n)] - 2) / (2 * n[!is.na(n)] - 1))
+     out
 }
 
+
+#' Correct correlations for scale coarseness
+#'
+#' @param r Observed correlation.
+#' @param kx,ky Number of scale points used to measure the x and y variables. Set to NULL to treat as continuously measured.
+#' @param n Optional sample size.
+#' @param dist_x,dist_y Assumed latent distribution of the x and y variables.
+#' @param bin_value_x,bin_value_y Are the scale points used to measure the of the x and y variables assumed to represent bin medians, means, or index values?
+#' @param width_x,width_y For symmetrically distributed variables, how many standard deviations above/below the latent mean should be be used for the latent variable range to make the correction? (Note: Setting \code{width} > 3 produces erratic results.) The latent variable range can alternatively be set using \code{lbound} and \code{ubound}.
+#' @param lbound_x,lbound_y What lower bound of the range for the latent x and y variables should be used to make the correction? (Note: For normally distributed variables, setting \code{lbound} < -3 produces erratic results.)
+#' @param ubound_x,ubound_y What upper bound of the range for the latent x and y variables should be used to make the correction? (Note: For normally distributed variables, setting \code{ubound} > 3 produces erratic results.)
+#' @param index_values_x,index_values_y Optional. If \code{bin_value} = "index", the bin index values. If unspecified, values 1:k are used.
+#'
+#' @return Vector of correlations corrected for scale coarseness (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
+#' @export
+#'
+#' @importFrom methods getFunction
+#'
+#' @references
+#' Aguinis, H., Pierce, C. A., & Culpepper, S. A. (2009).
+#' Scale coarseness as a methodological artifact:
+#' Correcting correlation coefficients attenuated from using coarse scales.
+#' \emph{Organizational Research Methods, 12}(4), 623–652. \url{https://doi.org/10.1177/1094428108318065}
+#'
+#' Schmidt, F. L., & Hunter, J. E. (2015).
+#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
+#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 287-288.
+#'
+#' Peters, C. C., & Van Voorhis, W. R. (1940).
+#' \emph{Statistical procedures and their mathematical bases}.
+#' New York, NY: Mcgraw-Hill. \url{https://doi.org/10.1037/13596-000}. pp. 393–399.
+#'
+#' @examples
+#' correct_r_coarseness(r = .35, kx = 5, ky = 4, n = 100)
+#' correct_r_coarseness(r = .35, kx = 5, n = 100)
+#' correct_r_coarseness(r = .35, kx = 5, ky = 4, n = 100, dist_x="unif", dist_y="norm")
+correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "norm", dist_y = "norm",
+                                 bin_value_x = c("median","mean","index"), bin_value_y = c("median","mean","index"),
+                                 width_x = 3, width_y = 3, lbound_x = NULL, ubound_x = NULL,
+                                 lbound_y = NULL, ubound_y = NULL, index_values_x = NULL, index_values_y = NULL){
+     if(!is.null(kx)){
+          if(!is.numeric(kx)) stop("kx must be numeric")
+          if(any(kx < 2)) stop("kx must be > 1")
+     }
+     if(!is.null(ky)){
+          if(!is.numeric(ky)) stop("ky must be numeric")
+          if(any(ky < 2)) stop("ky must be > 1")
+     }
+     bin_value_x <- match.arg(bin_value_x)
+     bin_value_y <- match.arg(bin_value_y)
+
+     ## Function to estimate correction factors for scale coarseness
+     .attenuation_coarseness <- function(k, dist, bin_value, width = NULL, lbound = NULL, ubound = NULL, index_values = NULL){
+          if(dist == "unif"){
+               sqrt((k^2 - 1) / k^2)
+          }else{
+               if(is.null(lbound)|is.null(ubound)){
+                    lbound <- -width
+                    ubound <-  width
+               }
+               cuts <- seq(lbound, ubound, length.out = k + 1)
+
+               if(bin_value == "mean"){
+                    if(dist != "norm") stop("bin_value='mean' requires dist='norm'")
+                    bin_vec <- NULL
+                    for(i in 1:k) bin_vec[i] <- truncate_mean(a = cuts[i], b = cuts[i+1])
+               }else if(bin_value == "median"){
+                    bin_vec <- NULL
+                    for(i in 1:k) bin_vec[i] <- mean(c(cuts[i], cuts[i+1]))
+               }else if(bin_value == "index"){
+                    if(!is.null(index_values)){
+                         if(length(index_values) == k){
+                              bin_vec <- index_values
+                         }else{
+                              stop("When 'index_values' is not NULL, it must contain k elements", call. = FALSE)
+                         }
+                    }else{
+                         bin_vec <- 1:k
+                    }
+               }
+
+               .fun <- function(k = k, bin_vec = bin_vec, dist = dist, lbound = lbound, ubound = ubound, cuts = cuts){
+                    x <- seq(lbound + .01, ubound - .01, .01)
+                    bin_id <- apply(t(x), 2, function(xi) which(xi > cuts))
+                    bin_id <- unlist(lapply(bin_id, function(xi) xi[length(xi)]))
+
+                    wt_cor(x = x, y = bin_vec[bin_id], wt = methods::getFunction(paste0("d", dist))(x))
+               }
+
+               .fun(k = k, bin_vec = bin_vec, dist = dist, lbound = lbound, ubound = ubound, cuts = cuts)
+          }
+     }
+
+     # Alternate method, referencing tabled values from Peters & Van Voorhis:
+     # a_table = matrix(c(   NA,    NA,     NA,    NA,    NA,    NA,
+     #                    0.798, 0.816,  0.816, 0.866, 0.866, 0.866,
+     #                    0.859, 0.859,  0.859, 0.943, 0.943, 0.943,
+     #                    0.915, 0.916,  0.916, 0.968, 0.968, 0.968,
+     #                    0.943, 0.943,  0.943, 0.980, 0.980, 0.980,
+     #                    0.959, 0.960,  0.960, 0.986, 0.986, 0.986,
+     #                    0.970, 0.970,  0.970, 0.990, 0.990, 0.990,
+     #                    0.976, 0.977,  0.977, 0.992, 0.992, 0.992,
+     #                    0.981, 0.982,  0.982, 0.994, 0.994, 0.994,
+     #                    0.985, 0.985,  0.985, 0.995, 0.995, 0.995,
+     #                    0.987, 0.988,  0.988, 0.996, 0.996, 0.996,
+     #                    0.989, 0.990,  0.990, 0.997, 0.997, 0.997,
+     #                    0.991, 0.991,  0.991, 0.997, 0.997, 0.997,
+     #                    0.992, 0.992,  0.992, 0.997, 0.997, 0.997,
+     #                    0.993, 0.994,  0.994, 0.998, 0.998, 0.998),
+     #                  byrow=TRUE, ncol=3, dimnames=list("",c("normmean","normmedian","normindex","unifmean","unifmedian","unifindex")))
+     # if(kx > 15) ax <- 1 else ax <- a_table[kx,paste0(dist_x,bin_value_x)]
+     # if(ky > 15) ay <- 1 else ay <- a_table[ky,paste0(dist_y,bin_value_y)]
+
+     .x <- list(k = kx, dist = dist_x, bin_value = bin_value_x, width = width_x, lbound = lbound_x, ubound = ubound_x, index_values = index_values_x)
+     for(i in names(.x)) if(is.null(.x[[i]])) .x[[i]] <- NULL
+     .x <- data.frame(.x, stringsAsFactors = FALSE)
+     x <- list()
+     for(i in 1:nrow(.x)) x[[i]] <- as.list(.x[i,])
+
+     .y <- list(k = ky, dist = dist_y, bin_value = bin_value_y, width = width_y, lbound = lbound_y, ubound = ubound_y, index_values = index_values_y)
+     for(i in names(.y)) if(is.null(.y[[i]])) .y[[i]] <- NULL
+     .y <- as.data.frame(.y, stringsAsFactors = FALSE)
+     y <- list()
+     for(i in 1:nrow(.y)) y[[i]] <- as.list(.y[i,])
+     rm(.x, .y)
+
+     ax <- unlist(lapply(x, function(xi){
+          if(is.null(xi$k)){
+               a <- 1
+          }else{
+               a <- .attenuation_coarseness(k = xi$k, dist = xi$dist, bin_value = xi$bin_value,
+                                             width = xi$width, lbound = xi$lbound, ubound = xi$ubound, index_values = xi$index_values)
+          }
+          a
+     }))
+     ay <- unlist(lapply(y, function(xi){
+          if(is.null(xi$k)){
+               a <- 1
+          }else{
+               a <- .attenuation_coarseness(k = xi$k, dist = xi$dist, bin_value = xi$bin_value,
+                                             width = xi$width, lbound = xi$lbound, ubound = xi$ubound, index_values = xi$index_values)
+          }
+          a
+     }))
+
+     A <- ax * ay
+     if(!is.null(n)){
+          var_e <- var_error_r(r = r, n = n, correct_bias = FALSE)
+          r_c <- r / A
+          var_e_c = var_e / A^2
+          n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
+          data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj)
+     }else{
+          r / A
+     }
+}
 
 
 #' Correct correlations for artifical dichotomization of one or both variables
@@ -134,6 +292,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' correct_r_meas(rxy = .3, rxx = .8, ryy = .8, n = 100)
 correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
                            n = NULL, conf_level = .95, correct_bias = FALSE){
+     warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
 
@@ -157,7 +316,7 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
 
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
 
-     warning_out <- record_warnings()
+     warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
 
      if(!is.null(n)){
           rxy$n <- rxp$n <- rty$n <- rtp$n <- n
@@ -215,6 +374,7 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
 correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
                             ux_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE,
                             n = NULL, conf_level = .95, correct_bias = FALSE){
+     warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
@@ -257,7 +417,7 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
 
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
 
-     warning_out <- record_warnings()
+     warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
 
      if(!is.null(n)){
           a <- .refine_var_rr(rxyi = rxyi[,1], ux = ux, rxx = NULL, indirect_rr = FALSE, ux_observed = TRUE, rxx_restricted = TRUE)
@@ -322,6 +482,7 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
 correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
                             ux_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE,
                             n = NULL, conf_level = .95, correct_bias = FALSE){
+     warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
@@ -366,7 +527,7 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
 
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
 
-     warning_out <- record_warnings()
+     warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
 
      if(!is.null(n)){
           a <- .refine_var_rr(rxyi = rxyi[,1], ux = ut, rxx = NULL, indirect_rr = TRUE, ux_observed = FALSE, rxx_restricted = TRUE)
@@ -438,6 +599,7 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
                             rxx_restricted = TRUE, ryy_restricted = TRUE,
                             sign_rxz = 1, sign_ryz = 1,
                             n = NULL, conf_level = .95, correct_bias = FALSE){
+     warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
@@ -484,7 +646,7 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
 
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
 
-     warning_out <- record_warnings()
+     warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
 
      if(!is.null(n)){
           rxyi$n <- rxpi$n <- rtpi$n <- rtyi$n <- rxya$n <- rxpa$n <- rtya$n <- rtpa$n <- n
@@ -566,6 +728,7 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
                             ux_observed = TRUE, uy_observed = TRUE,
                             rxx_restricted = TRUE, ryy_restricted = TRUE,
                             n = NULL, conf_level = .95, correct_bias = FALSE){
+     warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
@@ -612,7 +775,7 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
 
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
 
-     warning_out <- record_warnings()
+     warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
 
      if(!is.null(n)){
           rxyi$n <- rxpi$n <- rtpi$n <- rtyi$n <- rxya$n <- rxpa$n <- rtya$n <- rtpa$n <- n

@@ -31,7 +31,7 @@ simulate_d_sample(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, sr_vec,
 
 \item{composite_names}{Optional vector of names for composite variables.}
 
-\item{diffs_as_obs}{Logical scalar that determines whether differences among elements in \code{mu_mat} should be parameters for scaled differences in observed scores (\code{TRUE}) or in true scores (\code{FALSE}; default).}
+\item{diffs_as_obs}{Logical scalar that determines whether standard deviation parameters represent standard deviations of observed scores (\code{TRUE}) or of true scores (\code{FALSE}; default).}
 }
 \value{
 A sample of simulated mean differences.

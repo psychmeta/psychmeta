@@ -8,6 +8,7 @@
 #' @param wt_vec The vector of weights used in the meta-analysis.
 #' @param N The total sample size of the meta-analysis.
 #' @param k The number of effect sizes included in the meta-analysis.
+#' @param es_vec The vector of effect sizes used in the meta-analysis.
 #' @param es_failsafe Failsafe value of the effect size for use in file-drawer analyses.
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
 #' @param es_type Name of effect-size type.
@@ -15,11 +16,12 @@
 #' @return A list of heterogeneity statistics.
 #' @export
 #' @importFrom stats pchisq
+#' @importFrom stats uniroot
 #'
 #' @keywords internal
 .heterogeneity <- function(mean_es, var_es, var_e,
                            var_art = NA, var_pre = NA,
-                           wt_vec, N, k, es_failsafe = NULL, conf_level = .95, es_type = "es"){
+                           wt_vec, N, k, es_vec, es_failsafe = NULL, conf_level = .95, es_type = "es"){
 
      df <- as.numeric(k - 1)
 
@@ -74,6 +76,26 @@
      tau_squared[tau_squared < 0] <- 0
      tau_squared_ci <- limits_tau(Q = Q, df = df, C = C, conf_level = conf_level)
 
+     ## Outlier-robust estimators (mean)
+     abs_dev_sums <- sum(abs(es_vec - mean_es))
+     wt_root_sums <- sum(sqrt(wt_vec))
+     Q_r <- wt_root_sums * abs_dev_sums
+     H_r_squared <- (pi * Q_r^2) / (2 * k * df)
+     H_r <- sqrt(H_r_squared)
+     I_r_squared <- (Q_r^2 - (2 * k * df)/pi) / Q_r^2
+     tau_r_squared <- .tau_r_squared_solver(Q_r, wt_vec)
+
+     ## Outlier-robust estimators (median)
+     expit <- function(x) ifelse(x >= 0, 1/(1 + exp(-x/0.0001)), exp(x/0.0001)/(1 + exp(x/0.001)))
+     psi   <- function(x, es_vec, wt_vec) sum(wt_vec * (expit(x - es_vec) - 0.5))
+     median_es <- uniroot(psi, interval = c(min(es_vec) - 0.001, max(es_vec) + 0.001), wt_vec = wt_vec, es_vec = es_vec)$root
+     med_dev_sums <- sum(abs(es_vec - median_es))
+     Q_m <- wt_root_sums * med_dev_sums
+     H_m_squared <- (pi * Q_m^2) / (2 * k^2)
+     H_m <- sqrt(H_m_squared)
+     I_m_squared <- (Q_m^2 - (2 * k^2)/pi) / Q_m^2
+     tau_m_squared <- .tau_m_squared_solver(Q_m, wt_vec, k)
+
      out <- list(es_type = es_type,
                  percent_var_accounted = c(error = percent_var_error,
                                            artifacts = percent_var_art,
@@ -88,11 +110,67 @@
                  Q = c(Q = Q, df = df, p = p_Q),
                  tau_squared = c(tau_squared = tau_squared, tau_squared_ci),
                  tau = c(tau = tau_squared^.5, tau_squared_ci^.5),
+                 outlier_robust_mean = c(Q_r = Q_r, 
+                                         H_r_squared = H_r_squared, 
+                                         H_r = H_r, 
+                                         I_r_squared = I_r_squared, 
+                                         tau_r_squared = tau_r_squared,
+                                         tau_r = tau_r_squared^.5),
+                 outlier_robust_median = c(Q_m = Q_m, 
+                                           H_m_squared = H_m_squared, 
+                                           H_m = H_m, 
+                                           I_m_squared = I_m_squared, 
+                                           tau_m_squared = tau_m_squared,
+                                           tau_m = tau_m_squared^.5),
                  file_drawer = file_drawer)
      class(out) <- c("psychmeta", "heterogeneity")
      out
 }
 
+#' tau_r_squared Solver
+#' 
+#' Function to solve for tau_r_squared (outlier-robust estimator of tau_squared based on absolute deviations from mean)
+#' 
+#' @param Q_r The Q_r statistic.
+#' @param wt_vec Vector of study weights.
+#' 
+#' @author  Lifeng Lin and Haitao Chu
+#' 
+#' @return tau_r_squared
+.tau_r_squared_solver <- function(Q_r, wt_vec){
+  f <- function(tau_squared, Q_r, wt_vec) sum(sqrt(1 - wt_vec/sum(wt_vec) + tau_squared * (wt_vec - 2 * wt_vec^2/sum(wt_vec) + wt_vec * sum(wt_vec^2)/(sum(wt_vec))^2))) - Q_r * sqrt(pi/2)
+
+  tau_upp <- Q_r * sqrt(pi/2) / sum(sqrt(wt_vec - 2 * wt_vec^2/sum(wt_vec) + wt_vec * sum(wt_vec^2)/(sum(wt_vec))^2))
+  tau_squared_upp <- tau_upp^2
+  f_low <- f(0, Q_r, wt_vec)
+  f_upp <- f(tau_squared_upp, Q_r, wt_vec)
+  if(f_low * f_upp > 0) tau_squared_r <- 0 else tau_squared_r <- uniroot(f, interval = c(0, tau_squared_upp), Q_r = Q_r, wt_vec = wt_vec)$root
+
+  return(tau_squared_r)
+}
+
+#' tau_m_squared Solver
+#' 
+#' Function to solve for tau_m_squared (outlier-robust estimator of tau_squared based on absolute deviations from median)
+#' 
+#' @param Q_m The Q_r statistic.
+#' @param wt_vec Vector of study weights.
+#' @param k The number of effect sizes included in the meta-analysis.
+#' 
+#' @author  Lifeng Lin and Haitao Chu
+#' 
+#' @return tau_r_squared
+.tau_m_squared_solver <- function(Q_m, wt_vec, k){
+  f <- function(tau_squared, Q_m, wt_vec) sum(sqrt(1 + wt_vec * tau_squared)) - Q_m * sqrt(pi/2)
+
+  tau_squared_upp <- sum(1/wt_vec) * (Q_m^2/k * 2/pi -1)
+  tau_squared_upp <- max(tau_squared_upp, 0.01)
+  f_low <- f(0, Q_m, wt_vec)
+  f_upp <- f(tau_squared_upp, Q_m, wt_vec)
+  if(f_low * f_upp > 0) tau_squared_m <- 0 else tau_squared_m <- uniroot(f, interval = c(0, tau_squared_upp), Q_m = Q_m, wt_vec = wt_vec)$root
+
+  return(tau_squared_m)
+}
 
 #' Confidence limits of tau
 #'
@@ -145,6 +223,8 @@ limits_tau <- function(Q, df, C, conf_level = .95){
 #'      \item{\code{Q}}{Cochran's \eqn{\chi^{2}}{\chi-squared} statistic. Significance tests using this statistic are strongly discouraged; heterogeneity should instead be determined by examining the width of the credibility interval and the practical differences between effect sizes contained within it (Wiernik et al., 2017). This value is not accurate when artifact distribution methods are used for corrections.}
 #'      \item{\code{tau_squared}}{\eqn{\tau^{2}}{\tau-squared}, an estimator of the random effects variance component (analogous to the Hunter-Schmidt \eqn{SD_{res}^{2}}{var_res}, \eqn{SD_{\rho}^{2}}{var_\rho}, or \eqn{SD_{\delta}^{2}}{var_\delta} statistics), with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
 #'      \item{\code{tau}}{\eqn{\sqrt{\tau^{2}}}{sqrt(\tau-squared)}, analogous to the Hunter-Schmidt \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
+#'      \item{\code{Q_r}, \code{H_r_squared}, \code{H_r}, \code{I_r_squared}, \code{tau_r_squared}, \code{tau_r}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted mean effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
+#'      \item{\code{Q_m}, \code{H_m_squared}, \code{H_m}, \code{I_m_squared}, \code{tau_m_squared}, \code{tau_m}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted median effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
 #'      \item{\code{file_drawer}}{Fail-safe \emph{N} and \emph{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
 #'
 #' @export
@@ -159,6 +239,10 @@ limits_tau <- function(Q, df, C, conf_level = .95){
 #' Quantifying heterogeneity in a meta-analysis.
 #' \emph{Statistics in Medicine, 21}(11), 1539–1558. \url{https://doi.org/10.1002/sim.1186}
 #'
+#' Lin, L., Chu, H., & Hodges, J. S. (2017). 
+#' Alternative measures of between-study heterogeneity in meta-analysis: Reducing the impact of outlying studies. 
+#' \emph{Biometrics, 73}(1), 156–166. \url{https://doi.org/10.1111/biom.12543}
+#' 
 #' Schmidt, F. (2010).
 #' Detecting and correcting the lies that data tell.
 #' \emph{Perspectives on Psychological Science, 5}(3), 233–242. \url{https://doi.org/10.1177/1745691610369339}
@@ -169,7 +253,7 @@ limits_tau <- function(Q, df, C, conf_level = .95){
 #'
 #' Wiernik, B. M., Kostal, J. W., Wilmot, M. P., Dilchert, S., & Ones, D. S. (2017).
 #' Empirical benchmarks for interpreting effect size variability in meta-analysis.
-#' \emph{Industrial and Organizational Psychology, 10}(3). https://doi.org/10.1017/iop.2017.44
+#' \emph{Industrial and Organizational Psychology, 10}(3). \url{https://doi.org/10.1017/iop.2017.44}
 #'
 #'
 #' @examples
@@ -245,6 +329,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                         N = as.numeric(ma_obj_i$barebones$meta_table$N[i]),
                                                                         k = as.numeric(ma_obj_i$barebones$meta_table$k[i]),
                                                                         wt_vec = as.numeric(ma_obj_i$barebones$escalc_list[[i]]$weight),
+                                                                        es_vec = as.numeric(ma_obj_i$barebones$escalc_list[[i]]$yi),
                                                                         conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                }
 
@@ -261,6 +346,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                     N = as.numeric(meta_ic_ts$N[i]),
                                                                                                     k = as.numeric(meta_ic_ts$k[i]),
                                                                                                     wt_vec = as.numeric(data_ts$weight),
+                                                                                                    es_vec = as.numeric(data_ts$yi),
                                                                                                     conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$individual_correction$validity_generalization_x[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ic_vgx$mean_rho[i]),
                                                                                                                    var_es = as.numeric(meta_ic_vgx$var_r_c[i]),
@@ -269,6 +355,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ic_vgx$N[i]),
                                                                                                                    k = as.numeric(meta_ic_vgx$k[i]),
                                                                                                                    wt_vec = as.numeric(data_vgx$weight),
+                                                                                                                   es_vec = as.numeric(data_vgx$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$individual_correction$validity_generalization_y[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ic_vgy$mean_rho[i]),
                                                                                                                    var_es = as.numeric(meta_ic_vgy$var_r_c[i]),
@@ -277,6 +364,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ic_vgy$N[i]),
                                                                                                                    k = as.numeric(meta_ic_vgy$k[i]),
                                                                                                                    wt_vec = as.numeric(data_vgy$weight),
+                                                                                                                   es_vec = as.numeric(data_vgy$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                     }
                     if(es_type == "d"){
@@ -291,6 +379,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                     N = as.numeric(meta_ic_ts$N[i]),
                                                                                                     k = as.numeric(meta_ic_ts$k[i]),
                                                                                                     wt_vec = as.numeric(data_ts$weight),
+                                                                                                    es_vec = as.numeric(data_ts$yi),
                                                                                                     conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$individual_correction$observedGroup_latentY[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ic_vgx$mean_delta[i]),
                                                                                                                    var_es = as.numeric(meta_ic_vgx$var_d_c[i]),
@@ -299,6 +388,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ic_vgx$N[i]),
                                                                                                                    k = as.numeric(meta_ic_vgx$k[i]),
                                                                                                                    wt_vec = as.numeric(data_vgx$weight),
+                                                                                                                   es_vec = as.numeric(data_vgx$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$individual_correction$latentGroup_observedY[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ic_vgy$mean_delta[i]),
                                                                                                                    var_es = as.numeric(meta_ic_vgy$var_d_c[i]),
@@ -307,6 +397,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ic_vgy$N[i]),
                                                                                                                    k = as.numeric(meta_ic_vgy$k[i]),
                                                                                                                    wt_vec = as.numeric(data_vgy$weight),
+                                                                                                                   es_vec = as.numeric(data_vgy$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                     }
                }
@@ -323,6 +414,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                     N = as.numeric(meta_ad_ts$N[i]),
                                                                                                     k = as.numeric(meta_ad_ts$k[i]),
                                                                                                     wt_vec = as.numeric(data_bb$weight),
+                                                                                                    es_vec = as.numeric(data_bb$yi),
                                                                                                     conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ad_vgx$mean_rho[i]),
                                                                                                                    var_es = as.numeric(meta_ad_vgx$var_r[i]),
@@ -331,6 +423,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ad_vgx$N[i]),
                                                                                                                    k = as.numeric(meta_ad_vgx$k[i]),
                                                                                                                    wt_vec = as.numeric(data_bb$weight),
+                                                                                                                   es_vec = as.numeric(data_bb$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ad_vgy$mean_rho[i]),
                                                                                                                    var_es = as.numeric(meta_ad_vgy$var_r[i]),
@@ -339,6 +432,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ad_vgy$N[i]),
                                                                                                                    k = as.numeric(meta_ad_vgy$k[i]),
                                                                                                                    wt_vec = as.numeric(data_bb$weight),
+                                                                                                                   es_vec = as.numeric(data_bb$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                     }
                     if(es_type == "d"){
@@ -349,6 +443,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                     N = as.numeric(meta_ad_ts$N[i]),
                                                                                                     k = as.numeric(meta_ad_ts$k[i]),
                                                                                                     wt_vec = as.numeric(data_bb$weight),
+                                                                                                    es_vec = as.numeric(data_bb$yi),
                                                                                                     conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$artifact_distribution$observedGroup_latentY[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ad_vgx$mean_delta[i]),
                                                                                                                    var_es = as.numeric(meta_ad_vgx$var_d[i]),
@@ -357,6 +452,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ad_vgx$N[i]),
                                                                                                                    k = as.numeric(meta_ad_vgx$k[i]),
                                                                                                                    wt_vec = as.numeric(data_bb$weight),
+                                                                                                                   es_vec = as.numeric(data_bb$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                          out_list$artifact_distribution$latentGroup_observedY[[analysis_id]] <- .heterogeneity(mean_es = as.numeric(meta_ad_vgy$mean_delta[i]),
                                                                                                                    var_es = as.numeric(meta_ad_vgy$var_d[i]),
@@ -365,6 +461,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                                                                                                    N = as.numeric(meta_ad_vgy$N[i]),
                                                                                                                    k = as.numeric(meta_ad_vgy$k[i]),
                                                                                                                    wt_vec = as.numeric(data_bb$weight),
+                                                                                                                   es_vec = as.numeric(data_bb$yi),
                                                                                                                    conf_level = conf_level, es_failsafe = es_failsafe, es_type = es_type)
                     }
                }

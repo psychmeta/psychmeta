@@ -7,8 +7,8 @@
 simulate_d_database(k, n_params, rho_params, mu_params, sigma_params,
   rel_params, sr_params, wt_params = NULL, allow_neg_wt = FALSE,
   sr_composite_params = NULL, group_names = NULL, var_names = NULL,
-  composite_names = NULL, show_applicant = FALSE, keep_vars = "all",
-  decimals = 2, max_iter = 100)
+  composite_names = NULL, diffs_as_obs = FALSE, show_applicant = FALSE,
+  keep_vars = "all", decimals = 2, max_iter = 100)
 }
 \arguments{
 \item{k}{Number of studies to simulate.}
@@ -37,6 +37,8 @@ If multiple composites are formed, the list should be a list of lists, with the 
 \item{var_names}{Optional vector of variable names for all non-composite variables.}
 
 \item{composite_names}{Optional vector of names for composite variables.}
+
+\item{diffs_as_obs}{Logical scalar that determines whether standard deviation parameters represent standard deviations of observed scores (\code{TRUE}) or of true scores (\code{FALSE}; default).}
 
 \item{show_applicant}{Should applicant data be shown for sample statistics (\code{TRUE}) or suppressed (\code{FALSE})?}
 

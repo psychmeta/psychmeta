@@ -116,22 +116,22 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                analysis_id <- paste0("Analysis ID = ", i)
 
                if(es_type == "es"){
-                    es_data <- data.frame(sample_id = sample_id[[i]],
-                                          yi = yi[[i]],
+                    es_data <- data.frame(yi = yi[[i]],
                                           n = n[[i]])
+                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
                }
                if(es_type == "r"){
-                    es_data <- data.frame(sample_id = sample_id[[i]],
-                                          rxy = rxy[[i]],
+                    es_data <- data.frame(rxy = rxy[[i]],
                                           n = n[[i]])
                     es_data$n_adj <- n_adj[[i]]
+                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
                }
                if(es_type == "d"){
-                    es_data <- data.frame(sample_id = sample_id[[i]],
-                                          d = d[[i]],
-                                          n1 = n1[[i]],
-                                          n2 = n2[[i]])
+                    es_data <- data.frame(d = d[[i]],
+                                          n1 = n1[[i]])
+                    es_data$n2 <- n2[[i]]
                     es_data$n_adj <- n_adj[[i]]
+                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "d")
                }
 
                if(any(class_ma == "ma_ic")){
@@ -158,7 +158,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                     }
 
                     if(any(class_ma == "ma_ad")){
-                         ma_ad_dump_full <- do.call(ma_r_ad, append(ma_obj$artifact_distribution$inputs, list(.psychmeta_internal_request_datadump = TRUE)))
+                         ma_ad_dump_full <- do.call(.ma_r_ad, append(ma_obj$artifact_distribution$inputs, list(.psychmeta_internal_request_datadump = TRUE)))
                          ma_ad_dump <- ma_ad_dump_full$x
                          ma_ad_dump$art_grid <- ma_ad_dump_full$art_grid
                          ma_arg_list$ma_ad_dump <- ma_ad_dump

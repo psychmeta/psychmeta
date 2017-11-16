@@ -1413,7 +1413,7 @@ create_ad_group <- function(ad_type = "tsa",
           construct_pair_mat <- construct_pair_mat[construct_pair_lvls,]
           if(is.null(dim(construct_pair_mat))){
                construct_pair_mat <- t(construct_pair_mat)
-               rownames(construct_pair_mat) <- construct_pair_mat[,1]
+               rownames(construct_pair_mat) <- construct_pair_lvls
           }
 
           ad_obj_list <- list()

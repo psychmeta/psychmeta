@@ -2,7 +2,7 @@ match_variables <- function(call, arg, data){
      x  <- eval(call, data, enclos=sys.frame(sys.parent()))
      if(!is.null(x)){
           if(is.character(x)){
-               if(all(x %in% colnames(data))){
+               if(any(x %in% colnames(data))){
                     data[,x]
                }else{
                     x
@@ -20,8 +20,14 @@ clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator
      if(!is.null(moderator_matrix)){
           if(is.null(dim(moderator_matrix))) moderator_matrix <- data.frame(Moderator = moderator_matrix)
 
-          if(nrow(moderator_matrix) != length(es_vec)){
-               stop("moderator_matrix must contain as many cases as there are effect sizes in the meta-analysis", call. = FALSE)
+          if(length(es_vec)==1){
+               if(nrow(moderator_matrix) != nrow(es_vec)){
+                    stop("moderator_matrix must contain as many cases as there are effect sizes in the meta-analysis", call. = FALSE)
+               }
+          } else {
+               if(nrow(moderator_matrix) != length(es_vec)){
+                    stop("moderator_matrix must contain as many cases as there are effect sizes in the meta-analysis", call. = FALSE)
+               }
           }
 
           moderator_names <- colnames(moderator_matrix)
@@ -108,11 +114,15 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
      }
      if(!is.null(construct_mat_orig)) if(all(is.na(construct_mat_orig))) construct_mat_orig <- NULL
 
+     if(!is.null(data_x)) data_x$construct_x <- construct_x
+     if(!is.null(data_y)) data_y$construct_y <- construct_y
+
      ## Create copies of data_x and data_y to manipulate
      data_x_reorg <- data_x
      data_y_reorg <- data_y
 
      if(!is.null(construct_mat_orig)){
+
           if(!is.null(construct_order)){
                keep_id <- construct_mat_orig %in% construct_order
                dim(keep_id) <- dim(construct_mat_orig)
@@ -131,7 +141,7 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
                          }
                     }
                }else{
-                    is_x <- match(construct_mat_orig[,1],construct_order) < match(construct_mat_orig[,2],construct_order)
+                    is_x <- match(construct_mat_orig[,1], construct_order) < match(construct_mat_orig[,2], construct_order)
                }
                is_x <- cbind(is_x, !is_x)
                is_y <- !is_x
@@ -168,6 +178,7 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
                construct_mat_orig <- construct_mat_orig[keep_id,]
                is_x <- is_x[keep_id,]
                is_y <- is_y[keep_id,]
+
                if(!is.null(data_x)){
                     data_x <- data_x[keep_id,]
                     data_x_reorg <- data_x_reorg[keep_id,]
@@ -190,10 +201,13 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
                     data_y_reorg[move_x2y,] <- data_x[move_x2y,]
                }
 
-               construct_x <- construct_mat_orig[is_x]
-               construct_y <- construct_mat_orig[is_y]
+               construct_x <- data_x_reorg$construct_x
+               construct_y <- data_y_reorg$construct_y
           }
      }
+
+     if(!is.null(data_x)) data_x$construct_x <- data_x_reorg$construct_x <- NULL
+     if(!is.null(data_y)) data_y$construct_y <- data_y_reorg$construct_y <- NULL
 
      if(!is.null(construct_x)) if(all(is.na(construct_x))) construct_x <- NULL
      if(!is.null(construct_y)) if(all(is.na(construct_y))) construct_y <- NULL
@@ -224,8 +238,21 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
      temp_mat <- as.data.frame(temp_mat)
 
      ## Organize the matrix - first by moderator levels, then by constructs
-     if(!is.null(moderators)) temp_mat <- arrange_(temp_mat, .dots = colnames(moderators))
-     if(!is.null(construct_dat)) temp_mat <- arrange_(temp_mat, .dots = colnames(construct_dat))
+     if(!is.null(moderators)){
+          orig_names <- colnames(moderators)
+          temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
+          colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
+          temp_mat <- arrange_(temp_mat, .dots = temp_names)
+          colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
+     }
+     if(!is.null(construct_dat)){
+          orig_names <- colnames(construct_dat)
+          temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
+          colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
+          temp_mat <- arrange_(temp_mat, .dots = temp_names)
+          temp_mat <- arrange_(temp_mat, .dots = colnames(construct_dat))
+          colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
+     }
 
      ## Pull out the re-organized data
      es_data <- temp_mat[,colnames(es_data)]

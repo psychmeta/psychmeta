@@ -24,7 +24,11 @@
 #' correct_d_bias(d = .3, n = 30)
 #' correct_d_bias(d = .3, n = 300)
 #' correct_d_bias(d = .3, n = 3000)
-correct_d_bias <- function(d, n){d / (1 + .75 / (n - 3))}
+correct_d_bias <- function(d, n){
+     out <- d
+     out[!is.na(n)] <- d[!is.na(n)] / (1 + .75 / (n[!is.na(n)] - 3))
+     out
+}
 
 
 #' Correct for small-sample bias in Glass' \eqn{\Delta}{delta} values

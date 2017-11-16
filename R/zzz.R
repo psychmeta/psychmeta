@@ -4,15 +4,14 @@ globalVariables(c(".", "Value",                                  ## Global varia
                   "vi", "yi",                                    ## Global variables defined for the create_ad function
                   "mean_r", "sd_res", "rtpa", "rxpa", "rtya",    ## Global variables defined for the .ma_r_ic function
                   "rxy",                                         ## Global variables defined for the .ma_r_bb function
-                  "d", "n_1", "n_2", "n_1_split", "n_2_split"))  ## Global variables defined for the .ma_d_bb function
+                  "d", "n_1", "n_2", "n_1_split", "n_2_split",   ## Global variables defined for the .ma_d_bb function
+                  "difference", "construct_x", "construct_y"))
 
 
 
 ## Messages to be displayed when the user loads psychmeta:
 .onAttach <- function(libname, pkgname) {
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
-    packageStartupMessage("\n")
-    packageStartupMessage("\n")
     packageStartupMessage("This is ", paste(pkgname, version))
     packageStartupMessage("Please report any bugs to improve functionality. \n")
     packageStartupMessage("We work hard to produce these open-source tools for the R community - please cite psychmeta when you use it in your research: \nDahlke, J. A. & Wiernik, B. M. (2017). psychmeta: Psychometric meta-analysis toolkit. R package version ", version)

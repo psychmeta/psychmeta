@@ -5,27 +5,31 @@
      if(!any(impute_method %in% valid_options))
           stop("'impute_method' must be one of the following impute_methods: ", paste(valid_options, collapse = ", "), call. = FALSE)
 
+     if(!is.null(cat_moderator_matrix)) cat_moderator_matrix <- as_tibble(cat_moderator_matrix)
+
+     art_vec_imputed <- art_vec
      if(length(art_vec) != 0){
           ## Identify missingness ##
           if(!is.null(sample_id) & (!is.null(construct_id) | !is.null(measure_id))){
                full_id <- paste(sample_id, construct_id, measure_id)
-
-               full_arts <- art_vec
-               full_moderators <- cat_moderator_matrix
-               full_n <- n_vec
-
                unique_id <- !duplicated(full_id)
-               table(full_id, unique_id)
 
+               ## Sort out which entries should receive the same value:
+               if(!is.null(unique_id)){
+                    lvls <- levels(factor(full_id))
+                    for(i in lvls){
+                         subset_vec <- full_id == i
+                         if(!all(unique_id[subset_vec]))
+                              art_vec_imputed[subset_vec] <- mean(art_vec_imputed[subset_vec][unique_id[subset_vec]])
+                    }
+               }
 
-               art_vec[!unique_id] <- NA
           }else{
                unique_id <- NULL
           }
 
           missing_id <- is.na(art_vec)
           valid_id <- !missing_id
-          art_vec_imputed <- art_vec
           if(any(is.infinite(art_vec[valid_id]))){
                warning("Artifacts with infinite values were detected: These will be treated as missing", call. = FALSE)
                missing_id[valid_id] <- is.infinite(art_vec[valid_id])
@@ -61,7 +65,6 @@
                impute_method_old <- impute_method
                impute_method <- gsub(x = impute_method, pattern = "_mod", replacement = "_full")
           }
-
 
           if(impute_method == "unwt_mean_mod"){
                mod_vec <- apply(cat_moderator_matrix, 1, paste)
@@ -171,7 +174,6 @@
                lvls <- levels(factor(full_id))
                for(i in lvls){
                     subset_vec <- full_id == i
-
                     if(!all(unique_id[subset_vec]))
                          art_vec_imputed[subset_vec] <- mean(art_vec_imputed[subset_vec][unique_id[subset_vec]])
                }
@@ -263,7 +265,8 @@ impute_artifacts <- function(sample_id = NULL, construct_id = NULL, measure_id =
      if(!is.null(measure_id)){
           construct_measure_combo <- paste(construct_id, measure_id)
           imputed_arts_i <- by(id_vec, construct_measure_combo, function(i){
-               .impute_artifacts(sample_id = sample_id[i], construct_id = construct_id[i], measure_id = measure_id[i], art_vec[i], cat_moderator_matrix[i,],
+               .impute_artifacts(sample_id = sample_id[i], construct_id = construct_id[i], measure_id = measure_id[i],
+                                 art_vec = art_vec[i], cat_moderator_matrix = cat_moderator_matrix[i,],
                                  impute_method = impute_method, art_type = art_type, n_vec = n_vec[i])
           })
           combo_lvls <- names(imputed_arts_i)
@@ -276,7 +279,8 @@ impute_artifacts <- function(sample_id = NULL, construct_id = NULL, measure_id =
      ## If any missing values were left afted imputing by method, this will generate values from broader construct-specific distributions
      if(!is.null(construct_id)){
           imputed_arts_i <- by(id_vec, construct_id, function(i){
-               .impute_artifacts(sample_id = sample_id[i], construct_id = construct_id[i], measure_id = measure_id[i], art_vec[i], cat_moderator_matrix[i,],
+               .impute_artifacts(sample_id = sample_id[i], construct_id = construct_id[i], measure_id = measure_id[i],
+                                 art_vec = art_vec[i], cat_moderator_matrix = cat_moderator_matrix[i,],
                                  impute_method = impute_method, art_type = art_type, n_vec = n_vec[i])
           })
           combo_lvls <- names(imputed_arts_i)
@@ -286,7 +290,8 @@ impute_artifacts <- function(sample_id = NULL, construct_id = NULL, measure_id =
      }
 
      if(is.null(construct_id) & is.null(measure_id)){
-          imputed_arts <- .impute_artifacts(sample_id = sample_id, construct_id = construct_id, measure_id = measure_id, art_vec, cat_moderator_matrix,
+          imputed_arts <- .impute_artifacts(sample_id = sample_id, construct_id = construct_id, measure_id = measure_id,
+                                            art_vec = art_vec, cat_moderator_matrix = cat_moderator_matrix,
                                             impute_method = impute_method, art_type = art_type, n_vec = n_vec)
      }
 

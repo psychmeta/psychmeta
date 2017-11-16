@@ -13,7 +13,7 @@
 #' @param group_names Optional vector of group names.
 #' @param var_names Optional vector of variable names.
 #' @param composite_names Optional vector of names for composite variables.
-#' @param diffs_as_obs Logical scalar that determines whether differences among elements in \code{mu_mat} should be parameters for scaled differences in observed scores (\code{TRUE}) or in true scores (\code{FALSE}; default).
+#' @param diffs_as_obs Logical scalar that determines whether standard deviation parameters represent standard deviations of observed scores (\code{TRUE}) or of true scores (\code{FALSE}; default).
 #'
 #' @importFrom nor1mix norMix
 #' @importFrom nor1mix qnorMix
@@ -165,7 +165,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
      if(is.null(group_names)) group_names <- 1:length(n_vec)
      if(is.null(var_names)) var_names <- paste0("y", 1:length(sr_vec))
 
-     if(!diffs_as_obs) mu_mat <- mu_mat * rel_mat^.5
+     if(!diffs_as_obs) sigma_mat <- sigma_mat / rel_mat^.5
 
      group_list <- list()
      obs_a <- true_a <- error_a <- NULL
@@ -558,7 +558,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
      if(is.null(group_names)) group_names <- 1:length(p_vec)
      if(is.null(var_names)) var_names <- paste0("y", 1:length(sr_vec))
 
-     if(!diffs_as_obs) mu_mat <- mu_mat * rel_mat^.5
+     if(!diffs_as_obs) sigma_mat <- sigma_mat / rel_mat^.5
 
      sr_mat <- mu_mat
      sr_mat[1:length(sr_mat)] <- 1
@@ -878,6 +878,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
 #' @param group_names Optional vector of group names.
 #' @param var_names Optional vector of variable names for all non-composite variables.
 #' @param composite_names Optional vector of names for composite variables.
+#' @param diffs_as_obs Logical scalar that determines whether standard deviation parameters represent standard deviations of observed scores (\code{TRUE}) or of true scores (\code{FALSE}; default).
 #' @param show_applicant Should applicant data be shown for sample statistics (\code{TRUE}) or suppressed (\code{FALSE})?
 #' @param keep_vars Optional vector of variable names to be extracted from the simulation and returned in the output object. All variables are returned by default. Use this argument when
 #' only some variables are of interest and others are generated solely to serve as selection variables.
@@ -924,7 +925,7 @@ simulate_d_database <- function(k, n_params, rho_params,
                                 mu_params, sigma_params,
                                 rel_params, sr_params,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
-                                group_names = NULL, var_names = NULL, composite_names = NULL,
+                                group_names = NULL, var_names = NULL, composite_names = NULL, diffs_as_obs = FALSE,
                                 show_applicant = FALSE, keep_vars = "all", decimals = 2, max_iter = 100){
      inputs <- as.list(environment())
      call <- match.call()
@@ -1107,7 +1108,7 @@ simulate_d_database <- function(k, n_params, rho_params,
                                mu_mat = param_list[[1]][["mu_mat"]], sigma_mat = param_list[[1]][["sigma_mat"]],
                                rel_mat = param_list[[1]][["rel_mat"]], sr_vec = param_list[[1]][["sr_vec"]],
                                wt_mat = param_list[[1]][["wt_mat"]], sr_composites = param_list[[1]][["sr_composites"]],
-                               group_names = group_names, var_names = var_names, composite_names = composite_names)
+                               group_names = group_names, var_names = var_names, composite_names = composite_names, diffs_as_obs = diffs_as_obs)
 
      sim_dat_stats <- lapply(param_list, function(x){
           d_obs <- .simulate_d_sample_stats(n_vec = x[["n_vec"]], rho_mat_list = x[["rho_list"]],
@@ -1125,7 +1126,8 @@ simulate_d_database <- function(k, n_params, rho_params,
                                     mu_mat = x[["mu_mat"]], sigma_mat = x[["sigma_mat"]],
                                     rel_mat = x[["rel_mat"]], sr_vec = x[["sr_vec"]],
                                     wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                                    group_names = group_names, var_names = var_names, composite_names = composite_names, show_applicant = TRUE)
+                                    group_names = group_names, var_names = var_names, composite_names = composite_names,
+                                    show_applicant = TRUE, diffs_as_obs = diffs_as_obs)
           d_obs <- out$overall_results$observed
           colnames(d_obs)[colnames(d_obs) %in% c("di", "da")] <- c("dyi", "dya")
 
@@ -1209,6 +1211,7 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
      k <- length(levels(factor(data_obj$statistics$sample_id)))
 
      show_applicant <- any(grepl(x = name_vec, pattern = "ryya")) & any(grepl(x = name_vec, pattern = "na"))
+     sample_id <- unique(data_obj$statistics$sample_id)
 
      if(study_wise){
           if(show_applicant){
@@ -1219,14 +1222,14 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                art_names_stat <- c("uy_local", "uy1_local", "uy2_local", "uy_external", "uy1_external", "uy2_external", "ryyi", "ryyi1", "ryyi2")[c(rep(sparify_u, 6), rep(sparify_u, 3))]
                art_names_param <- c("uy", "uy1", "uy2", "ryyi", "ryyi1", "ryyi2")[c(rep(sparify_u, 3), rep(sparify_rel, 3))]
           }
-          delete_id <- sample(x = 1:k, size = round(prop_missing * k), replace = FALSE)
+          delete_id <- sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
           delete_id <- data_obj$statistics$sample_id %in% delete_id
           data_obj$statistics[delete_id,art_names_stat] <- NA
           data_obj$parameters[delete_id,art_names_param] <- NA
      }else{
           art_names <- c("u", "r")[c(sparify_u, sparify_rel)]
           for(i in art_names){
-               delete_id <- data_obj$statistics$sample_id %in% sample(x = 1:k, size = round(prop_missing * k), replace = FALSE)
+               delete_id <- data_obj$statistics$sample_id %in% sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
                if(i == "u"){
                     art_i_stat <- c("uy_local", "uy1_local", "uy2_local", "uy_external", "uy1_external", "uy2_external")
                     art_i_param <- c("uy", "uy1", "uy2")

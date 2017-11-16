@@ -61,6 +61,8 @@
 #' convert_es(es = .3,  input_es="r", output_es="r", n1=100)
 #' convert_es(es = .8,  input_es="d", output_es="d", n1=64, n2=36)
 convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","z"), output_es=c("r","d"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, correct_bias=TRUE, conf_level=.95){
+     warn_obj1 <- record_warnings()
+
      input_es <- match.arg(input_es, c("r","d","t","p.t","F","p.F","chisq","p.chisq","or","lor","z"))
      input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, correct_bias=correct_bias, conf_level=conf_level)
 
@@ -190,7 +192,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           conf_int <- data.frame(r=r.ci, n_effective=n, CI)
      }
 
-     warning_out <- record_warnings()
+     warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
 
      out <- list(meta_input = meta_input,
                  original_es = original_es,

@@ -1,6 +1,6 @@
 #' Bare-bones meta-analysis of generic effect sizes
 #'
-#' This function computes bare-bones meta-analyses of correlations.
+#' This function computes bare-bones meta-analyses of any effect size using user-supplied effect error variances.
 #'
 #' @param es Vector or column name of observed effect sizes.
 #' @param n Vector or column name of sample sizes.
@@ -37,7 +37,7 @@
 ma_r_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
                          conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                          moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
-
+     warn_obj1 <- record_warnings()
      call <- match.call()
 
      if(hs_override){
@@ -101,7 +101,7 @@ ma_r_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size"
      out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
      out <- append(list(call_history = list(call)), out)
 
-     out$barebones$messages <- list(warnings = record_warnings(),
+     out$barebones$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                     fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0)))
 
      class(out) <- c("psychmeta", "ma_generic", "ma_bb")

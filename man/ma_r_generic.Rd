@@ -51,7 +51,7 @@ Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML"
 A list object of the classes \code{psychmeta}, \code{ma_generic}, and \code{ma_bb}.
 }
 \description{
-This function computes bare-bones meta-analyses of correlations.
+This function computes bare-bones meta-analyses of any effect size using user-supplied effect error variances.
 }
 \examples{
 es <- c(.3, .5, .8)

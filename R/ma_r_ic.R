@@ -92,6 +92,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                     moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
                     impute_method = "bootstrap_mod", hs_override = FALSE, data = NULL, ...){
 
+     warn_obj1 <- record_warnings()
      call <- match.call()
 
      if(hs_override){
@@ -830,7 +831,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
      out$barebones$messages <- list(warnings = NULL,
                                     fyi = record_fyis(neg_var_res = neg_var_res))
-     out$individual_correction$messages <- list(warnings = record_warnings(),
+     out$individual_correction$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                 fyi = record_fyis(fyi_messages = fyi_messages,
                                                                   neg_var_res = neg_var_res,
                                                                   neg_var_rtpa = neg_var_rtpa,

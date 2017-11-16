@@ -1317,7 +1317,7 @@ print.psychmeta.heterogeneity <- function(x, ..., digits = 3){
      cat("Correlation between ", es_type, " values and artifactual perturbations: ",  round2char(x$`cor(es, perturbations)`[1], digits = digits), "\n", sep = "")
 
      cat("\n")
-     cat("H^2 value: ", round2char(x$H_squared, digits = digits),  "\n", sep = "")
+     cat("H value: ", round2char(x$H, digits = digits),  "\n", sep = "")
 
      cat("\n")
      cat("I^2 value: ", round2char(x$I_squared, digits = digits),  "\n", sep = "")

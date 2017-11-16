@@ -87,6 +87,8 @@
 #' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
 #' @export
 #'
+#' @importFrom tibble as_tibble
+#'
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
@@ -130,6 +132,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5,
                  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod",
                  decimals = 2, hs_override = FALSE, data = NULL, ...){
+     warn_obj1 <- record_warnings()
 
      ##### Get inputs #####
      call <- match.call()
@@ -188,7 +191,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- data.frame(data)
+          data <- as.data.frame(data)
 
           rxyi <- match_variables(call = call_full[[match("rxyi", names(call_full))]], arg = rxyi, data = data)
 
@@ -237,7 +240,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = data)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data))
 
           if(deparse(substitute(correct_rr_x)) != "NULL")
                correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x", names(call_full))]], arg = correct_rr_x, data = data)
@@ -258,6 +261,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                if(is.null(lvls)) lvls <- levels(factor(x))
                lvls
           })
+          names(moderator_levels) <- colnames(moderators)
      }else{
           moderator_levels <- NULL
           if(grepl(x = impute_method, "_mod")){
@@ -270,12 +274,34 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      ##### Data checking #####
      ## Filter for valid correlations
      valid_r <- filter_r(r_vec = rxyi, n_vec = n)
+     if(all(!valid_r)) stop("No valid correlations and/or sample sizes provided", call. = FALSE)
      if(sum(!valid_r) > 0)
           if(sum(!valid_r) ==1){
                warning(sum(!valid_r), " invalid correlation and/or sample size detected: Offending entry has been removed", call. = FALSE)
           }else{
                warning(sum(!valid_r), " invalid correlations and/or sample sizes detected: Offending entries have been removed", call. = FALSE)
           }
+
+     if(!is.null(construct_order)){
+          if(any(duplicated(construct_order))){
+               warning("Each element of 'construct_order' must have a unique value: First occurence of each value used", call. = FALSE)
+               construct_order <- construct_order[!duplicated(construct_order)]
+          }
+
+          if(!is.null(construct_x) | !is.null(construct_y)){
+               keep_construct <- as.character(construct_order) %in% c(as.character(construct_x), as.character(construct_y))
+               if(any(!keep_construct)) warning("'construct_order' contained invalid construct names: Invalid names removed", call. = FALSE)
+               construct_order <- construct_order[keep_construct]
+          }
+
+          if(!is.null(construct_x) & !is.null(construct_y)){
+               valid_r <- valid_r & construct_x %in% construct_order & construct_y %in% construct_order
+          }else{
+               if(!is.null(construct_x)) valid_r <- valid_r & construct_x %in% construct_order
+               if(!is.null(construct_y)) valid_r <- valid_r & construct_y %in% construct_order
+          }
+          if(all(!valid_r)) stop("No valid construct combinations provided", call. = FALSE)
+     }
 
      ## Check the lengths of all arguments
      if(ma_method == "ad"){
@@ -318,9 +344,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
+     if(!is.null(moderators)) moderators <- data.frame(moderators)[valid_r,]
 
      ##### Organize database #####
-     es_data <- data.frame(rxyi = rxyi, n = n)
+     es_data <- data_frame(rxyi = rxyi, n = n)
      es_data$n_adj <- n_adj
 
      if(es_d & !is.null(d)){
@@ -519,28 +546,28 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
           full_data_mod$composited <- FALSE
           collapsed_data$composited <- TRUE
-          indep_data <- rbind(full_data_mod[!duplicate_samples,], collapsed_data)
+          indep_data <- as_tibble(rbind(full_data_mod[!duplicate_samples,], collapsed_data))
           indep_data <- indep_data[order(indep_data$Analysis_ID),]
 
           if(ma_method == "ad") indep_data[indep_data$Analysis_ID != 1, c("rxx", "ryy", "ux", "uy")] <- NA
 
-          sample_id    <- indep_data[,"sample_id"]
+          sample_id   <- indep_data$sample_id ## ZZZ - Why is this a factor?
           es_data     <- indep_data[,str_es_data]
-          construct_x <- as.character(indep_data[,"construct_x"])
-          construct_y <- as.character(indep_data[,"construct_y"])
-          data_x      <- indep_data[,str_data_x]
-          data_y      <- indep_data[,str_data_y]
-          categorical_moderators <- as.character(indep_data[, str_moderators])
-          complete_moderators <- indep_data[, str_compmod_temp]
-          analysis_id <- indep_data[,"Analysis_ID"]
-          analysis_type <- as.character(indep_data[,"Analysis_Type"])
-          presorted_data <- indep_data[,c("Analysis_ID", "Analysis_Type", str_moderators)]
+          if(!is.null(construct_x)) construct_x <- as.character(indep_data$construct_x)
+          if(!is.null(construct_y)) construct_y <- as.character(indep_data$construct_y)
+          if(!is.null(data_x)) data_x <- indep_data[,str_data_x]
+          if(!is.null(data_y)) data_y <- indep_data[,str_data_y]
+          if(!is.null(str_moderators)) categorical_moderators <- apply(indep_data[,str_moderators],2,as.character)
+          if(!is.null(str_compmod_temp)) complete_moderators <- indep_data[, str_compmod_temp]
+          analysis_id <- indep_data$Analysis_ID
+          analysis_type <- as.character(indep_data$Analysis_Type)
+          presorted_data <- as_tibble(cbind(Analysis_ID=analysis_id, Analysis_Type=analysis_type, categorical_moderators))
 
-          categorical_moderators <- as.data.frame(categorical_moderators)
-          colnames(categorical_moderators) <- str_moderators
+          #categorical_moderators <- as.data.frame(categorical_moderators)  # ZZZ - These lines are unecessary after above
+          #colnames(categorical_moderators) <- str_moderators
 
-          complete_moderators <- as.data.frame(complete_moderators)
-          colnames(complete_moderators) <- str_compmod
+          #complete_moderators <- as.data.frame(complete_moderators)
+          #colnames(complete_moderators) <- str_compmod                     # /ZZZ
 
           rm(collapsed_data_list, collapsed_data, duplicates, indep_data, duplicate_samples, full_data)
      }else{
@@ -759,7 +786,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                if(!is.null(construct_y)) out$barebones$meta_table <- cbind(Construct_Y = construct_y[i][1], out$barebones$meta_table)
                if(!is.null(construct_x)) out$barebones$meta_table <- cbind(Construct_X = construct_x[i][1], out$barebones$meta_table)
 
-               out$barebones$messages <- record_warnings()
+
+               out$barebones$messages <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
                out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
                out <- append(list(call_history = list(call)), out)
 
@@ -880,7 +908,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           out <- list(call_history = list(call), inputs = inputs,
                       grand_tables = table_list,
                       construct_pairs = ma_list,
-                      messages = record_warnings())
+                      messages = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()))
 
           if(es_d & treat_as_d){
                if(ma_method != "bb"){
@@ -898,7 +926,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      }else{
           out <- ma_list[[1]]
           out$call_history[[1]] <- call
-          out$messages <- record_warnings()
+          warn_obj <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
+          if(is.null(out$messages$warnings) | !is.null(out$messages)) out$messages$warnings <- rbind(out$messages$warnings, warn_obj)
      }
 
      return(out)

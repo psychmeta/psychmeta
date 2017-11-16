@@ -823,7 +823,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      sr_as_fun <- lapply(sr_params, .check_fun)
 
      n_vec <- c(sample_params(param_list = list(n_params), k = k, as_desc = list(n_as_desc), as_weights_rows = list(n_as_weights_rows),
-                              as_weights_cols = list(n_as_weights_cols), as_fun = n_as_fun, param_type = "n", max_iter = max_iter))
+                              as_weights_cols = list(n_as_weights_cols), as_fun = list(n_as_fun), param_type = "n", max_iter = max_iter))
      rel_mat <- sample_params(param_list = rel_params, k = k, as_desc = rel_as_desc, as_weights_rows = rel_as_weights_rows,
                               as_weights_cols = rel_as_weights_cols, as_fun = rel_as_fun, param_type = "rel", max_iter = max_iter)
      sr_mat <- sample_params(param_list = sr_params, k = k, as_desc = sr_as_desc, as_weights_rows = sr_as_weights_rows,
@@ -928,7 +928,8 @@ simulate_r_database <- function(k, n_params, rho_params,
                stop("'n_as_ni' must be FALSE when selection is to be performed on multiple variables", call. = FALSE)
           }else{
                param_list <- lapply(param_list, function(x){
-                    x[["n"]] <- ceiling(x[["n"]] / c(x[["sr_vec"]], x[["sr_composites"]])[c(x[["sr_vec"]], x[["sr_composites"]]) < 1])
+                    if(any(x[["sr_vec"]] < 1))
+                         x[["n"]] <- ceiling(x[["n"]] / c(x[["sr_vec"]], x[["sr_composites"]])[c(x[["sr_vec"]], x[["sr_composites"]]) < 1])
                     x
                })
           }
@@ -942,6 +943,14 @@ simulate_r_database <- function(k, n_params, rho_params,
                                    var_names = var_names, composite_names = composite_names)
      })
 
+     for(i in 1:length(param_list)){
+          x <- param_list[[i]]
+          .simulate_r_sample_stats(n = x[["n"]], rho_mat = x[["rho_mat"]],
+                                   mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
+                                   rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
+                                   wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
+                                   var_names = var_names, composite_names = composite_names)
+     }
 
      sim_dat_params <- lapply(param_list, function(x){
           .simulate_r_sample_params(n = Inf, rho_mat = x[["rho_mat"]],
@@ -1004,44 +1013,44 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
      out <- NULL
      for(i in 1:length(param_list)){
           if(as_desc[[i]]){
-               invalid <- TRUE
+               invalid <- rep(TRUE, k)
                out_i <- rep(NA, k)
                iter <- 0
                while(any(invalid)){
                     iter <- iter + 1
 
                     if(param_type == "n"){
-                         out_i[invalid] <- round(rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                         out_i[invalid] <- round(rnorm(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                        sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5)))
                          invalid <- out_i < 3
                     }
                     if(param_type == "rel" | param_type == "sr" | param_type == "p"){
-                         out_i[invalid] <- .rbeta(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                         out_i[invalid] <- .rbeta(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                   sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
                          invalid <- zapsmall(out_i) == 0
                     }
                     if(param_type == "rho"){
-                         out_i[invalid] <- rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                         out_i[invalid] <- rnorm(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                  sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
                          invalid <- abs(out_i) > 1
                     }
                     if(param_type == "wt"){
-                         out_i[invalid] <- rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                         out_i[invalid] <- rnorm(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                  sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
                          if(!allow_neg_wt) invalid <- out_i < 0
                     }
                     if(param_type == "d"){
-                         out_i[invalid] <- rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                         out_i[invalid] <- rnorm(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                  sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
                          invalid <- FALSE
                     }
                     if(param_type == "mu"){
-                         out_i[invalid] <- rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                         out_i[invalid] <- rnorm(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                  sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
                          invalid <- FALSE
                     }
                     if(param_type == "sigma"){
-                         out_i[invalid] <- rnorm(n = k - sum(!invalid), mean = param_list[[i]]["mean"],
+                         out_i[invalid] <- rnorm(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                  sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
                          invalid <- zapsmall(out_i) <= 0
                     }
@@ -1073,17 +1082,20 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
                if(param_type == "wt") if(!allow_neg_wt) if(any(values < 0)) stop("When 'allow_neg_wt' is FALSE, weight parameters defined using weighted distributions cannot be negative", call. = FALSE)
                if(param_type == "sigma") if(any(zapsmall(values) <= 0)) stop("sigma parameters defined using weighted distributions cannot be less than or equal to zero", call. = FALSE)
 
-               out_i <- sample(values, k, replace = TRUE, prob = weights / sum(weights))
+               out_i <- sample(x = values, size = k, replace = TRUE, prob = weights / sum(weights))
 
           }else if(as_fun[[i]]){
-               invalid <- TRUE
+               invalid <- rep(TRUE, k)
                out_i <- rep(NA, k)
                iter <- 0
                while(any(invalid)){
                     iter <- iter + 1
-                    out_i[invalid] <- round(param_list[[i]](k - sum(!invalid)))
+                    out_i[invalid] <- param_list[[i]](sum(invalid))
 
-                    if(param_type == "n") invalid <- out_i < 3
+                    if(param_type == "n"){
+                         out_i <- round(out_i)
+                         invalid <- out_i < 3
+                    }
                     if(param_type == "rel" | param_type == "sr" | param_type == "p") invalid <- zapsmall(out_i) == 0
                     if(param_type == "rho") invalid <- abs(out_i) > 1
                     if(param_type == "wt") if(!allow_neg_wt) invalid <- out_i < 0
@@ -1097,7 +1109,7 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
           }else if(length(param_list[[i]]) == 1){
                out_i <- rep(param_list[[i]], k)
           }else{
-               out_i <- sample(param_list[[i]], k, replace = TRUE)
+               out_i <- sample(x = param_list[[i]], size = k, replace = TRUE)
           }
           if(param_type == "wt" & !allow_neg_wt) if(any(out_i < 0)) stop("Negative weights were supplied: To allow use of these weights, set allow_neg_wt to TRUE", call. = FALSE)
           out <- cbind(out, out_i)
@@ -1359,6 +1371,7 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
           variables <- levels(factor(c(as.character(data_obj$statistics$x_name), as.character(data_obj$statistics$y_name))))
 
           show_applicant <- any(grepl(x = name_vec, pattern = "rxxa")) & any(grepl(x = name_vec, pattern = "na")) & any(grepl(x = name_vec, pattern = "rxya"))
+          sample_id <- unique(data_obj$statistics$sample_id)
 
           if(study_wise){
                if(show_applicant){
@@ -1379,7 +1392,7 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                     match_x <- data_obj$statistics$x_name %in% x
                     match_y <- data_obj$statistics$y_name %in% x
                     for(i in art_names){
-                         delete_id <- data_obj$statistics$sample_id %in% sample(x = 1:k, size = round(prop_missing * k), replace = FALSE)
+                         delete_id <- data_obj$statistics$sample_id %in% sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
                          if(i == "u"){
                               art_i_param <- "ux"
                               art_i_stat <- c("ux_local", "ux_external")
@@ -1394,7 +1407,7 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                          for(ij in art_i_stat) data_obj$statistics[delete_id,ij] <- NA
                          for(ij in art_i_param) data_obj$parameters[delete_id,ij] <- NA
 
-                         delete_id <- data_obj$statistics$sample_id %in% sample(x = 1:k, size = round(prop_missing * k), replace = FALSE)
+                         delete_id <- data_obj$statistics$sample_id %in% sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
                          if(i == "u"){
                               art_i_param <- "uy"
                               art_i_stat <- c("uy_local", "uy_external")
@@ -1421,7 +1434,7 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
 
           art_names <- c("r", "u")[c(sparify_rel, sparify_u)]
           if(study_wise){
-               delete_id <- sample(x = 1:k, size = round(prop_missing * k), replace = FALSE)
+               delete_id <- sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
                for(j in variables){
                     if(show_applicant){
                          art_names_stat <- paste(c("ux_local", "ux_external", "rxxi", "rxxa")[c(sparify_u, sparify_u, sparify_rel, sparify_rel)], j, sep = "_")
@@ -1435,7 +1448,7 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
           }else{
                for(i in art_names){
                     for(j in variables){
-                         delete_id <- sample(x = 1:k, size = round(prop_missing * k), replace = FALSE)
+                         delete_id <- sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
                          if(i == "u"){
                               art_i_param <- paste0("ux_", j)
                               art_i_stat <- paste0(c("ux_local_", "ux_external_"), j)
