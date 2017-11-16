@@ -551,7 +551,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
           if(ma_method == "ad") indep_data[indep_data$Analysis_ID != 1, c("rxx", "ryy", "ux", "uy")] <- NA
 
-          sample_id   <- indep_data$sample_id ## ZZZ - Why is this a factor?
+          sample_id   <- indep_data$sample_id
           es_data     <- indep_data[,str_es_data]
           if(!is.null(construct_x)) construct_x <- as.character(indep_data$construct_x)
           if(!is.null(construct_y)) construct_y <- as.character(indep_data$construct_y)
@@ -562,12 +562,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           analysis_id <- indep_data$Analysis_ID
           analysis_type <- as.character(indep_data$Analysis_Type)
           presorted_data <- as_tibble(cbind(Analysis_ID=analysis_id, Analysis_Type=analysis_type, categorical_moderators))
-
-          #categorical_moderators <- as.data.frame(categorical_moderators)  # ZZZ - These lines are unecessary after above
-          #colnames(categorical_moderators) <- str_moderators
-
-          #complete_moderators <- as.data.frame(complete_moderators)
-          #colnames(complete_moderators) <- str_compmod                     # /ZZZ
 
           rm(collapsed_data_list, collapsed_data, duplicates, indep_data, duplicate_samples, full_data)
      }else{
