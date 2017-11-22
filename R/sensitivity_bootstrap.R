@@ -26,7 +26,6 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
           record_call <- TRUE
      }
 
-     ma_obj_i <- ma_obj
      ma_list <- lapply(ma_list, function(ma_obj_i){
           if(any(class(ma_obj_i) == "ma_ic")){
                ma_arg_list <- ma_obj_i$individual_correction$inputs

@@ -10,9 +10,13 @@ sensitivity_leave1out <- function(ma_obj, ...){
 
      if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)
 
-     d_metric <- ifelse(any(class_ma == "ma_d_as_d" | class_ma == "ma_r_as_d"), TRUE, FALSE)
-
-     if(d_metric) ma_obj <- convert_ma(ma_obj)
+     d_metric <- ifelse(any((class_ma == "ma_d_as_d" & (any(class_ma == "ma_ic") | any(class_ma == "ma_ad"))) | class_ma == "ma_r_as_d"), TRUE, FALSE)
+     if(d_metric){
+          ma_obj <- convert_ma(ma_obj)
+          convert_back <- TRUE
+     }else{
+          convert_back <- FALSE
+     }
 
      if(any(class(ma_obj) == "ma_master")){
           ma_list <- ma_obj$construct_pairs
@@ -173,7 +177,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                          vgx_mat <- ma_obj$individual_correction$validity_generalization_x$meta_table[i,]
                          vgy_mat <- ma_obj$individual_correction$validity_generalization_y$meta_table[i,]
 
-                         if(d_metric){
+                         if(convert_back){
                               bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                     conf_method = conf_method, cred_method = cred_method)
                               ts_mat <- .convert_ma(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -224,7 +228,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                          vgx_mat <- ma_obj$artifact_distribution$validity_generalization_x$meta_table[i,]
                          vgy_mat <- ma_obj$artifact_distribution$validity_generalization_y$meta_table[i,]
 
-                         if(d_metric){
+                         if(convert_back){
                               bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                       conf_method = conf_method, cred_method = cred_method)
                               ts_mat <- .convert_ma(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -272,7 +276,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                               es_data$weight <- wt_xy[[i]]
                               bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_bb_boot, ma_arg_list = ma_arg_list)
 
-                              if(d_metric){
+                              if(convert_back){
                                    bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
                                    bb_table <- .convert_ma(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -283,9 +287,9 @@ sensitivity_leave1out <- function(ma_obj, ...){
                          if(es_type == "d"){
                               es_data$vi <- vi[[i]]
                               es_data$weight <- wt[[i]]
-                              bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_bb_boot, ma_arg_list = ma_arg_list)
+                              bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
 
-                              if(!d_metric){
+                              if(convert_back){
                                    bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
                                    bb_table <- .convert_ma(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -309,7 +313,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
           ma_obj <- ma_list[[1]]
      }
 
-     if(d_metric) ma_obj <- convert_ma(ma_obj)
+     if(convert_back) ma_obj <- convert_ma(ma_obj)
 
      if(record_call) ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 

@@ -10,9 +10,13 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
 
      if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)
 
-     d_metric <- ifelse(any(class_ma == "ma_d_as_d" | class_ma == "ma_r_as_d"), TRUE, FALSE)
-
-     if(d_metric) ma_obj <- convert_ma(ma_obj)
+     d_metric <- ifelse(any((class_ma == "ma_d_as_d" & (any(class_ma == "ma_ic") | any(class_ma == "ma_ad"))) | class_ma == "ma_r_as_d"), TRUE, FALSE)
+     if(d_metric){
+          ma_obj <- convert_ma(ma_obj)
+          convert_back <- TRUE
+     }else{
+          convert_back <- FALSE
+     }
 
      if(any(class(ma_obj) == "ma_master")){
           ma_list <- ma_obj$construct_pairs
@@ -27,7 +31,6 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
           record_call <- TRUE
      }
 
-     ma_obj_i <- ma_obj
      ma_list <- lapply(ma_list, function(ma_obj_i){
           if(any(class(ma_obj_i) == "ma_ic")){
                ma_arg_list <- ma_obj_i$individual_correction$inputs
@@ -150,8 +153,8 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                     es_data$n <- n[[i]]
                     es_data$pi <- pi[[i]]
                     es_data$n_adj <- n_adj[[i]]
-                    es_data$vi <- vi_xy[[i]]
-                    es_data$weight <- wt_xy[[i]]
+                    es_data$vi <- vi[[i]]
+                    es_data$weight <- wt[[i]]
                     if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "d")
                }
 
@@ -195,7 +198,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                               es_data$weight <- wt[[i]]
                               bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
 
-                              if(!d_metric){
+                              if(convert_back){
                                    bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
                                    bb_table <- .convert_ma(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -219,7 +222,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                          vgx_mat <- ma_obj$individual_correction$validity_generalization_x$meta_table[i,]
                          vgy_mat <- ma_obj$individual_correction$validity_generalization_y$meta_table[i,]
 
-                         if(d_metric){
+                         if(convert_back){
                               ts_mat <- .convert_ma(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
                                                     conf_method = conf_method, cred_method = cred_method)
                               vgx_mat <- .convert_ma(ma_table = vgx_mat, p_vec = rep(p, nrow(vgx_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -266,7 +269,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                          vgx_mat <- ma_obj$artifact_distribution$validity_generalization_x$meta_table[i,]
                          vgy_mat <- ma_obj$artifact_distribution$validity_generalization_y$meta_table[i,]
 
-                         if(d_metric){
+                         if(convert_back){
                               bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                     conf_method = conf_method, cred_method = cred_method)
                               ts_mat <- .convert_ma(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -313,7 +316,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                               es_data$weight <- wt_xy[[i]]
                               bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_r_bb_boot, ma_arg_list = ma_arg_list)
 
-                              if(d_metric){
+                              if(convert_back){
                                    bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
                                    bb_table <- .convert_ma(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -326,7 +329,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
                               es_data$weight <- wt[[i]]
                               bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
 
-                              if(!d_metric){
+                              if(convert_back){
                                    bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
                                    bb_table <- .convert_ma(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -350,7 +353,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
           ma_obj <- ma_list[[1]]
      }
 
-     if(d_metric) ma_obj <- convert_ma(ma_obj)
+     if(convert_back) ma_obj <- convert_ma(ma_obj)
 
      if(record_call) ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 
