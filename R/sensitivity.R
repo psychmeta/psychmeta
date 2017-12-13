@@ -15,7 +15,7 @@
 #' @param boot_conf_level Width of confidence intervals to be constructed for all bootstrapped statistics.
 #' @param boot_ci_type Type of bootstrapped confidence interval (see "type" options for boot::boot.ci for possible arguments). Default is "bca".
 #' @param ... Additional arguments.
-#' 
+#'
 #' @importFrom tibble add_column
 #'
 #' @return An updated meta-analysis object with sensitivity analyses added.
@@ -45,6 +45,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
                         sort_method = "weight",
                         boot_iter = 1000, boot_conf_level = .95, boot_ci_type = "bca", ...){
 
+     cat(" **** Computing sensitivity analyses **** \n")
      bootstrap <- scalar_arg_warning(arg = bootstrap, arg_name = "bootstrap")
      leave1out <- scalar_arg_warning(arg = leave1out, arg_name = "leave1out")
      cumulative <- scalar_arg_warning(arg = cumulative, arg_name = "cumulative")
@@ -264,13 +265,13 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
                data$sample_id <- paste("Study", row.names(data))
           } else data$sample_id <- paste("Study", 1:nrow(data))
      }
-     
+
      .leave1out <- function(data, fun, ma_arg_list){
           k <- nrow(data)
           rows <- 1:k
           out <- NULL
           for(i in rows){
-               out <- rbind(out, fun(data = data, i = rows[-i], ma_arg_list = ma_arg_list))
+               out <- rbind(out, suppressWarnings(fun(data = data, i = rows[-i], ma_arg_list = ma_arg_list)))
           }
           as.data.frame(out)
      }
@@ -306,7 +307,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           k <- nrow(data)
           out <- NULL
           for(i in 1:k){
-               out <- rbind(out, fun(data = data, i = 1:i, ma_arg_list = ma_arg_list))
+               out <- rbind(out, suppressWarnings(fun(data = data, i = 1:i, ma_arg_list = ma_arg_list)))
           }
           as.data.frame(out)
      }

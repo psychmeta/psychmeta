@@ -51,8 +51,8 @@ Higgins, J. P. T., & Thompson, S. G. (2002).
 Quantifying heterogeneity in a meta-analysis.
 \emph{Statistics in Medicine, 21}(11), 1539–1558. \url{https://doi.org/10.1002/sim.1186}
 
-Lin, L., Chu, H., & Hodges, J. S. (2017). 
-Alternative measures of between-study heterogeneity in meta-analysis: Reducing the impact of outlying studies. 
+Lin, L., Chu, H., & Hodges, J. S. (2017).
+Alternative measures of between-study heterogeneity in meta-analysis: Reducing the impact of outlying studies.
 \emph{Biometrics, 73}(1), 156–166. \url{https://doi.org/10.1111/biom.12543}
 
 Schmidt, F. (2010).

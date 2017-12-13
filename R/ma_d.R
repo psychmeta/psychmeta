@@ -17,7 +17,7 @@
 #' @param correction_method When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-#' be used when interative artifact distributions are provided). See "Details" of \code{/link{ma_d_ad}} for descriptions of the available methods.
+#' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.
 #' @param group_id Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).
 #' @param group_order Vector indicating the order in which group_ids should be arranged.
 #' @param construct_y Vector of construct names for construct initially designated as Y.
@@ -39,6 +39,7 @@
 #' @param rGg Vector or column name of reliability estimates for X.
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #' @param pi Scalar or vector containing the restricted-group proportions of group membership. If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param pa Scalar or vector containing the unrestricted-group proportions of group membership (default = .5). If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param uy Vector or column name of u ratios for Y.
@@ -64,24 +65,12 @@
 #' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
 #' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
 #' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all rescrepancies among artifact entries before and after impuation.
-#' @param impute_method Method to use for imputing artifacts. Choices are:
-#' \itemize{
-#' \item "bootstrap_mod" = select random values from the most specific moderator categories available (default).
-#' \item "bootstrap_full" = select random values from the full vector of artifacts.
-#' \item "simulate_mod" = generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
-#' (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-#' \item "simulate_full" = generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-#' \item "wt_mean_mod" = replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-#' \item "wt_mean_full" = replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).
-#' \item "unwt_mean_mod" = replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-#' \item "unwt_mean_full" = replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).
-#' \item "replace_unity" = replace missing values with 1 (not recommended).
-#' \item "stop" = stop evaluations when missing artifacts are encountered.
-#' If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
-#' }
+#' @param impute_method Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.
 #' @param decimals Number of decimal places to which results should be rounded (default is to perform no rounding).
 #' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 #' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
+#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).
+#' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
@@ -120,7 +109,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  correct_rr_g = TRUE, correct_rr_y = TRUE,
                  indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                  rGg = NULL, pi = NULL, pa = NULL,
-                 ryy = NULL, ryy_restricted = TRUE,
+                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
                  uy = NULL, uy_observed = TRUE,
                  sign_rgz = 1, sign_ryz = 1,
                  conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
@@ -128,7 +117,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  pairwise_ads = FALSE, residual_ads = TRUE,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5, partial_intercor = FALSE,
                  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod",
-                 decimals = 2, hs_override = FALSE, data = NULL, ...){
+                 decimals = 2, hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL, data = NULL, ...){
 
      ##### Get inputs #####
      call <- match.call()
@@ -136,6 +125,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                     correct_bias = correct_bias, correct_rGg = correct_rGg, correct_ryy = correct_ryy,
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased,
                     cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
+
+     cat(" **** Running ma_d: Meta-analysis of d values **** \n")
 
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
@@ -146,6 +137,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
      error_type <- scalar_arg_warning(arg = error_type, arg_name = "error_type")
+     use_all_arts <- scalar_arg_warning(arg = use_all_arts, arg_name = "use_all_arts")
 
      conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
      cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
@@ -156,64 +148,67 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- data.frame(data)
+          data <- as.data.frame(data)
 
           d <- match_variables(call = call_full[[match("d", names(call_full))]], arg = d, data = data)
 
           n1 <- match_variables(call = call_full[[match("n1", names(call_full))]], arg = n1, data = data)
 
-          if(deparse(substitute(n2)) != "NULL")
+          if(deparse(substitute(n2))[1] != "NULL")
                n2 <- match_variables(call = call_full[[match("n2", names(call_full))]], arg = n2, data = data)
 
-          if(deparse(substitute(n_adj)) != "NULL")
+          if(deparse(substitute(n_adj))[1] != "NULL")
                n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, data = data)
 
-          if(deparse(substitute(group_id)) != "NULL")
+          if(deparse(substitute(group_id))[1] != "NULL")
                group_id <- match_variables(call = call_full[[match("group_id", names(call_full))]], arg = group_id, data = data)
 
-          if(deparse(substitute(construct_y)) != "NULL")
+          if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
 
-          if(deparse(substitute(measure_y)) != "NULL")
+          if(deparse(substitute(measure_y))[1] != "NULL")
                measure_y <- match_variables(call = call_full[[match("measure_y",  names(call_full))]], arg = measure_y, data = data)
 
-          if(deparse(substitute(rGg)) != "NULL")
+          if(deparse(substitute(rGg))[1] != "NULL")
                rGg <- match_variables(call = call_full[[match("rGg", names(call_full))]], arg = rGg, data = data)
 
-          if(deparse(substitute(ryy)) != "NULL")
+          if(deparse(substitute(ryy))[1] != "NULL")
                ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, data = data)
 
-          if(deparse(substitute(ryy_restricted)) != "NULL")
+          if(deparse(substitute(ryy_restricted))[1] != "NULL")
                ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted", names(call_full))]], arg = ryy_restricted, data = data)
 
-          if(deparse(substitute(uy)) != "NULL")
+          if(deparse(substitute(ryy_type))[1] != "NULL")
+               ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, data = data)
+
+          if(deparse(substitute(uy))[1] != "NULL")
                uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, data = data)
 
-          if(deparse(substitute(uy_observed)) != "NULL")
+          if(deparse(substitute(uy_observed))[1] != "NULL")
                uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, data = data)
 
-          if(deparse(substitute(sample_id)) != "NULL")
+          if(deparse(substitute(sample_id))[1] != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = data)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
 
-          if(deparse(substitute(correct_rr_g)) != "NULL")
+          if(deparse(substitute(correct_rr_g))[1] != "NULL")
                correct_rr_g <- match_variables(call = call_full[[match("correct_rr_g", names(call_full))]], arg = correct_rr_g, data = data)
 
-          if(deparse(substitute(correct_rr_y)) != "NULL")
+          if(deparse(substitute(correct_rr_y))[1] != "NULL")
                correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y", names(call_full))]], arg = correct_rr_y, data = data)
 
-          if(deparse(substitute(indirect_rr_g)) != "NULL")
+          if(deparse(substitute(indirect_rr_g))[1] != "NULL")
                indirect_rr_g <- match_variables(call = call_full[[match("indirect_rr_g", names(call_full))]], arg = indirect_rr_g, data = data)
 
-          if(deparse(substitute(indirect_rr_y)) != "NULL")
+          if(deparse(substitute(indirect_rr_y))[1] != "NULL")
                indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y", names(call_full))]], arg = indirect_rr_y, data = data)
-          
-          if(deparse(substitute(pi)) != "NULL")
+
+          if(deparse(substitute(pi))[1] != "NULL")
                pi <- match_variables(call = call_full[[match("pi", names(call_full))]], arg = pi, data = data)
-          
-          if(deparse(substitute(pa)) != "NULL")
+
+          if(deparse(substitute(pa))[1] != "NULL")
                pa <- match_variables(call = call_full[[match("pa", names(call_full))]], arg = pa, data = data)
      }
 
@@ -297,8 +292,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  correct_bias = correct_bias, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
                  correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
                  indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
-                 rxx = rxxi, rxx_restricted = TRUE,
-                 ryy = ryy, ryy_restricted = ryy_restricted,
+                 rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment",
+                 ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
                  ux = ux, ux_observed = TRUE,
                  uy = uy, uy_observed = uy_observed,
                  sign_rxz = sign_rgz, sign_ryz = sign_ryz,
@@ -307,7 +302,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  pairwise_ads = pairwise_ads, residual_ads = residual_ads,
                  check_dependence = check_dependence, collapse_method = collapse_method, intercor = intercor,
                  clean_artifacts = clean_artifacts, impute_artifacts = impute_artifacts, impute_method = impute_method,
-                 hs_override = hs_override, decimals = decimals, data = NULL,
+                 hs_override = hs_override, decimals = decimals, use_all_arts = use_all_arts, supplemental_ads = supplemental_ads, data = NULL,
 
                  ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
                  use_as_x = group_order, use_as_y = construct_order, es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa,

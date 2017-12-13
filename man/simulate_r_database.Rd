@@ -15,7 +15,7 @@ simulate_r_database(k, n_params, rho_params, mu_params = 0,
 
 \item{n_params}{Parameter distribution (or data-generation function; see details) for sample size.}
 
-\item{rho_params}{List of parameter distributions (or data-generation functions; see details) for correlations.}
+\item{rho_params}{List of parameter distributions (or data-generation functions; see details) for correlations. If simulating data from a single fixed population matrix, that matrix can be supplied for this argument (if the diagonal contains non-unity values and 'sigma_params' is not specified, those values will be used as variances).}
 
 \item{mu_params}{List of parameter distributions (or data-generation functions; see details) for means.}
 

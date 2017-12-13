@@ -76,6 +76,7 @@
 #' @param indirect_rr Logical vector determining whether reliability values are associated with indirect range restriction (\code{TRUE}) or direct range restriction (\code{FALSE}).
 #' @param rxx_restricted Logical vector determining whether reliability estimates were incumbent reliabilities (\code{TRUE}) or applicant reliabilities (\code{FALSE}).
 #' @param rxx_as_qx Logical vector determining whether the reliability estimates were reliabilities (\code{TRUE}) or square-roots of reliabilities (\code{FALSE}).
+#' @param rxxi_type,rxxa_type,qxi_type,qxa_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #'
 #'
 #' @details
@@ -274,7 +275,9 @@ NULL
 #'                  ux = .8, var_ux = 0,
 #'                  ux_observed = c(TRUE, TRUE, FALSE, FALSE),
 #'                  indirect_rr = c(TRUE, FALSE, TRUE, FALSE))
-estimate_var_qxi <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0, ux_observed = TRUE, indirect_rr = TRUE){
+estimate_var_qxi <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, qxa_type = "alpha"){
+     qxa_consistency <- convert_reltype2consistency(rel_type = qxa_type)
+     indirect_rr <- indirect_rr | qxa_consistency
      dat <- data.frame(qxa = qxa, var_qxa = var_qxa, ux = ux, var_ux = var_ux, cor_qxa_ux = cor_qxa_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
      out <- rep(NA, nrow(dat))
 
@@ -306,7 +309,9 @@ estimate_var_qxi <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0, u
 #'                  ux = .8, var_ux = 0,
 #'                  ux_observed = c(TRUE, TRUE, FALSE, FALSE),
 #'                  indirect_rr = c(TRUE, FALSE, TRUE, FALSE))
-estimate_var_qxa <- function(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0, ux_observed = TRUE, indirect_rr = TRUE){
+estimate_var_qxa <- function(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, qxi_type = "alpha"){
+     qxi_consistency <- convert_reltype2consistency(rel_type = qxi_type)
+     indirect_rr <- indirect_rr | qxi_consistency
      dat <- data.frame(qxi = qxi, var_qxi = var_qxi, ux = ux, var_ux = var_ux, cor_qxi_ux = cor_qxi_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
      out <- rep(NA, nrow(dat))
 
@@ -338,7 +343,9 @@ estimate_var_qxa <- function(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0, u
 #'                   var_rxxa = c(.02, .03, .04, .05), ux = .8, var_ux = 0,
 #'                  ux_observed = c(TRUE, TRUE, FALSE, FALSE),
 #'                  indirect_rr = c(TRUE, FALSE, TRUE, FALSE))
-estimate_var_rxxi <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 0, ux_observed = TRUE, indirect_rr = TRUE){
+estimate_var_rxxi <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, rxxa_type = "alpha"){
+     rxxa_consistency <- convert_reltype2consistency(rel_type = rxxa_type)
+     indirect_rr <- indirect_rr | rxxa_consistency
      dat <- data.frame(rxxa = rxxa, var_rxxa = var_rxxa, ux = ux, var_ux = var_ux, cor_rxxa_ux = cor_rxxa_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
      out <- rep(NA, nrow(dat))
 
@@ -370,7 +377,9 @@ estimate_var_rxxi <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 
 #'                   ux = .8, var_ux = 0,
 #'                  ux_observed = c(TRUE, TRUE, FALSE, FALSE),
 #'                  indirect_rr = c(TRUE, FALSE, TRUE, FALSE))
-estimate_var_rxxa <- function(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 0, ux_observed = TRUE, indirect_rr = TRUE){
+estimate_var_rxxa <- function(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, rxxi_type = "alpha"){
+     rxxi_consistency <- convert_reltype2consistency(rel_type = rxxi_type)
+     indirect_rr <- indirect_rr | rxxi_consistency
      dat <- data.frame(rxxi = rxxi, var_rxxi = var_rxxi, ux = ux, var_ux = var_ux, cor_rxxi_ux = cor_rxxi_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
      out <- rep(NA, nrow(dat))
 
@@ -531,7 +540,9 @@ estimate_var_ryyi <- function(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux
 
 
 #### Second-tier functions for qxi ####
-estimate_var_qxi_ux <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0, indirect_rr = TRUE){
+estimate_var_qxi_ux <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0, indirect_rr = TRUE, qxa_type = "alpha"){
+     qxa_consistency <- convert_reltype2consistency(rel_type = qxa_type)
+     indirect_rr <- indirect_rr | qxa_consistency
      var_qxa[is.na(var_qxa)] <- var_ux[is.na(var_ux)] <- 0
      if(indirect_rr){
           b_u <- (1 - qxa^2) / (ux^3 * sqrt((qxa^2 + ux^2 - 1) / ux^2))
@@ -544,7 +555,9 @@ estimate_var_qxi_ux <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0
 }
 
 
-estimate_var_qxa_ux <- function(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0, indirect_rr = TRUE){
+estimate_var_qxa_ux <- function(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0, indirect_rr = TRUE, qxi_type = "alpha"){
+     qxi_consistency <- convert_reltype2consistency(rel_type = qxi_type)
+     indirect_rr <- indirect_rr | qxi_consistency
      var_qxi[is.na(var_qxi)] <- var_ux[is.na(var_ux)] <- 0
      if(indirect_rr){
           b_u <- ((qxi^2 - 1) * ux) / sqrt((qxi^2 - 1) * ux^2 + 1)
@@ -678,7 +691,9 @@ estimate_var_rxxi_ux_drr <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxx
 
 
 #### Third-tier functions for rxx ####
-estimate_var_rxxa_ux <- function(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 0, indirect_rr = TRUE){
+estimate_var_rxxa_ux <- function(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 0, indirect_rr = TRUE, rxxi_type = "alpha"){
+     rxxi_consistency <- convert_reltype2consistency(rel_type = rxxi_type)
+     indirect_rr <- indirect_rr | rxxi_consistency
      var_rxxi[is.na(var_rxxi)] <- var_ux[is.na(var_ux)] <- 0
      if(indirect_rr){
           b_u <- 2 * (rxxi - 1) * ux
@@ -691,7 +706,9 @@ estimate_var_rxxa_ux <- function(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux
 }
 
 
-estimate_var_rxxi_ux <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 0, indirect_rr = TRUE){
+estimate_var_rxxi_ux <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 0, indirect_rr = TRUE, rxxa_type = "alpha"){
+     rxxa_consistency <- convert_reltype2consistency(rel_type = rxxa_type)
+     indirect_rr <- indirect_rr | rxxa_consistency
      var_rxxa[is.na(var_rxxa)] <- var_ux[is.na(var_ux)] <- 0
      if(indirect_rr){
           b_u <- (2 - 2 * rxxa) / ux^3

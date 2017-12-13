@@ -10,8 +10,9 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, ma_method = "bb",
   construct_order = NULL, wt_type = "sample_size", error_type = "mean",
   correct_bias = TRUE, correct_rxx = TRUE, correct_ryy = TRUE,
   correct_rr_x = TRUE, correct_rr_y = TRUE, indirect_rr_x = TRUE,
-  indirect_rr_y = TRUE, rxx = NULL, rxx_restricted = TRUE, ryy = NULL,
-  ryy_restricted = TRUE, ux = NULL, ux_observed = TRUE, uy = NULL,
+  indirect_rr_y = TRUE, rxx = NULL, rxx_restricted = TRUE,
+  rxx_type = "alpha", ryy = NULL, ryy_restricted = TRUE,
+  ryy_type = "alpha", ux = NULL, ux_observed = TRUE, uy = NULL,
   uy_observed = TRUE, sign_rxz = 1, sign_ryz = 1, conf_level = 0.95,
   cred_level = 0.8, conf_method = "t", cred_method = "t",
   var_unbiased = TRUE, moderators = NULL, cat_moderators = TRUE,
@@ -19,7 +20,8 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, ma_method = "bb",
   check_dependence = TRUE, collapse_method = "composite", intercor = 0.5,
   clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad",
   FALSE, TRUE), impute_method = "bootstrap_mod", decimals = 2,
-  hs_override = FALSE, data = NULL, ...)
+  hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL,
+  data = NULL, ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations}
@@ -75,6 +77,31 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{rxx_restricted}{Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
+\item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. Acceptable reliability types are:
+\itemize{
+\item{internal_consistency}{\cr A generic designation for internal-consistency reliability estimates derived from responses to a single test administration.}
+\item{multiple_administrations}{\cr A generic designation for reliability estimates derived from multiple administrations of a test.}
+\item{alpha}{\cr Coefficient alpha.}
+\item{lambda}{\cr Generic designation for a Guttman's lambda coefficient.}
+\item{lambda1}{\cr Guttman's lambda 1 coefficient.}
+\item{lambda2}{\cr Guttman's lambda 2 coefficient.}
+\item{lambda3}{\cr Guttman's lambda 3 coefficient.}
+\item{lambda4}{\cr Guttman's lambda 4 coefficient.}
+\item{lambda5}{\cr Guttman's lambda 5 coefficient.}
+\item{lambda6}{\cr Guttman's lambda 6 coefficient.}
+\item{omega}{\cr Omega coefficient indicating the proportion variance in a variable accounted for by modeled latent factors.}
+\item{icc}{\cr Intraclass correlation coefficient.}
+\item{interrater_r}{\cr Inter-rater correlation coefficient.}
+\item{interrater_r_sb}{\cr Inter-rater correlation coefficient, stepped up with the Spearman-Brown formula.}
+\item{splithalf}{\cr Split-half reliability coefficient.}
+\item{splithalf_sb}{\cr Split-half reliability coefficient, corrected toward the full test length with the Spearman-Brown formula.}
+\item{retest}{\cr Test-retest reliability coefficient.}
+\item{parallel}{\cr Parallel-forms reliability coefficient with tests taken during the same testing session.}
+\item{alternate}{\cr Alternate-forms reliability coefficient with tests taken during the same testing session.}
+\item{parallel_delayed}{\cr Parallel-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
+\item{alternate_delayed}{\cr Alternate-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
+}}
+
 \item{ryy}{Vector or column name of reliability estimates for Y.}
 
 \item{ryy_restricted}{Logical vector or column name determining whether each element of ryy is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
@@ -126,18 +153,17 @@ When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} s
 
 \item{impute_method}{Method to use for imputing artifacts. Choices are:
 \itemize{
-\item "bootstrap_mod" = select random values from the most specific moderator categories available (default).
-\item "bootstrap_full" = select random values from the full vector of artifacts.
-\item "simulate_mod" = generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
-(uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-\item "simulate_full" = generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-\item "wt_mean_mod" = replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-\item "wt_mean_full" = replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).
-\item "unwt_mean_mod" = replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-\item "unwt_mean_full" = replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).
-\item "replace_unity" = replace missing values with 1 (not recommended).
-\item "stop" = stop evaluations when missing artifacts are encountered.
-If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
+\item{bootstrap_mod}{\cr Select random values from the most specific moderator categories available (default).}
+\item{bootstrap_full}{\cr Select random values from the full vector of artifacts.}
+\item{simulate_mod}{\cr Generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
+(uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
+\item{simulate_full}{\cr Generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
+\item{wt_mean_mod}{\cr Replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
+\item{wt_mean_full}{\cr Replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).}
+\item{unwt_mean_mod}{\cr Replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
+\item{unwt_mean_full}{\cr Replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).}
+\item{replace_unity}{\cr Replace missing values with 1 (not recommended).}
+\item{stop}{\cr Stop evaluations when missing artifacts are encountered.}
 }
 If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".}
 
@@ -145,6 +171,10 @@ If an imputation method ending in "mod" is selected but no moderators are provid
 
 \item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
+
+\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{supplemental_ads}{Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.}
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
@@ -174,6 +204,41 @@ ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      correct_rr_x = FALSE, correct_rr_y = FALSE,
      construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+
+## Artifact information from studies not included in the meta-analysis can also be used to make
+## corrections. Passing artifact information with the 'supplemental_ads' argument allows for
+## additional artifact values and/or means and variances of artifacts to be used.
+## The 'supplemental_ads' analysis below gives the same results as the prior meta-analysis.
+x_ids <- c(data_r_meas_multi$x_name, data_r_meas_multi$y_name) == "X"
+rxxi <- c(data_r_meas_multi$rxxi, data_r_meas_multi$ryyi)[x_ids]
+n_rxxi = c(data_r_meas_multi$n, data_r_meas_multi$n)[x_ids]
+
+y_ids <- c(data_r_meas_multi$x_name, data_r_meas_multi$y_name) == "Y"
+ryyi <- c(data_r_meas_multi$rxxi, data_r_meas_multi$ryyi)[y_ids]
+n_ryyi = c(data_r_meas_multi$n, data_r_meas_multi$n)[y_ids]
+
+z_ids <- c(data_r_meas_multi$x_name, data_r_meas_multi$y_name) == "Z"
+rzzi <- c(data_r_meas_multi$rxxi, data_r_meas_multi$ryyi)[z_ids]
+n_rzzi = c(data_r_meas_multi$n, data_r_meas_multi$n)[z_ids]
+
+ma_r(ma_method = "ad", rxyi = rxyi, n = n,
+     correct_rr_x = FALSE, correct_rr_y = FALSE,
+     construct_x = x_name, construct_y = y_name,
+     moderators = moderator, data = data_r_meas_multi,
+     supplemental_ads = list(X = list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi),
+                             Y = list(rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi),
+                             Z = list(rxxi = rzzi, n_rxxi = n_rzzi, wt_rxxi = n_rzzi)))
+
+## If 'use_all_arts' is set to TRUE, artifacts from studies without valid correlations
+## will be used to inform artifact distributions. Below, correlations and artifacts
+## are provided by non-overlapping sets of studies.
+dat1 <- dat2 <- data_r_meas_multi
+dat1$rxxi <- dat1$ryyi <- NA
+dat2$rxyi <- NA
+dat <- rbind(dat1, dat2)
+ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+     correct_rr_x = FALSE, correct_rr_y = FALSE,
+     construct_x = x_name, construct_y = y_name, moderators = moderator, data = dat)
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).

@@ -32,6 +32,7 @@
 #' @param ux_observed Logical vector determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
 #' @param indirect_rr Logical vector determining whether each reliability value is associated with indirect range restriction (\code{TRUE}) or direct range restriction (\code{FALSE}).
 #' @param rxx_restricted Logical vector determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param rxxi_type,rxxa_type,ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #'
 #' @return A vector of estimated artifact values.
 #'
@@ -183,7 +184,9 @@ estimate_rxxa_ut_drr <- function(rxxi, ut){
 #' @export
 #' @examples
 #' estimate_rxxa(rxxi = .8, ux = .8, ux_observed = TRUE)
-estimate_rxxa <- function(rxxi, ux, ux_observed = TRUE, indirect_rr = TRUE){
+estimate_rxxa <- function(rxxi, ux, ux_observed = TRUE, indirect_rr = TRUE, rxxi_type = "alpha"){
+     rxxi_consistency <- convert_reltype2consistency(rel_type = rxxi_type)
+     indirect_rr <- indirect_rr | rxxi_consistency
      rxxa <- rxxi
      rxxa[ux_observed & indirect_rr] <- suppressWarnings(estimate_rxxa_ux_irr(rxxi = rxxi[ux_observed & indirect_rr], ux = ux[ux_observed & indirect_rr]))
      rxxa[!ux_observed & indirect_rr] <- suppressWarnings(estimate_rxxa_ut_irr(rxxi = rxxi[!ux_observed & indirect_rr], ut = ux[!ux_observed & indirect_rr]))
@@ -218,7 +221,9 @@ estimate_rxxi_ut_drr <- function(rxxa, ut){
 #' @export
 #' @examples
 #' estimate_rxxi(rxxa = .8, ux = .8, ux_observed = TRUE)
-estimate_rxxi <- function(rxxa, ux, ux_observed = TRUE, indirect_rr = TRUE){
+estimate_rxxi <- function(rxxa, ux, ux_observed = TRUE, indirect_rr = TRUE, rxxa_type = "alpha"){
+     rxxa_consistency <- convert_reltype2consistency(rel_type = rxxa_type)
+     indirect_rr <- indirect_rr | rxxa_consistency
      rxxi <- rxxa
      rxxi[ux_observed & indirect_rr] <- suppressWarnings(estimate_rxxi_ux_irr(rxxa = rxxa[ux_observed & indirect_rr], ux = ux[ux_observed & indirect_rr]))
      rxxi[!ux_observed & indirect_rr] <- suppressWarnings(estimate_rxxi_ut_irr(rxxa = rxxa[!ux_observed & indirect_rr], ut = ux[!ux_observed & indirect_rr]))
@@ -302,7 +307,9 @@ estimate_ryyi <- function(ryya, rxyi, ux){
 #' @export
 #' @examples
 #' estimate_uy(ryyi = c(.5, .7), ryya = c(.7, .8))
-estimate_uy <- function(ryyi, ryya, indirect_rr = TRUE){
+estimate_uy <- function(ryyi, ryya, indirect_rr = TRUE, ryy_type = "alpha"){
+     ryy_consistency <- convert_reltype2consistency(rel_type = ryy_type)
+     indirect_rr <- indirect_rr | ryy_consistency
      uy <- sqrt((1 - ryya) / (1 - ryyi))
      uy[!indirect_rr] <- (sqrt(1 - ryya[!indirect_rr]) * sqrt(ryyi[!indirect_rr])) / sqrt(ryya[!indirect_rr] * (1 - ryyi[!indirect_rr]))
      if(any(is.na(uy))) warning("Some estimated uy values were undefined", call. = FALSE)

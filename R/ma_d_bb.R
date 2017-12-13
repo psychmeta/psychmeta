@@ -73,27 +73,44 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- data.frame(data)
+          data <- as.data.frame(data)
 
           d <- match_variables(call = call_full[[match("d",  names(call_full))]], arg = d, data = data)
           n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], arg = n1, data = data)
           n2 <- match_variables(call = call_full[[match("n2",  names(call_full))]], arg = n2, data = data)
           n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], arg = n_adj, data = data)
 
-          if(deparse(substitute(sample_id)) != "NULL")
+          if(deparse(substitute(sample_id))[1] != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = data)
+               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
      }
 
      if(!is.null(moderators)){
-          moderator_levels <- lapply(data.frame(data.frame(moderators)[,cat_moderators]), function(x){
+          if(is.null(dim(moderators))){
+               moderators <- as.data.frame(moderators)
+               colnames(moderators) <- "Moderator"
+          }
+
+          moderator_names <- list(all = colnames(moderators),
+                                  cat = colnames(moderators)[cat_moderators],
+                                  noncat = colnames(moderators)[!cat_moderators])
+          moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
+
+          moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
                lvls <- levels(x)
                if(is.null(lvls)) lvls <- levels(factor(x))
                lvls
           })
+          names(moderator_levels) <- colnames(moderators)
+
+          moderators <- as.data.frame(moderators)
      }else{
+          moderator_names <- list(all = NULL,
+                                  cat = NULL,
+                                  noncat = NULL)
+
           moderator_levels <- NULL
      }
 
@@ -113,13 +130,14 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 
                        ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
                                           conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
-                       presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables, moderator_levels = moderator_levels)
+                       presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
+                       moderator_levels = moderator_levels, moderator_names = moderator_names)
 
      out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
      out <- append(list(call_history = list(call)), out)
 
      out$barebones$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                                    fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0)))
+                                    fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0, na.rm = TRUE)))
 
      class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
      return(out)
@@ -252,8 +270,12 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 
      ## Compute uncertainty intervals
      if(k == 1){
+          var_d <- sd_d <- NA
+          se_d <- sd_e
           ci <- confidence(mean = mean_d, sd = sd_e, k = 1, conf_level = conf_level, conf_method = conf_method)
+          var_res <- sd_res <- NA
      }else{
+          se_d <- sd_d / sqrt(k)
           ci <- confidence(mean = mean_d, sd = var_d^.5, k = k, conf_level = conf_level, conf_method = conf_method)
      }
      cv <- credibility(mean = mean_d, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
@@ -268,7 +290,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                                                     var_e = var_e,
                                                     var_res = var_res,
                                                     sd_d = var_d^.5,
-                                                    se_d = sd_d / sqrt(k),
+                                                    se_d = se_d,
                                                     sd_e = var_e^.5,
                                                     sd_res = sd_res,
                                                     ci, cv))),

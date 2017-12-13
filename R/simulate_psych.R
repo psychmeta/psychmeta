@@ -102,7 +102,7 @@ simulate_psych <- function(n, rho_mat,
           error = data.frame(error_scores_a)
      }
 
-     out <- list(obs = obs, true = true, error = error)
+     out <- list(observed = obs, true = true, error = error)
      class(out) <- c("psychmeta", "simulate_psych")
      out
 }

@@ -56,7 +56,8 @@
      .mean_qxi <- wt_mean(x = .ad_obj_x$qxi_irr$Value, wt = .ad_obj_x$qxi_irr$Weight)
      .mean_ut <- wt_mean(x = .ad_obj_x$ut$Value, wt = .ad_obj_x$ut$Weight)
      .mean_qyi <- wt_mean(x = .ad_obj_y$qxi_irr$Value, wt = .ad_obj_y$qxi_irr$Weight)
-     .mean_qya <- wt_mean(x = estimate_ryya(ryyi = .ad_obj_y$qxi_irr$Value^2, rxyi = mean_rxyi, ux = .mean_ut)^.5, wt = .ad_obj_y$qxi_irr$Weight)
+     .mean_qya <- NULL
+     for(i in 1:length(mean_rxyi)) .mean_qya[i] <- wt_mean(x = estimate_ryya(ryyi = .ad_obj_y$qxi_irr$Value^2, rxyi = mean_rxyi[i], ux = .mean_ut)^.5, wt = .ad_obj_y$qxi_irr$Weight)
 
      ad_list <- list(.qxi = .ad_obj_x$qxi_irr,
                      .qyi = .ad_obj_y$qxi_irr,
@@ -209,8 +210,8 @@
      ci_tp <- .correct_r_uvirr(rxyi = ci_xy_i, qxi = .mean_qxi, qyi = .mean_qyi, ut = .mean_ut)
 
      var_mat_tp <- estimate_var_rho_tsa_uvirr(mean_rtpa = mean_rtpa, var_rxyi = var_r, var_e = var_e,
-                                mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi,
-                                var_ut = .var_ut, var_qxa = .var_qxa, var_qyi = .var_qyi)
+                                              mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi,
+                                              var_ut = .var_ut, var_qxa = .var_qxa, var_qyi = .var_qyi)
 
      var_art_tp <- var_mat_tp$var_art
      var_pre_tp <- var_mat_tp$var_pre

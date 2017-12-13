@@ -17,9 +17,11 @@
 #'
 #' @keywords internal
 organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, construct_y = NULL,
-                                construct_order = NULL, moderator_levels = NULL, moderator_type = "hierarchical", ...){
+                                construct_order = NULL, moderator_levels = NULL, moderator_type = "hierarchical", moderator_names = NULL, ...){
 
      if(!is.null(moderator_matrix)){
+          .moderator_names <- colnames(moderator_matrix)
+
           if(any(levels(factor(unlist(moderator_matrix))) == "All Levels")){
                stop("The moderator-level label 'All Levels' in moderator_matrix is reserved for internal usage; please use a different moderator-level label", call. = FALSE)
           }
@@ -223,6 +225,8 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      }
      moderator_vars <- colnames(moderator_data)[1:(ncol(moderator_data) - ncol(es_data))]
 
+
+
      if(!is.null(construct_mat_initial)){
           construct_mat <- NULL
           for(i in 1:(nrow(moderator_data) / nrow(es_data))) construct_mat <- rbind(construct_mat, construct_mat_initial)
@@ -242,6 +246,8 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      x <- as.character(x)
      analysis_names <- x[!duplicated(x)]
      for(i in 1:length(analysis_names)) x[x == analysis_names[i]] <- i
+
+     if(!is.null(moderator_names)) moderator_vars <- colnames(moderator_data)[colnames(moderator_data) %in% .moderator_names] <- moderator_names
      moderator_data <- cbind(Analysis_ID = as.numeric(x), moderator_data)
 
      list(data = moderator_data,
@@ -272,12 +278,12 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                        moderator_matrix = NULL, moderator_type = "all", cat_moderators = TRUE,
                        construct_x = NULL, construct_y = NULL, ma_arg_list, ...){
 
-
      additional_args <- list(...)
      presorted_data <- additional_args$presorted_data
      id_variables <- additional_args$analysis_id_variables
      moderator_levels <- additional_args$moderator_levels
      construct_order <- additional_args$construct_order
+     moderator_names <- additional_args$moderator_names
 
      if(!is.null(presorted_data)){
           moderator_info <- list(data = cbind(presorted_data, es_data), id_variables = id_variables)
@@ -291,11 +297,17 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           moderator_matrix <- moderators$moderator_matrix
           cat_moderator_matrix <- moderators$cat_moderator_matrix
 
+          if(!is.null(moderator_names)){
+               .moderator_names <- moderator_names[["cat"]]
+          }else{
+               .moderator_names <- NULL
+          }
+          if(!is.null(cat_moderator_matrix)) cat_moderator_matrix <- data.frame(cat_moderator_matrix)
           moderator_info <- organize_moderators(moderator_matrix = cat_moderator_matrix,
                                                 es_data = es_data,
                                                 moderator_type = moderator_type,
                                                 construct_x = construct_x, construct_y = construct_y,
-                                                construct_order = construct_order, moderator_levels = moderator_levels)
+                                                construct_order = construct_order, moderator_levels = moderator_levels, moderator_names = .moderator_names)
      }
 
      data <- moderator_info$data

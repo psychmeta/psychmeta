@@ -476,7 +476,7 @@ print.psychmeta.ma_r.barebones.master <- function(x, ..., digits = 3){
      cat("-----------------------------\n")
 
      cat("\n")
-     cat("Omnibus results summary of bare-bones meta-analyses of correlations:\n")
+     cat("Omnibus summary of bare-bones meta-analyses of correlations:\n")
      print.data.frame(x$grand_tables$barebones[,!grepl(x = colnames(x$grand_tables$barebones), pattern = "var_")], digits = digits)
 
 }
@@ -511,15 +511,15 @@ print.psychmeta.ma_r.ad.master <- function(x, ..., digits = 3){
 
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution meta-analyses of true-score correlations:\n")
+     cat("Omnibus summary of artifact-distribution true-score meta-analyses of correlations:\n")
      print.data.frame(x$grand_tables$artifact_distribution$true_score[,!grepl(x = colnames(x$grand_tables$artifact_distribution$true_score), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution meta-analyses of validity generalization correlations treating X as the predictor:\n")
+     cat("Omnibus results summary of artifact-distribution validity generalization meta-analyses of correlations (X measured with error):\n")
      print.data.frame(x$grand_tables$artifact_distribution$validity_generalization_x[,!grepl(x = colnames(x$grand_tables$artifact_distribution$validity_generalization_x), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution meta-analyses of validity generalization correlations treating Y as the predictor:\n")
+     cat("Omnibus results summary of artifact-distribution validity generalization meta-analyses of correlations (Y measured with error):\n")
      print.data.frame(x$grand_tables$artifact_distribution$validity_generalization_y[,!grepl(x = colnames(x$grand_tables$artifact_distribution$validity_generalization_y), pattern = "var_")], digits = digits)
 
 }
@@ -543,15 +543,15 @@ print.psychmeta.ma_r.ic.master <- function(x, ..., digits = 3){
      cat("-----------------------------\n")
 
      cat("\n")
-     cat("Omnibus results summary of individual-correction meta-analyses of true-score correlations:\n")
+     cat("Omnibus summary of individual-correction true-score meta-analyses of correlations:\n")
      print.data.frame(x$grand_tables$individual_correction$true_score[,!grepl(x = colnames(x$grand_tables$individual_correction$true_score), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of individual-correction meta-analyses of validity generalization correlations treating X as the predictor:\n")
+     cat("Omnibus summary of individual-correction validity generalization meta-analyses of correlations (X measured with error):\n")
      print.data.frame(x$grand_tables$individual_correction$validity_generalization_x[,!grepl(x = colnames(x$grand_tables$individual_correction$validity_generalization_x), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of individual-correction meta-analyses of validity generalization correlations treating Y as the predictor:\n")
+     cat("Omnibus summary of individual-correction validity generalization meta-analyses of correlations (Y measured with error):\n")
      print.data.frame(x$grand_tables$individual_correction$validity_generalization_y[,!grepl(x = colnames(x$grand_tables$individual_correction$validity_generalization_y), pattern = "var_")], digits = digits)
 }
 
@@ -696,7 +696,7 @@ print.psychmeta.ma_d.ic <- function(x, ..., digits = 3){
      cat("-----------------------------\n")
 
      cat("\n")
-     cat("Omnibus results summary of bare-bones meta-analyses of d values:\n")
+     cat("Omnibus summary of bare-bones meta-analyses of d values:\n")
      print.data.frame(x$grand_tables$barebones[,!grepl(x = colnames(x$grand_tables$barebones), pattern = "var_")], digits = digits)
 
 }
@@ -731,15 +731,15 @@ print.psychmeta.ma_d.ad.master <- function(x, ..., digits = 3){
 
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution meta-analyses of fully corrected d values:\n")
+     cat("Omnibus summary of artifact-distribution meta-analyses of fully corrected d values:\n")
      print.data.frame(x$grand_tables$artifact_distribution$latentGroup_latentY[,!grepl(x = colnames(x$grand_tables$artifact_distribution$latentGroup_latentY), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution meta-analyses of d values with observed scores and latent groups:\n")
+     cat("Omnibus summary of artifact-distribution meta-analyses of d values with observed scores and latent groups:\n")
      print.data.frame(x$grand_tables$artifact_distribution$observedGroup_latentY[,!grepl(x = colnames(x$grand_tables$artifact_distribution$observedGroup_latentY), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution meta-analyses of d values with latent scores and observed groups:\n")
+     cat("Omnibus summary of artifact-distribution meta-analyses of d values with latent scores and observed groups:\n")
      print.data.frame(x$grand_tables$artifact_distribution$latentGroup_observedY[,!grepl(x = colnames(x$grand_tables$artifact_distribution$latentGroup_observedY), pattern = "var_")], digits = digits)
 
 }
@@ -763,15 +763,15 @@ print.psychmeta.ma_d.ic.master <- function(x, ..., digits = 3){
      cat("-----------------------------\n")
 
      cat("\n")
-     cat("Omnibus results summary of individual-correction meta-analyses of fully corrected d values:\n")
+     cat("Omnibus summary of individual-correction meta-analyses of fully corrected d values:\n")
      print.data.frame(x$grand_tables$individual_correction$latentGroup_latentY[,!grepl(x = colnames(x$grand_tables$individual_correction$latentGroup_latentY), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of individual-correction meta-analyses of d values with observed scores and latent groups:\n")
+     cat("Omnibus summary of individual-correction meta-analyses of d values with observed scores and latent groups:\n")
      print.data.frame(x$grand_tables$individual_correction$observedGroup_latentY[,!grepl(x = colnames(x$grand_tables$individual_correction$observedGroup_latentY), pattern = "var_")], digits = digits)
 
      cat("\n")
-     cat("Omnibus results summary of individual-correction meta-analyses of d values with latent scores and observed groups:\n")
+     cat("Omnibus summary of individual-correction meta-analyses of d values with latent scores and observed groups:\n")
      print.data.frame(x$grand_tables$individual_correction$latentGroup_observedY[,!grepl(x = colnames(x$grand_tables$individual_correction$latentGroup_observedY), pattern = "var_")], digits = digits)
 }
 
@@ -1011,7 +1011,7 @@ print.psychmeta.simulate_psych <- function(x, ..., digits = 3){
      cat("\n")
      if(nrow(x$obs) > 5){
           cat("Preview of observed scores (first 10 rows):\n")
-          print.data.frame(x$obs[1:5,], digits = digits)
+          print.data.frame(x$observed[1:5,], digits = digits)
 
           cat("Preview of true scores (first 10 rows):\n")
           print.data.frame(x$true[1:5,], digits = digits)
@@ -1020,7 +1020,7 @@ print.psychmeta.simulate_psych <- function(x, ..., digits = 3){
           print.data.frame(x$error[1:5,], digits = digits)
      }else{
           cat("Observed scores:\n")
-          print.data.frame(x$obs, digits = digits)
+          print.data.frame(x$observed, digits = digits)
 
           cat("True scores:\n")
           print.data.frame(x$true, digits = digits)
@@ -1065,7 +1065,7 @@ print.psychmeta.simulate_r <- function(x, ..., digits = 3){
      cat("\n")
 
      cat("Observed Descriptive Statistics:\n")
-     print(round(x[["descriptives_obs"]], digits = digits))
+     print(round(x[["descriptives"]][["observed"]], digits = digits))
 
 }
 

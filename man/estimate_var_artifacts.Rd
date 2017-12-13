@@ -15,16 +15,16 @@
 \title{Taylor series approximations for the variances of estimates artifact distributions.}
 \usage{
 estimate_var_qxi(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0,
-  ux_observed = TRUE, indirect_rr = TRUE)
+  ux_observed = TRUE, indirect_rr = TRUE, qxa_type = "alpha")
 
 estimate_var_qxa(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0,
-  ux_observed = TRUE, indirect_rr = TRUE)
+  ux_observed = TRUE, indirect_rr = TRUE, qxi_type = "alpha")
 
 estimate_var_rxxi(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 0,
-  ux_observed = TRUE, indirect_rr = TRUE)
+  ux_observed = TRUE, indirect_rr = TRUE, rxxa_type = "alpha")
 
 estimate_var_rxxa(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 0,
-  ux_observed = TRUE, indirect_rr = TRUE)
+  ux_observed = TRUE, indirect_rr = TRUE, rxxi_type = "alpha")
 
 estimate_var_ut(rxx, var_rxx = 0, ux, var_ux = 0, cor_rxx_ux = 0,
   rxx_restricted = TRUE, rxx_as_qx = FALSE)
@@ -76,6 +76,8 @@ estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0,
 \item{var_rxxi}{Variance of incumbent reliability values.}
 
 \item{cor_rxxi_ux}{Correlation between rxxi and ux.}
+
+\item{rxxi_type, rxxa_type, qxi_type, qxa_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
 
 \item{rxx}{Generic argument for a reliability estimate (whether this is a reliability or the square root of a reliability is clarified by the \code{rxx_as_qx} argument).}
 

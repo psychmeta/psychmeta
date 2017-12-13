@@ -38,6 +38,30 @@
 #' @param rxx_restricted Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of ryy is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. Acceptable reliability types are:
+#' \itemize{
+#' \item{internal_consistency}{\cr A generic designation for internal-consistency reliability estimates derived from responses to a single test administration.}
+#' \item{multiple_administrations}{\cr A generic designation for reliability estimates derived from multiple administrations of a test.}
+#' \item{alpha}{\cr Coefficient alpha.}
+#' \item{lambda}{\cr Generic designation for a Guttman's lambda coefficient.}
+#' \item{lambda1}{\cr Guttman's lambda 1 coefficient.}
+#' \item{lambda2}{\cr Guttman's lambda 2 coefficient.}
+#' \item{lambda3}{\cr Guttman's lambda 3 coefficient.}
+#' \item{lambda4}{\cr Guttman's lambda 4 coefficient.}
+#' \item{lambda5}{\cr Guttman's lambda 5 coefficient.}
+#' \item{lambda6}{\cr Guttman's lambda 6 coefficient.}
+#' \item{omega}{\cr Omega coefficient indicating the proportion variance in a variable accounted for by modeled latent factors.}
+#' \item{icc}{\cr Intraclass correlation coefficient.}
+#' \item{interrater_r}{\cr Inter-rater correlation coefficient.}
+#' \item{interrater_r_sb}{\cr Inter-rater correlation coefficient, stepped up with the Spearman-Brown formula.}
+#' \item{splithalf}{\cr Split-half reliability coefficient.}
+#' \item{splithalf_sb}{\cr Split-half reliability coefficient, corrected toward the full test length with the Spearman-Brown formula.}
+#' \item{retest}{\cr Test-retest reliability coefficient.}
+#' \item{parallel}{\cr Parallel-forms reliability coefficient with tests taken during the same testing session.}
+#' \item{alternate}{\cr Alternate-forms reliability coefficient with tests taken during the same testing session.}
+#' \item{parallel_delayed}{\cr Parallel-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
+#' \item{alternate_delayed}{\cr Alternate-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
+#' }
 #' @param ux Vector or column name of u ratios for X.
 #' @param ux_observed Logical vector or column name determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
 #' @param uy Vector or column name of u ratios for Y.
@@ -64,23 +88,24 @@
 #' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all rescrepancies among artifact entries before and after impuation.
 #' @param impute_method Method to use for imputing artifacts. Choices are:
 #' \itemize{
-#' \item "bootstrap_mod" = select random values from the most specific moderator categories available (default).
-#' \item "bootstrap_full" = select random values from the full vector of artifacts.
-#' \item "simulate_mod" = generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
-#' (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-#' \item "simulate_full" = generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-#' \item "wt_mean_mod" = replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-#' \item "wt_mean_full" = replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).
-#' \item "unwt_mean_mod" = replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-#' \item "unwt_mean_full" = replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).
-#' \item "replace_unity" = replace missing values with 1 (not recommended).
-#' \item "stop" = stop evaluations when missing artifacts are encountered.
-#' If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
+#' \item{bootstrap_mod}{\cr Select random values from the most specific moderator categories available (default).}
+#' \item{bootstrap_full}{\cr Select random values from the full vector of artifacts.}
+#' \item{simulate_mod}{\cr Generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
+#' (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
+#' \item{simulate_full}{\cr Generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
+#' \item{wt_mean_mod}{\cr Replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
+#' \item{wt_mean_full}{\cr Replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).}
+#' \item{unwt_mean_mod}{\cr Replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
+#' \item{unwt_mean_full}{\cr Replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).}
+#' \item{replace_unity}{\cr Replace missing values with 1 (not recommended).}
+#' \item{stop}{\cr Stop evaluations when missing artifacts are encountered.}
 #' }
 #' If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
 #' @param decimals Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
 #' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 #' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
+#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).
+#' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
@@ -112,6 +137,41 @@
 #' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'      correct_rr_x = FALSE, correct_rr_y = FALSE,
 #'      construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+#'
+#' ## Artifact information from studies not included in the meta-analysis can also be used to make
+#' ## corrections. Passing artifact information with the 'supplemental_ads' argument allows for
+#' ## additional artifact values and/or means and variances of artifacts to be used.
+#' ## The 'supplemental_ads' analysis below gives the same results as the prior meta-analysis.
+#' x_ids <- c(data_r_meas_multi$x_name, data_r_meas_multi$y_name) == "X"
+#' rxxi <- c(data_r_meas_multi$rxxi, data_r_meas_multi$ryyi)[x_ids]
+#' n_rxxi = c(data_r_meas_multi$n, data_r_meas_multi$n)[x_ids]
+#'
+#' y_ids <- c(data_r_meas_multi$x_name, data_r_meas_multi$y_name) == "Y"
+#' ryyi <- c(data_r_meas_multi$rxxi, data_r_meas_multi$ryyi)[y_ids]
+#' n_ryyi = c(data_r_meas_multi$n, data_r_meas_multi$n)[y_ids]
+#'
+#' z_ids <- c(data_r_meas_multi$x_name, data_r_meas_multi$y_name) == "Z"
+#' rzzi <- c(data_r_meas_multi$rxxi, data_r_meas_multi$ryyi)[z_ids]
+#' n_rzzi = c(data_r_meas_multi$n, data_r_meas_multi$n)[z_ids]
+#'
+#' ma_r(ma_method = "ad", rxyi = rxyi, n = n,
+#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'      construct_x = x_name, construct_y = y_name,
+#'      moderators = moderator, data = data_r_meas_multi,
+#'      supplemental_ads = list(X = list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi),
+#'                              Y = list(rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi),
+#'                              Z = list(rxxi = rzzi, n_rxxi = n_rzzi, wt_rxxi = n_rzzi)))
+#'
+#' ## If 'use_all_arts' is set to TRUE, artifacts from studies without valid correlations
+#' ## will be used to inform artifact distributions. Below, correlations and artifacts
+#' ## are provided by non-overlapping sets of studies.
+#' dat1 <- dat2 <- data_r_meas_multi
+#' dat1$rxxi <- dat1$ryyi <- NA
+#' dat2$rxyi <- NA
+#' dat <- rbind(dat1, dat2)
+#' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'      construct_x = x_name, construct_y = y_name, moderators = moderator, data = dat)
 ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                  ma_method = "bb", ad_type = "tsa", correction_method = "auto",
                  construct_x = NULL, construct_y = NULL,
@@ -121,8 +181,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                  correct_bias = TRUE, correct_rxx = TRUE, correct_ryy = TRUE,
                  correct_rr_x = TRUE, correct_rr_y = TRUE,
                  indirect_rr_x = TRUE, indirect_rr_y = TRUE,
-                 rxx = NULL, rxx_restricted = TRUE,
-                 ryy = NULL, ryy_restricted = TRUE,
+                 rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
+                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
                  ux = NULL, ux_observed = TRUE,
                  uy = NULL, uy_observed = TRUE,
                  sign_rxz = 1, sign_ryz = 1,
@@ -131,16 +191,19 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                  pairwise_ads = FALSE,  residual_ads = TRUE,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5,
                  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod",
-                 decimals = 2, hs_override = FALSE, data = NULL, ...){
-     warn_obj1 <- record_warnings()
+                 decimals = 2, hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL, data = NULL, ...){
 
      ##### Get inputs #####
      call <- match.call()
+     warn_obj1 <- record_warnings()
      inputs <- list(wt_type = wt_type, error_type = error_type,
                     correct_bias = correct_bias, correct_rxx = correct_rxx, correct_ryy = correct_ryy,
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased,
                     cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
-     inputs <- append(inputs, list(...))
+     additional_args <- list(...)
+     inputs <- append(inputs, additional_args)
+
+     if(is.null(inputs$es_d)) cat(" **** Running ma_r: Meta-analysis of correlations **** \n")
 
      use_as_x <- inputs$use_as_x
      use_as_y <- inputs$use_as_y
@@ -181,6 +244,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
      error_type <- scalar_arg_warning(arg = error_type, arg_name = "error_type")
+     use_all_arts <- scalar_arg_warning(arg = use_all_arts, arg_name = "use_all_arts")
 
      conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
      cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
@@ -197,72 +261,91 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
           n <- match_variables(call = call_full[[match("n", names(call_full))]], arg = n, data = data)
 
-          if(deparse(substitute(n_adj)) != "NULL")
+          if(deparse(substitute(n_adj))[1] != "NULL")
                n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, data = data)
 
-          if(deparse(substitute(construct_x)) != "NULL")
+          if(deparse(substitute(construct_x))[1] != "NULL")
                construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, data = data)
 
-          if(deparse(substitute(construct_y)) != "NULL")
+          if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
 
-          if(deparse(substitute(measure_x)) != "NULL")
+          if(deparse(substitute(measure_x))[1] != "NULL")
                measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, data = data)
 
-          if(deparse(substitute(measure_y)) != "NULL")
+          if(deparse(substitute(measure_y))[1] != "NULL")
                measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, data = data)
 
-          if(deparse(substitute(rxx)) != "NULL")
+          if(deparse(substitute(rxx))[1] != "NULL")
                rxx <- match_variables(call = call_full[[match("rxx", names(call_full))]], arg = rxx, data = data)
 
-          if(deparse(substitute(rxx_restricted)) != "NULL")
+          if(deparse(substitute(rxx_restricted))[1] != "NULL")
                rxx_restricted <- match_variables(call = call_full[[match("rxx_restricted", names(call_full))]], arg = rxx_restricted, data = data)
 
-          if(deparse(substitute(ryy)) != "NULL")
+          if(deparse(substitute(rxx_type))[1] != "NULL")
+               rxx_type <- match_variables(call = call_full[[match("rxx_type", names(call_full))]], arg = rxx_type, data = data)
+
+          if(deparse(substitute(ryy))[1] != "NULL")
                ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, data = data)
 
-          if(deparse(substitute(ryy_restricted)) != "NULL")
+          if(deparse(substitute(ryy_restricted))[1] != "NULL")
                ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted", names(call_full))]], arg = ryy_restricted, data = data)
 
-          if(deparse(substitute(ux)) != "NULL")
+          if(deparse(substitute(ryy_type))[1] != "NULL")
+               ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, data = data)
+
+          if(deparse(substitute(ux))[1] != "NULL")
                ux <- match_variables(call = call_full[[match("ux", names(call_full))]], arg = ux, data = data)
 
-          if(deparse(substitute(ux_observed)) != "NULL")
+          if(deparse(substitute(ux_observed))[1] != "NULL")
                ux_observed <- match_variables(call = call_full[[match("ux_observed", names(call_full))]], arg = ux_observed, data = data)
 
-          if(deparse(substitute(uy)) != "NULL")
+          if(deparse(substitute(uy))[1] != "NULL")
                uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, data = data)
 
-          if(deparse(substitute(uy_observed)) != "NULL")
+          if(deparse(substitute(uy_observed))[1] != "NULL")
                uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, data = data)
 
-          if(deparse(substitute(sample_id)) != "NULL")
+          if(deparse(substitute(sample_id))[1] != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data))
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
 
-          if(deparse(substitute(correct_rr_x)) != "NULL")
+          if(deparse(substitute(correct_rr_x))[1] != "NULL")
                correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x", names(call_full))]], arg = correct_rr_x, data = data)
 
-          if(deparse(substitute(correct_rr_y)) != "NULL")
+          if(deparse(substitute(correct_rr_y))[1] != "NULL")
                correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y", names(call_full))]], arg = correct_rr_y, data = data)
 
-          if(deparse(substitute(indirect_rr_x)) != "NULL")
+          if(deparse(substitute(indirect_rr_x))[1] != "NULL")
                indirect_rr_x <- match_variables(call = call_full[[match("indirect_rr_x", names(call_full))]], arg = indirect_rr_x, data = data)
 
-          if(deparse(substitute(indirect_rr_y)) != "NULL")
+          if(deparse(substitute(indirect_rr_y))[1] != "NULL")
                indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y", names(call_full))]], arg = indirect_rr_y, data = data)
      }
 
      if(!is.null(moderators)){
-          moderator_levels <- lapply(data.frame(data.frame(moderators)[,cat_moderators]), function(x){
+          if(is.null(dim(moderators))){
+               moderators <- as.data.frame(moderators)
+               colnames(moderators) <- "Moderator"
+          }
+
+          moderator_names <- list(all = colnames(moderators),
+                                  cat = colnames(moderators)[cat_moderators],
+                                  noncat = colnames(moderators)[!cat_moderators])
+          moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
+
+          moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
                lvls <- levels(x)
                if(is.null(lvls)) lvls <- levels(factor(x))
                lvls
           })
           names(moderator_levels) <- colnames(moderators)
      }else{
+          moderator_names <- list(all = NULL,
+                                  cat = NULL,
+                                  noncat = NULL)
           moderator_levels <- NULL
           if(grepl(x = impute_method, "_mod")){
                impute_method <- gsub(x = impute_method, pattern = "_mod", replacement = "_full")
@@ -314,6 +397,77 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           if(length(indirect_rr_y) != length(rxyi)) indirect_rr_y <- scalar_arg_warning(arg = indirect_rr_y, arg_name = "indirect_rr_y")
      }
 
+     rxx_type <- as.character(rxx_type)
+     ryy_type <- as.character(ryy_type)
+     rxx_type <- manage_arglength(x = rxx_type, y = rxyi)
+     ryy_type <- manage_arglength(x = ryy_type, y = rxyi)
+     rxx_consistency <- convert_reltype2consistency(rel_type = rxx_type)
+     ryy_consistency <- convert_reltype2consistency(rel_type = ryy_type)
+
+     if(use_all_arts & any(!valid_r)){
+          .rxx_type <- rxx_type[!valid_r]
+          .ryy_type <- ryy_type[!valid_r]
+
+          .n <- n[!valid_r]
+          if(!is.null(sample_id)){
+               .sample_id <- as.character(sample_id)[!valid_r]
+          }else{
+               .sample_id <- NULL
+          }
+          if(!is.null(construct_x)){
+               .construct_x <- as.character(construct_x)[!valid_r]
+          }else{
+               .construct_x <- NULL
+          }
+          if(!is.null(construct_y)){
+               .construct_y <- as.character(construct_y)[!valid_r]
+          }else{
+               .construct_y <- NULL
+          }
+          if(!is.null(measure_x)){
+               .measure_x <- as.character(measure_x)[!valid_r]
+          }else{
+               .measure_x <- NULL
+          }
+          if(!is.null(measure_y)){
+               .measure_y <- as.character(measure_y)[!valid_r]
+          }else{
+               .measure_y <- NULL
+          }
+
+          .rxx <- manage_arglength(x = rxx, y = rxyi)[!valid_r]
+          .rxx_restricted <- manage_arglength(x = rxx_restricted, y = rxyi)[!valid_r]
+          .ryy <- manage_arglength(x = ryy, y = rxyi)[!valid_r]
+          .ryy_restricted <- manage_arglength(x = ryy_restricted, y = rxyi)[!valid_r]
+          .ux <- manage_arglength(x = ux, y = rxyi)[!valid_r]
+          .ux_observed <- manage_arglength(x = ux_observed, y = rxyi)[!valid_r]
+          .uy <- manage_arglength(x = uy, y = rxyi)[!valid_r]
+          .uy_observed <- manage_arglength(x = uy_observed, y = rxyi)[!valid_r]
+
+          .supplemental_ads <- create_ad_list(sample_id = .sample_id, n = .n,
+                                              construct_x = .construct_x, measure_x = .measure_x,
+                                              construct_y = .construct_y, measure_y = .measure_y,
+                                              rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type,
+                                              ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type,
+                                              ux = .ux, ux_observed = .ux_observed,
+                                              uy = .uy, uy_observed = .uy_observed, process_ads = FALSE)
+
+          if(is.null(supplemental_ads)){
+               supplemental_ads <- .supplemental_ads
+          }else{
+               for(i in names(.supplemental_ads)){
+                    if(is.null(supplemental_ads[[i]])){
+                         supplemental_ads[[i]] <- .supplemental_ads[[i]]
+                    }else{
+                         for(j in names(.supplemental_ads[[i]])){
+                              supplemental_ads[[i]][[j]] <- c(supplemental_ads[[i]][[j]], .supplemental_ads[[i]][[j]])
+                         }
+                    }
+               }
+          }
+
+     }
+
      if(is.null(construct_x)) construct_x <- rep("X", length(rxyi))
      if(is.null(construct_y)) construct_y <- rep("Y", length(rxyi))
 
@@ -331,6 +485,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
      correct_rr_y <- manage_arglength(x = correct_rr_y, y = rxyi)[valid_r]
      indirect_rr_y <- manage_arglength(x = indirect_rr_y, y = rxyi)[valid_r]
+
+     rxx_type <- rxx_type[valid_r]
+     ryy_type <- ryy_type[valid_r]
+     rxx_consistency <- rxx_consistency[valid_r]
+     ryy_consistency <- ryy_consistency[valid_r]
 
      rxx <- manage_arglength(x = rxx, y = rxyi)[valid_r]
      rxx_restricted <- manage_arglength(x = rxx_restricted, y = rxyi)[valid_r]
@@ -368,6 +527,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           data_x <- data_y <- data.frame(matrix(NA, length(rxyi), 0))
           if(!is.null(rxx)){data_x$rxx <- rxx}else{data_x$rxx <- NA}
           if(!is.null(rxx_restricted)){data_x$rxx_restricted <- rxx_restricted}else{data_x$rxx_restricted <- TRUE}
+          if(!is.null(rxx_type)){data_x$rxx_type <- rxx_type}else{data_x$rxx_type <- "alpha"}
+          if(!is.null(rxx_consistency)){data_x$rxx_consistency <- rxx_consistency}else{data_x$rxx_consistency <- TRUE}
           if(!is.null(ux)){data_x$ux <- ux}else{data_x$ux <- NA}
           if(!is.null(ux_observed)){data_x$ux_observed <- ux_observed}else{data_x$ux_observed <- TRUE}
           if(!is.null(correct_rr_x)){data_x$correct_rr_x <- correct_rr_x}else{data_x$correct_rr_x <- FALSE}
@@ -375,6 +536,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
           if(!is.null(ryy)){data_y$ryy <- ryy}else{data_y$ryy <- NA}
           if(!is.null(ryy_restricted)){data_y$ryy_restricted <- ryy_restricted}else{data_y$ryy_restricted <- TRUE}
+          if(!is.null(ryy_type)){data_y$ryy_type <- ryy_type}else{data_y$ryy_type <- "alpha"}
+          if(!is.null(ryy_consistency)){data_y$ryy_consistency <- ryy_consistency}else{data_y$ryy_consistency <- TRUE}
           if(!is.null(uy)){data_y$uy <- uy}else{data_y$uy <- NA}
           if(!is.null(uy_observed)){data_y$uy_observed <- uy_observed}else{data_y$uy_observed <- TRUE}
           if(!is.null(correct_rr_y)){data_y$correct_rr_y <- correct_rr_y}else{data_y$correct_rr_y <- FALSE}
@@ -405,6 +568,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
      if(ma_method != "bb" & !is.null(sample_id)){
           if(impute_artifacts){
+               print.psychmeta
+               cat(" Imputing reliability information \n")
                rel_imputed <- impute_artifact_2col(logic_vec_x = data_x$rxx_restricted,
                                                    logic_vec_y = data_y$ryy_restricted,
                                                    sample_id = sample_id, n_vec = n,
@@ -417,6 +582,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                                    cat_moderator_matrix = categorical_moderators,
                                                    impute_method = impute_method, art_type = "reliability")
 
+               cat(" Imputing range-restriction information \n")
                u_imputed <- impute_artifact_2col(logic_vec_x = data_x$ux_observed,
                                                  logic_vec_y = data_y$uy_observed,
                                                  sample_id = sample_id, n_vec = n,
@@ -440,6 +606,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                data_y$uy_observed <- u_imputed$logic_vec_y
           }else{
                if(clean_artifacts){
+                    cat(" Cleaning reliability information \n")
                     rel_reconciled <- reconcile_artifacts(logic_vec_x = data_x$rxx_restricted,
                                                           logic_vec_y = data_y$ryy_restricted,
                                                           sample_id = sample_id,
@@ -450,6 +617,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                                           measure_x = measure_x,
                                                           measure_y = measure_y)
 
+                    cat(" Cleaning range-restriction information \n")
                     u_reconciled <- reconcile_artifacts(logic_vec_x = data_x$ux_observed,
                                                         logic_vec_y = data_y$uy_observed,
                                                         sample_id = sample_id,
@@ -530,7 +698,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                     }
                }
 
+          n_dups <- length(unique(duplicates$Analysis_ID))
+          progbar <- progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
+                                      total = n_dups, clear = FALSE, width = options()$width)
           collapsed_data_list <- by(1:length(duplicates$Analysis_ID), duplicates$Analysis_ID, function(i){
+               progbar$tick()
                out <- .remove_dependency(sample_id = "sample_id", es_data = str_es_data,
                                          data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
                                          intercor=intercor, partial_intercor = partial_intercor, construct_x = "construct_x", construct_y = "construct_y",
@@ -561,7 +733,14 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           if(!is.null(str_compmod_temp)) complete_moderators <- indep_data[, str_compmod_temp]
           analysis_id <- indep_data$Analysis_ID
           analysis_type <- as.character(indep_data$Analysis_Type)
+
+          if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
           presorted_data <- as_tibble(cbind(Analysis_ID=analysis_id, Analysis_Type=analysis_type, categorical_moderators))
+
+          if(!is.null(moderator_names[["cat"]])){
+               moderator_ids <- (length(analysis_id_variables) - length(moderator_names[["cat"]]) + 1):length(analysis_id_variables)
+               colnames(presorted_data)[moderator_ids] <- analysis_id_variables[moderator_ids] <- moderator_names[["cat"]]
+          }
 
           rm(collapsed_data_list, collapsed_data, duplicates, indep_data, duplicate_samples, full_data)
      }else{
@@ -575,9 +754,23 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           construct_pair <- factor(construct_pair, levels = possible_levels)
      }
 
+     if(!is.null(moderators)){
+          moderators <- as.data.frame(moderators)
+          if(!is.null(moderator_names[["all"]])){
+               colnames(moderators) <- moderator_names[["all"]]
+          }else{
+               colnames(moderators) <- paste0("Moderator_", 1:ncol(moderators))
+          }
+     }
+
      ##### Compute meta-analyses and artifact distributions #####
+     n_pairs <- length(unique(construct_pair))
+     progbar <- progress_bar$new(format = " Computing meta-analyses [:bar] :percent est. time remaining: :eta",
+                            total = n_pairs, clear = FALSE, width = options()$width)
+
      if(ma_method == "bb"){
           ma_list <- by(1:length(construct_pair), construct_pair, function(i){
+               progbar$tick()
 
                if(!is.null(presorted_data)){
                     id2logic <- rep(FALSE, length(presorted_data$Analysis_ID))
@@ -596,7 +789,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                       ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
                                                          cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
-                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables, moderator_levels = moderator_levels)
+                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
+                                      moderator_levels = moderator_levels, moderator_names = moderator_names)
                }else{
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "r", ma_type = "bb", ma_fun = .ma_r_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
@@ -604,7 +798,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                       ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
                                                          cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
-                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables, moderator_levels = moderator_levels)
+                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
+                                      moderator_levels = moderator_levels, moderator_names = moderator_names)
                }
 
                if(!is.null(construct_y)) out$barebones$meta_table <- cbind(Construct_Y = construct_y[i][1], out$barebones$meta_table)
@@ -616,7 +811,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
                if(es_d & treat_as_d){
                     class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
-
                }else{
                     class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
                }
@@ -632,14 +826,17 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                              artifact_distribution = NULL)
      }
 
-
      if(ma_method == "ic"){
           ad_obj_list_tsa <- .create_ad_list(ad_type = "tsa", sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
-                                             construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y, pairwise_ads = pairwise_ads)
+                                             construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
+                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads)
           ad_obj_list_int <- .create_ad_list(ad_type = "int", sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
-                                             construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y, pairwise_ads = pairwise_ads)
+                                             construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
+                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads)
 
           ma_list <- by(1:length(construct_pair), construct_pair, function(i){
+               progbar$tick()
+
                mod_names <- colnames(complete_moderators)
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
 
@@ -671,13 +868,15 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                ad_x_int <- ad_obj_list_int[[construct_pair[i][1]]][["ad_obj_x"]]
                ad_y_int <- ad_obj_list_int[[construct_pair[i][1]]][["ad_obj_y"]]
 
+               colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
+
                out <- ma_r_ic(rxyi = "rxyi", n = "n", n_adj = "n_adj", sample_id = "sample_id", hs_override = hs_override,
                               wt_type = wt_type, error_type = error_type,
                               correct_bias = correct_bias, correct_rxx = correct_rxx, correct_ryy = correct_ryy,
                               correct_rr_x = "correct_rr_x", correct_rr_y = "correct_rr_y",
                               indirect_rr_x = "indirect_rr_x", indirect_rr_y = "indirect_rr_y",
-                              rxx = "rxx", rxx_restricted = "rxx_restricted",
-                              ryy = "ryy", ryy_restricted = "ryy_restricted",
+                              rxx = "rxx", rxx_restricted = "rxx_restricted", rxx_type = "rxx_type",
+                              ryy = "ryy", ryy_restricted = "ryy_restricted", ryy_type = "ryy_type",
                               ux = "ux", ux_observed = "ux_observed",
                               uy = "uy", uy_observed = "uy_observed",
                               sign_rxz = sign_rxz, sign_ryz = sign_ryz,
@@ -729,11 +928,13 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      }
 
      if(ma_method == "ad"){
-
-          ad_obj_list <-  .create_ad_list(ad_type = ad_type, sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
-                                          construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y, pairwise_ads = pairwise_ads)
+          ad_obj_list <- .create_ad_list(ad_type = ad_type, sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
+                                         construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
+                                         pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads)
 
           ma_list <- by(1:length(construct_pair), construct_pair, function(i){
+               progbar$tick()
+
                mod_names <- colnames(complete_moderators)
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
 
@@ -766,7 +967,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                       ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
                                                          cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
-                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables, moderator_levels = moderator_levels)
+                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
+                                      moderator_levels = moderator_levels, moderator_names = moderator_names)
                }else{
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "r", ma_type = "bb", ma_fun = .ma_r_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
@@ -774,7 +976,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                       ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
                                                          cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
-                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables, moderator_levels = moderator_levels)
+                                      presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
+                                      moderator_levels = moderator_levels, moderator_names = moderator_names)
                }
 
                if(!is.null(construct_y)) out$barebones$meta_table <- cbind(Construct_Y = construct_y[i][1], out$barebones$meta_table)

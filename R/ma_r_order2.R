@@ -46,7 +46,7 @@
 #' ## job performance by Eastern Asian country
 #' ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'             var_r_c = NULL, k = k, ma_type = "ad",
-#'             sample_id = NULL, moderators = Country,
+#'             sample_id = NULL, moderators = "Country",
 #'             conf_level = .95, cred_level = .8, cred_method = "t",
 #'             var_unbiased = TRUE, data = data_r_oh_2009)
 ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = NULL, ma_type = c("bb", "ic", "ad"),
@@ -69,42 +69,55 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- data.frame(data)
+          data <- as.data.frame(data)
 
-          k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, data = data)
+          if(deparse(substitute(k))[1] != "NULL")
+               k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, data = data)
 
-          if(deparse(substitute(r)) != "NULL")
+          if(deparse(substitute(r))[1] != "NULL")
                r <- match_variables(call = call_full[[match("r", names(call_full))]], arg = r, data = data)
 
-          if(deparse(substitute(rho)) != "NULL")
+          if(deparse(substitute(rho))[1] != "NULL")
                rho <- match_variables(call = call_full[[match("rho", names(call_full))]], arg = rho, data = data)
 
-          if(deparse(substitute(var_r)) != "NULL")
+          if(deparse(substitute(var_r))[1] != "NULL")
                var_r <- match_variables(call = call_full[[match("var_r", names(call_full))]], arg = var_r, data = data)
 
-          if(deparse(substitute(var_r_c)) != "NULL")
+          if(deparse(substitute(var_r_c))[1] != "NULL")
                var_r_c <- match_variables(call = call_full[[match("var_r_c", names(call_full))]], arg = var_r_c, data = data)
 
-          if(deparse(substitute(sample_id)) != "NULL")
+          if(deparse(substitute(sample_id))[1] != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = data)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
 
-          if(deparse(substitute(construct_x)) != "NULL")
+          if(deparse(substitute(construct_x))[1] != "NULL")
                construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, data = data)
 
-          if(deparse(substitute(construct_y)) != "NULL")
+          if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
      }
 
      if(!is.null(moderators)){
-          moderator_levels <- lapply(data.frame(data.frame(moderators)[,TRUE]), function(x){
+          moderator_names <- list(all = colnames(moderators),
+                                  cat = colnames(moderators),
+                                  noncat = colnames(moderators))
+          moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
+
+          moderator_levels <- lapply(as_tibble(moderators), function(x){
                lvls <- levels(x)
                if(is.null(lvls)) lvls <- levels(factor(x))
                lvls
           })
+          names(moderator_levels) <- colnames(moderators)
+
+          moderators <- as.data.frame(moderators)
      }else{
+          moderator_names <- list(all = NULL,
+                                  cat = NULL,
+                                  noncat = NULL)
+
           moderator_levels <- NULL
      }
 
@@ -160,7 +173,8 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
                        moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = TRUE,
                        construct_x = construct_x, construct_y = construct_y,
 
-                       ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad)), moderator_levels = moderator_levels)
+                       ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad)),
+                       moderator_levels = moderator_levels, moderator_names = moderator_names)
 
      out <- append(list(call = call, inputs = inputs), out)
 

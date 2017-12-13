@@ -444,13 +444,14 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                       R_complete_a = R_complete_a,
                       R_complete_i = R_complete_i,
 
-                      descriptives_obs = desc_mat_obs,
-                      descriptives_true = desc_mat_true,
-                      descriptives_error = desc_mat_error,
+                      descriptives = list(observed = desc_mat_obs,
+                                          true = desc_mat_true,
+                                          error = desc_mat_error),
 
-                      data_obs = data.frame(obs_scores_a, selected = select_vec),
-                      data_true = data.frame(true_scores_a, selected = select_vec),
-                      data_error = data.frame(error_scores_a, selected = select_vec))
+                      data = list(observed = data.frame(obs_scores_a, selected = select_vec),
+                                  true = data.frame(true_scores_a, selected = select_vec),
+                                  error = data.frame(error_scores_a, selected = select_vec))
+                      )
      }else{
           S_xy_a <- cov(obs_scores_a)
           S_xy_i <- cov(obs_scores_a[select_vec,])
@@ -482,7 +483,8 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                       S_obs_a = S_xy_a,
                       S_obs_i = S_xy_i,
 
-                      descriptives_obs = desc_mat_obs)
+                      # descriptives_obs = desc_mat_obs,
+                      descriptives = list(observed = desc_mat_obs))
      }
 
      class(out) <- c("psychmeta", "simulate_r")
@@ -659,13 +661,10 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                  R_complete_a = R_complete_a,
                  R_complete_i = R_complete_i,
 
-                 descriptives_obs = desc_mat_obs,
-                 descriptives_true = desc_mat_true,
-                 descriptives_error = desc_mat_error,
-
-                 data_obs = NULL,
-                 data_true = NULL,
-                 data_error = NULL)
+                 descriptives = list(observed = desc_mat_obs,
+                                     true = desc_mat_true,
+                                     error = desc_mat_error)
+                 )
 
      class(out) <- c("psychmeta", "simulate_r")
      out
@@ -682,7 +681,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #'
 #' @param k Number of studies to simulate.
 #' @param n_params Parameter distribution (or data-generation function; see details) for sample size.
-#' @param rho_params List of parameter distributions (or data-generation functions; see details) for correlations.
+#' @param rho_params List of parameter distributions (or data-generation functions; see details) for correlations. If simulating data from a single fixed population matrix, that matrix can be supplied for this argument (if the diagonal contains non-unity values and 'sigma_params' is not specified, those values will be used as variances).
 #' @param mu_params List of parameter distributions (or data-generation functions; see details) for means.
 #' @param sigma_params List of parameter distributions (or data-generation functions; see details) for standard deviations.
 #' @param rel_params List of parameter distributions (or data-generation functions; see details) for reliabilities.
@@ -717,6 +716,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #' @export
 #'
 #' @importFrom tibble add_column
+#' @importFrom progress progress_bar
 #'
 #' @keywords datagen
 #'
@@ -762,6 +762,13 @@ simulate_r_database <- function(k, n_params, rho_params,
      if(zapsmall(decimals) != round(decimals)){
           decimals <- round(decimals)
           stop("'decimals' must be an integer: rounding supplied value to ", decimals, call. = FALSE)
+     }
+
+     if(is.matrix(rho_params)){
+          if(nrow(rho_params) == ncol(rho_params)){
+               if(length(sigma_params) == 1 & sigma_params[1] == 1) sigma_params <- diag(rho_params)
+               rho_params <- as.list(rho_params[lower.tri(rho_params)])
+          }
      }
 
      if((!is.null(wt_params) & is.null(sr_composite_params)) | (is.null(wt_params) & !is.null(sr_composite_params)))
@@ -935,30 +942,25 @@ simulate_r_database <- function(k, n_params, rho_params,
           }
      }
 
-     sim_dat_stats <- lapply(param_list, function(x){
-          .simulate_r_sample_stats(n = x[["n"]], rho_mat = x[["rho_mat"]],
-                                   mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
-                                   rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
-                                   wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                                   var_names = var_names, composite_names = composite_names)
+     progbar <- progress_bar$new(format = " Simulating correlation database [:bar] :percent est. time remaining: :eta",
+                                 total = length(param_list), clear = FALSE, width = options()$width)
+     sim_dat_list <- lapply(param_list, function(x){
+          progbar$tick()
+          out_stats <- .simulate_r_sample_stats(n = x[["n"]], rho_mat = x[["rho_mat"]],
+                                                mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
+                                                rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
+                                                wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
+                                                var_names = var_names, composite_names = composite_names, obs_only = TRUE)
+          out_params <- .simulate_r_sample_params(n = Inf, rho_mat = x[["rho_mat"]],
+                                                  mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
+                                                  rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
+                                                  wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
+                                                  var_names = var_names, composite_names = composite_names)
+          list(stats = out_stats,
+               params = out_params)
      })
-
-     for(i in 1:length(param_list)){
-          x <- param_list[[i]]
-          .simulate_r_sample_stats(n = x[["n"]], rho_mat = x[["rho_mat"]],
-                                   mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
-                                   rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
-                                   wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                                   var_names = var_names, composite_names = composite_names)
-     }
-
-     sim_dat_params <- lapply(param_list, function(x){
-          .simulate_r_sample_params(n = Inf, rho_mat = x[["rho_mat"]],
-                                    mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
-                                    rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
-                                    wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                                    var_names = var_names, composite_names = composite_names)
-     })
+     sim_dat_stats <- lapply(sim_dat_list, function(x) x[["stats"]])
+     sim_dat_params <- lapply(sim_dat_list, function(x) x[["params"]])
 
      if(keep_vars[1] != "all"){
           var_names <- keep_vars
@@ -1214,9 +1216,9 @@ format_wide <- function(x, param, var_names, show_applicant, decimals = 2){
      }
 
      if(show_applicant | param){
-          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives_obs[c(2, 1, 3, 5, 4, 7, 6),var_names], 1, function(x) list(x))))))
+          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives$observed[c(2, 1, 3, 5, 4, 7, 6),var_names], 1, function(x) list(x))))))
      }else{
-          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives_obs[c(2, 3, 5, 7),var_names], 1, function(x) list(x))))))
+          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives$observed[c(2, 3, 5, 7),var_names], 1, function(x) list(x))))))
      }
 
      desc_names <- colnames(desc_mat)
@@ -1233,10 +1235,12 @@ format_wide <- function(x, param, var_names, show_applicant, decimals = 2){
      desc_names <- gsub(x = desc_names, pattern = "Applicant mean.", replacement = "meanxa_")
      colnames(desc_mat) <- desc_names
 
+     rel_types <- setNames(as.data.frame(matrix("parallel", nrow = length(ni), ncol = length(var_names)), stringsAsFactors = FALSE),
+                           paste0("rel_type_", var_names))
      if(param){
-          data.frame(sample_id = 1:length(ni), ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat)
+          cbind(data.frame(sample_id = 1:length(ni), ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat), rel_types)
      }else{
-          data.frame(sample_id = 1:length(ni), round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals))
+          cbind(data.frame(sample_id = 1:length(ni), round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals)), rel_types)
      }
 }
 
@@ -1268,12 +1272,12 @@ format_long <- function(x, param, var_names, show_applicant, decimals = 2){
           cor_vec_i <- dat$R_obs_i[var_names,var_names][lower.tri(dat$R_obs_i[var_names,var_names])]
           if(show_applicant | param){
                cor_vec_a <- dat$R_obs_a[var_names,var_names][lower.tri(dat$R_obs_a[var_names,var_names])]
-               desc_1 <- t(dat$descriptives_obs[c(2, 1, 3, 5, 4, 7, 6),cor_name_1])
-               desc_2 <- t(dat$descriptives_obs[c(2, 1, 3, 5, 4, 7, 6),cor_name_2])
+               desc_1 <- t(dat$descriptives$observed[c(2, 1, 3, 5, 4, 7, 6),cor_name_1])
+               desc_2 <- t(dat$descriptives$observed[c(2, 1, 3, 5, 4, 7, 6),cor_name_2])
           }else{
                cor_vec_a <- NULL
-               desc_1 <- t(dat$descriptives_obs[c(2, 3, 5, 7),cor_name_1])
-               desc_2 <- t(dat$descriptives_obs[c(2, 3, 5, 7),cor_name_2])
+               desc_1 <- t(dat$descriptives$observed[c(2, 3, 5, 7),cor_name_1])
+               desc_2 <- t(dat$descriptives$observed[c(2, 3, 5, 7),cor_name_2])
           }
 
           rownames(desc_1) <- rownames(desc_2) <- NULL
@@ -1329,12 +1333,13 @@ format_long <- function(x, param, var_names, show_applicant, decimals = 2){
      colnames(desc_1) <- desc_names
      colnames(desc_2) <- gsub(x = desc_names, pattern = "x", replacement = "y")
 
+     rel_types <- setNames(as.data.frame(matrix("parallel", nrow = length(sample_id), ncol = 2), stringsAsFactors = FALSE), c("rxx_type", "ryy_type"))
      if(param){
-          data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name, ni = ni, na = na,
-                     rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2)
+          cbind(data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name, ni = ni, na = na,
+                     rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), rel_types)
      }else{
-          data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name,
-                     round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals))
+          cbind(data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name,
+                           round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals)), rel_types)
      }
 }
 

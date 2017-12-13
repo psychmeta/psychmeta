@@ -1,4 +1,4 @@
-match_variables <- function(call, arg, data){
+match_variables <- function(call, arg, data, show_arg = FALSE, as_array = FALSE){
      x  <- eval(call, data, enclos=sys.frame(sys.parent()))
      if(!is.null(x)){
           if(is.character(x)){
@@ -8,7 +8,11 @@ match_variables <- function(call, arg, data){
                     x
                }
           }else{
-               x
+               if(as_array & is.null(dim(x))){
+                    setNames(as.data.frame(x), as.character(call))
+               }else{
+                    x
+               }
           }
      }else{
           arg
@@ -16,7 +20,8 @@ match_variables <- function(call, arg, data){
 }
 
 
-clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator_levels = NULL){
+clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator_levels = NULL, moderator_names = NULL){
+     .moderator_names <- moderator_names
      if(!is.null(moderator_matrix)){
           if(is.null(dim(moderator_matrix))) moderator_matrix <- data.frame(Moderator = moderator_matrix)
 
@@ -55,6 +60,12 @@ clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator
      }else{
           cat_moderator_matrix <- NULL
      }
+
+     if(!is.null(.moderator_names)){
+          colnames(moderator_matrix) <- .moderator_names[["all"]]
+          colnames(cat_moderator_matrix) <- .moderator_names[["cat"]]
+     }
+
      list(moderator_matrix = moderator_matrix,
           cat_moderator_matrix = cat_moderator_matrix)
 }

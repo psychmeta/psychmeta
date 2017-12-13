@@ -176,10 +176,10 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
                                                       rel_vec = rel_mat[i,], sr_vec = rep(1, nrow(rel_mat)),
                                                       var_names = var_names, composite_names = composite_names)
 
-          last_col <- ncol(group_list[[i]]$data_obs)
-          dat_list <- list(obs = group_list[[i]]$data_obs[,-last_col],
-                           true = group_list[[i]]$data_true[,-last_col],
-                           error = group_list[[i]]$data_error[,-last_col])
+          last_col <- ncol(group_list[[i]]$data$observed)
+          dat_list <- list(obs = group_list[[i]]$data$observed[,-last_col],
+                           true = group_list[[i]]$data$true[,-last_col],
+                           error = group_list[[i]]$data$error[,-last_col])
 
           obs_a <- rbind(obs_a, data.frame(group = group_names[i], dat_list[["obs"]]))
           true_a <- rbind(true_a, data.frame(group = group_names[i], dat_list[["true"]]))
@@ -355,27 +355,27 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
           group_list[[i]]$R_obs_i <- ri_obs_group[[i]]
           group_list[[i]]$S_complete_i <- si_group[[i]]
           group_list[[i]]$R_complete_i <- suppressWarnings(cov2cor(si_group[[i]]))
-          group_list[[i]]$descriptives_obs["Incumbent reliability",] <- ryyi_group[,i]
-          group_list[[i]]$descriptives_obs["Incumbent SD",] <- sdyi_mat_obs[,i]
-          group_list[[i]]$descriptives_obs["Incumbent mean",] <- meanyi_mat_obs[,i]
-          group_list[[i]]$descriptives_obs["u ratio",] <- u_mat_obs[,i]
+          group_list[[i]]$descriptives$observed["Incumbent reliability",] <- ryyi_group[,i]
+          group_list[[i]]$descriptives$observed["Incumbent SD",] <- sdyi_mat_obs[,i]
+          group_list[[i]]$descriptives$observed["Incumbent mean",] <- meanyi_mat_obs[,i]
+          group_list[[i]]$descriptives$observed["u ratio",] <- u_mat_obs[,i]
 
-          group_list[[i]]$descriptives_true["Incumbent SD",] <- sdyi_mat_true[,i]
-          group_list[[i]]$descriptives_true["Incumbent mean",] <- meanyi_mat_true[,i]
-          group_list[[i]]$descriptives_true["u ratio",] <- u_mat_true[,i]
+          group_list[[i]]$descriptives$true["Incumbent SD",] <- sdyi_mat_true[,i]
+          group_list[[i]]$descriptives$true["Incumbent mean",] <- meanyi_mat_true[,i]
+          group_list[[i]]$descriptives$true["u ratio",] <- u_mat_true[,i]
 
-          group_list[[i]]$descriptives_error["Incumbent SD",] <- sdyi_mat_error[,i]
-          group_list[[i]]$descriptives_error["Incumbent mean",] <- meanyi_mat_error[,i]
-          group_list[[i]]$descriptives_error["u ratio",] <- u_mat_error[,i]
+          group_list[[i]]$descriptives$error["Incumbent SD",] <- sdyi_mat_error[,i]
+          group_list[[i]]$descriptives$error["Incumbent mean",] <- meanyi_mat_error[,i]
+          group_list[[i]]$descriptives$error["u ratio",] <- u_mat_error[,i]
 
           obs_out <- obs_a[obs_a$group == group_names[[i]],-1]
           true_out <- true_a[true_a$group == group_names[[i]],-1]
           error_out <- error_a[error_a$group == group_names[[i]],-1]
           rownames(obs_out) <- rownames(true_out) <- rownames(error_out) <- NULL
 
-          group_list[[i]]$data_obs <- obs_out
-          group_list[[i]]$data_true <- true_out
-          group_list[[i]]$data_error <- error_out
+          group_list[[i]]$data$observed <- obs_out
+          group_list[[i]]$data$true <- true_out
+          group_list[[i]]$data$error <- error_out
      }
 
      pa_ref <- na_ref / (na_ref + na_foc)
@@ -597,20 +597,20 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
      S_complete_a <- lapply(group_list, function(x){x[["S_complete_a"]]})
      S_complete_i <- lapply(group_list, function(x){x[["S_complete_i"]]})
 
-     meanya_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives_obs"]]["Applicant mean",]}))
-     meanyi_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives_obs"]]["Incumbent mean",]}))
-     sdya_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives_obs"]]["Applicant SD",]}))
-     sdyi_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives_obs"]]["Incumbent SD",]}))
+     meanya_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["observed"]]["Applicant mean",]}))
+     meanyi_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["observed"]]["Incumbent mean",]}))
+     sdya_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["observed"]]["Applicant SD",]}))
+     sdyi_mat_obs <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["observed"]]["Incumbent SD",]}))
 
-     meanya_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives_true"]]["Applicant mean",]}))
-     meanyi_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives_true"]]["Incumbent mean",]}))
-     sdya_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives_true"]]["Applicant SD",]}))
-     sdyi_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives_true"]]["Incumbent SD",]}))
+     meanya_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["true"]]["Applicant mean",]}))
+     meanyi_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["true"]]["Incumbent mean",]}))
+     sdya_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["true"]]["Applicant SD",]}))
+     sdyi_mat_true <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["true"]]["Incumbent SD",]}))
 
-     meanya_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives_error"]]["Applicant mean",]}))
-     meanyi_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives_error"]]["Incumbent mean",]}))
-     sdya_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives_error"]]["Applicant SD",]}))
-     sdyi_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives_error"]]["Incumbent SD",]}))
+     meanya_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["error"]]["Applicant mean",]}))
+     meanyi_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["error"]]["Incumbent mean",]}))
+     sdya_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["error"]]["Applicant SD",]}))
+     sdyi_mat_error <- simplify2array(lapply(group_list, function(x){x[["descriptives"]][["error"]]["Incumbent SD",]}))
 
      meanya <- cbind(meanya_mat_obs, meanya_mat_true, meanya_mat_error)
      meanyi <- cbind(meanyi_mat_obs, meanyi_mat_true, meanyi_mat_error)
@@ -648,11 +648,11 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
      da_error <- .compute_d_internal(mean_mat = meanya_mat_error, sd_mat = sdya_mat_error, p_vec = pa)
 
 
-     ryya <- diag(cov2cor(mix_out_a$cov_ml)[paste0("True_", var_names),paste0("Obs_", var_names)])^2
-     ryyi <- diag(cov2cor(mix_out_i$cov_ml)[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+     ryya <- diag(suppressWarnings(cov2cor(mix_out_a$cov_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+     ryyi <- diag(suppressWarnings(cov2cor(mix_out_i$cov_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
 
-     ryya_group <- simplify2array(lapply(S_complete_a, function(x) diag(cov2cor(x)[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
-     ryyi_group <- simplify2array(lapply(S_complete_i, function(x) diag(cov2cor(x)[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
+     ryya_group <- simplify2array(lapply(S_complete_a, function(x) diag(suppressWarnings(cov2cor(x))[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
+     ryyi_group <- simplify2array(lapply(S_complete_i, function(x) diag(suppressWarnings(cov2cor(x))[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
 
      sa <- mix_out_a$cov_ml
      si <- mix_out_i$cov_ml
@@ -866,11 +866,11 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
 #'
 #' @param k Number of studies to simulate.
 #' @param n_params List of parameter distributions (or data-generation function; see details) for subgroup sample sizes.
-#' @param rho_params List containing a list of parameter distributions (or data-generation functions; see details) for correlations for each simulated group.
-#' @param mu_params List containing a list of parameter distributions (or data-generation functions; see details) for means for each simulated group.
-#' @param sigma_params List containing a list of parameter distributions (or data-generation functions; see details) for standard deviations for each simulated group.
-#' @param rel_params List containing a list of parameter distributions (or data-generation functions; see details) for reliabilities for each simulated group.
-#' @param sr_params List of parameter distributions (or data-generation functions; see details) for selection ratios.
+#' @param rho_params List containing a list of parameter distributions (or data-generation functions; see details) for correlations for each simulated group. If simulating data from a single fixed population matrix in each group, supply a list of those matrices for this argument (if the diagonals contains non-unity values and 'sigma_params' argument is not specified, those values will be used as variances).
+#' @param mu_params List containing a list of parameter distributions (or data-generation functions; see details) for means for each simulated group. If \code{NULL}, all means will be set to zero.
+#' @param sigma_params List containing a list of parameter distributions (or data-generation functions; see details) for standard deviations for each simulated group. If \code{NULL}, all standard deviations will be set to unity.
+#' @param rel_params List containing a list of parameter distributions (or data-generation functions; see details) for reliabilities for each simulated group. If \code{NULL}, all reliabilities will be set to unity.
+#' @param sr_params List of parameter distributions (or data-generation functions; see details) for selection ratios. If \code{NULL}, all selection ratios will be set to unity.
 #' @param wt_params List of parameter distributions (or data-generation functions; see details) to create weights for use in forming composites.
 #' If multiple composites are formed, the list should be a list of lists, with the general format: \code{list(comp1_params = list(...params...), comp2_params = list(...params...), etc.)}.
 #' @param allow_neg_wt Logical scalar that determines whether negative weights should be allowed (\code{TRUE}) or not (\code{FALSE}).
@@ -902,6 +902,8 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
 #'
 #' @keywords datagen
 #'
+#' @importFrom progress progress_bar
+#'
 #' @examples
 #' ## Define sample sizes, means, and other parameters for each of two groups:
 #' n_params <- list(c(mean = 200, sd = 20),
@@ -922,8 +924,8 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, s
 #'                     group_names = NULL, var_names = c("y1", "y2"),
 #'                     show_applicant = TRUE, keep_vars = c("y1", "y2"), decimals = 2)
 simulate_d_database <- function(k, n_params, rho_params,
-                                mu_params, sigma_params,
-                                rel_params, sr_params,
+                                mu_params = NULL, sigma_params = NULL,
+                                rel_params = NULL, sr_params = NULL,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
                                 group_names = NULL, var_names = NULL, composite_names = NULL, diffs_as_obs = FALSE,
                                 show_applicant = FALSE, keep_vars = "all", decimals = 2, max_iter = 100){
@@ -934,6 +936,51 @@ simulate_d_database <- function(k, n_params, rho_params,
      if(zapsmall(decimals) != round(decimals)){
           decimals <- round(decimals)
           stop("'decimals' must be an integer: rounding supplied value to ", decimals, call. = FALSE)
+     }
+
+     .rho_dims <- function(rho_params){
+          if(is.matrix(rho_params)){
+               if(nrow(rho_params) == ncol(rho_params)){
+                    p <- nrow(rho_params)
+               }else{
+                    stop("If rho parameters are provided as a matrix, that matrix must be square", call. = FALSE)
+               }
+          }else if(is.list(rho_params)){
+               p <- sqrt(length(rho_params) * 2 + .5 * (1 + sqrt(1 + 4 * length(rho_params) * 2)))
+               if(p != round(p)) stop("Number of rho distributions does not correspond to a valid number of lower-triangle correlations", call. = FALSE)
+          }
+          p
+     }
+
+     rho_dims <- unlist(lapply(rho_params, .rho_dims))
+     if(all(rho_dims == rho_dims[1])){
+          p <- rho_dims[1]
+     }else{
+          stop("All groups' rho distributions must represent the same number of variables", call. = FALSE)
+     }
+
+     n_groups <- length(rho_params)
+     if(is.null(sigma_params)){
+          sigma_params <- list()
+          for(i in 1:n_groups) sigma_params[[i]] <- as.list(rep(1, p))
+     }
+     if(is.null(mu_params)){
+          mu_params <- list()
+          for(i in 1:n_groups) mu_params[[i]] <- as.list(rep(0, p))
+     }
+     if(is.null(rel_params)){
+          rel_params <- list()
+          for(i in 1:n_groups) rel_params[[i]] <- as.list(rep(1, p))
+     }
+     if(is.null(sr_params)) sr_params <- as.list(rep(1, p))
+
+     for(i in 1:n_groups){
+          if(is.matrix(rho_params[[i]])){
+               if(nrow(rho_params[[i]]) == ncol(rho_params[[i]])){
+                    if(length(sigma_params[[i]]) == 1 & sigma_params[[i]][1] == 1) sigma_params[[i]] <- as.list(diag(rho_params[[i]]))
+                    rho_params[[i]] <- as.list(rho_params[[i]][lower.tri(rho_params[[i]])])
+               }
+          }
      }
 
      if((!is.null(wt_params) & is.null(sr_composite_params)) | (is.null(wt_params) & !is.null(sr_composite_params)))
@@ -1110,32 +1157,38 @@ simulate_d_database <- function(k, n_params, rho_params,
                                wt_mat = param_list[[1]][["wt_mat"]], sr_composites = param_list[[1]][["sr_composites"]],
                                group_names = group_names, var_names = var_names, composite_names = composite_names, diffs_as_obs = diffs_as_obs)
 
-     sim_dat_stats <- lapply(param_list, function(x){
-          d_obs <- .simulate_d_sample_stats(n_vec = x[["n_vec"]], rho_mat_list = x[["rho_list"]],
+     progbar <- progress_bar$new(format = " Simulating d value database [:bar] :percent est. time remaining: :eta",
+                                 total = length(param_list), clear = FALSE, width = options()$width)
+     sim_dat_list <- lapply(param_list, function(x){
+          progbar$tick()
+
+          out_stats <- .simulate_d_sample_stats(n_vec = x[["n_vec"]], rho_mat_list = x[["rho_list"]],
                                             mu_mat = x[["mu_mat"]], sigma_mat = x[["sigma_mat"]],
                                             rel_mat = x[["rel_mat"]], sr_vec = x[["sr_vec"]],
                                             wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
                                             group_names = group_names, var_names = var_names, composite_names = composite_names, show_applicant = show_applicant)$overall_results$observed
-          colnames(d_obs)[colnames(d_obs) == "di"] <- "dyi"
-          if(show_applicant) colnames(d_obs)[colnames(d_obs) == "da"] <- "dya"
-          d_obs
-     })
+          colnames(out_stats)[colnames(out_stats) == "di"] <- "dyi"
+          if(show_applicant) colnames(out_stats)[colnames(out_stats) == "da"] <- "dya"
 
-     sim_dat_params <- lapply(param_list, function(x){
-          out <- .simulate_d_sample_params(p_vec = x[["n_vec"]] / sum(x[["n_vec"]]), rho_mat_list = x[["rho_list"]],
-                                    mu_mat = x[["mu_mat"]], sigma_mat = x[["sigma_mat"]],
-                                    rel_mat = x[["rel_mat"]], sr_vec = x[["sr_vec"]],
-                                    wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                                    group_names = group_names, var_names = var_names, composite_names = composite_names,
-                                    show_applicant = TRUE, diffs_as_obs = diffs_as_obs)
-          d_obs <- out$overall_results$observed
+          out_params <- .simulate_d_sample_params(p_vec = x[["n_vec"]] / sum(x[["n_vec"]]), rho_mat_list = x[["rho_list"]],
+                                                  mu_mat = x[["mu_mat"]], sigma_mat = x[["sigma_mat"]],
+                                                  rel_mat = x[["rel_mat"]], sr_vec = x[["sr_vec"]],
+                                                  wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
+                                                  group_names = group_names, var_names = var_names, composite_names = composite_names,
+                                                  show_applicant = TRUE, diffs_as_obs = diffs_as_obs)
+          d_obs <- out_params$overall_results$observed
           colnames(d_obs)[colnames(d_obs) %in% c("di", "da")] <- c("dyi", "dya")
 
-          d_true <- out$overall_results$true[,c("di", "da")]
+          d_true <- out_params$overall_results$true[,c("di", "da")]
           colnames(d_true) <- c("dpi", "dpa")
 
-          cbind(d_obs[,1:which(colnames(d_obs) == "y_name")], d_true, d_obs[,which(colnames(d_obs) == "dyi"):ncol(d_obs)])
+          out_params <- cbind(d_obs[,1:which(colnames(d_obs) == "y_name")], d_true, d_obs[,which(colnames(d_obs) == "dyi"):ncol(d_obs)])
+
+          list(stats = out_stats,
+               params = out_params)
      })
+     sim_dat_stats <- lapply(sim_dat_list, function(x) x[["stats"]])
+     sim_dat_params <- lapply(sim_dat_list, function(x) x[["params"]])
 
      if(keep_vars[1] != "all"){
           var_names <- keep_vars
@@ -1169,6 +1222,10 @@ simulate_d_database <- function(k, n_params, rho_params,
 
      dat_stats[,-c(1:which(colnames(dat_stats) == "y_name"))] <- round(dat_stats[,-c(1:which(colnames(dat_stats) == "y_name"))], decimals)
      dat_params[,-c(1:which(colnames(dat_stats) == "y_name"))] <- round(dat_params[,-c(1:which(colnames(dat_stats) == "y_name"))], decimals)
+
+     rel_types <- setNames(as.data.frame(matrix("parallel", nrow = nrow(dat_stats), ncol = 1), stringsAsFactors = FALSE), c("ryy_type"))
+     dat_stats <- cbind(dat_stats, rel_types)
+     dat_params <- cbind(dat_params, rel_types)
 
      out <- list(call_history = list(call), inputs = inputs,
                  statistics = dat_stats,

@@ -26,7 +26,18 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
           record_call <- TRUE
      }
 
+     if(!is.null(additional_args$min_k)){
+          min_k <- additional_args$min_k
+     }else{
+          min_k <- 10
+     }
+
+
+     progbar <- progress_bar$new(format = " Computing bootstrapped meta-analyses [:bar] :percent est. time remaining: :eta",
+                                 total = sum(unlist(lapply(ma_list, function(x){nrow(x$barebones$meta_table)}))),
+                                 clear = FALSE, width = options()$width)
      ma_list <- lapply(ma_list, function(ma_obj_i){
+
           if(any(class(ma_obj_i) == "ma_ic")){
                ma_arg_list <- ma_obj_i$individual_correction$inputs
           }else{
@@ -110,73 +121,75 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
           }else{
                ma_arg_list <- ma_obj_i$barebones$inputs
           }
-
           for(i in 1:k_analyses){
+               progbar$tick()
+
                analysis_id <- paste0("Analysis ID = ", i)
 
-               if(es_type == "es"){
-                    es_data <- data.frame(yi = yi[[i]],
-                                          n = n[[i]])
-                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
-               }
-               if(es_type == "r"){
-                    es_data <- data.frame(rxy = rxy[[i]],
-                                          n = n[[i]])
-                    es_data$n_adj <- n_adj[[i]]
-                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
-               }
-               if(es_type == "d"){
-                    es_data <- data.frame(d = d[[i]],
-                                          n1 = n1[[i]])
-                    es_data$n2 <- n2[[i]]
-                    es_data$n_adj <- n_adj[[i]]
-                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "d")
-               }
+               if(ma_obj_i$barebones$meta_table$k[i] >= min_k){
+                    if(es_type == "es"){
+                         es_data <- data.frame(yi = yi[[i]],
+                                               n = n[[i]])
+                         if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
+                    }
+                    if(es_type == "r"){
+                         es_data <- data.frame(rxy = rxy[[i]],
+                                               n = n[[i]])
+                         es_data$n_adj <- n_adj[[i]]
+                         if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
+                    }
+                    if(es_type == "d"){
+                         es_data <- data.frame(d = d[[i]],
+                                               n1 = n1[[i]])
+                         es_data$n2 <- n2[[i]]
+                         es_data$n_adj <- n_adj[[i]]
+                         if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "d")
+                    }
 
-               if(any(class_ma == "ma_ic")){
-                    es_data$rtpa = rtpa[[i]]
-                    es_data$rxpa = rxpa[[i]]
-                    es_data$rtya = rtya[[i]]
-                    es_data$A_tp = A_tp[[i]]
-                    es_data$A_xp = A_xp[[i]]
-                    es_data$A_ty = A_ty[[i]]
-                    es_data$a = a[[i]]
-                    es_data$correction_type = correction_type[[i]]
-                    es_data$n_adj <- n_adj[[i]]
-               }
-
-               if(any(class_ma == "ma_ic") | any(class_ma == "ma_ad")){
                     if(any(class_ma == "ma_ic")){
-                         boot_list <- .separate_boot(boot_list = .ma_bootstrap(data = es_data, ma_fun_boot = .ma_r_ic_boot, boot_iter = boot_iter,
-                                                                               boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
-
-                         out_list$barebones[[analysis_id]] <- boot_list$barebones
-                         out_list$individual_correction$true_score[[analysis_id]] <- boot_list$true_score
-                         out_list$individual_correction$validity_generalization_x[[analysis_id]] <- boot_list$validity_generalization_x
-                         out_list$individual_correction$validity_generalization_y[[analysis_id]] <- boot_list$validity_generalization_y
+                         es_data$rtpa = rtpa[[i]]
+                         es_data$rxpa = rxpa[[i]]
+                         es_data$rtya = rtya[[i]]
+                         es_data$A_tp = A_tp[[i]]
+                         es_data$A_xp = A_xp[[i]]
+                         es_data$A_ty = A_ty[[i]]
+                         es_data$a = a[[i]]
+                         es_data$correction_type = correction_type[[i]]
+                         es_data$n_adj <- n_adj[[i]]
                     }
 
-                    if(any(class_ma == "ma_ad")){
-                         ma_ad_dump_full <- do.call(.ma_r_ad, append(ma_obj$artifact_distribution$inputs, list(.psychmeta_internal_request_datadump = TRUE)))
-                         ma_ad_dump <- ma_ad_dump_full$x
-                         ma_ad_dump$art_grid <- ma_ad_dump_full$art_grid
-                         ma_arg_list$ma_ad_dump <- ma_ad_dump
+                    if(any(class_ma == "ma_ic") | any(class_ma == "ma_ad")){
+                         if(any(class_ma == "ma_ic")){
+                              boot_list <- .separate_boot(boot_list = .ma_bootstrap(data = es_data, ma_fun_boot = .ma_r_ic_boot, boot_iter = boot_iter,
+                                                                                    boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
 
-                         boot_list <- .separate_boot(boot_list = .ma_bootstrap(data = es_data, ma_fun_boot = .ma_r_ad_boot, boot_iter = boot_iter,
-                                                                               boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
-
-                         out_list$barebones[[analysis_id]] <- boot_list$barebones
-                         out_list$artifact_distribution$true_score[[analysis_id]] <- boot_list$true_score
-                         out_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- boot_list$validity_generalization_x
-                         out_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- boot_list$validity_generalization_y
-                    }
-               }else{
-                    if(any(class_ma == "ma_bb"))
-                         if(es_type == "es"){
-                              es_data$vi <- vi_xy[[i]]
-                              out_list$barebones[[analysis_id]] <- .ma_bootstrap(data = es_data, ma_fun_boot = .ma_generic_boot, boot_iter = boot_iter,
-                                                                                 boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list)
+                              out_list$barebones[[analysis_id]] <- boot_list$barebones
+                              out_list$individual_correction$true_score[[analysis_id]] <- boot_list$true_score
+                              out_list$individual_correction$validity_generalization_x[[analysis_id]] <- boot_list$validity_generalization_x
+                              out_list$individual_correction$validity_generalization_y[[analysis_id]] <- boot_list$validity_generalization_y
                          }
+
+                         if(any(class_ma == "ma_ad")){
+                              ma_ad_dump_full <- do.call(.ma_r_ad, append(ma_obj_i$artifact_distribution$inputs, list(.psychmeta_internal_request_datadump = TRUE)))
+                              ma_ad_dump <- ma_ad_dump_full$x
+                              ma_ad_dump$art_grid <- ma_ad_dump_full$art_grid
+                              ma_arg_list$ma_ad_dump <- ma_ad_dump
+
+                              boot_list <- .separate_boot(boot_list = .ma_bootstrap(data = es_data, ma_fun_boot = .ma_r_ad_boot, boot_iter = boot_iter,
+                                                                                    boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
+
+                              out_list$barebones[[analysis_id]] <- boot_list$barebones
+                              out_list$artifact_distribution$true_score[[analysis_id]] <- boot_list$true_score
+                              out_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- boot_list$validity_generalization_x
+                              out_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- boot_list$validity_generalization_y
+                         }
+                    }else{
+                         if(any(class_ma == "ma_bb"))
+                              if(es_type == "es"){
+                                   es_data$vi <- vi_xy[[i]]
+                                   out_list$barebones[[analysis_id]] <- .ma_bootstrap(data = es_data, ma_fun_boot = .ma_generic_boot, boot_iter = boot_iter,
+                                                                                      boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list)
+                              }
 
                          if(es_type == "r")
                               out_list$barebones[[analysis_id]] <- .ma_bootstrap(data = es_data, ma_fun_boot = .ma_r_bb_boot, boot_iter = boot_iter,
@@ -186,6 +199,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                               out_list$barebones[[analysis_id]] <- .ma_bootstrap(data = es_data, ma_fun_boot = .ma_d_bb_boot, boot_iter = boot_iter,
                                                                                  boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list)
 
+                    }
                }
 
           }

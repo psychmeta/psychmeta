@@ -4,25 +4,37 @@
 \alias{create_ad_int}
 \title{Generate an artifact distribution object for use in interactive artifact-distribution meta-analysis programs.}
 \usage{
-create_ad_int(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)), rxxa = NULL,
-  wt_rxxa = rep(1, length(rxxa)), ux = NULL, wt_ux = rep(1, length(ux)),
-  ut = NULL, wt_ut = rep(1, length(ut)), estimate_rxxa = TRUE,
-  estimate_rxxi = TRUE, estimate_ux = TRUE, estimate_ut = TRUE, ...)
+create_ad_int(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
+  rxxi_type = rep("alpha", length(rxxi)), rxxa = NULL, n_rxxa = NULL,
+  wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), ux = NULL,
+  ni_ux = NULL, wt_ux = ni_ux, ut = NULL, ni_ut = NULL, wt_ut = ni_ut,
+  estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE,
+  estimate_ut = TRUE, ...)
 }
 \arguments{
 \item{rxxi}{Vector of incumbent reliability estimates.}
 
+\item{n_rxxi}{Vector of sample sizes associated with the elements of \code{rxxi}.}
+
 \item{wt_rxxi}{Vector of weights associated with the elements of \code{rxxi}.}
 
+\item{rxxi_type, rxxa_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+
 \item{rxxa}{Vector of applicant reliability estimates.}
+
+\item{n_rxxa}{Vector of sample sizes associated with the elements of \code{rxxa}.}
 
 \item{wt_rxxa}{Vector of weights associated with the elements of \code{rxxa}.}
 
 \item{ux}{Vector of observed-score u ratios.}
 
+\item{ni_ux}{Vector of incumbent sample sizes associated with the elements of \code{ux}.}
+
 \item{wt_ux}{Vector of weights associated with the elements of \code{ux}.}
 
 \item{ut}{Vector of true-score u ratios.}
+
+\item{ni_ut}{Vector of incumbent sample sizes associated with the elements of \code{ut}.}
 
 \item{wt_ut}{Vector of weights associated with the elements of \code{ut}.}
 
@@ -50,8 +62,8 @@ All artifact distributions are optional; null artifact distributions will be giv
 }
 \examples{
 create_ad_int(rxxa = c(.9, .8), wt_rxxa = c(50, 150),
-               rxxi = c(.8, .7), wt_rxxi = c(50, 150),
-               ux = c(.9, .8), wt_ux = c(50, 150),
-               ut = c(.8, .7), wt_ut = c(50, 150))
+              rxxi = c(.8, .7), wt_rxxi = c(50, 150),
+              ux = c(.9, .8), wt_ux = c(50, 150),
+              ut = c(.8, .7), wt_ut = c(50, 150))
 }
 \keyword{internal}

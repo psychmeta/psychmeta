@@ -67,21 +67,21 @@
           }
 
           if(impute_method == "unwt_mean_mod"){
-               mod_vec <- apply(cat_moderator_matrix, 1, paste)
+               mod_vec <- apply(cat_moderator_matrix, 1, paste, collapse = " ")
                missing_mod <- mod_vec[missing_id]
                for(i in 1:length(missing_mod))
                     art_vec_imputed[missing_id & missing_mod[i] == mod_vec] <- mean(x = art_vec[valid_id & missing_mod[i] == mod_vec])
           }
 
           if(impute_method == "wt_mean_mod"){
-               mod_vec <- apply(cat_moderator_matrix, 1, paste)
+               mod_vec <- apply(cat_moderator_matrix, 1, paste, collapse = " ")
                missing_mod <- mod_vec[missing_id]
                for(i in 1:length(missing_mod))
                     art_vec_imputed[missing_id & missing_mod[i] == mod_vec] <- wt_mean(x = art_vec[valid_id & missing_mod[i] == mod_vec], wt = n_vec[valid_id & missing_mod[i] == mod_vec])
           }
 
           if(impute_method == "simulate_mod"){
-               mod_vec <- apply(cat_moderator_matrix, 1, paste)
+               mod_vec <- apply(cat_moderator_matrix, 1, paste, collapse = " ")
 
                mean_art <- tapply(art_vec[valid_id], mod_vec[valid_id], mean)
                sd_art <- tapply(art_vec[valid_id], mod_vec[valid_id], sd)
@@ -114,7 +114,7 @@
           }
 
           if(impute_method == "bootstrap_mod"){
-               mod_vec <- apply(cat_moderator_matrix, 1, paste)
+               mod_vec <- apply(cat_moderator_matrix, 1, paste, collapse = " ")
                missing_mod <- mod_vec[missing_id]
                for(i in 1:length(missing_mod))
                     if(any(valid_id & missing_mod[i] == mod_vec))

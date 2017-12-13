@@ -1,13 +1,31 @@
+Changes in Version 0.1.3 (2017-12-13)
+=====================================
+o Bug fixes and stability improvements for moderator analyses, the creation of artifact distributions, and computation of follow-up analyses.
+o Added reliability types arguments (e.g., “rxx_type”, “ryy_type”) to functions requiring reliability estimates to be corrected for range restriction. String vectors of reliability labels (e.g., “alpha”, “retest”, “parallel”; see documentation for the ma_r function for a complete list of supported labels) can now be supplied to many functions. When direct range restriction occurs, different corrections for range restriction are applied to internal-consistency reliability estimates and reliability estimates computed by correlating data from different testing occasions. 
+o The ma_r and ma_d functions now allow users to supply lists of external artifact information using the “supplemental_ads” argument (the ma_r_ic and ma_d_ic functions also allow this with the “supplemental_ads_x” and “supplemental_ads_y” arguments). These functions can also now harvest artifact information from studies in a database with invalid or missing effect sizes by setting the “use_all_arts” argument to TRUE.
+o “rho_params” arguments to the simulate_r_database function can now be supplied as a correlation matrix rather than a list (for situations in which samples are drawn from a single population). Similarly, elements in the “rho_params” list argument for the simulate_d_database can include matrices.
+o Progress bars have been added to potentially time-consuming functions to provide feedback about the percentage of progress and the estimated time remaining.
+
+
+Changes in Version 0.1.2 (2017-11-16)
+=====================================
+o Bug fixes for moderator analyses.
+o Bug fixes for specifying the order of constructs and selecting a
+subset of constructs in a database.
+o New function to correct for scale coarseness.
+o Improved vectorization support.
+
+
 Changes in Version 0.1.1 (2017-09-21)
 =====================================
 
-o We have added a suite of simulation function for d values (see the “simulate_d_sample” and “simulate_d_database” functions).
+o We have added a suite of simulation function for d values (see the "simulate_d_sample" and "simulate_d_database" functions).
 
-o Methods for meta-analyzing d values have been updated to better account for subgroup proportions when converting between the r and d metrics. The escalc objects that accompany a meta-analysis of d values now include more detailed information about incumbent and applicant subgroup proportions and the default for the “pa” argument (i.e., applicant proportions) is now NULL rather than .5 to prevent unintended corrections for range restriction.
+o Methods for meta-analyzing d values have been updated to better account for subgroup proportions when converting between the r and d metrics. The escalc objects that accompany a meta-analysis of d values now include more detailed information about incumbent and applicant subgroup proportions and the default for the "pa" argument (i.e., applicant proportions) is now NULL rather than .5 to prevent unintended corrections for range restriction.
 
-o A new “ma_generic” function has been added that allow users to do a psychmeta-style meta-analysis for any effect size for which the user has error-variance estimates. This function is supported by psychmeta’s sensitivity() and heterogeneity() functions.
+o A new "ma_generic" function has been added that allow users to do a psychmeta-style meta-analysis for any effect size for which the user has error-variance estimates. This function is supported by psychmeta's sensitivity() and heterogeneity() functions.
 
-o Taylor series methods for estimating the variance of converted artifact values (e.g., a rxxi distribution converted to a rxxa distribution) have been expanded to account for the correlation between artifact distributions when such information is available. Correlations among  artifacts’ sampling distributions can also be passed to the var_error_r_bvirr() function when it is called outside of a meta-analysis routine. 
+o Taylor series methods for estimating the variance of converted artifact values (e.g., a rxxi distribution converted to a rxxa distribution) have been expanded to account for the correlation between artifact distributions when such information is available. Correlations among  artifacts' sampling distributions can also be passed to the var_error_r_bvirr() function when it is called outside of a meta-analysis routine. 
 
 o The implementation of corrections of bivariate range restriction in individual-correction meta-analyses have been updated. Corrections for bivariate direct range restriction now use conventional compound attenuation factors, while the attenuation factors for bivariate indirect range restriction are now computed using mean effect sizes and artifacts to estimate sampling variances.
 
@@ -19,4 +37,4 @@ Changes in Version 0.1.0 (2017-08-15)
 
 o psychmeta has officially launched for public beta!
 
-o Please see the “psychmeta-package” entry in the psychmeta manual for an overview of the package and its applications. 
+o Please see the "psychmeta-package" entry in the psychmeta manual for an overview of the package and its applications. 

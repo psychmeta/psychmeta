@@ -458,7 +458,9 @@ estimate_var_rho_tsa_uvirr <- function(mean_rtpa, var_rxyi, var_e,
      # With respect to ut
      b_ut <- (2 * mean_rxyi) / mean_ut - mean_rxyi * mean_ut * mean_qxa^2 * B^2 - mean_rxyi * mean_ut * mean_rtpa^2 * A^2
      # With respect to rtpa
-     b_rtpa <- mean_rxyi / mean_rtpa - mean_rxyi * mean_rtpa * A^2 * (mean_ut^2 - 1)
+     r_ratio <- mean_rxyi / mean_rtpa
+     r_ratio[is.na(r_ratio)] <- 1
+     b_rtpa <- r_ratio - mean_rxyi * mean_rtpa * A^2 * (mean_ut^2 - 1)
 
      warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
      warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)

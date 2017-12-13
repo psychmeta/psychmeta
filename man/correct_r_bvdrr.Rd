@@ -6,8 +6,8 @@
 \usage{
 correct_r_bvdrr(rxyi, ux = 1, uy = 1, rxx = 1, ryy = 1,
   ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE,
-  ryy_restricted = TRUE, n = NULL, conf_level = 0.95,
-  correct_bias = FALSE)
+  rxx_type = "alpha", ryy_restricted = TRUE, ryy_type = "alpha",
+  n = NULL, conf_level = 0.95, correct_bias = FALSE)
 }
 \arguments{
 \item{rxyi}{Vector of observed correlations.}
@@ -25,6 +25,8 @@ correct_r_bvdrr(rxyi, ux = 1, uy = 1, rxx = 1, ryy = 1,
 \item{uy_observed}{Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.}
 
 \item{rxx_restricted}{Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.}
+
+\item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
 
 \item{ryy_restricted}{Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.}
 

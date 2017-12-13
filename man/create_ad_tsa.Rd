@@ -5,11 +5,15 @@
 \title{Generate an artifact distribution object for use in interactive artifact-distribution meta-analysis programs.}
 \usage{
 create_ad_tsa(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
-  mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL,
-  mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL,
-  rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, mean_qxa = NULL,
-  var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, mean_rxxa = NULL,
-  var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, ux = NULL,
+  rxxi_type = rep("alpha", length(rxxi)), mean_qxi = NULL, var_qxi = NULL,
+  k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha",
+  length(mean_qxi)), mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL,
+  mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
+  rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha",
+  length(rxxa)), mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL,
+  mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)),
+  mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL,
+  rxxa_dist_type = rep("alpha", length(mean_rxxa)), ux = NULL,
   ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
   mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL,
   mean_na_ux = NA, dep_sds_ux_spec = FALSE, ut = NULL, ni_ut = NULL,
@@ -24,6 +28,8 @@ create_ad_tsa(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 \item{n_rxxi}{Vector of sample sizes associated with the elements of \code{rxxi}.}
 
 \item{wt_rxxi}{Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).}
+
+\item{rxxi_type, rxxa_type, qxi_dist_type, rxxi_dist_type, qxa_dist_type, rxxa_dist_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
 
 \item{mean_qxi}{Vector that can be used to supply the means of externally computed distributions of incumbent square-root reliabilities.}
 
@@ -150,9 +156,9 @@ na_ux <- na_ut <- c(200, 200)
 mean_qxa <- mean_qxi <- mean_ux <- mean_ut <- mean_rxxi <- mean_rxxa <- c(.7, .8)
 var_qxa <- var_qxi <- var_ux <- var_ut <- var_rxxi <- var_rxxa <- c(.1, .05)
 k_qxa <- k_qxi <- k_ux <- k_ut <- k_rxxa <- k_rxxi <- 2
-mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- 100
+mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- c(100, 100)
 dep_sds_ux_obs <- dep_sds_ux_spec <- dep_sds_ut_obs <- dep_sds_ut_spec <- FALSE
-mean_na_ux <- mean_na_ut <- 200
+mean_na_ux <- mean_na_ut <- c(200, 200)
 
 wt_rxxa <- n_rxxa
 wt_rxxi <- n_rxxi
@@ -164,6 +170,13 @@ estimate_rxxi <- TRUE
 estimate_ux <- TRUE
 estimate_ut <- TRUE
 var_unbiased <- TRUE
+
+rxxi_type = rep("alpha", length(rxxi))
+rxxa_type = rep("alpha", length(rxxa))
+qxi_dist_type = rep("alpha", length(mean_qxi))
+qxa_dist_type = rep("alpha", length(mean_qxa))
+rxxi_dist_type = rep("alpha", length(mean_rxxi))
+rxxa_dist_type = rep("alpha", length(mean_rxxa))
 
 create_ad_tsa(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
               mean_qxa = mean_qxa, var_qxa = var_qxa,
@@ -180,7 +193,7 @@ create_ad_tsa(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
               dep_sds_ux_obs = dep_sds_ux_obs,
               mean_ux = mean_ux, var_ux = var_ux, k_ux =
-               k_ux, mean_ni_ux = mean_ni_ux,
+              k_ux, mean_ni_ux = mean_ni_ux,
               mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
 
               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut,

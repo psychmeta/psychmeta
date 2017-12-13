@@ -60,7 +60,8 @@ rownames(es_design) <- colnames(es_design) <- var_names
 n_design <- "ni"
 other_design <- cbind(rxxi = paste0("rxxi_", var_names),
                       ux_local = paste0("ux_local_", var_names),
-                      ux_external = paste0("ux_external_", var_names))
+                      ux_external = paste0("ux_external_", var_names),
+                      rel_type = paste0("rel_type_", var_names))
 rownames(other_design) <- var_names
 
 ## Reshape the data to "long" format

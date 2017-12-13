@@ -346,6 +346,7 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
 #' @param ryy Vector of reliability coefficients for Y.
 #' @param ux_observed Logical vector in which each entry specifies whether the corresponding ux value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param rxx_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
+#' @param rxx_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
 #' @param n Optional vector of sample sizes associated with the rxyi correlations.
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
@@ -372,7 +373,9 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
 #' correct_r_uvdrr(rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
-                            ux_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE,
+                            ux_observed = TRUE,
+                            rxx_restricted = TRUE, rxx_type = "alpha",
+                            ryy_restricted = TRUE,
                             n = NULL, conf_level = .95, correct_bias = FALSE){
      warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
@@ -382,8 +385,8 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      ux[!ux_observed] <- estimate_ux(ut = ux[!ux_observed], rxx = rxx[!ux_observed], rxx_restricted = rxx_restricted[!ux_observed])
 
      rxxi <- rxxa <- rxx
-     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted]))
-     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted]))
+     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted], rxxi_type = rxx_type[rxx_restricted]))
+     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted], rxxa_type = rxx_type[!rxx_restricted]))
 
      ryyi <- ryy
      ryyi[!ryy_restricted] <- suppressWarnings(estimate_ryyi(ryya = ryyi[!ryy_restricted], rxyi = rxyi[!ryy_restricted], ux = ux[!ryy_restricted]))
@@ -701,6 +704,7 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
 #' @param ux_observed Logical vector in which each entry specifies whether the corresponding ux value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param rxx_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
+#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
 #' @param n Optional vector of sample sizes associated with the rxyi correlations.
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
@@ -726,9 +730,11 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
 correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
                             rxx = 1, ryy = 1,
                             ux_observed = TRUE, uy_observed = TRUE,
-                            rxx_restricted = TRUE, ryy_restricted = TRUE,
+                            rxx_restricted = TRUE, rxx_type = "alpha",
+                            ryy_restricted = TRUE, ryy_type = "alpha",
                             n = NULL, conf_level = .95, correct_bias = FALSE){
      warn_obj1 <- record_warnings()
+
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
@@ -738,12 +744,12 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
      uy[!uy_observed] <- suppressWarnings(estimate_ux(ut = uy[!uy_observed], rxx = ryy[!uy_observed], rxx_restricted = ryy_restricted[!uy_observed]))
 
      rxxi <- rxxa <- rxx
-     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted]))
-     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted]))
+     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted], rxxi_type = rxx_type[rxx_restricted]))
+     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted], rxxa_type = rxx_type[!rxx_restricted]))
 
      ryyi <- ryya <- ryy
-     ryya[ryy_restricted] <- suppressWarnings(estimate_rxxa(ux = uy[ryy_restricted], rxxi = ryy[ryy_restricted]))
-     ryyi[!ryy_restricted] <- suppressWarnings(estimate_rxxi(ux = uy[!ryy_restricted], rxxa = ryy[!ryy_restricted]))
+     ryya[ryy_restricted] <- suppressWarnings(estimate_rxxa(ux = uy[ryy_restricted], rxxi = ryy[ryy_restricted], rxxi_type = ryy_type[ryy_restricted]))
+     ryyi[!ryy_restricted] <- suppressWarnings(estimate_rxxi(ux = uy[!ryy_restricted], rxxa = ryy[!ryy_restricted], rxxa_type = ryy_type[!ryy_restricted]))
 
      if(any(is.na(rxxa))) warning("Some rxxa values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(rxxi))) warning("Some rxxi values were undefined: Interpret results accordingly", call. = FALSE)
@@ -819,6 +825,7 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
 #' @param ux_observed Logical vector in which each entry specifies whether the corresponding ux value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param rxx_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
+#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
 #' @param sign_rxz Vector of signs of the relationships between X variables and the selection mechanism.
 #' @param sign_ryz Vector of signs of the relationships between Y variables and the selection mechanism.
@@ -905,7 +912,8 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
                       rxyi, ux = 1, uy = 1,
                       rxx = 1, ryy = 1,
                       ux_observed = TRUE, uy_observed = TRUE,
-                      rxx_restricted = TRUE, ryy_restricted = TRUE,
+                      rxx_restricted = TRUE, rxx_type = "alpha",
+                      ryy_restricted = TRUE, ryy_type = "alpha",
                       sign_rxz = 1, sign_ryz = 1,
                       n = NULL, conf_level = .95, correct_bias = FALSE){
      correction <- match.arg(correction)
@@ -916,12 +924,16 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
 
      if(correction == "uvdrr_x")
           out <- correct_r_uvdrr(rxyi = rxyi, ux = ux, rxx = rxx, ryy = ryy,
-                     ux_observed = ux_observed, rxx_restricted = rxx_restricted, ryy_restricted = ryy_restricted,
+                     ux_observed = ux_observed,
+                     rxx_restricted = rxx_restricted, rxx_type = rxx_type,
+                     ryy_restricted = ryy_restricted,
                      n = n, conf_level = conf_level, correct_bias = correct_bias)
 
      if(correction == "uvdrr_y")
           out <- correct_r_uvdrr(rxyi = rxyi, ux = uy, rxx = ryy, ryy = rxx,
-                                 ux_observed = uy_observed, rxx_restricted = ryy_restricted, ryy_restricted = rxx_restricted,
+                                 ux_observed = uy_observed,
+                                 rxx_restricted = ryy_restricted, rxx_type = ryy_type,
+                                 ryy_restricted = rxx_restricted,
                                  n = n, conf_level = conf_level, correct_bias = correct_bias)
 
      if(correction == "uvirr_x")
@@ -938,7 +950,8 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
           out <- correct_r_bvdrr(rxyi = rxyi, ux = ux, uy = uy,
                      rxx = rxx, ryy = ryy,
                      ux_observed = ux_observed, uy_observed = uy_observed,
-                     rxx_restricted = rxx_restricted, ryy_restricted = ryy_restricted,
+                     rxx_restricted = rxx_restricted, rxx_type = rxx_type,
+                     ryy_restricted = ryy_restricted, ryy_type = ryy_type,
                      n = n, conf_level = conf_level, correct_bias = correct_bias)
 
      if(correction == "bvirr")

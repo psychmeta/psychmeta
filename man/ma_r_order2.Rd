@@ -76,7 +76,7 @@ ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 ## job performance by Eastern Asian country
 ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
             var_r_c = NULL, k = k, ma_type = "ad",
-            sample_id = NULL, moderators = Country,
+            sample_id = NULL, moderators = "Country",
             conf_level = .95, cred_level = .8, cred_method = "t",
             var_unbiased = TRUE, data = data_r_oh_2009)
 }

@@ -1,111 +1,3 @@
-#' Create a tabular array of artifact information summarizing values and weights of values in an interactive artifact distribution
-#'
-#' This is an internal function that constructs a data frame of artifact estiamtes (in the Value column) and corresponding weights (in the Weight column), consolidated according to the specified number of digits used in rounding.
-#'
-#' @param art_vec Vector of artifact values (i.e., u ratios, reliability coefficients, square-root reliabilities).
-#' @param wt_vec Vector for weights to assign to individual artifact values.
-#' @param decimals Number of decimals to which artifact values should be rounded and consolidated.
-#'
-#' @return Data frame with two columns: One containing artifact values and the other containing weights associated with artifact values.
-#'
-#' @import dplyr
-#' @examples
-#' # .create_ad_int(art_vec = c(.8, .8, .9), wt_vec = c(100, 200, 100), decimals = 2)
-#'
-#' @keywords internal
-.create_ad_int <- function(art_vec, wt_vec = rep(1, length(art_vec)), decimals = Inf){
-     if(is.null(art_vec) | is.null(wt_vec) | length(art_vec) == 0 | length(wt_vec) == 0){
-          data.frame(Value = 1, Weight = 1)
-     }else{
-          if(length(art_vec) != length(wt_vec)) stop("Lengths of art_vec and wt_vec differ")
-          art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec)
-          art_tab <- as.data.frame(ungroup(art_tab %>% group_by(Value) %>% do(data.frame(Value = .$Value[1], Weight = sum(.$Weight)))))
-          art_tab[!is.na(art_tab[,1]),]
-     }
-}
-
-
-#' Create an array of all possible combinations of artifact values from 2-4 artifact distributions
-#'
-#' Creates a fully crossed multidimensional array of artifacts and weights (with 1 to 4 dimensions of artifact values) for use in interactive artifact-distribution meta-analyses.
-#'
-#' @param ad_list List of artifact distribution tables (i.e., objects produced by the create_ad function).
-#' @param name_vec Optional vector of artifact names that correspond to the tables in ad_list; if NULL, artifact names are taken from the names of list objects in ad_list.
-#'
-#' @return Data frame of all possible combinations of artifact values with the weight associated with each combination of artifacts.
-#'
-#' @examples
-#' #create_ad_array(ad_list = list(.create_ad_int(art_vec = c(.8, .8, .9),
-#' #                                         wt_vec = c(100, 200, 100), decimals = 2),
-#' #                               .create_ad_int(art_vec = c(.8, .8, .9),
-#' #                                         wt_vec = c(100, 200, 100), decimals = 2)),
-#' #                name_vec = c("q_x", "q_y"))
-#' #create_ad_array(ad_list = list(q_x = .create_ad_int(art_vec = c(.8, .8, .9),
-#' #                                               wt_vec = c(100, 200, 100), decimals = 2),
-#' #                               q_y = .create_ad_int(art_vec = c(.8, .8, .9),
-#' #                                               wt_vec = c(100, 200, 100), decimals = 2)))
-#'
-#' @keywords internal
-create_ad_array <- function(ad_list, name_vec = NULL){
-     expand_grid_1 <- function(x1, name_vec = NULL){
-          out <- data.frame(x1)
-          if(!is.null(name_vec)){
-               colnames(out) <- name_vec
-          }else{
-               colnames(out) <- names(ad_list)
-          }
-          out
-     }
-     expand_grid_2 <- function(x1, x2, name_vec = NULL){
-          out <- cbind(Var1 = rep.int(x1, length(x2)),
-                       Var2 = rep.int(x2, rep.int(length(x1), length(x2))))
-          if(!is.null(name_vec)){
-               colnames(out) <- name_vec
-          }else{
-               colnames(out) <- names(ad_list)
-          }
-          out
-     }
-     expand_grid_3 <- function(x1, x2, x3, name_vec = NULL){
-          out <- cbind(Var1 = rep.int(x1, length(x2) * length(x3)),
-                       Var2 = rep.int(rep.int(x2, rep.int(length(x1), length(x2))), length(x3)),
-                       Var3 = rep.int(x3, rep.int(length(x1) * length(x2), length(x3))))
-          if(!is.null(name_vec)){
-               colnames(out) <- name_vec
-          }else{
-               colnames(out) <- names(ad_list)
-          }
-          out
-     }
-     expand_grid_4 <- function(x1, x2, x3, x4, name_vec = NULL){
-          out <- data.frame(Var1 = rep.int(x1, length(x2) * length(x3) * length(x4)),
-                            Var2 = rep.int(rep.int(x2, rep.int(length(x1), length(x2))), length(x3) * length(x4)),
-                            Var3 = rep.int(rep.int(x3, rep.int(length(x1) * length(x2), length(x3))), length(x4)),
-                            Var4 = rep.int(x4, rep.int(length(x1) * length(x2) * length(x3), length(x4))))
-          if(!is.null(name_vec)){
-               colnames(out) <- name_vec
-          }else{
-               colnames(out) <- names(ad_list)
-          }
-          out
-     }
-
-     x_list <- lapply(ad_list, function(x) 1:nrow(x))
-     if(length(x_list) == 1) id_array <- expand_grid_1(x1 = x_list[[1]], name_vec = name_vec)
-     if(length(x_list) == 2) id_array <- expand_grid_2(x1 = x_list[[1]], x2 = x_list[[2]], name_vec = name_vec)
-     if(length(x_list) == 3) id_array <- expand_grid_3(x1 = x_list[[1]], x2 = x_list[[2]], x3 = x_list[[3]], name_vec = name_vec)
-     if(length(x_list) == 4) id_array <- expand_grid_4(x1 = x_list[[1]], x2 = x_list[[2]], x3 = x_list[[3]], x4 = x_list[[4]], name_vec = name_vec)
-     art_array <- wt_array <- as.data.frame(id_array)
-     for(i in 1:ncol(id_array)){
-          art_array[,i] <-  unlist(ad_list[[i]][,1])[id_array[,i]]
-          wt_array[,i] <-  unlist(ad_list[[i]][,2])[id_array[,i]]
-     }
-     art_array$wt <- apply(wt_array, 1, prod)
-     art_array$wt <- art_array$wt / sum(art_array$wt)
-     art_array
-}
-
-
 #' Generate an artifact distribution object for use in interactive artifact-distribution meta-analysis programs.
 #'
 #' This function generates \code{ad_obj} class objects containing interactive artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
@@ -116,12 +8,17 @@ create_ad_array <- function(ad_list, name_vec = NULL){
 #' All artifact distributions are optional; null artifact distributions will be given an artifact value of 1 and a weight of 1 as placeholders.
 #'
 #' @param rxxi Vector of incumbent reliability estimates.
+#' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
 #' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi}.
+#' @param rxxi_type,rxxa_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #' @param rxxa Vector of applicant reliability estimates.
+#' @param n_rxxa Vector of sample sizes associated with the elements of \code{rxxa}.
 #' @param wt_rxxa Vector of weights associated with the elements of \code{rxxa}.
 #' @param ux Vector of observed-score u ratios.
+#' @param ni_ux Vector of incumbent sample sizes associated with the elements of \code{ux}.
 #' @param wt_ux Vector of weights associated with the elements of \code{ux}.
 #' @param ut Vector of true-score u ratios.
+#' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
 #' @param wt_ut Vector of weights associated with the elements of \code{ut}.
 #' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.
 #' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.
@@ -136,18 +33,25 @@ create_ad_array <- function(ad_list, name_vec = NULL){
 #'
 #' @examples
 #' create_ad_int(rxxa = c(.9, .8), wt_rxxa = c(50, 150),
-#'                rxxi = c(.8, .7), wt_rxxi = c(50, 150),
-#'                ux = c(.9, .8), wt_ux = c(50, 150),
-#'                ut = c(.8, .7), wt_ut = c(50, 150))
-create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
-                          rxxa = NULL, wt_rxxa = rep(1, length(rxxa)),
+#'               rxxi = c(.8, .7), wt_rxxi = c(50, 150),
+#'               ux = c(.9, .8), wt_ux = c(50, 150),
+#'               ut = c(.8, .7), wt_ut = c(50, 150))
+create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
+                          rxxi_type = rep("alpha", length(rxxi)),
+                          rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa,
+                          rxxa_type = rep("alpha", length(rxxa)),
 
-                          ux = NULL, wt_ux = rep(1, length(ux)),
-                          ut = NULL, wt_ut = rep(1, length(ut)),
+                          ux = NULL, ni_ux = NULL, wt_ux = ni_ux,
+                          ut = NULL, ni_ut = NULL, wt_ut = ni_ut,
 
                           estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           ...){
+
+     if(is.null(wt_rxxi)) wt_rxxi <- rep(1, length(rxxi))
+     if(is.null(wt_rxxa)) wt_rxxa <- rep(1, length(rxxa))
+     if(is.null(wt_ux)) wt_ux <- rep(1, length(ux))
+     if(is.null(wt_ut)) wt_ut <- rep(1, length(ut))
 
      art_mean <- function(art_vec, wt_vec){
           if(!is.null(art_vec)){
@@ -159,28 +63,89 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 
      if(!is.null(rxxa)){
           filtered_rxxa <- filter_rel(rel_vec = rxxa, wt_vec = wt_rxxa)
+          rxxa_type <- as.character(rxxa_type)
+          if(length(rxxa_type) == 1) rxxa_type <- rep(rxxa_type, length(rxxa))
+          if(!is.null(n_rxxa)) n_rxxa <- n_rxxa[filtered_rxxa]
           rxxa <- rxxa[filtered_rxxa]
           wt_rxxa <- wt_rxxa[filtered_rxxa]
+          rxxa_type <- rxxa_type[filtered_rxxa]
+          if(length(rxxa) == 0) rxxa <- n_rxxa <- wt_rxxa <- rxxa_type <- NULL
      }
 
      if(!is.null(rxxi)){
           filtered_rxxi <- filter_rel(rel_vec = rxxi, wt_vec = wt_rxxi)
+          rxxi_type <- as.character(rxxi_type)
+          if(length(rxxi_type) == 1) rxxi_type <- rep(rxxi_type, length(rxxi))
+          if(!is.null(n_rxxi)) n_rxxi <- n_rxxi[filtered_rxxi]
           rxxi <- rxxi[filtered_rxxi]
           wt_rxxi <- wt_rxxi[filtered_rxxi]
+          rxxi_type <- rxxi_type[filtered_rxxi]
+          if(length(rxxi) == 0) rxxi <- n_rxxi <- wt_rxxi <- rxxi_type <- NULL
      }
 
      if(!is.null(ux)){
           filtered_ux <- filter_u(u_vec = ux, wt_vec = wt_ux)
+          if(!is.null(ni_ux)) ni_ux <- ni_ux[filtered_ux]
           ux <- ux[filtered_ux]
           wt_ux <- wt_ux[filtered_ux]
+          if(length(ux) == 0) ux <- ni_ux <- wt_ux <- NULL
      }
 
      if(!is.null(ut)){
           filtered_ut <- filter_u(u_vec = ut, wt_vec = wt_ut)
+          if(!is.null(ni_ut)) ni_ut <- ni_ut[filtered_ut]
           ut <- ut[filtered_ut]
           wt_ut <- wt_ut[filtered_ut]
+          if(length(ut) == 0) ut <- ni_ut <- wt_ut <- NULL
      }
 
+     .replace_null <- function(x){
+          if(length(x) == 0){
+               NULL
+          }else{
+               x
+          }
+     }
+
+     if(!is.null(rxxa)){
+          rxxa_consistency <- convert_reltype2consistency(rel_type = rxxa_type)
+          if(any(rxxa_consistency)){
+               rxxa_c <- .replace_null(x = rxxa[rxxa_consistency])
+               wt_rxxa_c <- .replace_null(x = wt_rxxa[rxxa_consistency])
+          }else{
+               rxxa_c <- wt_rxxa_c <- NULL
+          }
+
+          if(any(!rxxa_consistency)){
+               rxxa_m <- .replace_null(x = rxxa[!rxxa_consistency])
+               wt_rxxa_m <- .replace_null(x = wt_rxxa[!rxxa_consistency])
+          }else{
+               rxxa_m <- wt_rxxa_m <- NULL
+          }
+     }else{
+          rxxa_c <- wt_rxxa_c <- NULL
+          rxxa_m <- wt_rxxa_m <- NULL
+     }
+
+     if(!is.null(rxxi)){
+          rxxi_consistency <- convert_reltype2consistency(rel_type = rxxi_type)
+          if(any(rxxi_consistency)){
+               rxxi_c <- .replace_null(x = rxxi[rxxi_consistency])
+               wt_rxxi_c <- .replace_null(x = wt_rxxi[rxxi_consistency])
+          }else{
+               rxxi_c <- wt_rxxi_c <- NULL
+          }
+
+          if(any(!rxxi_consistency)){
+               rxxi_m <- .replace_null(x = rxxi[!rxxi_consistency])
+               wt_rxxi_m <- .replace_null(x = wt_rxxi[!rxxi_consistency])
+          }else{
+               rxxi_m <- wt_rxxi_m <- NULL
+          }
+     }else{
+          rxxi_c <- wt_rxxi_c <- NULL
+          rxxi_m <- wt_rxxi_m <- NULL
+     }
 
      rxxa_mean <- art_mean(art_vec = rxxa, wt_vec = wt_rxxa)
      rxxi_mean <- art_mean(art_vec = rxxi, wt_vec = wt_rxxi)
@@ -194,17 +159,32 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
      p_ut <- ut_wt / (ux_wt + ut_wt)
 
      rxxa_wt <- sum(wt_rxxa)
+     rxxa_wt_c <- sum(wt_rxxa_c)
+     rxxa_wt_m <- sum(wt_rxxa_m)
      rxxi_wt <- sum(wt_rxxi)
+     rxxi_wt_c <- sum(wt_rxxi_c)
+     rxxi_wt_m <- sum(wt_rxxi_m)
      p_rxxa <- rxxa_wt / (rxxi_wt + rxxa_wt)
      p_rxxi <- rxxi_wt / (rxxi_wt + rxxa_wt)
 
      if(estimate_rxxa){
           if(!is.null(ux_mean) & !is.null(rxxi)){
                rxxa_ux_irr <- estimate_rxxa(rxxi = rxxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-               rxxa_ux_drr <- estimate_rxxa(rxxi = rxxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE)
                wt_rxxa_ux <- wt_rxxi * p_ux
+               if(!is.null(rxxi_c)){
+                    rxxa_ux_drr_c <- estimate_rxxa(rxxi = rxxi_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                    wt_rxxa_ux_c <- wt_rxxi_c * p_ux
+               }else{
+                    rxxa_ux_drr_c <- wt_rxxa_ux_c <- NULL
+               }
+               if(!is.null(rxxi_m)){
+                    rxxa_ux_drr_m <- estimate_rxxa(rxxi = rxxi_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                    wt_rxxa_ux_m <- wt_rxxi_m * p_ux
+               }else{
+                    rxxa_ux_drr_m <- wt_rxxa_ux_m <- NULL
+               }
           }else{
-               rxxa_ux_irr <- rxxa_ux_drr <- wt_rxxa_ux <- NULL
+               rxxa_ux_irr <- rxxa_ux_drr_c <- rxxa_ux_drr_m <- wt_rxxa_ux <- wt_rxxa_ux_c <- wt_rxxa_ux_m <- NULL
           }
           if(!is.null(ut_mean) & !is.null(rxxi)){
                rxxa_ut <- estimate_rxxa(rxxi = rxxi, ux = ut_mean, ux_observed = FALSE)
@@ -213,16 +193,28 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
                rxxa_ut <- wt_rxxa_ut <- NULL
           }
      }else{
-          rxxa_ux <- wt_rxxa_ux <- rxxa_ut <- wt_rxxa_ut <- NULL
+          rxxa_ux_irr <- rxxa_ux_drr_c <- rxxa_ux_drr_m <- wt_rxxa_ux <- wt_rxxa_ux_c <- wt_rxxa_ux_m <- NULL
+          rxxa_ut <- wt_rxxa_ut <- NULL
      }
 
      if(estimate_rxxi){
           if(!is.null(ux_mean) & !is.null(rxxa)){
                rxxi_ux_irr <- estimate_rxxi(rxxa = rxxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-               rxxi_ux_drr <- estimate_rxxi(rxxa = rxxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE)
                wt_rxxi_ux <- wt_rxxa * p_ux
+               if(!is.null(rxxa_c)){
+                    rxxi_ux_drr_c <- estimate_rxxi(rxxa = rxxa_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                    wt_rxxi_ux_c <- wt_rxxa_c * p_ux
+               }else{
+                    rxxi_ux_drr_c <- wt_rxxi_ux_c <- NULL
+               }
+               if(!is.null(rxxa_m)){
+                    rxxi_ux_drr_m <- estimate_rxxi(rxxa = rxxa_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                    wt_rxxi_ux_m <- wt_rxxa_m * p_ux
+               }else{
+                    rxxi_ux_drr_m <- wt_rxxi_ux_m <- NULL
+               }
           }else{
-               rxxi_ux_irr <- rxxi_ux_drr <- wt_rxxi_ux <- NULL
+               rxxi_ux_irr <- rxxi_ux_drr_c <- rxxi_ux_drr_m <- wt_rxxi_ux <- wt_rxxi_ux_c <- wt_rxxi_ux_m <- NULL
           }
           if(!is.null(ut_mean) & !is.null(rxxa)){
                rxxi_ut <- estimate_rxxi(rxxa = rxxa, ux = ut_mean, ux_observed = FALSE)
@@ -231,7 +223,8 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
                rxxi_ut <- wt_rxxi_ut <- NULL
           }
      }else{
-          rxxi_ux <- wt_rxxi_ux <- rxxi_ut <- wt_rxxi_ut <- NULL
+          rxxi_ux_irr <- wt_rxxi_ux_c <- wt_rxxi_ux_m <- wt_rxxi_ux <- wt_rxxi_ux_c <- wt_rxxi_ux_m <- NULL
+          rxxi_ut <- wt_rxxi_ut <- NULL
      }
 
      if(estimate_ut){
@@ -270,18 +263,22 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 
 
      rxxa_vec_irr <- c(rxxa, rxxa_ux_irr, rxxa_ut)
-     rxxa_vec_drr <- c(rxxa, rxxa_ux_drr)
+     rxxa_vec_drr <- c(rxxa, rxxa_ux_drr_c, rxxa_ux_drr_m)
      wt_rxxa_irr <- c(wt_rxxa, wt_rxxa_ux, wt_rxxa_ut)
-     wt_rxxa_drr <- c(wt_rxxa, wt_rxxa_ux)
+     wt_rxxa_drr <- c(wt_rxxa, wt_rxxa_ux_c, wt_rxxa_ux_m)
 
      rxxi_vec_irr <- c(rxxi, rxxi_ux_irr, rxxi_ut)
-     rxxi_vec_drr <- c(rxxi, rxxi_ux_drr)
+     rxxi_vec_drr <- c(rxxi, rxxi_ux_drr_c, rxxi_ux_drr_m)
      wt_rxxi_irr <- c(wt_rxxi, wt_rxxi_ux, wt_rxxi_ut)
-     wt_rxxi_drr <- c(wt_rxxi, wt_rxxi_ux)
+     wt_rxxi_drr <- c(wt_rxxi, wt_rxxi_ux_c, wt_rxxi_ux_m)
 
+     .ux <- ux
+     .wt_ux <- wt_ux
      ux <- c(ux, ux_rxxa, ux_rxxi)
      wt_ux <- c(wt_ux, wt_ux_rxxa, wt_ux_rxxi)
 
+     .ut <- ut
+     .wt_ut <- wt_ut
      ut <- c(ut, ut_rxxa, ut_rxxi)
      wt_ut <- c(wt_ut, wt_ut_rxxa, wt_ut_rxxi)
 
@@ -302,11 +299,123 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
      valid_ux <- !is.null(ux) & length(ux) > 0
      valid_ut <- !is.null(ut) & length(ut) > 0
 
-     ad_contents <- paste(c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr", "ux", "ut")
-                        [c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)], collapse = " + ")
+
+     ad_contents <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr", "ux", "ut")[c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)]
      if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
 
-     class(out) <- c("psychmeta", "ad_obj", "ad_int", ad_contents = ad_contents)
+
+     summary_mat <- cbind(k = c(length(rxxa), length(rxxa), length(rxxi), length(rxxi),
+                                length(rxxa), length(rxxa), length(rxxi), length(rxxi),
+                                length(.ux), length(.ut)),
+                          N = c(sum(n_rxxa), sum(n_rxxa), sum(n_rxxi), sum(n_rxxi),
+                                sum(n_rxxa), sum(n_rxxa), sum(n_rxxi), sum(n_rxxi),
+                                sum(ni_ux), sum(ni_ut)),
+                          mean = NA, var = NA, sd = NA)
+     rownames(summary_mat) <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
+                                "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
+                                "ux", "ut")
+
+     if(estimate_rxxa){
+          if(!is.null(rxxa) | !is.null(rxxi)){
+               summary_mat["qxa_irr", "mean"] <- wt_mean(x = out$qxa_irr$Value, wt = out$qxa_irr$Weight)
+               summary_mat["qxa_irr", "var"] <- wt_var(x = out$qxa_irr$Value, wt = out$qxa_irr$Weight)
+               summary_mat["qxa_irr", "sd"] <- summary_mat["qxa_irr", "var"]^.5
+
+               summary_mat["qxa_drr", "mean"] <- wt_mean(x = out$qxa_drr$Value, wt = out$qxa_drr$Weight)
+               summary_mat["qxa_drr", "var"] <- wt_var(x = out$qxa_drr$Value, wt = out$qxa_drr$Weight)
+               summary_mat["qxa_drr", "sd"] <- summary_mat["qxa_drr", "var"]^.5
+
+               summary_mat["rxxa_irr", "mean"] <- wt_mean(x = out$qxa_irr$Value^2, wt = out$qxa_irr$Weight)
+               summary_mat["rxxa_irr", "var"] <- wt_var(x = out$qxa_irr$Value^2, wt = out$qxa_irr$Weight)
+               summary_mat["rxxa_irr", "sd"] <- summary_mat["rxxa_irr", "var"]^.5
+
+               summary_mat["rxxa_drr", "mean"] <- wt_mean(x = out$qxa_drr$Value^2, wt = out$qxa_drr$Weight)
+               summary_mat["rxxa_drr", "var"] <- wt_var(x = out$qxa_drr$Value^2, wt = out$qxa_drr$Weight)
+               summary_mat["rxxa_drr", "sd"] <- summary_mat["rxxa_drr", "var"]^.5
+          }
+          summary_mat[c("qxa_irr", "qxa_drr"), "k"] <- summary_mat[c("rxxa_irr", "rxxa_drr"), "k"] <- summary_mat[c("qxa_irr", "qxa_drr"), "k"] + c(length(rxxi), length(rxxi))
+          summary_mat[c("qxa_irr", "qxa_drr"), "N"] <- summary_mat[c("rxxa_irr", "rxxa_drr"), "N"] <- summary_mat[c("qxa_irr", "qxa_drr"), "N"] + c(sum(n_rxxi), sum(n_rxxi))
+     }else{
+          if(!is.null(rxxa)){
+               summary_mat["qxa_irr", "mean"] <- summary_mat["qxa_drr", "mean"] <- wt_mean(x = rxxa^.5, wt = wt_rxxa)
+               summary_mat["qxa_irr", "var"] <- summary_mat["qxa_drr", "var"] <- wt_var(x = rxxa^.5, wt = wt_rxxa)
+               summary_mat["qxa_irr", "sd"] <- summary_mat["qxa_drr", "sd"] <- summary_mat["qxa_irr", "var"]^.5
+
+               summary_mat["rxxa_irr", "mean"] <- summary_mat["rxxa_drr", "mean"] <- wt_mean(x = rxxa, wt = wt_rxxa)
+               summary_mat["rxxa_irr", "var"] <- summary_mat["rxxa_drr", "var"] <- wt_var(x = rxxa, wt = wt_rxxa)
+               summary_mat["rxxa_irr", "sd"] <- summary_mat["rxxa_drr", "sd"] <- summary_mat["rxxa_irr", "var"]^.5
+          }
+     }
+
+     if(estimate_rxxi){
+          if(!is.null(rxxa) | !is.null(rxxi)){
+               summary_mat["qxi_irr", "mean"] <- wt_mean(x = out$qxi_irr$Value, wt = out$qxi_irr$Weight)
+               summary_mat["qxi_irr", "var"] <- wt_var(x = out$qxi_irr$Value, wt = out$qxi_irr$Weight)
+               summary_mat["qxi_irr", "sd"] <- summary_mat["qxi_irr", "var"]^.5
+
+               summary_mat["qxi_drr", "mean"] <- wt_mean(x = out$qxi_drr$Value, wt = out$qxi_drr$Weight)
+               summary_mat["qxi_drr", "var"] <- wt_var(x = out$qxi_drr$Value, wt = out$qxi_drr$Weight)
+               summary_mat["qxi_drr", "sd"] <- summary_mat["qxi_drr", "var"]^.5
+
+               summary_mat["rxxi_irr", "mean"] <- wt_mean(x = out$qxi_irr$Value^2, wt = out$qxi_irr$Weight)
+               summary_mat["rxxi_irr", "var"] <- wt_var(x = out$qxi_irr$Value^2, wt = out$qxi_irr$Weight)
+               summary_mat["rxxi_irr", "sd"] <- summary_mat["rxxa_irr", "var"]^.5
+
+               summary_mat["rxxi_drr", "mean"] <- wt_mean(x = out$qxi_drr$Value^2, wt = out$qxi_drr$Weight)
+               summary_mat["rxxi_drr", "var"] <- wt_var(x = out$qxi_drr$Value^2, wt = out$qxi_drr$Weight)
+               summary_mat["rxxi_drr", "sd"] <- summary_mat["rxxi_drr", "var"]^.5
+          }
+          summary_mat[c("qxi_irr", "qxi_drr"), "k"] <- summary_mat[c("rxxi_irr", "rxxi_drr"), "k"] <- summary_mat[c("qxi_irr", "qxi_drr"), "k"] + c(length(rxxa), length(rxxa))
+          summary_mat[c("qxi_irr", "qxi_drr"), "N"] <- summary_mat[c("rxxi_irr", "rxxi_drr"), "N"] <- summary_mat[c("qxi_irr", "qxi_drr"), "N"] + c(sum(n_rxxa), sum(n_rxxa))
+     }else{
+          if(!is.null(rxxi)){
+               summary_mat["qxi_irr", "mean"] <- summary_mat["qxi_drr", "mean"] <- wt_mean(x = rxxi^.5, wt = wt_rxxi)
+               summary_mat["qxi_irr", "var"] <- summary_mat["qxi_drr", "var"] <- wt_var(x = rxxi^.5, wt = wt_rxxi)
+               summary_mat["qxi_irr", "sd"] <- summary_mat["qxi_drr", "sd"] <- summary_mat["qxa_irr", "var"]^.5
+
+               summary_mat["rxxi_irr", "mean"] <- summary_mat["rxxi_drr", "mean"] <- wt_mean(x = rxxi, wt = wt_rxxi)
+               summary_mat["rxxi_irr", "var"] <- summary_mat["rxxi_drr", "var"] <- wt_var(x = rxxi, wt = wt_rxxi)
+               summary_mat["rxxi_irr", "sd"] <- summary_mat["rxxi_drr", "sd"] <- summary_mat["rxxa_irr", "var"]^.5
+          }
+     }
+
+     if(estimate_ux){
+          if(!is.null(ux) | !is.null(ut)){
+               summary_mat["ux", "mean"] <- wt_mean(x = out$ux$Value, wt = out$ux$Weight)
+               summary_mat["ux", "var"] <- wt_var(x = out$ux$Value, wt = out$ux$Weight)
+               summary_mat["ux", "sd"] <- summary_mat["ux", "var"]^.5
+          }
+          summary_mat["ux", "k"] <- summary_mat["ux", "k"] + length(.ut)
+          summary_mat["ux", "N"] <- summary_mat["ux", "N"] + sum(ni_ut)
+     }else{
+          if(!is.null(ux)){
+               summary_mat["ux", "mean"] <- summary_mat["ux", "mean"] <- wt_mean(x = .ux^.5, wt = .wt_ux)
+               summary_mat["ux", "var"] <- summary_mat["ux", "var"] <- wt_var(x = .ux^.5, wt = .wt_ux)
+               summary_mat["ux", "sd"] <- summary_mat["ux", "sd"] <- summary_mat["ux", "var"]^.5
+          }
+     }
+
+     if(estimate_ut){
+          if(!is.null(ux) | !is.null(ut)){
+               summary_mat["ut", "mean"] <- wt_mean(x = out$ut$Value, wt = out$ut$Weight)
+               summary_mat["ut", "var"] <- wt_var(x = out$ut$Value, wt = out$ut$Weight)
+               summary_mat["ut", "sd"] <- summary_mat["ux", "var"]^.5
+          }
+          summary_mat["ut", "k"] <- summary_mat["ut", "k"] + length(.ux)
+          summary_mat["ut", "N"] <- summary_mat["ut", "N"] + sum(ni_ux)
+     }else{
+          if(!is.null(ut)){
+               summary_mat["ut", "mean"] <- summary_mat["ut", "mean"] <- wt_mean(x = .ut^.5, wt = .wt_ut)
+               summary_mat["ut", "var"] <- summary_mat["ut", "var"] <- wt_var(x = .ut^.5, wt = .wt_ut)
+               summary_mat["ut", "sd"] <- summary_mat["ut", "sd"] <- summary_mat["ut", "var"]^.5
+          }
+     }
+
+     summary_mat[,"N"][summary_mat[,"k"] > 0 & summary_mat[,"N"] == 0] <- NA
+
+     attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
+
+     class(out) <- c("psychmeta", "ad_obj", "ad_int")
      out
 }
 
@@ -329,6 +438,7 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 #' @param rxxi Vector of incumbent reliability estimates.
 #' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
 #' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).
+#' @param rxxi_type,rxxa_type,qxi_dist_type,rxxi_dist_type,qxa_dist_type,rxxa_dist_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #' @param mean_qxi Vector that can be used to supply the means of externally computed distributions of incumbent square-root reliabilities.
 #' @param var_qxi Vector that can be used to supply the variances of externally computed distributions of incumbent square-root reliabilities.
 #' @param k_qxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent square-root reliabilities.
@@ -405,9 +515,9 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 #' mean_qxa <- mean_qxi <- mean_ux <- mean_ut <- mean_rxxi <- mean_rxxa <- c(.7, .8)
 #' var_qxa <- var_qxi <- var_ux <- var_ut <- var_rxxi <- var_rxxa <- c(.1, .05)
 #' k_qxa <- k_qxi <- k_ux <- k_ut <- k_rxxa <- k_rxxi <- 2
-#' mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- 100
+#' mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- c(100, 100)
 #' dep_sds_ux_obs <- dep_sds_ux_spec <- dep_sds_ut_obs <- dep_sds_ut_spec <- FALSE
-#' mean_na_ux <- mean_na_ut <- 200
+#' mean_na_ux <- mean_na_ut <- c(200, 200)
 #'
 #' wt_rxxa <- n_rxxa
 #' wt_rxxi <- n_rxxi
@@ -419,6 +529,13 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 #' estimate_ux <- TRUE
 #' estimate_ut <- TRUE
 #' var_unbiased <- TRUE
+#'
+#' rxxi_type = rep("alpha", length(rxxi))
+#' rxxa_type = rep("alpha", length(rxxa))
+#' qxi_dist_type = rep("alpha", length(mean_qxi))
+#' qxa_dist_type = rep("alpha", length(mean_qxa))
+#' rxxi_dist_type = rep("alpha", length(mean_rxxi))
+#' rxxa_dist_type = rep("alpha", length(mean_rxxa))
 #'
 #' create_ad_tsa(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
 #'               mean_qxa = mean_qxa, var_qxa = var_qxa,
@@ -435,7 +552,7 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 #'               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
 #'               dep_sds_ux_obs = dep_sds_ux_obs,
 #'               mean_ux = mean_ux, var_ux = var_ux, k_ux =
-#'                k_ux, mean_ni_ux = mean_ni_ux,
+#'               k_ux, mean_ni_ux = mean_ni_ux,
 #'               mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
 #'
 #'               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut,
@@ -446,13 +563,13 @@ create_ad_int <- function(rxxi = NULL, wt_rxxi = rep(1, length(rxxi)),
 #'
 #'               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
 #'               estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
-create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
-                          mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL,
-                          mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL,
+create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
+                          mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)),
+                          mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
 
-                          rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa,
-                          mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL,
-                          mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL,
+                          rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
+                          mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)),
+                          mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)),
 
                           ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
                           mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = NA, dep_sds_ux_spec = FALSE,
@@ -464,6 +581,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           var_unbiased = TRUE, ...){
 
+     N_qxi <- mean_n_qxi * k_qxi
+     N_rxxi <- mean_n_rxxi * k_rxxi
+     N_qxa <- mean_n_qxa * k_qxa
+     N_rxxa <- mean_n_rxxa * k_rxxa
+     Ni_ux <- mean_ni_ux * k_ux
+     Na_ux <- mean_na_ux * k_ux
+     Ni_ut <- mean_ni_ut * k_ut
+     Na_ut <- mean_na_ut * k_ut
+
      art_summary <- function(art_vec, wt_vec, ni_vec, na_vec = NULL, dependent_sds = FALSE,
                              mean_art_1 = NULL, var_art_1 = NULL, k_art_1 = NULL, mean_ni_art_1 = NULL, mean_na_art_1 = NA, dependent_sds_art_1 = FALSE,
                              mean_art_2 = NULL, var_art_2 = NULL, k_art_2 = NULL, mean_n_art_2 = NULL, art = "q", var_unbiased){
@@ -471,11 +597,13 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                if(is.null(wt_vec)) wt_vec <- rep(1, length(art_vec))
                if(art == "q" | art == "rel") valid_art <- filter_rel(rel_vec = art_vec, wt_vec = wt_vec)
                if(art == "u") valid_art <- filter_u(u_vec = art_vec, wt_vec = wt_vec)
+               valid_art <- valid_art & !is.na(wt_vec)
 
                if(!is.null(ni_vec)){
                     valid_art <- valid_art & !is.na(ni_vec) & !is.infinite(ni_vec) & ni_vec > 0
                     ni_vec <- ni_vec[valid_art]
                }
+               if(!is.null(na_vec)) na_vec <- na_vec[valid_art]
                art_vec <- art_vec[valid_art]
                wt_vec <- wt_vec[valid_art]
 
@@ -586,6 +714,205 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           art_desc
      }
 
+     art_desc <- matrix(0, 0, 5)
+     colnames(art_desc) <- c("mean", "var", "var_res", "total_n", "n_wt")
+
+
+     if(!is.null(rxxi)){
+          rxxi_consistency <- convert_reltype2consistency(rel_type = rxxi_type)
+          if(any(rxxi_consistency)){
+               rxxi_c <- rxxi[rxxi_consistency]
+               n_rxxi_c <- n_rxxi[rxxi_consistency]
+               wt_rxxi_c <- wt_rxxi[rxxi_consistency]
+          }else{
+               rxxi_c <- n_rxxi_c <- wt_rxxi_c <- NULL
+          }
+
+          if(any(!rxxi_consistency)){
+               rxxi_m <- rxxi[!rxxi_consistency]
+               n_rxxi_m <- n_rxxi[!rxxi_consistency]
+               wt_rxxi_m <- wt_rxxi[!rxxi_consistency]
+          }else{
+               rxxi_m <- n_rxxi_m <- wt_rxxi_m <- NULL
+          }
+     }else{
+          rxxi_c <- n_rxxi_c <- wt_rxxi_c <- NULL
+          rxxi_m <- n_rxxi_m <- wt_rxxi_m <- NULL
+     }
+     if(!is.null(mean_qxi)){
+          qxi_dist_consistency <- convert_reltype2consistency(rel_type = qxi_dist_type)
+          if(any(qxi_dist_consistency)){
+               mean_qxi_c <- mean_qxi[qxi_dist_consistency]
+               var_qxi_c <- var_qxi[qxi_dist_consistency]
+               k_qxi_c <- k_qxi[qxi_dist_consistency]
+               mean_n_qxi_c <- mean_n_qxi[qxi_dist_consistency]
+          }else{
+               mean_qxi_c <- var_qxi_c <- k_qxi_c <- mean_n_qxi_c <- NULL
+          }
+
+          if(any(!qxi_dist_consistency)){
+               mean_qxi_m <- mean_qxi[!qxi_dist_consistency]
+               var_qxi_m <- var_qxi[!qxi_dist_consistency]
+               k_qxi_m <- k_qxi[!qxi_dist_consistency]
+               mean_n_qxi_m <- mean_n_qxi[!qxi_dist_consistency]
+          }else{
+               mean_qxi_m <- var_qxi_m <- k_qxi_m <- mean_n_qxi_m <- NULL
+          }
+     }else{
+          mean_qxi_c <- var_qxi_c <- k_qxi_c <- mean_n_qxi_c <- NULL
+          mean_qxi_m <- var_qxi_m <- k_qxi_m <- mean_n_qxi_m <- NULL
+     }
+     if(!is.null(mean_rxxi)){
+          rxxi_dist_consistency <- convert_reltype2consistency(rel_type = rxxi_dist_type)
+          if(any(rxxi_dist_consistency)){
+               mean_rxxi_c <- mean_rxxi[rxxi_dist_consistency]
+               var_rxxi_c <- var_rxxi[rxxi_dist_consistency]
+               k_rxxi_c <- k_rxxi[rxxi_dist_consistency]
+               mean_n_rxxi_c <- mean_n_rxxi[rxxi_dist_consistency]
+          }else{
+               mean_rxxi_c <- var_rxxi_c <- k_rxxi_c <- mean_n_rxxi_c <- NULL
+          }
+
+          if(any(!rxxi_dist_consistency)){
+               mean_rxxi_m <- mean_rxxi[!rxxi_dist_consistency]
+               var_rxxi_m <- var_rxxi[!rxxi_dist_consistency]
+               k_rxxi_m <- k_rxxi[!rxxi_dist_consistency]
+               mean_n_rxxi_m <- mean_n_rxxi[!rxxi_dist_consistency]
+          }else{
+               mean_rxxi_m <- var_rxxi_m <- k_rxxi_m <- mean_n_rxxi_m <- NULL
+          }
+     }else{
+          mean_rxxi_c <- var_rxxi_c <- k_rxxi_c <- mean_n_rxxi_c <- NULL
+          mean_rxxi_m <- var_rxxi_m <- k_rxxi_m <- mean_n_rxxi_m <- NULL
+     }
+
+
+     if(!is.null(rxxa)){
+          rxxa_consistency <- convert_reltype2consistency(rel_type = rxxa_type)
+          if(any(rxxa_consistency)){
+               rxxa_c <- rxxa[rxxa_consistency]
+               n_rxxa_c <- n_rxxa[rxxa_consistency]
+               wt_rxxa_c <- wt_rxxa[rxxa_consistency]
+          }else{
+               rxxa_c <- n_rxxa_c <- wt_rxxa_c <- NULL
+          }
+
+          if(any(!rxxa_consistency)){
+               rxxa_m <- rxxa[!rxxa_consistency]
+               n_rxxa_m <- n_rxxa[!rxxa_consistency]
+               wt_rxxa_m <- wt_rxxa[!rxxa_consistency]
+          }else{
+               rxxa_m <- n_rxxa_m <- wt_rxxa_m <- NULL
+          }
+     }else{
+          rxxa_c <- n_rxxa_c <- wt_rxxa_c <- NULL
+          rxxa_m <- n_rxxa_m <- wt_rxxa_m <- NULL
+     }
+     if(!is.null(mean_qxa)){
+          qxa_dist_consistency <- convert_reltype2consistency(rel_type = qxa_dist_type)
+          if(any(qxa_dist_consistency)){
+               mean_qxa_c <- mean_qxa[qxa_dist_consistency]
+               var_qxa_c <- var_qxa[qxa_dist_consistency]
+               k_qxa_c <- k_qxa[qxa_dist_consistency]
+               mean_n_qxa_c <- mean_n_qxa[qxa_dist_consistency]
+          }else{
+               mean_qxa_c <- var_qxa_c <- k_qxa_c <- mean_n_qxa_c <- NULL
+          }
+
+          if(any(!qxa_dist_consistency)){
+               mean_qxa_m <- mean_qxa[!qxa_dist_consistency]
+               var_qxa_m <- var_qxa[!qxa_dist_consistency]
+               k_qxa_m <- k_qxa[!qxa_dist_consistency]
+               mean_n_qxa_m <- mean_n_qxa[!qxa_dist_consistency]
+          }else{
+               mean_qxa_m <- var_qxa_m <- k_qxa_m <- mean_n_qxa_m <- NULL
+          }
+     }else{
+          mean_qxa_c <- var_qxa_c <- k_qxa_c <- mean_n_qxa_c <- NULL
+          mean_qxa_m <- var_qxa_m <- k_qxa_m <- mean_n_qxa_m <- NULL
+     }
+     if(!is.null(mean_rxxa)){
+          rxxa_dist_consistency <- convert_reltype2consistency(rel_type = rxxa_dist_type)
+          if(any(rxxa_dist_consistency)){
+               mean_rxxa_c <- mean_rxxa[rxxa_dist_consistency]
+               var_rxxa_c <- var_rxxa[rxxa_dist_consistency]
+               k_rxxa_c <- k_rxxa[rxxa_dist_consistency]
+               mean_n_rxxa_c <- mean_n_rxxa[rxxa_dist_consistency]
+          }else{
+               mean_rxxa_c <- var_rxxa_c <- k_rxxa_c <- mean_n_rxxa_c <- NULL
+          }
+
+          if(any(!rxxa_dist_consistency)){
+               mean_rxxa_m <- mean_rxxa[!rxxa_dist_consistency]
+               var_rxxa_m <- var_rxxa[!rxxa_dist_consistency]
+               k_rxxa_m <- k_rxxa[!rxxa_dist_consistency]
+               mean_n_rxxa_m <- mean_n_rxxa[!rxxa_dist_consistency]
+          }else{
+               mean_rxxa_m <- var_rxxa_m <- k_rxxa_m <- mean_n_rxxa_m <- NULL
+          }
+     }else{
+          mean_rxxa_c <- var_rxxa_c <- k_rxxa_c <- mean_n_rxxa_c <- NULL
+          mean_rxxa_m <- var_rxxa_m <- k_rxxa_m <- mean_n_rxxa_m <- NULL
+     }
+
+     .replace_null <- function(x){
+          if(length(x) == 0){
+               NULL
+          }else{
+               x
+          }
+     }
+
+     rxxi_c <- .replace_null(x = rxxi_c)
+     n_rxxi_c <- .replace_null(x = n_rxxi_c)
+     wt_rxxi_c <- .replace_null(x = wt_rxxi_c)
+     mean_qxi_c <- .replace_null(x = mean_qxi_c)
+     var_qxi_c <- .replace_null(x = var_qxi_c)
+     k_qxi_c <- .replace_null(x = k_qxi_c)
+     mean_n_qxi_c <- .replace_null(x = mean_n_qxi_c)
+     mean_rxxi_c <- .replace_null(x = mean_rxxi_c)
+     var_rxxi_c <- .replace_null(x = var_rxxi_c)
+     k_rxxi_c <- .replace_null(x = k_rxxi_c)
+     mean_n_rxxi_c <- .replace_null(x = mean_n_rxxi_c)
+
+     rxxa_c <- .replace_null(x = rxxa_c)
+     n_rxxa_c <- .replace_null(x = n_rxxa_c)
+     wt_rxxa_c <- .replace_null(x = wt_rxxa_c)
+     mean_qxa_c <- .replace_null(x = mean_qxa_c)
+     var_qxa_c <- .replace_null(x = var_qxa_c)
+     k_qxa_c <- .replace_null(x = k_qxa_c)
+     mean_n_qxa_c <- .replace_null(x = mean_n_qxa_c)
+     mean_rxxa_c <- .replace_null(x = mean_rxxa_c)
+     var_rxxa_c <- .replace_null(x = var_rxxa_c)
+     k_rxxa_c <- .replace_null(x = k_rxxa_c)
+     mean_n_rxxa_c <- .replace_null(x = mean_n_rxxa_c)
+
+     rxxi_m <- .replace_null(x = rxxi_m)
+     n_rxxi_m <- .replace_null(x = n_rxxi_m)
+     wt_rxxi_m <- .replace_null(x = wt_rxxi_m)
+     mean_qxi_m <- .replace_null(x = mean_qxi_m)
+     var_qxi_m <- .replace_null(x = var_qxi_m)
+     k_qxi_m <- .replace_null(x = k_qxi_m)
+     mean_n_qxi_m <- .replace_null(x = mean_n_qxi_m)
+     mean_rxxi_m <- .replace_null(x = mean_rxxi_m)
+     var_rxxi_m <- .replace_null(x = var_rxxi_m)
+     k_rxxi_m <- .replace_null(x = k_rxxi_m)
+     mean_n_rxxi_m <- .replace_null(x = mean_n_rxxi_m)
+
+     rxxa_m <- .replace_null(x = rxxa_m)
+     n_rxxa_m <- .replace_null(x = n_rxxa_m)
+     wt_rxxa_m <- .replace_null(x = wt_rxxa_m)
+     mean_qxa_m <- .replace_null(x = mean_qxa_m)
+     var_qxa_m <- .replace_null(x = var_qxa_m)
+     k_qxa_m <- .replace_null(x = k_qxa_m)
+     mean_n_qxa_m <- .replace_null(x = mean_n_qxa_m)
+     mean_rxxa_m <- .replace_null(x = mean_rxxa_m)
+     var_rxxa_m <- .replace_null(x = var_rxxa_m)
+     k_rxxa_m <- .replace_null(x = k_rxxa_m)
+     mean_n_rxxa_m <- .replace_null(x = mean_n_rxxa_m)
+
+
+     ## All reliability indices
      qxa_desc <- art_summary(art_vec = rxxa, wt_vec = wt_rxxa, ni_vec = n_rxxa,
                              mean_art_1 = mean_qxa, var_art_1 = var_qxa, k_art_1 = k_qxa, mean_ni_art_1 = mean_n_qxa,
                              mean_art_2 = mean_rxxa, var_art_2 = var_rxxa, k_art_2 = k_rxxa, mean_n_art_2 = mean_n_rxxa, art = "q", var_unbiased = var_unbiased)
@@ -593,6 +920,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                              mean_art_1 = mean_qxi, var_art_1 = var_qxi, k_art_1 = k_qxi, mean_ni_art_1 = mean_n_qxi,
                              mean_art_2 = mean_rxxi, var_art_2 = var_rxxi, k_art_2 = k_rxxi, mean_n_art_2 = mean_n_rxxi, art = "q", var_unbiased = var_unbiased)
 
+     ## All reliability coefficients
      rxxa_desc <- art_summary(art_vec = rxxa, wt_vec = wt_rxxa, ni_vec = n_rxxa,
                               mean_art_1 = mean_rxxa, var_art_1 = var_rxxa, k_art_1 = k_rxxa, mean_ni_art_1 = mean_n_rxxa,
                               mean_art_2 = mean_qxa, var_art_2 = var_qxa, k_art_2 = k_qxa, mean_n_art_2 = mean_n_qxa, art = "rel", var_unbiased = var_unbiased)
@@ -600,6 +928,43 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                               mean_art_1 = mean_rxxi, var_art_1 = var_rxxi, k_art_1 = k_rxxi, mean_ni_art_1 = mean_n_rxxi,
                               mean_art_2 = mean_qxi, var_art_2 = var_qxa, k_art_2 = k_qxi, mean_n_art_2 = mean_n_qxi, art = "rel", var_unbiased = var_unbiased)
 
+     ## Consistency estimates of reliability indices
+     qxa_desc_c <- art_summary(art_vec = rxxa_c, wt_vec = wt_rxxa_c, ni_vec = n_rxxa_c,
+                               mean_art_1 = mean_qxa_c, var_art_1 = var_qxa_c, k_art_1 = k_qxa_c, mean_ni_art_1 = mean_n_qxa_c,
+                               mean_art_2 = mean_rxxa_c, var_art_2 = var_rxxa_c, k_art_2 = k_rxxa_c, mean_n_art_2 = mean_n_rxxa_c, art = "q", var_unbiased = var_unbiased)
+     qxi_desc_c <- art_summary(art_vec = rxxi_c, wt_vec = wt_rxxi_c, ni_vec = n_rxxi_c,
+                               mean_art_1 = mean_qxi_c, var_art_1 = var_qxi_c, k_art_1 = k_qxi_c, mean_ni_art_1 = mean_n_qxi_c,
+                               mean_art_2 = mean_rxxi_c, var_art_2 = var_rxxi_c, k_art_2 = k_rxxi_c, mean_n_art_2 = mean_n_rxxi_c, art = "q", var_unbiased = var_unbiased)
+
+     ## Multi-administration estimates of reliability indices
+     qxa_desc_m <- art_summary(art_vec = rxxa_m, wt_vec = wt_rxxa_m, ni_vec = n_rxxa_m,
+                               mean_art_1 = mean_qxa_m, var_art_1 = var_qxa_m, k_art_1 = k_qxa_m, mean_ni_art_1 = mean_n_qxa_m,
+                               mean_art_2 = mean_rxxa_m, var_art_2 = var_rxxa_m, k_art_2 = k_rxxa_m, mean_n_art_2 = mean_n_rxxa_m, art = "q", var_unbiased = var_unbiased)
+     qxi_desc_m <- art_summary(art_vec = rxxi_m, wt_vec = wt_rxxi_m, ni_vec = n_rxxi_m,
+                               mean_art_1 = mean_qxi_m, var_art_1 = var_qxi_m, k_art_1 = k_qxi_m, mean_ni_art_1 = mean_n_qxi_m,
+                               mean_art_2 = mean_rxxi_m, var_art_2 = var_rxxi_m, k_art_2 = k_rxxi_m, mean_n_art_2 = mean_n_rxxi_m, art = "q", var_unbiased = var_unbiased)
+
+     ## Consistency estimates of reliability coefficients
+     rxxa_desc_c <- art_summary(art_vec = rxxa_c, wt_vec = wt_rxxa_c, ni_vec = n_rxxa_c,
+                                mean_art_1 = mean_rxxa_c, var_art_1 = var_rxxa_c, k_art_1 = k_rxxa_c, mean_ni_art_1 = mean_n_rxxa_c,
+                                mean_art_2 = mean_qxa_c, var_art_2 = var_qxa_c, k_art_2 = k_qxa_c, mean_n_art_2 = mean_n_qxa_c, art = "rel", var_unbiased = var_unbiased)
+     rxxi_desc_c <- art_summary(art_vec = rxxi_c, wt_vec = wt_rxxi_c, ni_vec = n_rxxi_c,
+                                mean_art_1 = mean_rxxi_c, var_art_1 = var_rxxi_c, k_art_1 = k_rxxi_c, mean_ni_art_1 = mean_n_rxxi_c,
+                                mean_art_2 = mean_qxi_c, var_art_2 = var_qxa_c, k_art_2 = k_qxi_c, mean_n_art_2 = mean_n_qxi_c, art = "rel", var_unbiased = var_unbiased)
+
+     ## Multi-administration estimates of reliability coefficients
+     rxxa_desc_m <- art_summary(art_vec = rxxa_m, wt_vec = wt_rxxa_m, ni_vec = n_rxxa_m,
+                                mean_art_1 = mean_rxxa_m, var_art_1 = var_rxxa_m, k_art_1 = k_rxxa_m, mean_ni_art_1 = mean_n_rxxa_m,
+                                mean_art_2 = mean_qxa_m, var_art_2 = var_qxa_m, k_art_2 = k_qxa_m, mean_n_art_2 = mean_n_qxa_m, art = "rel", var_unbiased = var_unbiased)
+     rxxi_desc_m <- art_summary(art_vec = rxxi_m, wt_vec = wt_rxxi_m, ni_vec = n_rxxi_m,
+                                mean_art_1 = mean_rxxi_m, var_art_1 = var_rxxi_m, k_art_1 = k_rxxi_m, mean_ni_art_1 = mean_n_rxxi_m,
+                                mean_art_2 = mean_qxi_m, var_art_2 = var_qxa_m, k_art_2 = k_qxi_m, mean_n_art_2 = mean_n_qxi_m, art = "rel", var_unbiased = var_unbiased)
+
+     inputs <- list(art_vec = ux, wt_vec = wt_ux, ni_vec = ni_ux, na_vec = na_ux, dependent_sds = dep_sds_ux_obs,
+                                mean_art_1 = mean_ux, var_art_1 = var_ux, k_art_1 = k_ux,
+                                mean_ni_art_1 = mean_ni_ux, mean_na_art_1 = mean_na_ux, dependent_sds_art_1 = dep_sds_ux_spec, art = "u", var_unbiased = var_unbiased)
+
+     ## u ratios
      ux_desc <- art_summary(art_vec = ux, wt_vec = wt_ux, ni_vec = ni_ux, na_vec = na_ux, dependent_sds = dep_sds_ux_obs,
                             mean_art_1 = mean_ux, var_art_1 = var_ux, k_art_1 = k_ux,
                             mean_ni_art_1 = mean_ni_ux, mean_na_art_1 = mean_na_ux, dependent_sds_art_1 = dep_sds_ux_spec, art = "u", var_unbiased = var_unbiased)
@@ -609,7 +974,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
      est_summaries <- function(qxi_desc, qxa_desc,
                                rxxi_desc, rxxa_desc,
+
+                               qxi_desc_c, qxa_desc_c,
+                               rxxi_desc_c, rxxa_desc_c,
+
+                               qxi_desc_m, qxa_desc_m,
+                               rxxi_desc_m, rxxa_desc_m,
+
                                ux_desc, ut_desc,
+
                                estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                                estimate_ux = TRUE, estimate_ut = TRUE){
           filler <- matrix(0, 0, 4)
@@ -621,7 +994,11 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           p_ut <- ut_wt / (ux_wt + ut_wt)
 
           qxa_wt <- as.numeric(ifelse(nrow(qxa_desc) > 0, ifelse(qxa_desc[,"n_wt"] == 1, qxa_desc[,"total_n"], 1), 0))
+          qxa_wt_c <- as.numeric(ifelse(nrow(qxa_desc_c) > 0, ifelse(qxa_desc_c[,"n_wt"] == 1, qxa_desc_c[,"total_n"], 1), 0))
+          qxa_wt_m <- as.numeric(ifelse(nrow(qxa_desc_m) > 0, ifelse(qxa_desc_m[,"n_wt"] == 1, qxa_desc_m[,"total_n"], 1), 0))
           qxi_wt <- as.numeric(ifelse(nrow(qxi_desc) > 0, ifelse(qxi_desc[,"n_wt"] == 1, qxi_desc[,"total_n"], 1), 0))
+          qxi_wt_c <- as.numeric(ifelse(nrow(qxi_desc_c) > 0, ifelse(qxi_desc_c[,"n_wt"] == 1, qxi_desc_c[,"total_n"], 1), 0))
+          qxi_wt_m <- as.numeric(ifelse(nrow(qxi_desc_m) > 0, ifelse(qxi_desc_m[,"n_wt"] == 1, qxi_desc_m[,"total_n"], 1), 0))
           p_qxa <- qxa_wt / (qxi_wt + qxa_wt)
           p_qxi <- qxi_wt / (qxi_wt + qxa_wt)
           p_ux[is.na(p_ux)] <- p_ut[is.na(p_ut)] <- p_qxa[is.na(p_qxa)] <- p_qxi[is.na(p_qxi)] <- 0
@@ -633,11 +1010,40 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxa_desc <- rxxa_desc <- filler
           }
 
+          if(nrow(qxa_desc_c) > 0){
+               qxa_desc_c <- t(c(qxa_desc_c[,1:3], wt = qxa_wt_c))
+               rxxa_desc_c <- t(c(rxxa_desc_c[,1:3], wt = qxa_wt_c))
+          }else{
+               qxa_desc_c <- rxxa_desc_c <- filler
+          }
+
+          if(nrow(qxa_desc_m) > 0){
+               qxa_desc_m <- t(c(qxa_desc_m[,1:3], wt = qxa_wt_m))
+               rxxa_desc_m <- t(c(rxxa_desc_m[,1:3], wt = qxa_wt_m))
+          }else{
+               qxa_desc_m <- rxxa_desc_m <- filler
+          }
+
+
           if(nrow(qxi_desc) > 0){
                qxi_desc <- t(c(qxi_desc[,1:3], wt = qxi_wt))
                rxxi_desc <- t(c(rxxi_desc[,1:3], wt = qxi_wt))
           }else{
                qxi_desc <- rxxi_desc <- filler
+          }
+
+          if(nrow(qxi_desc_c) > 0){
+               qxi_desc_c <- t(c(qxi_desc_c[,1:3], wt = qxi_wt_c))
+               rxxi_desc_c <- t(c(rxxi_desc_c[,1:3], wt = qxi_wt_c))
+          }else{
+               qxi_desc_c <- rxxi_desc_c <- filler
+          }
+
+          if(nrow(qxi_desc_m) > 0){
+               qxi_desc_m <- t(c(qxi_desc_m[,1:3], wt = qxi_wt_m))
+               rxxi_desc_m <- t(c(rxxi_desc_m[,1:3], wt = qxi_wt_m))
+          }else{
+               qxi_desc_m <- rxxi_desc_m <- filler
           }
 
           if(nrow(ux_desc) > 0){
@@ -659,27 +1065,53 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                     est_var_res_qxa_irr <- estimate_var_qxa_ux(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_qxa_desc_ux_irr <- t(c(mean = est_mean_qxa_irr, var = est_var_qxa_irr, var_res = est_var_res_qxa_irr, wt = as.numeric(p_ux * qxi_desc[,"wt"])))
 
-                    est_mean_qxa_drr <- estimate_rxxa(rxxi = qxi_desc[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE)^.5
-                    est_var_qxa_drr <- estimate_var_qxa_ux(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_var_res_qxa_drr <- estimate_var_qxa_ux(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_qxa_desc_ux_drr <- t(c(mean = est_mean_qxa_drr, var = est_var_qxa_drr, var_res = est_var_res_qxa_drr, wt = as.numeric(qxi_desc[,"wt"])))
+                    if(nrow(qxi_desc_c) > 0){
+                         est_mean_qxa_drr_c <- estimate_rxxa(rxxi = qxi_desc_c[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")^.5
+                         est_var_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "internal_consistency")
+                         est_var_res_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "internal_consistency")
+                         est_qxa_desc_ux_drr_c <- t(c(mean = est_mean_qxa_drr_c, var = est_var_qxa_drr_c, var_res = est_var_res_qxa_drr_c, wt = as.numeric(qxi_desc_c[,"wt"])))
+                    }else{
+                         est_qxa_desc_ux_drr_c <- filler
+                    }
+
+                    if(nrow(qxi_desc_m) > 0){
+                         est_mean_qxa_drr_m <- estimate_rxxa(rxxi = qxi_desc_m[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")^.5
+                         est_var_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "multiple_administrations")
+                         est_var_res_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "multiple_administrations")
+                         est_qxa_desc_ux_drr_m <- t(c(mean = est_mean_qxa_drr_m, var = est_var_qxa_drr_m, var_res = est_var_res_qxa_drr_m, wt = as.numeric(qxi_desc_m[,"wt"])))
+                    }else{
+                         est_qxa_desc_ux_drr_m <- filler
+                    }
 
 
                     est_mean_rxxa_irr <- estimate_rxxa(rxxi = rxxi_desc[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = TRUE)
                     est_var_rxxa_irr <- estimate_var_rxxa_ux(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_var_res_rxxa_irr <- estimate_var_rxxa_ux(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
-                    est_rxxa_desc_ux_irr <- t(c(mean = est_mean_rxxa_irr, var = est_var_rxxa_irr, var_res = est_var_res_rxxa_irr, wt = as.numeric(p_ux * qxi_desc[,"wt"])))
+                    est_rxxa_desc_ux_irr <- t(c(mean = est_mean_rxxa_irr, var = est_var_rxxa_irr, var_res = est_var_res_rxxa_irr, wt = as.numeric(p_ux * rxxi_desc[,"wt"])))
 
-                    est_mean_rxxa_drr <- estimate_rxxa(rxxi = rxxi_desc[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE)
-                    est_var_rxxa_drr <- estimate_var_rxxa_ux(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_var_res_rxxa_drr <- estimate_var_rxxa_ux(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_rxxa_desc_ux_drr <- t(c(mean = est_mean_rxxa_drr, var = est_var_rxxa_drr, var_res = est_var_res_rxxa_drr, wt = as.numeric(qxi_desc[,"wt"])))
+                    if(nrow(rxxi_desc_c) > 0){
+                         est_mean_rxxa_drr_c <- estimate_rxxa(rxxi = rxxi_desc_c[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                         est_var_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                         est_var_res_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                         est_rxxa_desc_ux_drr_c <- t(c(mean = est_mean_rxxa_drr_c, var = est_var_rxxa_drr_c, var_res = est_var_res_rxxa_drr_c, wt = as.numeric(rxxi_desc_c[,"wt"])))
+                    }else{
+                         est_rxxa_desc_ux_drr_c <- filler
+                    }
+
+                    if(nrow(rxxi_desc_m) > 0){
+                         est_mean_rxxa_drr_m <- estimate_rxxa(rxxi = rxxi_desc_m[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                         est_var_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                         est_var_res_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                         est_rxxa_desc_ux_drr_m <- t(c(mean = est_mean_rxxa_drr_m, var = est_var_rxxa_drr_m, var_res = est_var_res_rxxa_drr_m, wt = as.numeric(rxxi_desc_m[,"wt"])))
+                    }else{
+                         est_rxxa_desc_ux_drr_m <- filler
+                    }
                }else{
-                    est_qxa_desc_ux_irr <- est_qxa_desc_ux_drr <- est_rxxa_desc_ux_irr <- est_rxxa_desc_ux_drr <- filler
+                    est_qxa_desc_ux_irr <- est_qxa_desc_ux_drr_c <- est_qxa_desc_ux_drr_m <- est_rxxa_desc_ux_irr <- est_rxxa_desc_ux_drr_c <- est_rxxa_desc_ux_drr_m <- filler
                }
 
                if(nrow(qxi_desc) > 0 & nrow(ut_desc) > 0){
-                    est_mean_qxa <- estimate_rxxa(rxxi = rxxi_desc[,"mean"]^2, ux = ut_desc[,"mean"], ux_observed = FALSE)^.5
+                    est_mean_qxa <- estimate_rxxa(rxxi = qxi_desc[,"mean"]^2, ux = ut_desc[,"mean"], ux_observed = FALSE)^.5
                     est_var_qxa <- estimate_var_qxa_ut(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var"], ut = ut_desc[,"mean"])
                     est_var_res_qxa <- estimate_var_qxa_ut(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var_res"], ut = ut_desc[,"mean"])
                     est_qxa_desc_ut <- t(c(mean = est_mean_qxa, var = est_var_qxa, var_res = est_var_res_qxa, wt = as.numeric(p_ut * qxi_desc[,"wt"])))
@@ -703,10 +1135,23 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                     est_var_res_qxi_irr <- estimate_var_qxi_ux(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_qxi_desc_ux_irr <- t(c(mean = est_mean_qxi_irr, var = est_var_qxi_irr, var_res = est_var_res_qxi_irr, wt = as.numeric(p_ux * qxa_desc[,"wt"])))
 
-                    est_mean_qxi_drr <- estimate_rxxi(rxxa = qxa_desc[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE)^.5
-                    est_var_qxi_drr <- estimate_var_qxi_ux(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_var_res_qxi_drr <- estimate_var_qxi_ux(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_qxi_desc_ux_drr <- t(c(mean = est_mean_qxi_drr, var = est_var_qxi_drr, var_res = est_var_res_qxi_drr, wt = as.numeric(qxa_desc[,"wt"])))
+                    if(nrow(qxa_desc_c) > 0){
+                         est_mean_qxi_drr_c <- estimate_rxxi(rxxa = qxa_desc_c[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")^.5
+                         est_var_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "internal_consistency")
+                         est_var_res_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "internal_consistency")
+                         est_qxi_desc_ux_drr_c <- t(c(mean = est_mean_qxi_drr_c, var = est_var_qxi_drr_c, var_res = est_var_res_qxi_drr_c, wt = as.numeric(qxa_desc_c[,"wt"])))
+                    }else{
+                         est_qxi_desc_ux_drr_c <- filler
+                    }
+
+                    if(nrow(qxa_desc_m) > 0){
+                         est_mean_qxi_drr_m <- estimate_rxxi(rxxa = qxa_desc_m[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")^.5
+                         est_var_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "multiple_administrations")
+                         est_var_res_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "multiple_administrations")
+                         est_qxi_desc_ux_drr_m <- t(c(mean = est_mean_qxi_drr_m, var = est_var_qxi_drr_m, var_res = est_var_res_qxi_drr_m, wt = as.numeric(qxa_desc_m[,"wt"])))
+                    }else{
+                         est_qxi_desc_ux_drr_m <- filler
+                    }
 
 
                     est_mean_rxxi_irr <- estimate_rxxi(rxxa = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = TRUE)
@@ -714,12 +1159,25 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                     est_var_res_rxxi_irr <- estimate_var_rxxi_ux(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_rxxi_desc_ux_irr <- t(c(mean = est_mean_rxxi_irr, var = est_var_rxxi_irr, var_res = est_var_res_rxxi_irr, wt = as.numeric(p_ux * qxa_desc[,"wt"])))
 
-                    est_mean_rxxi_drr <- estimate_rxxi(rxxa = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE)
-                    est_var_rxxi_drr <- estimate_var_rxxi_ux(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_var_res_rxxi_drr <- estimate_var_rxxi_ux(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE)
-                    est_rxxi_desc_ux_drr <- t(c(mean = est_mean_rxxi_drr, var = est_var_rxxi_drr, var_res = est_var_res_rxxi_drr, wt = as.numeric(qxa_desc[,"wt"])))
+                    if(nrow(rxxa_desc_c) > 0){
+                         est_mean_rxxi_drr_c <- estimate_rxxi(rxxa = rxxa_desc_c[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                         est_var_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                         est_var_res_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                         est_rxxi_desc_ux_drr_c <- t(c(mean = est_mean_rxxi_drr_c, var = est_var_rxxi_drr_c, var_res = est_var_res_rxxi_drr_c, wt = as.numeric(rxxa_desc_c[,"wt"])))
+                    }else{
+                         est_rxxi_desc_ux_drr_c <- filler
+                    }
+
+                    if(nrow(rxxa_desc_m) > 0){
+                         est_mean_rxxi_drr_m <- estimate_rxxi(rxxa = rxxa_desc_m[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                         est_var_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                         est_var_res_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                         est_rxxi_desc_ux_drr_m <- t(c(mean = est_mean_rxxi_drr_m, var = est_var_rxxi_drr_m, var_res = est_var_res_rxxi_drr_m, wt = as.numeric(rxxa_desc_m[,"wt"])))
+                    }else{
+                         est_rxxi_desc_ux_drr_m <- filler
+                    }
                }else{
-                    est_qxi_desc_ux_irr <- est_qxi_desc_ux_drr <- est_rxxi_desc_ux_irr <- est_rxxi_desc_ux_drr <- filler
+                    est_qxi_desc_ux_irr <- est_qxi_desc_ux_drr_c <- est_qxi_desc_ux_drr_m <- est_rxxi_desc_ux_irr <- est_rxxi_desc_ux_drr_c <- est_rxxi_desc_ux_drr_m <- filler
                }
 
                if(nrow(qxa_desc) > 0 & nrow(ut_desc) > 0){
@@ -798,7 +1256,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                     est_var_res_ut <- estimate_var_ut_qxa(qxa = qxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_res"])
                     est_ut_desc_qxa <- t(c(mean = est_mean_ut, var = est_var_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxa * ux_desc[,"wt"])))
 
-                    est_mean_ut <- estimate_ux(rxx = rxxa_desc[,"mean"], ut = ux_desc[,"mean"], rxx_restricted = FALSE)
+                    est_mean_ut <- estimate_ut(rxx = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], rxx_restricted = FALSE)
                     est_var_ut <- estimate_var_ut_rxxi(rxxi = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var"])
                     est_var_res_ut <- estimate_var_ut_rxxi(rxxi = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_res"])
                     est_ut_desc_rxxa <- t(c(mean = est_mean_ut, var = est_var_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxa * ux_desc[,"wt"])))
@@ -823,16 +1281,16 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           }
 
           rbind(qxa_irr = summarize_ad(rbind(qxa_desc, est_qxa_desc_ux_irr, est_qxa_desc_ut), var_unbiased = var_unbiased),
-                qxa_drr = summarize_ad(rbind(qxa_desc, est_qxa_desc_ux_drr), var_unbiased = var_unbiased),
+                qxa_drr = summarize_ad(rbind(qxa_desc, est_qxa_desc_ux_drr_c, est_qxa_desc_ux_drr_m), var_unbiased = var_unbiased),
 
                 qxi_irr = summarize_ad(rbind(qxi_desc, est_qxi_desc_ux_irr, est_qxi_desc_ut), var_unbiased = var_unbiased),
-                qxi_drr = summarize_ad(rbind(qxi_desc, est_qxi_desc_ux_drr), var_unbiased = var_unbiased),
+                qxi_drr = summarize_ad(rbind(qxi_desc, est_qxi_desc_ux_drr_c, est_qxi_desc_ux_drr_m), var_unbiased = var_unbiased),
 
                 rxxa_irr = summarize_ad(rbind(rxxa_desc, est_rxxa_desc_ux_irr, est_rxxa_desc_ut), var_unbiased = var_unbiased),
-                rxxa_drr = summarize_ad(rbind(rxxa_desc, est_rxxa_desc_ux_drr), var_unbiased = var_unbiased),
+                rxxa_drr = summarize_ad(rbind(rxxa_desc, est_rxxa_desc_ux_drr_c, est_rxxa_desc_ux_drr_m), var_unbiased = var_unbiased),
 
                 rxxi_irr = summarize_ad(rbind(rxxi_desc, est_rxxi_desc_ux_irr, est_rxxi_desc_ut), var_unbiased = var_unbiased),
-                rxxi_drr = summarize_ad(rbind(rxxi_desc, est_rxxi_desc_ux_drr), var_unbiased = var_unbiased),
+                rxxi_drr = summarize_ad(rbind(rxxi_desc, est_rxxi_desc_ux_drr_c, est_rxxi_desc_ux_drr_m), var_unbiased = var_unbiased),
 
                 ux = summarize_ad(rbind(ux_desc, est_ux_desc_qxi, est_ux_desc_qxa), var_unbiased = var_unbiased),
                 ut = summarize_ad(rbind(ut_desc, est_ut_desc_qxi, est_ut_desc_qxa), var_unbiased = var_unbiased))
@@ -840,7 +1298,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
      out <- est_summaries(qxi_desc = qxi_desc, qxa_desc = qxa_desc,
                           rxxi_desc = rxxi_desc, rxxa_desc = rxxa_desc,
+
+                          qxi_desc_c = qxi_desc_c, qxa_desc_c = qxa_desc_c,
+                          rxxi_desc_c = rxxi_desc_c, rxxa_desc_c = rxxa_desc_c,
+
+                          qxi_desc_m = qxi_desc_m, qxa_desc_m = qxa_desc_m,
+                          rxxi_desc_m = rxxi_desc_m, rxxa_desc_m = rxxa_desc_m,
+
                           ux_desc = ux_desc, ut_desc = ut_desc,
+
                           estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                           estimate_ux = estimate_ux, estimate_ut = estimate_ut)
 
@@ -878,551 +1344,54 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                   "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
                   "ux", "ut"),]
 
-     ad_contents <- paste(c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
-                          "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
-                          "ux", "ut")
-                        [c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr,
-                           valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)], collapse = " + ")
+     ad_contents <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
+                      "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
+                      "ux", "ut")[c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr,
+                                    valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)]
      if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
-     class(out) <- c("psychmeta", "ad_obj", "ad_tsa", ad_contents = ad_contents)
+
+     summary_mat <- cbind(k_obs = c(length(rxxa), length(rxxa), length(rxxi), length(rxxi),
+                                    length(rxxa), length(rxxa), length(rxxi), length(rxxi),
+                                    length(ux), length(ut)),
+
+                          N_obs = c(sum(n_rxxa), sum(n_rxxa), sum(n_rxxi), sum(n_rxxi),
+                                    sum(n_rxxa), sum(n_rxxa), sum(n_rxxi), sum(n_rxxi),
+                                    sum(ni_ux), sum(ni_ut)),
+
+                          p_dists = c(length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
+                                     length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
+                                     length(mean_ux), length(mean_ut)),
+
+                          k_dists = c(sum(c(k_qxa, k_rxxa)), sum(c(k_qxa, k_rxxa)), sum(c(k_qxi, k_rxxi)), sum(c(k_qxi, k_rxxi)),
+                                      sum(c(k_qxa, k_rxxa)), sum(c(k_qxa, k_rxxa)), sum(c(k_qxi, k_rxxi)), sum(c(k_qxi, k_rxxi)),
+                                      sum(k_ux), sum(k_ut)),
+
+                          N_dists = c(sum(c(N_qxa, N_rxxa)), sum(c(N_qxa, N_rxxa)), sum(c(N_qxi, N_rxxi)), sum(c(N_qxi, N_rxxi)),
+                                      sum(c(N_qxa, N_rxxa)), sum(c(N_qxa, N_rxxa)), sum(c(N_qxi, N_rxxi)), sum(c(N_qxi, N_rxxi)),
+                                      sum(Ni_ux), sum(Ni_ut))
+                          )
+     rownames(summary_mat) <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
+                                "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
+                                "ux", "ut")
+     .summary_mat <- summary_mat
+
+     if(estimate_rxxa){
+          summary_mat[c("qxa_irr", "qxa_drr"),] <- .summary_mat[c("qxa_irr", "qxa_drr"),] + .summary_mat[c("qxi_irr", "qxi_drr"),]
+          summary_mat[c("rxxa_irr", "rxxa_drr"),] <- .summary_mat[c("rxxa_irr", "rxxa_drr"),] + .summary_mat[c("rxxi_irr", "rxxi_drr"),]
+     }
+     if(estimate_rxxi){
+          summary_mat[c("qxi_irr", "qxi_drr"),] <- .summary_mat[c("qxi_irr", "qxi_drr"),] + .summary_mat[c("qxa_irr", "qxa_drr"),]
+          summary_mat[c("rxxi_irr", "rxxi_drr"),] <- .summary_mat[c("rxxi_irr", "rxxi_drr"),] + .summary_mat[c("rxxa_irr", "rxxa_drr"),]
+     }
+     if(estimate_ux) summary_mat["ux",] <- .summary_mat["ux",] + .summary_mat["ut",]
+     if(estimate_ut) summary_mat["ut",] <- .summary_mat["ut",] + .summary_mat["ux",]
+
+     summary_mat <- cbind(k_total = apply(summary_mat[,c("k_obs", "k_dists")], 1, sum, na.rm = TRUE),
+                          N_total = apply(summary_mat[,c("N_obs", "N_dists")], 1, sum, na.rm = TRUE),
+                          summary_mat, out)
+     summary_mat <- cbind(summary_mat, sd = summary_mat[,"var"]^.5, sd_res = summary_mat[,"var_res"]^.5)
+     attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
+
+     class(out) <- c("psychmeta", "ad_obj", "ad_tsa")
      out
 }
-
-
-#' Generate an artifact distribution object for a dichotomous grouping variable for use in interactive artifact-distribution meta-analysis programs.
-#'
-#' This wrapper for \code{link{create_ad_int}} generates \code{ad_obj} class objects containing interactive artifact distributions for dichotomous group-membership variables.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#' All artifact distributions are optional; null distributions will be given an artifact value of 1 and a weight of 1 as placeholders.
-#'
-#' @param rGg Vector of correlations between observed-group status and latent-group status.
-#' @param wt_rGg Vector of weights associated with the elements in rxxi.
-#' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (list of artifact-distribution tables) for use in interactive artifact-distribution meta-analyses.
-#' @export
-#'
-#' @keywords internal
-#'
-#' @examples
-#' create_ad_int_group(rGg = c(.9, .8), wt_rGg = c(50, 150),
-#'                     pi = c(.9, .8), pa = c(.5, .5), wt_p = c(50, 150))
-create_ad_int_group <- function(rGg = NULL, wt_rGg = rep(1, length(rGg)),
-                                pi = NULL, pa = NULL, wt_p = rep(1, length(pi)),
-                                ...){
-
-     if(!is.null(pi))
-          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-     if(!is.null(pa))
-          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-
-     ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
-     if(!is.null(rGg)){
-          rxxi <- rGg^2
-     }else{
-          rxxi <- NULL
-     }
-
-     ## The variance of a dichotomous variable is pq = p(1-p), so we will estimate u ratios accordingly
-     if(!is.null(pi) & !is.null(pa)){
-          ux <- sqrt((pi * (1 - pi)) / (pa * (1 - pa)))
-     }else{
-          ux <- NULL
-     }
-
-     create_ad_int(rxxi = rxxi, wt_rxxi = wt_rGg, ux = ux, wt_ux = wt_p)
-}
-
-
-#' Generate an artifact distribution object for a dichotomous grouping variable for use in Taylor series artifact-distribution meta-analysis programs.
-#'
-#' This wrapper for \code{link{create_ad_tsa}} generates \code{ad_obj} class objects containing Taylor series artifact distributions for dichotomous group-membership variables.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' All artifact distributions are optional; null distributions will be given a mean of 1 and variance of 0 if not information is supplied.
-#'
-#' @param rGg Vector of incumbent reliability estimates.
-#' @param n_rGg Vector of sample sizes associated with the elements of rGg.
-#' @param wt_rGg Vector of weights associated with the elements of rGg (by default, sample sizes will be used as weights).
-#' @param mean_rGg Vector that can be used to supply the means of externally computed distributions of correlations between observed and latent group membership.
-#' @param var_rGg Vector that can be used to supply the variances of externally computed distributions of correlations between observed and latent group membership.
-#' @param k_rGg Vector that can be used to supply the number of studies included in externally computed distributions of correlations between observed and latent group membership.
-#' @param mean_n_rGg Vector that can be used to supply the mean sample sizes of externally computed distributions of correlations between observed and latent group membership.
-#'
-#' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param n_pi Vector of sample sizes associated with the elements in \code{pi}.
-#' @param n_pa Vector of sample sizes associated with the elements in \code{pa}.
-#' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
-#'
-#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use in Taylor serices artifact-distribution meta-analyses.
-#' @export
-#'
-#' @keywords internal
-#'
-#' @examples
-#' ## Example artifact distribution for a dichotomous grouping variable:
-#' create_ad_tsa_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
-#'                     mean_rGg = .9, var_rGg = .05,
-#'                     k_rGg = 5, mean_n_rGg = 100,
-#'                     pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = 300,
-#'                     var_unbiased = TRUE)
-create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
-                                mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
-                                pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
-                                var_unbiased = TRUE, ...){
-
-     if(!is.null(pi))
-          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-     if(!is.null(pa))
-          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-
-     ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
-     if(!is.null(rGg)){
-          rxxi <- rGg^2
-     }else{
-          rxxi <- NULL
-     }
-
-     ## The variance of a dichotomous variable is pq = p(1-p), so we will estimate u ratios accordingly
-     if(!is.null(pi) & !is.null(pa)){
-          ux <- sqrt((pi * (1 - pi)) / (pa * (1 - pa)))
-     }else{
-          ux <- NULL
-     }
-
-     create_ad_tsa(rxxi = rGg, n_rxxi = n_rGg, wt_rxxi = wt_rGg,
-                   mean_qxi = mean_rGg, var_qxi = var_rGg, k_qxi = k_rGg, mean_n_qxi = mean_n_rGg,
-                   ux = ux, ni_ux = n_pi, na_ux = n_pa, wt_ux = wt_p,
-                   var_unbiased = var_unbiased, ...)
-}
-
-
-
-
-
-#' Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
-#'
-#' This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' For u ratios, error variances can be computed for independent samples (i.e., settings in which the unrestricted standard deviation comes from an external study) or
-#' dependent samples (i.e., settings in which the range-restricted standard deviation comes from a sample that represents a subset of the applicant sample that provided the
-#' unrestricted standard deviation). The former circumstance is presumed to be more common, so error variances are computed for independent samples by default.
-#'
-#' @param ad_type Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
-#'
-#' @param rxxi Vector of incumbent reliability estimates.
-#' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
-#' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).
-#'
-#' @param rxxa Vector of applicant reliability estimates.
-#' @param n_rxxa Vector of sample sizes associated with the elements of \code{rxxa}.
-#' @param wt_rxxa Vector of weights associated with the elements of \code{rxxa} (by default, sample sizes will be used as weights).
-#'
-#' @param mean_qxi Vector that can be used to supply the means of externally computed distributions of incumbent square-root reliabilities.
-#' @param var_qxi Vector that can be used to supply the variances of externally computed distributions of incumbent square-root reliabilities.
-#' @param k_qxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent square-root reliabilities.
-#' @param mean_n_qxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent square-root reliabilities.
-#'
-#' @param mean_rxxi Vector that can be used to supply the means of externally computed distributions of incumbent reliabilities.
-#' @param var_rxxi Vector that can be used to supply the variances of externally computed distributions of incumbent reliabilities.
-#' @param k_rxxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent reliabilities.
-#' @param mean_n_rxxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent reliabilities.
-#'
-#' @param ux Vector of observed-score u ratios.
-#' @param ni_ux Vector of incumbent sample sizes associated with the elements of \code{ux}.
-#' @param wt_ux Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).
-#' @param na_ux Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ux values. \code{NULL} by default.
-#' Only used when ni_ux is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ux}.
-#' @param dep_sds_ux_obs Logical scalar or vector determinining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param ut Vector of true-score u ratios.
-#' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
-#' @param wt_ut Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).
-#' @param na_ut Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ut values. \code{NULL} by default.
-#' Only used when ni_ut is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ut}.
-#' @param dep_sds_ut_obs Logical scalar or vector determinining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param mean_qxa Vector that can be used to supply the means of externally computed distributions of applicant square-root reliabilities.
-#' @param var_qxa Vector that can be used to supply the variances of externally computed distributions of applicant square-root reliabilities.
-#' @param k_qxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant square-root reliabilities.
-#' @param mean_n_qxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant square-root reliabilities.
-#'
-#' @param mean_rxxa Vector that can be used to supply the means of externally computed distributions of applicant reliabilities.
-#' @param var_rxxa Vector that can be used to supply the variances of externally computed distributions of applicant reliabilities.
-#' @param k_rxxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant reliabilities.
-#' @param mean_n_rxxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant reliabilities.
-#'
-#' @param mean_ux Vector that can be used to supply the means of externally computed distributions of observed-score u ratios.
-#' @param var_ux Vector that can be used to supply the variances of externally computed distributions of observed-score u ratios.
-#' @param k_ux Vector that can be used to supply the number of studies included in externally computed distributions of observed-score u ratios.
-#' @param mean_ni_ux Vector that can be used to supply the mean incumbent sample sizes of externally computed distributions of observed-score u ratios.
-#' @param mean_na_ux Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.
-#' @param dep_sds_ux_spec Logical scalar or vector determinining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param mean_ut Vector that can be used to supply the means of externally computed distributions of true-score u ratios.
-#' @param var_ut Vector that can be used to supply the variances of externally computed distributions of true-score u ratios.
-#' @param k_ut Vector that can be used to supply the number of studies included in externally computed distributions of true-score u ratios.
-#' @param mean_ni_ut Vector that can be used to supply the mean sample sizes for of externally computed distributions of true-score u ratios.
-#' @param mean_na_ut Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of true-score u ratios.
-#' @param dep_sds_ut_spec Logical scalar or vector determinining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by  default.
-#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use artifact-distribution meta-analyses.
-#' @export
-#'
-#' @examples
-#' ## Example computed using observed values only:
-#' create_ad(ad_type = "tsa", rxxa = c(.9, .8), n_rxxa = c(50, 150),
-#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
-#'               ux = c(.9, .8), ni_ux = c(50, 150))
-#'
-#' create_ad(ad_type = "int", rxxa = c(.9, .8), n_rxxa = c(50, 150),
-#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
-#'               ux = c(.9, .8), ni_ux = c(50, 150))
-#'
-#' ## Example computed using all possible input arguments (arbitrary values):
-#' rxxa <- rxxi <- ux <- ut <- c(.7, .8)
-#' n_rxxa <- n_rxxi <- ni_ux <- ni_ut <- c(50, 100)
-#' na_ux <- na_ut <- c(200, 200)
-#' mean_qxa <- mean_qxi <- mean_ux <- mean_ut <- mean_rxxi <- mean_rxxa <- c(.7, .8)
-#' var_qxa <- var_qxi <- var_ux <- var_ut <- var_rxxi <- var_rxxa <- c(.1, .05)
-#' k_qxa <- k_qxi <- k_ux <- k_ut <- k_rxxa <- k_rxxi <- 2
-#' mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- 100
-#' dep_sds_ux_obs <- dep_sds_ux_spec <- dep_sds_ut_obs <- dep_sds_ut_spec <- FALSE
-#' mean_na_ux <- mean_na_ut <- 200
-#'
-#' wt_rxxa <- n_rxxa
-#' wt_rxxi <- n_rxxi
-#' wt_ux <- ni_ux
-#' wt_ut <- ni_ut
-#'
-#' estimate_rxxa <- TRUE
-#' estimate_rxxi <- TRUE
-#' estimate_ux <- TRUE
-#' estimate_ut <- TRUE
-#' var_unbiased <- TRUE
-#'
-#' create_ad(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
-#'               mean_qxa = mean_qxa, var_qxa = var_qxa,
-#'               k_qxa = k_qxa, mean_n_qxa = mean_n_qxa,
-#'               mean_rxxa = mean_rxxa, var_rxxa = var_rxxa,
-#'               k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa,
-#'
-#'               rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi,
-#'               mean_qxi = mean_qxi, var_qxi = var_qxi,
-#'               k_qxi = k_qxi, mean_n_qxi = mean_n_qxi,
-#'               mean_rxxi = mean_rxxi, var_rxxi = var_rxxi,
-#'               k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi,
-#'
-#'               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
-#'               dep_sds_ux_obs = dep_sds_ux_obs,
-#'               mean_ux = mean_ux, var_ux = var_ux, k_ux =
-#'                k_ux, mean_ni_ux = mean_ni_ux,
-#'               mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
-#'
-#'               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut,
-#'               dep_sds_ut_obs = dep_sds_ut_obs,
-#'               mean_ut = mean_ut, var_ut = var_ut,
-#'               k_ut = k_ut, mean_ni_ut = mean_ni_ut,
-#'               mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
-#'
-#'               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-#'               estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
-create_ad <- function(ad_type = "tsa",
-                      rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
-                      rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa,
-                      ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
-                      ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = FALSE,
-
-                      mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL,
-                      mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL,
-
-                      mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL,
-                      mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL,
-
-                      mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = NA, dep_sds_ux_spec = FALSE,
-
-                      mean_ut = NULL, var_ut = NULL, k_ut = NULL, mean_ni_ut = NULL, mean_na_ut = NA, dep_sds_ut_spec = FALSE,
-
-                      estimate_rxxa = TRUE, estimate_rxxi = TRUE,
-                      estimate_ux = TRUE, estimate_ut = TRUE,
-                      var_unbiased = TRUE, ...){
-
-     ad_type <- match.arg(ad_type, c("tsa", "int"))
-
-     if(ad_type == "tsa"){
-          out <- create_ad_tsa(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi,
-                               mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi,
-                               mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi,
-
-                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
-                               mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa,
-                               mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa,
-
-                               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
-                               mean_ux = mean_ux, var_ux = var_ux, k_ux = k_ux, mean_ni_ux = mean_ni_ux, mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
-
-                               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
-                               mean_ut = mean_ut, var_ut = var_ut, k_ut = k_ut, mean_ni_ut = mean_ni_ut, mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
-
-                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                               estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                               var_unbiased = var_unbiased)
-     }else{
-          out <- create_ad_int(rxxi = rxxi, wt_rxxi = wt_rxxi,
-                               rxxa = rxxa, wt_rxxa = wt_rxxa,
-
-                               ux = ux, wt_ux = wt_ux,
-                               ut = ut, wt_ut = wt_ut,
-
-                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                               estimate_ux = estimate_ux, estimate_ut = estimate_ut)
-     }
-     out
-}
-
-
-
-#' Generate an artifact distribution object for a dichotomous grouping variable.
-#'
-#' This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' @param ad_type Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
-#'
-#' @param rGg Vector of incumbent reliability estimates.
-#' @param n_rGg Vector of sample sizes associated with the elements of \code{rGg.}
-#' @param wt_rGg Vector of weights associated with the elements of \code{rGg} (by default, sample sizes will be used as weights if provided).
-#'
-#' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of \code{pi}/\code{pa} can be vectors - if both are vectors, they must be of equal length).
-#' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of \code{pi}/\code{pa} can be vectors - if both are vectors, they must be of equal length).
-#' @param n_pi Vector of sample sizes associated with the elements in \code{pi}.
-#' @param n_pa Vector of sample sizes associated with the elements in \code{pa}.
-#' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
-#'
-#' @param mean_rGg Vector that can be used to supply the means of externally computed distributions of correlations between observed and latent group membership.
-#' @param var_rGg Vector that can be used to supply the variances of externally computed distributions of correlations between observed and latent group membership.
-#' @param k_rGg Vector that can be used to supply the number of studies included in externally computed distributions of correlations between observed and latent group membership.
-#' @param mean_n_rGg Vector that can be used to supply the mean sample sizes of externally computed distributions of correlations between observed and latent group membership.
-#'
-#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use in artifact-distribution meta-analyses.
-#' @export
-#'
-#' @examples
-#' ## Example artifact distribution for a dichotomous grouping variable:
-#' create_ad_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
-#'                     mean_rGg = .9, var_rGg = .05,
-#'                     k_rGg = 5, mean_n_rGg = 100,
-#'                     pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = 300,
-#'                     var_unbiased = TRUE)
-create_ad_group <- function(ad_type = "tsa",
-                            rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
-                            pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
-                            mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
-                            var_unbiased = TRUE, ...){
-
-     ad_type <- match.arg(ad_type, c("tsa", "int"))
-
-     if(!is.null(pi))
-          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-     if(!is.null(pa))
-          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-
-     if(ad_type == "tsa"){
-          out <- create_ad_tsa_group(rGg = rGg, n_rGg = n_rGg, wt_rGg = wt_rGg,
-                                     mean_rGg = mean_rGg, var_rGg = var_rGg, k_rGg = k_rGg, mean_n_rGg = mean_n_rGg,
-                                     pi = pi, pa = pa, n_pi = n_pi, n_pa = n_pa, wt_p = wt_p,
-                                     var_unbiased = var_unbiased)
-     }else{
-          out <- create_ad_int_group(rGg = rGg, wt_rGg = wt_rGg, pi = pi, pa = pa, wt_p = wt_p)
-     }
-     out
-}
-
-
-
-## Internal function to harvest lists of artifact distributions from dataframes matching a known, internally imposed structure
-.create_ad_list <- function(ad_type = "tsa", sample_id, construct_x, construct_y, construct_pair, es_data, data_x, data_y, pairwise_ads = FALSE){
-     if(!is.null(sample_id)){
-          unique_x <- !duplicated(paste(sample_id, construct_x))
-          unique_y <- !duplicated(paste(sample_id, construct_y))
-     }else{
-          unique_x <- unique_y <- rep(TRUE, nrow(data_x))
-     }
-
-     if(pairwise_ads){
-          ad_obj_list <- by(1:length(construct_pair), construct_pair, function(i){
-               data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
-               if(!is.null(construct_x)) data <- data.frame(data, construct_x = construct_x[i])
-               if(!is.null(construct_y)) data <- data.frame(data, construct_y = construct_y[i])
-
-               n <- es_data$n[i][unique_x[i] & unique_y[i]]
-
-               rxx <- data_x$rxx[i][unique_x[i] & unique_y[i]]
-               rxx_restricted <- data_x$rxx_restricted[i][unique_x[i] & unique_y[i]]
-               ux <- data_x$ux[i][unique_x[i] & unique_y[i]]
-               ux_observed <- data_x$ux_observed[i][unique_x[i] & unique_y[i]]
-
-               ryy <- data_y$ryy[i][unique_x[i] & unique_y[i]]
-               ryy_restricted <- data_y$ryy_restricted[i][unique_x[i] & unique_y[i]]
-               uy <- data_y$uy[i][unique_x[i] & unique_x[i]]
-               uy_observed <- data_y$uy_observed[i][unique_x[i] & unique_y[i]]
-
-               rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
-               n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
-               rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
-               n_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){n[rxx_restricted]}else{NULL}}else{NULL}
-               ux <-     if(!is.null(ux)){if(any(ux_observed)){ux[ux_observed]}else{NULL}}else{NULL}
-               n_ux <-   if(!is.null(ux)){if(any(ux_observed)){n[ux_observed]}else{NULL}}else{NULL}
-               ut <-     if(!is.null(ux)){if(any(!ux_observed)){ux[!ux_observed]}else{NULL}}else{NULL}
-               n_ut <-   if(!is.null(ux)){if(any(!ux_observed)){n[!ux_observed]}else{NULL}}else{NULL}
-
-               ryya <-   if(!is.null(ryy)){if(any(!ryy_restricted)){ryy[!ryy_restricted]}else{NULL}}else{NULL}
-               n_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){n[!ryy_restricted]}else{NULL}}else{NULL}
-               ryyi <-   if(!is.null(ryy)){if(any(ryy_restricted)){ryy[ryy_restricted]}else{NULL}}else{NULL}
-               n_ryyi <- if(!is.null(ryy)){if(any(ryy_restricted)){n[ryy_restricted]}else{NULL}}else{NULL}
-               uy <-     if(!is.null(uy)){if(any(uy_observed)){uy[uy_observed]}else{NULL}}else{NULL}
-               n_uy <-   if(!is.null(uy)){if(any(uy_observed)){n[uy_observed]}else{NULL}}else{NULL}
-               up <-     if(!is.null(uy)){if(any(!uy_observed)){uy[!uy_observed]}else{NULL}}else{NULL}
-               n_up <-   if(!is.null(uy)){if(any(!uy_observed)){n[!uy_observed]}else{NULL}}else{NULL}
-
-               if(ad_type == "int"){
-                    ad_obj_x <- suppressWarnings(create_ad_int(rxxa = rxxa, wt_rxxa = n_rxxa,
-                                                               rxxi = rxxi, wt_rxxi = n_rxxi,
-                                                               ux = ux, wt_ux = n_ux,
-                                                               ut = ut, wt_ut = n_ut))
-
-                    ad_obj_y <- suppressWarnings(create_ad_int(rxxa = ryya, wt_rxxa = n_ryya,
-                                                               rxxi = ryyi, wt_rxxi = n_ryyi,
-                                                               ux = uy, wt_ux = n_uy,
-                                                               ut = up, wt_ut = n_up))
-               }else{
-                    ad_obj_x <- suppressWarnings(create_ad_tsa(rxxa = rxxa, n_rxxa = n_rxxa,
-                                                               rxxi = rxxi, n_rxxi = n_rxxi,
-                                                               ux = ux, ni_ux = n_ux,
-                                                               ut = ut, ni_ut = n_ut))
-
-                    ad_obj_y <- suppressWarnings(create_ad_tsa(rxxa = ryya, n_rxxa = n_ryya,
-                                                               rxxi = ryyi, n_rxxi = n_ryyi,
-                                                               ux = uy, ni_ux = n_uy,
-                                                               ut = up, ni_ut = n_up))
-               }
-
-               list(ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y)
-          })
-     }else{
-          ad_obj_list_x <- by(1:length(construct_pair), construct_x, function(i){
-               data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
-               if(!is.null(construct_x)) data <- data.frame(data, construct_x = construct_x[i])
-
-               n <- es_data$n[i][unique_x[i]]
-
-               rxx <- data_x$rxx[i][unique_x[i]]
-               rxx_restricted <- data_x$rxx_restricted[i][unique_x[i]]
-               ux <- data_x$ux[i][unique_x[i]]
-               ux_observed <- data_x$ux_observed[i][unique_x[i]]
-
-               rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
-               n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
-               rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
-               n_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){n[rxx_restricted]}else{NULL}}else{NULL}
-               ux <-     if(!is.null(ux)){if(any(ux_observed)){ux[ux_observed]}else{NULL}}else{NULL}
-               n_ux <-   if(!is.null(ux)){if(any(ux_observed)){n[ux_observed]}else{NULL}}else{NULL}
-               ut <-     if(!is.null(ux)){if(any(!ux_observed)){ux[!ux_observed]}else{NULL}}else{NULL}
-               n_ut <-   if(!is.null(ux)){if(any(!ux_observed)){n[!ux_observed]}else{NULL}}else{NULL}
-
-               if(ad_type == "int"){
-                    ad_obj_x <- suppressWarnings(create_ad_int(rxxa = rxxa, wt_rxxa = n_rxxa,
-                                                               rxxi = rxxi, wt_rxxi = n_rxxi,
-                                                               ux = ux, wt_ux = n_ux,
-                                                               ut = ut, wt_ut = n_ut))
-               }else{
-                    ad_obj_x <- suppressWarnings(create_ad_tsa(rxxa = rxxa, n_rxxa = n_rxxa,
-                                                               rxxi = rxxi, n_rxxi = n_rxxi,
-                                                               ux = ux, ni_ux = n_ux,
-                                                               ut = ut, ni_ut = n_ut))
-               }
-
-               list(ad_obj_x = ad_obj_x)
-          })
-
-          ad_obj_list_y <- by(1:length(construct_pair), construct_y, function(i){
-               data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
-               if(!is.null(construct_y)) data <- data.frame(data, construct_y = construct_y[i])
-
-               n <- es_data$n[i][unique_y[i]]
-
-               ryy <- data_y$ryy[i][unique_y[i]]
-               ryy_restricted <- data_y$ryy_restricted[i][unique_y[i]]
-               uy <- data_y$uy[i][unique_y[i]]
-               uy_observed <- data_y$uy_observed[i][unique_y[i]]
-
-               ryya <-   if(!is.null(ryy)){if(any(!ryy_restricted)){ryy[!ryy_restricted]}else{NULL}}else{NULL}
-               n_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){n[!ryy_restricted]}else{NULL}}else{NULL}
-               ryyi <-   if(!is.null(ryy)){if(any(ryy_restricted)){ryy[ryy_restricted]}else{NULL}}else{NULL}
-               n_ryyi <- if(!is.null(ryy)){if(any(ryy_restricted)){n[ryy_restricted]}else{NULL}}else{NULL}
-               uy <-     if(!is.null(uy)){if(any(uy_observed)){uy[uy_observed]}else{NULL}}else{NULL}
-               n_uy <-   if(!is.null(uy)){if(any(uy_observed)){n[uy_observed]}else{NULL}}else{NULL}
-               up <-     if(!is.null(uy)){if(any(!uy_observed)){uy[!uy_observed]}else{NULL}}else{NULL}
-               n_up <-   if(!is.null(uy)){if(any(!uy_observed)){n[!uy_observed]}else{NULL}}else{NULL}
-
-               if(ad_type == "int"){
-                    ad_obj_y <- suppressWarnings(create_ad_int(rxxa = ryya, wt_rxxa = n_ryya,
-                                                               rxxi = ryyi, wt_rxxi = n_ryyi,
-                                                               ux = uy, wt_ux = n_uy,
-                                                               ut = up, wt_ut = n_up))
-               }else{
-                    ad_obj_y <- suppressWarnings(create_ad_tsa(rxxa = ryya, n_rxxa = n_ryya,
-                                                               rxxi = ryyi, n_rxxi = n_ryyi,
-                                                               ux = uy, ni_ux = n_uy,
-                                                               ut = up, ni_ut = n_up))
-               }
-
-               list(ad_obj_y = ad_obj_y)
-          })
-
-          construct_pair_mat <- cbind(construct_pair, construct_x, construct_y)
-          rownames(construct_pair_mat) <- construct_pair
-
-          construct_pair_lvls <- levels(factor(construct_pair))
-          construct_pair_mat <- construct_pair_mat[construct_pair_lvls,]
-          if(is.null(dim(construct_pair_mat))){
-               construct_pair_mat <- t(construct_pair_mat)
-               rownames(construct_pair_mat) <- construct_pair_lvls
-          }
-
-          ad_obj_list <- list()
-          for(i in construct_pair_lvls){
-               ad_obj_list[[i]] <- list(ad_obj_x = ad_obj_list_x[[construct_pair_mat[i,2]]], ad_obj_y = ad_obj_list_y[[construct_pair_mat[i,3]]])
-          }
-
-          rm(ad_obj_list_x, ad_obj_list_y)
-     }
-     ad_obj_list
-}
-

@@ -42,27 +42,28 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- data.frame(data)
+          data <- as.data.frame(data)
 
-          k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, data = data)
+          if(deparse(substitute(k))[1] != "NULL")
+               k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, data = data)
 
-          if(deparse(substitute(d)) != "NULL")
+          if(deparse(substitute(d))[1] != "NULL")
                d <- match_variables(call = call_full[[match("d", names(call_full))]], arg = d, data = data)
 
-          if(deparse(substitute(delta)) != "NULL")
+          if(deparse(substitute(delta))[1] != "NULL")
                delta <- match_variables(call = call_full[[match("delta", names(call_full))]], arg = delta, data = data)
 
-          if(deparse(substitute(var_d)) != "NULL")
+          if(deparse(substitute(var_d))[1] != "NULL")
                var_d <- match_variables(call = call_full[[match("var_d", names(call_full))]], arg = var_d, data = data)
 
-          if(deparse(substitute(var_d_c)) != "NULL")
+          if(deparse(substitute(var_d_c))[1] != "NULL")
                var_d_c <- match_variables(call = call_full[[match("var_d_c", names(call_full))]], arg = var_d_c, data = data)
 
-          if(deparse(substitute(sample_id)) != "NULL")
+          if(deparse(substitute(sample_id))[1] != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = data)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
 
           if(deparse(substitute(construct_x)) != "NULL")
                construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, data = data)
@@ -72,12 +73,29 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
      }
 
      if(!is.null(moderators)){
-          moderator_levels <- lapply(data.frame(data.frame(moderators)[,TRUE]), function(x){
+          if(is.null(dim(moderators))){
+               moderators <- as.data.frame(moderators)
+               colnames(moderators) <- "Moderator"
+          }
+
+          moderator_names <- list(all = colnames(moderators),
+                                  cat = colnames(moderators),
+                                  noncat = colnames(moderators))
+          moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
+
+          moderator_levels <- lapply(as_tibble(moderators), function(x){
                lvls <- levels(x)
                if(is.null(lvls)) lvls <- levels(factor(x))
                lvls
           })
+          names(moderator_levels) <- colnames(moderators)
+
+          moderators <- as.data.frame(moderators)
      }else{
+          moderator_names <- list(all = NULL,
+                                  cat = NULL,
+                                  noncat = NULL)
+
           moderator_levels <- NULL
      }
 
@@ -133,7 +151,8 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
                        moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = TRUE,
                        construct_x = construct_x, construct_y = construct_y,
 
-                       ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad)), moderator_levels = moderator_levels)
+                       ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad)),
+                       moderator_levels = moderator_levels, moderator_names = moderator_names)
 
      out <- append(list(call = call, inputs = inputs), out)
 

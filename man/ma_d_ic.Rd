@@ -9,12 +9,13 @@ ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   correct_bias = TRUE, correct_rGg = FALSE, correct_ryy = TRUE,
   correct_rr_g = FALSE, correct_rr_y = TRUE, indirect_rr_g = TRUE,
   indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
-  ryy_restricted = TRUE, uy = NULL, uy_observed = TRUE, sign_rgz = 1,
-  sign_ryz = 1, conf_level = 0.95, cred_level = 0.8, conf_method = "t",
-  cred_method = "t", var_unbiased = TRUE, moderators = NULL,
-  cat_moderators = TRUE, moderator_type = "simple",
-  impute_method = "bootstrap_mod", decimals = 2, hs_override = FALSE,
-  data = NULL, ...)
+  ryy_restricted = TRUE, ryy_type = "alpha", uy = NULL,
+  uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1, conf_level = 0.95,
+  cred_level = 0.8, conf_method = "t", cred_method = "t",
+  var_unbiased = TRUE, moderators = NULL, cat_moderators = TRUE,
+  moderator_type = "simple", impute_method = "bootstrap_mod",
+  decimals = 2, hs_override = FALSE, use_all_arts = FALSE,
+  supplemental_ads_y = NULL, data = NULL, ...)
 }
 \arguments{
 \item{d}{Vector or column name of observed \emph{d} values.}
@@ -61,6 +62,8 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{ryy_restricted}{Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
+\item{ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+
 \item{uy}{Vector or column name of u ratios for Y.}
 
 \item{uy_observed}{Logical vector or column name determining whether each element of \code{uy} is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).}
@@ -86,26 +89,16 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 \item{moderator_type}{Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time,
 "hierarchical" means that all possible combinations and subsets of moderators are to be examined, and "all" means that simple and hierarchical moderator analyses are to be performed.}
 
-\item{impute_method}{Method to use for imputing artifacts. Choices are:
-\itemize{
-\item "bootstrap_mod" = select random values from the most specific moderator categories available (default).
-\item "bootstrap_full" = select random values from the full vector of artifacts.
-\item "simulate_mod" = generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
-(uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-\item "simulate_full" = generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).
-\item "wt_mean_mod" = replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-\item "wt_mean_full" = replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).
-\item "unwt_mean_mod" = replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).
-\item "unwt_mean_full" = replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).
-\item "replace_unity" = replace missing values with 1 (not recommended).
-\item "stop" = stop evaluations when missing artifacts are encountered.
-If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
-}}
+\item{impute_method}{Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.}
 
 \item{decimals}{Number of decimal places to which results should be rounded (default is to perform no rounding).}
 
 \item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
+
+\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{supplemental_ads_y}{List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.}
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 

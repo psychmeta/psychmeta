@@ -355,6 +355,12 @@
           out$construct_x <- construct_x[i][1]
           out$construct_y <- construct_y[i][1]
 
+          out$rxx_consistency <- as.logical(mean(data_x$rxx_consistency[i]))
+          out$ryy_consistency <- as.logical(mean(data_y$ryy_consistency[i]))
+
+          out$rxx_type <- convert_consistency2reltype(consistency = out$rxx_consistency)
+          out$ryy_type <- convert_consistency2reltype(consistency = out$ryy_consistency)
+
           out
      })
 
@@ -371,6 +377,9 @@
                           pa = unlist(lapply(out, function(x) x$pa_comp)))
 
      data_x_list <- list(rxx = unlist(lapply(out, function(x) x$rxx_comp)),
+                         rxx_type = unlist(lapply(out, function(x) x$rxx_type)),
+                         rxx_consistency = unlist(lapply(out, function(x) x$rxx_consistency)),
+
                          ux = unlist(lapply(out, function(x) x$ux_comp)),
                          rxx_restricted = unlist(lapply(out, function(x) x$rxx_restricted_comp)),
                          ux_observed = unlist(lapply(out, function(x) x$ux_observed_comp)),
@@ -379,6 +388,9 @@
                          indirect_rr_x = unlist(lapply(out, function(x) x$indirect_rr_x)))
 
      data_y_list <- list(ryy = unlist(lapply(out, function(x) x$ryy_comp)),
+                         ryy_type = unlist(lapply(out, function(x) x$ryy_type)),
+                         ryy_consistency = unlist(lapply(out, function(x) x$ryy_consistency)),
+
                          uy = unlist(lapply(out, function(x) x$uy_comp)),
                          ryy_restricted = unlist(lapply(out, function(x) x$ryy_restricted_comp)),
                          uy_observed = unlist(lapply(out, function(x) x$uy_observed_comp)),

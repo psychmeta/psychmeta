@@ -14,9 +14,11 @@
 \alias{estimate_rxxi_u}
 \title{Estimation of applicant and incumbent reliabilities and of true- and observed-score u ratios}
 \usage{
-estimate_rxxa(rxxi, ux, ux_observed = TRUE, indirect_rr = TRUE)
+estimate_rxxa(rxxi, ux, ux_observed = TRUE, indirect_rr = TRUE,
+  rxxi_type = "alpha")
 
-estimate_rxxi(rxxa, ux, ux_observed = TRUE, indirect_rr = TRUE)
+estimate_rxxi(rxxa, ux, ux_observed = TRUE, indirect_rr = TRUE,
+  rxxa_type = "alpha")
 
 estimate_ut(ux, rxx, rxx_restricted = TRUE)
 
@@ -26,7 +28,7 @@ estimate_ryya(ryyi, rxyi, ux)
 
 estimate_ryyi(ryya, rxyi, ux)
 
-estimate_uy(ryyi, ryya, indirect_rr = TRUE)
+estimate_uy(ryyi, ryya, indirect_rr = TRUE, ryy_type = "alpha")
 
 estimate_up(ryyi, ryya)
 
@@ -42,6 +44,8 @@ estimate_rxxi_u(ux, ut)
 \item{ux_observed}{Logical vector determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).}
 
 \item{indirect_rr}{Logical vector determining whether each reliability value is associated with indirect range restriction (\code{TRUE}) or direct range restriction (\code{FALSE}).}
+
+\item{rxxi_type, rxxa_type, ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
 
 \item{rxxa}{Vector of applicant reliability estimates for X.}
 

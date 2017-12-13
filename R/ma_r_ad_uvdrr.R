@@ -51,7 +51,8 @@
      .mean_qxa <- wt_mean(x = .ad_obj_x$qxa_drr$Value, wt = .ad_obj_x$qxa_drr$Weight)
      .mean_ux <- wt_mean(x = .ad_obj_x$ux$Value, wt = .ad_obj_x$ux$Weight)
      .mean_qyi <- wt_mean(x = .ad_obj_y$qxi_irr$Value, wt = .ad_obj_y$qxi_irr$Weight)
-     .mean_qya <- wt_mean(x = estimate_ryya(ryyi = .ad_obj_y$qxi_irr$Value^2, rxyi = mean_rxyi, ux = .mean_ux)^.5, wt = .ad_obj_y$qxi_irr$Weight)
+     .mean_qya <- NULL
+     for(i in 1:length(mean_rxyi)).mean_qya[i] <- wt_mean(x = estimate_ryya(ryyi = .ad_obj_y$qxi_irr$Value^2, rxyi = mean_rxyi[i], ux = .mean_ux)^.5, wt = .ad_obj_y$qxi_irr$Weight)
 
      ad_list <- list(.qxa = .ad_obj_x$qxa_drr,
                      .qyi = .ad_obj_y$qxi_irr,

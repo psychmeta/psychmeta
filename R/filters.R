@@ -126,10 +126,10 @@ screen_u <- function(u_vec, art_name = "u ratio"){
 #' ## filter_rel(rel_vec = c(.7, .8), wt_vec = c(-80, 100))
 filter_rel <- function(rel_vec, wt_vec){
      keep_id <- !is.na(rel_vec)
+     keep_id <- keep_id & !is.na(wt_vec)
      if(any(keep_id)){
           if(!is.numeric(rel_vec)) stop("Reliability values must be numeric", call. = FALSE)
           keep_id[keep_id] <- is.finite(rel_vec[keep_id]) & abs(rel_vec[keep_id]) <= 1 & abs(rel_vec[keep_id]) > 0 & wt_vec[keep_id] >= 0
-          keep_id
      }
      keep_id
 }
@@ -151,6 +151,7 @@ filter_rel <- function(rel_vec, wt_vec){
 #' ## filter_u(u_vec = c(.7, .8), wt_vec = c(-80, 100))
 filter_u <- function(u_vec, wt_vec){
      keep_id <- !is.na(u_vec)
+     keep_id <- keep_id & !is.na(wt_vec)
      if(any(keep_id)){
           if(!is.numeric(u_vec)) stop("u ratios must be numeric", call. = FALSE)
           keep_id[keep_id] <- is.finite(u_vec[keep_id]) & u_vec[keep_id] > 0 & wt_vec[keep_id] >= 0
@@ -188,7 +189,7 @@ screen_ad_int <- function(x){
      class_vec <- class(x)
      if(!is.null(class_vec)){
           if(all(c("psychmeta", "ad_obj", "ad_int") %in% class_vec)){
-               ad_contents <- class(x)["ad_contents"]
+               ad_contents <- paste(attributes(x)[["ad_contents"]], collapse = " + ")
           }else{
                stop("x is not an interactive artifact distribution object", call. = FALSE)
           }
@@ -251,7 +252,7 @@ screen_ad_tsa <- function(x){
      class_vec <- class(x)
      if(!is.null(class_vec)){
           if(all(c("psychmeta", "ad_obj", "ad_tsa") %in% class_vec)){
-               ad_contents <- class(x)["ad_contents"]
+               ad_contents <- paste(attributes(x)[["ad_contents"]], collapse = " + ")
           }else{
                stop("x is not a Taylor series artifact distribution object", call. = FALSE)
           }
@@ -368,19 +369,23 @@ warning_variance <- function(var, var_name = NULL, sd_warning = TRUE){
                sd_name <- gsub(x = var_name, pattern = "var", replacement = "sd")
                warning(paste(var_name, "was undefined:", sd_name, "was set to zero"), call. = FALSE)
           }
-          if(any(var[!is.na(var)] < 0)){
-               sd_name <- gsub(x = var_name, pattern = "var", replacement = "sd")
-               warning(paste(var_name, "was negative:", sd_name, "was set to zero"), call. = FALSE)
+          if(any(!is.na(var))){
+               if(any(var[!is.na(var)] < 0)){
+                    sd_name <- gsub(x = var_name, pattern = "var", replacement = "sd")
+                    warning(paste(var_name, "was negative:", sd_name, "was set to zero"), call. = FALSE)
+               }
           }
      }else{
           if(any(is.na(var))){
                warning(paste("Some", var_name, "values were undefined: Offending values were set to zero"), call. = FALSE)
           }
-          if(any(var[!is.na(var)] < 0)){
-               warning(paste("Some", var_name, "values were negative: Offending values were set to zero"), call. = FALSE)
-          }
-          if(any(is.infinite(var[!is.na(var)]))){
-               warning(paste("Some", var_name, "values were infinite: Offending values were set to zero"), call. = FALSE)
+          if(any(!is.na(var))){
+               if(any(var[!is.na(var)] < 0)){
+                    warning(paste("Some", var_name, "values were negative: Offending values were set to zero"), call. = FALSE)
+               }
+               if(any(is.infinite(var[!is.na(var)]))){
+                    warning(paste("Some", var_name, "values were infinite: Offending values were set to zero"), call. = FALSE)
+               }
           }
      }
 }
@@ -524,3 +529,49 @@ clean_warning <- function(warn_obj1, warn_obj2){
      }
      warn_obj
 }
+
+
+#' Convert string variable containing reliability type indicators to a logical variable indicating whether a reliability value is an internal-consistency estimate or a multiple-administration estimate
+#'
+#' @param rel_type String vector containing reliability type indicators.
+#' @param arg_name Optional name of the arg_name object.
+#'
+#' @return Logical internal-consistency indicators.
+#'
+#' @keywords internal
+convert_reltype2consistency <- function(rel_type, arg_name = NULL){
+     if(length(rel_type) == 0){
+          NULL
+     }else{
+          rel_type <- as.character(rel_type)
+          if(is.null(arg_name)) arg_name <- deparse(substitute(rel_type))
+          single_admin <- c("internal_consistency", "alpha", "lambda", "lambda1", "lambda2", "lambda3", "lambda4", "lambda5", "lambda6",
+                            "omega", "icc", "interrater_r", "interrater_r_sb", "splithalf", "splithalf_sb")
+          multi_admin <- c("multiple_administrations", "retest", "parallel", "alternate", "parallel_delayed", "alternate_delayed", "group_treatment")
+          is_single_admin <- rel_type %in% single_admin
+          is_multi_admin <- rel_type %in% multi_admin
+          if(any(!is_single_admin & !is_multi_admin))
+               stop("Invalid reliability type specified to ", arg_name, " argument", call. = FALSE)
+          is_single_admin
+     }
+}
+
+
+#' Convert logical variable indicating whether a reliability value is an internal-consistency estimate or a multiple-administration estimate to a string variable of generic reliability types
+#'
+#' @param consistency Logical internal-consistency indicators.
+#'
+#' @return String variable of generic reliability types.
+#'
+#' @keywords internal
+convert_consistency2reltype <- function(consistency){
+     if(length(consistency) == 0){
+          NULL
+     }else{
+          rel_type <- consistency
+          rel_type[consistency] <- "internal_consistency"
+          rel_type[!consistency] <- "multiple_administrations"
+          rel_type
+     }
+}
+

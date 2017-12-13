@@ -4,26 +4,27 @@
 \alias{simulate_d_database}
 \title{Simulate d value databases of primary studies}
 \usage{
-simulate_d_database(k, n_params, rho_params, mu_params, sigma_params,
-  rel_params, sr_params, wt_params = NULL, allow_neg_wt = FALSE,
-  sr_composite_params = NULL, group_names = NULL, var_names = NULL,
-  composite_names = NULL, diffs_as_obs = FALSE, show_applicant = FALSE,
-  keep_vars = "all", decimals = 2, max_iter = 100)
+simulate_d_database(k, n_params, rho_params, mu_params = NULL,
+  sigma_params = NULL, rel_params = NULL, sr_params = NULL,
+  wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
+  group_names = NULL, var_names = NULL, composite_names = NULL,
+  diffs_as_obs = FALSE, show_applicant = FALSE, keep_vars = "all",
+  decimals = 2, max_iter = 100)
 }
 \arguments{
 \item{k}{Number of studies to simulate.}
 
 \item{n_params}{List of parameter distributions (or data-generation function; see details) for subgroup sample sizes.}
 
-\item{rho_params}{List containing a list of parameter distributions (or data-generation functions; see details) for correlations for each simulated group.}
+\item{rho_params}{List containing a list of parameter distributions (or data-generation functions; see details) for correlations for each simulated group. If simulating data from a single fixed population matrix in each group, supply a list of those matrices for this argument (if the diagonals contains non-unity values and 'sigma_params' argument is not specified, those values will be used as variances).}
 
-\item{mu_params}{List containing a list of parameter distributions (or data-generation functions; see details) for means for each simulated group.}
+\item{mu_params}{List containing a list of parameter distributions (or data-generation functions; see details) for means for each simulated group. If \code{NULL}, all means will be set to zero.}
 
-\item{sigma_params}{List containing a list of parameter distributions (or data-generation functions; see details) for standard deviations for each simulated group.}
+\item{sigma_params}{List containing a list of parameter distributions (or data-generation functions; see details) for standard deviations for each simulated group. If \code{NULL}, all standard deviations will be set to unity.}
 
-\item{rel_params}{List containing a list of parameter distributions (or data-generation functions; see details) for reliabilities for each simulated group.}
+\item{rel_params}{List containing a list of parameter distributions (or data-generation functions; see details) for reliabilities for each simulated group. If \code{NULL}, all reliabilities will be set to unity.}
 
-\item{sr_params}{List of parameter distributions (or data-generation functions; see details) for selection ratios.}
+\item{sr_params}{List of parameter distributions (or data-generation functions; see details) for selection ratios. If \code{NULL}, all selection ratios will be set to unity.}
 
 \item{wt_params}{List of parameter distributions (or data-generation functions; see details) to create weights for use in forming composites.
 If multiple composites are formed, the list should be a list of lists, with the general format: \code{list(comp1_params = list(...params...), comp2_params = list(...params...), etc.)}.}

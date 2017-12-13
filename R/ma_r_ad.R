@@ -234,8 +234,15 @@ gather_ma_ad <- function(x){
      if(length(meas_correction) == 2) meas_correction <- paste(meas_correction, collapse = " & ")
      if(x$correct_meas_x | x$correct_meas_y) meas_correction <- paste("Corrected for measurement error in", meas_correction)
 
-     x$sd_art_tp[is.na(x$sd_art_tp)] <- x$sd_pre_tp[is.na(x$sd_pre_tp)] <- x$sd_res_tp[is.na(x$sd_res_tp)] <- x$sd_rho_tp[is.na(x$sd_rho_tp)] <-
-          x$sd_rho_xp[is.na(x$sd_rho_xp)] <- x$sd_rho_ty[is.na(x$sd_rho_ty)] <- 0
+     x$sd_res_tp[x$k == 1] <-
+          x$var_res_tp[x$k == 1] <-
+          x$sd_rho_tp[x$k == 1] <- x$sd_rho_xp[x$k == 1] <- x$sd_rho_ty[x$k == 1] <-
+          x$var_rho_tp[x$k == 1] <- x$var_rho_xp[x$k == 1] <- x$var_rho_ty[x$k == 1] <- NA
+
+     x$sd_art_tp[is.na(x$sd_art_tp) & x$k > 1] <-
+          x$sd_pre_tp[is.na(x$sd_pre_tp) & x$k > 1] <-
+          x$sd_res_tp[is.na(x$sd_res_tp) & x$k > 1] <-
+          x$sd_rho_tp[is.na(x$sd_rho_tp) & x$k > 1] <- x$sd_rho_xp[is.na(x$sd_rho_xp) & x$k > 1] <- x$sd_rho_ty[is.na(x$sd_rho_ty) & x$k > 1] <- 0
 
      cv_tp <- credibility(mean = x$mean_rtpa, sd = x$sd_rho_tp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
      cv_xp <- credibility(mean = x$mean_rxpa, sd = x$sd_rho_xp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
@@ -341,8 +348,8 @@ gather_ma_ad <- function(x){
           }
      }
 
-     ad_contents_x <- class(ad_obj_x)["ad_contents"]
-     ad_contents_y <- class(ad_obj_y)["ad_contents"]
+     ad_contents_x <- paste(attributes(ad_obj_x)[["ad_contents"]], collapse = " + ")
+     ad_contents_y <- paste(attributes(ad_obj_y)[["ad_contents"]], collapse = " + ")
 
      valid_qxa <- grepl(x = ad_contents_x, pattern = "qxa")
      valid_qxi <- grepl(x = ad_contents_x, pattern = "qxi")
@@ -682,10 +689,10 @@ gather_ma_ad <- function(x){
                ma_r_obj$artifact_distribution <- append(list(call = call, inputs = inputs), out)
                ma_r_obj$call_history <- append(ma_r_obj$call_history, list(call))
 
-               neg_var_res <- sum(ma_r_obj$barebones$meta_table$var_res < 0)
-               neg_var_rtpa <- sum(ma_r_obj$artifact_distribution$true_score$var_rho < 0)
-               neg_var_rxpa <- sum(ma_r_obj$artifact_distribution$validity_generalization_x$var_rho < 0)
-               neg_var_rtya <- sum(ma_r_obj$artifact_distribution$validity_generalization_x$var_rho < 0)
+               neg_var_res <- sum(ma_r_obj$barebones$meta_table$var_res < 0, na.rm = TRUE)
+               neg_var_rtpa <- sum(ma_r_obj$artifact_distribution$true_score$var_rho < 0, na.rm = TRUE)
+               neg_var_rxpa <- sum(ma_r_obj$artifact_distribution$validity_generalization_x$var_rho < 0, na.rm = TRUE)
+               neg_var_rtya <- sum(ma_r_obj$artifact_distribution$validity_generalization_x$var_rho < 0, na.rm = TRUE)
 
                ma_r_obj$artifact_distribution$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                                fyi = record_fyis(fyi_messages = fyi_messages,

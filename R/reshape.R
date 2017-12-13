@@ -57,11 +57,11 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
      if(!is.null(data)){
           data <- as_tibble(data)
           var_names <- match_variables(call = call_full[[match("var_names", names(call_full))]], arg = var_names, data = data)
-          cor_data <- match_variables(call = call_full[[match("cor_data", names(call_full))]], arg = cor_data, data = data)
-          if(deparse(substitute(common_data)) != "NULL")
-               common_data <- match_variables(call = call_full[[match("common_data",  names(call_full))]], arg = common_data, data = data)
-          if(deparse(substitute(unique_data)) != "NULL")
-               unique_data <- match_variables(call = call_full[[match("unique_data",  names(call_full))]], arg = unique_data, data = data)
+          cor_data <- match_variables(call = call_full[[match("cor_data", names(call_full))]], arg = cor_data, data = data, as_array = TRUE)
+          if(deparse(substitute(common_data))[1] != "NULL")
+               common_data <- match_variables(call = call_full[[match("common_data",  names(call_full))]], arg = common_data, data = data, as_array = TRUE)
+          if(deparse(substitute(unique_data))[1] != "NULL")
+               unique_data <- match_variables(call = call_full[[match("unique_data",  names(call_full))]], arg = unique_data, data = data, as_array = TRUE)
      }
      if(!is.null(dim(var_names))) var_names <- unlist(var_names)
      var_names <- as.character(var_names)
@@ -170,7 +170,8 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 #' n_design <- "ni"
 #' other_design <- cbind(rxxi = paste0("rxxi_", var_names),
 #'                       ux_local = paste0("ux_local_", var_names),
-#'                       ux_external = paste0("ux_external_", var_names))
+#'                       ux_external = paste0("ux_external_", var_names),
+#'                       rel_type = paste0("rel_type_", var_names))
 #' rownames(other_design) <- var_names
 #'
 #' ## Reshape the data to "long" format
@@ -274,8 +275,10 @@ reshape_vec2mat <- function(cov = NULL, var = NULL, order = NULL, var_names = NU
      if(is.null(var) & is.null(cov) & is.null(order))
           stop("cov, var, and/or order must be specified")
      if(is.null(order)){
-          if(!is.null(cov))
+          if(!is.null(cov)){
                order <- sqrt(length(cov) * 2 + .5 * (1 + sqrt(1 + 4 * length(cov) * 2)))
+               if(order != round(order)) stop("length of cov does not correspond to a valid number of lower-triangle correlations", call. = FALSE)
+          }
           if(!is.null(var))
                order <- length(var)
      }
