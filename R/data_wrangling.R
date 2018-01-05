@@ -212,8 +212,8 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
                     data_y_reorg[move_x2y,] <- data_x[move_x2y,]
                }
 
-               construct_x <- data_x_reorg$construct_x
-               construct_y <- data_y_reorg$construct_y
+               if(!is.null(data_x_reorg)) construct_x <- data_x_reorg$construct_x
+               if(!is.null(data_y_reorg)) construct_y <- data_y_reorg$construct_y
           }
      }
 
@@ -245,7 +245,7 @@ organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, con
      if(!is.null(data_x_reorg)) temp_mat <- cbind(temp_mat, data_x_reorg)
      if(!is.null(data_y_reorg)) temp_mat <- cbind(temp_mat, data_y_reorg)
      if(!is.null(moderators)) temp_mat <- cbind(moderators, temp_mat)
-     if(!is.null(construct_dat)) temp_mat <- cbind(construct_dat, temp_mat)
+     if(!is.null(construct_mat)) temp_mat <- cbind(construct_dat, temp_mat)
      temp_mat <- as.data.frame(temp_mat)
 
      ## Organize the matrix - first by moderator levels, then by constructs

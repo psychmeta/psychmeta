@@ -100,10 +100,10 @@ credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = "t"){
 #' @examples
 #' confidence_r(r = .3, n = 200, conf_level = .95)
 confidence_r <- function(r, n, conf_level=.95) {
-    z <- convert_es.q_r_to_z(r)
+    z <- convert_es.q_r_to_Fisherz(r)
     if (n < 4) se <- 1 else se <- 1/sqrt(n - 3)
     CI.z <- confidence(mean = z, se=se, conf_level=conf_level)
-    return(convert_es.q_z_to_r(CI.z))
+    return(convert_es.q_Fisherz_to_r(CI.z))
 }
 
 

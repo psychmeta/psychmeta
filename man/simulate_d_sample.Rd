@@ -4,9 +4,10 @@
 \alias{simulate_d_sample}
 \title{Simulate a sample of psychometric d value data with measurement error, direct range restriction, and/or indirect range restriction}
 \usage{
-simulate_d_sample(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, sr_vec,
-  wt_mat = NULL, sr_composites = NULL, group_names = NULL,
-  var_names = NULL, composite_names = NULL, diffs_as_obs = FALSE)
+simulate_d_sample(n_vec, rho_mat_list, mu_mat, sigma_mat = 1, rel_mat = 1,
+  sr_vec = 1, k_items_vec = 1, wt_mat = NULL, sr_composites = NULL,
+  group_names = NULL, var_names = NULL, composite_names = NULL,
+  diffs_as_obs = FALSE)
 }
 \arguments{
 \item{n_vec}{Vector of sample sizes (or a vector of proportions, if parameters are to be estimated).}
@@ -20,6 +21,8 @@ simulate_d_sample(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, sr_vec,
 \item{rel_mat}{Matrix of reliability parameters, with groups on the rows and variables on the columns.}
 
 \item{sr_vec}{Vector of selection ratios.}
+
+\item{k_items_vec}{Number of test items comprising each of the variables to be simulated (all are single-item variables by default).}
 
 \item{wt_mat}{Optional matrix of weights to use in forming a composite of the variables in \code{rho_mat.} Matrix should have as many rows (or vector elements) as there are variables in \code{rho_mat}.}
 
@@ -37,7 +40,7 @@ simulate_d_sample(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, sr_vec,
 A sample of simulated mean differences.
 }
 \description{
-This function generates a simulated psychometric sample consisting of two groups and computes the \emph{d} values that result after introducing measurement error and/or range restriction.
+This function generates a simulated psychometric sample consisting of any number of groups and computes the \emph{d} values that result after introducing measurement error and/or range restriction.
 }
 \examples{
 ## Simulate statistics by providing integers as n_vec":

@@ -39,6 +39,7 @@ Subgroup moderator analyses are run by supplying a moderator matrix to the \code
 \section{Reporting results and supplemental analyses}{
 
 Meta-analysis results can be viewed by passing an ma object to \code{print}(). Bootstrap confidence intervals, leave one out analyses, and other sensitivity analyses are available in \code{\link{sensitivity}}. Supplemental heterogeneity statistics (e.g., \emph{Q}, \eqn{I^{2}}{I^2}) can be computed using \code{\link{heterogeneity}}. Meta-analytic results can be converted between the \emph{r} and \emph{d} metrics using \code{\link{convert_ma}}. Each \code{ma_obj} contains a \pkg{metafor} \code{escalc} object in \code{ma$...$escalc} that can be passed to \pkg{metafor}'s functions for plotting, publication/availability bias, and other supplemental analyses. Second-order meta-analyses of correlations can be computed using \code{\link{ma_r_order2}}. Example second-order meta-analysis datasets from Schmidt and Oh (2013) are available.
+Tables of meta-analytic results can be written as rich text files using the \code{\link{metabulate}} function, which exports near publication-quality tables that will typically require only minor customization by the user.
 }
 
 \section{Simulating psychometric meta-analyses}{

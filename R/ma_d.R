@@ -19,7 +19,15 @@
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.
 #' @param group_id Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).
-#' @param group_order Vector indicating the order in which group_ids should be arranged.
+#' The \code{group_id} argument supercedes the \code{group1} and \code{group2} arguments.
+#' If \code{group_id} is not \code{NULL}, the values supplied to the \code{group_order} argument must correspond to \code{group_id} values.
+#' @param group1,group2 Vector of names for groups in a comparison (e.g., group1 = "Control" and group2 = "Treatment", group1 = "Majority" and group2 = "Minority").
+#' The \code{group1} and \code{group2} arguments are superceded by the \code{group_id} argument.
+#' If \code{group_id} is \code{NULL}, the values supplied to the \code{group_order} argument must correspond to individual \code{group1} and \code{group2} values - the order of group pairings will be determined interally.
+#' IMPORTANT: Groups whose names appear before other groups' names in the \code{group_order} vector  will be treated as referent groups for the focal groups whose names occur later in the \code{group_order} vector (the referent group is the group from whose mean the focal group's mean is subtracted when computing a \emph{d} value).
+#' If a \code{group2} value comes before a \code{group1} value according to the \code{group_order} vector, the groups' positions in all other arguments will be swapped and the sign of the \emph{d} value will be reversed so that \code{group1} is always the referent group.
+#' @param group_order Optional vector indicating the order in which (1) \code{group1} and \code{group2} values or (2) \code{group_ids} should be arranged.
+#' If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.
 #' @param construct_y Vector of construct names for construct initially designated as Y.
 #' @param measure_y Vector of names names for measures associated with constructs initially designated as "Y".
 #' @param construct_order Vector indicating the order in which Y variables should be arranged.
@@ -101,7 +109,7 @@
 #'      construct_y = construct, data = data_d_meas_multi)
 ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  treat_as_d = TRUE, ma_method = "bb", ad_type = "tsa", correction_method = "auto",
-                 group_id = NULL, group_order = NULL,
+                 group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
                  construct_y = NULL, measure_y = NULL, construct_order = NULL,
                  wt_type = "inv_var_mean", error_type = "mean",
                  correct_bias = TRUE,
@@ -163,6 +171,12 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
           if(deparse(substitute(group_id))[1] != "NULL")
                group_id <- match_variables(call = call_full[[match("group_id", names(call_full))]], arg = group_id, data = data)
 
+          if(deparse(substitute(group1))[1] != "NULL")
+               group1 <- match_variables(call = call_full[[match("group1", names(call_full))]], arg = group1, data = data)
+
+          if(deparse(substitute(group2))[1] != "NULL")
+               group2 <- match_variables(call = call_full[[match("group2", names(call_full))]], arg = group2, data = data)
+
           if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
 
@@ -212,10 +226,44 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                pa <- match_variables(call = call_full[[match("pa", names(call_full))]], arg = pa, data = data)
      }
 
-     if(!is.null(group_id)){
-          group_id <- as.character(group_id)
+     if(is.null(group_id)){
+
+          if(is.null(group1) & is.null(group2)){
+               group_order <- "group1-group2"
+               group_id <- rep(group_order, length(d))
+               swap_order <- NULL
+          }else{
+               if(is.null(group_order)) group_order <- sort(unique(c(as.character(group1), as.character(group2))))
+
+               if(!is.null(group1)){
+                    group1 <- as.character(group1)
+               }else{
+                    group1 <- rep("group1", length(d))
+                    group_order <- c("group1", group_order)
+               }
+
+               if(!is.null(group2)){
+                    group2 <- as.character(group2)
+               }else{
+                    group2 <- rep("group2", length(d))
+                    group_order <- c(group_order, "group2")
+               }
+
+               group_id <- t(apply(cbind(group1 = group1, group2 = group2), 1, function(x){
+                    sort(factor(x, levels = group_order))
+               }))
+               .group_id <- sort(factor(unique(c(as.character(group1), as.character(group2))), levels = group_order))
+               group_mat <- matrix(.group_id, length(.group_id), length(.group_id), T)
+               group_order <- paste0(group_mat[lower.tri(group_mat)], "-", t(group_mat)[lower.tri(group_mat)])
+               swap_order <- group_id[,1] != group1
+               d[swap_order] <- -d[swap_order]
+               group_id <- paste(group_id[,1], group_id[,2], sep = "-")
+          }
+
      }else{
-          group_id <- rep("1", length(d))
+          group_id <- as.character(group_id)
+          if(!is.null(group_order)) group_order <- sort(unique(group_id))
+          swap_order <- NULL
      }
 
      if(!is.null(construct_y)){
@@ -223,6 +271,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      }else{
           construct_y <- rep("Y", length(d))
      }
+
+     if(is.null(construct_order)) construct_order <- sort(unique(construct_y))
 
      ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
      if(!is.null(rGg)){
@@ -276,6 +326,13 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      n1[n != n_adj] <- n_adj[n != n_adj]
      pi[is.na(pi)] <- (n1_i / n_adj)[is.na(pi)]
 
+     if(!is.null(swap_order)){
+          .n1 <- n1
+          .n2 <- n2
+          n1[swap_order] <- .n2[swap_order]
+          n2[swap_order] <- .n1[swap_order]
+     }
+
      rxyi <- convert_es.q_d_to_r(d = d, p = pi)
 
      ## The variance of a dichotomous variable is pq = p(1-p), so we will estimate u ratios accordingly
@@ -287,7 +344,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
                  construct_x = group_id, construct_y = construct_y,
                  measure_x = NULL, measure_y = measure_y,
-                 construct_order = NULL,
+                 # construct_order = c(group_order, construct_order),
                  wt_type = wt_type, error_type = error_type,
                  correct_bias = correct_bias, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
                  correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
@@ -305,7 +362,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  hs_override = hs_override, decimals = decimals, use_all_arts = use_all_arts, supplemental_ads = supplemental_ads, data = NULL,
 
                  ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
-                 use_as_x = group_order, use_as_y = construct_order, es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa,
+                 use_as_x = group_order, use_as_y = construct_order,
+                 es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa,
                  partial_intercor = partial_intercor)
 
      out$call_history <- append(list(call), out$call_history)

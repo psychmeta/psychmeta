@@ -4,7 +4,7 @@
 \alias{round2char}
 \title{Round numeric values to an exact number of digits and return as a character}
 \usage{
-round2char(x, digits = 3, na_replace = "")
+round2char(x, digits = 3, na_replace = "", omit_leading_zero = FALSE)
 }
 \arguments{
 \item{x}{Numeric values}
@@ -12,6 +12,8 @@ round2char(x, digits = 3, na_replace = "")
 \item{digits}{Number of digits to which result should be rounded}
 
 \item{na_replace}{Scalar value: Character with which NA values should be replaced}
+
+\item{omit_leading_zero}{Logical scalar determining whether to omit leading zeros (\code{TRUE}) or retain them (\code{FALSE}; default).}
 }
 \value{
 A vector of rounded numbers converted to characters

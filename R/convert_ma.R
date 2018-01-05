@@ -651,6 +651,16 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      ma_table[,col_ids$old_cols] <- ma_table_subset
      colnames(ma_table)[colnames(ma_table) %in% col_ids$old_cols] <- col_ids$new_cols
+
+     # if(any(col_ids$method == c("bb_r", "ad_r", "ic_r"))) if(colnames(ma_table)[2] == "Construct_X") colnames(ma_table)[2] <- "Group_Contrast"
+     # if(any(col_ids$method == c("bb_d", "ad_d", "ic_d"))) if(colnames(ma_table)[2] == "Group_Contrast") colnames(ma_table)[2] <- "Construct_X"
+
+     if(colnames(ma_table)[1] == "Construct_X"){
+          colnames(ma_table)[1] <- "Group_Contrast"
+     }else{
+          if(colnames(ma_table)[1] == "Group_Contrast") colnames(ma_table)[1] <- "Construct_X"
+     }
+
      ma_table
 }
 

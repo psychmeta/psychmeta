@@ -489,33 +489,33 @@ create_ad_group <- function(ad_type = "tsa",
                             estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE, estimate_ut = TRUE,
                             var_unbiased = TRUE, supplemental_ads = NULL){
 
-     if(!is.null(sample_id)){
-          unique_x <- !duplicated(paste(sample_id, construct_x))
-          unique_y <- !duplicated(paste(sample_id, construct_y))
-     }else{
-          unique_x <- unique_y <- rep(TRUE, nrow(data_x))
-     }
-
      if(pairwise_ads){
+          if(!is.null(sample_id)){
+               unique_x <- !duplicated(paste(construct_pair, sample_id, construct_x))
+               unique_y <- !duplicated(paste(construct_pair, sample_id, construct_y))
+          }else{
+               unique_x <- unique_y <- rep(TRUE, nrow(data_x))
+          }
+
+          data <- data.frame(es_data, data_x, data_y)
           ad_obj_list <- by(1:length(construct_pair), construct_pair, function(i){
 
-               data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
-               if(!is.null(construct_x)) data <- data.frame(data, construct_x = construct_x[i])
-               if(!is.null(construct_y)) data <- data.frame(data, construct_y = construct_y[i])
+               if(!is.null(construct_x)) data$construct_x <- construct_x[i]
+               if(!is.null(construct_y)) data$construct_y <- construct_y[i]
 
-               n <- es_data$n[i][unique_x[i] & unique_y[i]]
+               n <- data$n[i][unique_x[i] & unique_y[i]]
 
-               rxx <- data_x$rxx[i][unique_x[i] & unique_y[i]]
-               rxx_restricted <- data_x$rxx_restricted[i][unique_x[i] & unique_y[i]]
-               rxx_type <- data_x$rxx_type[i][unique_x[i] & unique_y[i]]
-               ux <- data_x$ux[i][unique_x[i] & unique_y[i]]
-               ux_observed <- data_x$ux_observed[i][unique_x[i] & unique_y[i]]
+               rxx <- data$rxx[i][unique_x[i] & unique_y[i]]
+               rxx_restricted <- data$rxx_restricted[i][unique_x[i] & unique_y[i]]
+               rxx_type <- data$rxx_type[i][unique_x[i] & unique_y[i]]
+               ux <- data$ux[i][unique_x[i] & unique_y[i]]
+               ux_observed <- data$ux_observed[i][unique_x[i] & unique_y[i]]
 
-               ryy <- data_y$ryy[i][unique_x[i] & unique_y[i]]
-               ryy_restricted <- data_y$ryy_restricted[i][unique_x[i] & unique_y[i]]
-               ryy_type <- data_y$ryy_type[i][unique_x[i] & unique_y[i]]
-               uy <- data_y$uy[i][unique_x[i] & unique_x[i]]
-               uy_observed <- data_y$uy_observed[i][unique_x[i] & unique_y[i]]
+               ryy <- data$ryy[i][unique_x[i] & unique_y[i]]
+               ryy_restricted <- data$ryy_restricted[i][unique_x[i] & unique_y[i]]
+               ryy_type <- data$ryy_type[i][unique_x[i] & unique_y[i]]
+               uy <- data$uy[i][unique_x[i] & unique_x[i]]
+               uy_observed <- data$uy_observed[i][unique_x[i] & unique_y[i]]
 
                rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
                n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
@@ -561,7 +561,19 @@ create_ad_group <- function(ad_type = "tsa",
                list(ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y)
           })
      }else{
-          ad_obj_list_x <- by(1:length(construct_pair), construct_x, function(i){
+          if(!is.null(sample_id)){
+               unique_x <- !duplicated(paste(c(sample_id, sample_id), c(construct_x, construct_y)))
+          }else{
+               unique_x <- rep(TRUE, nrow(data_x) + nrow(data_y))
+          }
+
+          es_data <- rbind(es_data, es_data)
+          colnames(data_y) <- colnames(data_x)
+          data_x <- rbind(data_x, data_y)
+          construct_pair <- c(construct_pair, construct_pair)
+          construct_x <- c(construct_x, construct_y)
+
+          ad_obj_list_x <- ad_obj_list_y <- by(1:length(construct_pair), construct_x, function(i){
 
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
                if(!is.null(construct_x)) data <- data.frame(data, construct_x = construct_x[i])
@@ -595,42 +607,6 @@ create_ad_group <- function(ad_type = "tsa",
                                                                    var_unbiased = var_unbiased, supplemental_ads = supplemental_ads[[construct_x[i][1]]]))
 
                list(ad_obj_x = ad_obj_x)
-          })
-
-          ad_obj_list_y <- by(1:length(construct_pair), construct_y, function(i){
-
-               data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
-               if(!is.null(construct_y)) data <- data.frame(data, construct_y = construct_y[i])
-
-               n <- es_data$n[i][unique_y[i]]
-
-               ryy <- data_y$ryy[i][unique_y[i]]
-               ryy_restricted <- data_y$ryy_restricted[i][unique_y[i]]
-               ryy_type <- data_y$ryy_type[i][unique_y[i]]
-               uy <- data_y$uy[i][unique_y[i]]
-               uy_observed <- data_y$uy_observed[i][unique_y[i]]
-
-               ryya <-   if(!is.null(ryy)){if(any(!ryy_restricted)){ryy[!ryy_restricted]}else{NULL}}else{NULL}
-               n_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){n[!ryy_restricted]}else{NULL}}else{NULL}
-               ryyi <-   if(!is.null(ryy)){if(any(ryy_restricted)){ryy[ryy_restricted]}else{NULL}}else{NULL}
-               n_ryyi <- if(!is.null(ryy)){if(any(ryy_restricted)){n[ryy_restricted]}else{NULL}}else{NULL}
-               uy <-     if(!is.null(uy)){if(any(uy_observed)){uy[uy_observed]}else{NULL}}else{NULL}
-               n_uy <-   if(!is.null(uy)){if(any(uy_observed)){n[uy_observed]}else{NULL}}else{NULL}
-               up <-     if(!is.null(uy)){if(any(!uy_observed)){uy[!uy_observed]}else{NULL}}else{NULL}
-               n_up <-   if(!is.null(uy)){if(any(!uy_observed)){n[!uy_observed]}else{NULL}}else{NULL}
-
-               ryyi_type <- if(!is.null(ryy)){if(any(ryy_restricted)){ryy_type[ryy_restricted]}else{NULL}}else{NULL}
-               ryya_type <- if(!is.null(ryy)){if(any(!ryy_restricted)){ryy_type[!ryy_restricted]}else{NULL}}else{NULL}
-
-               ad_obj_y <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = ryya, n_rxxa = n_ryya, wt_rxxa = n_ryya, rxxa_type = ryya_type,
-                                                                   rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi, rxxi_type = ryyi_type,
-                                                                   ux = uy, ni_ux = n_uy, wt_ux = n_uy,
-                                                                   ut = up, ni_ut = n_up, wt_ut = n_up,
-                                                                   estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                                   estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                   var_unbiased = var_unbiased, supplemental_ads = supplemental_ads[[construct_y[i][1]]]))
-
-               list(ad_obj_y = ad_obj_y)
           })
 
           construct_pair_mat <- cbind(construct_pair, construct_x, construct_y)
@@ -735,21 +711,12 @@ create_ad_list <- function(ad_type = "tsa", sample_id = NULL, n,
      for(i in names(full_data)) if(is.null(full_data[[i]])) full_data[[i]] <- rep(NA, length(n))
      full_data <- as.data.frame(full_data)
 
-     if(!is.null(sample_id)){
-          unique_x <- !duplicated(paste(sample_id, construct_x, measure_x))
-          unique_y <- !duplicated(paste(sample_id, construct_y, measure_y))
-     }else{
-          unique_x <- unique_y <- rep(TRUE, nrow(full_data))
-     }
      construct_pair <- paste0("X = ", construct_x, ", Y = ", construct_y)
-
      data_x <- full_data[,c("sample_id", "n", "construct_x", "measure_x", "rxx", "rxx_restricted", "rxx_type", "ux", "ux_observed")]
      data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "uy", "uy_observed")]
      colnames(data_y) <- colnames(data_x)
      full_data <- rbind(data_x, data_y)
      construct_pair <- c(construct_pair, construct_pair)
-     unique_x <- c(unique_x, unique_x)
-     unique_y <- c(unique_y, unique_y)
 
      .ad_obj_list <- by(1:length(construct_pair), full_data$construct_x, function(i){
 

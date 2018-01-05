@@ -5,10 +5,11 @@
 \title{Simulate correlation databases of primary studies}
 \usage{
 simulate_r_database(k, n_params, rho_params, mu_params = 0,
-  sigma_params = 1, rel_params, sr_params, wt_params = NULL,
-  allow_neg_wt = FALSE, sr_composite_params = NULL, var_names = NULL,
-  composite_names = NULL, n_as_ni = FALSE, show_applicant = FALSE,
-  keep_vars = "all", decimals = 2, format = "long", max_iter = 100)
+  sigma_params = 1, rel_params = 1, sr_params = 1, k_items_params = 1,
+  wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
+  var_names = NULL, composite_names = NULL, n_as_ni = FALSE,
+  show_applicant = FALSE, keep_vars = NULL, decimals = 2,
+  format = "long", max_iter = 100)
 }
 \arguments{
 \item{k}{Number of studies to simulate.}
@@ -24,6 +25,8 @@ simulate_r_database(k, n_params, rho_params, mu_params = 0,
 \item{rel_params}{List of parameter distributions (or data-generation functions; see details) for reliabilities.}
 
 \item{sr_params}{List of parameter distributions (or data-generation functions; see details) for selection ratios.}
+
+\item{k_items_params}{List of parameter distributions (or data-generation functions; see details) for the number of test items comprising each of the variables to be simulated (all are single-item variables by default).}
 
 \item{wt_params}{List of parameter distributions (or data-generation functions; see details) to create weights for use in forming composites.
 If multiple composites are formed, the list should be a list of lists, with the general format: \code{list(comp1_params = list(...params...), comp2_params = list(...params...), etc.)}.}
@@ -89,13 +92,13 @@ wt_params = list(list(c(1, 2, 3),
                       c(mean = 2, sd = .25),
                       cbind(value = c(1, 2, 3), weight = c(1, 2, 1))))
 
-## Simultate with long format
+## Simulate with long format
 simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
                   rel_params = rel_params, sr_params = sr_params,
                   sr_composite_params = sr_composite_params, wt_params = wt_params,
                   var_names = c("X", "Y", "Z"), format = "long")
 
-## Simultate with wide format
+## Simulate with wide format
 simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
                   rel_params = rel_params, sr_params = sr_params,
                   sr_composite_params = sr_composite_params, wt_params = wt_params,

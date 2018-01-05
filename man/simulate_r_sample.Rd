@@ -6,8 +6,9 @@
 \usage{
 simulate_r_sample(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
   mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-  sr_vec = rep(1, ncol(rho_mat)), wt_mat = NULL, sr_composites = NULL,
-  var_names = NULL, composite_names = NULL, n_as_ni = FALSE, ...)
+  sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
+  wt_mat = NULL, sr_composites = NULL, var_names = NULL,
+  composite_names = NULL, n_as_ni = FALSE, ...)
 }
 \arguments{
 \item{n}{Number of cases to simulate before performing selection. If \code{Inf}, function will simulate parameter values.}
@@ -22,6 +23,8 @@ simulate_r_sample(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 
 \item{sr_vec}{Vector of selection ratios corresponding to the variables in \code{rho_mat}
 (set selection ratios to 1 for variables that should not be used in selection).}
+
+\item{k_items_vec}{Number of test items comprising each of the variables to be simulated (all are single-item variables by default).}
 
 \item{wt_mat}{Optional matrix of weights to use in forming a composite of the variables in \code{rho_mat.} Matrix should have as many rows (or vector elements) as there are variables in \code{rho_mat}.}
 

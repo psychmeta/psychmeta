@@ -5,10 +5,10 @@
 \title{Simulate d value databases of primary studies}
 \usage{
 simulate_d_database(k, n_params, rho_params, mu_params = NULL,
-  sigma_params = NULL, rel_params = NULL, sr_params = NULL,
+  sigma_params = 1, rel_params = 1, sr_params = 1, k_items_params = 1,
   wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
   group_names = NULL, var_names = NULL, composite_names = NULL,
-  diffs_as_obs = FALSE, show_applicant = FALSE, keep_vars = "all",
+  diffs_as_obs = FALSE, show_applicant = FALSE, keep_vars = NULL,
   decimals = 2, max_iter = 100)
 }
 \arguments{
@@ -25,6 +25,8 @@ simulate_d_database(k, n_params, rho_params, mu_params = NULL,
 \item{rel_params}{List containing a list of parameter distributions (or data-generation functions; see details) for reliabilities for each simulated group. If \code{NULL}, all reliabilities will be set to unity.}
 
 \item{sr_params}{List of parameter distributions (or data-generation functions; see details) for selection ratios. If \code{NULL}, all selection ratios will be set to unity.}
+
+\item{k_items_params}{List of parameter distributions (or data-generation functions; see details) for the number of test items comprising each of the variables to be simulated (all are single-item variables by default).}
 
 \item{wt_params}{List of parameter distributions (or data-generation functions; see details) to create weights for use in forming composites.
 If multiple composites are formed, the list should be a list of lists, with the general format: \code{list(comp1_params = list(...params...), comp2_params = list(...params...), etc.)}.}
@@ -86,7 +88,7 @@ rel_params <- list(list(.8, .8),
                    list(.8, .8))
 sr_params <- list(1, .5)
 
-simulate_d_database(k = 10, n_params = n_params, rho_params = rho_params,
+simulate_d_database(k = 5, n_params = n_params, rho_params = rho_params,
                     mu_params = mu_params, sigma_params = sigma_params,
                     rel_params = rel_params, sr_params = sr_params,
                     group_names = NULL, var_names = c("y1", "y2"),

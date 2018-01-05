@@ -6,14 +6,15 @@
 \usage{
 ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   treat_as_d = TRUE, ma_method = "bb", ad_type = "tsa",
-  correction_method = "auto", group_id = NULL, group_order = NULL,
-  construct_y = NULL, measure_y = NULL, construct_order = NULL,
-  wt_type = "inv_var_mean", error_type = "mean", correct_bias = TRUE,
-  correct_rGg = FALSE, correct_ryy = TRUE, correct_rr_g = TRUE,
-  correct_rr_y = TRUE, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
-  rGg = NULL, pi = NULL, pa = NULL, ryy = NULL, ryy_restricted = TRUE,
-  ryy_type = "alpha", uy = NULL, uy_observed = TRUE, sign_rgz = 1,
-  sign_ryz = 1, conf_level = 0.95, cred_level = 0.8, conf_method = "t",
+  correction_method = "auto", group_id = NULL, group1 = NULL,
+  group2 = NULL, group_order = NULL, construct_y = NULL,
+  measure_y = NULL, construct_order = NULL, wt_type = "inv_var_mean",
+  error_type = "mean", correct_bias = TRUE, correct_rGg = FALSE,
+  correct_ryy = TRUE, correct_rr_g = TRUE, correct_rr_y = TRUE,
+  indirect_rr_g = TRUE, indirect_rr_y = TRUE, rGg = NULL, pi = NULL,
+  pa = NULL, ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+  uy = NULL, uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1,
+  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
   cred_method = "t", var_unbiased = TRUE, moderators = NULL,
   cat_moderators = TRUE, moderator_type = "simple", pairwise_ads = FALSE,
   residual_ads = TRUE, check_dependence = TRUE,
@@ -45,9 +46,18 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.}
 
-\item{group_id}{Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).}
+\item{group_id}{Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).
+The \code{group_id} argument supercedes the \code{group1} and \code{group2} arguments.
+If \code{group_id} is not \code{NULL}, the values supplied to the \code{group_order} argument must correspond to \code{group_id} values.}
 
-\item{group_order}{Vector indicating the order in which group_ids should be arranged.}
+\item{group1, group2}{Vector of names for groups in a comparison (e.g., group1 = "Control" and group2 = "Treatment", group1 = "Majority" and group2 = "Minority").
+The \code{group1} and \code{group2} arguments are superceded by the \code{group_id} argument.
+If \code{group_id} is \code{NULL}, the values supplied to the \code{group_order} argument must correspond to individual \code{group1} and \code{group2} values - the order of group pairings will be determined interally.
+IMPORTANT: Groups whose names appear before other groups' names in the \code{group_order} vector  will be treated as referent groups for the focal groups whose names occur later in the \code{group_order} vector (the referent group is the group from whose mean the focal group's mean is subtracted when computing a \emph{d} value).
+If a \code{group2} value comes before a \code{group1} value according to the \code{group_order} vector, the groups' positions in all other arguments will be swapped and the sign of the \emph{d} value will be reversed so that \code{group1} is always the referent group.}
+
+\item{group_order}{Optional vector indicating the order in which (1) \code{group1} and \code{group2} values or (2) \code{group_ids} should be arranged.
+If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.}
 
 \item{construct_y}{Vector of construct names for construct initially designated as Y.}
 

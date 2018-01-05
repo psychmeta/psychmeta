@@ -126,17 +126,20 @@
 #' @examples
 #' ## The 'ma_r' function can compute multi-construct bare-bones meta-analyes:
 #' ma_r(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-#'      construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'      moderators = moderator, data = data_r_meas_multi)
 #'
 #' ## It can also perform multiple individual-correction meta-analyses:
 #' ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-#'      construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'      moderators = moderator, data = data_r_meas_multi)
 #'
 #' ## And 'ma_r' can also curate artifact distributions and compute multiple
 #' ## artifact-distribution meta-analyses:
 #' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'      moderators = moderator, data = data_r_meas_multi)
 #'
 #' ## Artifact information from studies not included in the meta-analysis can also be used to make
 #' ## corrections. Passing artifact information with the 'supplemental_ads' argument allows for
@@ -157,7 +160,7 @@
 #' ma_r(ma_method = "ad", rxyi = rxyi, n = n,
 #'      correct_rr_x = FALSE, correct_rr_y = FALSE,
 #'      construct_x = x_name, construct_y = y_name,
-#'      moderators = moderator, data = data_r_meas_multi,
+#'      moderators = moderator, sample_id = sample_id, data = data_r_meas_multi,
 #'      supplemental_ads = list(X = list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi),
 #'                              Y = list(rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi),
 #'                              Z = list(rxxi = rzzi, n_rxxi = n_rzzi, wt_rxxi = n_rzzi)))
@@ -171,7 +174,9 @@
 #' dat <- rbind(dat1, dat2)
 #' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name, moderators = moderator, data = dat)
+#'      construct_x = x_name, construct_y = y_name,
+#'      sample_id = sample_id, moderators = moderator,
+#'      use_all_arts = TRUE, data = dat)
 ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                  ma_method = "bb", ad_type = "tsa", correction_method = "auto",
                  construct_x = NULL, construct_y = NULL,
@@ -196,7 +201,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
-     inputs <- list(wt_type = wt_type, error_type = error_type,
+     inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads,
                     correct_bias = correct_bias, correct_rxx = correct_rxx, correct_ryy = correct_ryy,
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased,
                     cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
@@ -765,8 +770,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
      ##### Compute meta-analyses and artifact distributions #####
      n_pairs <- length(unique(construct_pair))
-     progbar <- progress_bar$new(format = " Computing meta-analyses [:bar] :percent est. time remaining: :eta",
-                            total = n_pairs, clear = FALSE, width = options()$width)
+     progbar <- progress::progress_bar$new(format = " Computing meta-analyses [:bar] :percent est. time remaining: :eta",
+                                           total = n_pairs, clear = FALSE, width = options()$width)
 
      if(ma_method == "bb"){
           ma_list <- by(1:length(construct_pair), construct_pair, function(i){

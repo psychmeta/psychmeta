@@ -115,13 +115,33 @@ estimate_length_sb <- function(rel_initial, rel_desired){
 #' k_vars_y = 2, mean_intercor_y = .2)
 composite_r_scalar <- function(mean_rxy, k_vars_x = NULL, mean_intercor_x = NULL, k_vars_y = NULL, mean_intercor_y = NULL){
      if(!is.null(k_vars_x) & !is.null(k_vars_y)){
-          out <- mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x) * ((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))
+          decompose_x <- k_vars_x < 1
+          k_vars_x[decompose_x] <- 1 / k_vars_x[decompose_x]
+          x_coeff <- sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x))
+          x_coeff[decompose_x] <- 1 / x_coeff[decompose_x]
+
+          decompose_y <- k_vars_y < 1
+          k_vars_y[decompose_y] <- 1 / k_vars_y[decompose_y]
+          y_coeff <- sqrt(((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))
+          y_coeff[decompose_y] <- 1 / y_coeff[decompose_y]
+
+          out <- mean_rxy / (x_coeff * y_coeff)
      }else{
           if(!is.null(k_vars_x)){
-               out <- mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x))
+               decompose_x <- k_vars_x < 1
+               k_vars_x[decompose_x] <- 1 / k_vars_x[decompose_x]
+               x_coeff <- sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x))
+               x_coeff[decompose_x] <- 1 / x_coeff[decompose_x]
+
+               out <- mean_rxy / x_coeff
           }
           if(!is.null(k_vars_y)){
-               out <- mean_rxy / sqrt(((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))
+               decompose_y <- k_vars_y < 1
+               k_vars_y[decompose_y] <- 1 / k_vars_y[decompose_y]
+               y_coeff <- sqrt(((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))
+               y_coeff[decompose_y] <- 1 / y_coeff[decompose_y]
+
+               out <- mean_rxy / y_coeff
           }
      }
      out

@@ -331,3 +331,60 @@ var_error_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, ncase
 }
 
 
+#' Estimate the error variance of the probability-based effect size (A, AUC, the common language effect size [CLES])
+#'
+#' @param A Vector of probaility-based effect sizes (common language effect sizes)
+#' @param n1 Vector of sample sizes from group 1 (or the total sample size with the assumption that groups are of equal size, if no group 2 sample size is supplied).
+#' @param n2 Vector of sample sizes from group 2.
+#'
+#' @return A vector of sampling-error variances.
+#' @export
+#'
+#' @references
+#' Ruscio, J. (2008). 
+#' A probability-based measure of effect size: Robustness to base rates and other factors. 
+#' \emph{Psychological Methods, 13}(1), 19–30. \url{https://doi.org/10.1037/1082-989X.13.1.19}
+#'
+#' @details
+#' The sampling variance of a \emph{A} (also called \emph{AUC} [area under curve] or \emph{CLES} [common-language effect size]) value is:
+#'
+#' \deqn{\frac{\left[\left(\frac{1}{n_{1}}\right)+\left(\frac{1}{n_{2}}\right)+\left(\frac{1}{n_{1}n_{2}}\right)\right]}{12}}{var_e = [ (1/n1) + (1/n2) + (1 / (n1 * n2)) ] / 12}
+#'
+#' When groups 1 and 2 are of equal size, this reduces to
+#'
+#' \deqn{\frac{\left[\left(\frac{1}{n}\right)+\left(\frac{1}{n^{2}}\right)\right]}{3}}{var_e = [ (1/n) + (1/n^2) ] / 3}
+#'
+#'
+#' @examples
+#' var_error_A(A = 1, n1 = 30, n2 = 30)
+#' var_error_auc(A = 1, n1 = 60, n2 = NA)
+#' var_error_cles(A = 1, n1 = 30, n2 = 30)
+var_error_A <- function(A, n1, n2 = NA){
+     if(is.data.frame(A)) A <- as.matrix(A)
+     if(is.data.frame(n1)) n1 <- as.matrix(n1)
+     if(is.data.frame(n2)) n2 <- as.matrix(n2)
+
+     n <- n1
+     n[!is.na(n2)] <- n[!is.na(n2)] + n2[!is.na(n2)]
+
+     var_e <- ( (1/n) + (1/n^2) ) / 3
+     var_e[!is.na(n2)] <- ( 1/n1[!is.na(n2)] + 1/n2[!is.na(n2)] + 1/(n1[!is.na(n2)] * n2[!is.na(n2)]) ) / 12
+
+     if(!is.null(dim(var_e)))
+          if(ncol(var_e) == 1){
+               var_e <- c(var_e)
+          }
+     var_e
+}
+
+#' @rdname var_error_A
+#' @export
+var_error_auc <- function(A, n1, n2 = NA){
+     var_error_A(A, n1, n2)
+}
+
+#' @rdname var_error_A
+#' @export
+var_error_cles <- function(A, n1, n2 = NA){
+     var_error_A(A, n1, n2)
+}

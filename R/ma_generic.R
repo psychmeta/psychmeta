@@ -33,8 +33,8 @@
 #' es <- c(.3, .5, .8)
 #' n <- c(100, 200, 150)
 #' var_e <- 1 / n
-#' ma_r_generic(es = es, n = n, var_e = var_e)
-ma_r_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
+#' ma_generic(es = es, n = n, var_e = var_e)
+ma_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
                          conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                          moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
      warn_obj1 <- record_warnings()
@@ -53,7 +53,7 @@ ma_r_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size"
      conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
      cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
 
-     formal_args <- formals(ma_r_generic)
+     formal_args <- formals(ma_generic)
      formal_args[["..."]] <- NULL
      for(i in names(formal_args)) if(i %in% names(call)) formal_args[[i]] <- NULL
      call_full <- as.call(append(as.list(call), formal_args))

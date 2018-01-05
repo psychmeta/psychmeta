@@ -1,3 +1,9 @@
+Changes in Version 0.2.0 (2018-01-05)
+=====================================
+o Bug fixes for identifying independent artifacts in artifact-distribution meta-analyses using ma_r and ma_d.
+o The simulation functions (simulate_r_sample, simulate_r_database, simulate_d_sample, simulate_d_database) can now simulate alpha reliabilities for variables when the number of items in a scale is indicated with the “k_items_vec” or “k_items_params” arguments. 
+o A new function called “metabulate" has been added that writes meta-analytic tables as rich text files with near publication-quality formatting. 
+
 Changes in Version 0.1.3 (2017-12-13)
 =====================================
 o Bug fixes and stability improvements for moderator analyses, the creation of artifact distributions, and computation of follow-up analyses.

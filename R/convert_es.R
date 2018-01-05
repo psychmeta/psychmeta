@@ -7,12 +7,14 @@
 #' This function converts a variety of effect sizes to either correlations or Cohen's \emph{d} values. The function also computes and prints confidence intervals for the output effect sizes.
 #'
 #' @param es Vector of effect sizes to convert.
-#' @param input_es Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, and Fisher \emph{z}.
-#' @param output_es Metric of output effect sizes. Currently supports correlations and Cohen's \emph{d}.
+#' @param input_es Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).
+#' @param output_es Metric of output effect sizes. Currently supports correlations, Cohen's \emph{d} values, and common language effect sizes (CLES, A, AUC).
 #' @param n1 Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.
 #' @param n2 Vector of sample sizes of group 2 of the two groups being contrasted.
 #' @param df1 Vector of input test statistic degrees of freedom (for \emph{t} and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \emph{F}).
 #' @param df2 Vector of input test statistic within-group degrees of freedom (for \emph{F}).
+#' @param sd1 Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.
+#' @param sd2 Vector of standard deviations of group 2 of the two groups being contrasted.
 #' @param correct_bias Logical argument that determines whether to correct output effect sizes and error-variance estimates for small-sample bias (\code{TRUE}) or not (\code{FALSE}) when computing confidence intervals.
 #' @param conf_level Confidence level that defines the width of the confidence interval (default = .95).
 #'
@@ -29,6 +31,8 @@
 #' @importFrom stats qchisq
 #' @importFrom stats qf
 #' @importFrom stats qt
+#' @importFrom stats qnorm
+#' @importFrom stats pnorm
 #'
 #' @references
 #' Chinn, S. (2000).
@@ -38,8 +42,12 @@
 #' Lipsey, M. W., & Wilson, D. B. (2001).
 #' \emph{Practical meta-analysis}.
 #' Thousand Oaks, CA: SAGE.
+#' 
+#' Ruscio, J. (2008). 
+#' A probability-based measure of effect size: Robustness to base rates and other factors. 
+#' \emph{Psychological Methods, 13}(1), 19–30. \url{https://doi.org/10.1037/1082-989X.13.1.19}
 #'
-#' #' Schmidt, F. L., & Hunter, J. E. (2015).
+#' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
 #' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}
 #'
@@ -57,30 +65,34 @@
 #' convert_es(es = 1.47, input_es="lor", output_es="r", n1=100, n2=100)
 #' convert_es(es = 1.47, input_es="lor", output_es="d", n1=100, n2=100)
 #'
-#' ## To simply compute a confidence interval for r or d:
+#' ## To simply compute a confidence interval for r, d, or A:
 #' convert_es(es = .3,  input_es="r", output_es="r", n1=100)
 #' convert_es(es = .8,  input_es="d", output_es="d", n1=64, n2=36)
-convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","z"), output_es=c("r","d"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, correct_bias=TRUE, conf_level=.95){
+#' convert_es(es = .8,  input_es="A", output_es="A", n1=64, n2=36)
+convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles"),
+                       output_es=c("r","d","A","auc","cles"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, sd1=NULL, sd2=NULL,
+                       correct_bias=TRUE, conf_level=.95){
      warn_obj1 <- record_warnings()
 
-     input_es <- match.arg(input_es, c("r","d","t","p.t","F","p.F","chisq","p.chisq","or","lor","z"))
-     input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, correct_bias=correct_bias, conf_level=conf_level)
+     input_es <- match.arg(input_es, c("r","d","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles"))
+     input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2, correct_bias=correct_bias, conf_level=conf_level)
 
-     arg_lengths <- unlist(lapply(list(n1=n1, n2=n1, df1=df1, df2=df2), length))
+     arg_lengths <- unlist(lapply(list(n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2), length))
      nonnull_nonscalar <- arg_lengths[arg_lengths > 1]
      if(any(nonnull_nonscalar != nonnull_nonscalar[1]))
           stop("All arguments that are not NULL or of length 1 must be of equal length", call. = FALSE)
 
-     if(input_es == "r")       .screen_r(es)
-     if(input_es == "t")       .screen_t(es, n1, n2, df1)
-     if(input_es == "p.t")     .screen_pt(es, n1, n2, df1)
-     if(input_es == "F")       .screen_F(es, n1, n2, df1, df2)
-     if(input_es == "p.F")     .screen_pF(es, n1, n2, df1, df2)
-     if(input_es == "chisq")   .screen_chisq(es, df1)
-     if(input_es == "p.chisq") .screen_pchisq(es, df1)
-     if(input_es == "or")      .screen_or(es)
+     if(input_es == "r")                      .screen_r(es)
+     if(input_es == "t")                      .screen_t(es, n1, n2, df1)
+     if(input_es == "p.t")                    .screen_pt(es, n1, n2, df1)
+     if(input_es == "F")                      .screen_F(es, n1, n2, df1, df2)
+     if(input_es == "p.F")                    .screen_pF(es, n1, n2, df1, df2)
+     if(input_es == "chisq")                  .screen_chisq(es, df1)
+     if(input_es == "p.chisq")                .screen_pchisq(es, df1)
+     if(input_es == "or")                     .screen_or(es)
+     if(input_es %in% c("A", "auc", "cles"))  .screen_auc(es)
 
-     x <- list(es = es, n1=n1, n2=n2, df1=df1, df2=df2)
+     x <- list(es = es, n1=n1, n2=n2, df1=df1, df2=df2, sd1=sd1, sd2=sd2)
      # Compute sample sizes and df as needed
      if(is.null(n1) & is.null(n2)) {
           x$p   <- .5
@@ -98,7 +110,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           if(output_es == "r")
                if(input_es %in% c("d", "or", "lor"))
                     warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
-          if(output_es == "d")
+          if(output_es %in% c("d", "A", "auc", "cles"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
                     warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
      }else if(!is.null(n2)) {
@@ -108,6 +120,12 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           x$n <- n1
           x$n2 <- NA
           x$p   <- .5
+          if(output_es == "r")
+               if(input_es %in% c("d", "or", "lor"))
+                    warning("Assumed equal groups.", call.=FALSE)
+          if(output_es %in% c("d", "A", "auc", "cles"))
+               if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
+                    warning("Assumed equal groups.", call.=FALSE)
      }
      subset_id <- is.na(x$n) & !is.na(x$n1)
      x$n[subset_id] <- x$n1[subset_id]
@@ -122,6 +140,17 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      if(input_es=="t" & is.null(df1)) x$df1 <- x$n - 2
      if(input_es=="F" & is.null(df2)) x$df2 <- x$n - 2
+
+     # Assume SDs as needed
+     if(is.null(sd1) & is.null(sd2)){
+          x$sd1 <- x$sd2 <- 1
+          if(output_es %in% c("A", "auc", "cles"))
+               warning("Group SDs = 1 assumed.", call.=FALSE)
+     }else if(is.null(sd2)){
+          x$sd2 <- x$sd1
+          if(output_es %in% c("A", "auc", "cles"))
+               warning("Equal group SDs assumed.", call.=FALSE)
+     }
 
      if(grepl(x = input_es, pattern = "p.")){
           class(x) <- paste(gsub(x = input_es, pattern = "p.", replacement = "p_"), "to", output_es, sep = "_")
@@ -190,6 +219,41 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           names(original_es)[1] <- input_es
           meta_input <- data.frame(r = r, n_effective=n_effective)
           conf_int <- data.frame(r=r.ci, n_effective=n, CI)
+     }
+
+     if(output_es %in% c("A", "auc", "cles") ){
+          A <- .convert(x = x)
+          n <- x$n
+          n1 <- x$n1
+          n2 <- x$n2
+
+          # Correct for small-sample bias using d formula?
+          # Include the p/sd parameters in the conversion?
+          # A.ci <- if(correct_bias) convert_es.q_d_to_auc(correct_d_bias(convert_es.q_auc_to_d(A), n)) else A
+          A.ci <- A
+
+          if(input_es == "delta" | input_es == "g"){
+               if(input_es == "delta"){
+                    n_effective <- adjust_n_d(d = d, var_e = var_error_delta(delta = x$es, nc = n1, ne = n2, correct_bias = FALSE))
+               }
+               if(input_es == "g"){
+                    d.ci <- convert_es.q_g_to_d(x = x)
+                    n_effective <- adjust_n_d(d = d.ci, var_e = var_error_g(g = d.ci, n1 = n1, n2 = n2))
+               }
+          }else{
+               n_effective <- n
+          }
+
+
+          V.A <- rep(NA, length(A.ci))
+          V.A[is.na(n2)]  <- var_error_A(A=A.ci[is.na(n2)], n1=n[is.na(n2)])
+          V.A[!is.na(n2)] <- var_error_A(A=A.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)])
+
+          CI <- confidence(A, se=sqrt(V.A), conf_level=conf_level)
+          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
+          names(original_es)[1] <- input_es
+          meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
+          conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, CI)
      }
 
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
@@ -289,6 +353,15 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 }
 
+.screen_auc <- function(es){
+     if(any(es < 0, es > 1)){
+          stop("Value supplied for A/AUC/CLES is not a probability", call. = FALSE)
+     }else{
+          if(any(es == 0, es == 1)){
+          stop("Value supplied for A/AUC/CLES produces an infinite d value", call. = FALSE)
+          }
+     }
+}
 
 "convert_es.q_r_to_r" <- function(r, x = NULL) {
      if(!is.null(x)){
@@ -305,6 +378,14 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      d
+}
+
+"convert_es.q_A_to_A" <- function(A, x = NULL) {
+     if(!is.null(x)){
+          A <- x$es
+     }
+
+     A
 }
 
 "convert_es.q_delta_to_d" <- function(d, x = NULL) {
@@ -445,15 +526,15 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      return( convert_es.q_d_to_r(d, p))
 }
 
-"convert_es.q_z_to_r" <- function(z, x = NULL) {
+"convert_es.q_Fisherz_to_r" <- function(Fisherz, x = NULL) {
      if(!is.null(x)){
-          z <- x$es
+          Fisherz <- x$es
      }
 
-     return( (exp(2 * z) - 1) / (1 + exp(2 * z)) )
+     return( (exp(2 * Fisherz) - 1) / (1 + exp(2 * Fisherz)) )
 }
 
-"convert_es.q_r_to_z" <- function(r, x = NULL) {
+"convert_es.q_r_to_Fisherz" <- function(r, x = NULL) {
      if(!is.null(x)){
           r <- x$es
      }
@@ -563,13 +644,196 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      return( lor * sqrt(3) / pi )
 }
 
-"convert_es.q_z_to_d" <- function(z, p, x = NULL) {
+"convert_es.q_Fisherz_to_d" <- function(Fisherz, p, x = NULL) {
      if(!is.null(x)){
-          z <- x$es
+          Fisherz <- x$es
           p <- x$p
      }
 
-     r <- convert_es.q_z_to_r(z)
+     r <- convert_es.q_Fisherz_to_r(Fisherz)
      return( convert_es.q_r_to_d(r, p) )
 }
 
+"convert_es.q_auc_to_d" <- function(auc, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          auc <- x$es
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+
+     return( qnorm(auc) * sqrt( (sd1^2 + sd2^2)/(p*sd1^2 + (1-p)*sd2^2) ) )
+}
+
+"convert_es.q_auc_to_r" <- function(auc, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          auc <- x$es
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+
+     d <- convert_es.q_auc_to_d(auc)
+     return( convert_es.q_d_to_r(d, p) )
+}
+
+"convert_es.q_d_to_auc" <- function(d, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          d <- x$es
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+
+     return(pnorm(d / sqrt( (sd1^2 + sd2^2)/(p*sd1^2 + (1-p)*sd2^2) ) ))
+}
+
+"convert_es.q_r_to_auc" <- function(r, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          r <- x$es
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_r_to_d(r,p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_delta_to_auc" <- function(d, p, sd1, sd2, x = NULL) {
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2, x))
+}
+
+"convert_es.q_g_to_auc" <- function(g, n, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          g <- x$es
+          n <- x$n
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_g_to_d(g,n)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_t_to_auc" <- function(t, df1, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          t <- x$es
+          df1 <- x$df1
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_t_to_d(t, df1, p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.p_t_to_auc" <- function(p.t, df1, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          p.t <- x$es
+          df1 <- x$df1
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.p_t_to_d(p.t, df1, p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_F_to_auc" <- function(F, df2, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          F <- x$es
+          df2 <- x$df2
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_F_to_d(F, df2, p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.p_F_to_auc" <- function(p.F, df2, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          p.F <- x$es
+          df2 <- x$df2
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.p_F_to_d(p.F, df2, p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_chisq_to_auc" <- function(chisq, n, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          chisq <- x$es
+          n <- x$n
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_chisq_to_d(chisq, n, p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.p_chisq_to_auc" <- function(p.chisq, n, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          p.chisq <- x$es
+          n <- x$n
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.p_chisq_to_d(p.chisq, n, p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_or_to_auc" <- function(or, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          or <- x$es
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_or_to_d(or)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_lor_to_auc" <- function(lor, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          lor <- x$es
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_lor_to_d(lor)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_Fisherz_to_auc" <- function(Fisherz, p, sd1, sd2, x = NULL) {
+     if(!is.null(x)){
+          Fisherz <- x$es
+          p <- x$p
+          sd1 <- x$sd1
+          sd2 <- x$sd2
+     }
+     d <- convert_es.q_Fisherz_to_d(Fisherz, p)
+     return(convert_es.q_d_to_auc(d, p, sd1, sd2))
+}
+
+"convert_es.q_A_to_d"         <- "convert_es.q_cles_to_d"       <- "convert_es.q_auc_to_d"
+"convert_es.q_A_to_r"         <- "convert_es.q_cles_to_r"       <- "convert_es.q_auc_to_r"
+"convert_es.q_r_to_A"         <- "convert_es.q_r_to_cles"       <- "convert_es.q_r_to_auc"      
+"convert_es.q_delta_to_A"     <- "convert_es.q_delta_to_cles"   <- "convert_es.q_delta_to_auc"  
+"convert_es.q_g_to_A"         <- "convert_es.q_g_to_cles"       <- "convert_es.q_g_to_auc"      
+"convert_es.q_t_to_A"         <- "convert_es.q_t_to_cles"       <- "convert_es.q_t_to_auc"      
+"convert_es.p_t_to_A"         <- "convert_es.p_t_to_cles"       <- "convert_es.p_t_to_auc"      
+"convert_es.q_F_to_A"         <- "convert_es.q_F_to_cles"       <- "convert_es.q_F_to_auc"      
+"convert_es.p_F_to_A"         <- "convert_es.p_F_to_cles"       <- "convert_es.p_F_to_auc"      
+"convert_es.q_chisq_to_A"     <- "convert_es.q_chisq_to_cles"   <- "convert_es.q_chisq_to_auc"  
+"convert_es.p_chisq_to_A"     <- "convert_es.p_chisq_to_cles"   <- "convert_es.p_chisq_to_auc"  
+"convert_es.q_or_to_A"        <- "convert_es.q_or_to_cles"      <- "convert_es.q_or_to_auc"     
+"convert_es.q_lor_to_A"       <- "convert_es.q_lor_to_cles"     <- "convert_es.q_lor_to_auc"    
+"convert_es.q_Fisherz_to_A"   <- "convert_es.q_Fisherz_to_cles" <- "convert_es.q_Fisherz_to_auc"
+"covert_es.q_A_to_auc"        <- "covert_es.q_A_to_cles"        <- "covert_es.q_A_to_A"
+"covert_es.q_auc_to_auc"      <- "covert_es.q_auc_to_cles"      <- "covert_es.q_auc_to_A"        <- "covert_es.q_A_to_A"
+"covert_es.q_cles_to_auc"     <- "covert_es.q_cles_to_cles"     <- "covert_es.q_cles_to_A"       <- "covert_es.q_A_to_A"

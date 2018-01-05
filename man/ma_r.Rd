@@ -193,17 +193,20 @@ When multiple construct pairs are meta-analyzed, the result of this function tak
 \examples{
 ## The 'ma_r' function can compute multi-construct bare-bones meta-analyes:
 ma_r(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-     construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+     construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+     moderators = moderator, data = data_r_meas_multi)
 
 ## It can also perform multiple individual-correction meta-analyses:
 ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-     construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+     construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+     moderators = moderator, data = data_r_meas_multi)
 
 ## And 'ma_r' can also curate artifact distributions and compute multiple
 ## artifact-distribution meta-analyses:
 ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      correct_rr_x = FALSE, correct_rr_y = FALSE,
-     construct_x = x_name, construct_y = y_name, moderators = moderator, data = data_r_meas_multi)
+     construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+     moderators = moderator, data = data_r_meas_multi)
 
 ## Artifact information from studies not included in the meta-analysis can also be used to make
 ## corrections. Passing artifact information with the 'supplemental_ads' argument allows for
@@ -224,7 +227,7 @@ n_rzzi = c(data_r_meas_multi$n, data_r_meas_multi$n)[z_ids]
 ma_r(ma_method = "ad", rxyi = rxyi, n = n,
      correct_rr_x = FALSE, correct_rr_y = FALSE,
      construct_x = x_name, construct_y = y_name,
-     moderators = moderator, data = data_r_meas_multi,
+     moderators = moderator, sample_id = sample_id, data = data_r_meas_multi,
      supplemental_ads = list(X = list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi),
                              Y = list(rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi),
                              Z = list(rxxi = rzzi, n_rxxi = n_rzzi, wt_rxxi = n_rzzi)))
@@ -238,7 +241,9 @@ dat2$rxyi <- NA
 dat <- rbind(dat1, dat2)
 ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      correct_rr_x = FALSE, correct_rr_y = FALSE,
-     construct_x = x_name, construct_y = y_name, moderators = moderator, data = dat)
+     construct_x = x_name, construct_y = y_name,
+     sample_id = sample_id, moderators = moderator,
+     use_all_arts = TRUE, data = dat)
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).

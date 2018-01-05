@@ -1,130 +1,3 @@
-#' Generate a system of folders from a file path to a new directory
-#'
-#' This function is intended to be helpful in simulations when directories need to be created and named according to values generated during the simulation.
-#'
-#' @param path The path to the directory to be created
-#'
-#' @return Creates a system of folders to a new directory
-#' @export
-#'
-#' @keywords utilities
-generate_directory <- function(path){
-     path_split <- unlist(strsplit(x = path, split = "/"))
-     path_vec <- NULL
-     for(i in 1:length(path_split)){
-          if(i == 1){
-               path_vec[i] <- path_split[i]
-          }else{
-               path_vec[i] <- paste(path_vec[i-1], path_split[i], sep = "/")
-          }
-          if(!dir.exists(path_vec[i])) dir.create(path_vec[i])
-     }
-}
-
-
-#' Generate a list of simulated sample matrices sampled from the Wishart distribution
-#'
-#' This function generates simulated sample matrices based on a population matrix and a sample size. It uses the Wishart distribution (i.e., the multivariate \eqn{\chi^2} distribution) to obtain data, rescales the data into the input metric, and can be standardized into a correlation matrix by setting \code{as_cor} to \code{TRUE}.
-#' The function can produce a list of matrices for any number of samples.
-#'
-#' @param sigma Population covariance matrix. May be standardized or unstandardized.
-#' @param n Sample size for simulated sample matrices.
-#' @param k Number of sample matrices to generate.
-#' @param as_cor Should the simulated matrices be standardized (\code{TRUE}) or unstandardized (\code{FALSE})?
-#'
-#' @return A list of simulated sample matrices.
-#' @export
-#'
-#' @importFrom stats rWishart
-#'
-#' @keywords distribution
-#'
-#' @examples
-#' ## Define a hypothetical matrix:
-#' sigma <- reshape_vec2mat(cov = .4, order = 5)
-#'
-#' ## Simualte a list of unstandardized covariance matrices:
-#' simulate_matrix(sigma = sigma, n = 50, k = 10, as_cor = FALSE)
-#'
-#' ## Simualte a list of correlation matrices:
-#' simulate_matrix(sigma = sigma, n = 50, k = 10, as_cor = TRUE)
-simulate_matrix <- function(sigma, n, k=1, as_cor = FALSE) {
-     mat_array <- rWishart(n=k, df=n-2, Sigma=sigma)
-     if(as_cor){
-          mat_list <- lapply(1:k, function(x){
-               mat <- cov2cor(mat_array[ , , x])
-               dimnames(mat) <- dimnames(sigma)
-               mat
-          })
-     }else{
-          scale_mat <- diag(rep(n^-.5, ncol(sigma)))
-          mat_list <- lapply(1:k, function(x){
-               mat <- scale_mat %*% mat_array[ , , x] %*% scale_mat
-               dimnames(mat) <- dimnames(sigma)
-               mat
-          })
-     }
-     names(mat_list) <- paste("Sample", 1:k, sep = " ")
-     return(mat_list)
-}
-
-
-#' Generate a vector of simulated sample alpha coefficients
-#'
-#' This function generates inter-item covariance matrices from a population matrix and computes a coefficient alpha reliability estimate for each matrix.
-#'
-#' @param item_mat Item intercorrelation/intercovariance matrix. If item_mat is not supplied, the user must supply both \code{alpha} and \code{k_items}.
-#' If item_mat is \code{NULL}, the program will assume that all item intercorrelations are equal.
-#' @param alpha Population alpha value. Must be supplied if \code{item_mat} is \code{NULL}.
-#' @param k_items Number of items on the test to be simulated. Must be supplied if \code{item_mat} is \code{NULL.}
-#' @param n_cases Number of cases to simulate in sampling distribution of alpha.
-#' @param k_samples Number of samples to simulate.
-#' @param standarized Should alpha be computed from correlation matrices (\code{TRUE}) or unstandardized covariance matrices (\code{FALSE})?
-#'
-#' @return A vector of simulated sample alpha coefficients
-#' @export
-#'
-#' @keywords distribution
-#'
-#' @examples
-#' ## Define a hypothetical matrix:
-#' item_mat <- reshape_vec2mat(cov = .3, order = 12)
-#'
-#' ## Simulations of unstandardized alphas
-#' set.seed(100)
-#' simulate_alpha(item_mat = item_mat, n_cases = 50, k_samples = 10, standarized = FALSE)
-#' set.seed(100)
-#' simulate_alpha(alpha = mean(item_mat[lower.tri(item_mat)]) / mean(item_mat),
-#' k_items = ncol(item_mat), n_cases = 50, k_samples = 10, standarized = FALSE)
-#'
-#' ## Simulations of standardized alphas
-#' set.seed(100)
-#' simulate_alpha(item_mat = item_mat, n_cases = 50, k_samples = 10, standarized = TRUE)
-#' set.seed(100)
-#' simulate_alpha(alpha = mean(item_mat[lower.tri(item_mat)]) / mean(item_mat),
-#' k_items = ncol(item_mat), n_cases = 50, k_samples = 10, standarized = TRUE)
-simulate_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases, k_samples, standarized = FALSE){
-     if(is.null(item_mat)){
-          if(!is.null(alpha) & !is.null(k_items)){
-               item_mat <- matrix((alpha / k_items) / (1 + (1 / k_items - 1) * alpha), k_items, k_items)
-               diag(item_mat) <- 1
-          }else{
-               stop("Either item_mat or the combination of alpha and k_items must be supplied to compute the error variance of alpha.", call. = FALSE)
-          }
-     }else{
-          if(!is.matrix(item_mat)) stop("item_mat must be a matrix", call. = FALSE)
-          if(!is.numeric(item_mat)) stop("item_mat must be numeric", call. = FALSE)
-          if(nrow(item_mat) != ncol(item_mat)) stop("item_mat must be square", call. = FALSE)
-          if(!all(item_mat == t(item_mat))) stop("item_mat must be symmetric", call. = FALSE)
-     }
-
-     item_mat_list <- simulate_matrix(sigma = item_mat, n = n_cases, k=k_samples, as_cor = standarized)
-     alpha_vec <- as.numeric(unlist(lapply(item_mat_list, function(x) mean(x[lower.tri(x)]) / mean(x))))
-     alpha_vec
-}
-
-
-
 #' Simulation of data with measurement error and range-restriction artifacts
 #'
 #' This function simulates a psychometric sample and produces correlation matrices, artifact information, and other descriptive statistics that have been affected by measurement error and/or range restriction.
@@ -139,6 +12,7 @@ simulate_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_case
 #' @param rel_vec Vector of reliabilities corresponding to the variables in \code{rho_mat.}
 #' @param sr_vec Vector of selection ratios corresponding to the variables in \code{rho_mat}
 #' (set selection ratios to 1 for variables that should not be used in selection).
+#' @param k_items_vec Number of test items comprising each of the variables to be simulated (all are single-item variables by default).
 #' @param wt_mat Optional matrix of weights to use in forming a composite of the variables in \code{rho_mat.} Matrix should have as many rows (or vector elements) as there are variables in \code{rho_mat}.
 #' @param sr_composites Optional vector selection ratios for composite variables. If not \code{NULL}, \code{sr_composites} must have as many elements as there are columns in \code{wt_mat}.
 #' @param var_names Vector of variable names corresponding to the variables in \code{rho_mat}.
@@ -183,13 +57,13 @@ simulate_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_case
 #'                 wt_mat = cbind(c(0, 0, 0, .3, 1), c(1, .3, 0, 0, 0)), sr_composites = c(.7, .5))
 simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                               mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-                              sr_vec = rep(1, ncol(rho_mat)),
+                              sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
                               wt_mat = NULL, sr_composites = NULL,
                               var_names = NULL, composite_names = NULL, n_as_ni = FALSE, ...){
 
      args <- .simulate_r_sample_screen(n = n, rho_mat = rho_mat,
                                        mu_vec = mu_vec, sigma_vec = sigma_vec,
-                                       rel_vec = rel_vec, sr_vec = sr_vec,
+                                       rel_vec = rel_vec, sr_vec = sr_vec, k_items_vec = k_items_vec,
                                        wt_mat = wt_mat, sr_composites = sr_composites,
                                        var_names = var_names, composite_names = composite_names)
 
@@ -205,20 +79,22 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           .simulate_r_sample_stats(n = args$n, rho_mat = args$rho_mat,
                                    mu_vec = args$mu_vec, sigma_vec = args$sigma_vec,
                                    rel_vec = args$rel_vec, sr_vec = args$sr_vec,
+                                   k_items_vec = args$k_items_vec,
                                    wt_mat = args$wt_mat, sr_composites = args$sr_composites,
                                    var_names = args$var_names, composite_names = args$composite_names)
      }else{
           .simulate_r_sample_params(n = args$n, rho_mat = args$rho_mat,
                                     mu_vec = args$mu_vec, sigma_vec = args$sigma_vec,
                                     rel_vec = args$rel_vec, sr_vec = args$sr_vec,
+                                    k_items_vec = args$k_items_vec,
                                     wt_mat = args$wt_mat, sr_composites = args$sr_composites,
                                     var_names = args$var_names, composite_names = args$composite_names)
      }
 }
 
-.simulate_r_sample_screen <- function(n, rho_mat,
+.simulate_r_sample_screen <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                       mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-                                      rel_vec = rep(1, ncol(rho_mat)), sr_vec = rep(1, ncol(rho_mat)),
+                                      sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
                                       wt_mat = NULL, sr_composites = NULL,
                                       var_names = NULL, composite_names = NULL, ...){
 
@@ -235,6 +111,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      }
      rel_vec <- c(rel_vec)
      sr_vec <- c(sr_vec)
+     k_items_vec <- c(k_items_vec)
 
      if(!is.numeric(n)) stop("n must be numeric", call. = FALSE)
      if(any(!is.numeric(rho_mat))) stop("rho_mat must be numeric", call. = FALSE)
@@ -242,6 +119,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      if(!is.numeric(sigma_vec)) stop("sigma_vec must be numeric", call. = FALSE)
      if(!is.numeric(rel_vec)) stop("rel_vec must be numeric", call. = FALSE)
      if(!is.numeric(sr_vec)) stop("sr_vec must be numeric", call. = FALSE)
+     if(!is.numeric(k_items_vec)) stop("k_items_vec must be numeric", call. = FALSE)
 
      if(is.na(n)) stop("n cannot be NA", call. = FALSE)
      if(any(is.na(rho_mat))) stop("rho_mat cannot be NA", call. = FALSE)
@@ -249,19 +127,26 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      if(any(is.na(sigma_vec))) stop("sigma_vec cannot be NA", call. = FALSE)
      if(any(is.na(rel_vec))) stop("rel_vec cannot be NA", call. = FALSE)
      if(any(is.na(sr_vec))) stop("sr_vec cannot be NA", call. = FALSE)
+     if(any(is.na(k_items_vec))) stop("k_items_vec cannot be NA", call. = FALSE)
 
      if(any(is.infinite(rho_mat))) stop("rho_mat must be finite", call. = FALSE)
      if(any(is.infinite(mu_vec))) stop("mu_vec must be finite", call. = FALSE)
      if(any(is.infinite(sigma_vec))) stop("sigma_vec must be finite", call. = FALSE)
      if(any(is.infinite(rel_vec))) stop("rel_vec must be finite", call. = FALSE)
      if(any(is.infinite(sr_vec))) stop("sr_vec must be finite", call. = FALSE)
+     if(any(is.infinite(k_items_vec))) stop("k_items_vec must be finite", call. = FALSE)
 
      if(is.finite(n)) if(n <= 0) stop("n must be positive", call. = FALSE)
      if(any(rel_vec <= 0)) stop("rel_vec must be positive", call. = FALSE)
      if(any(sr_vec < 0)) stop("sr_vec must be non-negative", call. = FALSE)
+     if(any(k_items_vec < 1)) stop("k_items_vec must be greater than or equal to 1", call. = FALSE)
+
+     if(any(zapsmall(k_items_vec) != round(k_items_vec))) stop("k_items_vec must consist of whole numbers", call. = FALSE)
+     k_items_vec <- round(k_items_vec)
 
      if(ncol(rho_mat) != length(rel_vec)) stop("rel_vec must have as many elements as rho_mat has variables", call. = FALSE)
      if(ncol(rho_mat) != length(sr_vec)) stop("sr_vec must have as many elements as rho_mat has variables", call. = FALSE)
+     if(ncol(rho_mat) != length(k_items_vec)) stop("k_items_vec must have as many elements as rho_mat has variables", call. = FALSE)
      if(!is.null(var_names)){
           var_names <- c(var_names)
           if(ncol(rho_mat) != length(var_names)) stop("var_names must have as many elements as rho_mat has variables", call. = FALSE)
@@ -294,11 +179,12 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      as.list(environment())
 }
 
-.simulate_r_sample_stats <- function(n, rho_mat,
+.simulate_r_sample_stats <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                      mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-                                     rel_vec = rep(1, ncol(rho_mat)), sr_vec = rep(1, ncol(rho_mat)),
+                                     sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
                                      wt_mat = NULL, sr_composites = NULL,
-                                     var_names = NULL, composite_names = NULL, obs_only = FALSE, ...){
+                                     var_names = NULL, composite_names = NULL,
+                                     obs_only = FALSE, show_items = FALSE, keep_vars = NULL, ...){
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")
      }
@@ -308,18 +194,28 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                composite_names <- paste("composite", 1:ncol(wt_mat), sep = "")
      }
 
-     ## Create matrix of true-score covariances
-     S <- diag(sigma_vec) %*% diag(rel_vec^.5) %*% rho_mat %*% diag(rel_vec^.5) %*% diag(sigma_vec)
+     simdat <- simulate_psych_items(n = n, k_vec = k_items_vec, R_scales = rho_mat, rel_vec = rel_vec,
+                                    mean_vec = mu_vec, sd_vec = sigma_vec, var_names = var_names)
 
-     ## Generate true-score, error-score, and observed-score data
-     true_scores_a <- MASS::mvrnorm(n = n, mu = mu_vec, Sigma = S)
-     error_scores_a <- MASS::mvrnorm(n = n, mu = rep(0, ncol(rho_mat)), Sigma = diag(sigma_vec^2 - sigma_vec^2 * rel_vec))
+     true_scores_a <- as.matrix(simdat$data$true)
+     error_scores_a <- as.matrix(simdat$data$error)
+     .var_names <- var_names
+     var_names <- colnames(true_scores_a)
+     scale_ids <- var_names %in% .var_names
+     item_index <- simdat$params$item_index
+     item_names <- simdat$params$item_names
+
+     item_wt <- list()
+     for(i in 1:length(k_items_vec)) item_wt[[i]] <- rep(1, length(item_index[[i]]))
+     names(item_wt) <- .var_names
 
      if(!is.null(wt_mat)){
-          true_scores_a <- cbind(true_scores_a, Composite = true_scores_a %*% wt_mat)
-          error_scores_a <- cbind(error_scores_a, Composite = error_scores_a %*% wt_mat)
-          sr_vec <- c(sr_vec, sr_composites)
+          true_scores_a <- cbind(true_scores_a, Composite = true_scores_a[,1:ncol(rho_mat)] %*% wt_mat)
+          error_scores_a <- cbind(error_scores_a, Composite = error_scores_a[,1:ncol(rho_mat)] %*% wt_mat)
+          scale_ids <- c(scale_ids, rep(TRUE, length(composite_names)))
+          sr_vec <- c(sr_vec, rep(1, ncol(true_scores_a) - sum(scale_ids)), sr_composites)
           var_names <- c(var_names, composite_names)
+          .var_names <- c(.var_names, composite_names)
      }
      obs_scores_a <- true_scores_a + error_scores_a
 
@@ -330,6 +226,18 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           select_vec <- select_vec & obs_scores_a[,i] >= sort(obs_scores_a[,i], decreasing = TRUE)[n * sr_vec[i]]
 
      colnames(true_scores_a) <- colnames(error_scores_a) <- colnames(obs_scores_a) <- var_names
+
+     alpha_a <- .alpha_items(item_dat = obs_scores_a[,], item_index = item_index)
+     alpha_i <- .alpha_items(item_dat = obs_scores_a[select_vec,], item_index = item_index)
+
+     if(show_items){
+          item_obs_scores_a <- obs_scores_a
+          item_true_scores_a <- true_scores_a
+          item_error_scores_a <- error_scores_a
+     }
+     obs_scores_a <- obs_scores_a[,scale_ids]
+     true_scores_a <- true_scores_a[,scale_ids]
+     error_scores_a <- error_scores_a[,scale_ids]
 
      ## Compute unrestricted variances
      var_obs_a <- apply(obs_scores_a, 2, var)
@@ -359,6 +267,65 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      na <- as.numeric(n)
      ni <- sum(select_vec)
      sr_overall <- ni / na
+
+     ## Compute covariances
+     S_xy_a <- cov(obs_scores_a)
+     S_xy_i <- cov(obs_scores_a[select_vec,])
+
+     R_xy_a <- cov2cor(S_xy_a)
+     R_xy_i <- cov2cor(S_xy_i)
+
+     if(!is.null(wt_mat)){
+          for(i in 1:ncol(wt_mat)){
+               alpha_a <- cbind(alpha_a, c(composite_rel_matrix(r_mat = R_xy_a[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_a[1,1:ncol(rho_mat)],
+                                                                sd_vec = sd_obs_a[1:ncol(rho_mat)],
+                                                                wt_vec = wt_mat[,i]),
+
+                                           composite_rel_matrix(r_mat = R_xy_a[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_a[2,1:ncol(rho_mat)],
+                                                                sd_vec = rep(1, ncol(rho_mat)),
+                                                                wt_vec = wt_mat[,i])))
+
+               alpha_i <- cbind(alpha_i, c(composite_rel_matrix(r_mat = R_xy_i[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_i[1,1:ncol(rho_mat)],
+                                                                sd_vec = sd_obs_i[1:ncol(rho_mat)],
+                                                                wt_vec = wt_mat[,i]),
+
+                                           composite_rel_matrix(r_mat = R_xy_i[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_i[2,1:ncol(rho_mat)],
+                                                                sd_vec = rep(1, ncol(rho_mat)),
+                                                                wt_vec = wt_mat[,i])))
+          }
+          colnames(alpha_a) <- colnames(alpha_i) <- var_names[scale_ids]
+     }
+
+     if(is.null(keep_vars)){
+          keep_ids <- scale_ids
+          export_ids <- rep(TRUE, length(scale_ids))
+          keep_ids_scales <- keep_ids[scale_ids]
+     }else{
+          keep_ids <- scale_ids & var_names %in% keep_vars
+          keep_ids_scales <- keep_ids[scale_ids]
+
+          .item_index <- .item_names <- list()
+          for(i in keep_vars) .item_names[[i]] <- item_names[[i]]
+
+          export_ids <- keep_ids | (var_names %in% unlist(.item_names))
+          k_items_vec <- k_items_vec[keep_ids_scales]
+          .var_names <- .var_names[keep_ids_scales]
+          var_names <- var_names[export_ids]
+
+          for(i in keep_vars) .item_index[[i]] <- which(var_names %in% item_names[[i]])
+
+          item_index <- .item_index
+          item_names <- .item_names
+     }
+
+     keep_ids_long <- rep(keep_ids_scales, 3)
+     obs_scores_a <- obs_scores_a[,keep_ids_scales]
+     true_scores_a <- true_scores_a[,keep_ids_scales]
+     error_scores_a <- error_scores_a[,keep_ids_scales]
 
      if(!obs_only){
           ## Compute unrestricted variances
@@ -394,25 +361,28 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           S_complete_i <- cov(cbind(obs_scores_a[select_vec,], true_scores_a[select_vec,], error_scores_a[select_vec,]))
 
           rownames(S_complete_a) <- colnames(S_complete_a) <-
-               rownames(S_complete_i) <- colnames(S_complete_i) <- c(paste("Obs_", var_names, sep = ""),
-                                                                     paste("True_", var_names, sep = ""),
-                                                                     paste("Error_", var_names, sep = ""))
+               rownames(S_complete_i) <- colnames(S_complete_i) <- c(paste("Obs_", .var_names, sep = ""),
+                                                                     paste("True_", .var_names, sep = ""),
+                                                                     paste("Error_", .var_names, sep = ""))
 
           R_complete_a <- suppressWarnings(cov2cor(S_complete_a))
           R_complete_i <- suppressWarnings(cov2cor(S_complete_i))
           R_complete_a[is.na(R_complete_a)] <- R_complete_i[is.na(R_complete_i)] <- 0
 
-          R_xy_a <- R_complete_a[1:length(var_names), 1:length(var_names)]
-          R_xy_i <- R_complete_i[1:length(var_names), 1:length(var_names)]
-
           ## Compile matrices of descriptive statistics and artifacts
-          desc_mat_obs <- rbind(`Applicant reliability` = rel_a,
-                                `Incumbent reliability` = rel_i,
-                                `u ratio` = u_obs,
-                                `Applicant SD` = sd_obs_a,
-                                `Incumbent SD` = sd_obs_i,
-                                `Applicant mean` = mean_obs_a,
-                                `Incumbent mean` = mean_obs_i)
+          desc_mat_obs <- rbind(`Applicant parallel-forms reliability` = rel_a[keep_ids_scales],
+                                `Applicant unstandardized alpha` = alpha_a[1,keep_ids_scales],
+                                `Applicant standardized alpha` = alpha_a[2,keep_ids_scales],
+
+                                `Incumbent parallel-forms reliability` = rel_i[keep_ids_scales],
+                                `Incumbent unstandardized alpha` = alpha_i[1,keep_ids_scales],
+                                `Incumbent standardized alpha` = alpha_i[2,keep_ids_scales],
+
+                                `u ratio` = u_obs[keep_ids_scales],
+                                `Applicant SD` = sd_obs_a[keep_ids_scales],
+                                `Incumbent SD` = sd_obs_i[keep_ids_scales],
+                                `Applicant mean` = mean_obs_a[keep_ids_scales],
+                                `Incumbent mean` = mean_obs_i[keep_ids_scales])
 
           desc_mat_true <- rbind(`u ratio` = u_true,
                                  `Applicant SD` = sd_true_a,
@@ -427,16 +397,15 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                   `Incumbent mean` = mean_error_i)
 
           ## Name name variables in output arrays
-          dimnames(R_xy_a) <- dimnames(R_xy_i) <- list(var_names, var_names)
-          colnames(desc_mat_obs) <- colnames(desc_mat_true) <- colnames(desc_mat_error) <- var_names
+          colnames(desc_mat_obs) <- colnames(desc_mat_true) <- colnames(desc_mat_error) <- .var_names
 
           ## Assemble list of output information
           out <- list(na = na,
                       ni = ni,
                       sr = as.numeric(sr_overall),
 
-                      R_obs_a = R_xy_a,
-                      R_obs_i = R_xy_i,
+                      R_obs_a = R_xy_a[keep_ids_scales,keep_ids_scales],
+                      R_obs_i = R_xy_i[keep_ids_scales,keep_ids_scales],
 
                       S_complete_a = S_complete_a,
                       S_complete_i = S_complete_i,
@@ -451,51 +420,55 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                       data = list(observed = data.frame(obs_scores_a, selected = select_vec),
                                   true = data.frame(true_scores_a, selected = select_vec),
                                   error = data.frame(error_scores_a, selected = select_vec))
-                      )
+          )
      }else{
-          S_xy_a <- cov(obs_scores_a)
-          S_xy_i <- cov(obs_scores_a[select_vec,])
-
-          R_xy_a <- cov2cor(S_xy_a)
-          R_xy_i <- cov2cor(S_xy_i)
-
           ## Compile matrices of descriptive statistics and artifacts
-          desc_mat_obs <- rbind(`Applicant reliability` = rel_a,
-                                `Incumbent reliability` = rel_i,
-                                `u ratio` = u_obs,
-                                `Applicant SD` = sd_obs_a,
-                                `Incumbent SD` = sd_obs_i,
-                                `Applicant mean` = mean_obs_a,
-                                `Incumbent mean` = mean_obs_i)
+          desc_mat_obs <- rbind(`Applicant parallel-forms reliability` = rel_a[keep_ids_scales],
+                                `Applicant unstandardized alpha` = alpha_a[1,keep_ids_scales],
+                                `Applicant standardized alpha` = alpha_a[2,keep_ids_scales],
+
+                                `Incumbent parallel-forms reliability` = rel_i[keep_ids_scales],
+                                `Incumbent unstandardized alpha` = alpha_i[1,keep_ids_scales],
+                                `Incumbent standardized alpha` = alpha_i[2,keep_ids_scales],
+
+                                `u ratio` = u_obs[keep_ids],
+                                `Applicant SD` = sd_obs_a[keep_ids],
+                                `Incumbent SD` = sd_obs_i[keep_ids],
+                                `Applicant mean` = mean_obs_a[keep_ids],
+                                `Incumbent mean` = mean_obs_i[keep_ids])
 
           ## Name name variables in output arrays
-          dimnames(R_xy_a) <- dimnames(R_xy_i) <- list(var_names, var_names)
-          colnames(desc_mat_obs) <- var_names
+          colnames(desc_mat_obs) <- .var_names
 
           ## Assemble list of output information
           out <- list(na = na,
                       ni = ni,
                       sr = as.numeric(sr_overall),
 
-                      R_obs_a = R_xy_a,
-                      R_obs_i = R_xy_i,
+                      R_obs_a = R_xy_a[keep_ids_scales,keep_ids_scales],
+                      R_obs_i = R_xy_i[keep_ids_scales,keep_ids_scales],
 
-                      S_obs_a = S_xy_a,
-                      S_obs_i = S_xy_i,
+                      S_obs_a = S_xy_a[keep_ids_scales,keep_ids_scales],
+                      S_obs_i = S_xy_i[keep_ids_scales,keep_ids_scales],
 
-                      # descriptives_obs = desc_mat_obs,
                       descriptives = list(observed = desc_mat_obs))
      }
+
+     if(show_items) out <- append(out, list(item_info = list(item_index = item_index,
+                                                             item_names = item_names,
+                                                             data = list(observed = item_obs_scores_a[,export_ids],
+                                                                         true = item_true_scores_a[,export_ids],
+                                                                         error = item_error_scores_a[,export_ids]))))
 
      class(out) <- c("psychmeta", "simulate_r")
      out
 }
 
-.simulate_r_sample_params <- function(n, rho_mat,
+.simulate_r_sample_params <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                       mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-                                      rel_vec = rep(1, ncol(rho_mat)), sr_vec = rep(1, ncol(rho_mat)),
+                                      sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
                                       wt_mat = NULL, sr_composites = NULL,
-                                      var_names = NULL, composite_names = NULL, ...){
+                                      var_names = NULL, composite_names = NULL, show_items = FALSE, keep_vars = NULL, ...){
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")
      }
@@ -504,7 +477,6 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           if(is.null(composite_names))
                composite_names <- paste("composite", 1:ncol(wt_mat), sep = "")
      }
-
 
      r_mat <- rho_mat
      diag(r_mat) <- 1 / rel_vec
@@ -556,12 +528,12 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           if(length(x_col) == 1){
                cut_scores <- qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5, lower.tail = FALSE)
                s_mat_i <- truncate_var(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
+
                means_x_i <- truncate_mean(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
                sr_overall <- sr_vec[x_col]
           }else{
                if(zapsmall(det(S_complete_a[x_col,x_col])) == 0)
                     stop("Covariance matrix among selection variables is not positive definite: Selection cannot be performed", call. = FALSE)
-               tmvtnorm::ptmvnorm
                dat_i <- mtmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
                                  lower = qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE))
                means_x_i <- dat_i$tmean
@@ -622,30 +594,116 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      R_xy_a <- R_complete_a[var_names_obs, var_names_obs]
      R_xy_i <- R_complete_i[var_names_obs, var_names_obs]
 
+     .rho_mat <- R_complete_a[var_names_true,var_names_true]
+     if(!is.null(wt_mat)){
+          .k_items_vec <- c(k_items_vec, rep(1, ncol(wt_mat)))
+     }else{
+          .k_items_vec <- k_items_vec
+     }
+     itemdat <- simulate_psych_items(n = Inf, k_vec = .k_items_vec, R_scales = .rho_mat, rel_vec = rel_a,
+                                     mean_vec = mean_obs_a, sd_vec = sd_obs_a, var_names = var_names)
+     item_index <- itemdat$params$item_index
+     item_names <- itemdat$params$item_names
+     alpha_a <- .alpha_items(S = itemdat$S$observed, R = itemdat$R$observed, item_index = item_index)
+     .S <- correct_matrix_mvrr(Sigma_i = itemdat$S$observed, Sigma_xx_a = S_complete_i[1:nrow(rho_mat),1:nrow(rho_mat)],
+                               x_col = 1:nrow(rho_mat), standardize = FALSE)
+     .R <- cov2cor(.S)
+
+     alpha_i <- .alpha_items(S = .S, R = .R, item_index = itemdat$params$item_index)
+     alpha_a <- alpha_a[,1:ncol(rho_mat)]
+     alpha_i <- alpha_i[,1:ncol(rho_mat)]
+     itemdat$Si <- .S
+     itemdat$Ri <- .R
+     itemdat$means_i <- correct_means_mvrr(Sigma = itemdat$S$observed, means_i = itemdat$params$means,
+                                           means_x_a = means_i[1:nrow(rho_mat)], x_col = 1:nrow(rho_mat))
+
+     if(!is.null(wt_mat)){
+          for(i in 1:ncol(wt_mat)){
+               alpha_a <- cbind(alpha_a, c(composite_rel_matrix(r_mat = R_xy_a[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_a[1,1:ncol(rho_mat)],
+                                                                sd_vec = sd_obs_a[1:ncol(rho_mat)],
+                                                                wt_vec = wt_mat[,i]),
+
+                                           composite_rel_matrix(r_mat = R_xy_a[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_a[2,1:ncol(rho_mat)],
+                                                                sd_vec = rep(1, ncol(rho_mat)),
+                                                                wt_vec = wt_mat[,i])))
+
+               alpha_i <- cbind(alpha_i, c(composite_rel_matrix(r_mat = R_xy_i[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_i[1,1:ncol(rho_mat)],
+                                                                sd_vec = sd_obs_i[1:ncol(rho_mat)],
+                                                                wt_vec = wt_mat[,i]),
+
+                                           composite_rel_matrix(r_mat = R_xy_i[1:ncol(rho_mat),1:ncol(rho_mat)],
+                                                                rel_vec = alpha_i[2,1:ncol(rho_mat)],
+                                                                sd_vec = rep(1, ncol(rho_mat)),
+                                                                wt_vec = wt_mat[,i])))
+          }
+          colnames(alpha_a) <- colnames(alpha_i) <- var_names
+     }
+
+     if(is.null(keep_vars)){
+          keep_ids <- rep(TRUE, length(var_names))
+     }else{
+          keep_ids <- var_names %in% keep_vars
+
+          .item_index <- .item_names <- list()
+          for(i in keep_vars) .item_names[[i]] <- item_names[[i]]
+          .var_names <- colnames(itemdat$R$observed)
+          for(i in keep_vars) .item_index[[i]] <- which(.var_names %in% item_names[[i]])
+
+          export_ids <- c(keep_ids, rep(FALSE, length(.var_names) - length(keep_ids))) | (.var_names %in% unlist(.item_names))
+
+          itemdat$R <- lapply(itemdat$R, function(x) x[export_ids,export_ids])
+          itemdat$S <- lapply(itemdat$S, function(x) x[export_ids,export_ids])
+          itemdat$params$rel <- itemdat$params$rel[keep_ids]
+          itemdat$params$means <- itemdat$params$means[keep_ids]
+          itemdat$params$sds <- itemdat$params$sds[keep_ids]
+          itemdat$params$scale_names <- itemdat$params$scale_names[keep_ids]
+          itemdat$means_i <- itemdat$means_i[export_ids]
+
+          k_items_vec <- k_items_vec[keep_ids]
+          .var_names <- .var_names[keep_ids]
+          var_names <- var_names[keep_ids]
+
+          item_index <- .item_index
+          item_names <- .item_names
+     }
+
      ## Compile matrices of descriptive statistics and artifacts
-     desc_mat_obs <- rbind(`Applicant reliability` = rel_a,
-                           `Incumbent reliability` = rel_i,
-                           `u ratio` = u_obs,
-                           `Applicant SD` = sd_obs_a,
-                           `Incumbent SD` = sd_obs_i,
-                           `Applicant mean` = mean_obs_a,
-                           `Incumbent mean` = mean_obs_i)
+     desc_mat_obs <- rbind(`Applicant parallel-forms reliability` = rel_a[keep_ids],
+                           `Applicant unstandardized alpha` = alpha_a[1,keep_ids],
+                           `Applicant standardized alpha` = alpha_a[2,keep_ids],
 
-     desc_mat_true <- rbind(`u ratio` = u_true,
-                            `Applicant SD` = sd_true_a,
-                            `Incumbent SD` = sd_true_i,
-                            `Applicant mean` = mean_true_a,
-                            `Incumbent mean` = mean_true_i)
+                           `Incumbent parallel-forms reliability` = rel_i[keep_ids],
+                           `Incumbent unstandardized alpha` = alpha_i[1,keep_ids],
+                           `Incumbent standardized alpha` = alpha_i[2,keep_ids],
 
-     desc_mat_error <- rbind(`u ratio` = u_error,
-                             `Applicant SD` = sd_error_a,
-                             `Incumbent SD` = sd_error_i,
-                             `Applicant mean` = mean_error_a,
-                             `Incumbent mean` = mean_error_i)
+                           `u ratio` = u_obs[keep_ids],
+                           `Applicant SD` = sd_obs_a[keep_ids],
+                           `Incumbent SD` = sd_obs_i[keep_ids],
+                           `Applicant mean` = mean_obs_a[keep_ids],
+                           `Incumbent mean` = mean_obs_i[keep_ids])
+
+     desc_mat_true <- rbind(`u ratio` = u_true[keep_ids],
+                            `Applicant SD` = sd_true_a[keep_ids],
+                            `Incumbent SD` = sd_true_i[keep_ids],
+                            `Applicant mean` = mean_true_a[keep_ids],
+                            `Incumbent mean` = mean_true_i[keep_ids])
+
+     desc_mat_error <- rbind(`u ratio` = u_error[keep_ids],
+                             `Applicant SD` = sd_error_a[keep_ids],
+                             `Incumbent SD` = sd_error_i[keep_ids],
+                             `Applicant mean` = mean_error_a[keep_ids],
+                             `Incumbent mean` = mean_error_i[keep_ids])
 
      ## Name name variables in output arrays
+     R_xy_a <- R_xy_a[keep_ids,keep_ids]
+     R_xy_i <- R_xy_i[keep_ids,keep_ids]
      dimnames(R_xy_a) <- dimnames(R_xy_i) <- list(var_names, var_names)
      colnames(desc_mat_obs) <- colnames(desc_mat_true) <- colnames(desc_mat_error) <- var_names
+
+     keep_ids_long <- rep(keep_ids, 3)
 
      ## Assemble list of output information
      out <- list(na = Inf,
@@ -655,21 +713,36 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                  R_obs_a = R_xy_a,
                  R_obs_i = R_xy_i,
 
-                 S_complete_a = S_complete_a,
-                 S_complete_i = S_complete_i,
+                 S_complete_a = S_complete_a[keep_ids_long,keep_ids_long],
+                 S_complete_i = S_complete_i[keep_ids_long,keep_ids_long],
 
-                 R_complete_a = R_complete_a,
-                 R_complete_i = R_complete_i,
+                 R_complete_a = R_complete_a[keep_ids_long,keep_ids_long],
+                 R_complete_i = R_complete_i[keep_ids_long,keep_ids_long],
 
                  descriptives = list(observed = desc_mat_obs,
                                      true = desc_mat_true,
                                      error = desc_mat_error)
-                 )
+     )
+
+     if(show_items) out <- append(out, list(item_info = itemdat))
 
      class(out) <- c("psychmeta", "simulate_r")
      out
 }
 
+.rho_dims <- function(rho_params){
+     if(is.matrix(rho_params)){
+          if(nrow(rho_params) == ncol(rho_params)){
+               p <- nrow(rho_params)
+          }else{
+               stop("If rho parameters are provided as a matrix, that matrix must be square", call. = FALSE)
+          }
+     }else if(is.list(rho_params)){
+          p <- sqrt(length(rho_params) * 2 + .5 * (1 + sqrt(1 + 4 * length(rho_params) * 2)))
+          if(p != round(p)) stop("Number of rho distributions does not correspond to a valid number of lower-triangle correlations", call. = FALSE)
+     }
+     p
+}
 
 #' Simulate correlation databases of primary studies
 #'
@@ -686,6 +759,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #' @param sigma_params List of parameter distributions (or data-generation functions; see details) for standard deviations.
 #' @param rel_params List of parameter distributions (or data-generation functions; see details) for reliabilities.
 #' @param sr_params List of parameter distributions (or data-generation functions; see details) for selection ratios.
+#' @param k_items_params List of parameter distributions (or data-generation functions; see details) for the number of test items comprising each of the variables to be simulated (all are single-item variables by default).
 #' @param wt_params List of parameter distributions (or data-generation functions; see details) to create weights for use in forming composites.
 #' If multiple composites are formed, the list should be a list of lists, with the general format: \code{list(comp1_params = list(...params...), comp2_params = list(...params...), etc.)}.
 #' @param allow_neg_wt Logical scalar that determines whether negative weights should be allowed (\code{TRUE}) or not (\code{FALSE}).
@@ -738,22 +812,22 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #'                       c(mean = 2, sd = .25),
 #'                       cbind(value = c(1, 2, 3), weight = c(1, 2, 1))))
 #'
-#' ## Simultate with long format
+#' ## Simulate with long format
 #' simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
 #'                   rel_params = rel_params, sr_params = sr_params,
 #'                   sr_composite_params = sr_composite_params, wt_params = wt_params,
 #'                   var_names = c("X", "Y", "Z"), format = "long")
 #'
-#' ## Simultate with wide format
+#' ## Simulate with wide format
 #' simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
 #'                   rel_params = rel_params, sr_params = sr_params,
 #'                   sr_composite_params = sr_composite_params, wt_params = wt_params,
 #'                   var_names = c("X", "Y", "Z"), format = "wide")
 simulate_r_database <- function(k, n_params, rho_params,
                                 mu_params = 0, sigma_params = 1,
-                                rel_params, sr_params,
+                                rel_params = 1, sr_params = 1, k_items_params = 1,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL, var_names = NULL, composite_names = NULL,
-                                n_as_ni = FALSE, show_applicant = FALSE, keep_vars = "all", decimals = 2,
+                                n_as_ni = FALSE, show_applicant = FALSE, keep_vars = NULL, decimals = 2,
                                 format = "long", max_iter = 100){
      inputs <- as.list(environment())
      call <- match.call()
@@ -771,23 +845,54 @@ simulate_r_database <- function(k, n_params, rho_params,
           }
      }
 
+     p <- .rho_dims(rho_params = rho_params)
+
+     if(is.null(sigma_params)){
+          sigma_params <- as.list(rep(1, p))
+     }else if(!is.list(sigma_params) & length(sigma_params) == 1){
+          sigma_params <- as.list(rep(sigma_params, p))
+     }
+
+     if(is.null(mu_params)){
+          mu_params <- as.list(rep(1, p))
+     }else if(!is.list(mu_params) & length(mu_params) == 1){
+          mu_params <- as.list(rep(mu_params, p))
+     }
+
+     if(is.null(rel_params)){
+          rel_params <- as.list(rep(1, p))
+     }else if(!is.list(rel_params) & length(rel_params) == 1){
+          rel_params <- as.list(rep(rel_params, p))
+     }
+
+     if(is.null(sr_params)){
+          sr_params <- as.list(rep(1, p))
+     }else if(!is.list(sr_params) & length(sr_params) == 1 & unlist(sr_params)[1] == 1){
+          sr_params <- as.list(rep(1, p))
+     }
+
+     if(is.null(k_items_params)){
+          k_items_params <- as.list(rep(1, p))
+     }else if(!is.list(k_items_params) & length(k_items_params) == 1){
+          k_items_params <- as.list(rep(k_items_params, p))
+     }
+
      if((!is.null(wt_params) & is.null(sr_composite_params)) | (is.null(wt_params) & !is.null(sr_composite_params)))
           stop("'wt_params' and 'sr_composite_params' must both be NULL or non-NULL: One cannot be supplied without the other", call. = FALSE)
-     if(!is.null(wt_params)) if(!is.list(wt_params)) wt_params <- list(wt_params)
-     if(!is.null(sr_composite_params)) if(!is.list(sr_composite_params)) sr_composite_params <- list(sr_composite_params)
+     if(!is.null(wt_params)) if(!is.list(wt_params)) wt_params <- as.list(wt_params)
+     if(!is.null(sr_composite_params)) if(!is.list(sr_composite_params)) sr_composite_params <- as.list(sr_composite_params)
      if(!is.null(wt_params) & !is.null(sr_composite_params)){
           if(length(wt_params) != length(sr_composite_params)){
                stop("Lengths of the lists supplied for 'wt_params' and 'sr_composite_params' must be equal", call. = FALSE)
           }
      }
-     if(keep_vars[1] != "all" | length(keep_vars) > 1){
+     if(!is.null(keep_vars)){
           if(any(!(keep_vars %in% c(var_names, composite_names)))){
-               stop("If 'keep_vars' is a value other than 'all', all values in 'keep_vars' must correspond to variable names supplied as 'var_names' and 'composite_names' arguments", call. = FALSE)
+               stop("If 'keep_vars' is not NULL, all values in 'keep_vars' must correspond to variable names supplied as 'var_names' and 'composite_names' arguments", call. = FALSE)
           }
-     }
-
-     if(keep_vars[1] != "all" & length(keep_vars) == 1){
-          stop("If 'keep_vars' is a value other than 'all', 'keep_vars' must contain at least two variable names", call. = FALSE)
+          if(length(keep_vars) == 1){
+               stop("If 'keep_vars' is not NULL, 'keep_vars' must contain at least two variable names", call. = FALSE)
+          }
      }
 
      if(is.null(max_iter)) stop("'max_iter' cannot be NULL", call. = FALSE)
@@ -807,6 +912,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      if(length(sigma_params) > 1) sigma_as_desc <- lapply(sigma_params, .check_desc)
      rel_as_desc <- lapply(rel_params, .check_desc)
      sr_as_desc <- lapply(sr_params, .check_desc)
+     kitems_as_desc <- lapply(k_items_params, .check_desc)
 
      n_as_weights_rows <- .check_weights_rows(n_params)
      rho_as_weights_rows <- lapply(rho_params, .check_weights_rows)
@@ -814,6 +920,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      if(length(sigma_params) > 1) sigma_as_weights_rows <- lapply(sigma_params, .check_weights_rows)
      rel_as_weights_rows <- lapply(rel_params, .check_weights_rows)
      sr_as_weights_rows <- lapply(sr_params, .check_weights_rows)
+     kitems_as_weights_rows <- lapply(k_items_params, .check_weights_rows)
 
      n_as_weights_cols <- .check_weights_cols(n_params)
      rho_as_weights_cols <- lapply(rho_params, .check_weights_cols)
@@ -821,6 +928,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      if(length(sigma_params) > 1) sigma_as_weights_cols <- lapply(sigma_params, .check_weights_cols)
      rel_as_weights_cols <- lapply(rel_params, .check_weights_cols)
      sr_as_weights_cols <- lapply(sr_params, .check_weights_cols)
+     kitems_as_weights_cols <- lapply(k_items_params, .check_weights_cols)
 
      n_as_fun <- .check_fun(n_params)
      rho_as_fun <- lapply(rho_params, .check_fun)
@@ -828,6 +936,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      if(length(sigma_params) > 1) sigma_as_fun <- lapply(sigma_params, .check_fun)
      rel_as_fun <- lapply(rel_params, .check_fun)
      sr_as_fun <- lapply(sr_params, .check_fun)
+     kitems_as_fun <- lapply(k_items_params, .check_fun)
 
      n_vec <- c(sample_params(param_list = list(n_params), k = k, as_desc = list(n_as_desc), as_weights_rows = list(n_as_weights_rows),
                               as_weights_cols = list(n_as_weights_cols), as_fun = list(n_as_fun), param_type = "n", max_iter = max_iter))
@@ -835,6 +944,9 @@ simulate_r_database <- function(k, n_params, rho_params,
                               as_weights_cols = rel_as_weights_cols, as_fun = rel_as_fun, param_type = "rel", max_iter = max_iter)
      sr_mat <- sample_params(param_list = sr_params, k = k, as_desc = sr_as_desc, as_weights_rows = sr_as_weights_rows,
                              as_weights_cols = sr_as_weights_cols, as_fun = sr_as_fun, param_type = "sr", max_iter = max_iter)
+     kitems_mat <- sample_params(param_list = k_items_params, k = k, as_desc = kitems_as_desc, as_weights_rows = kitems_as_weights_rows,
+                             as_weights_cols = kitems_as_weights_cols, as_fun = kitems_as_fun, param_type = "k_items", max_iter = max_iter)
+
 
      if(is.numeric(mu_params) & length(mu_params) == 1){
           mu_mat <- rel_mat
@@ -920,6 +1032,7 @@ simulate_r_database <- function(k, n_params, rho_params,
                                   sigma_vec = sigma_mat[i,],
                                   rel_vec = c(rel_mat[i,]),
                                   sr_vec = c(sr_mat[i,]),
+                                  k_items_vec = c(kitems_mat[i,]),
                                   wt_mat = wt_mat_i,
                                   sr_composites = sr_composite_i)
      }
@@ -927,6 +1040,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      .simulate_r_sample_screen(n = param_list[[1]][["n"]], rho_mat = param_list[[1]][["rho_mat"]],
                                mu_vec = param_list[[1]][["mu_vec"]], sigma_vec = param_list[[1]][["sigma_vec"]],
                                rel_vec = param_list[[1]][["rel_vec"]], sr_vec = param_list[[1]][["sr_vec"]],
+                               k_items_vec = param_list[[1]][["k_items_vec"]],
                                wt_mat = param_list[[1]][["wt_mat"]], sr_composites = param_list[[1]][["sr_composites"]],
                                var_names = var_names, composite_names = composite_names)
 
@@ -942,29 +1056,27 @@ simulate_r_database <- function(k, n_params, rho_params,
           }
      }
 
-     progbar <- progress_bar$new(format = " Simulating correlation database [:bar] :percent est. time remaining: :eta",
-                                 total = length(param_list), clear = FALSE, width = options()$width)
-     sim_dat_list <- lapply(param_list, function(x){
+     progbar <- progress::progress_bar$new(format = " Simulating correlation database [:bar] :percent est. time remaining: :eta",
+                                           total = length(param_list), clear = FALSE, width = options()$width)
+     sim_dat_stats <- sim_dat_params <- list()
+     for(i in 1:length(param_list)){
           progbar$tick()
-          out_stats <- .simulate_r_sample_stats(n = x[["n"]], rho_mat = x[["rho_mat"]],
-                                                mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
-                                                rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
-                                                wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                                                var_names = var_names, composite_names = composite_names, obs_only = TRUE)
-          out_params <- .simulate_r_sample_params(n = Inf, rho_mat = x[["rho_mat"]],
+          x <- param_list[[i]]
+          sim_dat_stats[[i]] <- .simulate_r_sample_stats(n = x[["n"]], rho_mat = x[["rho_mat"]],
+                                                         mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
+                                                         rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
+                                                         k_items_vec = x[["k_items_vec"]],
+                                                         wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
+                                                         var_names = var_names, composite_names = composite_names, obs_only = TRUE, keep_vars = keep_vars)
+          sim_dat_params[[i]] <- .simulate_r_sample_params(n = Inf, rho_mat = x[["rho_mat"]],
                                                   mu_vec = x[["mu_vec"]], sigma_vec = x[["sigma_vec"]],
                                                   rel_vec = x[["rel_vec"]], sr_vec = x[["sr_vec"]],
+                                                  k_items_vec = x[["k_items_vec"]],
                                                   wt_mat = x[["wt_mat"]], sr_composites = x[["sr_composites"]],
-                                                  var_names = var_names, composite_names = composite_names)
-          list(stats = out_stats,
-               params = out_params)
-     })
-     sim_dat_stats <- lapply(sim_dat_list, function(x) x[["stats"]])
-     sim_dat_params <- lapply(sim_dat_list, function(x) x[["params"]])
-
-     if(keep_vars[1] != "all"){
-          var_names <- keep_vars
+                                                  var_names = var_names, composite_names = composite_names, keep_vars = keep_vars)
      }
+     var_names <- colnames(sim_dat_stats[[i]]$R_obs_i)
+     if(!is.null(keep_vars)) var_names <- keep_vars
 
      if(format == "wide"){
           dat_stats <- format_wide(x = sim_dat_stats, param = FALSE, var_names = var_names, show_applicant = show_applicant, decimals = decimals)
@@ -1026,6 +1138,11 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
                                                        sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5)))
                          invalid <- out_i < 3
                     }
+                    if(param_type == "k_items"){
+                         out_i[invalid] <- round(rnorm(n = sum(invalid), mean = param_list[[i]]["mean"],
+                                                       sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5)))
+                         invalid <- out_i < 1
+                    }
                     if(param_type == "rel" | param_type == "sr" | param_type == "p"){
                          out_i[invalid] <- .rbeta(n = sum(invalid), mean = param_list[[i]]["mean"],
                                                   sd = ifelse(any(names(param_list[[i]]) == "sd"), param_list[[i]]["sd"], param_list[[i]]["var"]^.5))
@@ -1076,7 +1193,10 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
 
                if(any(weights < 0)) stop("Parameters defined using weighted distributions cannot have negative weights", call. = FALSE)
 
+               if(param_type == "n" | param_type == "k_items") values <- round(values)
+
                if(param_type == "n") if(any(values < 3)) stop("n parameters defined using weighted distributions cannot be samller than 3", call. = FALSE)
+               if(param_type == "k_items") if(any(values < 1)) stop("k_items parameters defined using weighted distributions cannot be samller than 1", call. = FALSE)
                if(param_type == "rel") if(any(zapsmall(values) == 0)) stop("Reliability parameters defined using weighted distributions cannot be zero", call. = FALSE)
                if(param_type == "sr") if(any(zapsmall(values) == 0)) stop("Selection-ratio parameters defined using weighted distributions cannot be zero", call. = FALSE)
                if(param_type == "p") if(any(zapsmall(values) == 0)) stop("Proportion parameters defined using weighted distributions cannot be zero", call. = FALSE)
@@ -1095,6 +1215,10 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
                     out_i[invalid] <- param_list[[i]](sum(invalid))
 
                     if(param_type == "n"){
+                         out_i <- round(out_i)
+                         invalid <- out_i < 3
+                    }
+                    if(param_type == "k_items"){
                          out_i <- round(out_i)
                          invalid <- out_i < 3
                     }
@@ -1216,14 +1340,44 @@ format_wide <- function(x, param, var_names, show_applicant, decimals = 2){
      }
 
      if(show_applicant | param){
-          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives$observed[c(2, 1, 3, 5, 4, 7, 6),var_names], 1, function(x) list(x))))))
+          stat_names <- c("Incumbent parallel-forms reliability",
+                          "Incumbent unstandardized alpha",
+                          "Incumbent standardized alpha",
+
+                          "Applicant parallel-forms reliability",
+                          "Applicant unstandardized alpha",
+                          "Applicant standardized alpha",
+
+                          "u ratio",
+
+                          "Incumbent mean",
+                          "Applicant mean",
+
+                          "Incumbent SD",
+                          "Applicant SD")
+
+          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives$observed[stat_names,var_names], 1, function(x) list(x))))))
      }else{
-          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives$observed[c(2, 3, 5, 7),var_names], 1, function(x) list(x))))))
+          stat_names <- c("Incumbent parallel-forms reliability",
+                          "Incumbent unstandardized alpha",
+                          "Incumbent standardized alpha",
+
+                          "u ratio",
+
+                          "Incumbent mean",
+                          "Incumbent SD")
+
+          desc_mat <- t(simplify2array(lapply(x, function(x) unlist(apply(x$descriptives$observed[stat_names,var_names], 1, function(x) list(x))))))
+
      }
 
      desc_names <- colnames(desc_mat)
-     desc_names <- gsub(x = desc_names, pattern = "Applicant reliability.", replacement = "rxxa_")
-     desc_names <- gsub(x = desc_names, pattern = "Incumbent reliability.", replacement = "rxxi_")
+     desc_names <- gsub(x = desc_names, pattern = "Applicant parallel-forms reliability.", replacement = "parallel_rxxa_")
+     desc_names <- gsub(x = desc_names, pattern = "Applicant unstandardized alpha.", replacement = "raw_alpha_a_")
+     desc_names <- gsub(x = desc_names, pattern = "Applicant standardized alpha.", replacement = "std_alpha_a_")
+     desc_names <- gsub(x = desc_names, pattern = "Incumbent parallel-forms reliability.", replacement = "parallel_rxxi_")
+     desc_names <- gsub(x = desc_names, pattern = "Incumbent unstandardized alpha.", replacement = "raw_alpha_i_")
+     desc_names <- gsub(x = desc_names, pattern = "Incumbent standardized alpha.", replacement = "std_alpha_i_")
      if(param){
           desc_names <- gsub(x = desc_names, pattern = "u ratio.", replacement = "ux_")
      }else{
@@ -1235,12 +1389,10 @@ format_wide <- function(x, param, var_names, show_applicant, decimals = 2){
      desc_names <- gsub(x = desc_names, pattern = "Applicant mean.", replacement = "meanxa_")
      colnames(desc_mat) <- desc_names
 
-     rel_types <- setNames(as.data.frame(matrix("parallel", nrow = length(ni), ncol = length(var_names)), stringsAsFactors = FALSE),
-                           paste0("rel_type_", var_names))
      if(param){
-          cbind(data.frame(sample_id = 1:length(ni), ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat), rel_types)
+          data.frame(sample_id = 1:length(ni), ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat)
      }else{
-          cbind(data.frame(sample_id = 1:length(ni), round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals)), rel_types)
+          data.frame(sample_id = 1:length(ni), round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals))
      }
 }
 
@@ -1270,14 +1422,42 @@ format_long <- function(x, param, var_names, show_applicant, decimals = 2){
 
      .format_long <- function(dat, param){
           cor_vec_i <- dat$R_obs_i[var_names,var_names][lower.tri(dat$R_obs_i[var_names,var_names])]
+
           if(show_applicant | param){
                cor_vec_a <- dat$R_obs_a[var_names,var_names][lower.tri(dat$R_obs_a[var_names,var_names])]
-               desc_1 <- t(dat$descriptives$observed[c(2, 1, 3, 5, 4, 7, 6),cor_name_1])
-               desc_2 <- t(dat$descriptives$observed[c(2, 1, 3, 5, 4, 7, 6),cor_name_2])
+
+               stat_names <- c("Incumbent parallel-forms reliability",
+                               "Incumbent unstandardized alpha",
+                               "Incumbent standardized alpha",
+
+                               "Applicant parallel-forms reliability",
+                               "Applicant unstandardized alpha",
+                               "Applicant standardized alpha",
+
+                               "u ratio",
+
+                               "Incumbent mean",
+                               "Applicant mean",
+
+                               "Incumbent SD",
+                               "Applicant SD")
+
+               desc_1 <- t(dat$descriptives$observed[stat_names, cor_name_1])
+               desc_2 <- t(dat$descriptives$observed[stat_names, cor_name_2])
           }else{
                cor_vec_a <- NULL
-               desc_1 <- t(dat$descriptives$observed[c(2, 3, 5, 7),cor_name_1])
-               desc_2 <- t(dat$descriptives$observed[c(2, 3, 5, 7),cor_name_2])
+
+               stat_names <- c("Incumbent parallel-forms reliability",
+                               "Incumbent unstandardized alpha",
+                               "Incumbent standardized alpha",
+
+                               "u ratio",
+
+                               "Incumbent mean",
+                               "Incumbent SD")
+
+               desc_1 <- t(dat$descriptives$observed[stat_names,cor_name_1])
+               desc_2 <- t(dat$descriptives$observed[stat_names,cor_name_2])
           }
 
           rownames(desc_1) <- rownames(desc_2) <- NULL
@@ -1319,8 +1499,12 @@ format_long <- function(x, param, var_names, show_applicant, decimals = 2){
      na <- unlist(lapply(x, function(x) rep(x$na, length(cor_name_1))))
 
      desc_names <- colnames(desc_1)
-     desc_names <- gsub(x = desc_names, pattern = "Applicant reliability", replacement = "rxxa")
-     desc_names <- gsub(x = desc_names, pattern = "Incumbent reliability", replacement = "rxxi")
+     desc_names <- gsub(x = desc_names, pattern = "Applicant parallel-forms reliability", replacement = "parallel_rxxa")
+     desc_names <- gsub(x = desc_names, pattern = "Applicant unstandardized alpha", replacement = "raw_alpha_xa")
+     desc_names <- gsub(x = desc_names, pattern = "Applicant standardized alpha", replacement = "std_alpha_xa")
+     desc_names <- gsub(x = desc_names, pattern = "Incumbent parallel-forms reliability", replacement = "parallel_rxxi")
+     desc_names <- gsub(x = desc_names, pattern = "Incumbent unstandardized alpha", replacement = "raw_alpha_xi")
+     desc_names <- gsub(x = desc_names, pattern = "Incumbent standardized alpha", replacement = "std_alpha_xi")
      if(param){
           desc_names <- gsub(x = desc_names, pattern = "u ratio", replacement = "ux")
      }else{
@@ -1333,13 +1517,12 @@ format_long <- function(x, param, var_names, show_applicant, decimals = 2){
      colnames(desc_1) <- desc_names
      colnames(desc_2) <- gsub(x = desc_names, pattern = "x", replacement = "y")
 
-     rel_types <- setNames(as.data.frame(matrix("parallel", nrow = length(sample_id), ncol = 2), stringsAsFactors = FALSE), c("rxx_type", "ryy_type"))
      if(param){
-          cbind(data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name, ni = ni, na = na,
-                     rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), rel_types)
+          data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name, ni = ni, na = na,
+                     rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2)
      }else{
-          cbind(data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name,
-                           round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals)), rel_types)
+          data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name,
+                     round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals))
      }
 }
 
@@ -1380,13 +1563,20 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
 
           if(study_wise){
                if(show_applicant){
-                    art_names_stat <- c("ux_local", "ux_external", "rxxi", "rxxa",
-                                        "uy_local", "uy_external", "ryyi", "ryya")[c(sparify_u, sparify_u, sparify_rel, sparify_rel, sparify_u, sparify_u, sparify_rel, sparify_rel)]
+                    art_logic_stat <- c(rep(sparify_u, 2), rep(sparify_rel, 6),
+                                        rep(sparify_u, 2), rep(sparify_rel, 6))
+                    art_names_stat <- c("ux_local", "ux_external", "parallel_rxxi", "parallel_rxxa", "raw_alpha_xi", "std_alpha_xi", "raw_alpha_xa", "std_alpha_xa",
+                                        "uy_local", "uy_external", "parallel_ryyi", "parallel_ryya", "raw_alpha_yi", "std_alpha_yi", "raw_alpha_ya", "std_alpha_ya")[art_logic_stat]
                }else{
-                    art_names_stat <- c("ux_local", "ux_external", "rxxi",
-                                        "uy_local", "uy_external", "ryyi")[c(sparify_u, sparify_u, sparify_rel, sparify_u, sparify_u, sparify_rel)]
+                    art_logic_stat <- c(rep(sparify_u, 2), rep(sparify_rel, 3),
+                                        rep(sparify_u, 2), rep(sparify_rel, 3))
+                    art_names_stat <- c("ux_local", "ux_external", "parallel_rxxi", "raw_alpha_xi", "std_alpha_xi",
+                                        "uy_local", "uy_external", "parallel_ryyi", "raw_alpha_yi", "std_alpha_yi")[art_logic_stat]
                }
-               art_names_param <- c("ux", "rxxi", "rxxa", "uy", "ryyi", "ryya")[c(sparify_u, sparify_rel, sparify_rel, sparify_u, sparify_rel, sparify_rel)]
+               art_logic_param <- c(rep(sparify_u, 2), rep(sparify_rel, 6),
+                                    rep(sparify_u, 2), rep(sparify_rel, 6))
+               art_names_param <- c("ux", "parallel_rxxi", "parallel_rxxa", "raw_alpha_xi", "std_alpha_xi", "raw_alpha_xa", "std_alpha_xa",
+                                    "uy", "parallel_ryyi", "parallel_ryya", "raw_alpha_yi", "std_alpha_yi", "raw_alpha_ya", "std_alpha_ya")[art_logic_stat]
                delete_id <- sample(x = 1:k, size = round(prop_missing * k), replace = FALSE)
                delete_id <- data_obj$statistics$sample_id %in% delete_id
                data_obj$statistics[delete_id,art_names_stat] <- NA
@@ -1403,10 +1593,10 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                               art_i_stat <- c("ux_local", "ux_external")
                          }else{
                               if(show_applicant){
-                                   art_i_param <- art_i_stat <- c("rxxi", "rxxa")
+                                   art_i_param <- art_i_stat <- c("parallel_rxxi", "parallel_rxxa", "raw_alpha_xi", "std_alpha_xi", "raw_alpha_xa", "std_alpha_xa")
                               }else{
-                                   art_i_param <- c("rxxi", "rxxa")
-                                   art_i_stat <- "rxxi"
+                                   art_i_param <- c("parallel_rxxi", "parallel_rxxa", "raw_alpha_xi", "std_alpha_xi", "raw_alpha_xa", "std_alpha_xa")
+                                   art_i_stat <- c("parallel_rxxi", "raw_alpha_xi", "std_alpha_xi")
                               }
                          }
                          for(ij in art_i_stat) data_obj$statistics[delete_id,ij] <- NA
@@ -1418,10 +1608,10 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                               art_i_stat <- c("uy_local", "uy_external")
                          }else{
                               if(show_applicant){
-                                   art_i_param <- art_i_stat <- c("ryyi", "ryya")
+                                   art_i_param <- art_i_stat <- c("parallel_ryyi", "parallel_ryya", "raw_alpha_yi", "std_alpha_yi", "raw_alpha_ya", "std_alpha_ya")
                               }else{
-                                   art_i_param <- c("ryyi", "ryya")
-                                   art_i_stat <- "ryyi"
+                                   art_i_param <- c("parallel_ryyi", "parallel_ryya", "raw_alpha_yi", "std_alpha_yi", "raw_alpha_ya", "std_alpha_ya")
+                                   art_i_stat <- c("parallel_ryyi", "raw_alpha_yi", "std_alpha_yi")
                               }
                          }
                          for(ij in art_i_stat) data_obj$statistics[delete_id,ij] <- NA
@@ -1431,22 +1621,27 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
           }
      }else{
           k <- nrow(data_obj$statistics)
-          qx_names <- gsub(x = name_vec[grepl(x = name_vec, pattern = "rxxi_")], pattern = "rxxi_", replacement = "")
+          qx_names <- gsub(x = name_vec[grepl(x = name_vec, pattern = "parallel_rxxi_")], pattern = "parallel_rxxi_", replacement = "")
           ux_names <- gsub(x = name_vec[grepl(x = name_vec, pattern = "ux_local_")], pattern = "ux_local_", replacement = "")
           variables <- qx_names[qx_names %in% ux_names]
 
-          show_applicant <- any(grepl(x = name_vec, pattern = "rxxa_")) & any(grepl(x = name_vec, pattern = "na")) & any(grepl(x = name_vec, pattern = "rxya_"))
+          show_applicant <- any(grepl(x = name_vec, pattern = "parallel_rxxa_")) & any(grepl(x = name_vec, pattern = "na")) & any(grepl(x = name_vec, pattern = "rxya_"))
 
           art_names <- c("r", "u")[c(sparify_rel, sparify_u)]
           if(study_wise){
                delete_id <- sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
                for(j in variables){
                     if(show_applicant){
-                         art_names_stat <- paste(c("ux_local", "ux_external", "rxxi", "rxxa")[c(sparify_u, sparify_u, sparify_rel, sparify_rel)], j, sep = "_")
+                         art_logic_stat <- c(rep(sparify_u, 2), rep(sparify_rel, 6))
+                         art_names_stat <- paste(c("ux_local", "ux_external", "parallel_rxxi", "parallel_rxxa",
+                                                   "raw_alpha_a", "std_alpha_a", "raw_alpha_i", "std_alpha_i")[art_logic_stat], j, sep = "_")
                     }else{
-                         art_names_stat <- paste(c("ux_local", "ux_external", "rxxi")[c(sparify_u, sparify_u, sparify_rel)], j, sep = "_")
+                         art_logic_stat <- c(rep(sparify_u, 2), rep(sparify_rel, 3))
+                         art_names_stat <- paste(c("ux_local", "ux_external", "parallel_rxxi", "raw_alpha_i", "std_alpha_i")[art_logic_stat], j, sep = "_")
                     }
-                    art_names_param <- paste(c("ux", "rxxi", "rxxa")[c(sparify_u, sparify_rel, sparify_rel)], variables, sep = "_")
+                    art_logic_param <- c(rep(sparify_u, 2), rep(sparify_rel, 6))
+                    art_names_param <- paste(c("ux_local", "ux_external", "parallel_rxxi", "parallel_rxxa",
+                                               "raw_alpha_a", "std_alpha_a", "raw_alpha_i", "std_alpha_i")[art_logic_stat], j, sep = "_")
                     data_obj$statistics[delete_id,art_names_stat] <- NA
                     data_obj$parameters[delete_id,art_names_param] <- NA
                }
@@ -1459,10 +1654,10 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                               art_i_stat <- paste0(c("ux_local_", "ux_external_"), j)
                          }else{
                               if(show_applicant){
-                                   art_i_param <- art_i_stat <- paste0(c("rxxi_", "rxxa_"), j)
+                                   art_i_param <- art_i_stat <- paste0(c("parallel_rxxi_", "parallel_rxxa_", "raw_alpha_a_", "std_alpha_a_", "raw_alpha_i_", "std_alpha_i_"), j)
                               }else{
-                                   art_i_param <- paste0(c("rxxi_", "rxxa_"), j)
-                                   art_i_stat <- paste0("rxxi_", j)
+                                   art_i_param <- paste0(c("parallel_rxxi_", "parallel_rxxa_", "raw_alpha_a_", "std_alpha_a_", "raw_alpha_i_", "std_alpha_i_"), j)
+                                   art_i_stat <- paste0(c("parallel_rxxi_", "raw_alpha_i_", "std_alpha_i_"), j)
                               }
                          }
                          for(ij in art_i_stat) data_obj$statistics[delete_id,ij] <- NA
@@ -1546,5 +1741,55 @@ merge_simdat_r <- function(...){
 }
 
 
+
+.subset_sample_r <- function(simdat, keep_vars = NULL, delete_items = FALSE){
+
+     if(!is.null(keep_vars)){
+          var_names <- colnames(simdat$R_obs_a)
+
+          keep_ids <- var_names %in% keep_vars
+
+          if(delete_items) simdat$item_info <- NULL
+
+          if(!is.null(simdat$item_info)){
+               item_index <- simdat$item_info$item_index
+               item_names <- simdat$item_info$item_names
+
+               .item_index <- .item_names <- list()
+               for(i in keep_vars) .item_names[[i]] <- item_names[[i]]
+               .var_names <- colnames(simdat$item_info$data$observed)
+               for(i in keep_vars) .item_index[[i]] <- which(.var_names %in% item_names[[i]])
+
+               export_ids <- c(keep_ids, rep(FALSE, length(.var_names) - length(keep_ids))) | (.var_names %in% unlist(.item_names))
+
+               if(!is.null(simdat$item_info$R)){
+                    simdat$item_info$R <- lapply(simdat$item_info$R, function(x) x[export_ids,export_ids])
+                    simdat$item_info$S <- lapply(simdat$item_info$S, function(x) x[export_ids,export_ids])
+                    simdat$item_info$params$rel <- simdat$item_info$params$rel[keep_ids]
+                    simdat$item_info$params$means <- simdat$item_info$params$means[keep_ids]
+                    simdat$item_info$params$sds <- simdat$item_info$params$sds[keep_ids]
+                    simdat$item_info$params$scale_names <- simdat$item_info$params$scale_names[keep_ids]
+                    simdat$item_info$means_i <- simdat$item_info$means_i[export_ids]
+               }else{
+                    simdat$item_info$data <- lapply(simdat$item_info$data, function(x) x[,export_ids])
+               }
+
+               simdat$item_info$item_index <- .item_index
+               simdat$item_info$item_names <- .item_names
+          }
+
+          simdat$R_obs_a <- simdat$R_obs_a[keep_ids,keep_ids]
+          simdat$R_obs_i <- simdat$R_obs_i[keep_ids,keep_ids]
+
+          keep_ids_long <- rep(keep_ids, 3)
+          simdat$S_complete_a <- simdat$S_complete_a[keep_ids_long,keep_ids_long]
+          simdat$S_complete_i <- simdat$S_complete_i[keep_ids_long,keep_ids_long]
+          simdat$descriptives <- lapply(simdat$descriptives, function(x) x[,keep_ids])
+
+          if(!is.null(simdat$data)) simdat$data <- lapply(simdat$data, function(x) x[,keep_ids])
+     }
+
+     simdat
+}
 
 

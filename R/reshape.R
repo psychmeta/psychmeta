@@ -168,10 +168,9 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 #' es_design[lower.tri(es_design)] <- c("rxyi_X_Y", "rxyi_X_Z", "rxyi_Y_Z")
 #' rownames(es_design) <- colnames(es_design) <- var_names
 #' n_design <- "ni"
-#' other_design <- cbind(rxxi = paste0("rxxi_", var_names),
+#' other_design <- cbind(rxxi = paste0("parallel_rxxi_", var_names),
 #'                       ux_local = paste0("ux_local_", var_names),
-#'                       ux_external = paste0("ux_external_", var_names),
-#'                       rel_type = paste0("rel_type_", var_names))
+#'                       ux_external = paste0("ux_external_", var_names))
 #' rownames(other_design) <- var_names
 #'
 #' ## Reshape the data to "long" format

@@ -5,16 +5,17 @@
 \title{Convert effect sizes and compute confidence intervals}
 \usage{
 convert_es(es, input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F",
-  "chisq", "p.chisq", "or", "lor", "z"), output_es = c("r", "d"), n1 = NULL,
-  n2 = NULL, df1 = NULL, df2 = NULL, correct_bias = TRUE,
+  "chisq", "p.chisq", "or", "lor", "Fisherz", "A", "auc", "cles"),
+  output_es = c("r", "d", "A", "auc", "cles"), n1 = NULL, n2 = NULL,
+  df1 = NULL, df2 = NULL, sd1 = NULL, sd2 = NULL, correct_bias = TRUE,
   conf_level = 0.95)
 }
 \arguments{
 \item{es}{Vector of effect sizes to convert.}
 
-\item{input_es}{Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, and Fisher \emph{z}.}
+\item{input_es}{Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).}
 
-\item{output_es}{Metric of output effect sizes. Currently supports correlations and Cohen's \emph{d}.}
+\item{output_es}{Metric of output effect sizes. Currently supports correlations, Cohen's \emph{d} values, and common language effect sizes (CLES, A, AUC).}
 
 \item{n1}{Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.}
 
@@ -23,6 +24,10 @@ convert_es(es, input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F",
 \item{df1}{Vector of input test statistic degrees of freedom (for \emph{t} and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \emph{F}).}
 
 \item{df2}{Vector of input test statistic within-group degrees of freedom (for \emph{F}).}
+
+\item{sd1}{Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.}
+
+\item{sd2}{Vector of standard deviations of group 2 of the two groups being contrasted.}
 
 \item{correct_bias}{Logical argument that determines whether to correct output effect sizes and error-variance estimates for small-sample bias (\code{TRUE}) or not (\code{FALSE}) when computing confidence intervals.}
 
@@ -56,9 +61,10 @@ convert_es(es = 4.37, input_es="or", output_es="d", n1=100, n2=100)
 convert_es(es = 1.47, input_es="lor", output_es="r", n1=100, n2=100)
 convert_es(es = 1.47, input_es="lor", output_es="d", n1=100, n2=100)
 
-## To simply compute a confidence interval for r or d:
+## To simply compute a confidence interval for r, d, or A:
 convert_es(es = .3,  input_es="r", output_es="r", n1=100)
 convert_es(es = .8,  input_es="d", output_es="d", n1=64, n2=36)
+convert_es(es = .8,  input_es="A", output_es="A", n1=64, n2=36)
 }
 \references{
 Chinn, S. (2000).
@@ -69,7 +75,11 @@ Lipsey, M. W., & Wilson, D. B. (2001).
 \emph{Practical meta-analysis}.
 Thousand Oaks, CA: SAGE.
 
-#' Schmidt, F. L., & Hunter, J. E. (2015).
+Ruscio, J. (2008). 
+A probability-based measure of effect size: Robustness to base rates and other factors. 
+\emph{Psychological Methods, 13}(1), 19–30. \url{https://doi.org/10.1037/1082-989X.13.1.19}
+
+Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
 Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}
 }
