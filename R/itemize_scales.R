@@ -44,7 +44,7 @@ itemize_scales <- function(k_vec, R_scales, rel_vec,
      comb_var <- comb_cov %*% wt_mat
      S_complete <- cbind(rbind(comb_var, t(comb_cov)), rbind(comb_cov, S))
      rownames(S_complete) <- colnames(S_complete) <- c(var_names, item_names)
-     R_complete <- cov2cor(S_complete)
+     R_complete <- suppressWarnings(cov2cor(S_complete))
      item_index_complete <- lapply(item_index, function(x) x + length(k_vec))
 
      means_complete <- c(mean_vec, item_means)

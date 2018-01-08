@@ -168,6 +168,7 @@ The automatic compositing features are employed when \code{sample_id}s and/or co
 When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
 }
 \examples{
+\dontrun{
 ## The 'ma_d' function can compute multi-construct bare-bones meta-analyes:
 ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 
@@ -180,6 +181,7 @@ ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
 ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
      ryy = ryyi, correct_rr_y = FALSE,
      construct_y = construct, data = data_d_meas_multi)
+}
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).

@@ -72,6 +72,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
                                        mu_mat = mu_mat, sigma_mat = sigma_mat,
                                        rel_mat = rel_mat, sr_vec = sr_vec, k_items_vec = k_items_vec,
                                        group_names = group_names, var_names = var_names,
+                                       sr_composites = sr_composites, composite_names = composite_names, wt_mat = wt_mat,
                                        show_applicant = TRUE, diffs_as_obs = diffs_as_obs)
 
      if(all(n_vec < 1)){
@@ -79,12 +80,14 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
                                            mu_mat = args$mu_mat, sigma_mat = args$sigma_mat,
                                            rel_mat = args$rel_mat, sr_vec = args$sr_vec, k_items_vec = args$k_items_vec,
                                            group_names = args$group_names, var_names = args$var_names,
+                                           sr_composites = args$sr_composites, composite_names = args$composite_names, wt_mat = args$wt_mat,
                                            show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }else{
           out <- .simulate_d_sample_stats(n_vec = args$n_vec, rho_mat_list = args$rho_mat_list,
                                           mu_mat = args$mu_mat, sigma_mat = args$sigma_mat,
                                           rel_mat = args$rel_mat, sr_vec = args$sr_vec, k_items_vec = args$k_items_vec,
                                           group_names = args$group_names, var_names = args$var_names,
+                                          sr_composites = args$sr_composites, composite_names = args$composite_names, wt_mat = args$wt_mat,
                                           show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }
 
@@ -149,6 +152,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
 
      if(any(zapsmall(k_items_vec) != round(k_items_vec))) stop("k_items_vec must consist of whole numbers", call. = FALSE)
      k_items_vec <- round(k_items_vec)
+     if(length(k_items_vec) == 1) k_items_vec <- rep(k_items_vec, ncol(rho_mat_list[[1]]))
 
      if(length(diffs_as_obs) > 1) warning("diffs_as_obs must be a scalar: only the first element used", call. = FALSE)
      if(!is.logical(diffs_as_obs)) stop("diffs_as_obs must be logical", call. = FALSE)
@@ -199,7 +203,10 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
      groups <- rownames(x)
      vars <- colnames(x)
 
-     mat1 <- mat2 <- gather(data.frame(group = groups, x), -group, key = y_name, value = stat_name)
+     # mat1 <- mat2 <- gather(data.frame(group = groups, x), -group, key = y_name, value = stat_name)
+     mat1 <- mat2 <- data.frame(group = rep(groups, ncol(x)),
+                                y_name = c(matrix(vars, nrow(x), ncol(x), T)),
+                                stat_name = c(unlist(x)))
 
      colnames(mat1)[1] <- "group1"
      colnames(mat2)[1] <- "group2"
@@ -221,7 +228,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
 }
 
 
-.compute_d_internal <- function(dat = NULL, means = NULL, sds = NULL, p = NULL, applicant, groups_on_cols = FALSE){
+.compute_d_internal <- function(dat = NULL, means = NULL, sds = NULL, n = NULL, p = NULL, applicant, groups_on_cols = FALSE){
      if(!is.null(dat)){
           means <- t(simplify2array(by(dat[,-1], dat[,1], function(x) apply(x, 2, mean))))
           sds <- t(simplify2array(by(dat[,-1], dat[,1], function(x) apply(x, 2, sd))))
@@ -231,7 +238,10 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
           if(groups_on_cols){
                means <- t(means)
                sds <- t(sds)
-               p <- t(p)
+               if(!is.null(p)) p <- t(p)
+               if(!is.null(n)) n <- t(n)
+          }else{
+               p <- NULL
           }
      }
 
@@ -364,73 +374,70 @@ append_dmat <- function(di_mat, da_mat,
 
      if(!diffs_as_obs) sigma_mat <- sigma_mat / rel_mat^.5
 
+     .sr_composites <- NULL
+     if(!is.null(composite_names)) .sr_composites <- rep(1, length(composite_names))
+
      group_list <- list()
      obs_a <- true_a <- error_a <- items_a <- NULL
+     for(i in 1:length(n_vec)){
+
+          group_list[[i]] <- .simulate_psych_d(n = n_vec[i], rho_mat = rho_mat_list[[i]],
+                                               mu_vec = mu_mat[i,], sigma_vec = sigma_mat[i,],
+                                               wt_mat = wt_mat, sr_composites = .sr_composites,
+                                               rel_vec = rel_mat[i,], sr_vec = rep(1, nrow(rel_mat)),
+                                               k_items_vec = k_items_vec,
+                                               var_names = var_names, composite_names = composite_names)
+
+          obs_a <- rbind(obs_a, data.frame(group = group_names[i], group_list[[i]]$obs_scores_a))
+          true_a <- rbind(true_a, data.frame(group = group_names[i], group_list[[i]]$true_scores_a))
+          error_a <- rbind(error_a, data.frame(group = group_names[i], group_list[[i]]$error_scores_a))
+     }
+
+     .sr_vec <- c(sr_vec, rep(1, sum(k_items_vec)), sr_composites)
+
+     ## Create selection vector
+     select_ids <- which(.sr_vec < 1)
+     cut_vec <- rep(NA, ncol(obs_a) - 1)
+     select_vec <- rep(TRUE, nrow(obs_a))
+     for(i in select_ids){
+          cut_vec[i] <- sort(obs_a[,-1][,i], decreasing = TRUE)[nrow(obs_a) * .sr_vec[i]]
+          select_vec <- select_vec & obs_a[,-1][,i] >= cut_vec[i]
+     }
+
+     obs_a <- obs_a[,c(TRUE, group_list[[1]]$scale_ids)]
+     true_a <- true_a[,c(TRUE, group_list[[1]]$scale_ids)]
+     error_a <- error_a[,c(TRUE, group_list[[1]]$scale_ids)]
+
      for(i in 1:length(n_vec)){
           group_list[[i]] <- .simulate_r_sample_stats(n = n_vec[i], rho_mat = rho_mat_list[[i]],
                                                       mu_vec = mu_mat[i,], sigma_vec = sigma_mat[i,],
                                                       wt_mat = wt_mat, sr_composites = sr_composites,
-                                                      rel_vec = rel_mat[i,], sr_vec = rep(1, nrow(rel_mat)),
+                                                      rel_vec = rel_mat[i,], sr_vec = sr_vec,
                                                       k_items_vec = k_items_vec,
                                                       var_names = var_names, composite_names = composite_names,
-                                                      show_items = TRUE)
-
-          last_col <- ncol(group_list[[i]]$data$observed)
-          dat_list <- list(obs = group_list[[i]]$data$observed[,-last_col],
-                           true = group_list[[i]]$data$true[,-last_col],
-                           error = group_list[[i]]$data$error[,-last_col])
-
-
-          obs_a <- rbind(obs_a, data.frame(group = group_names[i], dat_list[["obs"]]))
-          true_a <- rbind(true_a, data.frame(group = group_names[i], dat_list[["true"]]))
-          error_a <- rbind(error_a, data.frame(group = group_names[i], dat_list[["error"]]))
+                                                      show_items = TRUE, d_sim_info = append(group_list[[i]],
+                                                                                             list(cut_vec = cut_vec)))
 
           items_a <- rbind(items_a, data.frame(group = group_names[i], group_list[[i]]$item_info$data$observed))
           item_index <- group_list[[i]]$item_info$item_index
           group_list[[i]]$item_info <- NULL
-          rm(dat_list)
      }
      names(group_list) <- group_names
      obs_a$group <- true_a$group <- error_a$group <- factor(obs_a$group, levels = group_names)
      var_names <- colnames(obs_a)[-1]
 
-     ## Create selection vector
-     select_ids <- which(sr_vec < 1) + 1
-     select_vec <- rep(TRUE, nrow(obs_a))
-     for(i in select_ids)
-          select_vec <- select_vec & obs_a[,i] >= sort(obs_a[,i], decreasing = TRUE)[nrow(obs_a) * sr_vec[i-1]]
-
-     da_obs <- .compute_d_internal(dat = obs_a, applicant = TRUE)
-     da_true <- .compute_d_internal(dat = true_a, applicant = TRUE)
-     da_error <- .compute_d_internal(dat = error_a, applicant = TRUE)
-
      obs_i <- obs_a[select_vec,]
      true_i <- true_a[select_vec,]
      error_i <- error_a[select_vec,]
-
-     di_obs <- .compute_d_internal(dat = obs_i, applicant = FALSE)
-     di_true <- .compute_d_internal(dat = true_i, applicant = FALSE)
-     di_error <- .compute_d_internal(dat = error_i, applicant = FALSE)
 
      ryya <- diag(cor(obs_a[,-1], true_a[,-1]))^2
      ryyi <- diag(cor(obs_i[,-1], true_i[,-1]))^2
 
      ra_obs <- cor(obs_a[,-1])
-     ra_true <- cor(true_a[,-1])
-     ra_error <- suppressWarnings(cor(error_a[,-1]))
-
      ra_obs <- cor(obs_a[,-1])
-     ra_true <- cor(true_a[,-1])
-     ra_error <- suppressWarnings(cor(error_a[,-1]))
 
-     ra_obs_group <- by(obs_a, obs_a$group, function(x) cor(x[,-1]))
-     ri_obs_group <- by(obs_i, obs_i$group, function(x) cor(x[,-1]))
-
-     ra_true_group <- suppressWarnings(by(true_a, true_a$group, function(x) cor(x[,-1])))
-     ri_true_group <- suppressWarnings(by(true_i, true_i$group, function(x) cor(x[,-1])))
-
-     ra_error_group <- suppressWarnings(by(error_a, error_a$group, function(x) cor(x[,-1])))
-     ri_error_group <- suppressWarnings(by(error_i, error_i$group, function(x) cor(x[,-1])))
+     ra_obs_group <- lapply(group_list, function(x) x$R_obs_a)
+     ri_obs_group <- lapply(group_list, function(x) x$R_obs_i)
 
      dat_a <- cbind(obs_a, true_a[,-1], error_a[,-1])
      dat_i <- cbind(obs_i, true_i[,-1], error_i[,-1])
@@ -440,9 +447,22 @@ append_dmat <- function(di_mat, da_mat,
      sa <- cov(dat_a[,-1])
      si <- cov(dat_i[,-1])
 
-     sa_group <- lapply(by(dat_a, dat_a$group, function(x) cov(x[,-1])), function(x) x)
-     si_group <- lapply(by(dat_i, obs_i$group, function(x) cov(x[,-1])), function(x) x)
+     sa_group <- lapply(group_list, function(x){x <- x$S_complete_a; dimnames(x) <- list(colnames(dat_a)[-1], colnames(dat_a)[-1]); x})
+     si_group <- lapply(group_list, function(x){x <- x$S_complete_i; dimnames(x) <- list(colnames(dat_a)[-1], colnames(dat_a)[-1]); x})
      names(sa_group) <- names(sa_group) <- paste("group =", group_names)
+
+     var_names_temp <- paste0("Obs_", var_names)
+     sa_obs_group <- lapply(group_list, function(x){
+          out <- x$S_complete_a[var_names_temp,var_names_temp]
+          dimnames(out) <- list(var_names, var_names)
+          out
+          })
+     si_obs_group <- lapply(group_list, function(x){
+          out <- x$S_complete_i[var_names_temp,var_names_temp]
+          dimnames(out) <- list(var_names, var_names)
+          out
+     })
+     rm(var_names_temp)
 
      ## Extract vectors of overall descriptives
      sdyi_vec <- diag(si)^.5
@@ -476,55 +496,79 @@ append_dmat <- function(di_mat, da_mat,
      u_vec_true <- u_vec[grepl(x = names(u_vec), pattern = "_true")]
      u_vec_error <- u_vec[grepl(x = names(u_vec), pattern = "_error")]
 
-
      ## Extract matrices of subgroup descriptives
-     sdyi_mat <- simplify2array(lapply(as.list(1:length(sa_group)), function(x) diag(si_group[[x]])^.5))
-     sdya_mat <- simplify2array(lapply(as.list(1:length(sa_group)), function(x) diag(sa_group[[x]])^.5))
-     meanyi_mat <- simplify2array(by(1:nrow(obs_i), obs_i$group, function(x) apply(dat_i[x,-1], 2, mean)))
-     meanya_mat <- simplify2array(by(1:nrow(obs_a), obs_a$group, function(x) apply(dat_a[x,-1], 2, mean)))
-     u_mat <- sdyi_mat / sdya_mat
-
      ## Organize incumbent SDs
-     sdyi_mat_obs <- sdyi_mat[grepl(x = rownames(sdyi_mat), pattern = "_obs"),]
-     sdyi_mat_true <- sdyi_mat[grepl(x = rownames(sdyi_mat), pattern = "_true"),]
-     sdyi_mat_error <- sdyi_mat[grepl(x = rownames(sdyi_mat), pattern = "_error"),]
+     sdyi_mat_obs <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Incumbent SD",]))
+     sdyi_mat_true <- simplify2array(lapply(group_list, function(x) x$descriptives$true["Incumbent SD",]))
+     sdyi_mat_error <- simplify2array(lapply(group_list, function(x) x$descriptives$error["Incumbent SD",]))
 
      ## Organize applicant SDs
-     sdya_mat_obs <- sdya_mat[grepl(x = rownames(sdya_mat), pattern = "_obs"),]
-     sdya_mat_true <- sdya_mat[grepl(x = rownames(sdya_mat), pattern = "_true"),]
-     sdya_mat_error <- sdya_mat[grepl(x = rownames(sdya_mat), pattern = "_error"),]
+     sdya_mat_obs <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Applicant SD",]))
+     sdya_mat_true <- simplify2array(lapply(group_list, function(x) x$descriptives$true["Applicant SD",]))
+     sdya_mat_error <- simplify2array(lapply(group_list, function(x) x$descriptives$error["Applicant SD",]))
 
      ## Organize incumbent means
-     meanyi_mat_obs <- meanyi_mat[grepl(x = rownames(meanyi_mat), pattern = "_obs"),]
-     meanyi_mat_true <- meanyi_mat[grepl(x = rownames(meanyi_mat), pattern = "_true"),]
-     meanyi_mat_error <- meanyi_mat[grepl(x = rownames(meanyi_mat), pattern = "_error"),]
+     meanyi_mat_obs <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Incumbent mean",]))
+     meanyi_mat_true <- simplify2array(lapply(group_list, function(x) x$descriptives$true["Incumbent mean",]))
+     meanyi_mat_error <- simplify2array(lapply(group_list, function(x) x$descriptives$error["Incumbent mean",]))
 
      ## Organize applicant means
-     meanya_mat_obs <- meanya_mat[grepl(x = rownames(meanya_mat), pattern = "_obs"),]
-     meanya_mat_true <- meanya_mat[grepl(x = rownames(meanya_mat), pattern = "_true"),]
-     meanya_mat_error <- meanya_mat[grepl(x = rownames(meanya_mat), pattern = "_error"),]
+     meanya_mat_obs <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Applicant mean",]))
+     meanya_mat_true <- simplify2array(lapply(group_list, function(x) x$descriptives$true["Applicant mean",]))
+     meanya_mat_error <- simplify2array(lapply(group_list, function(x) x$descriptives$error["Applicant mean",]))
 
      ## Organize u ratios
-     u_mat_obs <- u_mat[grepl(x = rownames(u_mat), pattern = "_obs"),]
-     u_mat_true <- u_mat[grepl(x = rownames(u_mat), pattern = "_true"),]
-     u_mat_error <- u_mat[grepl(x = rownames(u_mat), pattern = "_error"),]
+     u_mat_obs <- sdyi_mat_obs / sdya_mat_obs
+     u_mat_true <- sdyi_mat_true / sdya_mat_true
+     u_mat_error <- sdyi_mat_error / sdya_mat_error
 
-     ryya_group <- simplify2array(by(1:nrow(obs_a), obs_a$group, function(x) diag(cor(obs_a[x,-1], true_a[x,-1]))^2))
-     ryyi_group <- simplify2array(by(1:nrow(obs_i), obs_i$group, function(x) diag(cor(obs_i[x,-1], true_i[x,-1]))^2))
+     sdya_mat <- rbind(sdya_mat_obs, sdya_mat_true, sdya_mat_error)
+     sdyi_mat <- rbind(sdyi_mat_obs, sdyi_mat_true, sdyi_mat_error)
 
-     alpha_a_group <- by(items_a[,-1], items_a[,1], function(x) .alpha_items(item_dat = x, item_index = item_index))
-     alpha_i_group <- by(items_a[select_vec,-1], items_a[select_vec,1], function(x) .alpha_items(item_dat = x, item_index = item_index))
+     meanya_mat <- rbind(meanya_mat_obs, meanya_mat_true, meanya_mat_error)
+     meanyi_mat <- rbind(meanyi_mat_obs, meanyi_mat_true, meanyi_mat_error)
+
+     rownames(sdya_mat) <- rownames(sdyi_mat) <- rownames(meanya_mat) <- rownames(meanyi_mat) <- colnames(sa)
+     u_mat <- sdyi_mat / sdya_mat
+
+
+
+     .na_mat <- matrix(unlist(by(dat_a, dat_a$group, nrow)), nrow(meanya_mat_obs), ncol(meanya_mat_obs), T)
+     .ni_mat <- matrix(unlist(by(dat_i, dat_i$group, nrow)), nrow(meanya_mat_obs), ncol(meanya_mat_obs), T)
+     rownames(meanya_mat_obs) <- rownames(meanyi_mat_obs) <- var_names
+     dimnames(.na_mat) <- dimnames(.ni_mat) <- dimnames(meanya_mat_obs)
+     dimnames(sdya_mat_obs) <- dimnames(sdya_mat_true) <- dimnames(sdya_mat_error) <- dimnames(meanya_mat_obs)
+     dimnames(sdyi_mat_obs) <- dimnames(sdyi_mat_true) <- dimnames(sdyi_mat_error) <- dimnames(meanya_mat_obs)
+
+     da_obs <- .compute_d_internal(means = meanya_mat_obs, sds = sdya_mat_obs, n = .na_mat, applicant = TRUE, groups_on_cols = TRUE)
+     da_true <- .compute_d_internal(means = meanya_mat_true, sds = sdya_mat_true, n = .na_mat, applicant = TRUE, groups_on_cols = TRUE)
+     da_error <- .compute_d_internal(means = meanya_mat_error, sds = sdya_mat_error, n = .na_mat, applicant = TRUE, groups_on_cols = TRUE)
+
+     di_obs <- .compute_d_internal(means = meanyi_mat_obs, sds = sdyi_mat_obs, n = .na_mat, applicant = FALSE, groups_on_cols = TRUE)
+     di_true <- .compute_d_internal(means = meanyi_mat_true, sds = sdyi_mat_true, n = .na_mat, applicant = FALSE, groups_on_cols = TRUE)
+     di_error <- .compute_d_internal(means = meanyi_mat_error, sds = sdyi_mat_error, n = .na_mat, applicant = FALSE, groups_on_cols = TRUE)
+
+     ryya_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Applicant parallel-forms reliability",]))
+     ryyi_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Incumbent parallel-forms reliability",]))
+
+     raw_alpha_a_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Applicant unstandardized alpha",]))
+     raw_alpha_i_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Incumbent unstandardized alpha",]))
+
+     std_alpha_a_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Applicant standardized alpha",]))
+     std_alpha_i_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Incumbent standardized alpha",]))
+
      alpha_a <- .alpha_items(item_dat = items_a[,-1], item_index = item_index)
      alpha_i <- .alpha_items(item_dat = items_a[select_vec,-1], item_index = item_index)
 
-     raw_alpha_a_group <- simplify2array(lapply(alpha_a_group, function(x) x[1,]))
-     raw_alpha_i_group <- simplify2array(lapply(alpha_i_group, function(x) x[1,]))
-
-     std_alpha_a_group <- simplify2array(lapply(alpha_a_group, function(x) x[2,]))
-     std_alpha_i_group <- simplify2array(lapply(alpha_i_group, function(x) x[2,]))
-
      if(!is.null(wt_mat)){
           p <- ncol(rho_mat_list[[1]])
+
+          alpha_a <- alpha_a[,1:p]
+          alpha_i <- alpha_i[,1:p]
+          raw_alpha_a_group <- raw_alpha_a_group[1:p,]
+          raw_alpha_i_group <- raw_alpha_i_group[1:p,]
+          std_alpha_a_group <- std_alpha_a_group[1:p,]
+          std_alpha_i_group <- std_alpha_i_group[1:p,]
 
           ra <- cov2cor(sa[1:p, 1:p])
           ra_group <- lapply(sa_group, function(x) cov2cor(x[1:p, 1:p]))
@@ -556,7 +600,7 @@ append_dmat <- function(di_mat, da_mat,
                raw_alpha_a_group <- rbind(raw_alpha_a_group,
                                           unlist(lapply(as.list(1:length(ra_group)), function(x){
                                                composite_rel_matrix(r_mat = ra_group[[x]],
-                                                                    rel_vec = raw_alpha_a_group[,x],
+                                                                    rel_vec = raw_alpha_a_group[1:p,x],
                                                                     sd_vec = sdya_mat[1:p,x],
                                                                     wt_vec = wt_mat[,i])
                                           })))
@@ -564,7 +608,7 @@ append_dmat <- function(di_mat, da_mat,
                std_alpha_a_group <- rbind(std_alpha_a_group,
                                           unlist(lapply(as.list(1:length(ra_group)), function(x){
                                                composite_rel_matrix(r_mat = ra_group[[x]],
-                                                                    rel_vec = std_alpha_a_group[,x],
+                                                                    rel_vec = std_alpha_a_group[1:p,x],
                                                                     sd_vec = rep(1, ncol(ra_group[[x]])),
                                                                     wt_vec = wt_mat[,i])
                                           })))
@@ -573,7 +617,7 @@ append_dmat <- function(di_mat, da_mat,
                raw_alpha_i_group <- rbind(raw_alpha_i_group,
                                           unlist(lapply(as.list(1:length(ri_group)), function(x){
                                                composite_rel_matrix(r_mat = ri_group[[x]],
-                                                                    rel_vec = raw_alpha_i_group[,x],
+                                                                    rel_vec = raw_alpha_i_group[1:p,x],
                                                                     sd_vec = sdyi_mat[1:p,x],
                                                                     wt_vec = wt_mat[,i])
                                           })))
@@ -581,7 +625,7 @@ append_dmat <- function(di_mat, da_mat,
                std_alpha_i_group <- rbind(std_alpha_i_group,
                                           unlist(lapply(as.list(1:length(ri_group)), function(x){
                                                composite_rel_matrix(r_mat = ri_group[[x]],
-                                                                    rel_vec = std_alpha_i_group[,x],
+                                                                    rel_vec = std_alpha_i_group[1:p,x],
                                                                     sd_vec = rep(1, ncol(ri_group[[x]])),
                                                                     wt_vec = wt_mat[,i])
                                           })))
@@ -591,46 +635,12 @@ append_dmat <- function(di_mat, da_mat,
      }
 
      observed <- append_dmat(di_mat = di_obs, da_mat = da_obs,
-                             ryya = ryya, std_alpha_a = alpha_a[,2], raw_alpha_a = alpha_a[,1],
+                             ryya = ryya, std_alpha_a = alpha_a[2,], raw_alpha_a = alpha_a[1,],
                              ryya_group = ryya_group, std_alpha_a_group = std_alpha_a_group, raw_alpha_a_group = raw_alpha_a_group,
-                             ryyi = ryyi, std_alpha_i = alpha_i[,2], raw_alpha_i = alpha_i[,1],
+                             ryyi = ryyi, std_alpha_i = alpha_i[2,], raw_alpha_i = alpha_i[1,],
                              ryyi_group = ryyi_group, std_alpha_i_group = std_alpha_i_group, raw_alpha_i_group = raw_alpha_i_group, show_applicant = show_applicant)
      true <- append_dmat(di_mat = di_true, da_mat = da_true, show_applicant = show_applicant)
      error <- append_dmat(di_mat = di_error, da_mat = da_error, show_applicant = show_applicant)
-
-     for(i in 1:length(group_names)){
-          group_list[[i]]$ni <- di_obs[,c("ni1", "ni2")][di_obs[,1:2] == group_names[i]][1]
-          group_list[[i]]$sr <- group_list[[i]]$ni / group_list[[i]]$na
-
-          group_list[[i]]$R_obs_i <- ri_obs_group[[i]]
-          group_list[[i]]$S_complete_i <- si_group[[i]]
-          group_list[[i]]$R_complete_i <- suppressWarnings(cov2cor(si_group[[i]]))
-
-          group_list[[i]]$descriptives$observed["Incumbent parallel-forms reliability",] <- ryyi_group[,i]
-          group_list[[i]]$descriptives$observed["Incumbent unstandardized alpha",] <- raw_alpha_i_group[,i]
-          group_list[[i]]$descriptives$observed["Incumbent standardized alpha",] <- std_alpha_i_group[,i]
-
-          group_list[[i]]$descriptives$observed["Incumbent SD",] <- sdyi_mat_obs[,i]
-          group_list[[i]]$descriptives$observed["Incumbent mean",] <- meanyi_mat_obs[,i]
-          group_list[[i]]$descriptives$observed["u ratio",] <- u_mat_obs[,i]
-
-          group_list[[i]]$descriptives$true["Incumbent SD",] <- sdyi_mat_true[,i]
-          group_list[[i]]$descriptives$true["Incumbent mean",] <- meanyi_mat_true[,i]
-          group_list[[i]]$descriptives$true["u ratio",] <- u_mat_true[,i]
-
-          group_list[[i]]$descriptives$error["Incumbent SD",] <- sdyi_mat_error[,i]
-          group_list[[i]]$descriptives$error["Incumbent mean",] <- meanyi_mat_error[,i]
-          group_list[[i]]$descriptives$error["u ratio",] <- u_mat_error[,i]
-
-          obs_out <- obs_a[obs_a$group == group_names[[i]],-1]
-          true_out <- true_a[true_a$group == group_names[[i]],-1]
-          error_out <- error_a[error_a$group == group_names[[i]],-1]
-          rownames(obs_out) <- rownames(true_out) <- rownames(error_out) <- NULL
-
-          group_list[[i]]$data$observed <- obs_out
-          group_list[[i]]$data$true <- true_out
-          group_list[[i]]$data$error <- error_out
-     }
 
      p_vec <- n_vec / sum(n_vec)
      sr_overall <- unlist(lapply(group_list, function(x) as.numeric(x$sr)))
@@ -683,13 +693,50 @@ append_dmat <- function(di_mat, da_mat,
           }
      }
 
+     if(!is.null(wt_mat)){
+          .composites <- function(S, mu_vec){
+               comb_cov <- t(wt_mat) %*% S
+               comb_var <- comb_cov %*% wt_mat
+               mu_out <- c(mu_vec, t(wt_mat) %*% mu_vec)
+               S_out <- cbind(rbind(S, comb_cov), rbind(t(comb_cov), comb_var))
+               list(S = S_out, mu_vec = mu_out)
+          }
+
+          s_list <- rho_mat_list
+          .mu_mat <- .sigma_mat <- NULL
+          for(i in 1:length(s_list)){
+               s_list[[i]] <- diag(sigma_mat[i,]) %*% diag(rel_mat[i,]^.5) %*% s_list[[i]] %*% diag(rel_mat[i,]^.5) %*% diag(sigma_mat[i,])
+               .comp_out <- .composites(S = s_list[[i]], mu_vec = mu_mat[,i])
+               s_list[[i]] <- .comp_out$S
+               .mu_mat <- rbind(.mu_mat, .comp_out$mu_vec)
+               .sigma_mat <- rbind(.sigma_mat, diag(s_list[[i]])^.5)
+          }
+          mix_out <- mix_matrix(mat_list = s_list, mu_mat = .mu_mat, p_vec = p_vec,
+                                group_names = group_names, var_names = c(var_names, composite_names))
+
+          sr_composites_mat <- as.matrix(.mu_mat[,-(1:ncol(mu_mat))])
+          sr_composites_mat[1:length(sr_composites_mat)] <- 1
+          for(i in 1:length(sr_composites)){
+               if(all(.mu_mat[,i] == .mu_mat[1,i]) & all(.sigma_mat[,i] == .sigma_mat[1,i])){
+                    cut <- qnorm(sr_composites[i], mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
+                    sr_composites_mat[,i] <- pnorm(cut, mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
+               }else{
+                    mix <- norMix(mu = .mu_mat[,i], w = p_vec, sigma = .sigma_mat[,i])
+                    cut <- qnorMix(sr_composites[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
+                    sr_composites_mat[,i] <- pnorm(cut, mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
+               }
+          }
+     }else{
+          sr_composites_mat <- NULL
+     }
+
      group_list <- list()
      for(i in 1:length(p_vec)){
           group_list[[i]] <- .simulate_r_sample_params(n = Inf, rho_mat = rho_mat_list[[i]],
                                                        mu_vec = mu_mat[i,], sigma_vec = sigma_mat[i,],
                                                        rel_vec = rel_mat[i,], sr_vec = sr_mat[i,],
                                                        k_items_vec = k_items_vec,
-                                                       wt_mat = wt_mat, sr_composites = sr_composites,
+                                                       wt_mat = wt_mat, sr_composites = sr_composites_mat[i,],
                                                        var_names = var_names, composite_names = composite_names,
                                                        show_items = TRUE)
      }
@@ -818,7 +865,6 @@ append_dmat <- function(di_mat, da_mat,
      std_alpha_a_group <- simplify2array(lapply(alpha_a_group, function(x) x[2,]))
      std_alpha_i_group <- simplify2array(lapply(alpha_i_group, function(x) x[2,]))
 
-
      if(!is.null(wt_mat)){
           p <- ncol(rho_mat_list[[1]])
 
@@ -906,9 +952,9 @@ append_dmat <- function(di_mat, da_mat,
 
      names(ryya) <- names(ryyi) <- rownames(ryya_group) <- rownames(ryyi_group) <- var_names
      observed <- append_dmat(di_mat = di_obs, da_mat = da_obs,
-                             ryya = ryya, std_alpha_a = alpha_a[,2], raw_alpha_a = alpha_a[,1],
+                             ryya = ryya, std_alpha_a = alpha_a[2,], raw_alpha_a = alpha_a[1,],
                              ryya_group = ryya_group, std_alpha_a_group = std_alpha_a_group, raw_alpha_a_group = raw_alpha_a_group,
-                             ryyi = ryyi, std_alpha_i = alpha_i[,2], raw_alpha_i = alpha_i[,1],
+                             ryyi = ryyi, std_alpha_i = alpha_i[2,], raw_alpha_i = alpha_i[1,],
                              ryyi_group = ryyi_group, std_alpha_i_group = std_alpha_i_group, raw_alpha_i_group = raw_alpha_i_group, show_applicant = show_applicant)
      true <- append_dmat(di_mat = di_true, da_mat = da_true, show_applicant = show_applicant)
      error <- append_dmat(di_mat = di_error, da_mat = da_error, show_applicant = show_applicant)
@@ -991,6 +1037,7 @@ append_dmat <- function(di_mat, da_mat,
 #' @importFrom progress progress_bar
 #'
 #' @examples
+#' \dontrun{
 #' ## Define sample sizes, means, and other parameters for each of two groups:
 #' n_params <- list(c(mean = 200, sd = 20),
 #'                  c(mean = 100, sd = 20))
@@ -1007,8 +1054,10 @@ append_dmat <- function(di_mat, da_mat,
 #' simulate_d_database(k = 5, n_params = n_params, rho_params = rho_params,
 #'                     mu_params = mu_params, sigma_params = sigma_params,
 #'                     rel_params = rel_params, sr_params = sr_params,
+#'                     k_items = c(4, 4),
 #'                     group_names = NULL, var_names = c("y1", "y2"),
 #'                     show_applicant = TRUE, keep_vars = c("y1", "y2"), decimals = 2)
+#' }
 simulate_d_database <- function(k, n_params, rho_params,
                                 mu_params = NULL, sigma_params = 1,
                                 rel_params = 1, sr_params = 1, k_items_params = 1,
@@ -1057,6 +1106,7 @@ simulate_d_database <- function(k, n_params, rho_params,
           for(i in 1:n_groups) rel_params[[i]] <- as.list(rep(.rel_params, p))
      }
      if(is.null(sr_params)) sr_params <- as.list(rep(1, p))
+     if(!is.list(sr_params) & length(sr_params) == 1) sr_params <- as.list(rep(1, p))
      if(is.null(k_items_params)) k_items_params <- as.list(rep(1, p))
      if(!is.list(k_items_params) & length(k_items_params) == 1) k_items_params <- as.list(rep(k_items_params, p))
 

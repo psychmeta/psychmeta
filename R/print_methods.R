@@ -1012,13 +1012,13 @@ print.psychmeta.simulate_psych <- function(x, ..., digits = 3){
      cat("Overview of simulated data:\n")
      cat("\n")
      if(nrow(x$obs) > 5){
-          cat("Preview of observed scores (first 10 rows):\n")
+          cat("Preview of observed scores (first 5 rows):\n")
           print.data.frame(x$observed[1:5,], digits = digits)
 
-          cat("Preview of true scores (first 10 rows):\n")
+          cat("Preview of true scores (first 5 rows):\n")
           print.data.frame(x$true[1:5,], digits = digits)
 
-          cat("Preview of error scores (first 10 rows):\n")
+          cat("Preview of error scores (first 5 rows):\n")
           print.data.frame(x$error[1:5,], digits = digits)
      }else{
           cat("Observed scores:\n")

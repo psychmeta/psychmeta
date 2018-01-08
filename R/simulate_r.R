@@ -143,6 +143,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 
      if(any(zapsmall(k_items_vec) != round(k_items_vec))) stop("k_items_vec must consist of whole numbers", call. = FALSE)
      k_items_vec <- round(k_items_vec)
+     if(length(k_items_vec) == 1) k_items_vec <- rep(k_items_vec, ncol(rho_mat))
 
      if(ncol(rho_mat) != length(rel_vec)) stop("rel_vec must have as many elements as rho_mat has variables", call. = FALSE)
      if(ncol(rho_mat) != length(sr_vec)) stop("sr_vec must have as many elements as rho_mat has variables", call. = FALSE)
@@ -184,7 +185,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                      sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
                                      wt_mat = NULL, sr_composites = NULL,
                                      var_names = NULL, composite_names = NULL,
-                                     obs_only = FALSE, show_items = FALSE, keep_vars = NULL, ...){
+                                     obs_only = FALSE, show_items = FALSE, keep_vars = NULL, d_sim_info = NULL, ...){
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")
      }
@@ -194,38 +195,61 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                composite_names <- paste("composite", 1:ncol(wt_mat), sep = "")
      }
 
-     simdat <- simulate_psych_items(n = n, k_vec = k_items_vec, R_scales = rho_mat, rel_vec = rel_vec,
-                                    mean_vec = mu_vec, sd_vec = sigma_vec, var_names = var_names)
+     if(is.null(d_sim_info)){
+          simdat <- simulate_psych_items(n = n, k_vec = k_items_vec, R_scales = rho_mat, rel_vec = rel_vec,
+                                         mean_vec = mu_vec, sd_vec = sigma_vec, var_names = var_names)
 
-     true_scores_a <- as.matrix(simdat$data$true)
-     error_scores_a <- as.matrix(simdat$data$error)
-     .var_names <- var_names
-     var_names <- colnames(true_scores_a)
-     scale_ids <- var_names %in% .var_names
-     item_index <- simdat$params$item_index
-     item_names <- simdat$params$item_names
+          true_scores_a <- as.matrix(simdat$data$true)
+          error_scores_a <- as.matrix(simdat$data$error)
+          simdat$data$true <- simdat$data$error <- simdat$data$observed <- NULL
 
-     item_wt <- list()
-     for(i in 1:length(k_items_vec)) item_wt[[i]] <- rep(1, length(item_index[[i]]))
-     names(item_wt) <- .var_names
+          .var_names <- var_names
+          var_names <- colnames(true_scores_a)
+          scale_ids <- var_names %in% .var_names
+          item_index <- simdat$params$item_index
+          item_names <- simdat$params$item_names
 
-     if(!is.null(wt_mat)){
-          true_scores_a <- cbind(true_scores_a, Composite = true_scores_a[,1:ncol(rho_mat)] %*% wt_mat)
-          error_scores_a <- cbind(error_scores_a, Composite = error_scores_a[,1:ncol(rho_mat)] %*% wt_mat)
-          scale_ids <- c(scale_ids, rep(TRUE, length(composite_names)))
-          sr_vec <- c(sr_vec, rep(1, ncol(true_scores_a) - sum(scale_ids)), sr_composites)
-          var_names <- c(var_names, composite_names)
-          .var_names <- c(.var_names, composite_names)
+          item_wt <- list()
+          for(i in 1:length(k_items_vec)) item_wt[[i]] <- rep(1, length(item_index[[i]]))
+          names(item_wt) <- .var_names
+
+          if(!is.null(wt_mat)){
+               true_scores_a <- cbind(true_scores_a, Composite = true_scores_a[,1:ncol(rho_mat)] %*% wt_mat)
+               error_scores_a <- cbind(error_scores_a, Composite = error_scores_a[,1:ncol(rho_mat)] %*% wt_mat)
+               scale_ids <- c(scale_ids, rep(TRUE, length(composite_names)))
+               sr_vec <- c(sr_vec, rep(1, ncol(true_scores_a) - sum(scale_ids)), sr_composites)
+               var_names <- c(var_names, composite_names)
+               .var_names <- c(.var_names, composite_names)
+          }
+          obs_scores_a <- true_scores_a + error_scores_a
+          colnames(true_scores_a) <- colnames(error_scores_a) <- colnames(obs_scores_a) <- var_names
+
+          ## Perform selection on any variables for which the selection ratio is less than 1
+          select_ids <- which(sr_vec < 1)
+          select_vec <- rep(TRUE, n)
+          for(i in select_ids)
+               select_vec <- select_vec & obs_scores_a[,i] >= sort(obs_scores_a[,i], decreasing = TRUE)[n * sr_vec[i]]
+
+     }else{
+          simdat = d_sim_info$simdat
+          item_index <- simdat$params$item_index
+          item_names <- simdat$params$item_names
+
+          obs_scores_a = d_sim_info$obs_scores_a
+          true_scores_a = d_sim_info$true_scores_a
+          error_scores_a = d_sim_info$error_scores_a
+          scale_ids = d_sim_info$scale_ids
+          sr_vec = d_sim_info$sr_vec
+          var_names = d_sim_info$var_names
+          .var_names = d_sim_info$.var_names
+
+          cut_vec = d_sim_info$cut_vec
+
+          select_ids <- which(!is.na(cut_vec))
+          select_vec <- rep(TRUE, n)
+          for(i in select_ids)
+               select_vec <- select_vec & obs_scores_a[,i] >= cut_vec[i]
      }
-     obs_scores_a <- true_scores_a + error_scores_a
-
-     ## Perform selection on any variables for which the selection ratio is less than 1
-     select_ids <- which(sr_vec < 1)
-     select_vec <- rep(TRUE, n)
-     for(i in select_ids)
-          select_vec <- select_vec & obs_scores_a[,i] >= sort(obs_scores_a[,i], decreasing = TRUE)[n * sr_vec[i]]
-
-     colnames(true_scores_a) <- colnames(error_scores_a) <- colnames(obs_scores_a) <- var_names
 
      alpha_a <- .alpha_items(item_dat = obs_scores_a[,], item_index = item_index)
      alpha_i <- .alpha_items(item_dat = obs_scores_a[select_vec,], item_index = item_index)
@@ -238,6 +262,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      obs_scores_a <- obs_scores_a[,scale_ids]
      true_scores_a <- true_scores_a[,scale_ids]
      error_scores_a <- error_scores_a[,scale_ids]
+     colnames(true_scores_a) <- colnames(error_scores_a) <- colnames(obs_scores_a) <- .var_names
 
      ## Compute unrestricted variances
      var_obs_a <- apply(obs_scores_a, 2, var)
@@ -510,6 +535,8 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                       1:k + k, (start_composite + ncol(wt_mat)):(start_composite + 2 * ncol(wt_mat) - 1),
                       1:k + 2 * k, (start_composite + 2* ncol(wt_mat)):(start_composite + 3 * ncol(wt_mat) - 1))
 
+          wt_mat_comp[,1] %*% S_complete_a %*% wt_mat_comp[,1]
+
           comb_cov <- t(wt_mat_comp) %*% S_complete_a
           comb_var <- comb_cov %*% wt_mat_comp
 
@@ -540,7 +567,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                s_mat_i <- dat_i$tvar
                s_mat_i <- zapsmall((s_mat_i + t(s_mat_i)) / 2)
                sr_overall <- ptmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
-                                      lowerx = qnorm(sr_vec[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE),
+                                      lowerx = qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = diag(S_complete_a)[x_col]^.5, lower.tail = FALSE),
                                       upperx = rep(Inf, length(x_col)))[1]
           }
           S_complete_i <- correct_matrix_mvrr(Sigma_i = S_complete_a, Sigma_xx_a = s_mat_i, x_col = x_col, standardize = FALSE)

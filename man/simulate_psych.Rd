@@ -6,8 +6,9 @@
 \usage{
 simulate_psych(n, rho_mat, mu_vec = rep(0, ncol(rho_mat)),
   sigma_vec = rep(1, ncol(rho_mat)), rel_vec = rep(1, ncol(rho_mat)),
-  sr_vec = rep(1, ncol(rho_mat)), wt_mat = NULL, sr_composites = NULL,
-  var_names = NULL, composite_names = NULL)
+  sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
+  wt_mat = NULL, sr_composites = NULL, var_names = NULL,
+  composite_names = NULL)
 }
 \arguments{
 \item{n}{Number of cases to simulate before performing selection. If \code{Inf}, function will simulate parameter values.}
@@ -22,6 +23,8 @@ simulate_psych(n, rho_mat, mu_vec = rep(0, ncol(rho_mat)),
 
 \item{sr_vec}{Vector of selection ratios corresponding to the variables in \code{rho_mat}
 (set selection ratios to 1 for variables that should not be used in selection).}
+
+\item{k_items_vec}{Number of test items comprising each of the variables to be simulated (all are single-item variables by default).}
 
 \item{wt_mat}{Optional matrix of weights to use in forming a composite of the variables in \code{rho_mat.} Matrix should have as many rows (or vector elements) as there are variables in \code{rho_mat}.}
 
@@ -53,6 +56,14 @@ rho_mat <- matrix(.5, 5, 5)
 diag(rho_mat) <- 1
 simulate_psych(n = 1000, rho_mat = rho_mat,
                 rel_vec = rep(.8, 5), sr_vec = c(1, 1, 1, 1, .5),
+                wt_mat = cbind(c(0, 0, 0, .3, 1), c(1, .3, 0, 0, 0)), sr_composites = c(.7, .5))
+
+## Generate data for similar scenario as above, but with scales consisted of 1-5 items:
+rho_mat <- matrix(.5, 5, 5)
+diag(rho_mat) <- 1
+simulate_psych(n = 1000, rho_mat = rho_mat,
+                rel_vec = rep(.8, 5), sr_vec = c(1, 1, 1, 1, .5),
+                k_items_vec = 1:5,
                 wt_mat = cbind(c(0, 0, 0, .3, 1), c(1, .3, 0, 0, 0)), sr_composites = c(.7, .5))
 }
 \keyword{datagen}

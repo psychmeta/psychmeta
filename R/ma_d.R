@@ -95,6 +95,7 @@
 #' Unpublished manuscript.
 #'
 #' @examples
+#' \dontrun{
 #' ## The 'ma_d' function can compute multi-construct bare-bones meta-analyes:
 #' ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 #'
@@ -107,6 +108,7 @@
 #' ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
 #'      ryy = ryyi, correct_rr_y = FALSE,
 #'      construct_y = construct, data = data_d_meas_multi)
+#' }
 ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  treat_as_d = TRUE, ma_method = "bb", ad_type = "tsa", correction_method = "auto",
                  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
