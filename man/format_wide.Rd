@@ -4,12 +4,14 @@
 \alias{format_wide}
 \title{Create wide-format datasets in simulate_r_database}
 \usage{
-format_wide(x, param, var_names, show_applicant, decimals = 2)
+format_wide(x, param, sample_id, var_names, show_applicant, decimals = 2)
 }
 \arguments{
 \item{x}{Simulation list}
 
 \item{param}{Is simulation data parameter data (TRUE) or sample data (FALSE)?}
+
+\item{sample_id}{What is the ID associated with the sample?}
 
 \item{var_names}{Variables to pull from simulation list}
 

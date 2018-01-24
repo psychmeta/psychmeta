@@ -58,7 +58,7 @@ simulate_psych(n = 1000, rho_mat = rho_mat,
                 rel_vec = rep(.8, 5), sr_vec = c(1, 1, 1, 1, .5),
                 wt_mat = cbind(c(0, 0, 0, .3, 1), c(1, .3, 0, 0, 0)), sr_composites = c(.7, .5))
 
-## Generate data for similar scenario as above, but with scales consisted of 1-5 items:
+## Generate data for similar scenario as above, but with scales consisting of 1-5 items:
 rho_mat <- matrix(.5, 5, 5)
 diag(rho_mat) <- 1
 simulate_psych(n = 1000, rho_mat = rho_mat,

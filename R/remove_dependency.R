@@ -358,6 +358,12 @@
           out$rxx_consistency <- as.logical(mean(data_x$rxx_consistency[i]))
           out$ryy_consistency <- as.logical(mean(data_y$ryy_consistency[i]))
 
+          out$correct_rxx <- as.logical(mean(data_x$correct_rxx[i]))
+          out$correct_ryy <- as.logical(mean(data_y$correct_ryy[i]))
+
+          out$sign_rxz <- sign(mean(data_x$sign_rxz[i]))
+          out$sign_ryz <- sign(mean(data_y$sign_ryz[i]))
+
           out$rxx_type <- convert_consistency2reltype(consistency = out$rxx_consistency)
           out$ryy_type <- convert_consistency2reltype(consistency = out$ryy_consistency)
 
@@ -385,7 +391,10 @@
                          ux_observed = unlist(lapply(out, function(x) x$ux_observed_comp)),
 
                          correct_rr_x = unlist(lapply(out, function(x) x$correct_rr_x)),
-                         indirect_rr_x = unlist(lapply(out, function(x) x$indirect_rr_x)))
+                         indirect_rr_x = unlist(lapply(out, function(x) x$indirect_rr_x)),
+
+                         correct_rxx = unlist(lapply(out, function(x) x$correct_rxx)),
+                         sign_rxz = unlist(lapply(out, function(x) x$sign_rxz)))
 
      data_y_list <- list(ryy = unlist(lapply(out, function(x) x$ryy_comp)),
                          ryy_type = unlist(lapply(out, function(x) x$ryy_type)),
@@ -396,7 +405,10 @@
                          uy_observed = unlist(lapply(out, function(x) x$uy_observed_comp)),
 
                          correct_rr_y = unlist(lapply(out, function(x) x$correct_rr_y)),
-                         indirect_rr_y = unlist(lapply(out, function(x) x$indirect_rr_y)))
+                         indirect_rr_y = unlist(lapply(out, function(x) x$indirect_rr_y)),
+
+                         correct_ryy = unlist(lapply(out, function(x) x$correct_ryy)),
+                         sign_ryz = unlist(lapply(out, function(x) x$sign_ryz)))
 
      for(i in names(es_data_list)) if(is.null(es_data_list[[i]])) es_data_list[[i]] <- NULL
      for(i in names(data_x_list)) if(is.null(data_x_list[[i]])) data_x_list[[i]] <- NULL

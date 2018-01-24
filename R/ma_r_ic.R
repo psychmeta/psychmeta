@@ -11,8 +11,8 @@
 #' (see metafor documentation for details about the metafor methods).
 #' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rxx Logical scalar that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_ryy Logical scalar that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_rxx Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rr_x Logical scalar or vector or column name determining whether each correlation in rxyi should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rr_y Logical scalar or vector or column name determining whether each correlation in rxyi should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
 #' @param indirect_rr_x Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in X (\code{TRUE}) or not (\code{FALSE}).
@@ -106,8 +106,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
      sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
-     correct_rxx <- scalar_arg_warning(arg = correct_rxx, arg_name = "correct_rxx")
-     correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
      use_all_arts <- scalar_arg_warning(arg = use_all_arts, arg_name = "use_all_arts")
 
      inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type,
@@ -151,10 +149,15 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           rxyi <- match_variables(call = call_full[[match("rxyi", names(call_full))]], arg = rxyi, data = data)
           n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, data = data)
           n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, data = data)
+          correct_rxx <- match_variables(call = call_full[[match("correct_rxx", names(call_full))]], arg = correct_rxx, data = data)
+          correct_ryy <- match_variables(call = call_full[[match("correct_ryy", names(call_full))]], arg = correct_ryy, data = data)
           correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x", names(call_full))]], arg = correct_rr_x, data = data)
           correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y", names(call_full))]], arg = correct_rr_y, data = data)
           indirect_rr_x <- match_variables(call = call_full[[match("indirect_rr_x", names(call_full))]], arg = indirect_rr_x, data = data)
           indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y", names(call_full))]], arg = indirect_rr_y, data = data)
+
+          sign_rxz <- match_variables(call = call_full[[match("sign_rxz", names(call_full))]], arg = sign_rxz, data = data)
+          sign_ryz <- match_variables(call = call_full[[match("sign_ryz", names(call_full))]], arg = sign_ryz, data = data)
 
           if(deparse(substitute(rxx))[1] != "NULL")
                rxx <- match_variables(call = call_full[[match("rxx",  names(call_full))]], arg = rxx, data = data)
@@ -241,6 +244,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      ryy_type <- as.character(ryy_type)
      rxx_type <- manage_arglength(x = rxx_type, y = rxyi)
      ryy_type <- manage_arglength(x = ryy_type, y = rxyi)
+     correct_rxx <- manage_arglength(x = correct_rxx, y = rxyi)
+     correct_ryy <- manage_arglength(x = correct_ryy, y = rxyi)
 
      if(use_all_arts & any(!valid_r)){
           .rxx_type <- rxx_type[!valid_r]
@@ -377,8 +382,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      if(all(is.na(ux_observed))) ux_observed <- rep(TRUE, length(rxyi))
      if(all(is.na(uy_observed))) uy_observed <- rep(TRUE, length(rxyi))
 
-     if(correct_rxx & any(!is.na(rxx))) screen_rel(rel_vec = rxx[!is.na(rxx)], art_name = "rxx")
-     if(correct_ryy & any(!is.na(ryy))) screen_rel(rel_vec = ryy[!is.na(ryy)], art_name = "ryy")
+     if(any(correct_rxx & !is.na(rxx))) screen_rel(rel_vec = rxx[correct_rxx & !is.na(rxx)], art_name = "rxx")
+     if(any(correct_ryy & !is.na(ryy))) screen_rel(rel_vec = ryy[correct_ryy & !is.na(ryy)], art_name = "ryy")
 
      ## Only organize moderators when the call comes from the user, now when it comes from a master function
      if(is.null(presorted_data)){
@@ -493,11 +498,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           uy_vec <- up_vec <- uy
           ux_vec[!(do_uvdrr_x | do_bvdrr | do_bvirr)] <- ut_vec[!do_uvirr_x] <- uy_vec[!(do_uvdrr_y | do_bvdrr | do_bvirr)] <- up_vec[!do_uvirr_y] <- NA
 
-          if(correct_rxx & !all(is.na(rxx))){
+          if(!all(!correct_rxx | is.na(rxx))){
                rxxi_vec <- rxxa_vec <- rxx
                rxxi_vec[!rxx_restricted] <- rxxa_vec[rxx_restricted] <- NA
-               valid_rxxi <- !is.na(rxxi_vec)
-               valid_rxxa <- !is.na(rxxa_vec)
+               valid_rxxi <- !is.na(rxxi_vec) & correct_rxx
+               valid_rxxa <- !is.na(rxxa_vec) & correct_rxx
 
                ## Estimate the necessary incumbent relibilities for X
                ## If the u ratio for X is known:
@@ -513,7 +518,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                rxxi_vec[subset_vec2] <- estimate_ryya(ryyi = ryy[subset_vec2], rxyi = rxyi[subset_vec2], ux = uy_temp)
 
                ## If any of the neceesary reliabilities are missing, run the imputation subroutine
-               subset_vec <- do_uvirr_x | do_uvdrr_y | do_uvirr_y
+               subset_vec <- correct_rxx & (do_uvirr_x | do_uvdrr_y | do_uvirr_y)
                if(is.null(presorted_data))
                     if(any(is.na(rxxi_vec[subset_vec])))
                          if(any(!is.na(rxxi_vec[subset_vec]))){
@@ -546,11 +551,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                               rxxi_vec <- rxxa_vec <- rep(1, length(rxyi))
                          }
 
-          if(correct_ryy & !all(is.na(ryy))){
+          if(!all(!correct_ryy | is.na(ryy))){
                ryyi_vec <- ryya_vec <- ryy
                ryyi_vec[!ryy_restricted] <- ryya_vec[ryy_restricted] <- NA
-               valid_ryyi <- !is.na(ryyi_vec)
-               valid_ryya <- !is.na(ryya_vec)
+               valid_ryyi <- correct_ryy & !is.na(ryyi_vec)
+               valid_ryya <- correct_ryy & !is.na(ryya_vec)
 
                ## Estimate the necessary incumbent relibilities for Y
                ## If the u ratio for Y is known:
@@ -566,7 +571,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                ryyi_vec[subset_vec2] <- estimate_ryya(ryyi = ryy[subset_vec2], rxyi = rxyi[subset_vec2], ux = ux_temp)
 
                ## If any of the neceesary reliabilities are missing, run the imputation subroutine
-               subset_vec <- do_uvirr_y | do_uvdrr_x | do_uvirr_x
+               subset_vec <- correct_ryy & (do_uvirr_y | do_uvdrr_x | do_uvirr_x)
                if(is.null(presorted_data))
                     if(any(is.na(ryyi_vec[subset_vec])))
                          if(any(!is.na(ryyi_vec[subset_vec]))){
@@ -667,10 +672,12 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                do_uvirr_y[subset_vec] <- FALSE
           }
 
+          rxxi_vec[!correct_rxx] <- rxxa_vec[!correct_rxx] <- ryyi_vec[!correct_ryy] <- ryya_vec[!correct_ryy] <- NA
+
      }else{
-          if(correct_rxx | correct_ryy){
-               do_meas <- TRUE
-               if(correct_rxx){
+          if(any(correct_rxx | correct_ryy)){
+               do_meas <- correct_rxx | correct_ryy
+               if(any(correct_rxx)){
                     if(is.null(presorted_data)){
                          rxxi_vec <- impute_artifacts(art_vec = rxx, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)
                     }else{
@@ -679,7 +686,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                }else{
                     rxxi_vec <- 1
                }
-               if(correct_ryy){
+               if(any(correct_ryy)){
                     if(is.null(presorted_data)){
                          ryyi_vec <- impute_artifacts(art_vec = ryy, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)
                     }else{
@@ -688,6 +695,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                }else{
                     ryyi_vec <- 1
                }
+               rxxi_vec[!correct_rxx] <- ryyi_vec[!correct_ryy] <- 1
+               rxxi_vec[!do_meas] <- ryyi_vec[!do_meas] <- NA
           }else{
                rxxi_vec <- ryyi_vec <- NA
                do_meas <- FALSE

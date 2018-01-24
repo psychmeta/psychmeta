@@ -6,7 +6,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
                   "rxy",                                         ## Global variables defined for the .ma_r_bb function
                   "d", "n_1", "n_2", "n_1_split", "n_2_split",   ## Global variables defined for the .ma_d_bb function
                   "difference", "construct_x", "construct_y",
-                  "group", "y_name"))
+                  "group", "y_name", "na.pass"))
 
 
 
@@ -15,7 +15,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage("This is ", paste(pkgname, version))
     packageStartupMessage("Please report any bugs to improve functionality. \n")
-    packageStartupMessage("We work hard to produce these open-source tools for the R community - please cite psychmeta when you use it in your research: \nDahlke, J. A. & Wiernik, B. M. (2017). psychmeta: Psychometric meta-analysis toolkit. R package version ", version)
+    packageStartupMessage("We work hard to produce these open-source tools for the R community - please cite psychmeta when you use it in your research: \nDahlke, J. A. & Wiernik, B. M. (2018). psychmeta: Psychometric meta-analysis toolkit. R package version ", version)
 }
 
 

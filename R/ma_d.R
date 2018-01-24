@@ -14,7 +14,8 @@
 #' @param treat_as_d Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).
 #' @param ma_method Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
 #' @param ad_type For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".
-#' @param correction_method When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+#' @param correction_method Character scalar or a matrix with \code{group_id} levels as row names and \code{construct_y} levels as column names.
+#' When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.
@@ -36,10 +37,13 @@
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
 #' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rGg Logical scalar that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_ryy Logical scalar that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_rel Optional named vector that supercedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.
+#' @param correct_rGg Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_rr Optional named vector that supercedes \code{correct_rr_g} and \code{correct_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for range restriction.
 #' @param correct_rr_g Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rr_y Logical scalar or vector or column name determining whether each \emph{d} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
+#' @param indirect_rr Optional named vector that supercedes \code{indirect_rr_g} and \code{indirect_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.
 #' @param indirect_rr_g Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
 #' Superceded in evaluation by \code{correct_rr_g} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).
 #' @param indirect_rr_y Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
@@ -52,6 +56,7 @@
 #' @param pa Scalar or vector containing the unrestricted-group proportions of group membership (default = .5). If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param uy Vector or column name of u ratios for Y.
 #' @param uy_observed Logical vector or column name determining whether each element of \code{uy} is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
+#' @param sign_rz Optional named vector that supercedes \code{sign_rgz} and \code{sign_ryz}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.
 #' @param sign_rgz Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
@@ -115,13 +120,13 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  construct_y = NULL, measure_y = NULL, construct_order = NULL,
                  wt_type = "inv_var_mean", error_type = "mean",
                  correct_bias = TRUE,
-                 correct_rGg = FALSE, correct_ryy = TRUE,
-                 correct_rr_g = TRUE, correct_rr_y = TRUE,
-                 indirect_rr_g = TRUE, indirect_rr_y = TRUE,
+                 correct_rel = NULL, correct_rGg = FALSE, correct_ryy = TRUE,
+                 correct_rr = NULL, correct_rr_g = TRUE, correct_rr_y = TRUE,
+                 indirect_rr = NULL, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                  rGg = NULL, pi = NULL, pa = NULL,
                  ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
                  uy = NULL, uy_observed = TRUE,
-                 sign_rgz = 1, sign_ryz = 1,
+                 sign_rz = NULL, sign_rgz = 1, sign_ryz = 1,
                  conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
                  pairwise_ads = FALSE, residual_ads = TRUE,
@@ -274,6 +279,31 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
           construct_y <- rep("Y", length(d))
      }
 
+     if(is.matrix(correction_method)){
+          .colnames <- colnames(correction_method)
+          .rownames <- rownames(correction_method)
+
+          if(!all(construct_y %in% construct_y))
+               stop("Column names of correction_method must contain the same levels as construct_y", call. = FALSE)
+
+          if(!all(.rownames %in% group_id))
+               stop("Row names of correction_method must contain the same levels as group_id", call. = FALSE)
+
+          .constructs <- c(as.character(group_id), as.character(construct_y))
+          .correction_method <- correction_method
+          correction_method <- matrix(formals(ma_d)[["correction_method"]], length(.constructs), length(.constructs))
+          rownames(correction_method) <- colnames(correction_method) <- .constructs
+          for(i in .rownames){
+               for(j in .colnames){
+                    .methods <- .correction_method[i,j]
+                    .methods[.methods == ""] <- NA
+                    .methods <- .methods[!is.na(.methods)]
+                    if(length(.methods) == 1) correction_method[j,i] <- correction_method[i,j] <- .methods
+               }
+          }
+     }
+
+
      if(is.null(construct_order)) construct_order <- sort(unique(construct_y))
 
      ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
@@ -347,15 +377,15 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  construct_x = group_id, construct_y = construct_y,
                  measure_x = NULL, measure_y = measure_y,
                  # construct_order = c(group_order, construct_order),
-                 wt_type = wt_type, error_type = error_type,
-                 correct_bias = correct_bias, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
-                 correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
-                 indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
+                 wt_type = wt_type, error_type = error_type, correct_bias = correct_bias,
+                 correct_rel = correct_rel, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
+                 correct_rr = correct_rr, correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
+                 indirect_rr = indirect_rr, indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
                  rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment",
                  ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
                  ux = ux, ux_observed = TRUE,
                  uy = uy, uy_observed = uy_observed,
-                 sign_rxz = sign_rgz, sign_ryz = sign_ryz,
+                 sign_rz = sign_rz, sign_rxz = sign_rgz, sign_ryz = sign_ryz,
                  conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased,
                  moderators = moderators, cat_moderators = cat_moderators, moderator_type = moderator_type,
                  pairwise_ads = pairwise_ads, residual_ads = residual_ads,

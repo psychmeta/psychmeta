@@ -1,3 +1,10 @@
+Changes in Version 0.2.2 (2018-01-24)
+=====================================
+o A new function (called matreg, with aliases of matrixreg, lm_mat, and lm_matrix) has been added that computes regression models from covariance matrices and vectors of means and generates output that resembles that of the "lm" function. Output from matreg can be used with the summary(), predict(), and confint() functions. 
+o The ma_r and mad_d functions have been modified to allow for more flexibility in computing multiple meta-analyses in a single function call, especially when those meta-analyses use artifact-distribution corrections. Several new arguments have been added to allow users to name the types artifact corrections they would like to apply to each construct - see function documentation for argument details.
+o The correct_rxx and correct_ryy arguments across meta-analysis routines (excluding ma_r_ad and ma_d_ad) can now support both scalar and vector arguments.
+o Efficiency improvements and improvements to the accuracy of progress-bar feedback have been made to the simulate_r_database and simulate_d_database functions.
+
 Changes in Version 0.2.1 (2018-01-07)
 =====================================
 o Hotfixes for bugs in “simulate_d_sample” function affecting composite variables.

@@ -12,7 +12,8 @@
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
 #' @param ma_method Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
 #' @param ad_type For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".
-#' @param correction_method When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+#' @param correction_method Character scalar or a square matrix with the collective levels of \code{construct_x} and \code{construct_y} as row names and column names.
+#' When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.
@@ -26,10 +27,13 @@
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
 #' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rxx Logical scalar that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_ryy Logical scalar that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_rel Optional named vector that supercedes \code{correct_rxx} and \code{correct_ryy}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for unreliability.
+#' @param correct_rxx Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_rr Optional named vector that supercedes \code{correct_rr_x} and \code{correct_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for range restriction.
 #' @param correct_rr_x Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.
 #' @param correct_rr_y Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.
+#' @param indirect_rr Optional named vector that supercedes \code{indirect_rr_x} and \code{indirect_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.
 #' @param indirect_rr_x Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in X (\code{TRUE}) or not (\code{FALSE}).
 #' Superceded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_x} == \code{FALSE}, the value supplied for \code{indirect_rr_x} is disregarded).
 #' @param indirect_rr_y Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
@@ -66,6 +70,7 @@
 #' @param ux_observed Logical vector or column name determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
 #' @param uy Vector or column name of u ratios for Y.
 #' @param uy_observed Logical vector or column name determining whether each element of uy is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
+#' @param sign_rz Optional named vector that supercedes \code{sign_rxz} and \code{sign_ryz}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.
 #' @param sign_rxz Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
@@ -182,15 +187,15 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                  construct_x = NULL, construct_y = NULL,
                  measure_x = NULL, measure_y = NULL,
                  construct_order = NULL,
-                 wt_type = "sample_size", error_type = "mean",
-                 correct_bias = TRUE, correct_rxx = TRUE, correct_ryy = TRUE,
-                 correct_rr_x = TRUE, correct_rr_y = TRUE,
-                 indirect_rr_x = TRUE, indirect_rr_y = TRUE,
+                 wt_type = "sample_size", error_type = "mean", correct_bias = TRUE,
+                 correct_rel = NULL, correct_rxx = TRUE, correct_ryy = TRUE,
+                 correct_rr = NULL, correct_rr_x = TRUE, correct_rr_y = TRUE,
+                 indirect_rr = NULL, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
                  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
                  ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
                  ux = NULL, ux_observed = TRUE,
                  uy = NULL, uy_observed = TRUE,
-                 sign_rxz = 1, sign_ryz = 1,
+                 sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
                  conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
                  pairwise_ads = FALSE,  residual_ads = TRUE,
@@ -235,15 +240,12 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
      ma_method <- scalar_arg_warning(arg = ma_method, arg_name = "ma_method")
      ad_type <- scalar_arg_warning(arg = ad_type, arg_name = "ad_type")
-     correction_method <- scalar_arg_warning(arg = correction_method, arg_name = "correction_method")
      pairwise_ads <- scalar_arg_warning(arg = pairwise_ads, arg_name = "pairwise_ads")
      check_dependence <- scalar_arg_warning(arg = check_dependence, arg_name = "check_dependence")
      collapse_method <- scalar_arg_warning(arg = collapse_method, arg_name = "collapse_method")
 
      if(ma_method == "barebones") ma_method <- "bb"
 
-     sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
-     sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
      correct_bias <- scalar_arg_warning(arg = correct_bias, arg_name = "correct_bias")
 
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
@@ -265,6 +267,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           rxyi <- match_variables(call = call_full[[match("rxyi", names(call_full))]], arg = rxyi, data = data)
 
           n <- match_variables(call = call_full[[match("n", names(call_full))]], arg = n, data = data)
+
+          correct_rxx <- match_variables(call = call_full[[match("correct_rxx", names(call_full))]], arg = correct_rxx, data = data)
+          correct_ryy <- match_variables(call = call_full[[match("correct_ryy", names(call_full))]], arg = correct_ryy, data = data)
+          sign_rxz <- match_variables(call = call_full[[match("sign_rxz", names(call_full))]], arg = sign_rxz, data = data)
+          sign_ryz <- match_variables(call = call_full[[match("sign_ryz", names(call_full))]], arg = sign_ryz, data = data)
 
           if(deparse(substitute(n_adj))[1] != "NULL")
                n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, data = data)
@@ -391,15 +398,135 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           if(all(!valid_r)) stop("No valid construct combinations provided", call. = FALSE)
      }
 
-     ## Check the lengths of all arguments
-     if(ma_method == "ad"){
-          correct_rxx <- scalar_arg_warning(arg = correct_rxx, arg_name = "correct_rxx")
-          if(length(correct_rr_x) != length(rxyi)) correct_rr_x <- scalar_arg_warning(arg = correct_rr_x, arg_name = "correct_rr_x")
-          if(length(indirect_rr_x) != length(rxyi)) indirect_rr_x <- scalar_arg_warning(arg = indirect_rr_x, arg_name = "indirect_rr_x")
+     if(is.null(construct_x)) construct_x <- rep("X", length(rxyi))
+     if(is.null(construct_y)) construct_y <- rep("Y", length(rxyi))
 
-          correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
-          if(length(correct_rr_y) != length(rxyi)) correct_rr_y <- scalar_arg_warning(arg = correct_rr_y, arg_name = "correct_rr_y")
-          if(length(indirect_rr_y) != length(rxyi)) indirect_rr_y <- scalar_arg_warning(arg = indirect_rr_y, arg_name = "indirect_rr_y")
+     if(is.matrix(correction_method)){
+          .colnames <- colnames(correction_method)
+          .rownames <- rownames(correction_method)
+          if(length(.colnames) != length(.rownames))
+               stop("If correction_method is a matrix, it must be square", call. = FALSE)
+
+          if(!all(.colnames %in% .rownames))
+               stop("Row names and column names of correction_method must contain the same levels", call. = FALSE)
+
+          .correction_method <- correction_method <- correction_method[.colnames,.colnames]
+          for(i in .colnames){
+               for(j in .colnames){
+                    if(i != j){
+                         .methods <- c(.correction_method[i,j], .correction_method[j,i])
+                         .methods[.methods == ""] <- NA
+                         .methods <- .methods[!is.na(.methods)]
+                         if(length(.methods) == 2){
+                              if(.methods[1] != .methods[2])
+                                   stop("Non-missing redundant cells in the correction_method matrix must contain the same values", call. = FALSE)
+                              .methods <- .methods[1]
+                         }else if(length(.methods) == 0){
+                              .methods <- formals(ma_r)[["correction_method"]]
+                         }
+                         correction_method[j,i] <- correction_method[i,j] <- .methods
+                    }
+               }
+          }
+          rm(.correction_method)
+     }else{
+          correction_method <- scalar_arg_warning(arg = unlist(correction_method), arg_name = "correction_method")
+          unique_constructs <- unique(c(as.character(construct_x), as.character(construct_y)))
+          correction_method <- matrix(correction_method, length(unique_constructs), length(unique_constructs))
+          rownames(correction_method) <- colnames(correction_method) <- unique_constructs
+     }
+
+     ## Check the lengths of all arguments
+     if(ma_method != "bb"){
+
+          .distribute_logic <- function(logic_general,
+                                        logic_x = NULL, logic_y= NULL,
+                                        name_logic_x, name_logic_y,
+                                        construct_x, construct_y, vec_length){
+               .logic_x <- logic_x
+               .logic_y <- logic_y
+
+               construct_x <- as.character(construct_x)
+               construct_y <- as.character(construct_y)
+               unique_constructs <- unique(c(as.character(construct_x), as.character(construct_y)))
+
+               if(!is.null(.logic_x)){
+                    if(length(.logic_x) == 1){
+                         logic_x <- rep(.logic_x, vec_length)
+                    }else{
+                         logic_x <- rep(formals(ma_r)[[name_logic_x]], vec_length)
+                    }
+               }else{
+                    logic_x <- rep(formals(ma_r)[[name_logic_x]], vec_length)
+               }
+
+               if(!is.null(.logic_y)){
+                    if(length(.logic_y) == 1){
+                         logic_y <- rep(.logic_y, vec_length)
+                    }else{
+                         logic_y <- rep(formals(ma_r)[[name_logic_y]], vec_length)
+                    }
+               }else{
+                    logic_y <- rep(formals(ma_r)[[name_logic_y]], vec_length)
+               }
+
+               for(construct in unique_constructs){
+                    if(any(names(logic_general) == construct)){
+                         logic_x[construct_x == construct] <- logic_general[construct]
+                         logic_y[construct_y == construct] <- logic_general[construct]
+                    }
+               }
+
+               setNames(list(logic_x, logic_y), c(name_logic_x, name_logic_y))
+          }
+
+          if(!is.null(correct_rel)){
+               .correct_rel <- .distribute_logic(logic_general = correct_rel,
+                                                 logic_x = correct_rxx, logic_y = correct_ryy,
+                                                 name_logic_x = "correct_rxx", name_logic_y = "correct_ryy",
+                                                 construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
+               correct_rxx <- .correct_rel[["correct_rxx"]]
+               correct_ryy <- .correct_rel[["correct_ryy"]]
+          }else{
+               if(length(correct_rxx) != length(rxyi)) correct_rxx <- scalar_arg_warning(arg = correct_rxx, arg_name = "correct_rxx")
+               if(length(correct_ryy) != length(rxyi)) correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
+          }
+
+          if(!is.null(correct_rr)){
+               .correct_rr <- .distribute_logic(logic_general = correct_rr,
+                                                logic_x = correct_rr_x, logic_y = correct_rr_y,
+                                                name_logic_x = "correct_rr_x", name_logic_y = "correct_rr_y",
+                                                 construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
+               correct_rr_x <- .correct_rel[["correct_rr_x"]]
+               correct_rr_y <- .correct_rel[["correct_rr_y"]]
+          }else{
+               if(length(correct_rr_x) != length(rxyi)) correct_rr_x <- scalar_arg_warning(arg = correct_rr_x, arg_name = "correct_rr_x")
+               if(length(correct_rr_y) != length(rxyi)) correct_rr_y <- scalar_arg_warning(arg = correct_rr_y, arg_name = "correct_rr_y")
+          }
+
+          if(!is.null(indirect_rr)){
+               .indirect_rr <- .distribute_logic(logic_general = indirect_rr,
+                                                 logic_x = indirect_rr_x, logic_y = indirect_rr_y,
+                                                 name_logic_x = "indirect_rr_x", name_logic_y = "indirect_rr_y",
+                                                construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
+               indirect_rr_x <- .correct_rel[["indirect_rr_x"]]
+               indirect_rr_y <- .correct_rel[["indirect_rr_y"]]
+          }else{
+               if(length(indirect_rr_x) != length(rxyi)) indirect_rr_x <- scalar_arg_warning(arg = indirect_rr_x, arg_name = "indirect_rr_x")
+               if(length(indirect_rr_y) != length(rxyi)) indirect_rr_y <- scalar_arg_warning(arg = indirect_rr_y, arg_name = "indirect_rr_y")
+          }
+
+          if(!is.null(sign_rz)){
+               .sign_rz <- .distribute_logic(logic_general = sign_rz,
+                                              logic_x = sign_rxz, logic_y = sign_ryz,
+                                              name_logic_x = "sign_rxz", name_logic_y = "sign_ryz",
+                                              construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
+               sign_rxz <- .sign_rz[["sign_rxz"]]
+               sign_ryz <- .sign_rz[["sign_ryz"]]
+          }else{
+               sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
+               sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
+          }
      }
 
      rxx_type <- as.character(rxx_type)
@@ -473,9 +600,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
      }
 
-     if(is.null(construct_x)) construct_x <- rep("X", length(rxyi))
-     if(is.null(construct_y)) construct_y <- rep("Y", length(rxyi))
-
      if(!is.null(sample_id)) sample_id <- as.character(sample_id)[valid_r]
      if(!is.null(measure_x)) measure_x <- as.character(measure_x)[valid_r]
      if(!is.null(measure_y)) measure_y <- as.character(measure_y)[valid_r]
@@ -483,11 +607,19 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      construct_x <- as.character(construct_x)[valid_r]
      construct_y <- as.character(construct_y)[valid_r]
 
-     correct_rxx <- scalar_arg_warning(arg = correct_rxx, arg_name = "correct_rxx")
+     # correct_rxx <- scalar_arg_warning(arg = correct_rxx, arg_name = "correct_rxx")
+     # correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
+     correct_rxx <- manage_arglength(x = correct_rxx, y = rxyi)[valid_r]
+     correct_ryy <- manage_arglength(x = correct_ryy, y = rxyi)[valid_r]
+
+     # sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
+     # sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
+     sign_rxz <- manage_arglength(x = sign_rxz, y = rxyi)[valid_r]
+     sign_ryz <- manage_arglength(x = sign_ryz, y = rxyi)[valid_r]
+
      correct_rr_x <- manage_arglength(x = correct_rr_x, y = rxyi)[valid_r]
      indirect_rr_x <- manage_arglength(x = indirect_rr_x, y = rxyi)[valid_r]
 
-     correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
      correct_rr_y <- manage_arglength(x = correct_rr_y, y = rxyi)[valid_r]
      indirect_rr_y <- manage_arglength(x = indirect_rr_y, y = rxyi)[valid_r]
 
@@ -538,6 +670,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           if(!is.null(ux_observed)){data_x$ux_observed <- ux_observed}else{data_x$ux_observed <- TRUE}
           if(!is.null(correct_rr_x)){data_x$correct_rr_x <- correct_rr_x}else{data_x$correct_rr_x <- FALSE}
           if(!is.null(indirect_rr_x)){data_x$indirect_rr_x <- indirect_rr_x}else{data_x$indirect_rr_x <- FALSE}
+          if(!is.null(correct_rxx)){data_x$correct_rxx <- correct_rxx}else{data_x$correct_rxx <- TRUE}
+          if(!is.null(sign_rxz)){data_x$sign_rxz <- sign_rxz}else{data_x$sign_rxz <- 1}
 
           if(!is.null(ryy)){data_y$ryy <- ryy}else{data_y$ryy <- NA}
           if(!is.null(ryy_restricted)){data_y$ryy_restricted <- ryy_restricted}else{data_y$ryy_restricted <- TRUE}
@@ -547,6 +681,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           if(!is.null(uy_observed)){data_y$uy_observed <- uy_observed}else{data_y$uy_observed <- TRUE}
           if(!is.null(correct_rr_y)){data_y$correct_rr_y <- correct_rr_y}else{data_y$correct_rr_y <- FALSE}
           if(!is.null(indirect_rr_y)){data_y$indirect_rr_y <- indirect_rr_y}else{data_y$indirect_rr_y <- FALSE}
+          if(!is.null(correct_ryy)){data_y$correct_ryy <- correct_ryy}else{data_y$correct_ryy <- TRUE}
+          if(!is.null(sign_ryz)){data_y$sign_ryz <- sign_ryz}else{data_y$sign_ryz <- 1}
      }else{
           data_x <- data_y <- NULL
      }
@@ -573,7 +709,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
      if(ma_method != "bb" & !is.null(sample_id)){
           if(impute_artifacts){
-               print.psychmeta
                cat(" Imputing reliability information \n")
                rel_imputed <- impute_artifact_2col(logic_vec_x = data_x$rxx_restricted,
                                                    logic_vec_y = data_y$ryy_restricted,
@@ -877,14 +1012,14 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
 
                out <- ma_r_ic(rxyi = "rxyi", n = "n", n_adj = "n_adj", sample_id = "sample_id", hs_override = hs_override,
                               wt_type = wt_type, error_type = error_type,
-                              correct_bias = correct_bias, correct_rxx = correct_rxx, correct_ryy = correct_ryy,
+                              correct_bias = correct_bias, correct_rxx = "correct_rxx", correct_ryy = "correct_ryy",
                               correct_rr_x = "correct_rr_x", correct_rr_y = "correct_rr_y",
                               indirect_rr_x = "indirect_rr_x", indirect_rr_y = "indirect_rr_y",
                               rxx = "rxx", rxx_restricted = "rxx_restricted", rxx_type = "rxx_type",
                               ryy = "ryy", ryy_restricted = "ryy_restricted", ryy_type = "ryy_type",
                               ux = "ux", ux_observed = "ux_observed",
                               uy = "uy", uy_observed = "uy_observed",
-                              sign_rxz = sign_rxz, sign_ryz = sign_ryz,
+                              sign_rxz = "sign_rxz", sign_ryz = "sign_ryz",
                               conf_level = conf_level, cred_level = cred_level,
                               conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased,
                               moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz, cat_moderators = cat_moderators, moderator_type = moderator_type,
@@ -1001,11 +1136,31 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                     class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
                }
 
-               out <- .ma_r_ad(ma_r_obj = out, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y, correction_method = correction_method,
-                              correct_rxx = correct_rxx, correct_ryy = correct_ryy,
-                              correct_rr_x = data$correct_rr_x[1], correct_rr_y = data$correct_rr_y[1],
-                              indirect_rr_x = data$indirect_rr_x[1], indirect_rr_y = data$indirect_rr_y[1],
-                              residual_ads = residual_ads, sign_rxz = sign_rxz, sign_ryz = sign_ryz, decimals = decimals)
+               .construct_x <- as.character(data$construct_x[1])
+               .construct_y <- as.character(data$construct_y[1])
+               if(!all(data$correct_rxx[1] == data$correct_rxx))
+                    stop("Inconsistent correct_rxx values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the correct_rel argument", call. = FALSE)
+               if(!all(data$correct_ryy[1] == data$correct_ryy))
+                    stop("Inconsistent correct_ryy values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the correct_rel argument", call. = FALSE)
+               if(!all(data$correct_rr_x[1] == data$correct_rr_x))
+                    stop("Inconsistent correct_rr_x values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the correct_rr argument", call. = FALSE)
+               if(!all(data$correct_rr_y[1] == data$correct_rr_y))
+                    stop("Inconsistent correct_rr_y values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the correct_rr argument", call. = FALSE)
+               if(!all(data$indirect_rr_x[1] == data$indirect_rr_x))
+                    stop("Inconsistent indirect_rr_x values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the indirect_rr argument", call. = FALSE)
+               if(!all(data$indirect_rr_y[1] == data$indirect_rr_y))
+                    stop("Inconsistent indirect_rr_y values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the indirect_rr argument", call. = FALSE)
+               if(!all(data$sign_rxz[1] == data$sign_rxz))
+                    stop("Inconsistent sign_rxz values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the sign_rz argument", call. = FALSE)
+               if(!all(data$sign_ryz[1] == data$sign_ryz))
+                    stop("Inconsistent sign_ryz values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the sign_rz argument", call. = FALSE)
+
+               out <- .ma_r_ad(ma_r_obj = out, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
+                               correction_method = correction_method[.construct_x, .construct_y],
+                               correct_rxx = data$correct_rxx[1], correct_ryy = data$correct_ryy[1],
+                               correct_rr_x = data$correct_rr_x[1], correct_rr_y = data$correct_rr_y[1],
+                               indirect_rr_x = data$indirect_rr_x[1], indirect_rr_y = data$indirect_rr_y[1],
+                               residual_ads = residual_ads, sign_rxz = data$sign_rxz[1], sign_ryz = data$sign_ryz[1], decimals = decimals)
 
                if(es_d){
                     ad_method <- out$artifact_distribution$method_details["ad_method"]
@@ -1092,9 +1247,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           bb_meta_mat <- ts_meta_mat <- vgx_meta_mat <- vgy_meta_mat <- NULL
           for(i in 1:length(bb_metas)){
                bb_meta_mat <- rbind(bb_meta_mat, cbind(Pair_ID = i, bb_metas[[i]]))
-               ts_meta_mat <- rbind(ts_meta_mat, cbind(Pair_ID = i, ts_metas[[i]]))
-               vgx_meta_mat <- rbind(vgx_meta_mat, cbind(Pair_ID = i, vgx_metas[[i]]))
-               vgy_meta_mat <- rbind(vgy_meta_mat, cbind(Pair_ID = i, vgy_metas[[i]]))
+               if(!is.null(ts_metas[[i]])) ts_meta_mat <- rbind(ts_meta_mat, cbind(Pair_ID = i, ts_metas[[i]]))
+               if(!is.null(vgx_metas[[i]])) vgx_meta_mat <- rbind(vgx_meta_mat, cbind(Pair_ID = i, vgx_metas[[i]]))
+               if(!is.null(vgy_metas[[i]])) vgy_meta_mat <- rbind(vgy_meta_mat, cbind(Pair_ID = i, vgy_metas[[i]]))
           }
 
           table_list <- list(barebones = bb_meta_mat,

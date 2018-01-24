@@ -35,9 +35,9 @@ ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, wt_type = "sample_size",
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rxx}{Logical scalar that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rxx}{Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_ryy}{Logical scalar that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_rr_x}{Logical scalar or vector or column name determining whether each correlation in rxyi should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}).}
 

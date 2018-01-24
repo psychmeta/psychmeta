@@ -8,20 +8,21 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, ma_method = "bb",
   ad_type = "tsa", correction_method = "auto", construct_x = NULL,
   construct_y = NULL, measure_x = NULL, measure_y = NULL,
   construct_order = NULL, wt_type = "sample_size", error_type = "mean",
-  correct_bias = TRUE, correct_rxx = TRUE, correct_ryy = TRUE,
-  correct_rr_x = TRUE, correct_rr_y = TRUE, indirect_rr_x = TRUE,
+  correct_bias = TRUE, correct_rel = NULL, correct_rxx = TRUE,
+  correct_ryy = TRUE, correct_rr = NULL, correct_rr_x = TRUE,
+  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_x = TRUE,
   indirect_rr_y = TRUE, rxx = NULL, rxx_restricted = TRUE,
   rxx_type = "alpha", ryy = NULL, ryy_restricted = TRUE,
   ryy_type = "alpha", ux = NULL, ux_observed = TRUE, uy = NULL,
-  uy_observed = TRUE, sign_rxz = 1, sign_ryz = 1, conf_level = 0.95,
-  cred_level = 0.8, conf_method = "t", cred_method = "t",
-  var_unbiased = TRUE, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = "simple", pairwise_ads = FALSE, residual_ads = TRUE,
-  check_dependence = TRUE, collapse_method = "composite", intercor = 0.5,
-  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad",
-  FALSE, TRUE), impute_method = "bootstrap_mod", decimals = 2,
-  hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL,
-  data = NULL, ...)
+  uy_observed = TRUE, sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
+  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
+  cred_method = "t", var_unbiased = TRUE, moderators = NULL,
+  cat_moderators = TRUE, moderator_type = "simple", pairwise_ads = FALSE,
+  residual_ads = TRUE, check_dependence = TRUE,
+  collapse_method = "composite", intercor = 0.5, clean_artifacts = TRUE,
+  impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE),
+  impute_method = "bootstrap_mod", decimals = 2, hs_override = FALSE,
+  use_all_arts = FALSE, supplemental_ads = NULL, data = NULL, ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations}
@@ -36,7 +37,8 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, ma_method = "bb",
 
 \item{ad_type}{For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".}
 
-\item{correction_method}{When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+\item{correction_method}{Character scalar or a square matrix with the collective levels of \code{construct_x} and \code{construct_y} as row names and column names.
+When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.}
@@ -59,13 +61,19 @@ be used when interative artifact distributions are provided). See "Details" of \
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rxx}{Logical scalar that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rel}{Optional named vector that supercedes \code{correct_rxx} and \code{correct_ryy}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
 
-\item{correct_ryy}{Logical scalar that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rxx}{Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{correct_rr}{Optional named vector that supercedes \code{correct_rr_x} and \code{correct_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for range restriction.}
 
 \item{correct_rr_x}{Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
 
 \item{correct_rr_y}{Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
+
+\item{indirect_rr}{Optional named vector that supercedes \code{indirect_rr_x} and \code{indirect_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.}
 
 \item{indirect_rr_x}{Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in X (\code{TRUE}) or not (\code{FALSE}).
 Superceded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_x} == \code{FALSE}, the value supplied for \code{indirect_rr_x} is disregarded).}
@@ -113,6 +121,8 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 \item{uy}{Vector or column name of u ratios for Y.}
 
 \item{uy_observed}{Logical vector or column name determining whether each element of uy is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).}
+
+\item{sign_rz}{Optional named vector that supercedes \code{sign_rxz} and \code{sign_ryz}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.}
 
 \item{sign_rxz}{Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).}
 

@@ -38,9 +38,9 @@ ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rGg}{Logical scalar that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rGg}{Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_ryy}{Logical scalar that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_rr_g}{Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).}
 

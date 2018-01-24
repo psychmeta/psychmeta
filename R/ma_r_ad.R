@@ -210,7 +210,9 @@ gather_ma_ad <- function(x){
      }else{
           ad_method <- "Taylor series approximation method"
      }
+     if(correction_method == "none")    ad_method <- "Artifact distributions not used"
 
+     if(correction_method == "none")    range_restriction <- "Made no corrections for range restriction"
      if(correction_method == "meas")    range_restriction <- "Made no corrections for range restriction"
      if(correction_method == "bvdrr")   range_restriction <- "Corrected for bivariate direct range restriction"
      if(correction_method == "bvirr")   range_restriction <- "Corrected for bivariate indirect range restriction (i.e., Case V)"
@@ -529,13 +531,13 @@ gather_ma_ad <- function(x){
                          correction_method <- "meas"
                     }else{
                          correction_method <- "NULL"
-                         warning("No valid combinations of artifacts were supplied: Automatic search for most appropriate correction terminated: \n
-                                 Function will return intial meta-analysis object without adding artifact-distribution results", call. = FALSE)
+                         warning("No valid combinations of artifacts were supplied: Automatic search for most appropriate correction terminated: \nFunction will return intial meta-analysis object without adding artifact-distribution results", call. = FALSE)
+                         correction_method <- "none"
                     }
                     }
                }
           }else{
-               valid_options <- c("meas", "uvdrr", "uvirr", "bvdrr", "bvirr", "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj")
+               valid_options <- c("meas", "uvdrr", "uvirr", "bvdrr", "bvirr", "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none")
                if(!any(correction_method %in% valid_options))
                     stop("'correction_method' must be one of the following methods: ", paste(valid_options, collapse = ", "), call. = FALSE)
 

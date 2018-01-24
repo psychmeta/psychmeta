@@ -9,12 +9,13 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   correction_method = "auto", group_id = NULL, group1 = NULL,
   group2 = NULL, group_order = NULL, construct_y = NULL,
   measure_y = NULL, construct_order = NULL, wt_type = "inv_var_mean",
-  error_type = "mean", correct_bias = TRUE, correct_rGg = FALSE,
-  correct_ryy = TRUE, correct_rr_g = TRUE, correct_rr_y = TRUE,
+  error_type = "mean", correct_bias = TRUE, correct_rel = NULL,
+  correct_rGg = FALSE, correct_ryy = TRUE, correct_rr = NULL,
+  correct_rr_g = TRUE, correct_rr_y = TRUE, indirect_rr = NULL,
   indirect_rr_g = TRUE, indirect_rr_y = TRUE, rGg = NULL, pi = NULL,
   pa = NULL, ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
-  uy = NULL, uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1,
-  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
+  uy = NULL, uy_observed = TRUE, sign_rz = NULL, sign_rgz = 1,
+  sign_ryz = 1, conf_level = 0.95, cred_level = 0.8, conf_method = "t",
   cred_method = "t", var_unbiased = TRUE, moderators = NULL,
   cat_moderators = TRUE, moderator_type = "simple", pairwise_ads = FALSE,
   residual_ads = TRUE, check_dependence = TRUE,
@@ -41,7 +42,8 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 
 \item{ad_type}{For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".}
 
-\item{correction_method}{When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+\item{correction_method}{Character scalar or a matrix with \code{group_id} levels as row names and \code{construct_y} levels as column names.
+When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.}
@@ -73,13 +75,19 @@ If \code{group_order} is \code{NULL}, the order of group pairings will be determ
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rGg}{Logical scalar that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rel}{Optional named vector that supercedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
 
-\item{correct_ryy}{Logical scalar that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rGg}{Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{correct_rr}{Optional named vector that supercedes \code{correct_rr_g} and \code{correct_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for range restriction.}
 
 \item{correct_rr_g}{Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_rr_y}{Logical scalar or vector or column name determining whether each \emph{d} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{indirect_rr}{Optional named vector that supercedes \code{indirect_rr_g} and \code{indirect_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.}
 
 \item{indirect_rr_g}{Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
 Superceded in evaluation by \code{correct_rr_g} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).}
@@ -102,6 +110,8 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 \item{uy}{Vector or column name of u ratios for Y.}
 
 \item{uy_observed}{Logical vector or column name determining whether each element of \code{uy} is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).}
+
+\item{sign_rz}{Optional named vector that supercedes \code{sign_rgz} and \code{sign_ryz}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.}
 
 \item{sign_rgz}{Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).}
 

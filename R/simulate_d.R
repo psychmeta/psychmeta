@@ -24,14 +24,14 @@
 #' @export
 #'
 #' @examples
-#' ## Simulate statistics by providing integers as n_vec":
+#' ## Simulate statistics by providing integers as "n_vec":
 #' simulate_d_sample(n_vec = c(200, 100), rho_mat_list = list(reshape_vec2mat(.5),
 #'                                                            reshape_vec2mat(.4)),
 #'                   mu_mat = rbind(c(1, .5), c(0, 0)), sigma_mat = rbind(c(1, 1), c(1, 1)),
 #'                   rel_mat = rbind(c(.8, .7), c(.7, .7)), sr_vec = c(1, .5),
 #'                   group_names = c("A", "B"))
 #'
-#' ## Simulate statistics by providing proportions as "n_vec":
+#' ## Simulate parameters by providing proportions as "n_vec":
 #' simulate_d_sample(n_vec = c(2/3, 1/3), rho_mat_list = list(reshape_vec2mat(.5),
 #'                                                            reshape_vec2mat(.4)),
 #'                   mu_mat = rbind(c(1, .5), c(0, 0)), sigma_mat = rbind(c(1, 1), c(1, 1)),
@@ -544,9 +544,9 @@ append_dmat <- function(di_mat, da_mat,
      da_true <- .compute_d_internal(means = meanya_mat_true, sds = sdya_mat_true, n = .na_mat, applicant = TRUE, groups_on_cols = TRUE)
      da_error <- .compute_d_internal(means = meanya_mat_error, sds = sdya_mat_error, n = .na_mat, applicant = TRUE, groups_on_cols = TRUE)
 
-     di_obs <- .compute_d_internal(means = meanyi_mat_obs, sds = sdyi_mat_obs, n = .na_mat, applicant = FALSE, groups_on_cols = TRUE)
-     di_true <- .compute_d_internal(means = meanyi_mat_true, sds = sdyi_mat_true, n = .na_mat, applicant = FALSE, groups_on_cols = TRUE)
-     di_error <- .compute_d_internal(means = meanyi_mat_error, sds = sdyi_mat_error, n = .na_mat, applicant = FALSE, groups_on_cols = TRUE)
+     di_obs <- .compute_d_internal(means = meanyi_mat_obs, sds = sdyi_mat_obs, n = .ni_mat, applicant = FALSE, groups_on_cols = TRUE)
+     di_true <- .compute_d_internal(means = meanyi_mat_true, sds = sdyi_mat_true, n = .ni_mat, applicant = FALSE, groups_on_cols = TRUE)
+     di_error <- .compute_d_internal(means = meanyi_mat_error, sds = sdyi_mat_error, n = .ni_mat, applicant = FALSE, groups_on_cols = TRUE)
 
      ryya_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Applicant parallel-forms reliability",]))
      ryyi_group <- simplify2array(lapply(group_list, function(x) x$descriptives$observed["Incumbent parallel-forms reliability",]))

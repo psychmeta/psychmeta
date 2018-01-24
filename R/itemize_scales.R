@@ -101,8 +101,8 @@ simulate_psych_items <- function(n, k_vec, R_scales, rel_vec,
                     item_index = obs_out$item_index_complete)
 
      if(!is.infinite(n)){
-          items_true <- MASS::mvrnorm(n = n, mu = true_out$item_means, Sigma = true_out$S_items, empirical = TRUE)
-          items_error <- MASS::mvrnorm(n = n, mu = error_out$item_means, Sigma = error_out$S_items, empirical = TRUE)
+          items_true <- MASS::mvrnorm(n = n, mu = true_out$item_means, Sigma = true_out$S_items)
+          items_error <- MASS::mvrnorm(n = n, mu = error_out$item_means, Sigma = error_out$S_items)
           colnames(items_true) <- colnames(items_error) <- colnames(true_out$S_items)
           items_obs <- items_true + items_error
 
@@ -140,9 +140,9 @@ simulate_psych_items <- function(n, k_vec, R_scales, rel_vec,
      }
 }
 
-.compute_alpha <- function(sigma, wt = rep(1, ncol(sigma))){
+.compute_alpha <- function(sigma, ...){
      k <- ncol(sigma)
-     wt <- c(wt)
+     wt <- rep(1, ncol(sigma))
      numer <- sum(wt * diag(sigma))
      denom <- c(wt %*% sigma %*% wt)
      k / (k - 1) * (1 - numer / denom)
@@ -174,4 +174,31 @@ simulate_psych_items <- function(n, k_vec, R_scales, rel_vec,
      rel_mat <- simplify2array(rel_list)
      rel_mat[is.na(rel_mat)] <- NA
      rel_mat
+}
+
+
+#' Compute coefficient alpha
+#'
+#' @param sigma Covariance matrix (must be supplied if data argument is not supplied)
+#' @param data Data matrix or data frame (must be supplied if sigma argument is not supplied)
+#' @param standardized Logical scalar determining whether alpha should be computed from an unstandardized covariance matrix (\code{TRUE}) or a correlation matrix (\code{FALSE}).
+#' @param ... Additional arguments to be passed to \code{cov()} function.
+#'
+#' @return Coefficient alpha
+#' @export
+#'
+#' @examples
+#' compute_alpha(sigma = reshape_vec2mat(cov = .4, order = 10))
+compute_alpha <- function(sigma = NULL, data = NULL, standardized = FALSE, ...){
+     if(is.null(sigma)){
+          if(is.null(data)){
+               stop("Either sigma or data must be supplied", call. = FALSE)
+          }else{
+               sigma <- cov(data, ...)
+          }
+     }
+
+     if(standardized) sigma <- cov2cor(sigma)
+
+     .compute_alpha(sigma = sigma)
 }

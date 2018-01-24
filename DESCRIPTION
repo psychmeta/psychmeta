@@ -1,8 +1,8 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 0.2.1
-Date: 2018-01-07
+Version: 0.2.2
+Date: 2018-01-24
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "dahlk068@umn.edu"),
               person("Brenton M.", "Wiernik", role = "aut", email = "psychmeta@wiernik.org"),
@@ -17,10 +17,10 @@ Depends: R (>= 3.4.0)
 Encoding: UTF-8
 LazyData: true
 Imports: MASS, boot, tmvtnorm, tibble, reshape2, ggplot2, dplyr, stats,
-        metafor, nor1mix, methods, progress, tidyr, rtf
+        metafor, nor1mix, methods, progress, tidyr, rtf, fungible
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2018-01-08 01:58:50 UTC; dahlk068
+Packaged: 2018-01-24 15:57:04 UTC; dahlk068
 Author: Jeffrey A. Dahlke [aut, cre],
   Brenton M. Wiernik [aut],
   Michael T. Brannick [ctb],
