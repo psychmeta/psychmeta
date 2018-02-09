@@ -9,7 +9,7 @@ simulate_d_database(k, n_params, rho_params, mu_params = NULL,
   wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
   group_names = NULL, var_names = NULL, composite_names = NULL,
   diffs_as_obs = FALSE, show_applicant = FALSE, keep_vars = NULL,
-  decimals = 2, max_iter = 100)
+  decimals = 2, max_iter = 100, ...)
 }
 \arguments{
 \item{k}{Number of studies to simulate.}
@@ -51,6 +51,8 @@ only some variables are of interest and others are generated solely to serve as 
 \item{decimals}{Number of decimals to which statistical results (not parameters) should be rounded. Rounding to 2 decimal places best captures the precision of data available from published primary research.}
 
 \item{max_iter}{Maximum number of iterations to allow in the parameter selection process before terminating with convergence failure. Must be finite.}
+
+\item{...}{Additional arguments.}
 }
 \value{
 A database of simulated primary studies' statistics and analytically determined parameter values.

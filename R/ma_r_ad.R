@@ -646,10 +646,10 @@ gather_ma_ad <- function(x){
 
                if(!is.infinite(decimals)){
                     ad_obj_x <- lapply(ad_obj_x, function(x)
-                         .create_ad_int(art_vec = x[,"Value"], wt_vec = x[,"Weight"], decimals = 2))
+                         .create_ad_int(art_vec = x[,"Value"], wt_vec = x[,"Weight"], decimals = decimals))
 
                     ad_obj_y <- lapply(ad_obj_y, function(x)
-                         .create_ad_int(art_vec = x[,"Value"], wt_vec = x[,"Weight"], decimals = 2))
+                         .create_ad_int(art_vec = x[,"Value"], wt_vec = x[,"Weight"], decimals = decimals))
                }
           }
           if(matching_ads_tsa){

@@ -4,7 +4,8 @@
 \alias{format_long}
 \title{Create long-format datasets in simulate_r_database}
 \usage{
-format_long(x, param, sample_id, var_names, show_applicant, decimals = 2)
+format_long(x, param, sample_id, var_names, show_applicant, decimals = 2,
+  noalpha = FALSE)
 }
 \arguments{
 \item{x}{Simulation list}
@@ -18,6 +19,8 @@ format_long(x, param, sample_id, var_names, show_applicant, decimals = 2)
 \item{show_applicant}{Should applicant data be shown for sample statistics (TRUE) or suppressed (FALSE)?}
 
 \item{decimals}{Number of decimals to which statistical results (not parameters) should be rounded. Rounding to 2 decimal places best captures the precision of data available from published primary research.}
+
+\item{noalpha}{Logical scalar indicating whether or not alpha is in the database.}
 }
 \value{
 A dataframe of results

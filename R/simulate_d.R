@@ -97,7 +97,8 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
 
 
 
-.simulate_d_sample_screen <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, sr_vec, k_items_vec,
+.simulate_d_sample_screen <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, rel_mat, sr_vec,
+                                      k_items_vec = rep(1, ncol(mu_mat)),
                                       wt_mat = NULL, sr_composites = NULL,
                                       group_names = NULL, var_names = NULL, composite_names = NULL,
                                       show_applicant = FALSE, diffs_as_obs = FALSE){
@@ -1016,6 +1017,7 @@ append_dmat <- function(di_mat, da_mat,
 #' only some variables are of interest and others are generated solely to serve as selection variables.
 #' @param decimals Number of decimals to which statistical results (not parameters) should be rounded. Rounding to 2 decimal places best captures the precision of data available from published primary research.
 #' @param max_iter Maximum number of iterations to allow in the parameter selection process before terminating with convergence failure. Must be finite.
+#' @param ... Additional arguments.
 #'
 #' @details
 #' Values supplied as any argument with the suffix "params" can take any of three forms (see Examples for a demonstration of usage):
@@ -1063,9 +1065,13 @@ simulate_d_database <- function(k, n_params, rho_params,
                                 rel_params = 1, sr_params = 1, k_items_params = 1,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
                                 group_names = NULL, var_names = NULL, composite_names = NULL, diffs_as_obs = FALSE,
-                                show_applicant = FALSE, keep_vars = NULL, decimals = 2, max_iter = 100){
+                                show_applicant = FALSE, keep_vars = NULL, decimals = 2, max_iter = 100, ...){
      inputs <- as.list(environment())
      call <- match.call()
+
+     noalpha <- list(...)$noalpha
+     if(is.null(noalpha)) noalpha <- FALSE
+     if(length(noalpha) > 1) noalpha <- noalpha[1]
 
      if(decimals < 2) stop("'decimals' must be a number greater than or equal to 2", call. = FALSE)
      if(zapsmall(decimals) != round(decimals)){
@@ -1360,10 +1366,10 @@ simulate_d_database <- function(k, n_params, rho_params,
      dat_last <- dat_stats[,which(colnames(dat_stats) == "meanyi"):ncol(dat_stats)]
      dat_stats <- cbind(dat_first, dat_u_local, dat_u_external, dat_last)
 
-     if(!show_applicant) dat_params[,c("da", "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
-                                       "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
-                                       "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2",
-                                       "sdya_pooled", "sdya_mixture", "sdya1", "sdya2", "meanya", "meanya1", "meanya2")] <- NULL
+     # if(!show_applicant) dat_params[,c("da", "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
+     #                                   "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
+     #                                   "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2",
+     #                                   "sdya_pooled", "sdya_mixture", "sdya1", "sdya2", "meanya", "meanya1", "meanya2")] <- NULL
 
      numeric_vars_stats <- rep(TRUE, ncol(dat_stats))
      numeric_vars_params <- rep(TRUE, ncol(dat_params))
@@ -1447,6 +1453,10 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                                     "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
                                     "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")[art_logic_stat]
           }
+
+          art_names_stat <- art_names_stat[art_names_stat %in% colnames(data_obj$statistics)]
+          art_names_param <- art_names_param[art_names_param %in% colnames(data_obj$parameters)]
+
           delete_id <- sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
           delete_id <- data_obj$statistics$sample_id %in% delete_id
           data_obj$statistics[delete_id,art_names_stat] <- NA
@@ -1473,6 +1483,10 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                                                         "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")
                     }
                }
+
+               art_i_stat <- art_i_stat[art_i_stat %in% colnames(data_obj$statistics)]
+               art_i_param <- art_i_param[art_i_param %in% colnames(data_obj$parameters)]
+
                for(ij in art_i_stat) data_obj$statistics[delete_id,ij] <- NA
                for(ij in art_i_param) data_obj$parameters[delete_id,ij] <- NA
           }

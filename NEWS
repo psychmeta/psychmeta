@@ -1,3 +1,9 @@
+Changes in Version 0.2.3 (2018-02-09)
+=====================================
+o Bug fix to the interactive artifact-distribution method for bivariate indirect range restriction (bvirr) to properly compute SD rho.
+o Bug fix to allow interactive artifact distributions to be rounded to the desired number of decimal places.
+o Bug fix for computing the mean reliability indices in the Taylor-series estimate of the corrected error variance for correlations corrected with the bivariate indirect range restriction (bvirr) correction.
+
 Changes in Version 0.2.2 (2018-01-24)
 =====================================
 o A new function (called matreg, with aliases of matrixreg, lm_mat, and lm_matrix) has been added that computes regression models from covariance matrices and vectors of means and generates output that resembles that of the "lm" function. Output from matreg can be used with the summary(), predict(), and confint() functions. 

@@ -281,7 +281,7 @@ var_error_g <- function(g, n1, n2 = NA){
 #' If item_mat is NULL, the program will assume that all item intercorrelations are equal.
 #' @param alpha Vector of population alpha values. Must be supplied if item_mat is NULL.
 #' @param k_items Vector of numbers of items to be simulated. Must be supplied if item_mat is NULL.
-#' @param ncases Vector of sample sizes to simulate in sampling distribution of alpha.
+#' @param n_cases Vector of sample sizes to simulate in sampling distribution of alpha.
 #'
 #' @return Vector of sampling variances of the supplied alpha(s).
 #' @export
@@ -297,10 +297,10 @@ var_error_g <- function(g, n1, n2 = NA){
 #' alpha <- mean(item_mat[lower.tri(item_mat)]) / mean(item_mat)
 #' k_items <- nrow(item_mat)
 #'
-#' var_error_alpha(item_mat = item_mat, ncases = 50)
-#' var_error_alpha(alpha = alpha, k_items = k_items, ncases = 50)
-#' var_error_alpha(alpha = c(alpha, alpha), k_items = c(k_items, k_items), ncases = 50)
-var_error_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, ncases){
+#' var_error_alpha(item_mat = item_mat, n_cases = 50)
+#' var_error_alpha(alpha = alpha, k_items = k_items, n_cases = 50)
+#' var_error_alpha(alpha = c(alpha, alpha), k_items = c(k_items, k_items), n_cases = 50)
+var_error_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases){
      if(is.null(item_mat)){
           if(is.null(alpha) | is.null(k_items))
                stop("Either item_mat or the combination of alpha and k_items must be supplied to compute the error variance of alpha.", call. = FALSE)
@@ -327,7 +327,7 @@ var_error_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, ncase
           tr_matsq <- sum(diag(item_matsq))
      }
 
-     (((2 * k_items^2) / ((k_items - 1)^2 * sum_mat^3)) * (sum_mat * (tr_matsq + tr_mat^2) - 2 * tr_mat * sum_matsq)) / ncases
+     (((2 * k_items^2) / ((k_items - 1)^2 * sum_mat^3)) * (sum_mat * (tr_matsq + tr_mat^2) - 2 * tr_mat * sum_matsq)) / n_cases
 }
 
 
@@ -341,8 +341,8 @@ var_error_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, ncase
 #' @export
 #'
 #' @references
-#' Ruscio, J. (2008). 
-#' A probability-based measure of effect size: Robustness to base rates and other factors. 
+#' Ruscio, J. (2008).
+#' A probability-based measure of effect size: Robustness to base rates and other factors.
 #' \emph{Psychological Methods, 13}(1), 19–30. \url{https://doi.org/10.1037/1082-989X.13.1.19}
 #'
 #' @details

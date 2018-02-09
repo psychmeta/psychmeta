@@ -40,7 +40,7 @@ var_error_auc(A = 1, n1 = 60, n2 = NA)
 var_error_cles(A = 1, n1 = 30, n2 = 30)
 }
 \references{
-Ruscio, J. (2008). 
-A probability-based measure of effect size: Robustness to base rates and other factors. 
+Ruscio, J. (2008).
+A probability-based measure of effect size: Robustness to base rates and other factors.
 \emph{Psychological Methods, 13}(1), 19–30. \url{https://doi.org/10.1037/1082-989X.13.1.19}
 }

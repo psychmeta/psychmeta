@@ -175,3 +175,49 @@ simulate_psych <- function(n, rho_mat,
           .var_names = .var_names)
 }
 
+
+.simulate_psych_d_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
+                                      mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
+                                      sr_vec = rep(1, ncol(rho_mat)),
+                                      wt_mat = NULL, sr_composites = NULL,
+                                      var_names = NULL, composite_names = NULL, ...){
+
+     if(is.null(var_names)){
+          var_names <- paste("x", 1:ncol(rho_mat), sep = "")
+     }
+
+     if(!is.null(wt_mat)){
+          if(is.null(composite_names))
+               composite_names <- paste("composite", 1:ncol(wt_mat), sep = "")
+     }
+
+     ## Create matrix of true-score covariances
+     S <- diag(sigma_vec) %*% diag(rel_vec^.5) %*% rho_mat %*% diag(rel_vec^.5) %*% diag(sigma_vec)
+
+     ## Generate true-score, error-score, and observed-score data
+     true_scores_a <- MASS::mvrnorm(n = n, mu = mu_vec, Sigma = S)
+     error_scores_a <- MASS::mvrnorm(n = n, mu = rep(0, ncol(rho_mat)), Sigma = diag(sigma_vec^2 - sigma_vec^2 * rel_vec))
+
+     if(!is.null(wt_mat)){
+          true_scores_a <- cbind(true_scores_a, Composite = true_scores_a %*% wt_mat)
+          error_scores_a <- cbind(error_scores_a, Composite = error_scores_a %*% wt_mat)
+          sr_vec <- c(sr_vec, sr_composites)
+          var_names <- c(var_names, composite_names)
+     }
+     obs_scores_a <- true_scores_a + error_scores_a
+
+     ## Perform selection on any variables for which the selection ratio is less than 1
+     select_ids <- which(sr_vec < 1)
+     select_vec <- rep(TRUE, n)
+     for(i in select_ids)
+          select_vec <- select_vec & obs_scores_a[,i] >= sort(obs_scores_a[,i], decreasing = TRUE)[n * sr_vec[i]]
+
+     colnames(true_scores_a) <- colnames(error_scores_a) <- colnames(obs_scores_a) <- var_names
+
+     list(obs_scores_a = obs_scores_a,
+          true_scores_a = true_scores_a,
+          error_scores_a = error_scores_a,
+          sr_vec = sr_vec,
+          var_names = c(var_names, composite_names))
+}
+

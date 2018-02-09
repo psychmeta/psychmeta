@@ -80,7 +80,7 @@
      })
      var_pre_tp <- var_e + var_art_tp
      var_res_tp <- var_r - var_pre_tp
-     var_rho_tp <- var_res * mean_ux^2 * mean_uy^2/(mean_qxa^2 * mean_qya^2)
+     var_rho_tp <- var_res_tp * mean_ux^2 * mean_uy^2/(mean_qxa^2 * mean_qya^2)
 
      mean_rxpa <- mean_rtpa * mean_qxa
      ci_xp <- ci_tp * mean_qxa

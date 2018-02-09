@@ -76,7 +76,7 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
                               mean_rxyi = NULL, mean_ux = NULL, mean_uy = NULL, mean_qxa = NULL, mean_qya = NULL,
                               var_rxyi = NULL, var_ux = NULL, var_uy = NULL, var_qxa = NULL, var_qya = NULL,
                               cor_rxyi_ux = 0, cor_rxyi_uy = 0, cor_rxyi_qxa = 0, cor_rxyi_qya = 0,
-                              cor_ux_uy = 0, cor_ux_qxa = 0,cor_ux_qya = 0, cor_uy_qxa = 0, cor_uy_qya = 0, cor_qxa_qya = 0,
+                              cor_ux_uy = 0, cor_ux_qxa = 0, cor_ux_qya = 0, cor_uy_qxa = 0, cor_uy_qya = 0, cor_qxa_qya = 0,
                               sign_rxz = 1, sign_ryz = 1, r_deriv_only = FALSE){
 
      if(length(qx) == 1 & length(rxyi) > 1) qx <- rep(qx, length(rxyi))
@@ -136,11 +136,8 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
           if(!is.null(var_qxa)){
                var_e_qxa <- var_qxa
           }else{
-               if(is.null(mean_qxa)){
-                    mean_qxi <- estimate_rxxi(rxxa = qx[qx_restricted]^2, ux = mean_ux)^.5
-               }else{
-                    mean_qxi <- estimate_rxxi(rxxa = mean_qxa^2, ux = mean_ux)^.5
-               }
+               if(is.null(mean_qxa)) mean_qxa <- wt_mean(x = qxa, wt = ni)
+               mean_qxi <- estimate_rxxi(rxxa = mean_qxa^2, ux = mean_ux)^.5
 
                var_e_qxa <- var_error_q(q = mean_qxa, n = ni)
                var_e_qxa[!is.na(na)] <- var_error_q(q = mean_qxa, n = na[!is.na(na)])
@@ -151,16 +148,13 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
           if(!is.null(var_qya)){
                var_e_qya <- var_qya
           }else{
-               if(is.null(mean_qya)){
-                    mean_qyi <- estimate_rxxi(rxxa = qy[qy_restricted]^2, ux = mean_uy)^.5
-               }else{
-                    mean_qyi <- estimate_rxxi(rxxa = mean_qya^2, ux = mean_uy)^.5
-               }
+               if(is.null(mean_qya)) mean_qya <- wt_mean(x = qya, wt = ni)
+               mean_qyi <- estimate_rxxi(rxxa = mean_qya^2, ux = mean_uy)^.5
+
                var_e_qya <- var_error_q(q = mean_qya, n = ni)
                var_e_qya[!is.na(na)] <- var_error_q(q = mean_qya, n = na[!is.na(na)])
                var_e_qya[qx_restricted] <- var_error_q(q = mean_qyi, n = ni[qx_restricted])
                var_e_qya[qy_restricted] <- estimate_var_qxa_ux(qxi = mean_qyi, var_qxi = var_e_qya[qy_restricted], ux = ux[qy_restricted], indirect_rr = TRUE)
-
           }
 
           ## Estimate the corrected correlation

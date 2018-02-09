@@ -9,7 +9,7 @@ simulate_r_database(k, n_params, rho_params, mu_params = 0,
   wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
   var_names = NULL, composite_names = NULL, n_as_ni = FALSE,
   show_applicant = FALSE, keep_vars = NULL, decimals = 2,
-  format = "long", max_iter = 100)
+  format = "long", max_iter = 100, ...)
 }
 \arguments{
 \item{k}{Number of studies to simulate.}
@@ -51,6 +51,8 @@ only some variables are of interest and others are generated solely to serve as 
 \item{format}{Database format: "long" or "wide."}
 
 \item{max_iter}{Maximum number of iterations to allow in the parameter selection process before terminating with convergence failure. Must be finite.}
+
+\item{...}{Additional arguments.}
 }
 \value{
 A database of simulated primary studies' statistics and analytically determined parameter values.
