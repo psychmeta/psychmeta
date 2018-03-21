@@ -22,6 +22,7 @@
      cred_level <- x$cred_level
      cred_method <- x$cred_method
      var_unbiased <- x$var_unbiased
+     decimals <- x$decimals
 
      k <- barebones[,"k"]
      N <- barebones[,"N"]
@@ -30,6 +31,10 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
+
+     ad_obj_x <- prepare_ad_int(ad_obj = ad_obj_x, residual_ads = residual_ads, decimals = decimals)
+     ad_obj_y <- prepare_ad_int(ad_obj = ad_obj_y, residual_ads = residual_ads, decimals = decimals)
 
      if(correct_rxx){
           if(nrow(ad_obj_x$qxi_irr) == 1 & ad_obj_x$qxi_irr$Value[1] == 1){
@@ -138,6 +143,7 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
 
      qx_label <- ifelse(ad_obj_x["qxi_irr", "mean"] == 1 & ad_obj_x["qxi_irr", "var"] == 0, "qxa_irr", "qxi_irr")
      qy_label <- ifelse(ad_obj_y["qxi_irr", "mean"] == 1 & ad_obj_y["qxi_irr", "var"] == 0, "qxa_irr", "qxi_irr")
@@ -167,7 +173,7 @@
 
      var_mat_tp <- estimate_var_rho_tsa_meas(mean_rtp = mean_rtp, var_rxy = var_r, var_e = var_e,
                                mean_qx = mean_qx, mean_qy = mean_qy,
-                               var_qx = var_qx, var_qy = var_qy)
+                               var_qx = var_qx, var_qy = var_qy, show_variance_warnings = FALSE)
 
      var_art_tp <- var_mat_tp$var_art
      var_pre_tp <- var_mat_tp$var_pre

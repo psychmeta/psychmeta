@@ -46,6 +46,7 @@
 #' @param var_rxx Variance of reliability estimates for X.
 #' @param mean_ryy Mean reliability for Y.
 #' @param var_ryy Variance of reliability estimates for Y.
+#' @param ... Additional arguments.
 #'
 #' @return Vector of meta-analytic variances estimated via Taylor series approximation.
 #'
@@ -248,7 +249,11 @@
 #'                  mean_qy = .8, var_qy = .005)
 estimate_var_rho_tsa_meas <- function(mean_rtp, var_rxy, var_e,
                                       mean_qx = 1, var_qx = 0,
-                                      mean_qy = 1, var_qy = 0){
+                                      mean_qy = 1, var_qy = 0, ...){
+
+     show_variance_warnings <- list(...)$show_variance_warnings
+     if(is.null(show_variance_warnings)) show_variance_warnings <- TRUE
+
      ## Partial derivatives of the attenuation formula
      # With respect to qx
      b_qx <- mean_rtp * mean_qy
@@ -257,10 +262,12 @@ estimate_var_rho_tsa_meas <- function(mean_rtp, var_rxy, var_e,
      # With respect to rtp
      b_rtp <- mean_qx * mean_qy
 
-     warning_variance(var = var_rxy, var_name = "var_rxy", sd_warning = FALSE)
-     warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
-     warning_variance(var = var_qx, var_name = "var_qx", sd_warning = FALSE)
-     warning_variance(var = var_qy, var_name = "var_qy", sd_warning = FALSE)
+     if(show_variance_warnings){
+          warning_variance(var = var_rxy, var_name = "var_rxy", sd_warning = FALSE)
+          warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
+          warning_variance(var = var_qx, var_name = "var_qx", sd_warning = FALSE)
+          warning_variance(var = var_qy, var_name = "var_qy", sd_warning = FALSE)
+     }
 
      var_rxy[is.na(var_rxy)] <- 0
      var_e[is.na(var_e)] <- 0
@@ -302,7 +309,10 @@ estimate_var_rho_tsa_meas <- function(mean_rtp, var_rxy, var_e,
 estimate_var_rho_tsa_uvdrr <- function(mean_rtpa, var_rxyi, var_e,
                                        mean_ux = 1, var_ux = 0,
                                        mean_qxa = 1, var_qxa = 0,
-                                       mean_qyi = 1, var_qyi = 0){
+                                       mean_qyi = 1, var_qyi = 0, ...){
+
+     show_variance_warnings <- list(...)$show_variance_warnings
+     if(is.null(show_variance_warnings)) show_variance_warnings <- TRUE
 
      A <- 1 / sqrt(mean_rtpa^2 * mean_qxa^2* (mean_ux^2 - 1) + 1)
 
@@ -316,11 +326,13 @@ estimate_var_rho_tsa_uvdrr <- function(mean_rtpa, var_rxyi, var_e,
      # With respect to rtpa
      b_rtpa <- (mean_qyi * mean_qxa * mean_ux) * A^3
 
-     warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
-     warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
-     warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
-     warning_variance(var = var_qyi, var_name = "var_qyi", sd_warning = FALSE)
-     warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+     if(show_variance_warnings){
+          warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
+          warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
+          warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
+          warning_variance(var = var_qyi, var_name = "var_qyi", sd_warning = FALSE)
+          warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+     }
 
      var_rxyi[is.na(var_rxyi)] <- 0
      var_e[is.na(var_e)] <- 0
@@ -367,7 +379,10 @@ estimate_var_rho_tsa_bvdrr <- function(mean_rtpa, var_rxyi, var_e = 0,
                                        mean_ux = 1, var_ux = 0,
                                        mean_uy = 1, var_uy = 0,
                                        mean_qxa = 1, var_qxa = 0,
-                                       mean_qya = 1, var_qya = 0){
+                                       mean_qya = 1, var_qya = 0, ...){
+
+     show_variance_warnings <- list(...)$show_variance_warnings
+     if(is.null(show_variance_warnings)) show_variance_warnings <- TRUE
 
      A <- sqrt((1/(mean_qya * mean_qxa) - mean_qya * mean_rtpa^2 * mean_qxa)^2 + 4 * mean_rtpa^2 * mean_ux^2 * mean_uy^2)
      B <- (mean_qya^2 * mean_rtpa^2 * mean_qxa^2 + mean_qya * mean_qxa * A - 1)
@@ -392,12 +407,14 @@ estimate_var_rho_tsa_bvdrr <- function(mean_rtpa, var_rxyi, var_e = 0,
 
 
      ## Clean up variances
-     warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
-     warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
-     warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
-     warning_variance(var = var_uy, var_name = "var_uy", sd_warning = FALSE)
-     warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
-     warning_variance(var = var_qya, var_name = "var_qya", sd_warning = FALSE)
+     if(show_variance_warnings){
+          warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
+          warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
+          warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+          warning_variance(var = var_uy, var_name = "var_uy", sd_warning = FALSE)
+          warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
+          warning_variance(var = var_qya, var_name = "var_qya", sd_warning = FALSE)
+     }
 
      var_rxyi[is.na(var_rxyi)] <- 0
      var_e[is.na(var_e)] <- 0
@@ -444,7 +461,10 @@ estimate_var_rho_tsa_bvdrr <- function(mean_rtpa, var_rxyi, var_e = 0,
 estimate_var_rho_tsa_uvirr <- function(mean_rtpa, var_rxyi, var_e,
                                        mean_ut = 1, var_ut = 0,
                                        mean_qxa = 1, var_qxa = 0,
-                                       mean_qyi = 1, var_qyi = 0){
+                                       mean_qyi = 1, var_qyi = 0, ...){
+
+     show_variance_warnings <- list(...)$show_variance_warnings
+     if(is.null(show_variance_warnings)) show_variance_warnings <- TRUE
 
      A <- 1 / sqrt(mean_ut^2 * mean_rtpa^2 - mean_rtpa^2 + 1)
      B <- 1 / sqrt(mean_ut^2 * mean_qxa^2 - mean_qxa^2 + 1)
@@ -462,11 +482,13 @@ estimate_var_rho_tsa_uvirr <- function(mean_rtpa, var_rxyi, var_e,
      r_ratio[is.na(r_ratio)] <- 1
      b_rtpa <- r_ratio - mean_rxyi * mean_rtpa * A^2 * (mean_ut^2 - 1)
 
-     warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
-     warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
-     warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
-     warning_variance(var = var_qyi, var_name = "var_qyi", sd_warning = FALSE)
-     warning_variance(var = var_ut, var_name = "var_ut", sd_warning = FALSE)
+     if(show_variance_warnings){
+          warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
+          warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
+          warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
+          warning_variance(var = var_qyi, var_name = "var_qyi", sd_warning = FALSE)
+          warning_variance(var = var_ut, var_name = "var_ut", sd_warning = FALSE)
+     }
 
      var_rxyi[is.na(var_rxyi)] <- 0
      var_e[is.na(var_e)] <- 0
@@ -515,7 +537,11 @@ estimate_var_rho_tsa_bvirr <- function(mean_rtpa, var_rxyi, var_e = 0,
                                        mean_uy = 1, var_uy = 0,
                                        mean_qxa = 1, var_qxa = 0,
                                        mean_qya = 1, var_qya = 0,
-                                       sign_rxz = 1, sign_ryz = 1){
+                                       sign_rxz = 1, sign_ryz = 1, ...){
+
+     show_variance_warnings <- list(...)$show_variance_warnings
+     if(is.null(show_variance_warnings)) show_variance_warnings <- TRUE
+
      ## Estimate lambda
      lambda <- .lambda_bvirr(ux = mean_ux, uy = mean_uy, sign_rxz = sign_rxz, sign_ryz = sign_ryz)
 
@@ -542,12 +568,14 @@ estimate_var_rho_tsa_bvirr <- function(mean_rtpa, var_rxyi, var_e = 0,
           b_uy[is.na(b_uy)] <- ((lambda * (1 - mean_uy^2) * sqrt(abs(1 - mean_ux^2))) / (mean_ux * abs(1 - mean_uy^2 + .01)^1.5) - mean_rxyi / mean_uy)[is.na(b_uy)]
      }
 
-     warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
-     warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
-     warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
-     warning_variance(var = var_uy, var_name = "var_uy", sd_warning = FALSE)
-     warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
-     warning_variance(var = var_qya, var_name = "var_qya", sd_warning = FALSE)
+     if(show_variance_warnings){
+          warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
+          warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
+          warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+          warning_variance(var = var_uy, var_name = "var_uy", sd_warning = FALSE)
+          warning_variance(var = var_qxa, var_name = "var_qxa", sd_warning = FALSE)
+          warning_variance(var = var_qya, var_name = "var_qya", sd_warning = FALSE)
+     }
 
      var_rxyi[is.na(var_rxyi)] <- 0
      var_e[is.na(var_e)] <- 0
@@ -594,7 +622,10 @@ estimate_var_rho_tsa_bvirr <- function(mean_rtpa, var_rxyi, var_e = 0,
 estimate_var_rho_tsa_rb1 <- function(mean_rtpa, var_rxyi, var_e,
                                      mean_ux = 1, var_ux = 0,
                                      mean_rxx = 1, var_rxx = 0,
-                                     mean_ryy = 1, var_ryy = 0){
+                                     mean_ryy = 1, var_ryy = 0, ...){
+
+     show_variance_warnings <- list(...)$show_variance_warnings
+     if(is.null(show_variance_warnings)) show_variance_warnings <- TRUE
 
      ## Compute the mean observed correlation
      mean_rxyi <- .attenuate_r_rb(rtpa = mean_rtpa, qx = mean_rxx^.5, qy = mean_ryy^.5, ux = mean_ux)
@@ -609,11 +640,13 @@ estimate_var_rho_tsa_rb1 <- function(mean_rtpa, var_rxyi, var_e,
      ## With respect to rtpa
      b_rtpa <- mean_rxyi / mean_rtpa + (mean_rxyi^3 * (1 - mean_ux^2)) / (mean_rtpa * mean_ux^2)
 
-     warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
-     warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
-     warning_variance(var = var_rxx, var_name = "var_rxx", sd_warning = FALSE)
-     warning_variance(var = var_ryy, var_name = "var_ryy", sd_warning = FALSE)
-     warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+     if(show_variance_warnings){
+          warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
+          warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
+          warning_variance(var = var_rxx, var_name = "var_rxx", sd_warning = FALSE)
+          warning_variance(var = var_ryy, var_name = "var_ryy", sd_warning = FALSE)
+          warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+     }
 
      var_rxyi[is.na(var_rxyi)] <- 0
      var_e[is.na(var_e)] <- 0
@@ -657,7 +690,10 @@ estimate_var_rho_tsa_rb1 <- function(mean_rtpa, var_rxyi, var_e,
 estimate_var_rho_tsa_rb2 <- function(mean_rtpa, var_rxyi, var_e,
                                      mean_ux = 1, var_ux = 0,
                                      mean_qx = 1, var_qx = 0,
-                                     mean_qy = 1, var_qy = 0){
+                                     mean_qy = 1, var_qy = 0, ...){
+
+     show_variance_warnings <- list(...)$show_variance_warnings
+     if(is.null(show_variance_warnings)) show_variance_warnings <- TRUE
 
      ## Compute the mean observed correlation
      mean_rxyi <- .attenuate_r_rb(rtpa = mean_rtpa, qx = mean_qx, qy = mean_qy, ux = mean_ux)
@@ -672,11 +708,13 @@ estimate_var_rho_tsa_rb2 <- function(mean_rtpa, var_rxyi, var_e,
      ## With respect to rtpa
      b_rtpa <- mean_rxyi / mean_rtpa + (mean_rxyi^3 * (1 - mean_ux^2)) / (mean_rtpa * mean_ux^2)
 
-     warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
-     warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
-     warning_variance(var = var_qx, var_name = "var_qx", sd_warning = FALSE)
-     warning_variance(var = var_qy, var_name = "var_qy", sd_warning = FALSE)
-     warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+     if(show_variance_warnings){
+          warning_variance(var = var_rxyi, var_name = "var_rxyi", sd_warning = FALSE)
+          warning_variance(var = var_e, var_name = "var_e", sd_warning = FALSE)
+          warning_variance(var = var_qx, var_name = "var_qx", sd_warning = FALSE)
+          warning_variance(var = var_qy, var_name = "var_qy", sd_warning = FALSE)
+          warning_variance(var = var_ux, var_name = "var_ux", sd_warning = FALSE)
+     }
 
      var_rxyi[is.na(var_rxyi)] <- 0
      var_e[is.na(var_e)] <- 0

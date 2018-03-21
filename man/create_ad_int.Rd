@@ -61,9 +61,9 @@ Allows consolidation of observed and estimated artifact information by cross-cor
 All artifact distributions are optional; null artifact distributions will be given an artifact value of 1 and a weight of 1 as placeholders.
 }
 \examples{
-create_ad_int(rxxa = c(.9, .8), wt_rxxa = c(50, 150),
-              rxxi = c(.8, .7), wt_rxxi = c(50, 150),
-              ux = c(.9, .8), wt_ux = c(50, 150),
-              ut = c(.8, .7), wt_ut = c(50, 150))
+create_ad_int(rxxa = c(.9, .8), n_rxxa = c(50, 150),
+              rxxi = c(.8, .7), n_rxxi = c(50, 150),
+              ux = c(.9, .8), ni_ux = c(50, 150),
+              ut = c(.8, .7), ni_ut = c(50, 150))
 }
 \keyword{internal}

@@ -14,15 +14,58 @@
 #'
 #' @keywords internal
 .create_ad_int <- function(art_vec, wt_vec = rep(1, length(art_vec)), decimals = Inf){
-     if(is.null(art_vec) | is.null(wt_vec) | length(art_vec) == 0 | length(wt_vec) == 0 | all(is.na(art_vec))){
+     if(is.null(art_vec) | is.null(wt_vec) | length(art_vec) == 0 | length(wt_vec) == 0){
           data.frame(Value = 1, Weight = 1)
      }else{
-          if(length(art_vec) != length(wt_vec)) stop("Lengths of art_vec and wt_vec differ")
-          art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec)
-          art_tab <- as.data.frame(ungroup(art_tab %>% group_by(Value) %>% do(data.frame(Value = .$Value[1], Weight = sum(.$Weight)))))
-          art_tab[!is.na(art_tab[,1]),]
+          if(all(is.na(art_vec))){
+               data.frame(Value = 1, Weight = 1)
+          }else{
+               if(length(art_vec) != length(wt_vec)) stop("Lengths of art_vec and wt_vec differ")
+               art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec)
+               art_tab <- as.data.frame(ungroup(art_tab %>% group_by(Value) %>% do(data.frame(Value = .$Value[1], Weight = sum(.$Weight)))))
+               art_tab[!is.na(art_tab[,1]),]
+          }
      }
 }
+
+
+prepare_ad_int <- function(ad_obj, residual_ads = TRUE, decimals = Inf){
+     screen_ad_int(ad_obj)
+
+     if(is.na(decimals)) warning("decimals cannot be NA")
+     if(is.null(decimals)) warning("decimals cannot be NULL")
+     if(decimals < 1) warning("decimals cannot be less than 1")
+
+     if(!is.infinite(decimals)){
+          .attributes <- attributes(ad_obj)
+          ad_obj <- lapply(ad_obj, function(x){
+               if(nrow(x) == 1){
+                    x
+               }else{
+                    .create_ad_int(art_vec = x[,"Value"], wt_vec = x[,"Weight"], decimals = decimals)
+               }
+          })
+          attributes(ad_obj) <- .attributes
+     }
+
+     if(residual_ads){
+          new_sd <- attributes(ad_obj)$summary[,"sd_res"]
+          new_sd[is.na(new_sd)] <- 0
+          for(i in names(ad_obj)){
+               ad_obj_i <- ad_obj[[i]]
+               mean_i <- wt_mean(x = ad_obj_i$Value, wt = ad_obj_i$Weight)
+               sd_i <- wt_var(x = ad_obj_i$Value, wt = ad_obj_i$Weight)^.5
+               if(new_sd[i] == 0 | nrow(ad_obj_i) == 1){
+                    ad_obj_i <- data.frame(Value = mean_i, Weight = sum(ad_obj_i$Weight))
+               }else{
+                    ad_obj_i$Value <- (ad_obj_i$Value - mean_i) / sd_i * new_sd[i] + mean_i
+               }
+               ad_obj[[i]] <- ad_obj_i
+          }
+     }
+     ad_obj
+}
+
 
 
 #' Create an array of all possible combinations of artifact values from 2-4 artifact distributions
@@ -605,7 +648,6 @@ create_ad_group <- function(ad_type = "tsa",
                                                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                                    estimate_ux = estimate_ux, estimate_ut = estimate_ut,
                                                                    var_unbiased = var_unbiased, supplemental_ads = supplemental_ads[[construct_x[i][1]]]))
-
                list(ad_obj_x = ad_obj_x)
           })
 
@@ -621,11 +663,14 @@ create_ad_group <- function(ad_type = "tsa",
 
           ad_obj_list <- list()
           for(i in construct_pair_lvls){
-               ad_obj_list[[i]] <- list(ad_obj_x = ad_obj_list_x[[construct_pair_mat[i,2]]], ad_obj_y = ad_obj_list_y[[construct_pair_mat[i,3]]])
+               ad_obj_list[[i]] <- list(ad_obj_x = ad_obj_list_x[[construct_pair_mat[i,2]]],
+                                        ad_obj_y = ad_obj_list_y[[construct_pair_mat[i,3]]])
+               attributes(ad_obj_list[[i]][["ad_obj_x"]]) <- attributes(ad_obj_list_x[[construct_pair_mat[i,2]]])
+               attributes(ad_obj_list[[i]][["ad_obj_y"]]) <- attributes(ad_obj_list_y[[construct_pair_mat[i,3]]])
           }
-
           rm(ad_obj_list_x, ad_obj_list_y)
      }
+
      ad_obj_list
 }
 

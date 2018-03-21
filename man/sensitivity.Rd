@@ -57,14 +57,20 @@ This function helps researchers to examine the stability/fragility of their meta
 ## Run a meta-analysis using simulated UVIRR data:
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
 correct_rr_y = FALSE, data = data_r_uvirr)
+ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
 
 ## Pass the meta-analysis object to the sensitivity() function:
 ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10, cumulative = TRUE,
 boot_ci_type = "norm", sort_method = "inv_var")
 
-## Examine the tables and plots produced for the meta-analysis:
+## Examine the tables and plots produced for the IC meta-analysis:
 ma_obj$follow_up_analyses$bootstrap$barebones$`Analysis ID = 1`
 ma_obj$follow_up_analyses$bootstrap$individual_correction$true_score$`Analysis ID = 1`
 ma_obj$follow_up_analyses$leave1out$individual_correction$true_score$`Analysis ID = 1`
 ma_obj$follow_up_analyses$cumulative$individual_correction$true_score$`Analysis ID = 1`
+
+## Examine the tables and plots produced for the AD meta-analysis:
+ma_obj$follow_up_analyses$bootstrap$artifact_distribution$true_score$`Analysis ID = 1`
+ma_obj$follow_up_analyses$leave1out$artifact_distribution$true_score$`Analysis ID = 1`
+ma_obj$follow_up_analyses$cumulative$artifact_distribution$true_score$`Analysis ID = 1`
 }

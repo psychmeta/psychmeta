@@ -454,14 +454,14 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      ## Column names from meta-analyses of correlations
      bb_names_r <- c("k", "N", "mean_r", "var_r", "var_e", "var_res", "sd_r", "se_r", "sd_e", "sd_res")
-     ad_names_r <- c("k", "N", "mean_r", "var_r", "var_e", "var_art", "var_pre", "var_res", "sd_r", "sd_e",
+     ad_names_r <- c("k", "N", "mean_r", "var_r", "var_e", "var_art", "var_pre", "var_res", "sd_r", "se_r", "sd_e",
                      "sd_art", "sd_pre", "sd_res", "mean_rho", "var_rho", "sd_rho")
      ic_names_r <- c("k", "N", "mean_r", "var_r", "var_e", "var_res", "sd_r", "se_r", "sd_e", "sd_res",
                      "mean_rho", "var_r_c", "var_e_c", "var_rho", "sd_r_c", "se_r_c", "sd_e_c", "sd_rho")
 
      ## Column names from meta-analyses of d values
      bb_names_d <- c("k", "N", "mean_d", "var_d", "var_e", "var_res", "sd_d", "se_d", "sd_e", "sd_res")
-     ad_names_d <- c("k", "N", "mean_d", "var_d", "var_e", "var_art", "var_pre", "var_res", "sd_d", "sd_e",
+     ad_names_d <- c("k", "N", "mean_d", "var_d", "var_e", "var_art", "var_pre", "var_res", "sd_d", "se_d", "sd_e",
                      "sd_art", "sd_pre", "sd_res", "mean_delta", "var_delta", "sd_delta")
      ic_names_d <- c("k", "N", "mean_d", "var_d", "var_e", "var_res", "sd_d", "se_d", "sd_e", "sd_res",
                      "mean_delta", "var_d_c", "var_e_c", "var_delta", "sd_d_c", "se_d_c", "sd_e_c", "sd_delta")
@@ -478,7 +478,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
           method <- "ad_r"
           old_cols <- ad_names_r
           new_cols <- ad_names_d
-          col_type <- c("NA", "NA", "es1", "var1", "var1", "var1", "var1", "var1", "sd1", "sd1", "sd1", "sd1", "sd1",
+          col_type <- c("NA", "NA", "es1", "var1", "var1", "var1", "var1", "var1", "sd1", "se1", "sd1", "sd1", "sd1", "sd1",
                         "es2", "var2", "sd2",
                         "es3", "es3", "es4", "es4")
      }
@@ -503,7 +503,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
           method <- "ad_d"
           old_cols <- ad_names_d
           new_cols <- ad_names_r
-          col_type <- c("NA", "NA", "es1", "var1", "var1", "var1", "var1", "var1", "sd1", "sd1", "sd1", "sd1", "sd1",
+          col_type <- c("NA", "NA", "es1", "var1", "var1", "var1", "var1", "var1", "sd1", "se1", "sd1", "sd1", "sd1", "sd1",
                         "es2", "var2", "sd2",
                         "es3", "es3", "es4", "es4")
      }
@@ -565,10 +565,9 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
           ma_table_subset[,es1_col] <- .convert_r_to_d(r = ma_table_subset[,es1_col],
                                                        p = matrix(p_vec, length(p_vec), length(es1_col)))
 
-          if(any(col_ids$method == c("bb_r", "ic_r")))
-               ma_table_subset[,se1_col] <- convert_sdr_to_sdd(r = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
-                                                               sd = ma_table_subset[,se1_col],
-                                                               p = matrix(p_vec, length(p_vec), length(se1_col)))
+          ma_table_subset[,se1_col] <- convert_sdr_to_sdd(r = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
+                                                          sd = ma_table_subset[,se1_col],
+                                                          p = matrix(p_vec, length(p_vec), length(se1_col)))
 
           if(col_ids$method != "bb_r"){
                if(col_ids$method == "ic_r"){
@@ -612,10 +611,9 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
           ma_table_subset[,es1_col] <- .convert_d_to_r(d = ma_table_subset[,es1_col],
                                                        p = matrix(p_vec, length(p_vec), length(es1_col)))
 
-          if(any(col_ids$method == c("bb_r", "ic_r")))
-               ma_table_subset[,se1_col] <- convert_sdd_to_sdr(d = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
-                                                               sd = ma_table_subset[,se1_col],
-                                                               p = matrix(p_vec, length(p_vec), length(se1_col)))
+          ma_table_subset[,se1_col] <- convert_sdd_to_sdr(d = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
+                                                          sd = ma_table_subset[,se1_col],
+                                                          p = matrix(p_vec, length(p_vec), length(se1_col)))
 
           if(col_ids$method != "bb_d"){
                if(col_ids$method == "ic_d"){
@@ -652,8 +650,6 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
      ma_table[,col_ids$old_cols] <- ma_table_subset
      colnames(ma_table)[colnames(ma_table) %in% col_ids$old_cols] <- col_ids$new_cols
 
-     # if(any(col_ids$method == c("bb_r", "ad_r", "ic_r"))) if(colnames(ma_table)[2] == "Construct_X") colnames(ma_table)[2] <- "Group_Contrast"
-     # if(any(col_ids$method == c("bb_d", "ad_d", "ic_d"))) if(colnames(ma_table)[2] == "Group_Contrast") colnames(ma_table)[2] <- "Construct_X"
 
      if(colnames(ma_table)[1] == "Construct_X"){
           colnames(ma_table)[1] <- "Group_Contrast"

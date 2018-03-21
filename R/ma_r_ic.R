@@ -672,7 +672,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                do_uvirr_y[subset_vec] <- FALSE
           }
 
-          rxxi_vec[!correct_rxx] <- rxxa_vec[!correct_rxx] <- ryyi_vec[!correct_ryy] <- ryya_vec[!correct_ryy] <- NA
+          rxxi_vec[!correct_rxx] <- rxxa_vec[!correct_rxx] <- ryyi_vec[!correct_ryy] <- ryya_vec[!correct_ryy] <- 1
 
      }else{
           if(any(correct_rxx | correct_ryy)){
@@ -705,7 +705,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           rxxa_vec <- ryya_vec <- ux_vec <- uy_vec <- ut_vec <- up_vec <- ux <- uy <- NA
           do_uvdrr_x <- do_uvdrr_y <- do_uvirr_x <- do_uvirr_y <- do_bvirr <- do_bvdrr <- FALSE
      }
-
 
      ## Perform study specific artifact corrections
      rtpa_vec <- rxyi_orig <- rxyi

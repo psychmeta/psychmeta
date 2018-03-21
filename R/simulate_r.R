@@ -185,7 +185,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                      sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
                                      wt_mat = NULL, sr_composites = NULL,
                                      var_names = NULL, composite_names = NULL,
-                                     obs_only = FALSE, show_items = FALSE, keep_vars = NULL, d_sim_info = NULL, ...){
+                                     obs_only = FALSE, show_items = FALSE, keep_vars = NULL, simdat_info = NULL, ...){
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")
      }
@@ -195,7 +195,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                composite_names <- paste("composite", 1:ncol(wt_mat), sep = "")
      }
 
-     if(is.null(d_sim_info)){
+     if(is.null(simdat_info)){
           simdat <- simulate_psych_items(n = n, k_vec = k_items_vec, R_scales = rho_mat, rel_vec = rel_vec,
                                          mean_vec = mu_vec, sd_vec = sigma_vec, var_names = var_names)
 
@@ -231,19 +231,19 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                select_vec <- select_vec & obs_scores_a[,i] >= sort(obs_scores_a[,i], decreasing = TRUE)[n * sr_vec[i]]
 
      }else{
-          simdat <- d_sim_info$simdat
+          simdat <- simdat_info$simdat
           item_index <- simdat$params$item_index
           item_names <- simdat$params$item_names
 
-          obs_scores_a <- d_sim_info$obs_scores_a
-          true_scores_a <- d_sim_info$true_scores_a
-          error_scores_a <- d_sim_info$error_scores_a
-          scale_ids <- d_sim_info$scale_ids
-          sr_vec <- d_sim_info$sr_vec
-          var_names <- d_sim_info$var_names
-          .var_names <- d_sim_info$.var_names
+          obs_scores_a <- simdat_info$obs_scores_a
+          true_scores_a <- simdat_info$true_scores_a
+          error_scores_a <- simdat_info$error_scores_a
+          scale_ids <- simdat_info$scale_ids
+          sr_vec <- simdat_info$sr_vec
+          var_names <- simdat_info$var_names
+          .var_names <- simdat_info$.var_names
 
-          cut_vec <- d_sim_info$cut_vec
+          cut_vec <- simdat_info$cut_vec
 
           select_ids <- which(!is.na(cut_vec))
           select_vec <- rep(TRUE, n)
@@ -456,11 +456,11 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                 `Incumbent unstandardized alpha` = alpha_i[1,keep_ids_scales],
                                 `Incumbent standardized alpha` = alpha_i[2,keep_ids_scales],
 
-                                `u ratio` = u_obs[keep_ids],
-                                `Applicant SD` = sd_obs_a[keep_ids],
-                                `Incumbent SD` = sd_obs_i[keep_ids],
-                                `Applicant mean` = mean_obs_a[keep_ids],
-                                `Incumbent mean` = mean_obs_i[keep_ids])
+                                `u ratio` = u_obs[keep_ids_scales],
+                                `Applicant SD` = sd_obs_a[keep_ids_scales],
+                                `Incumbent SD` = sd_obs_i[keep_ids_scales],
+                                `Applicant mean` = mean_obs_a[keep_ids_scales],
+                                `Incumbent mean` = mean_obs_i[keep_ids_scales])
 
           ## Name name variables in output arrays
           colnames(desc_mat_obs) <- .var_names
@@ -1116,6 +1116,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      }else{
           .stats <- format_long(x = .params, param = FALSE, sample_id = 1, var_names = .var_names, show_applicant = show_applicant, decimals = decimals, noalpha = noalpha)
           .params <- format_long(x = .params, param = TRUE, sample_id = 1, var_names = .var_names, show_applicant = show_applicant, decimals = decimals, noalpha = noalpha)
+
      }
 
      dat_stats <- data.frame(matrix(NA, length(param_list) * nrow(.stats), ncol(.stats)))

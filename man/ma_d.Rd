@@ -169,6 +169,88 @@ When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} s
 }
 \value{
 A list object of the classes \code{psychmeta}, \code{ma_d_as_r} or \code{ma_d_as_d}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
+Components of output tables for bare-bones meta-analyses:
+\itemize{
+\item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
+\item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
+\item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
+\item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
+\item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance.}
+\item{\code{sd_d}}{\cr Square root of \code{var_r}.}
+\item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
+\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
+}
+
+Components of output tables for individual-correction meta-analyses:
+\itemize{
+\item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
+\item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
+\item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
+\item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
+\item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance.}
+\item{\code{sd_d}}{\cr Square root of \code{var_r}.}
+\item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
+\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+\item{\code{mean_delta}}{\cr Mean artifact-corrected \emph{d} value.}
+\item{\code{var_d_c}}{\cr Variance of artifact-corrected \emph{d} values.}
+\item{\code{var_e_c}}{\cr Predicted sampling-error variance of artifact-corrected \emph{d} values.}
+\item{\code{var_delta}}{\cr Variance of artifact-corrected \emph{d} values after removing predicted sampling-error variance.}
+\item{\code{sd_d_c}}{\cr Square root of \code{var_r_c}.}
+\item{\code{se_d_c}}{\cr Standard error of \code{mean_delta}.}
+\item{\code{sd_e_c}}{\cr Square root of \code{var_e_c}.}
+\item{\code{sd_delta}}{\cr Square root of \code{var_delta}.}
+\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+}
+
+Components of output tables for artifact-distribution meta-analyses:
+\itemize{
+\item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
+\item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
+\item{\code{var_r}}{\cr Weighted variance of observed \emph{d} values.}
+\item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
+\item{\code{var_art}}{\cr Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts.}
+\item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
+\item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
+\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+\item{\code{sd_art}}{\cr Square root of \code{var_art}.}
+\item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
+\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+\item{\code{mean_delta}}{\cr Mean artifact-corrected \emph{d} value.}
+\item{\code{var_delta}}{\cr Variance of artifact-corrected \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
+\item{\code{sd_delta}}{\cr Square root of \code{var_delta}.}
+\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+}
 }
 \description{
 This is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.

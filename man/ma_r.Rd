@@ -192,6 +192,88 @@ If an imputation method ending in "mod" is selected but no moderators are provid
 }
 \value{
 A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
+Components of output tables for bare-bones meta-analyses:
+\itemize{
+\item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+\item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
+\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_r}}{\cr Mean observed correlation.}
+\item{\code{var_r}}{\cr Weighted variance of observed correlations.}
+\item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
+\item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance.}
+\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+\item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
+\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
+}
+
+Components of output tables for individual-correction meta-analyses:
+\itemize{
+\item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+\item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
+\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_r}}{\cr Mean observed correlation.}
+\item{\code{var_r}}{\cr Weighted variance of observed correlations.}
+\item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
+\item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance.}
+\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+\item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
+\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+\item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
+\item{\code{var_r_c}}{\cr Variance of artifact-corrected correlations.}
+\item{\code{var_e_c}}{\cr Predicted sampling-error variance of artifact-corrected correlations.}
+\item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance.}
+\item{\code{sd_r_c}}{\cr Square root of \code{var_r_c}.}
+\item{\code{se_r_c}}{\cr Standard error of \code{mean_rho}.}
+\item{\code{sd_e_c}}{\cr Square root of \code{var_e_c}.}
+\item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
+\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+}
+
+Components of output tables for artifact-distribution meta-analyses:
+\itemize{
+\item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+\item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
+\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_r}}{\cr Mean observed correlation.}
+\item{\code{var_r}}{\cr Weighted variance of observed correlations.}
+\item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
+\item{\code{var_art}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts.}
+\item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
+\item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance and predicted artifact variance.}
+\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+\item{\code{sd_art}}{\cr Square root of \code{var_art}.}
+\item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
+\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+\item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
+\item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance and predicted artifact variance.}
+\item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
+\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+}
 }
 \description{
 This is the master function for meta-analyses of correlations - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of construct pairs.
@@ -248,6 +330,7 @@ ma_r(ma_method = "ad", rxyi = rxyi, n = n,
 dat1 <- dat2 <- data_r_meas_multi
 dat1$rxxi <- dat1$ryyi <- NA
 dat2$rxyi <- NA
+dat2$sample_id <- dat2$sample_id + 40
 dat <- rbind(dat1, dat2)
 ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      correct_rr_x = FALSE, correct_rr_y = FALSE,

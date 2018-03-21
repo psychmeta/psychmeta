@@ -382,7 +382,7 @@ append_dmat <- function(di_mat, da_mat,
      obs_a <- true_a <- error_a <- items_a <- NULL
      for(i in 1:length(n_vec)){
 
-          group_list[[i]] <- .simulate_psych_d(n = n_vec[i], rho_mat = rho_mat_list[[i]],
+          group_list[[i]] <- .simulate_psych_handoff(n = n_vec[i], rho_mat = rho_mat_list[[i]],
                                                mu_vec = mu_mat[i,], sigma_vec = sigma_mat[i,],
                                                wt_mat = wt_mat, sr_composites = .sr_composites,
                                                rel_vec = rel_mat[i,], sr_vec = rep(1, nrow(rel_mat)),
@@ -416,7 +416,7 @@ append_dmat <- function(di_mat, da_mat,
                                                       rel_vec = rel_mat[i,], sr_vec = sr_vec,
                                                       k_items_vec = k_items_vec,
                                                       var_names = var_names, composite_names = composite_names,
-                                                      show_items = TRUE, d_sim_info = append(group_list[[i]],
+                                                      show_items = TRUE, simdat_info = append(group_list[[i]],
                                                                                              list(cut_vec = cut_vec)))
 
           items_a <- rbind(items_a, data.frame(group = group_names[i], group_list[[i]]$item_info$data$observed))

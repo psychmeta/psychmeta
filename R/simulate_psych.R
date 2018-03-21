@@ -131,11 +131,20 @@ simulate_psych <- function(n, rho_mat,
 }
 
 
-.simulate_psych_d <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
-                              mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-                              sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
-                              wt_mat = NULL, sr_composites = NULL,
-                              var_names = NULL, composite_names = NULL){
+.simulate_psych_handoff <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
+                                    mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
+                                    sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
+                                    wt_mat = NULL, sr_composites = NULL,
+                                    var_names = NULL, composite_names = NULL){
+
+     if(is.null(var_names)){
+          var_names <- paste("x", 1:ncol(rho_mat), sep = "")
+     }
+
+     if(!is.null(wt_mat)){
+          if(is.null(composite_names))
+               composite_names <- paste("composite", 1:ncol(wt_mat), sep = "")
+     }
 
      simdat <- simulate_psych_items(n = n, k_vec = k_items_vec, R_scales = rho_mat, rel_vec = rel_vec,
                                     mean_vec = mu_vec, sd_vec = sigma_vec, var_names = var_names)
@@ -176,11 +185,11 @@ simulate_psych <- function(n, rho_mat,
 }
 
 
-.simulate_psych_d_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
-                                      mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-                                      sr_vec = rep(1, ncol(rho_mat)),
-                                      wt_mat = NULL, sr_composites = NULL,
-                                      var_names = NULL, composite_names = NULL, ...){
+.simulate_psych_handoff_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
+                                            mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
+                                            sr_vec = rep(1, ncol(rho_mat)),
+                                            wt_mat = NULL, sr_composites = NULL,
+                                            var_names = NULL, composite_names = NULL, ...){
 
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")

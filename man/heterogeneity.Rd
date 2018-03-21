@@ -37,9 +37,11 @@ This function computes a variety of supplemental statistics for meta-analyses. T
 \examples{
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
  correct_rr_y = FALSE, data = data_r_uvirr)
+ ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
 ma_obj <- heterogeneity(ma_obj = ma_obj)
 ma_obj$follow_up_analyses$heterogeneity$barebones$`Analysis ID = 1`
 ma_obj$follow_up_analyses$heterogeneity$individual_correction$true_score$`Analysis ID = 1`
+ma_obj$follow_up_analyses$heterogeneity$artifact_distribution$true_score$`Analysis ID = 1`
 }
 \references{
 Becker, B. J. (2005).

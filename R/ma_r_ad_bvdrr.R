@@ -15,6 +15,7 @@
      cred_level <- x$cred_level
      cred_method <- x$cred_method
      var_unbiased <- x$var_unbiased
+     decimals <- x$decimals
 
      k <- barebones[,"k"]
      N <- barebones[,"N"]
@@ -23,6 +24,10 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
+
+     ad_obj_x <- prepare_ad_int(ad_obj = ad_obj_x, residual_ads = residual_ads, decimals = decimals)
+     ad_obj_y <- prepare_ad_int(ad_obj = ad_obj_y, residual_ads = residual_ads, decimals = decimals)
 
      if(correct_rxx){
           mean_qxa <- wt_mean(x = ad_obj_x$qxa_drr$Value, wt = ad_obj_x$qxa_drr$Weight)
@@ -121,6 +126,7 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
 
      var_label <- ifelse(residual_ads, "var_res", "var")
 

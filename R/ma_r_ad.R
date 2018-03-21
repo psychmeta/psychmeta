@@ -252,19 +252,19 @@ gather_ma_ad <- function(x){
 
      true_score <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxy,
                          var_r = x$var_r, var_e = x$var_e, var_art = x$var_art_tp, var_pre = x$var_pre_tp, var_res = x$var_res_tp,
-                         sd_r = x$sd_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
+                         sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
                          mean_rho = x$mean_rtpa, var_rho = x$var_rho_tp, sd_rho = x$sd_rho_tp,
                          x$ci_tp, cv_tp)
 
      validity_generalization_x <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxyi,
                                         var_r = x$var_r, var_e = x$var_e, var_art = x$var_art_tp, var_pre = x$var_pre_tp, var_res = x$var_res_tp,
-                                        sd_r = x$sd_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
+                                        sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
                                         mean_rho = x$mean_rxpa, var_rho = x$var_rho_xp, sd_rho = x$sd_rho_xp,
                                         x$ci_xp, cv_xp)
 
      validity_generalization_y <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxyi,
                                         var_r = x$var_r, var_e = x$var_e, var_art = x$var_art_tp, var_pre = x$var_pre_tp, var_res = x$var_res_tp,
-                                        sd_r = x$sd_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
+                                        sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
                                         mean_rho = x$mean_rtya, var_rho = x$var_rho_ty, sd_rho = x$sd_rho_ty,
                                         x$ci_ty, cv_ty)
 
@@ -639,18 +639,6 @@ gather_ma_ad <- function(x){
           if(matching_ads_int){
                screen_ad_int(ad_obj_x)
                screen_ad_int(ad_obj_y)
-
-               if(is.na(decimals)) warning("decimals cannot be NA")
-               if(is.null(decimals)) warning("decimals cannot be NULL")
-               if(decimals < 1) warning("decimals cannot be less than 1")
-
-               if(!is.infinite(decimals)){
-                    ad_obj_x <- lapply(ad_obj_x, function(x)
-                         .create_ad_int(art_vec = x[,"Value"], wt_vec = x[,"Weight"], decimals = decimals))
-
-                    ad_obj_y <- lapply(ad_obj_y, function(x)
-                         .create_ad_int(art_vec = x[,"Value"], wt_vec = x[,"Weight"], decimals = decimals))
-               }
           }
           if(matching_ads_tsa){
                screen_ad_tsa(ad_obj_x)
@@ -674,7 +662,8 @@ gather_ma_ad <- function(x){
                     correct_rxx = correct_rxx, correct_ryy = correct_ryy, residual_ads = residual_ads,
                     indirect_rr_x = indirect_rr_x, indirect_rr_y = indirect_rr_y,
                     sign_rxz = sign_rxz, sign_ryz = sign_ryz, cred_level = ma_r_obj$barebones$inputs$cred_level,
-                    cred_method = ma_r_obj$barebones$inputs$cred_method, var_unbiased = ma_r_obj$barebones$inputs$var_unbiased, flip_xy = flip_xy)
+                    cred_method = ma_r_obj$barebones$inputs$cred_method, var_unbiased = ma_r_obj$barebones$inputs$var_unbiased,
+                    flip_xy = flip_xy, decimals = decimals)
 
           ad_method <- ifelse(matching_ads_int, "int", "tsa")
           ad_class <- class(x) <- paste(ad_method, correction_method, sep = "_")

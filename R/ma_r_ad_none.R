@@ -25,11 +25,13 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
 
      mean_rtpa <- mean_rxpa <- mean_rtya <- mean_rxyi
      ci_tp <- ci_xp <- ci_ty <- ci_xy
 
-     var_art_tp <- var_art_xp <- var_art_ty <- 0
+     var_art_tp <- var_art_xp <- var_art_ty <- rep(0, length(var_e))
+     sd_art_tp <- sd_art_xp <- sd_art_ty <- rep(0, length(var_e))
      var_pre_tp <- var_pre_xp <- var_pre_ty <- var_e
      var_res_tp <- var_res_xp <- var_res_ty <- var_res
      var_rho_tp <- var_rho_xp <- var_rho_ty <- var_res
@@ -37,7 +39,6 @@
      sd_r <- var_r^.5
      sd_e <- var_e^.5
 
-     sd_art_tp <- var_art_tp^.5
      sd_pre_tp <- var_pre_tp^.5
      sd_res_tp <- var_res_tp^.5
      sd_rho_tp <- var_rho_tp^.5

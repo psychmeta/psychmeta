@@ -115,6 +115,89 @@
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
+#' Components of output tables for bare-bones meta-analyses:
+#' \itemize{
+#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+#' \item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
+#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+#' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+#' \item{\code{mean_r}}{\cr Mean observed correlation.}
+#' \item{\code{var_r}}{\cr Weighted variance of observed correlations.}
+#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
+#' \item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance.}
+#' \item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+#' \item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
+#' \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+#' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+#' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
+#' }
+#'
+#' Components of output tables for individual-correction meta-analyses:
+#' \itemize{
+#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+#' \item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
+#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+#' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+#' \item{\code{mean_r}}{\cr Mean observed correlation.}
+#' \item{\code{var_r}}{\cr Weighted variance of observed correlations.}
+#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
+#' \item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance.}
+#' \item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+#' \item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
+#' \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+#' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+#' \item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
+#' \item{\code{var_r_c}}{\cr Variance of artifact-corrected correlations.}
+#' \item{\code{var_e_c}}{\cr Predicted sampling-error variance of artifact-corrected correlations.}
+#' \item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance.}
+#' \item{\code{sd_r_c}}{\cr Square root of \code{var_r_c}.}
+#' \item{\code{se_r_c}}{\cr Standard error of \code{mean_rho}.}
+#' \item{\code{sd_e_c}}{\cr Square root of \code{var_e_c}.}
+#' \item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
+#' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+#' }
+#'
+#' Components of output tables for artifact-distribution meta-analyses:
+#' \itemize{
+#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+#' \item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
+#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
+#' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
+#' \item{\code{mean_r}}{\cr Mean observed correlation.}
+#' \item{\code{var_r}}{\cr Weighted variance of observed correlations.}
+#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
+#' \item{\code{var_art}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts.}
+#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
+#' \item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance and predicted artifact variance.}
+#' \item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+#' \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
+#' \item{\code{sd_art}}{\cr Square root of \code{var_art}.}
+#' \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
+#' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
+#' \item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
+#' \item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance and predicted artifact variance.}
+#' \item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
+#' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+#' }
+#'
 #' @export
 #'
 #' @importFrom tibble as_tibble
@@ -176,6 +259,7 @@
 #' dat1 <- dat2 <- data_r_meas_multi
 #' dat1$rxxi <- dat1$ryyi <- NA
 #' dat2$rxyi <- NA
+#' dat2$sample_id <- dat2$sample_id + 40
 #' dat <- rbind(dat1, dat2)
 #' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'      correct_rr_x = FALSE, correct_rr_y = FALSE,
@@ -371,11 +455,47 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      valid_r <- filter_r(r_vec = rxyi, n_vec = n)
      if(all(!valid_r)) stop("No valid correlations and/or sample sizes provided", call. = FALSE)
      if(sum(!valid_r) > 0)
-          if(sum(!valid_r) ==1){
+          if(sum(!valid_r) == 1){
                warning(sum(!valid_r), " invalid correlation and/or sample size detected: Offending entry has been removed", call. = FALSE)
           }else{
                warning(sum(!valid_r), " invalid correlations and/or sample sizes detected: Offending entries have been removed", call. = FALSE)
           }
+
+     if(!is.null(construct_x)){
+          na_x <- is.na(construct_x)
+          if(any(na_x)){
+               if(sum(na_x) == 1){
+                    warning(sum(na_x), " missing construct_x entry removed: To use this observation, provide a non-NA label", call. = FALSE)
+               }else{
+                    warning(sum(na_x), " missing construct_x entries removed: To use these observations, provide non-NA labels", call. = FALSE)
+               }
+               valid_r <- valid_r & !na_x
+          }
+     }
+
+     if(!is.null(construct_y)){
+          na_y <- is.na(construct_y)
+          if(any(na_y)){
+               if(sum(na_y) == 1){
+                    warning(sum(na_y), " missing construct_y entry removed: To use this observation, provide a non-NA label", call. = FALSE)
+               }else{
+                    warning(sum(na_y), " missing construct_y entries removed: To use these observations, provide non-NA labels", call. = FALSE)
+               }
+               valid_r <- valid_r & !na_y
+          }
+     }
+
+     if(!is.null(sample_id)){
+          na_sample_id <- is.na(sample_id)
+          if(any(na_sample_id)){
+               if(sum(na_sample_id) == 1){
+                    warning(sum(na_sample_id), " missing sample_id label identified: Missing label has been replaced by a generic designator", call. = FALSE)
+               }else{
+                    warning(sum(na_sample_id), " missing sample_id labels identified: Missing labels have been replaced by unique generic designators", call. = FALSE)
+               }
+               sample_id[na_sample_id] <- paste0("psychmeta generated sample ID #", 1:sum(na_sample_id))
+          }
+     }
 
      if(!is.null(construct_order)){
           if(any(duplicated(construct_order))){
@@ -576,28 +696,84 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           .uy <- manage_arglength(x = uy, y = rxyi)[!valid_r]
           .uy_observed <- manage_arglength(x = uy_observed, y = rxyi)[!valid_r]
 
-          .supplemental_ads <- create_ad_list(sample_id = .sample_id, n = .n,
-                                              construct_x = .construct_x, measure_x = .measure_x,
-                                              construct_y = .construct_y, measure_y = .measure_y,
-                                              rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type,
-                                              ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type,
-                                              ux = .ux, ux_observed = .ux_observed,
-                                              uy = .uy, uy_observed = .uy_observed, process_ads = FALSE)
+          if(!is.null(sample_id)){
+               sample_id <- as.character(sample_id)
 
-          if(is.null(supplemental_ads)){
-               supplemental_ads <- .supplemental_ads
-          }else{
-               for(i in names(.supplemental_ads)){
-                    if(is.null(supplemental_ads[[i]])){
-                         supplemental_ads[[i]] <- .supplemental_ads[[i]]
-                    }else{
-                         for(j in names(.supplemental_ads[[i]])){
-                              supplemental_ads[[i]][[j]] <- c(supplemental_ads[[i]][[j]], .supplemental_ads[[i]][[j]])
+               x_id <- paste(sample_id, construct_x)
+               excluded_x_id <- x_id[!valid_r]
+               included_x_id <- x_id[valid_r]
+
+               y_id <- paste(sample_id, construct_y)
+               excluded_y_id <- y_id[!valid_r]
+               included_y_id <- y_id[valid_r]
+
+               .valid_r_x <- excluded_x_id %in% included_x_id
+               .valid_r_y <- excluded_y_id %in% included_y_id
+               .valid_r_xy <- .valid_r_x | .valid_r_y
+
+
+               .n <- .n[!.valid_r_xy]
+               .sample_id <- .sample_id[!.valid_r_xy]
+               .valid_r_x <- .valid_r_x[!.valid_r_xy]
+               .valid_r_y <- .valid_r_y[!.valid_r_xy]
+
+               if(!is.null(.construct_x)) .construct_x <- .construct_x[!.valid_r_xy]
+               if(!is.null(.measure_x)) .measure_x <- .measure_x[!.valid_r_xy]
+               .rxx <- .rxx[!.valid_r_xy]
+               .rxx_restricted <- .rxx_restricted[!.valid_r_xy]
+               .rxx_type <- .rxx_type[!.valid_r_xy]
+               .ux <- .ux[!.valid_r_xy]
+               .ux_observed <- .ux_observed[!.valid_r_xy]
+
+               if(!is.null(.construct_y)) .construct_y <- .construct_y[!.valid_r_xy]
+               if(!is.null(.measure_y)) .measure_y <- .measure_y[!.valid_r_xy]
+               .ryy <- .ryy[!.valid_r_xy]
+               .ryy_restricted <- .ryy_restricted[!.valid_r_xy]
+               .ryy_type <- .ryy_type[!.valid_r_xy]
+               .uy <- .uy[!.valid_r_xy]
+               .uy_observed <- .uy_observed[!.valid_r_xy]
+
+
+               if(is.null(.construct_x)) .construct_x[.valid_r_x] <-NA
+               if(is.null(.measure_x)) .measure_x[.valid_r_x] <-NA
+               .rxx[.valid_r_x] <-
+                    .rxx_restricted[.valid_r_x] <-
+                    .rxx_type[.valid_r_x] <-
+                    .ux[.valid_r_x] <-
+                    .ux_observed[.valid_r_x] <- NA
+
+               if(is.null(.construct_y)) .construct_y[.valid_r_y] <- NA
+               if(is.null(.measure_y)) .measure_y[.valid_r_y] <- NA
+               .ryy[.valid_r_y] <-
+                    .ryy_restricted[.valid_r_y] <-
+                    .ryy_type[.valid_r_y] <-
+                    .uy[.valid_r_y] <-
+                    .uy_observed[.valid_r_y] <- NA
+          }
+
+          if(length(.n)){
+               .supplemental_ads <- create_ad_list(sample_id = .sample_id, n = .n,
+                                                   construct_x = .construct_x, measure_x = .measure_x,
+                                                   construct_y = .construct_y, measure_y = .measure_y,
+                                                   rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type,
+                                                   ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type,
+                                                   ux = .ux, ux_observed = .ux_observed,
+                                                   uy = .uy, uy_observed = .uy_observed, process_ads = FALSE)
+
+               if(is.null(supplemental_ads)){
+                    supplemental_ads <- .supplemental_ads
+               }else{
+                    for(i in names(.supplemental_ads)){
+                         if(is.null(supplemental_ads[[i]])){
+                              supplemental_ads[[i]] <- .supplemental_ads[[i]]
+                         }else{
+                              for(j in names(.supplemental_ads[[i]])){
+                                   supplemental_ads[[i]][[j]] <- c(supplemental_ads[[i]][[j]], .supplemental_ads[[i]][[j]])
+                              }
                          }
                     }
                }
           }
-
      }
 
      if(!is.null(sample_id)) sample_id <- as.character(sample_id)[valid_r]
@@ -607,13 +783,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
      construct_x <- as.character(construct_x)[valid_r]
      construct_y <- as.character(construct_y)[valid_r]
 
-     # correct_rxx <- scalar_arg_warning(arg = correct_rxx, arg_name = "correct_rxx")
-     # correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
      correct_rxx <- manage_arglength(x = correct_rxx, y = rxyi)[valid_r]
      correct_ryy <- manage_arglength(x = correct_ryy, y = rxyi)[valid_r]
 
-     # sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
-     # sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
      sign_rxz <- manage_arglength(x = sign_rxz, y = rxyi)[valid_r]
      sign_ryz <- manage_arglength(x = sign_ryz, y = rxyi)[valid_r]
 
@@ -839,7 +1011,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                }
 
           n_dups <- length(unique(duplicates$Analysis_ID))
-          progbar <- progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
+          progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
                                       total = n_dups, clear = FALSE, width = options()$width)
           collapsed_data_list <- by(1:length(duplicates$Analysis_ID), duplicates$Analysis_ID, function(i){
                progbar$tick()
@@ -1066,6 +1238,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                                           validity_generalization_y = vgy_meta_mat),
                              artifact_distribution = NULL)
      }
+
 
      if(ma_method == "ad"){
           ad_obj_list <- .create_ad_list(ad_type = ad_type, sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,

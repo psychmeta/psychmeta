@@ -31,6 +31,7 @@
      cred_method <- x$cred_method
      var_unbiased <- x$var_unbiased
      flip_xy <- x$flip_xy
+     decimals <- x$decimals
 
      k <- barebones[,"k"]
      N <- barebones[,"N"]
@@ -39,6 +40,10 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
+
+     ad_obj_x <- prepare_ad_int(ad_obj = ad_obj_x, residual_ads = residual_ads, decimals = decimals)
+     ad_obj_y <- prepare_ad_int(ad_obj = ad_obj_y, residual_ads = residual_ads, decimals = decimals)
 
      if(!correct_rxx) ad_obj_x$qxa_irr <- ad_obj_x$qxi_irr <- ad_obj_x$qxa_drr <- ad_obj_x$qxi_drr <- data.frame(Value = 1, Weight = 1)
      if(!correct_ryy) ad_obj_y$qxa_irr <- ad_obj_y$qxi_irr <- ad_obj_y$qxa_drr <- ad_obj_y$qxi_drr <- data.frame(Value = 1, Weight = 1)
@@ -166,6 +171,7 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
 
      if(!correct_rxx){
           ad_obj_x[c("rxxi_irr", "rxxi_drr", "rxxa_irr", "rxxa_drr"),"mean"] <- 1
@@ -207,7 +213,7 @@
 
      var_mat_tp <- estimate_var_rho_tsa_rb1(mean_rtpa = mean_rtpa, var_rxyi = var_r, var_e = var_e,
                                             mean_ux = .mean_ux, mean_rxx = .mean_rxxa, mean_ryy = .mean_ryya,
-                                            var_ux = .var_ux, var_rxx = .var_rxxa, var_ryy = .var_ryya)
+                                            var_ux = .var_ux, var_rxx = .var_rxxa, var_ryy = .var_ryya, show_variance_warnings = FALSE)
 
      .mean_rxpa <- mean_rtpa * .mean_rxxa^.5
      .ci_xp <- ci_tp * .mean_rxxa^.5
@@ -297,6 +303,7 @@
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
+     se_r <- barebones[,"se_r"]
 
      if(!correct_rxx){
           ad_obj_x[c("qxi_irr", "qxi_drr", "qxa_irr", "qxa_drr"),"mean"] <- 1
@@ -338,7 +345,7 @@
 
      var_mat_tp <- estimate_var_rho_tsa_rb2(mean_rtpa = mean_rtpa, var_rxyi = var_r, var_e = var_e,
                                             mean_ux = .mean_ux, mean_qx = .mean_qxa, mean_qy = .mean_qya,
-                                            var_ux = .var_ux, var_qx = .var_qxa, var_qy = .var_qya)
+                                            var_ux = .var_ux, var_qx = .var_qxa, var_qy = .var_qya, show_variance_warnings = FALSE)
 
      .mean_rxpa <- mean_rtpa * .mean_qxa
      .ci_xp <- ci_tp * .mean_qxa

@@ -1,3 +1,10 @@
+Changes in Version 0.2.4 (2018-03-20)
+=====================================
+o A new method to account for sampling error in interactive artifact distributions has been added (NOTE: this is now the default methods used in interactive AD meta-analyses).
+o Stability improvements for dMod functions.
+o Artifacts harvested from rows of a database that do not contain effects sizes in the ma_r and ma_d functions are now organized to avoid redundancy with observations from the same sample that are included in the meta-analytic computations. 
+o Bug fixes to metabulate(). 
+
 Changes in Version 0.2.3 (2018-02-09)
 =====================================
 o Bug fix to the interactive artifact-distribution method for bivariate indirect range restriction (bvirr) to properly compute SD rho.

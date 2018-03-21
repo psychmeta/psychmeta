@@ -60,13 +60,34 @@
                             referent_sd_y,
                             focal_min_x, focal_max_x,
                             signed = TRUE){
-     if(signed){signFun <- function(x){x}}else{signFun <- abs}
-     integrate(f = function(x)
-          signFun(x * (referent_slope - focal_slope) + referent_int - focal_int) *
-               dnorm(x, mean = focal_mean_x, sd = focal_sd_x),
-          lower = focal_min_x, upper = focal_max_x)$v / referent_sd_y
-}
 
+     if(zapsmall(focal_min_x) == zapsmall(focal_max_x)){
+          0
+     }else{
+          if(signed){signFun <- function(x){x}}else{signFun <- abs}
+          ..internalDmodOut.1234 <- try(integrate(f = function(x){
+               signFun(x * (referent_slope - focal_slope) + referent_int - focal_int) *
+                    dnorm(x, mean = focal_mean_x, sd = focal_sd_x)},
+               lower = focal_min_x, upper = focal_max_x)$v / referent_sd_y)
+
+          if(!is.null(attributes(..internalDmodOut.1234)$class))
+               if(attributes(..internalDmodOut.1234)$class == "try-error"){
+                    ..internalDmodOut.1234 <- integrate(f = function(x){
+                         signFun(x * (referent_slope - focal_slope) + referent_int - focal_int) *
+                              dnorm(x, mean = focal_mean_x, sd = focal_sd_x)},
+                         lower = max(c(focal_mean_x - 3 * focal_sd_x, focal_min_x)), upper = min(c(focal_mean_x + 3 * focal_sd_x, focal_max_x)))$v / referent_sd_y
+               }
+          if(!is.null(attributes(..internalDmodOut.1234)$class)){
+               if(attributes(..internalDmodOut.1234)$class == "try-error"){
+                    NA
+               }else{
+                    ..internalDmodOut.1234
+               }
+          }else{
+               ..internalDmodOut.1234
+          }
+     }
+}
 
 
 #' Function for computing non-parametric \eqn{d_{Mod}}{d_Mod} effect sizes for a single focal group
@@ -300,11 +321,11 @@ compute_dmod_npar <- function(referent_int, referent_slope,
 #'
 #' @examples
 #' compute_dmod_par(referent_int = -.05, referent_slope = .5,
-#'           focal_int = c(.05, 0, -.05), focal_slope = c(.5, .3, .3),
-#'           focal_mean_x = c(-.5, 0, -.5), focal_sd_x = rep(1, 3),
-#'           referent_sd_y = 1,
-#'           focal_min_x = rep(-Inf, 3), focal_max_x = rep(Inf, 3),
-#'           focal_names = NULL, rescale_cdf = TRUE)
+#'                  focal_int = c(.05, 0, -.05), focal_slope = c(.5, .3, .3),
+#'                  focal_mean_x = c(-.5, 0, -.5), focal_sd_x = rep(1, 3),
+#'                  referent_sd_y = 1,
+#'                  focal_min_x = rep(-Inf, 3), focal_max_x = rep(Inf, 3),
+#'                  focal_names = NULL, rescale_cdf = TRUE)
 compute_dmod_par <- function(referent_int, referent_slope,
                              focal_int, focal_slope,
                              focal_mean_x, focal_sd_x,
@@ -369,28 +390,40 @@ compute_dmod_par <- function(referent_int, referent_slope,
      paramMat[,"x_int"][extremeIntLo] <- paramMat[,"focal_min_x"][extremeIntLo]
      paramMat[,"x_int"][extremeIntHi] <- paramMat[,"focal_max_x"][extremeIntHi]
 
+     paramMat <- cbind(paramMat, .x_int = paramMat[,"x_int"])
+     tooSmall <- !is.infinite(paramMat[,"x_int"]) & paramMat[,"x_int"] < paramMat[,"focal_mean_x"] - 5 * paramMat[,"focal_sd_x"]
+     tooBig <- !is.infinite(paramMat[,"x_int"]) & paramMat[,"x_int"] < paramMat[,"focal_mean_x"] + 5 * paramMat[,"focal_sd_x"]
+     paramMat[tooSmall, ".x_int"] <- paramMat[tooSmall, "focal_mean_x"] - 5 * paramMat[tooSmall, "focal_sd_x"]
+     paramMat[tooBig, ".x_int"] <- paramMat[tooBig, "focal_mean_x"] + 5 * paramMat[tooBig, "focal_sd_x"]
+
      neginf2Int <- apply(paramMat, 1, function(x)
           if(!is.na(x["x_int"])){
-               integrate(f = function(i) dnorm(i, mean = x["focal_mean_x"], sd = x["focal_sd_x"]),
-                         lower = -Inf, upper = x["x_int"])$v
+               pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"])
           }else{0})
      int2Inf <- apply(paramMat, 1, function(x)
           if(!is.na(x["x_int"])){
-               integrate(f = function(i) dnorm(i, mean = x["focal_mean_x"], sd = x["focal_sd_x"]),
-                         lower = x["x_int"], upper = Inf)$v
+               pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"], lower.tail = FALSE)
           }else{0})
-     neginf2Int[useFullCdf] <- 0
+     neginf2Int[useFullCdf] <- 1
      int2Inf[useFullCdf] <- 1
 
      propBelowInt <- apply(paramMat, 1, function(x)
           if(!is.na(x["x_int"])){
-               integrate(f = function(i) dnorm(i, mean = x["focal_mean_x"], sd = x["focal_sd_x"]),
-                         lower = x["focal_min_x"], upper = x["x_int"])$v
+               if(zapsmall(x["focal_min_x"]) == zapsmall(x["x_int"])){
+                    0
+               }else{
+                    pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"]) -
+                         pnorm(x["focal_min_x"], mean = x["focal_sd_x"], sd = x["focal_sd_x"])
+               }
           }else{0})
      propAboveInt <- apply(paramMat, 1, function(x)
           if(!is.na(x["x_int"])){
-               integrate(f = function(i) dnorm(i, mean = x["focal_mean_x"], sd = x["focal_sd_x"]),
-                         lower = x["x_int"], upper = x["focal_max_x"])$v
+               if(zapsmall(x["focal_max_x"]) == zapsmall(x["x_int"])){
+                    0
+               }else{
+                    pnorm(x["focal_max_x"], mean = x["focal_sd_x"], sd = x["focal_sd_x"]) -
+                         pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"])
+               }
           }else{0})
 
      if(rescale_cdf){
@@ -400,25 +433,31 @@ compute_dmod_par <- function(referent_int, referent_slope,
           rescaleCdfLo <- 1
           rescaleCdfHi <- 1
      }
+     rescaleCdfLo[is.na(rescaleCdfLo)] <- 1
+     rescaleCdfHi[is.na(rescaleCdfHi)] <- 1
+     rescaleCdfLo[rescaleCdfLo == 0] <- 1
+     rescaleCdfHi[rescaleCdfHi == 0] <- 1
 
-     dModLo <- apply(paramMat, 1, function(x)
-          if(!is.na(x["x_int"])){
+     dModLo <- apply(paramMat, 1, function(x){
+          if(!is.na(x[".x_int"])){
                .integrate_dmod(referent_int = x["referent_int"], referent_slope = x["referent_slope"],
                                focal_int = x["focal_int"], focal_slope = x["focal_slope"],
                                focal_mean_x = x["focal_mean_x"], focal_sd_x = x["focal_sd_x"],
                                referent_sd_y = x["referent_sd_y"],
                                focal_min_x = x["focal_min_x"],
-                               focal_max_x = x["x_int"], signed = TRUE)
-          }else{0}) / rescaleCdfLo
-     dModHi <- apply(paramMat, 1, function(x)
-          if(!is.na(x["x_int"])){
+                               focal_max_x = x[".x_int"], signed = TRUE)
+          }else{0}
+     }) / rescaleCdfLo
+     dModHi <- apply(paramMat, 1, function(x){
+          if(!is.na(x[".x_int"])){
                .integrate_dmod(referent_int = x["referent_int"], referent_slope = x["referent_slope"],
                                focal_int = x["focal_int"], focal_slope = x["focal_slope"],
                                focal_mean_x = x["focal_mean_x"], focal_sd_x = x["focal_sd_x"],
                                referent_sd_y = x["referent_sd_y"],
-                               focal_min_x = x["x_int"],
+                               focal_min_x = x[".x_int"],
                                focal_max_x = x["focal_max_x"], signed = TRUE)
-          }else{0}) / rescaleCdfHi
+          }else{0}
+     }) / rescaleCdfHi
 
      dModLo[is.na(dModLo)] <- 0
      dModHi[is.na(dModHi)] <- 0

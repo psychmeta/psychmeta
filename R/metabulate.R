@@ -313,8 +313,6 @@ add_commas <- function(x, decimals = 0){
           }
 
           for(i in 1:ncol(ma_tab)) ma_tab[,i] <- as.character(ma_tab[,i])
-          ma_tab[,"k"] <- add_commas(x = ma_tab[,"k"])
-          ma_tab[,"N"] <- add_commas(x = ma_tab[,"N"])
 
           ma_tab$var_r <- ma_tab$var_d <- ma_tab$var_es <- ma_tab$var_e <- ma_tab$var_res <- NULL
           ma_tab$var_art <- ma_tab$var_pre <- NULL
