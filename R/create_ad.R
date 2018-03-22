@@ -1725,13 +1725,18 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                     valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)]
      if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
 
-     summary_mat <- cbind(k_obs = c(length(rxxa), length(rxxa), length(rxxi), length(rxxi),
-                                    length(rxxa), length(rxxa), length(rxxi), length(rxxi),
-                                    length(ux), length(ut)),
+     .valid_rxxa <- filter_rel(rel_vec = rxxa, wt_vec = wt_rxxa)
+     .valid_rxxi <- filter_rel(rel_vec = rxxi, wt_vec = wt_rxxi)
+     .valid_ux <- filter_u(u_vec = ux, wt_vec = wt_ux)
+     .valid_ut <- filter_u(u_vec = ut, wt_vec = wt_ut)
 
-                          N_obs = c(sum(n_rxxa), sum(n_rxxa), sum(n_rxxi), sum(n_rxxi),
-                                    sum(n_rxxa), sum(n_rxxa), sum(n_rxxi), sum(n_rxxi),
-                                    sum(ni_ux), sum(ni_ut)),
+     summary_mat <- cbind(k_obs = c(length(rxxa[.valid_rxxa]), length(rxxa[.valid_rxxa]), length(rxxi[.valid_rxxi]), length(rxxi[.valid_rxxi]),
+                                    length(rxxa[.valid_rxxa]), length(rxxa[.valid_rxxa]), length(rxxi[.valid_rxxi]), length(rxxi[.valid_rxxi]),
+                                    length(ux[.valid_ux]), length(ut[.valid_ut])),
+
+                          N_obs = c(sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
+                                    sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
+                                    sum(ni_ux[.valid_ux]), sum(ni_ut[.valid_ut])),
 
                           p_dists = c(length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
                                      length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),

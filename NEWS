@@ -1,3 +1,7 @@
+Changes in Version 0.2.5 (2018-03-21)
+=====================================
+o Hot fix for consolidating dependent effect sizes. 
+
 Changes in Version 0.2.4 (2018-03-20)
 =====================================
 o A new method to account for sampling error in interactive artifact distributions has been added (NOTE: this is now the default methods used in interactive AD meta-analyses).

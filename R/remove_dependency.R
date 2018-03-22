@@ -87,7 +87,7 @@
      list(ux = ux_out,
           uy = uy_out,
           rxx = rxx_out,
-          ryy = rxx_out)
+          ryy = ryy_out)
 }
 
 .remove_dependency <- function(sample_id, es_data = NULL, data_x = NULL, data_y = NULL,

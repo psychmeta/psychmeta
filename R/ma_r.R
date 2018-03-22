@@ -1010,10 +1010,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                     }
                }
 
-          n_dups <- length(unique(duplicates$Analysis_ID))
+          n_dups <- length(unique(duplicates$sample_id))
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
                                       total = n_dups, clear = FALSE, width = options()$width)
-          collapsed_data_list <- by(1:length(duplicates$Analysis_ID), duplicates$Analysis_ID, function(i){
+          collapsed_data_list <- by(1:length(duplicates$Analysis_ID), duplicates$sample_id, function(i){
                progbar$tick()
                out <- .remove_dependency(sample_id = "sample_id", es_data = str_es_data,
                                          data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
@@ -1238,7 +1238,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
                                                           validity_generalization_y = vgy_meta_mat),
                              artifact_distribution = NULL)
      }
-
 
      if(ma_method == "ad"){
           ad_obj_list <- .create_ad_list(ad_type = ad_type, sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
