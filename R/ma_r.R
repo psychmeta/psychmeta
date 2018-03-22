@@ -1013,7 +1013,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL,
           n_dups <- length(unique(duplicates$sample_id))
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
                                       total = n_dups, clear = FALSE, width = options()$width)
-          collapsed_data_list <- by(1:length(duplicates$Analysis_ID), duplicates$sample_id, function(i){
+          collapsed_data_list <- by(1:length(duplicates$Analysis_ID), duplicates$Analysis_ID, function(i){
                progbar$tick()
                out <- .remove_dependency(sample_id = "sample_id", es_data = str_es_data,
                                          data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
