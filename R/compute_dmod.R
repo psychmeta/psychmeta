@@ -392,17 +392,17 @@ compute_dmod_par <- function(referent_int, referent_slope,
 
      paramMat <- cbind(paramMat, .x_int = paramMat[,"x_int"])
      tooSmall <- !is.infinite(paramMat[,"x_int"]) & paramMat[,"x_int"] < paramMat[,"focal_mean_x"] - 5 * paramMat[,"focal_sd_x"]
-     tooBig <- !is.infinite(paramMat[,"x_int"]) & paramMat[,"x_int"] < paramMat[,"focal_mean_x"] + 5 * paramMat[,"focal_sd_x"]
+     tooBig <- !is.infinite(paramMat[,"x_int"]) & paramMat[,"x_int"] > paramMat[,"focal_mean_x"] + 5 * paramMat[,"focal_sd_x"]
      paramMat[tooSmall, ".x_int"] <- paramMat[tooSmall, "focal_mean_x"] - 5 * paramMat[tooSmall, "focal_sd_x"]
      paramMat[tooBig, ".x_int"] <- paramMat[tooBig, "focal_mean_x"] + 5 * paramMat[tooBig, "focal_sd_x"]
 
      neginf2Int <- apply(paramMat, 1, function(x)
           if(!is.na(x["x_int"])){
-               pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"])
+               pnorm(x["x_int"], mean = x["focal_mean_x"], sd = x["focal_sd_x"])
           }else{0})
      int2Inf <- apply(paramMat, 1, function(x)
           if(!is.na(x["x_int"])){
-               pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"], lower.tail = FALSE)
+               pnorm(x["x_int"], mean = x["focal_mean_x"], sd = x["focal_sd_x"], lower.tail = FALSE)
           }else{0})
      neginf2Int[useFullCdf] <- 1
      int2Inf[useFullCdf] <- 1
@@ -412,8 +412,8 @@ compute_dmod_par <- function(referent_int, referent_slope,
                if(zapsmall(x["focal_min_x"]) == zapsmall(x["x_int"])){
                     0
                }else{
-                    pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"]) -
-                         pnorm(x["focal_min_x"], mean = x["focal_sd_x"], sd = x["focal_sd_x"])
+                    pnorm(x["x_int"], mean = x["focal_mean_x"], sd = x["focal_sd_x"]) -
+                         pnorm(x["focal_min_x"], mean = x["focal_mean_x"], sd = x["focal_sd_x"])
                }
           }else{0})
      propAboveInt <- apply(paramMat, 1, function(x)
@@ -421,8 +421,8 @@ compute_dmod_par <- function(referent_int, referent_slope,
                if(zapsmall(x["focal_max_x"]) == zapsmall(x["x_int"])){
                     0
                }else{
-                    pnorm(x["focal_max_x"], mean = x["focal_sd_x"], sd = x["focal_sd_x"]) -
-                         pnorm(x["x_int"], mean = x["focal_sd_x"], sd = x["focal_sd_x"])
+                    pnorm(x["focal_max_x"], mean = x["focal_mean_x"], sd = x["focal_sd_x"]) -
+                         pnorm(x["x_int"], mean = x["focal_mean_x"], sd = x["focal_sd_x"])
                }
           }else{0})
 
@@ -448,6 +448,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
                                focal_max_x = x[".x_int"], signed = TRUE)
           }else{0}
      }) / rescaleCdfLo
+
      dModHi <- apply(paramMat, 1, function(x){
           if(!is.na(x[".x_int"])){
                .integrate_dmod(referent_int = x["referent_int"], referent_slope = x["referent_slope"],
@@ -656,7 +657,7 @@ compute_dmod <- function(data, group, predictors, criterion,
           }
      }
 
-     data <- data.frame(G = group, Y = criterion, predictors)
+     data <- data.frame(G = group, Y = unlist(criterion), predictors)
      xNames <- colnames(data)[-(1:2)]
 
      groupNames <- levels(factor(data[,"G"]))
@@ -731,10 +732,10 @@ compute_dmod <- function(data, group, predictors, criterion,
                if(!cross_validate_wts)
                     regModel <- lm(as.formula(paste("Y ~", paste(xNames, collapse = " + "))), data = data_i)$coeff
                data_i <- data.frame(cbind(data_i[,1:2],
-                                         X = as.numeric(apply(as.matrix(data_i[,xNames]), 1,
-                                                              function(x) regModel[-1] %*% x))))
+                                          X = as.numeric(apply(as.matrix(data_i[,xNames]), 1,
+                                                               function(x) regModel[-1] %*% x))))
           }else{
-               data_i <- data.frame(data_i)
+               data_i <- data.frame(cbind(data_i[,1:2], X = unlist(data_i[,3])))
           }
 
           regList <- by(data_i, INDICES = data_i$G, function(x) lm(Y ~ X, data = x)$coeff)
@@ -762,28 +763,16 @@ compute_dmod <- function(data, group, predictors, criterion,
                                        focal_max_x = maxVec[focalId],
                                        focal_names = focal_id_vec,
                                        rescale_cdf = rescale_cdf)$point_estimate
-
-               referent_int = intVec[referentId]
-               referent_slope = slopeVec[referentId]
-               focal_int = intVec[focalId]
-               focal_slope = slopeVec[focalId]
-               focal_mean_x = xMeanVec[focalId]
-               focal_sd_x = xSdVec[focalId]
-               referent_sd_y = ySdVec[referentId]
-               focal_min_x = minVec[focalId]
-               focal_max_x = maxVec[focalId]
-               focal_names = focal_id_vec
-               rescale_cdf = rescale_cdf
           }else{
                out <- data.frame(t(apply(t(focalId), 2, function(x){
-                   x_out <-  compute_dmod_npar(referent_int = intVec[referentId],
-                                               referent_slope = slopeVec[referentId],
-                                               focal_int = intVec[x],
-                                               focal_slope = slopeVec[x],
-                                               focal_x = data_i[data_i$G == groupNames[x],"X"],
-                                               referent_sd_y = ySdVec[referentId])$point_estimate
-                   class(x_out) <- NULL
-                   unlist(x_out)
+                    x_out <-  compute_dmod_npar(referent_int = intVec[referentId],
+                                                referent_slope = slopeVec[referentId],
+                                                focal_int = intVec[x],
+                                                focal_slope = slopeVec[x],
+                                                focal_x = data_i[data_i$G == groupNames[x],"X"],
+                                                referent_sd_y = ySdVec[referentId])$point_estimate
+                    class(x_out) <- NULL
+                    unlist(x_out)
                })))
                out <- cbind(focal_group = focal_id_vec, out)
           }

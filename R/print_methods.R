@@ -1276,11 +1276,11 @@ print.psychmeta.dmod <- function(x, ..., digits = 3){
 
           cat("\n")
           cat("Bootrapped Lower-Bound Confidence Limit:\n")
-          print.data.frame(x[[4]], digits = digits)
-
+          print.data.frame(x[[grep(x = names(x), pattern = "bootstrap_CI_LL_")]], digits = digits)
+          
           cat("\n")
           cat("Bootrapped Upper-Bound Confidence Limit:\n")
-          print.data.frame(x[[5]], digits = digits)
+          print.data.frame(x[[grep(x = names(x), pattern = "bootstrap_CI_UL_")]], digits = digits)
      }else{
           cat("\n")
           cat("Point Estimates:\n")
