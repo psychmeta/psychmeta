@@ -7,7 +7,7 @@
 var_error_q(q, n)
 }
 \arguments{
-\item{q}{Vector of of square roots of reliability estimates.}
+\item{q}{Vector of square roots of reliability estimates.}
 
 \item{n}{Vector of sample sizes.}
 }

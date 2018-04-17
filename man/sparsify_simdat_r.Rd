@@ -21,6 +21,6 @@ A sparsified database
 }
 \description{
 This function can be used to randomly delete artifact from databases produced by the \code{\link{simulate_r_database}} function.
-Deletion of artifacts can be performed in either a study-wise fashion for complete missingness within randomly selected studies or element-wise missingness for compeltely random deletion of artifacts in the database.
+Deletion of artifacts can be performed in either a study-wise fashion for complete missingness within randomly selected studies or element-wise missingness for completely random deletion of artifacts in the database.
 Deletion can be applied to reliability estimates and/or u ratios.
 }

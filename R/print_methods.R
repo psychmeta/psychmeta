@@ -44,12 +44,13 @@ round2char <- function(x, digits = 3, na_replace = "", omit_leading_zero = FALSE
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta <- function(x, ..., digits = 3){
+print.psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
 
      if(any(class(x) == "ma_generic")){
@@ -61,12 +62,18 @@ print.psychmeta <- function(x, ..., digits = 3){
           cat("\n")
           print(x$call_history[[length(x$call_history)]])
 
-          print.psychmeta.ma_generic(x, ..., digits = digits)
+          print.psychmeta.ma_generic(x, ..., digits = digits, verbose = verbose)
 
           if(any(names(x) == "follow_up_analyses")){
                cat("\n")
                cat("Follow-up analyses are available in ma_obj$follow_up_analyses. Currently, these include:\n",
                    paste(names(x$follow_up_analyses), collapse = ", "))
+          }
+
+          if(any(names(x) == "plots")){
+               cat("\n")
+               cat("Plots are available in ma_obj$plots. Currently, these include:\n",
+                   paste(names(x$plots), collapse = ", "))
           }
      }
 
@@ -84,18 +91,24 @@ print.psychmeta <- function(x, ..., digits = 3){
           print(x$call_history[[length(x$call_history)]])
 
           if(any(class(x) == "ma_bb"))
-               print.psychmeta.ma_r.barebones(x, ..., digits = digits)
+               print.psychmeta.ma_r.barebones(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ic"))
-               print.psychmeta.ma_r.ic(x, ..., digits = digits)
+               print.psychmeta.ma_r.ic(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ad"))
-               print.psychmeta.ma_r.ad(x, ..., digits = digits)
+               print.psychmeta.ma_r.ad(x, ..., digits = digits, verbose = verbose)
 
           if(any(names(x) == "follow_up_analyses")){
                cat("\n")
                cat("Follow-up analyses are available in ma_obj$follow_up_analyses. Currently, these include:\n",
                    paste(names(x$follow_up_analyses), collapse = ", "))
+          }
+
+          if(any(names(x) == "plots")){
+               cat("\n")
+               cat("Plots are available in ma_obj$plots. Currently, these include:\n",
+                   paste(names(x$plots), collapse = ", "))
           }
      }
 
@@ -114,21 +127,24 @@ print.psychmeta <- function(x, ..., digits = 3){
           print(x$call_history[[length(x$call_history)]])
 
           if(any(class(x) == "ma_bb"))
-               print.psychmeta.ma_r.barebones.master(x, ..., digits = digits)
+               print.psychmeta.ma_r.barebones.master(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ic"))
-               print.psychmeta.ma_r.ic.master(x, ..., digits = digits)
+               print.psychmeta.ma_r.ic.master(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ad"))
-               print.psychmeta.ma_r.ad.master(x, ..., digits = digits)
+               print.psychmeta.ma_r.ad.master(x, ..., digits = digits, verbose = verbose)
 
-          if(!is.null(x$construct_pairs[[1]]$follow_up_analyses)){
-
-          }
-          if(any(names(x$construct_pairs[[1]]) == "follow_up_analyses")){
+          if(any(unlist(lapply(x$construct_pairs, function(.x) any(names(.x) == "follow_up_analyses"))))){
                cat("\n")
                cat("Follow-up analyses are available in ma_obj$construct_pairs$`Pair ID`$follow_up_analyses. Currently, these include:\n",
-                   paste(names(x$construct_pairs[[1]]$follow_up_analyses), collapse = ", "))
+                   paste(unique(unlist(lapply(x$construct_pairs, function(.x) names(.x$follow_up_analyses)))), collapse = ", "))
+          }
+
+          if(any(unlist(lapply(x$construct_pairs, function(.x) any(names(.x) == "plots"))))){
+               cat("\n")
+               cat("Plots are available in ma_obj$construct_pairs$`Pair ID`$plots. Currently, these include:\n",
+                   paste(unique(unlist(lapply(x$construct_pairs, function(.x) names(.x$plots)))), collapse = ", "))
           }
      }
 
@@ -147,18 +163,24 @@ print.psychmeta <- function(x, ..., digits = 3){
           print(x$call_history[[length(x$call_history)]])
 
           if(any(class(x) == "ma_bb"))
-               print.psychmeta.ma_d.barebones(x, ..., digits = digits)
+               print.psychmeta.ma_d.barebones(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ic"))
-               print.psychmeta.ma_d.ic(x)
+               print.psychmeta.ma_d.ic(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ad"))
-               print.psychmeta.ma_d.ad(x)
+               print.psychmeta.ma_d.ad(x, ..., digits = digits, verbose = verbose)
 
           if(any(names(x) == "follow_up_analyses")){
                cat("\n")
                cat("Follow-up analyses are available in ma_obj$follow_up_analyses. Currently, these include:\n",
                    paste(names(x$follow_up_analyses), collapse = ", "))
+          }
+
+          if(any(names(x) == "plots")){
+               cat("\n")
+               cat("Plots are available in ma_obj$plots. Currently, these include:\n",
+                   paste(names(x$plots), collapse = ", "))
           }
      }
 
@@ -179,27 +201,33 @@ print.psychmeta <- function(x, ..., digits = 3){
           print(x$call_history[[length(x$call_history)]])
 
           if(any(class(x) == "ma_bb"))
-               print.psychmeta.ma_d.barebones.master(x, ..., digits = digits)
+               print.psychmeta.ma_d.barebones.master(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ic"))
-               print.psychmeta.ma_d.ic.master(x, ..., digits = digits)
+               print.psychmeta.ma_d.ic.master(x, ..., digits = digits, verbose = verbose)
 
           if(any(class(x) == "ma_ad"))
-               print.psychmeta.ma_d.ad.master(x, ..., digits = digits)
+               print.psychmeta.ma_d.ad.master(x, ..., digits = digits, verbose = verbose)
 
-          if(any(names(x$construct_pairs[[1]]) == "follow_up_analyses")){
+          if(any(unlist(lapply(x$construct_pairs, function(.x) any(names(.x) == "follow_up_analyses"))))){
                cat("\n")
                cat("Follow-up analyses are available in ma_obj$construct_pairs$`Pair ID`$follow_up_analyses. Currently, these include:\n",
-                   paste(names(x$construct_pairs[[1]]$follow_up_analyses), collapse = ", "))
+                   paste(unique(unlist(lapply(x$construct_pairs, function(.x) names(.x$follow_up_analyses)))), collapse = ", "))
+          }
+
+          if(any(unlist(lapply(x$construct_pairs, function(.x) any(names(.x) == "plots"))))){
+               cat("\n")
+               cat("Plots are available in ma_obj$construct_pairs$`Pair ID`$plots. Currently, these include:\n",
+                   paste(unique(unlist(lapply(x$construct_pairs, function(.x) names(.x$plots)))), collapse = ", "))
           }
      }
 
      if(any(class(x) == "ma_r_as_r") & any(class(x) == "ma_order2")){
-          print.psychmeta.ma_r.order2(x, ..., digits = digits)
+          print.psychmeta.ma_r.order2(x, ..., digits = digits, verbose = verbose)
      }
 
      if(any(class(x) == "ma_d_as_d") & any(class(x) == "ma_order2")){
-          print.psychmeta.ma_d.order2(x, ..., digits = digits)
+          print.psychmeta.ma_d.order2(x, ..., digits = digits, verbose = verbose)
      }
 
      if(any(class(x) == "ad_obj")){
@@ -299,10 +327,158 @@ print.psychmeta <- function(x, ..., digits = 3){
 
      }
 
-     if(any(class(x) == "heterogeneity")){
+     if(any(class(x) == "heterogeneity"))
           print.psychmeta.heterogeneity(x, ..., digits = digits)
+
+     if(any(class(x) == "ma_cumulative"))
+          print.psychmeta.ma_cumulative(x, ..., digits = digits)
+
+     if(any(class(x) == "ma_leave1out"))
+          print.psychmeta.ma_leave1out(x, ..., digits = digits)
+
+     if(any(class(x) == "ma_bootstrap"))
+          print.psychmeta.ma_bootstrap(x, ..., digits = digits)
+
+
+     if(any(class(x) == "get_plots"))
+          print.psychmeta.get_plots(x, ..., digits = digits)
+     if(any(class(x) == "get_matrix"))
+          print.psychmeta.get_matrix(x, ..., digits = digits)
+     if(any(class(x) == "get_escalc"))
+          print.psychmeta.get_escalc(x, ..., digits = digits)
+     if(any(class(x) == "get_metatab"))
+          print.psychmeta.get_metatab(x, ..., digits = digits)
+
+
+     if(any(class(x) == "get_followup"))
+          print.psychmeta.get_followup(x, ..., digits = digits)
+     if(any(class(x) == "get_heterogeneity"))
+          print.psychmeta.get_heterogeneity(x, ..., digits = digits)
+     if(any(class(x) == "get_metareg"))
+          print.psychmeta.get_metareg(x, ..., digits = digits)
+     if(any(class(x) == "get_bootstrap"))
+          print.psychmeta.get_bootstrap(x, ..., digits = digits)
+     if(any(class(x) == "get_leave1out"))
+          print.psychmeta.get_leave1out(x, ..., digits = digits)
+     if(any(class(x) == "get_cumulative"))
+          print.psychmeta.get_cumulative(x, ..., digits = digits)
+
+}
+
+
+
+
+print.psychmeta.ma_table <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
+     if(ma_type == "ma_r_bb"){
+          full_names <- c("mean_r", "var_r", "var_e", "var_res", "sd_r", "se_r", "sd_e", "sd_res")
+          verbose_names <- c("mean_r", "sd_r", "se_r", "sd_e", "sd_res")
+          succinct_names <- c("mean_r", "sd_r", "se_r", "sd_res")
+     }
+     if(ma_type == "ma_r_ic"){
+          full_names <- c("mean_r", "var_r", "var_e", "var_res", "sd_r", "se_r", "sd_e", "sd_res",
+                          "mean_rho", "var_r_c", "var_e_c", "var_rho", "sd_r_c", "se_r_c", "sd_e_c", "sd_rho")
+          verbose_names <- c("mean_r", "sd_r", "se_r", "sd_e", "sd_res",
+                             "mean_rho", "sd_r_c", "se_r_c", "sd_e_c", "sd_rho")
+          succinct_names <- c("mean_r", "sd_r", "se_r", "sd_res",
+                              "mean_rho", "sd_r_c", "se_r_c", "sd_rho")
+     }
+     if(ma_type == "ma_r_ad"){
+          full_names <- c("mean_r", "var_r", "var_e", "var_art", "var_pre", "var_res", "sd_r", "se_r", "sd_e", "sd_art", "sd_pre", "sd_res",
+                          "mean_rho", "var_r_c", "var_e_c", "var_art_c", "var_pre_c", "var_rho", "sd_r_c", "se_r_c", "sd_e_c", "sd_art_c", "sd_pre_c", "sd_rho")
+          verbose_names <- c("mean_r", "sd_r", "se_r", "sd_e", "sd_art", "sd_pre", "sd_res",
+                             "mean_rho", "sd_r_c", "se_r_c", "sd_e_c", "sd_art_c", "sd_pre_c", "sd_rho")
+          succinct_names <- c("mean_r", "sd_r", "se_r", "sd_res",
+                              "mean_rho", "sd_r_c", "se_r_c", "sd_rho")
      }
 
+
+     if(ma_type == "ma_d_bb"){
+          full_names <- c("mean_d", "var_d", "var_e", "var_res", "sd_d", "se_d", "sd_e", "sd_res")
+          verbose_names <- c("mean_d", "sd_d", "se_d", "sd_e", "sd_res")
+          succinct_names <- c("mean_d", "sd_d", "se_d", "sd_res")
+     }
+     if(ma_type == "ma_d_ic"){
+          full_names <- c("mean_d", "var_d", "var_e", "var_res", "sd_d", "se_d", "sd_e", "sd_res",
+                          "mean_delta", "var_d_c", "var_e_c", "var_delta", "sd_d_c", "se_d_c", "sd_e_c", "sd_delta")
+          verbose_names <- c("mean_d", "sd_d", "se_d", "sd_e", "sd_res",
+                             "mean_delta", "sd_d_c", "se_d_c", "sd_e_c", "sd_delta")
+          succinct_names <- c("mean_d", "sd_d", "se_d", "sd_res",
+                              "mean_delta", "sd_d_c", "se_d_c", "sd_delta")
+     }
+     if(ma_type == "ma_d_ad"){
+          full_names <- c("mean_d", "var_d", "var_e", "var_art", "var_pre", "var_res", "sd_d", "se_d", "sd_e", "sd_art", "sd_pre", "sd_res",
+                          "mean_delta", "var_d_c", "var_e_c", "var_art_c", "var_pre_c", "var_delta", "sd_d_c", "se_r_c", "sd_e_c", "sd_art_c", "sd_pre_c", "sd_delta")
+          verbose_names <- c("mean_d", "sd_d", "se_d", "sd_e", "sd_art", "sd_pre", "sd_res",
+                             "mean_delta", "sd_d_c", "se_r_c", "sd_e_c", "sd_art_c", "sd_pre_c", "sd_delta")
+          succinct_names <- c("mean_d", "sd_d", "se_d", "sd_res",
+                              "mean_delta", "sd_d_c", "se_r_c", "sd_delta")
+     }
+
+
+     if(ma_type == "ma_generic"){
+          full_names <- c("mean_es", "var_es", "var_e", "var_res", "sd_es", "se_es", "sd_e", "sd_res")
+          verbose_names <- c("mean_es", "sd_es", "se_es", "sd_e", "sd_res")
+          succinct_names <- c("mean_es", "sd_es", "se_es", "sd_res")
+     }
+
+
+     if(ma_type == "ma_r_bb_order2"){
+          # full_names <- c("mean_r_bar", "var_r_bar", "var_e", "var_r_bar_res", "sd_r_bar", "se_r_bar", "sd_e", "sd_r_bar_res", "percent_var", "rel_r", "cor(r, error)")
+          # selected_names <- c("mean_r_bar", "sd_r_bar", "se_r_bar", "sd_r_bar_res", "percent_var", "rel_r", "cor(r, error)")
+          full_names <- c("mean_r_bar", "var_r_bar", "var_e", "var_r_bar_res", "sd_r_bar", "se_r_bar", "sd_e", "sd_r_bar_res")
+          verbose_names <- c("mean_r_bar", "sd_r_bar", "se_r_bar", "sd_e", "sd_r_bar_res")
+          succinct_names <- c("mean_r_bar", "sd_r_bar", "se_r_bar", "sd_r_bar_res")
+     }
+     if(ma_type == "ma_r_ic_order2"){
+          # full_names <- c("mean_rho_bar", "var_rho_bar", "var_e", "var_rho_bar_res", "sd_rho_bar", "se_rho_bar", "sd_e", "sd_rho_bar_res", "percent_var", "rel_rho", "cor(rho, error)")
+          # selected_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_rho_bar_res", "percent_var", "rel_rho", "cor(rho, error)")
+          full_names <- c("mean_rho_bar", "var_rho_bar", "var_e", "var_rho_bar_res", "sd_rho_bar", "se_rho_bar", "sd_e", "sd_rho_bar_res")
+          verbose_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_e", "sd_rho_bar_res")
+          succinct_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_rho_bar_res")
+     }
+     if(ma_type == "ma_r_ad_order2"){
+          # full_names <- c("mean_rho_bar", "var_rho_bar", "var_e", "var_rho_bar_res", "sd_rho_bar", "se_rho_bar", "sd_e", "sd_rho_bar_res", "percent_var", "rel_rho", "cor(rho, error)")
+          # selected_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_rho_bar_res", "percent_var", "rel_rho", "cor(rho, error)")
+          full_names <- c("mean_rho_bar", "var_rho_bar", "var_e", "var_rho_bar_res", "sd_rho_bar", "se_rho_bar", "sd_e", "sd_rho_bar_res")
+          verbose_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_e", "sd_rho_bar_res")
+          succinct_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_rho_bar_res")
+     }
+
+
+     if(ma_type == "ma_d_bb_order2"){
+          # full_names <- c("mean_d_bar", "var_d_bar", "var_e", "var_d_bar_res", "sd_d_bar", "se_d_bar", "sd_e", "sd_d_bar_res", "percent_var", "rel_d", "cor(d, error)")
+          # selected_names <- c("mean_d_bar", "sd_d_bar", "se_d_bar", "sd_d_bar_res", "percent_var", "rel_d", "cor(d, error)")
+          full_names <- c("mean_d_bar", "var_d_bar", "var_e", "var_d_bar_res", "sd_d_bar", "se_d_bar", "sd_e", "sd_d_bar_res")
+          verbose_names <- c("mean_d_bar", "sd_d_bar", "se_d_bar", "sd_e", "sd_d_bar_res")
+          succinct_names <- c("mean_d_bar", "sd_d_bar", "se_d_bar", "sd_d_bar_res")
+     }
+     if(ma_type == "ma_d_ic_order2"){
+          # full_names <- c("mean_delta_bar", "var_delta_bar", "var_e", "var_delta_bar_res", "sd_delta_bar", "se_delta_bar", "sd_e", "sd_delta_bar_res", "percent_var", "rel_delta", "cor(delta, error)")
+          # selected_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_delta_bar_res", "percent_var", "rel_delta", "cor(delta, error)")
+          full_names <- c("mean_delta_bar", "var_delta_bar", "var_e", "var_delta_bar_res", "sd_delta_bar", "se_delta_bar", "sd_e", "sd_delta_bar_res")
+          verbose_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_e", "sd_delta_bar_res")
+          succinct_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_delta_bar_res")
+     }
+     if(ma_type == "ma_d_ad_order2"){
+          # full_names <- c("mean_delta_bar", "var_delta_bar", "var_e", "var_delta_bar_res", "sd_delta_bar", "se_delta_bar", "sd_e", "sd_delta_bar_res", "percent_var", "rel_delta", "cor(delta, error)")
+          # selected_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_delta_bar_res", "percent_var", "rel_delta", "cor(delta, error)")
+          full_names <- c("mean_delta_bar", "var_delta_bar", "var_e", "var_delta_bar_res", "sd_delta_bar", "se_delta_bar", "sd_e", "sd_delta_bar_res")
+          verbose_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_e", "sd_delta_bar_res")
+          succinct_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_delta_bar_res")
+     }
+
+     .colnames <- colnames(x)
+     leading_cols <- 1:max(which(.colnames == "N"))
+     trailing_cols <- which(grepl(x = .colnames, pattern = "CI_LL_") | grepl(x = .colnames, pattern = "CI_UL_") | grepl(x = .colnames, pattern = "CV_LL_") | grepl(x = .colnames, pattern = "CV_UL_"))
+     trailing_cols <- trailing_cols[trailing_cols > max(leading_cols)]
+     # if(max(trailing_cols) < ncol(x)) trailing_cols <- c(trailing_cols, (max(trailing_cols) + 1):ncol(x))
+     if(verbose){
+          middle_cols <- which(.colnames %in% verbose_names)
+     }else{
+          middle_cols <- which(.colnames %in% succinct_names)
+     }
+
+     print.data.frame(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
 }
 
 
@@ -313,12 +489,13 @@ print.psychmeta <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_generic <- function(x, ..., digits = 3){
+print.psychmeta.ma_generic <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -326,8 +503,8 @@ print.psychmeta.ma_generic <- function(x, ..., digits = 3){
      cat("-----------------------------\n")
 
      cat("\n")
-     cat("Result of bare-bones meta-analysis of correlations:\n")
-     print.data.frame(x$barebones$meta_table[,!grepl(x = colnames(x$barebones$meta_table), pattern = "var_")], digits = digits)
+     cat("Result of bare-bones meta-analysis of effect sizes:\n")
+     print.psychmeta.ma_table(x = x$barebones$meta_table, ..., digits = digits, ma_type = "ma_generic", verbose = verbose)
 
      if(!is.null(x$barebones$messages$warnings) | !is.null(x$barebones$messages$fyi))
           cat("\n")
@@ -338,21 +515,19 @@ print.psychmeta.ma_generic <- function(x, ..., digits = 3){
 }
 
 
-
-
-
 #### Print first-order ma_r from basic functions ####
 #' print method for bare-bones meta-analyses of correlations
 #'
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_r.barebones <- function(x, ..., digits = 3){
+print.psychmeta.ma_r.barebones <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -361,7 +536,7 @@ print.psychmeta.ma_r.barebones <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Result of bare-bones meta-analysis of correlations:\n")
-     print.data.frame(x$barebones$meta_table[,!grepl(x = colnames(x$barebones$meta_table), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$barebones$meta_table, ..., digits = digits, ma_type = "ma_r_bb", verbose = verbose)
 
      if(!is.null(x$barebones$messages$warnings) | !is.null(x$barebones$messages$fyi))
           cat("\n")
@@ -377,12 +552,13 @@ print.psychmeta.ma_r.barebones <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_r.ad <- function(x, ..., digits = 3){
+print.psychmeta.ma_r.ad <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -397,16 +573,16 @@ print.psychmeta.ma_r.ad <- function(x, ..., digits = 3){
      cat("Range-restriction correction: ", x$artifact_distribution$method_details["range_restriction"], "\n")
 
      cat("\n")
-     cat("Result of artifact-distribution meta-analysis of true-score correlations:\n")
-     print.data.frame(x$artifact_distribution$true_score[,!grepl(x = colnames(x$artifact_distribution$true_score), pattern = "var_")], digits = digits)
+     cat("Result of artifact-distribution true-score meta-analysis of correlations:\n")
+     print.psychmeta.ma_table(x = x$artifact_distribution$true_score, ..., digits = digits, ma_type = "ma_r_ad", verbose = verbose)
 
      cat("\n")
-     cat("Result of artifact-distribution meta-analysis of validity generalization correlations treating X as the predictor:\n")
-     print.data.frame(x$artifact_distribution$validity_generalization_x[,!grepl(x = colnames(x$artifact_distribution$validity_generalization_x), pattern = "var_")], digits = digits)
+     cat("Result of artifact-distribution validity generalization meta-analysis of correlations (X measured with error):\n")
+     print.psychmeta.ma_table(x = x$artifact_distribution$validity_generalization_x, ..., digits = digits, ma_type = "ma_r_ad", verbose = verbose)
 
      cat("\n")
-     cat("Result of artifact-distribution meta-analysis of validity generalization correlations treating Y as the predictor:\n")
-     print.data.frame(x$artifact_distribution$validity_generalization_y[,!grepl(x = colnames(x$artifact_distribution$validity_generalization_y), pattern = "var_")], digits = digits)
+     cat("Result of artifact-distribution validity generalization meta-analysis of correlations (Y measured with error):\n")
+     print.psychmeta.ma_table(x = x$artifact_distribution$validity_generalization_y, ..., digits = digits, ma_type = "ma_r_ad", verbose = verbose)
 
      if(!is.null(x$artifact_distribution$messages$warnings) | !is.null(x$artifact_distribution$messages$fyi))
           cat("\n")
@@ -422,12 +598,13 @@ print.psychmeta.ma_r.ad <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_r.ic <- function(x, ..., digits = 3){
+print.psychmeta.ma_r.ic <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -439,16 +616,16 @@ print.psychmeta.ma_r.ic <- function(x, ..., digits = 3){
      print.data.frame(x$individual_correction$correction_summary[[1]], digits = digits)
 
      cat("\n")
-     cat("Result of individual-correction meta-analysis of true-score correlations\n")
-     print.data.frame(x$individual_correction$true_score$meta_table[,!grepl(x = colnames(x$individual_correction$true_score$meta_table), pattern = "var_")], digits = digits)
+     cat("Result of individual-correction true-score meta-analysis correlations\n")
+     print.psychmeta.ma_table(x = x$individual_correction$true_score$meta_table, ..., digits = digits, ma_type = "ma_r_ic", verbose = verbose)
 
      cat("\n")
-     cat("Result of individual-correction meta-analysis of validity generalization correlations treating X as the predictor:\n")
-     print.data.frame(x$individual_correction$validity_generalization_x$meta_table[,!grepl(x = colnames(x$individual_correction$validity_generalization_x$meta_table), pattern = "var_")], digits = digits)
+     cat("Result of individual-correction validity generalization meta-analysis of correlations (X measured with error):\n")
+     print.psychmeta.ma_table(x = x$individual_correction$validity_generalization_x$meta_table, ..., digits = digits, ma_type = "ma_r_ic", verbose = verbose)
 
      cat("\n")
-     cat("Result of individual-correction meta-analysis of validity generalization correlations treating Y as the predictor:\n")
-     print.data.frame(x$individual_correction$validity_generalization_y$meta_table[,!grepl(x = colnames(x$individual_correction$validity_generalization_y$meta_table), pattern = "var_")], digits = digits)
+     cat("Result of individual-correction validity generalization meta-analysis of correlations (Y measured with error):\n")
+     print.psychmeta.ma_table(x = x$individual_correction$validity_generalization_y$meta_table, ..., digits = digits, ma_type = "ma_r_ic", verbose = verbose)
 
      if(!is.null(x$individual_correction$messages$warnings) | !is.null(x$individual_correction$messages$fyi))
           cat("\n")
@@ -465,12 +642,13 @@ print.psychmeta.ma_r.ic <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_r.barebones.master <- function(x, ..., digits = 3){
+print.psychmeta.ma_r.barebones.master <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -479,7 +657,7 @@ print.psychmeta.ma_r.barebones.master <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Omnibus summary of bare-bones meta-analyses of correlations:\n")
-     print.data.frame(x$grand_tables$barebones[,!grepl(x = colnames(x$grand_tables$barebones), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$barebones, ..., digits = digits, ma_type = "ma_r_bb", verbose = verbose)
 
 }
 
@@ -489,12 +667,13 @@ print.psychmeta.ma_r.barebones.master <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_r.ad.master <- function(x, ..., digits = 3){
+print.psychmeta.ma_r.ad.master <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -514,15 +693,15 @@ print.psychmeta.ma_r.ad.master <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Omnibus summary of artifact-distribution true-score meta-analyses of correlations:\n")
-     print.data.frame(x$grand_tables$artifact_distribution$true_score[,!grepl(x = colnames(x$grand_tables$artifact_distribution$true_score), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$artifact_distribution$true_score, ..., digits = digits, ma_type = "ma_r_ad", verbose = verbose)
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution validity generalization meta-analyses of correlations (X measured with error):\n")
-     print.data.frame(x$grand_tables$artifact_distribution$validity_generalization_x[,!grepl(x = colnames(x$grand_tables$artifact_distribution$validity_generalization_x), pattern = "var_")], digits = digits)
+     cat("Omnibus summary of artifact-distribution validity generalization meta-analyses of correlations (X measured with error):\n")
+     print.psychmeta.ma_table(x = x$grand_tables$artifact_distribution$validity_generalization_x, ..., digits = digits, ma_type = "ma_r_ad", verbose = verbose)
 
      cat("\n")
-     cat("Omnibus results summary of artifact-distribution validity generalization meta-analyses of correlations (Y measured with error):\n")
-     print.data.frame(x$grand_tables$artifact_distribution$validity_generalization_y[,!grepl(x = colnames(x$grand_tables$artifact_distribution$validity_generalization_y), pattern = "var_")], digits = digits)
+     cat("Omnibus summary of artifact-distribution validity generalization meta-analyses of correlations (Y measured with error):\n")
+     print.psychmeta.ma_table(x = x$grand_tables$artifact_distribution$validity_generalization_y, ..., digits = digits, ma_type = "ma_r_ad", verbose = verbose)
 
 }
 
@@ -532,12 +711,13 @@ print.psychmeta.ma_r.ad.master <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_r.ic.master <- function(x, ..., digits = 3){
+print.psychmeta.ma_r.ic.master <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -546,15 +726,15 @@ print.psychmeta.ma_r.ic.master <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Omnibus summary of individual-correction true-score meta-analyses of correlations:\n")
-     print.data.frame(x$grand_tables$individual_correction$true_score[,!grepl(x = colnames(x$grand_tables$individual_correction$true_score), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$individual_correction$true_score, ..., digits = digits, ma_type = "ma_r_ic", verbose = verbose)
 
      cat("\n")
      cat("Omnibus summary of individual-correction validity generalization meta-analyses of correlations (X measured with error):\n")
-     print.data.frame(x$grand_tables$individual_correction$validity_generalization_x[,!grepl(x = colnames(x$grand_tables$individual_correction$validity_generalization_x), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$individual_correction$validity_generalization_x, ..., digits = digits, ma_type = "ma_r_ic", verbose = verbose)
 
      cat("\n")
      cat("Omnibus summary of individual-correction validity generalization meta-analyses of correlations (Y measured with error):\n")
-     print.data.frame(x$grand_tables$individual_correction$validity_generalization_y[,!grepl(x = colnames(x$grand_tables$individual_correction$validity_generalization_y), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$individual_correction$validity_generalization_y, ..., digits = digits, ma_type = "ma_r_ic", verbose = verbose)
 }
 
 
@@ -566,12 +746,13 @@ print.psychmeta.ma_r.ic.master <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_d.barebones <- function(x, ..., digits = 3){
+print.psychmeta.ma_d.barebones <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -580,7 +761,7 @@ print.psychmeta.ma_d.barebones <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Result of bare-bones meta-analysis of d values:\n")
-     print.data.frame(x$barebones$meta_table[,!grepl(x = colnames(x$barebones$meta_table), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$barebones$meta_table, ..., digits = digits, ma_type = "ma_d_bb", verbose = verbose)
 
      if(!is.null(x$barebones$messages$warnings) | !is.null(x$barebones$messages$fyi))
           cat("\n")
@@ -596,12 +777,13 @@ print.psychmeta.ma_d.barebones <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_d.ad <- function(x, ..., digits = 3){
+print.psychmeta.ma_d.ad <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -617,15 +799,15 @@ print.psychmeta.ma_d.ad <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Result of artifact-distribution meta-analysis of fully corrected d values:\n")
-     print.data.frame(x$artifact_distribution$latentGroup_latentY[,!grepl(x = colnames(x$artifact_distribution$latentGroup_latentY), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$artifact_distribution$latentGroup_latentY, ..., digits = digits, ma_type = "ma_d_ad", verbose = verbose)
 
      cat("\n")
-     cat("Result of artifact-distribution meta-analysis of d values with observed scores and latent groups:\n")
-     print.data.frame(x$artifact_distribution$observedGroup_latentY[,!grepl(x = colnames(x$artifact_distribution$observedGroup_latentY), pattern = "var_")], digits = digits)
+     cat("Result of artifact-distribution meta-analysis of d values with observed groups and latent scores:\n")
+     print.psychmeta.ma_table(x = x$artifact_distribution$observedGroup_latentY, ..., digits = digits, ma_type = "ma_d_ad", verbose = verbose)
 
      cat("\n")
-     cat("Result of artifact-distribution meta-analysis of d values with latent scores and observed groups:\n")
-     print.data.frame(x$artifact_distribution$latentGroup_observedY[,!grepl(x = colnames(x$artifact_distribution$latentGroup_observedY), pattern = "var_")], digits = digits)
+     cat("Result of artifact-distribution meta-analysis of d values with latent groups and observed scores:\n")
+     print.psychmeta.ma_table(x = x$artifact_distribution$latentGroup_observedY, ..., digits = digits, ma_type = "ma_d_ad", verbose = verbose)
 
      if(!is.null(x$artifact_distribution$messages$warnings) | !is.null(x$artifact_distribution$messages$fyi))
           cat("\n")
@@ -641,12 +823,13 @@ print.psychmeta.ma_d.ad <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_d.ic <- function(x, ..., digits = 3){
+print.psychmeta.ma_d.ic <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -659,15 +842,15 @@ print.psychmeta.ma_d.ic <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Result of individual-correction meta-analysis of fully corrected d values:\n")
-     print.data.frame(x$individual_correction$latentGroup_latentY$meta_table[,!grepl(x = colnames(x$individual_correction$latentGroup_latentY$meta_table), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$individual_correction$latentGroup_latentY$meta_table, ..., digits = digits, ma_type = "ma_d_ic", verbose = verbose)
 
      cat("\n")
-     cat("Result of individual-correction meta-analysis of d values with observed scores and latent groups:\n")
-     print.data.frame(x$individual_correction$observedGroup_latentY$meta_table[,!grepl(x = colnames(x$individual_correction$observedGroup_latentY$meta_table), pattern = "var_")], digits = digits)
+     cat("Result of individual-correction meta-analysis of d values with observed groups and latent scores:\n")
+     print.psychmeta.ma_table(x = x$individual_correction$observedGroup_latentY$meta_table, ..., digits = digits, ma_type = "ma_d_ic", verbose = verbose)
 
      cat("\n")
-     cat("Result of individual-correction meta-analysis of d values with latent scores and observed groups:\n")
-     print.data.frame(x$individual_correction$latentGroup_observedY$meta_table[,!grepl(x = colnames(x$individual_correction$latentGroup_observedY$meta_table), pattern = "var_")], digits = digits)
+     cat("Result of individual-correction meta-analysis of d values with latent groups and observed scores:\n")
+     print.psychmeta.ma_table(x = x$individual_correction$latentGroup_observedY$meta_table, ..., digits = digits, ma_type = "ma_d_ic", verbose = verbose)
 
      if(!is.null(x$individual_correction$messages$warnings) | !is.null(x$individual_correction$messages$fyi))
           cat("\n")
@@ -685,12 +868,13 @@ print.psychmeta.ma_d.ic <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
- print.psychmeta.ma_d.barebones.master <- function(x, ..., digits = 3){
+ print.psychmeta.ma_d.barebones.master <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -699,7 +883,7 @@ print.psychmeta.ma_d.ic <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Omnibus summary of bare-bones meta-analyses of d values:\n")
-     print.data.frame(x$grand_tables$barebones[,!grepl(x = colnames(x$grand_tables$barebones), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$barebones, ..., digits = digits, ma_type = "ma_d_bb", verbose = verbose)
 
 }
 
@@ -709,12 +893,13 @@ print.psychmeta.ma_d.ic <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_d.ad.master <- function(x, ..., digits = 3){
+print.psychmeta.ma_d.ad.master <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -734,15 +919,15 @@ print.psychmeta.ma_d.ad.master <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Omnibus summary of artifact-distribution meta-analyses of fully corrected d values:\n")
-     print.data.frame(x$grand_tables$artifact_distribution$latentGroup_latentY[,!grepl(x = colnames(x$grand_tables$artifact_distribution$latentGroup_latentY), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$artifact_distribution$latentGroup_latentY, ..., digits = digits, ma_type = "ma_d_ad", verbose = verbose)
 
      cat("\n")
-     cat("Omnibus summary of artifact-distribution meta-analyses of d values with observed scores and latent groups:\n")
-     print.data.frame(x$grand_tables$artifact_distribution$observedGroup_latentY[,!grepl(x = colnames(x$grand_tables$artifact_distribution$observedGroup_latentY), pattern = "var_")], digits = digits)
+     cat("Omnibus summary of artifact-distribution meta-analyses of d values with observed groups and latent scores:\n")
+     print.psychmeta.ma_table(x = x$grand_tables$artifact_distribution$observedGroup_latentY, ..., digits = digits, ma_type = "ma_d_ad", verbose = verbose)
 
      cat("\n")
-     cat("Omnibus summary of artifact-distribution meta-analyses of d values with latent scores and observed groups:\n")
-     print.data.frame(x$grand_tables$artifact_distribution$latentGroup_observedY[,!grepl(x = colnames(x$grand_tables$artifact_distribution$latentGroup_observedY), pattern = "var_")], digits = digits)
+     cat("Omnibus summary of artifact-distribution meta-analyses of d values with latent groups and observed scores:\n")
+     print.psychmeta.ma_table(x = x$grand_tables$artifact_distribution$latentGroup_observedY, ..., digits = digits, ma_type = "ma_d_ad", verbose = verbose)
 
 }
 
@@ -752,12 +937,13 @@ print.psychmeta.ma_d.ad.master <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_d.ic.master <- function(x, ..., digits = 3){
+print.psychmeta.ma_d.ic.master <- function(x, ..., digits = 3, verbose = FALSE){
      cat("\n")
      cat("\n")
 
@@ -766,15 +952,15 @@ print.psychmeta.ma_d.ic.master <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("Omnibus summary of individual-correction meta-analyses of fully corrected d values:\n")
-     print.data.frame(x$grand_tables$individual_correction$latentGroup_latentY[,!grepl(x = colnames(x$grand_tables$individual_correction$latentGroup_latentY), pattern = "var_")], digits = digits)
+     print.psychmeta.ma_table(x = x$grand_tables$individual_correction$latentGroup_latentY, ..., digits = digits, ma_type = "ma_d_ic", verbose = verbose)
 
      cat("\n")
-     cat("Omnibus summary of individual-correction meta-analyses of d values with observed scores and latent groups:\n")
-     print.data.frame(x$grand_tables$individual_correction$observedGroup_latentY[,!grepl(x = colnames(x$grand_tables$individual_correction$observedGroup_latentY), pattern = "var_")], digits = digits)
+     cat("Omnibus summary of individual-correction meta-analyses of d values with observed groups and latent scores:\n")
+     print.psychmeta.ma_table(x = x$grand_tables$individual_correction$observedGroup_latentY, ..., digits = digits, ma_type = "ma_d_ic", verbose = verbose)
 
      cat("\n")
-     cat("Omnibus summary of individual-correction meta-analyses of d values with latent scores and observed groups:\n")
-     print.data.frame(x$grand_tables$individual_correction$latentGroup_observedY[,!grepl(x = colnames(x$grand_tables$individual_correction$latentGroup_observedY), pattern = "var_")], digits = digits)
+     cat("Omnibus summary of individual-correction meta-analyses of d values with latent groups and observed scores:\n")
+     print.psychmeta.ma_table(x = x$grand_tables$individual_correction$latentGroup_observedY, ..., digits = digits, ma_type = "ma_d_ic", verbose = verbose)
 }
 
 
@@ -785,12 +971,13 @@ print.psychmeta.ma_d.ic.master <- function(x, ..., digits = 3){
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_r.order2 <- function(x, ..., digits = 3){
+print.psychmeta.ma_r.order2 <- function(x, ..., digits = 3, verbose = FALSE){
      cat("Second-Order Meta-Analysis of Correlations:\n")
      cat("\n")
 
@@ -800,19 +987,19 @@ print.psychmeta.ma_r.order2 <- function(x, ..., digits = 3){
      if(any(class(x) == "ma_bb")){
           cat("\n")
           cat("Bare-Bones Results:\n")
-          print.data.frame(x$barebones$meta_table[,!grepl(x = colnames(x$barebones$meta_table), pattern = "var_")], digits = digits)
+          print.psychmeta.ma_table(x = x$barebones$meta_table, ..., digits = digits, ma_type = "ma_r_bb_order2", verbose = verbose)
      }
 
      if(any(class(x) == "ma_ic")){
           cat("\n")
           cat("Second-Order Individual-Correction Results:\n")
-          print.data.frame(x$individual_correction$meta_table[,!grepl(x = colnames(x$individual_correction$meta_table), pattern = "var_")], digits = digits)
+          print.psychmeta.ma_table(x = x$individual_correction$meta_table, ..., digits = digits, ma_type = "ma_r_ic_order2", verbose = verbose)
      }
 
      if(any(class(x) == "ma_ad")){
           cat("\n")
           cat("Second-Order Artifact-Distribution Results:\n")
-          print.data.frame(x$artifact_distribution$meta_table[,!grepl(x = colnames(x$artifact_distribution$meta_table), pattern = "var_")], digits = digits)
+          print.psychmeta.ma_table(x = x$artifact_distribution$meta_table, ..., digits = digits, ma_type = "ma_r_ad_order2", verbose = verbose)
      }
 
      if(!is.null(x$messages$warnings) | !is.null(x$messages$fyi))
@@ -825,18 +1012,19 @@ print.psychmeta.ma_r.order2 <- function(x, ..., digits = 3){
 
 
 
-#### Print second-order ma_r ####
+#### Print second-order ma_d ####
 #' print method for second-order meta-analyses of d values
 #'
 #' @param x Object to be printed.
 #' @param ... Further arguments passed to or from other methods.
 #' @param digits Number of digits to which results should be printed.
+#' @param verbose Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).
 #'
 #' @return Printed results from objects of the 'psychmeta' class.
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.ma_d.order2 <- function(x, ..., digits = 3){
+print.psychmeta.ma_d.order2 <- function(x, ..., digits = 3, verbose = FALSE){
      cat("Second-Order Meta-Analysis of d Values:\n")
      cat("\n")
 
@@ -846,19 +1034,19 @@ print.psychmeta.ma_d.order2 <- function(x, ..., digits = 3){
      if(any(class(x) == "ma_bb")){
           cat("\n")
           cat("Bare-Bones Results:\n")
-          print.data.frame(x$barebones$meta_table[,!grepl(x = colnames(x$barebones$meta_table), pattern = "var_")], digits = digits)
+          print.psychmeta.ma_table(x = x$barebones$meta_table, ..., digits = digits, ma_type = "ma_d_bb_order2", verbose = verbose)
      }
 
      if(any(class(x) == "ma_ic")){
           cat("\n")
           cat("Second-Order Individual-Correction Results:\n")
-          print.data.frame(x$individual_correction$meta_table[,!grepl(x = colnames(x$individual_correction$meta_table), pattern = "var_")], digits = digits)
+          print.psychmeta.ma_table(x = x$individual_correction$meta_table, ..., digits = digits, ma_type = "ma_d_ic_order2", verbose = verbose)
      }
 
      if(any(class(x) == "ma_ad")){
           cat("\n")
           cat("Second-Order Artifact-Distribution Results:\n")
-          print.data.frame(x$artifact_distribution$meta_table[,!grepl(x = colnames(x$artifact_distribution$meta_table), pattern = "var_")], digits = digits)
+          print.psychmeta.ma_table(x = x$artifact_distribution$meta_table, ..., digits = digits, ma_type = "ma_d_ad_order2", verbose = verbose)
      }
 
      if(!is.null(x$messages$warnings) | !is.null(x$messages$fyi))
@@ -1277,7 +1465,7 @@ print.psychmeta.dmod <- function(x, ..., digits = 3){
           cat("\n")
           cat("Bootrapped Lower-Bound Confidence Limit:\n")
           print.data.frame(x[[grep(x = names(x), pattern = "bootstrap_CI_LL_")]], digits = digits)
-          
+
           cat("\n")
           cat("Bootrapped Upper-Bound Confidence Limit:\n")
           print.data.frame(x[[grep(x = names(x), pattern = "bootstrap_CI_UL_")]], digits = digits)
@@ -1335,4 +1523,223 @@ print.psychmeta.heterogeneity <- function(x, ..., digits = 3){
      cat("tau^2: ", round2char(x$tau_squared[1], digits = digits), ", ", conf_level, "% CI = [", round2char(x$tau_squared[2], digits = digits), ", ", round2char(x$tau_squared[3], digits = digits), "] \n", sep = "")
 }
 
+
+#### Print leave-one-out ####
+#' print method for leave-one-out meta-analyses
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.ma_leave1out <- function(x, ..., digits = 3){
+     cat("Leave-one-out meta-analysis results \n")
+     cat("---------------------------------------- \n")
+     print.data.frame(x$data, digits = digits)
+     x$sd_plot
+     cat("See the 'plots' list for data visualizations. \n")
+}
+
+
+#### Print cumulative ####
+#' print method for cumulative meta-analyses
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.ma_cumulative <- function(x, ..., digits = 3){
+     cat("Cumulative meta-analysis results \n")
+     cat("---------------------------------------- \n")
+     print.data.frame(x$data, digits = digits)
+     cat("See the 'plots' list for data visualizations. \n")
+}
+
+
+#### Print bootstrap ####
+#' print method for bootstrapped meta-analyses
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.ma_bootstrap <- function(x, ..., digits = 3){
+     cat("Bootstrapped meta-analysis results \n")
+     cat("---------------------------------------- \n")
+     print.data.frame(as.data.frame(x$boot_summary), digits = digits)
+     cat("See list item 'boot_data' for meta-analysis results from each bootstrap iteration \n")
+}
+
+
+####Print output of get_stuff functions ####
+#' print method for meta-analysis tables retrieved with \code{get_metatab()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_metatab <- function(x, ..., digits = 3){
+     cat("List of meta-analytic tables \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific tables, use the '$' operator to search this list object. \n")
+}
+
+#' print method for meta-analysis plots retrieved with \code{get_plots()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_plots <- function(x, ..., digits = 3){
+     cat("List of meta-analysis plots \n")
+     cat("---------------------------------------- \n")
+     cat("To view plots, use the '$' operator to search this list object. \n")
+}
+
+#' print method for meta-analytic matrices retrieved with \code{get_matrix()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_matrix <- function(x, ..., digits = 3){
+     cat("List of meta-analytic matrices \n")
+     cat("---------------------------------------- \n")
+     cat("To view matrices, use the '$' operator to search this list object. \n")
+}
+
+#' print method for lists of escalc objects retrieved with \code{get_escalc()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_escalc <- function(x, ..., digits = 3){
+     cat("List of escalc objects \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific escalc data frames, use the '$' operator to search this list object. \n")
+}
+
+#' print method for lists of follow-up analyses retrieved with \code{get_followup()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_followup <- function(x, ..., digits = 3){
+     cat("List of meta-analytic follow-up analyses \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific results, use the '$' operator to search this list object. \n")
+}
+
+#' print method for lists of heterogeneity analyses retrieved with \code{get_heterogeneity()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_heterogeneity <- function(x, ..., digits = 3){
+     cat("List of heterogeneity analyses \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific results, use the '$' operator to search this list object. \n")
+}
+
+#' print method for lists of meta-regression analyses retrieved with \code{get_metareg()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_metareg <- function(x, ..., digits = 3){
+     cat("List of meta-regression analyses \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific results, use the '$' operator to search this list object. \n")
+}
+
+#' print method for lists of bootstrapped meta-analyses retrieved with \code{get_bootstrap()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_bootstrap <- function(x, ..., digits = 3){
+     cat("List of bootstrap meta-analyses \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific results, use the '$' operator to search this list object. \n")
+}
+
+#' print method for lists of leave-one-out meta-analyses retrieved with \code{get_leave1out()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_leave1out <- function(x, ..., digits = 3){
+     cat("List of leave-one-out meta-analyses \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific results, use the '$' operator to search this list object. \n")
+}
+
+#' print method for lists of cumulative meta-analyses retrieved with \code{get_cumulative()}
+#'
+#' @param x Object to be printed.
+#' @param ... Further arguments passed to or from other methods.
+#' @param digits Number of digits to which results should be printed.
+#'
+#' @return Printed results from objects of the 'psychmeta' class.
+#' @export
+#'
+#' @keywords internal
+print.psychmeta.get_cumulative <- function(x, ..., digits = 3){
+     cat("List of cumulative meta-analyses \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific results, use the '$' operator to search this list object. \n")
+}
 

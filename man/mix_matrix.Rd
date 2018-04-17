@@ -4,11 +4,11 @@
 \alias{mix_matrix}
 \title{Estimate mixture covariance matrix from within-group covariance matrices}
 \usage{
-mix_matrix(mat_list, mu_mat, p_vec, N = NULL, group_names = NULL,
+mix_matrix(sigma_list, mu_mat, p_vec, N = Inf, group_names = NULL,
   var_names = NULL)
 }
 \arguments{
-\item{mat_list}{List of covariance matrices.}
+\item{sigma_list}{List of covariance matrices.}
 
 \item{mu_mat}{Matrix of mean parameters, with groups on the rows and variables on the columns.}
 
@@ -25,4 +25,13 @@ List of mixture covariances and means.
 }
 \description{
 Estimate mixture covariance matrix from within-group covariance matrices
+}
+\examples{
+out <- unmix_matrix(sigma_mat = reshape_vec2mat(.5, order = 2),
+                    mu_mat = rbind(c(0, 0), c(.5, 1)),
+                    p_vec =  c(.3, .7), N = 100)
+
+mix_matrix(sigma_list = out$cov_group_unbiased,
+           mu_mat = out$means_raw[-3,],
+           p_vec = out$p_group, N = out$N)
 }

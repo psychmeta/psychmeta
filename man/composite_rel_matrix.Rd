@@ -11,7 +11,7 @@ composite_rel_matrix(rel_vec, r_mat, sd_vec, wt_vec = rep(1, length(rel_vec)))
 
 \item{r_mat}{Correlation matrix from which the composite is to be computed.}
 
-\item{sd_vec}{Vector of standard deivations associated with variables in the composite to be formed.}
+\item{sd_vec}{Vector of standard deviations associated with variables in the composite to be formed.}
 
 \item{wt_vec}{Weights to be used in forming the composite (by default, all variables receive equal weight).}
 }

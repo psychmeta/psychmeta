@@ -4,7 +4,7 @@
 #'
 #' @param ma_obj Meta-analysis object of correlations or \emph{d} values (regardless of input metric, output metric will be \emph{d}).
 #' @param ad_obj_g Artifact-distribution object for the grouping variable (output of the \code{link{create_ad}} or \code{link{create_ad_group}} functions).
-#' If ma_obj is of the class \code{ma_master} (i.e,. the output of \code{\link{ma_r}} or \code{\link{ma_d}}), the object supplied for
+#' If ma_obj is of the class \code{ma_master} (i.e., the output of \code{\link{ma_r}} or \code{\link{ma_d}}), the object supplied for
 #' \code{ad_obj_g} must be a named list of artifact distributions with names.
 #' corresponding to the "X" constructs in the meta-analyses contained within \code{ma_obj}.
 #' @param ad_obj_y Artifact-distribution object for the Y variable (output of the \code{create_ad} function).
@@ -13,7 +13,7 @@
 #' @param correction_method One of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-#' be used when interative artifact distributions are provided). See "Details" for descriptions of the available methods.
+#' be used when interactive artifact distributions are provided). See "Details" for descriptions of the available methods.
 #' @param use_ic_ads Determines whether artifact distributions should be extracted from the individual correction results in \code{ma_obj}.
 #' Only evaluated when \code{ad_obj_g} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
 #' Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.
@@ -64,9 +64,9 @@
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
 #' \emph{Journal of Applied Psychology, 79}(3), 425.
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2017). \emph{One of these artifacts is not like the others:
-#' New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-#' Unpublished manuscript.
+#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+#' Accounting for indirect range restriction in organizational and psychological research}.
+#' Manuscript submitted for review.
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
 #' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382

@@ -22,7 +22,7 @@ as the regression weights estimated from this matrix are expected to be invarian
 \item{var_names}{Optional vector of names for the variables in \code{Sigma}, in order of appearance in the matrix.}
 }
 \value{
-A vector of means that has been manipuated by the multivariate range-restriction formula.
+A vector of means that has been manipulated by the multivariate range-restriction formula.
 }
 \description{
 Correct (or select upon) a vector of means using principles from the Pearson-Aitken-Lawley multivariate selection theorem.

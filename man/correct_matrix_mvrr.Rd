@@ -21,16 +21,14 @@ correct_matrix_mvrr(Sigma_i, Sigma_xx_a, x_col, y_col = NULL,
 \item{var_names}{Optional vector of names for the variables in \code{Sigma_i}, in order of appearance in the matrix.}
 }
 \value{
-A matrix that has been manipuated by the multivariate range-restriction formula.
+A matrix that has been manipulated by the multivariate range-restriction formula.
 }
 \description{
 Correct (or select upon) a covariance matrix using the Pearson-Aitken-Lawley multivariate selection theorem.
 }
 \examples{
-Sigma_i <- matrix(.2, 5, 5)
-diag(Sigma_i) <- 1
-Sigma_xx_a <- matrix(.4, 2, 2)
-diag(Sigma_xx_a) <- .8
+Sigma_i <- reshape_vec2mat(cov = .2, var = .8, order = 4)
+Sigma_xx_a <- reshape_vec2mat(cov = .5, order = 2)
 correct_matrix_mvrr(Sigma_i = Sigma_i, Sigma_xx_a = Sigma_xx_a, x_col = 1:2, standardize = TRUE)
 }
 \references{

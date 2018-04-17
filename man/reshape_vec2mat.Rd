@@ -4,18 +4,23 @@
 \alias{reshape_vec2mat}
 \title{Assemble a variance-covariance matrix}
 \usage{
-reshape_vec2mat(cov = NULL, var = NULL, order = NULL, var_names = NULL)
+reshape_vec2mat(cov = NULL, var = NULL, order = NULL, var_names = NULL,
+  by_row = FALSE, diag = FALSE)
 }
 \arguments{
-\item{cov}{Scalar or vector of covariance information to include the off-diagonal positions of the matrix (default value is zero).
-If a vector, the elements must be provided in the order associated with concatenated column vectors of the lower triangle of the desired matrix,
-which is the order or elements that would occur if the lower triangle of the desired matrix were extracted with the following R function: x[lower.tri(x)].}
+\item{cov}{Scalar or vector of covariance information to include the lower-triangle positions of the matrix (default value is zero).
+If a vector, the elements must be provided in the order associated with concatenated column (\code{by_row = FALSE; default}) or row (\code{by_row = TRUE}) vectors of the lower triangle of the desired matrix.
+If variances are included in these values, set the \code{diag} argument to \code{TRUE}.}
 
 \item{var}{Scalar or vector of variance information to include the diagonal positions of the matrix (default value is 1).}
 
 \item{order}{If cov and var are scalars, this argument determines the number of variables to create in the output matrix.}
 
 \item{var_names}{Optional vector of variable names.}
+
+\item{by_row}{Logical scalar indicating whether \code{cov} values should fill the lower triangle by row (\code{TRUE}) or by column (\code{FALSE}; default).}
+
+\item{diag}{Logical scalar indicating whether \code{cov} values include variances (\code{FALSE} by default; if \code{TRUE}, the variance values supplied with the \code{cov} argument will supersede the \code{var} argument).}
 }
 \value{
 A variance-covariance matrix
@@ -30,7 +35,7 @@ It allows the user to supply a vector of covariances that make up the lower tria
 reshape_vec2mat(cov = c(.3, .2, .4), var_names = c("x", "y", "z"))
 
 ## Specify scalar values to repeat for the covariances and variances
-c(cov = .3, var = 2, order = 3)
+reshape_vec2mat(cov = .3, var = 2, order = 3)
 
 ## Give a vector of variances to create a diagonal matrix
 reshape_vec2mat(var = 1:5)

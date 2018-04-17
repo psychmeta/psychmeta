@@ -1,7 +1,7 @@
-#' Write a summary table of meta-anlytic results
+#' Write a summary table of meta-analytic results
 #'
 #' @param ma_obj Meta-analysis object.
-#' @param path Path (with file name and .rtf extension) for the ouput file.
+#' @param file Path with file name for the output file.
 #' @param show_conf Logical scalar determining whether to show confidence intervals (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param show_cred Logical scalar determining whether to show credibility intervals (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param show_se Logical scalar determining whether to show standard errors (\code{TRUE}) or not (\code{FALSE}; default).
@@ -13,27 +13,27 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## Create output table for meta-analysis of correlations
+#' ## Create output table for meta-analysis of correlations:
 #' ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                  construct_x = x_name, construct_y = y_name,
 #'                  moderators = moderator, data = data_r_meas_multi)
 #' ma_r_obj <- ma_r_ad(ma_obj = ma_r_obj, correct_rr_x = FALSE, correct_rr_y = FALSE)
-#' metabulate(ma_obj = ma_r_obj, path = "meta tables correlations.rtf")
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations.rtf")
 #'
-#' ## Create output table for meta-analysis of d values
+#' ## Create output table for meta-analysis of d values:
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
 #'                  construct_y = construct, data = data_d_meas_multi)
 #' ma_d_obj <- ma_d_ad(ma_obj = ma_d_obj, correct_rr_g = FALSE, correct_rr_y = FALSE)
-#' metabulate(ma_obj = ma_d_obj, path = "meta tables d values.rtf")
+#' metabulate(ma_obj = ma_d_obj, file = "meta tables d values.rtf")
 #'
-#' ## Create output table for meta-analysis of generic effect sizes
+#' ## Create output table for meta-analysis of generic effect sizes:
 #' dat <- data.frame(es = data_r_meas_multi$rxyi,
 #'                   n = data_r_meas_multi$n,
 #'                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
-#' metabulate(ma_obj = ma_obj, path = "meta tables generic es.rtf")
+#' metabulate(ma_obj = ma_obj, file = "meta tables generic es.rtf")
 #' }
-metabulate <- function(ma_obj, path, show_conf = TRUE, show_cred = TRUE, show_se = FALSE){
+metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se = FALSE){
 
      ma_class <- class(ma_obj)
      is_r <- any(ma_class %in% c("ma_r_as_r", "ma_d_as_r"))
@@ -73,8 +73,10 @@ metabulate <- function(ma_obj, path, show_conf = TRUE, show_cred = TRUE, show_se
                    col.justify = ma_tab$col.justify)
      }
 
-     rtf <- RTF(file = path, width = 8.5, height = 11, font.size = 10, omi = rep(.5, 4))
-     rtf <- RTF(file = path, width = 11, height = 8.5, font.size = 10, omi = rep(.5, 4))
+
+     if(substr(file, nchar(file) - 4 + 1, nchar(file)) != ".rtf")
+          file <- paste0(file, ".rtf")
+     rtf <- RTF(file = file, width = 11, height = 8.5, font.size = 10, omi = rep(.5, 4))
 
      if(!is.null(ma_tab_bb)){
           addText(rtf, "{\\b Bare-bones table}")
@@ -316,6 +318,8 @@ add_commas <- function(x, decimals = 0){
 
           ma_tab$var_r <- ma_tab$var_d <- ma_tab$var_es <- ma_tab$var_e <- ma_tab$var_res <- NULL
           ma_tab$var_art <- ma_tab$var_pre <- NULL
+          ma_tab$var_e_c <- ma_tab$var_art_c <- ma_tab$var_pre_c <- NULL
+          ma_tab$sd_e_c <- ma_tab$sd_art_c <- ma_tab$sd_pre_c <- NULL
           ma_tab$var_r_c <- ma_tab$var_d_c <- ma_tab$var_e_c <- ma_tab$var_rho <- ma_tab$var_delta <- NULL
           ma_tab$sd_e <- ma_tab$sd_e_c <- NULL
 

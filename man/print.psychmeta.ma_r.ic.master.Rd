@@ -4,7 +4,8 @@
 \alias{print.psychmeta.ma_r.ic.master}
 \title{print method for individual-correction meta-analyses of correlations}
 \usage{
-\method{print}{psychmeta.ma_r.ic.master}(x, ..., digits = 3)
+\method{print}{psychmeta.ma_r.ic.master}(x, ..., digits = 3,
+  verbose = FALSE)
 }
 \arguments{
 \item{x}{Object to be printed.}
@@ -12,6 +13,8 @@
 \item{...}{Further arguments passed to or from other methods.}
 
 \item{digits}{Number of digits to which results should be printed.}
+
+\item{verbose}{Logical scalar determining whether objects with verbose-printing options should be printed in great detail (\code{TRUE}) or succinctly (\code{FALSE}; default).}
 }
 \value{
 Printed results from objects of the 'psychmeta' class.

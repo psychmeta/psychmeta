@@ -4,15 +4,17 @@
 \alias{metareg}
 \title{Compute meta-regressions}
 \usage{
-metareg(ma_obj, max_interaction = 1)
+metareg(ma_obj, formula_list = NULL, ...)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object.}
 
-\item{max_interaction}{The maximum level at which interactions should be analyzed. Default is 1 (i.e., main effects only).}
+\item{formula_list}{Optional list of regression formulas to evaluate.}
+
+\item{...}{Additional arguments.}
 }
 \value{
-ma_obj with meta-regression results added (see ma_obj$follow_up_analyses$meta_regression).
+ma_obj with meta-regression results added (see ma_obj$follow_up_analyses$metareg).
 }
 \description{
 This function is a wrapper for \pkg{metafor}'s \code{rma} function that computes meta-regressions for all bare-bones and individual-correction meta-analyses within an object.
@@ -33,7 +35,7 @@ ma_obj <- ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalez
 ma_obj <- metareg(ma_obj)
 
 ## Examine the meta-regression results for the bare-bones and corrected data:
-ma_obj$follow_up_analyses$meta_regression$barebones$`Main Effects`
-ma_obj$follow_up_analyses$meta_regression$individual_correction$true_score$`Main Effects`
+ma_obj$follow_up_analyses$metareg$barebones$`Main Effects`
+ma_obj$follow_up_analyses$metareg$individual_correction$true_score$`Main Effects`
 }
 \keyword{regression}

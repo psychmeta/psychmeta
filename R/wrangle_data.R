@@ -1,10 +1,31 @@
-match_variables <- function(call, arg, data, show_arg = FALSE, as_array = FALSE){
+fix_df <- function(df){
+     if(!is.data.frame(df)){
+          df
+     }else{
+          as.data.frame(lapply(as.list(df), function(x){
+               if(is.matrix(x) | is.data.frame(x)){
+                    c(x)
+               }else{
+                    x
+               }
+          }))
+     }
+}
+
+match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
      x  <- eval(call, data, enclos=sys.frame(sys.parent()))
      if(!is.null(x)){
           if(is.character(x)){
                if(any(x %in% colnames(data))){
                     data[,x]
                }else{
+                    if(!is.null(arg_name) & length(x) == 1){
+                         if(x == arg_name){
+                              x <- NULL
+                         }else{
+                              x
+                         }
+                    }
                     x
                }
           }else{
@@ -52,8 +73,9 @@ clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator
 
                if(!is.null(moderator_levels))
                     for(i in 1:ncol(cat_moderator_matrix))
-                         cat_moderator_matrix[,i] <- moderator_matrix[,i] <- factor(cat_moderator_matrix[,i], levels = moderator_levels[[i]])
+                         cat_moderator_matrix[,i] <- factor(cat_moderator_matrix[,i], levels = moderator_levels[[i]])
 
+                    moderator_matrix[,cat_moderators] <- cat_moderator_matrix
           }else{
                cat_moderator_matrix <- NULL
           }
@@ -75,6 +97,7 @@ clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator
 #'
 #' @param es_data Matrix of effect-size data to be used in meta-analyses.
 #' @param sample_id Optional vector of identification labels for studies in the meta-analysis.
+#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' @param construct_x Vector of construct names for construct initially designated as X.
 #' @param construct_y Vector of construct names for construct initially designated as Y.
 #' @param data_x Additional data (e.g., artifact information) specific to the variables originally designated as X.
@@ -89,13 +112,12 @@ clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator
 #' @return A reorganized list of study data
 #'
 #' @keywords internal
-organize_database <- function(es_data, sample_id = NULL, construct_x = NULL, construct_y = NULL,
+organize_database <- function(es_data, sample_id = NULL, citekey = NULL, construct_x = NULL, construct_y = NULL,
                               data_x = NULL, data_y = NULL, moderators = NULL,
                               use_as_x = NULL, use_as_y = NULL, construct_order = NULL, cat_moderators = TRUE, moderator_levels = NULL){
 
-     if(!is.null(sample_id)){
-          es_data <- cbind(sample_id = sample_id, es_data)
-     }
+     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
+     if(!is.null(sample_id)) es_data <- cbind(sample_id = sample_id, es_data)
 
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){

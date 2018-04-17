@@ -7,7 +7,7 @@
 var_error_alpha(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases)
 }
 \arguments{
-\item{item_mat}{Item intercorrelation/intercovariance matrix. If item_mat is not supplied, the user must supply both alpha and k_items.
+\item{item_mat}{Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both alpha and k_items.
 If item_mat is NULL, the program will assume that all item intercorrelations are equal.}
 
 \item{alpha}{Vector of population alpha values. Must be supplied if item_mat is NULL.}

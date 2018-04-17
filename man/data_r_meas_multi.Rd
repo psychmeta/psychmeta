@@ -3,7 +3,7 @@
 \docType{data}
 \name{data_r_meas_multi}
 \alias{data_r_meas_multi}
-\title{Hypothetical correlation dataset simulated to statisfy the assumptions of the correction for measurement error only in multiple constructs}
+\title{Hypothetical correlation dataset simulated to satisfy the assumptions of the correction for measurement error only in multiple constructs}
 \format{data.frame}
 \usage{
 data(data_r_meas_multi)

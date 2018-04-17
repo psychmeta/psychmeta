@@ -2,9 +2,12 @@
 % Please edit documentation in R/convert_ma.R
 \name{convert_ma}
 \alias{convert_ma}
+\alias{convert_meta}
 \title{Function to convert meta-analysis of correlations to d values or vice-versa}
 \usage{
 convert_ma(ma_obj)
+
+convert_meta(ma_obj)
 }
 \arguments{
 \item{ma_obj}{A meta-analysis object of class \code{ma_r_as_r}, \code{ma_d_as_d}, \code{ma_r_as_d}, or \code{ma_d_as_r}}

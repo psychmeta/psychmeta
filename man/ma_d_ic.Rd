@@ -5,17 +5,18 @@
 \title{Individual-correction meta-analysis of \emph{d} values}
 \usage{
 ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
-  treat_as_d = TRUE, wt_type = "inv_var_mean", error_type = "mean",
-  correct_bias = TRUE, correct_rGg = FALSE, correct_ryy = TRUE,
-  correct_rr_g = FALSE, correct_rr_y = TRUE, indirect_rr_g = TRUE,
-  indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", uy = NULL,
-  uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1, conf_level = 0.95,
-  cred_level = 0.8, conf_method = "t", cred_method = "t",
-  var_unbiased = TRUE, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = "simple", impute_method = "bootstrap_mod",
-  decimals = 2, hs_override = FALSE, use_all_arts = FALSE,
-  supplemental_ads_y = NULL, data = NULL, ...)
+  citekey = NULL, treat_as_d = TRUE, wt_type = "inv_var_mean",
+  error_type = "mean", correct_bias = TRUE, correct_rGg = FALSE,
+  correct_ryy = TRUE, correct_rr_g = FALSE, correct_rr_y = TRUE,
+  indirect_rr_g = TRUE, indirect_rr_y = TRUE, rGg = NULL, pi = NULL,
+  pa = NULL, ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+  uy = NULL, uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1,
+  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
+  cred_method = "t", var_unbiased = TRUE, moderators = NULL,
+  cat_moderators = TRUE, moderator_type = "simple",
+  impute_method = "bootstrap_mod", decimals = 2, hs_override = FALSE,
+  use_all_arts = FALSE, estimate_pa = FALSE, supplemental_ads_y = NULL,
+  data = NULL, ...)
 }
 \arguments{
 \item{d}{Vector or column name of observed \emph{d} values.}
@@ -27,6 +28,8 @@ ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 \item{n_adj}{Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.}
 
 \item{sample_id}{Optional vector of identification labels for samples/studies in the meta-analysis.}
+
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").}
 
 \item{treat_as_d}{Logical scalar determining whether \emph{d} values are to be meta-analyzed as d values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).}
 
@@ -47,10 +50,10 @@ ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 \item{correct_rr_y}{Logical scalar or vector or column name determining whether each \emph{d} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{indirect_rr_g}{Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).}
+Superseded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).}
 
 \item{indirect_rr_y}{Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
+Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
 
 \item{rGg}{Vector or column name of reliability estimates for X.}
 
@@ -98,7 +101,9 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{supplemental_ads_y}{List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.}
+\item{estimate_pa}{Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).}
+
+\item{supplemental_ads_y}{List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.}
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
@@ -122,7 +127,7 @@ Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
 Thousand Oaks, California: SAGE Publications, Inc. Chapter 3.
 
-Dahlke, J. A., & Wiernik, B. M. (2017). \emph{One of these artifacts is not like the others:
-New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }

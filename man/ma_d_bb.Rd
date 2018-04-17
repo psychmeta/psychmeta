@@ -6,22 +6,24 @@
 \title{Bare-bones meta-analysis of \emph{d} values}
 \usage{
 ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL,
-  wt_type = "sample_size", error_type = "mean", correct_bias = FALSE,
-  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
-  cred_method = "t", var_unbiased = TRUE, moderators = NULL,
-  cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE,
-  data = NULL, ...)
+  citekey = NULL, wt_type = "sample_size", error_type = "mean",
+  correct_bias = FALSE, conf_level = 0.95, cred_level = 0.8,
+  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
+  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
+  hs_override = FALSE, data = NULL, ...)
 }
 \arguments{
 \item{d}{Vector of \emph{d} values.}
 
-\item{n1}{Vector or column name of primary sample sizes (if sugroup sample sizes are not known, these values are total sample sizes; if subgroup sample sizes are known, these values are sample sizes for the first of the two groups).}
+\item{n1}{Vector or column name of primary sample sizes (if subgroup sample sizes are not known, these values are total sample sizes; if subgroup sample sizes are known, these values are sample sizes for the first of the two groups).}
 
 \item{n2}{Optional: Vector or column name of secondary sample sizes. If subgroup sample sizes are known, these values are sample sizes for the second of the two groups. \code{NULL} by default.}
 
 \item{n_adj}{Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.}
 
-\item{sample_id}{Optional vector of identification labels for samples/studies in the meta-analysis.
+\item{sample_id}{Optional vector of identification labels for samples/studies in the meta-analysis.}
+
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.}
 
 \item{wt_type}{Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and

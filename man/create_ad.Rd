@@ -7,21 +7,23 @@
 create_ad(ad_type = "tsa", rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
   rxxi_type = rep("alpha", length(rxxi)), rxxa = NULL, n_rxxa = NULL,
   wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), ux = NULL,
-  ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
-  ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut,
-  dep_sds_ut_obs = FALSE, mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL,
-  mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)),
-  mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL,
+  ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux,
+  length(mean_ux)), ut = NULL, ni_ut = NULL, na_ut = NULL,
+  wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
+  mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL,
+  qxi_dist_type = rep("alpha", length(mean_qxi)), mean_rxxi = NULL,
+  var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL,
   rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_qxa = NULL,
   var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL,
   qxa_dist_type = rep("alpha", length(mean_qxa)), mean_rxxa = NULL,
   var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL,
   rxxa_dist_type = rep("alpha", length(mean_rxxa)), mean_ux = NULL,
-  var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = NA,
-  dep_sds_ux_spec = FALSE, mean_ut = NULL, var_ut = NULL, k_ut = NULL,
-  mean_ni_ut = NULL, mean_na_ut = NA, dep_sds_ut_spec = FALSE,
-  estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE,
-  estimate_ut = TRUE, var_unbiased = TRUE, ...)
+  var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = rep(NA,
+  length(mean_ux)), dep_sds_ux_spec = rep(FALSE, length(mean_ux)),
+  mean_ut = NULL, var_ut = NULL, k_ut = NULL, mean_ni_ut = NULL,
+  mean_na_ut = rep(NA, length(mean_ut)), dep_sds_ut_spec = rep(FALSE,
+  length(mean_ut)), estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+  estimate_ux = TRUE, estimate_ut = TRUE, var_unbiased = TRUE, ...)
 }
 \arguments{
 \item{ad_type}{Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.}
@@ -49,7 +51,7 @@ Only used when ni_ux is not NULL. If supplied, must be either a scalar or the sa
 
 \item{wt_ux}{Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).}
 
-\item{dep_sds_ux_obs}{Logical scalar or vector determinining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ux_obs}{Logical scalar or vector determining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{ut}{Vector of true-score u ratios.}
 
@@ -60,7 +62,7 @@ Only used when ni_ut is not NULL. If supplied, must be either a scalar or the sa
 
 \item{wt_ut}{Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).}
 
-\item{dep_sds_ut_obs}{Logical scalar or vector determinining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ut_obs}{Logical scalar or vector determining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{mean_qxi}{Vector that can be used to supply the means of externally computed distributions of incumbent square-root reliabilities.}
 
@@ -104,7 +106,7 @@ Only used when ni_ut is not NULL. If supplied, must be either a scalar or the sa
 
 \item{mean_na_ux}{Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.}
 
-\item{dep_sds_ux_spec}{Logical scalar or vector determinining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ux_spec}{Logical scalar or vector determining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{mean_ut}{Vector that can be used to supply the means of externally computed distributions of true-score u ratios.}
 
@@ -116,15 +118,15 @@ Only used when ni_ut is not NULL. If supplied, must be either a scalar or the sa
 
 \item{mean_na_ut}{Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of true-score u ratios.}
 
-\item{dep_sds_ut_spec}{Logical scalar or vector determinining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ut_spec}{Logical scalar or vector determining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
-\item{estimate_rxxa}{Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_rxxa}{Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_rxxi}{Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_rxxi}{Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_ux}{Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_ux}{Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_ut}{Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_ut}{Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.}
 
 \item{var_unbiased}{Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
 

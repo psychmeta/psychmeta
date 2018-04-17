@@ -182,12 +182,13 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
 }
 
 
-#' Correct correlations for artifical dichotomization of one or both variables
+#' Correct correlations for artificial dichotomization of one or both variables
 #'
 #' @param r Vector of correlations attenuated by artificial dichomization.
-#' @param p_x Vector of proportions of the distribution on either side of the split applied to X (set as NA if X is continuous).
-#' @param p_y Vector of proportions of the distribution on either side of the split applied to Y (set as NA if Y is continuous).
+#' @param px Vector of proportions of the distribution on either side of the split applied to X (set as NA if X is continuous).
+#' @param py Vector of proportions of the distribution on either side of the split applied to Y (set as NA if Y is continuous).
 #' @param n Optional vector of sample sizes.
+#' @param ... Additional arguments.
 #'
 #' @return Vector of correlations corrected for artificial dichomization (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 #' @export
@@ -201,24 +202,29 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
 #' \deqn{r_{c}=\frac{r_{obs}}{\left[\frac{\phi\left(p_{X}\right)}{p_{X}\left(1-p_{X}\right)}\right]\left[\frac{\phi\left(p_{Y}\right)}{p_{Y}\left(1-p_{Y}\right)}\right]}}{r_c = r_obs / (ordinate(p_x) / sqrt(p_x * (1 - p_x) * ordinate(p_y) / sqrt(p_y * (1 - p_y))}
 #'
 #' @examples
-#' correct_r_dich(r = 0.32, p_x = .5, p_y = .5, n = 100)
-correct_r_dich <- function(r, p_x = NA, p_y = NA, n = NULL){
-     a_x <- a_y <- rep(1, length(r))
+#' correct_r_dich(r = 0.32, px = .5, py = .5, n = 100)
+correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
+     ax <- ay <- rep(1, length(r))
 
-     if(any(p_x[!is.na(p_x)] >= 1 | p_x[!is.na(p_x)] <= 0)) stop("p_x must be greater than 0 and less than 1", call. = FALSE)
-     if(any(p_y[!is.na(p_y)] >= 1 | p_y[!is.na(p_y)] <= 0)) stop("p_y must be greater than 0 and less than 1", call. = FALSE)
+     p_x <- list(...)$p_x
+     p_y <- list(...)$p_y
+     if(!is.null(p_x)) px <- p_x
+     if(!is.null(p_y)) py <- p_y
 
-     a_x[!is.na(p_x)] <- dnorm(qnorm(p_x[!is.na(p_x)], lower.tail = FALSE)) / sqrt(p_x[!is.na(p_x)] * (1 - p_x[!is.na(p_x)]))
-     a_y[!is.na(p_y)] <- dnorm(qnorm(p_y[!is.na(p_y)], lower.tail = FALSE)) / sqrt(p_y[!is.na(p_y)] * (1 - p_y[!is.na(p_y)]))
+     if(any(px[!is.na(px)] >= 1 | px[!is.na(px)] <= 0)) stop("px must be greater than 0 and less than 1", call. = FALSE)
+     if(any(py[!is.na(py)] >= 1 | py[!is.na(py)] <= 0)) stop("py must be greater than 0 and less than 1", call. = FALSE)
+
+     ax[!is.na(px)] <- dnorm(qnorm(px[!is.na(px)], lower.tail = FALSE)) / sqrt(px[!is.na(px)] * (1 - px[!is.na(px)]))
+     ay[!is.na(py)] <- dnorm(qnorm(py[!is.na(py)], lower.tail = FALSE)) / sqrt(py[!is.na(py)] * (1 - py[!is.na(py)]))
 
      if(!is.null(n)){
           var_e <- var_error_r(r = r, n = n)
-          r_c <- r / (a_x * a_y)
-          var_e_c = var_e / (a_x * a_y)^2
+          r_c <- r / (ax * ay)
+          var_e_c = var_e / (ax * ay)^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
           data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj)
      }else{
-          r / (a_x * a_y)
+          r / (ax * ay)
      }
 }
 
@@ -843,9 +849,9 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
 #' Correcting doubly truncated correlations: An improved approximation for correcting the bivariate normal correlation when truncation has occurred on both variables.
 #' \emph{Educational and Psychological Measurement, 47}(2), 309–315. \url{https://doi.org/10.1177/0013164487472002}
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2017).
-#' \emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-#' Unpublished manuscript.
+#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+#' Accounting for indirect range restriction in organizational and psychological research}.
+#' Manuscript submitted for review.
 #'
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 #' Implications of direct and indirect range restriction for meta-analysis methods and findings.

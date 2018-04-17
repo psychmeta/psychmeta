@@ -12,7 +12,7 @@
 #' @param item_ka Scalar or vector indicating the number of items toward which reliability estimates should be adjusted using the Spearman-Brown formula.
 #' @param n Vector of sample sizes.
 #' @param meani Vector of sample means.
-#' @param sr Vector of selection ratios (used only when no other usuable u-ratio inputs are available).
+#' @param sr Vector of selection ratios (used only when no other useable u-ratio inputs are available).
 #' @param rxya_est Vector of estimated unrestricted correlations between the selection mechanism and the variable of interest (used only when \code{sr} is used).
 #' @param data Optional data frame containing any or all information for use in other arguments.
 #'
@@ -67,37 +67,37 @@ estimate_u <- function(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL, r
           data <- data.frame(data)
 
           if(deparse(substitute(measure_id)) != "NULL")
-               measure_id <- match_variables(call = call_full[[match("measure_id",  names(call_full))]], arg = measure_id, data = data)
+               measure_id <- match_variables(call = call_full[[match("measure_id",  names(call_full))]], arg = measure_id, arg_name = "measure_id", data = data)
 
           if(deparse(substitute(sdi)) != "NULL")
-               sdi <- match_variables(call = call_full[[match("sdi",  names(call_full))]], arg = sdi, data = data)
+               sdi <- match_variables(call = call_full[[match("sdi",  names(call_full))]], arg = sdi, arg_name = "sdi", data = data)
 
           if(deparse(substitute(sda)) != "NULL")
-               sda <- match_variables(call = call_full[[match("sda",  names(call_full))]], arg = sda, data = data)
+               sda <- match_variables(call = call_full[[match("sda",  names(call_full))]], arg = sda, arg_name = "sda", data = data)
 
           if(deparse(substitute(rxxi)) != "NULL")
-               rxxi <- match_variables(call = call_full[[match("rxxi",  names(call_full))]], arg = rxxi, data = data)
+               rxxi <- match_variables(call = call_full[[match("rxxi",  names(call_full))]], arg = rxxi, arg_name = "rxxi", data = data)
 
           if(deparse(substitute(rxxa)) != "NULL")
-               rxxa <- match_variables(call = call_full[[match("rxxa",  names(call_full))]], arg = rxxa, data = data)
+               rxxa <- match_variables(call = call_full[[match("rxxa",  names(call_full))]], arg = rxxa, arg_name = "rxxa", data = data)
 
           if(deparse(substitute(item_ki)) != "NULL")
-               item_ki <- match_variables(call = call_full[[match("item_ki",  names(call_full))]], arg = item_ki, data = data)
+               item_ki <- match_variables(call = call_full[[match("item_ki",  names(call_full))]], arg = item_ki, arg_name = "item_ki", data = data)
 
           if(deparse(substitute(item_ka)) != "NULL")
-               item_ka <- match_variables(call = call_full[[match("item_ka",  names(call_full))]], arg = item_ka, data = data)
+               item_ka <- match_variables(call = call_full[[match("item_ka",  names(call_full))]], arg = item_ka, arg_name = "item_ka", data = data)
 
           if(deparse(substitute(n)) != "NULL")
-               n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, data = data)
+               n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, arg_name = "n", data = data)
 
           if(deparse(substitute(meani)) != "NULL")
-               meani <- match_variables(call = call_full[[match("meani",  names(call_full))]], arg = meani, data = data)
+               meani <- match_variables(call = call_full[[match("meani",  names(call_full))]], arg = meani, arg_name = "meani", data = data)
 
           if(deparse(substitute(sr)) != "NULL")
-               sr <- match_variables(call = call_full[[match("sr",  names(call_full))]], arg = sr, data = data)
+               sr <- match_variables(call = call_full[[match("sr",  names(call_full))]], arg = sr, arg_name = "sr", data = data)
 
           if(deparse(substitute(rxya_est)) != "NULL")
-               rxya_est <- match_variables(call = call_full[[match("rxya_est",  names(call_full))]], arg = rxya_est, data = data)
+               rxya_est <- match_variables(call = call_full[[match("rxya_est",  names(call_full))]], arg = rxya_est, arg_name = "rxya_est", data = data)
      }
 
      dat <- list(measure_id = measure_id, sdi = sdi, sda = sda, rxxi = rxxi, rxxa = rxxa,

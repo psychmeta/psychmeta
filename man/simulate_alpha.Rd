@@ -8,7 +8,7 @@ simulate_alpha(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases,
   k_samples, standarized = FALSE)
 }
 \arguments{
-\item{item_mat}{Item intercorrelation/intercovariance matrix. If item_mat is not supplied, the user must supply both \code{alpha} and \code{k_items}.
+\item{item_mat}{Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both \code{alpha} and \code{k_items}.
 If item_mat is \code{NULL}, the program will assume that all item intercorrelations are equal.}
 
 \item{alpha}{Population alpha value. Must be supplied if \code{item_mat} is \code{NULL}.}

@@ -82,7 +82,7 @@
      }
 
      rxx_out <- .colsolidate_dependent_rel(rxx = rxx, ux = ux_out$ux, uy = uy_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = rxx_restricted, ux_observed = ux_out$ux_observed)
-     ryy_out <- .colsolidate_dependent_rel(rxx = ryy, ux = uy_out$ux, uy = ux_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = ryy_restricted, ux_observed = ux_out$ux_observed)
+     ryy_out <- .colsolidate_dependent_rel(rxx = ryy, ux = uy_out$ux, uy = ux_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = ryy_restricted, ux_observed = uy_out$ux_observed)
 
      list(ux = ux_out,
           uy = uy_out,
@@ -90,7 +90,7 @@
           ryy = ryy_out)
 }
 
-.remove_dependency <- function(sample_id, es_data = NULL, data_x = NULL, data_y = NULL,
+.remove_dependency <- function(sample_id = NULL, citekey = NULL, es_data = NULL, data_x = NULL, data_y = NULL,
                                collapse_method = c("stop", "composite", "average"), retain_original = TRUE,
                                intercor = .5, partial_intercor = FALSE,
                                construct_x = NULL, construct_y = NULL,
@@ -99,6 +99,11 @@
      if(!is.null(data)) {
           es_data <- data[,es_data]
           sample_id <- data[,sample_id]
+          if(citekey %in% colnames(data)){
+               citekey <- data[,citekey]
+          }else{
+               citekey <- NULL
+          }
           data_x <- data[,data_x]
           data_y <- data[,data_y]
           construct_x <- as.character(data[,construct_x])
@@ -116,7 +121,7 @@
      }
      additions <- list(...)
 
-     es_metric <- match.arg(es_metric)
+     es_metric <- match.arg(es_metric, c("r", "d"))
 
      dup_IDs <- duplicated(sample_id) | duplicated(sample_id,fromLast=TRUE)
      sample_id_construct_pair <- paste0("ID = ", sample_id, ", X = ", construct_x, ", Y = ", construct_y)
@@ -124,7 +129,7 @@
      collapse_es <- any(as.logical(as.numeric(table(sample_id_construct_pair)) > 1))
 
 
-     collapse_method <- match.arg(collapse_method)
+     collapse_method <- match.arg(collapse_method, c("stop", "composite", "average"))
      if(collapse_method == "stop" & collapse_es) {
           if(nrow(es_data[dup_IDs,]) > 0) stop(c("\nDuplicate effect sizes found:\n", apply(cbind(unique(sample_id_construct_pair[dup_IDs]),"\n"), 1, function(x) x)), call. = FALSE)
      }
@@ -133,6 +138,12 @@
      if(is.null(p_vec)) p_vec <- rep(.5, nrow(es_data))
 
      out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair, function(i) {
+
+          if(!is.null(citekey)){
+               citekey_comp <- paste(unique(as.character(citekey)[i]), collapse = ",")
+          }else{
+               citekey_comp <- NULL
+          }
 
           if(ma_method != "bb"){
                art_out <- .consolidate_dependent_artifacts(n = es_data$n[i],
@@ -355,17 +366,19 @@
           out$construct_x <- construct_x[i][1]
           out$construct_y <- construct_y[i][1]
 
-          out$rxx_consistency <- as.logical(mean(data_x$rxx_consistency[i]))
-          out$ryy_consistency <- as.logical(mean(data_y$ryy_consistency[i]))
+          if(!is.null(data_x$rxx_consistency)) out$rxx_consistency <- as.logical(mean(data_x$rxx_consistency[i]))
+          if(!is.null(data_y$ryy_consistency)) out$ryy_consistency <- as.logical(mean(data_y$ryy_consistency[i]))
 
-          out$correct_rxx <- as.logical(mean(data_x$correct_rxx[i]))
-          out$correct_ryy <- as.logical(mean(data_y$correct_ryy[i]))
+          if(!is.null(data_x$correct_rxx)) out$correct_rxx <- as.logical(mean(data_x$correct_rxx[i]))
+          if(!is.null(data_y$correct_ryy)) out$correct_ryy <- as.logical(mean(data_y$correct_ryy[i]))
 
-          out$sign_rxz <- sign(mean(data_x$sign_rxz[i]))
-          out$sign_ryz <- sign(mean(data_y$sign_ryz[i]))
+          if(!is.null(data_x$sign_rxz)) out$sign_rxz <- sign(mean(data_x$sign_rxz[i]))
+          if(!is.null(data_y$sign_ryz)) out$sign_ryz <- sign(mean(data_y$sign_ryz[i]))
 
-          out$rxx_type <- convert_consistency2reltype(consistency = out$rxx_consistency)
-          out$ryy_type <- convert_consistency2reltype(consistency = out$ryy_consistency)
+          if(!is.null(data_x$rxx_type)) out$rxx_type <- convert_consistency2reltype(consistency = out$rxx_consistency)
+          if(!is.null(data_y$ryy_type)) out$ryy_type <- convert_consistency2reltype(consistency = out$ryy_consistency)
+
+          out$citekey <- citekey_comp
 
           out
      })
@@ -373,6 +386,7 @@
      es_data_list <- list(construct_x = unlist(lapply(out, function(x) x$construct_x)),
                           construct_y = unlist(lapply(out, function(x) x$construct_y)),
                           sample_id = unlist(lapply(out, function(x) x$sample_id)),
+                          citekey = unlist(lapply(out, function(x) x$citekey)),
                           es = unlist(lapply(out, function(x) x$es_comp)),
                           n = unlist(lapply(out, function(x) x$n_comp)),
                           n_adj = unlist(lapply(out, function(x) x$n_adj_comp)),
@@ -423,14 +437,14 @@
      if(nrow(data_x) == 0){
           data_x <- NULL
      }else{
-          rownames(data_y) <- 1:nrow(es_data)
-          es_data <- data.frame(es_data, data_x, data_y)
+          rownames(data_x) <- 1:nrow(es_data)
+          es_data <- data.frame(es_data, data_x)
      }
      if(nrow(data_y) == 0){
           data_y <- NULL
      }else{
           rownames(data_y) <- 1:nrow(es_data)
-          es_data <- data.frame(es_data, data_x, data_y)
+          es_data <- data.frame(es_data, data_y)
      }
 
      es_data

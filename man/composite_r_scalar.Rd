@@ -45,7 +45,7 @@ composite_r_scalar(mean_rxy = .3, k_vars_x = 4, mean_intercor_x = .4)
 
 ## Correlation between two composites:
 composite_r_scalar(mean_rxy = .3, k_vars_x = 2, mean_intercor_x = .5,
-k_vars_y = 2, mean_intercor_y = .2)
+                   k_vars_y = 2, mean_intercor_y = .2)
 }
 \references{
 Ghiselli, E. E., Campbell, J. P., & Zedeck, S. (1981).

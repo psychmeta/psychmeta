@@ -321,9 +321,9 @@ estimate_var_rho_tsa_rb2(mean_rtpa = .5, var_rxyi = .02, var_e = .01,
                 mean_qy = .8, var_qy = .005)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2017).
-\emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 
 Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 Implications of direct and indirect range restriction for meta-analysis methods and findings.

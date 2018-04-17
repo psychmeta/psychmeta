@@ -7,9 +7,10 @@
 #' to a specific construct pair within the \code{construct_pairs} list.
 #'
 #' @param ma_obj Meta-analysis object.
-#' @param max_interaction The maximum level at which interactions should be analyzed. Default is 1 (i.e., main effects only).
+#' @param formula_list Optional list of regression formulas to evaluate.
+#' @param ... Additional arguments.
 #'
-#' @return ma_obj with meta-regression results added (see ma_obj$follow_up_analyses$meta_regression).
+#' @return ma_obj with meta-regression results added (see ma_obj$follow_up_analyses$metareg).
 #' @export
 #'
 #' @keywords regression
@@ -26,11 +27,14 @@
 #' ma_obj <- metareg(ma_obj)
 #'
 #' ## Examine the meta-regression results for the bare-bones and corrected data:
-#' ma_obj$follow_up_analyses$meta_regression$barebones$`Main Effects`
-#' ma_obj$follow_up_analyses$meta_regression$individual_correction$true_score$`Main Effects`
-metareg <- function(ma_obj, max_interaction = 1){
+#' ma_obj$follow_up_analyses$metareg$barebones$`Main Effects`
+#' ma_obj$follow_up_analyses$metareg$individual_correction$true_score$`Main Effects`
+metareg <- function(ma_obj, formula_list = NULL, ...){
      es_type <- NULL
      class_ma <- class(ma_obj)
+
+     max_interaction <- list(...)$max_interaction
+     if(is.null(max_interaction)) max_interaction <- 1
 
      if(any(class_ma == "ma_r_as_r" | class_ma == "ma_d_as_r")) es_type <- "r"
      if(any(class_ma == "ma_d_as_d" | class_ma == "ma_r_as_d")) es_type <- "d"
@@ -52,26 +56,28 @@ metareg <- function(ma_obj, max_interaction = 1){
 
           moderator_names <- colnames(moderator_matrix)
           if(!is.null(moderator_matrix)){
-               formula_list <- list(paste("~", paste(moderator_names, collapse = " + ")))
-               interaction_list <- list()
-               if(length(moderator_names) > 1 & max_interaction > 1){
-                    for(i in 2:min(length(moderator_names), max_interaction)) interaction_list[[i]] <- combn(moderator_names, i)
-                    interaction_list <- lapply(interaction_list, function(x) paste(c(x), collapse = " * "))
-                    for(i in 2:length(interaction_list))
-                         formula_list[[i]] <- paste(c(formula_list[[i - 1]], interaction_list[[i]]), collapse = " + ")
-               }
-               formula_list <- lapply(formula_list, as.formula)
-               if(length(formula_list) > 1){
-                    names(formula_list) <- c("Main Effects", paste(2:length(formula_list), "-Way Interactions", sep = ""))
-               }else{
-                    names(formula_list) <- "Main Effects"
+               if(is.null(formula_list)){
+                    formula_list <- list(paste("~", paste(moderator_names, collapse = " + ")))
+                    interaction_list <- list()
+                    if(length(moderator_names) > 1 & max_interaction > 1){
+                         for(i in 2:min(length(moderator_names), max_interaction)) interaction_list[[i]] <- combn(moderator_names, i)
+                         interaction_list <- lapply(interaction_list, function(x) paste(c(x), collapse = " * "))
+                         for(i in 2:length(interaction_list))
+                              formula_list[[i]] <- paste(c(formula_list[[i - 1]], interaction_list[[i]]), collapse = " + ")
+                    }
+                    formula_list <- lapply(formula_list, as.formula)
+                    if(length(formula_list) > 1){
+                         names(formula_list) <- c("Main Effects", paste(2:length(formula_list), "-Way Interactions", sep = ""))
+                    }else{
+                         names(formula_list) <- "Main Effects"
+                    }
                }
 
                if("ma_bb" %in% class_ma){
                     data_bb <- data.frame(moderator_matrix, ma_obj_i$barebones$escalc_list$`Analysis ID = 1`)
-                    meta_regression_bb <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_bb))
+                    metareg_bb <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_bb))
                }else{
-                    meta_regression_bb <- NULL
+                    metareg_bb <- NULL
                }
 
                if("ma_ic" %in% class_ma){
@@ -86,20 +92,20 @@ metareg <- function(ma_obj, max_interaction = 1){
                          data_vgy <- data.frame(moderator_matrix, ma_obj_i$individual_correction$latentGroup_observedY$escalc_list$`Analysis ID = 1`)
                     }
 
-                    meta_regression_ts <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_ts))
-                    meta_regression_vgx <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_vgx))
-                    meta_regression_vgy <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_vgy))
+                    metareg_ts <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_ts))
+                    metareg_vgx <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_vgx))
+                    metareg_vgy <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_vgy))
                }else{
-                    meta_regression_ts <- meta_regression_vgx <- meta_regression_vgy <- NULL
+                    metareg_ts <- metareg_vgx <- metareg_vgy <- NULL
                }
           }else{
-               meta_regression_bb <- meta_regression_ts <- meta_regression_vgx <- meta_regression_vgy <- NULL
+               metareg_bb <- metareg_ts <- metareg_vgx <- metareg_vgy <- NULL
           }
 
-          ma_obj_i$follow_up_analyses$meta_regression <- list(barebones = meta_regression_bb,
-                                                              individual_correction = list(true_score = meta_regression_ts,
-                                                                                           validity_generalization_x = meta_regression_vgx,
-                                                                                           validity_generalization_y = meta_regression_vgy))
+          ma_obj_i$follow_up_analyses$metareg <- list(barebones = metareg_bb,
+                                                      individual_correction = list(true_score = metareg_ts,
+                                                                                   validity_generalization_x = metareg_vgx,
+                                                                                   validity_generalization_y = metareg_vgy))
           ma_obj_i
      })
 

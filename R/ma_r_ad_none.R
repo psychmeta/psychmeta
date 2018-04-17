@@ -30,6 +30,8 @@
      mean_rtpa <- mean_rxpa <- mean_rtya <- mean_rxyi
      ci_tp <- ci_xp <- ci_ty <- ci_xy
 
+     sd_art <- var_art <- 0
+     var_pre <- var_e
      var_art_tp <- var_art_xp <- var_art_ty <- rep(0, length(var_e))
      sd_art_tp <- sd_art_xp <- sd_art_ty <- rep(0, length(var_e))
      var_pre_tp <- var_pre_xp <- var_pre_ty <- var_e
@@ -37,7 +39,7 @@
      var_rho_tp <- var_rho_xp <- var_rho_ty <- var_res
 
      sd_r <- var_r^.5
-     sd_e <- var_e^.5
+     sd_pre <- sd_e <- var_e^.5
 
      sd_pre_tp <- var_pre_tp^.5
      sd_res_tp <- var_res_tp^.5
@@ -48,6 +50,14 @@
 
      correct_meas_x <- FALSE
      correct_meas_y <- FALSE
+
+     ## New variances
+     var_r_tp <- var_r_xp <- var_r_ty <- var_r
+     var_e_tp <- var_e_xp <- var_e_ty <- var_e
+     se_r_tp <- se_r_xp <- se_r_ty <- se_r
+     sd_r_tp <- sd_r_xp <- sd_r_ty <- var_r^.5
+     sd_e_tp <- sd_e_xp <- sd_e_ty <- var_e^.5
+     ##
 
      out <- as.list(environment())
      class(out) <- class(x)

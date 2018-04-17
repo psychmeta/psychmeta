@@ -24,7 +24,7 @@ corresponding to the "Y" constructs in the meta-analyses contained within \code{
 \item{correction_method}{One of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-be used when interative artifact distributions are provided). See "Details" for descriptions of the available methods.}
+be used when interactive artifact distributions are provided). See "Details" for descriptions of the available methods.}
 
 \item{use_ic_ads}{Determines whether artifact distributions should be extracted from the individual correction results in \code{ma_obj}.
 Only evaluated when \code{ad_obj_x} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
@@ -114,9 +114,9 @@ Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
 \emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
 
-Dahlke, J. A., & Wiernik, B. M. (2017).
-\emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 
 Raju, N. S., & Burke, M. J. (1983).
 Two new procedures for studying validity generalization.

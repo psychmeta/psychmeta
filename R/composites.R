@@ -112,7 +112,7 @@ estimate_length_sb <- function(rel_initial, rel_desired){
 #'
 #' ## Correlation between two composites:
 #' composite_r_scalar(mean_rxy = .3, k_vars_x = 2, mean_intercor_x = .5,
-#' k_vars_y = 2, mean_intercor_y = .2)
+#'                    k_vars_y = 2, mean_intercor_y = .2)
 composite_r_scalar <- function(mean_rxy, k_vars_x = NULL, mean_intercor_x = NULL, k_vars_y = NULL, mean_intercor_y = NULL){
      if(!is.null(k_vars_x) & !is.null(k_vars_y)){
           decompose_x <- k_vars_x < 1
@@ -176,10 +176,10 @@ composite_r_scalar <- function(mean_rxy, k_vars_x = NULL, mean_intercor_x = NULL
 #' where \eqn{\rho_{XY}}{r_composite} is the composite correlation, \eqn{\mathbf{w}}{wt} is a vector of weights, and \eqn{\mathbf{R}}{R} is a correlation matrix. The subscripts of \eqn{\mathbf{w}}{wt} and \eqn{\mathbf{R}}{R} indicate the variables indexed within the vector or matrix.
 #'
 #' @examples
-#' r_mat <- matrix(.4, 3, 3)
-#' r_mat[,1] <- r_mat[1,] <- .3
-#' diag(r_mat) <- 1
-#' composite_r_matrix(r_mat = r_mat, x_col = 2:3, y_col = 1)
+#' composite_r_scalar(mean_rxy = .3, k_vars_x = 4, mean_intercor_x = .4)
+#' R <- reshape_vec2mat(.4, order = 5)
+#' R[-1,1] <- R[1,-1] <- .3
+#' composite_r_matrix(r_mat = R, x_col = 2:5, y_col = 1)
 composite_r_matrix <- function(r_mat, x_col, y_col, wt_vec_x = rep(1, length(x_col)), wt_vec_y = rep(1, length(y_col))){
      r_mat <- cov2cor(r_mat)
      as.numeric(wt_vec_x %*% r_mat[x_col,y_col] %*% wt_vec_y) /
@@ -191,7 +191,7 @@ composite_r_matrix <- function(r_mat, x_col, y_col, wt_vec_x = rep(1, length(x_c
 
 #' Scalar formula to estimate the standardized mean difference associated with a composite variable
 #'
-#' This functions estimates the \emph{d} value of a composite of X variables, given the mean \emph{d} value of the individual X values and the mean correlation among those variables.
+#' This function estimates the \emph{d} value of a composite of X variables, given the mean \emph{d} value of the individual X values and the mean correlation among those variables.
 #'
 #' There are two different methods available for computing such a composite, one that uses the partial intercorrelation among the X variables (i.e., the average within-group correlation)
 #' and one that uses the overall correlation among the X variables (i.e., the total or mixture correlation across groups).
@@ -252,7 +252,7 @@ composite_d_scalar <- function(mean_d, mean_intercor, k_vars, p = .5, partial_in
 #'
 #' @examples
 #' composite_d_matrix(d_vec = c(1, 1), r_mat = matrix(c(1, .7, .7, 1), 2, 2),
-#' wt_vec = c(1, 1), p = .5)
+#'                    wt_vec = c(1, 1), p = .5)
 composite_d_matrix <- function(d_vec, r_mat, wt_vec, p = .5){
      r_vec <- convert_es.q_d_to_r(d = d_vec, p = p)
      mat <- rbind(c(1, r_vec), cbind(r_vec, r_mat))
@@ -304,7 +304,7 @@ composite_rel_scalar <- function(mean_rel, mean_intercor, k_vars){
 #'
 #' @param rel_vec Vector of reliabilities associated with variables in the composite to be formed.
 #' @param r_mat Correlation matrix from which the composite is to be computed.
-#' @param sd_vec Vector of standard deivations associated with variables in the composite to be formed.
+#' @param sd_vec Vector of standard deviations associated with variables in the composite to be formed.
 #' @param wt_vec Weights to be used in forming the composite (by default, all variables receive equal weight).
 #'
 #' @return The estimated reliability of the composite variable.

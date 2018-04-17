@@ -1,204 +1,3 @@
-#' Computation of heterogeneity indices from meta-analytic results
-#'
-#' @param mean_es The mean effect size.
-#' @param var_es The observed variances of effect sizes.
-#' @param var_e The predicted error variance in effect sizes.
-#' @param var_art The variance of effect sizes predicted from artifacts.
-#' @param var_pre The total amount of artifactual variance predicted from artifacts and statistical error,
-#' @param wt_vec The vector of weights used in the meta-analysis.
-#' @param N The total sample size of the meta-analysis.
-#' @param k The number of effect sizes included in the meta-analysis.
-#' @param es_vec The vector of effect sizes used in the meta-analysis.
-#' @param es_failsafe Failsafe value of the effect size for use in file-drawer analyses.
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param es_type Name of effect-size type.
-#'
-#' @return A list of heterogeneity statistics.
-#' @export
-#' @importFrom stats pchisq
-#' @importFrom stats uniroot
-#'
-#' @keywords internal
-.heterogeneity <- function(mean_es, var_es, var_e,
-                           var_art = NA, var_pre = NA,
-                           wt_vec, N, k, es_vec, es_failsafe = NULL, conf_level = .95, es_type = "es"){
-
-     df <- as.numeric(k - 1)
-
-     var_art[!is.na(var_pre)] <- var_pre[!is.na(var_pre)] - var_e[!is.na(var_pre)]
-
-     if(!is.null(es_failsafe)){
-          ## File-drawer k and n
-          k_failsafe <- k * (mean_es / es_failsafe - 1)
-          n_failsafe <- k_failsafe * N / k
-
-          file_drawer = c(es_failsafe,
-                          k_failsafe = k_failsafe,
-                          n_failsafe = n_failsafe)
-          names(file_drawer)[1] <- paste0(es_type, "_failsafe")
-     }else{
-          file_drawer <- NULL
-     }
-
-     var_art[is.na(var_art)] <- 0
-     var_pre[is.na(var_pre)] <- var_e[is.na(var_pre)]
-
-     ## Percentage of variance accounted for
-     percent_var_error <- var_e / var_es * 100
-     percent_var_art <- var_art / var_es * 100
-     percent_var_total <- var_pre / var_es * 100
-
-     ## Correlations between effect sizes and artifactual perturbations
-     cor_es_error <- sqrt(var_e / var_es)
-     cor_es_art <- sqrt(var_art / var_es)
-     cor_es_total <- sqrt(var_pre / var_es)
-     cor_es_error[cor_es_error > 1] <- cor_es_art[cor_es_art > 1] <- cor_es_total[cor_es_total > 1] <- 1
-
-     # Reliability of observed effect size differences
-     rel_es_obs <- 1 - var_pre / var_es
-
-     ## H^2
-     H_squared <- var_es / var_pre
-     H <- sqrt(H_squared)
-
-     ## I^2
-     I_squared <- rel_es_obs * 100
-
-     ## Q
-     wt_sums <- sum(wt_vec)
-     wt_squared_sums <- sum(wt_vec^2)
-     Q <- wt_sums * var_es
-     p_Q <- pchisq(q = Q, df = df, lower.tail = FALSE)
-
-     ## Tau
-     C <- wt_sums - (wt_squared_sums / wt_sums)
-     tau_squared <- (Q - df) / C
-     tau_squared[tau_squared < 0] <- 0
-     tau_squared_ci <- limits_tau(Q = Q, df = df, C = C, conf_level = conf_level)
-
-     ## Outlier-robust estimators (mean)
-     abs_dev_sums <- sum(abs(es_vec - mean_es))
-     wt_root_sums <- sum(sqrt(wt_vec))
-     Q_r <- wt_root_sums * abs_dev_sums
-     H_r_squared <- (pi * Q_r^2) / (2 * k * df)
-     H_r <- sqrt(H_r_squared)
-     I_r_squared <- (Q_r^2 - (2 * k * df)/pi) / Q_r^2
-     tau_r_squared <- .tau_r_squared_solver(Q_r, wt_vec)
-
-     ## Outlier-robust estimators (median)
-     expit <- function(x) ifelse(x >= 0, 1/(1 + exp(-x/0.0001)), exp(x/0.0001)/(1 + exp(x/0.001)))
-     psi   <- function(x, es_vec, wt_vec) sum(wt_vec * (expit(x - es_vec) - 0.5))
-     median_es <- uniroot(psi, interval = c(min(es_vec) - 0.001, max(es_vec) + 0.001), wt_vec = wt_vec, es_vec = es_vec)$root
-     med_dev_sums <- sum(abs(es_vec - median_es))
-     Q_m <- wt_root_sums * med_dev_sums
-     H_m_squared <- (pi * Q_m^2) / (2 * k^2)
-     H_m <- sqrt(H_m_squared)
-     I_m_squared <- (Q_m^2 - (2 * k^2)/pi) / Q_m^2
-     tau_m_squared <- .tau_m_squared_solver(Q_m, wt_vec, k)
-
-     out <- list(es_type = es_type,
-                 percent_var_accounted = c(error = percent_var_error,
-                                           artifacts = percent_var_art,
-                                           total = percent_var_total),
-                 `cor(es, perturbations)` = c(error = cor_es_error,
-                                              artifacts = cor_es_art,
-                                              total = cor_es_total),
-                 rel_es_obs = c(rel_es_obs = rel_es_obs),
-                 H_squared = c(H_squared = H_squared),
-                 H = c(H = H),
-                 I_squared = c(I_squared = I_squared),
-                 Q = c(Q = Q, df = df, p = p_Q),
-                 tau_squared = c(tau_squared = tau_squared, tau_squared_ci),
-                 tau = c(tau = tau_squared^.5, tau_squared_ci^.5),
-                 outlier_robust_mean = c(Q_r = Q_r,
-                                         H_r_squared = H_r_squared,
-                                         H_r = H_r,
-                                         I_r_squared = I_r_squared,
-                                         tau_r_squared = tau_r_squared,
-                                         tau_r = tau_r_squared^.5),
-                 outlier_robust_median = c(Q_m = Q_m,
-                                           H_m_squared = H_m_squared,
-                                           H_m = H_m,
-                                           I_m_squared = I_m_squared,
-                                           tau_m_squared = tau_m_squared,
-                                           tau_m = tau_m_squared^.5),
-                 file_drawer = file_drawer)
-     class(out) <- c("psychmeta", "heterogeneity")
-     out
-}
-
-#' tau_r_squared Solver
-#'
-#' Function to solve for tau_r_squared (outlier-robust estimator of tau_squared based on absolute deviations from mean)
-#'
-#' @param Q_r The Q_r statistic.
-#' @param wt_vec Vector of study weights.
-#'
-#' @author  Lifeng Lin and Haitao Chu
-#'
-#' @return tau_r_squared
-.tau_r_squared_solver <- function(Q_r, wt_vec){
-  f <- function(tau_squared, Q_r, wt_vec) sum(sqrt(1 - wt_vec/sum(wt_vec) + tau_squared * (wt_vec - 2 * wt_vec^2/sum(wt_vec) + wt_vec * sum(wt_vec^2)/(sum(wt_vec))^2))) - Q_r * sqrt(pi/2)
-
-  tau_upp <- Q_r * sqrt(pi/2) / sum(sqrt(wt_vec - 2 * wt_vec^2/sum(wt_vec) + wt_vec * sum(wt_vec^2)/(sum(wt_vec))^2))
-  tau_squared_upp <- tau_upp^2
-  f_low <- f(0, Q_r, wt_vec)
-  f_upp <- f(tau_squared_upp, Q_r, wt_vec)
-  if(f_low * f_upp > 0) tau_squared_r <- 0 else tau_squared_r <- uniroot(f, interval = c(0, tau_squared_upp), Q_r = Q_r, wt_vec = wt_vec)$root
-
-  return(tau_squared_r)
-}
-
-#' tau_m_squared Solver
-#'
-#' Function to solve for tau_m_squared (outlier-robust estimator of tau_squared based on absolute deviations from median)
-#'
-#' @param Q_m The Q_r statistic.
-#' @param wt_vec Vector of study weights.
-#' @param k The number of effect sizes included in the meta-analysis.
-#'
-#' @author  Lifeng Lin and Haitao Chu
-#'
-#' @return tau_r_squared
-.tau_m_squared_solver <- function(Q_m, wt_vec, k){
-  f <- function(tau_squared, Q_m, wt_vec) sum(sqrt(1 + wt_vec * tau_squared)) - Q_m * sqrt(pi/2)
-
-  tau_squared_upp <- sum(1/wt_vec) * (Q_m^2/k * 2/pi -1)
-  tau_squared_upp <- max(tau_squared_upp, 0.01)
-  f_low <- f(0, Q_m, wt_vec)
-  f_upp <- f(tau_squared_upp, Q_m, wt_vec)
-  if(f_low * f_upp > 0) tau_squared_m <- 0 else tau_squared_m <- uniroot(f, interval = c(0, tau_squared_upp), Q_m = Q_m, wt_vec = wt_vec)$root
-
-  return(tau_squared_m)
-}
-
-#' Confidence limits of tau
-#'
-#' @param Q The Q statistic from the meta-analysis.
-#' @param df The degrees of freedom associated with the Q statistic.
-#' @param C The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))
-#' @param conf_level Confidence level
-#'
-#' @return The confidence limits of tau
-#'
-#' @keywords internal
-limits_tau <- function(Q, df, C, conf_level = .95){
-     B <- rep(NA, length(Q))
-     B[Q > df + 1] <- (.5 * (log(Q) - log(df)) / (sqrt(2 * Q) - sqrt(2 * df - 1)))[Q > df + 1]
-     B[!(Q > df + 1)] <- sqrt(1 / (2 * (df - 1) * (1 - (1 / (3 * (df - 1)^2)))))[!(Q > df + 1)]
-
-     ci_lower <- (df * (exp(.5 * log(Q / df) - qnorm((1 - conf_level) / 2, lower.tail = FALSE) * B)^2 - 1)) / C
-     ci_upper <- (df * (exp(.5 * log(Q / df) + qnorm((1 - conf_level) / 2, lower.tail = FALSE) * B)^2 - 1)) / C
-     ci_lower[ci_lower < 0] <- 0
-     ci_upper[ci_upper < 0] <- 0
-     ci <- c(ci_lower, ci_upper)
-     ci[is.na(ci)] <- 0
-     names(ci) <- paste("CI", round(conf_level * 100), c("LL", "UL"), sep = "_")
-     ci
-}
-
-
-
 #' @name heterogeneity
 #' @rdname heterogeneity
 #'
@@ -214,8 +13,8 @@ limits_tau <- function(Q, df, C, conf_level = .95){
 #'
 #' @return ma_obj with heterogeneity statistics added. Included statistics include:
 #'      \item{\code{es_type}}{The effect size metric used.}
-#'      \item{\code{percent_var_accounted}}{Percent variance accounted for statistics (by sampling error, by other artifacts, and total). These statistics are widely reported, but not recommended, as they tend to be misinterpreted as suggesting only a small portion of the observed variance is accounted for by sampling error and other artifacts (Schmidt, 2010; Schmidt & Hunter, 2015, p. 15, 425). The square roots of these values are more interpretible and appropriate indices of the relations between observed effect sizes and statistical artifacts (see \code{cor(es, perturbations)}).}
-#'      \item{\code{cor(es, perturbations)}}{The correlation between observed effect sizes and stastical artifacts in each sample (with sampling error, with other artifacts, and with artifacts in total), computed as \eqn{\sqrt{percent\;var\;accounted}}{sqrt(percent_var_accounted)}. These indices are more interpretible and appropriate indices of the relations between observed effect sizes and statistical artifacts than \code{percent_var_accounted}.}
+#'      \item{\code{percent_var_accounted}}{Percent variance accounted for statistics (by sampling error, by other artifacts, and total). These statistics are widely reported, but not recommended, as they tend to be misinterpreted as suggesting only a small portion of the observed variance is accounted for by sampling error and other artifacts (Schmidt, 2010; Schmidt & Hunter, 2015, p. 15, 425). The square roots of these values are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts (see \code{cor(es, perturbations)}).}
+#'      \item{\code{cor(es, perturbations)}}{The correlation between observed effect sizes and statistical artifacts in each sample (with sampling error, with other artifacts, and with artifacts in total), computed as \eqn{\sqrt{percent\;var\;accounted}}{sqrt(percent_var_accounted)}. These indices are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts than \code{percent_var_accounted}.}
 #'      \item{\code{rel_es_obs}}{\eqn{1-\frac{var_{pre}}{var_{es}}}{1 - (var_pre / var_es)}, the reliability of observed effect size differences as indicators of true effect sizes differences in the sampled studies. This value is useful for correcting correlations between moderators and effect sizes in meta-regression.}
 #'      \item{\code{H_squared}}{The ratio of the observed effect size variance to the predicted (error) variance. Also the square root of \code{Q} divided by its degrees of freedom.}
 #'      \item{\code{H}}{The ratio of the observed effect size standard deviation to the predicted (error) standard deviation.}
@@ -490,4 +289,207 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
 
      ma_obj
 }
+
+#' Computation of heterogeneity indices from meta-analytic results
+#'
+#' @param mean_es The mean effect size.
+#' @param var_es The observed variances of effect sizes.
+#' @param var_e The predicted error variance in effect sizes.
+#' @param var_art The variance of effect sizes predicted from artifacts.
+#' @param var_pre The total amount of artifactual variance predicted from artifacts and statistical error,
+#' @param wt_vec The vector of weights used in the meta-analysis.
+#' @param N The total sample size of the meta-analysis.
+#' @param k The number of effect sizes included in the meta-analysis.
+#' @param es_vec The vector of effect sizes used in the meta-analysis.
+#' @param es_failsafe Failsafe value of the effect size for use in file-drawer analyses.
+#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
+#' @param es_type Name of effect-size type.
+#'
+#' @return A list of heterogeneity statistics.
+#' @export
+#' @importFrom stats pchisq
+#' @importFrom stats uniroot
+#'
+#' @keywords internal
+.heterogeneity <- function(mean_es, var_es, var_e,
+                           var_art = NA, var_pre = NA,
+                           wt_vec, N, k, es_vec, es_failsafe = NULL, conf_level = .95, es_type = "es"){
+
+     df <- as.numeric(k - 1)
+
+     var_art[!is.na(var_pre)] <- var_pre[!is.na(var_pre)] - var_e[!is.na(var_pre)]
+
+     if(!is.null(es_failsafe)){
+          ## File-drawer k and n
+          k_failsafe <- k * (mean_es / es_failsafe - 1)
+          n_failsafe <- k_failsafe * N / k
+
+          file_drawer = c(es_failsafe,
+                          k_failsafe = k_failsafe,
+                          n_failsafe = n_failsafe)
+          names(file_drawer)[1] <- paste0(es_type, "_failsafe")
+     }else{
+          file_drawer <- NULL
+     }
+
+     var_art[is.na(var_art)] <- 0
+     var_pre[is.na(var_pre)] <- var_e[is.na(var_pre)]
+
+     ## Percentage of variance accounted for
+     percent_var_error <- var_e / var_es * 100
+     percent_var_art <- var_art / var_es * 100
+     percent_var_total <- var_pre / var_es * 100
+
+     ## Correlations between effect sizes and artifactual perturbations
+     cor_es_error <- sqrt(var_e / var_es)
+     cor_es_art <- sqrt(var_art / var_es)
+     cor_es_total <- sqrt(var_pre / var_es)
+     cor_es_error[cor_es_error > 1] <- cor_es_art[cor_es_art > 1] <- cor_es_total[cor_es_total > 1] <- 1
+
+     # Reliability of observed effect size differences
+     rel_es_obs <- 1 - var_pre / var_es
+
+     ## H^2
+     H_squared <- var_es / var_pre
+     H <- sqrt(H_squared)
+
+     ## I^2
+     I_squared <- rel_es_obs * 100
+
+     ## Q
+     wt_sums <- sum(wt_vec)
+     wt_squared_sums <- sum(wt_vec^2)
+     Q <- wt_sums * var_es
+     p_Q <- pchisq(q = Q, df = df, lower.tail = FALSE)
+
+     ## Tau
+     C <- wt_sums - (wt_squared_sums / wt_sums)
+     tau_squared <- (Q - df) / C
+     tau_squared[tau_squared < 0] <- 0
+     tau_squared_ci <- limits_tau(Q = Q, df = df, C = C, conf_level = conf_level)
+
+     ## Outlier-robust estimators (mean)
+     abs_dev_sums <- sum(abs(es_vec - mean_es))
+     wt_root_sums <- sum(sqrt(wt_vec))
+     Q_r <- wt_root_sums * abs_dev_sums
+     H_r_squared <- (pi * Q_r^2) / (2 * k * df)
+     H_r <- sqrt(H_r_squared)
+     I_r_squared <- (Q_r^2 - (2 * k * df)/pi) / Q_r^2
+     tau_r_squared <- .tau_r_squared_solver(Q_r, wt_vec)
+
+     ## Outlier-robust estimators (median)
+     expit <- function(x) ifelse(x >= 0, 1/(1 + exp(-x/0.0001)), exp(x/0.0001)/(1 + exp(x/0.001)))
+     psi   <- function(x, es_vec, wt_vec) sum(wt_vec * (expit(x - es_vec) - 0.5))
+     median_es <- uniroot(psi, interval = c(min(es_vec) - 0.001, max(es_vec) + 0.001), wt_vec = wt_vec, es_vec = es_vec)$root
+     med_dev_sums <- sum(abs(es_vec - median_es))
+     Q_m <- wt_root_sums * med_dev_sums
+     H_m_squared <- (pi * Q_m^2) / (2 * k^2)
+     H_m <- sqrt(H_m_squared)
+     I_m_squared <- (Q_m^2 - (2 * k^2)/pi) / Q_m^2
+     tau_m_squared <- .tau_m_squared_solver(Q_m, wt_vec, k)
+
+     out <- list(es_type = es_type,
+                 percent_var_accounted = c(error = percent_var_error,
+                                           artifacts = percent_var_art,
+                                           total = percent_var_total),
+                 `cor(es, perturbations)` = c(error = cor_es_error,
+                                              artifacts = cor_es_art,
+                                              total = cor_es_total),
+                 rel_es_obs = c(rel_es_obs = rel_es_obs),
+                 H_squared = c(H_squared = H_squared),
+                 H = c(H = H),
+                 I_squared = c(I_squared = I_squared),
+                 Q = c(Q = Q, df = df, p = p_Q),
+                 tau_squared = c(tau_squared = tau_squared, tau_squared_ci),
+                 tau = c(tau = tau_squared^.5, tau_squared_ci^.5),
+                 outlier_robust_mean = c(Q_r = Q_r,
+                                         H_r_squared = H_r_squared,
+                                         H_r = H_r,
+                                         I_r_squared = I_r_squared,
+                                         tau_r_squared = tau_r_squared,
+                                         tau_r = tau_r_squared^.5),
+                 outlier_robust_median = c(Q_m = Q_m,
+                                           H_m_squared = H_m_squared,
+                                           H_m = H_m,
+                                           I_m_squared = I_m_squared,
+                                           tau_m_squared = tau_m_squared,
+                                           tau_m = tau_m_squared^.5),
+                 file_drawer = file_drawer)
+     class(out) <- c("psychmeta", "heterogeneity")
+     out
+}
+
+#' tau_r_squared Solver
+#'
+#' Function to solve for tau_r_squared (outlier-robust estimator of tau_squared based on absolute deviations from mean)
+#'
+#' @param Q_r The Q_r statistic.
+#' @param wt_vec Vector of study weights.
+#'
+#' @author  Lifeng Lin and Haitao Chu
+#'
+#' @return tau_r_squared
+.tau_r_squared_solver <- function(Q_r, wt_vec){
+  f <- function(tau_squared, Q_r, wt_vec) sum(sqrt(1 - wt_vec/sum(wt_vec) + tau_squared * (wt_vec - 2 * wt_vec^2/sum(wt_vec) + wt_vec * sum(wt_vec^2)/(sum(wt_vec))^2))) - Q_r * sqrt(pi/2)
+
+  tau_upp <- Q_r * sqrt(pi/2) / sum(sqrt(wt_vec - 2 * wt_vec^2/sum(wt_vec) + wt_vec * sum(wt_vec^2)/(sum(wt_vec))^2))
+  tau_squared_upp <- tau_upp^2
+  f_low <- f(0, Q_r, wt_vec)
+  f_upp <- f(tau_squared_upp, Q_r, wt_vec)
+  if(f_low * f_upp > 0) tau_squared_r <- 0 else tau_squared_r <- uniroot(f, interval = c(0, tau_squared_upp), Q_r = Q_r, wt_vec = wt_vec)$root
+
+  return(tau_squared_r)
+}
+
+#' tau_m_squared Solver
+#'
+#' Function to solve for tau_m_squared (outlier-robust estimator of tau_squared based on absolute deviations from median)
+#'
+#' @param Q_m The Q_r statistic.
+#' @param wt_vec Vector of study weights.
+#' @param k The number of effect sizes included in the meta-analysis.
+#'
+#' @author  Lifeng Lin and Haitao Chu
+#'
+#' @return tau_r_squared
+.tau_m_squared_solver <- function(Q_m, wt_vec, k){
+  f <- function(tau_squared, Q_m, wt_vec) sum(sqrt(1 + wt_vec * tau_squared)) - Q_m * sqrt(pi/2)
+
+  tau_squared_upp <- sum(1/wt_vec) * (Q_m^2/k * 2/pi -1)
+  tau_squared_upp <- max(tau_squared_upp, 0.01)
+  f_low <- f(0, Q_m, wt_vec)
+  f_upp <- f(tau_squared_upp, Q_m, wt_vec)
+  if(f_low * f_upp > 0) tau_squared_m <- 0 else tau_squared_m <- uniroot(f, interval = c(0, tau_squared_upp), Q_m = Q_m, wt_vec = wt_vec)$root
+
+  return(tau_squared_m)
+}
+
+#' Confidence limits of tau
+#'
+#' @param Q The Q statistic from the meta-analysis.
+#' @param df The degrees of freedom associated with the Q statistic.
+#' @param C The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))
+#' @param conf_level Confidence level
+#'
+#' @return The confidence limits of tau
+#'
+#' @keywords internal
+limits_tau <- function(Q, df, C, conf_level = .95){
+     B <- rep(NA, length(Q))
+     B[Q > df + 1] <- (.5 * (log(Q) - log(df)) / (sqrt(2 * Q) - sqrt(2 * df - 1)))[Q > df + 1]
+     B[!(Q > df + 1)] <- sqrt(1 / (2 * (df - 1) * (1 - (1 / (3 * (df - 1)^2)))))[!(Q > df + 1)]
+
+     ci_lower <- (df * (exp(.5 * log(Q / df) - qnorm((1 - conf_level) / 2, lower.tail = FALSE) * B)^2 - 1)) / C
+     ci_upper <- (df * (exp(.5 * log(Q / df) + qnorm((1 - conf_level) / 2, lower.tail = FALSE) * B)^2 - 1)) / C
+     ci_lower[ci_lower < 0] <- 0
+     ci_upper[ci_upper < 0] <- 0
+     ci <- c(ci_lower, ci_upper)
+     ci[is.na(ci)] <- 0
+     names(ci) <- paste("CI", round(conf_level * 100), c("LL", "UL"), sep = "_")
+     ci
+}
+
+
+
+
 

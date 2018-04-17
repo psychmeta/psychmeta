@@ -78,7 +78,7 @@ Only used when ni_ux is not NULL. If supplied, must be either a scalar or the sa
 
 \item{wt_ux}{Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).}
 
-\item{dep_sds_ux_obs}{Logical scalar or vector determinining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ux_obs}{Logical scalar or vector determining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{mean_ux}{Vector that can be used to supply the means of externally computed distributions of observed-score u ratios.}
 
@@ -90,7 +90,7 @@ Only used when ni_ux is not NULL. If supplied, must be either a scalar or the sa
 
 \item{mean_na_ux}{Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.}
 
-\item{dep_sds_ux_spec}{Logical scalar or vector determinining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ux_spec}{Logical scalar or vector determining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{ut}{Vector of true-score u ratios.}
 
@@ -101,7 +101,7 @@ Only used when ni_ut is not NULL. If supplied, must be either a scalar or the sa
 
 \item{wt_ut}{Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).}
 
-\item{dep_sds_ut_obs}{Logical scalar or vector determinining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ut_obs}{Logical scalar or vector determining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{mean_ut}{Vector that can be used to supply the means of externally computed distributions of true-score u ratios.}
 
@@ -113,15 +113,15 @@ Only used when ni_ut is not NULL. If supplied, must be either a scalar or the sa
 
 \item{mean_na_ut}{Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of true-score u ratios.}
 
-\item{dep_sds_ut_spec}{Logical scalar or vector determinining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
+\item{dep_sds_ut_spec}{Logical scalar or vector determining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
-\item{estimate_rxxa}{Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_rxxa}{Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_rxxi}{Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_rxxi}{Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_ux}{Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_ux}{Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_ut}{Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_ut}{Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.}
 
 \item{var_unbiased}{Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
 

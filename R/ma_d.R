@@ -2,15 +2,16 @@
 #'
 #' This is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
 #' When artifact-distribution meta-analyses are performed, this function will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
-#' This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, to impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
+#' This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
 #' The automatic compositing features are employed when \code{sample_id}s and/or construct names are provided.
-#' When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
+#' When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitivity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
 #'
 #' @param d Vector or column name of observed \emph{d} values.
 #' @param n1 Vector or column name of sample sizes.
 #' @param n2 Vector or column name of sample sizes.
 #' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
+#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' @param treat_as_d Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).
 #' @param ma_method Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
 #' @param ad_type For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".
@@ -18,36 +19,32 @@
 #' When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-#' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.
+#' be used when interactive artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.
 #' @param group_id Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).
-#' The \code{group_id} argument supercedes the \code{group1} and \code{group2} arguments.
+#' The \code{group_id} argument supersedes the \code{group1} and \code{group2} arguments.
 #' If \code{group_id} is not \code{NULL}, the values supplied to the \code{group_order} argument must correspond to \code{group_id} values.
-#' @param group1,group2 Vector of names for groups in a comparison (e.g., group1 = "Control" and group2 = "Treatment", group1 = "Majority" and group2 = "Minority").
-#' The \code{group1} and \code{group2} arguments are superceded by the \code{group_id} argument.
-#' If \code{group_id} is \code{NULL}, the values supplied to the \code{group_order} argument must correspond to individual \code{group1} and \code{group2} values - the order of group pairings will be determined interally.
-#' IMPORTANT: Groups whose names appear before other groups' names in the \code{group_order} vector  will be treated as referent groups for the focal groups whose names occur later in the \code{group_order} vector (the referent group is the group from whose mean the focal group's mean is subtracted when computing a \emph{d} value).
-#' If a \code{group2} value comes before a \code{group1} value according to the \code{group_order} vector, the groups' positions in all other arguments will be swapped and the sign of the \emph{d} value will be reversed so that \code{group1} is always the referent group.
+#' @param group1,group2 Vector of group identification labels (e.g., Treatment1, Treatment2, Control)
 #' @param group_order Optional vector indicating the order in which (1) \code{group1} and \code{group2} values or (2) \code{group_ids} should be arranged.
 #' If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.
 #' @param construct_y Vector of construct names for construct initially designated as Y.
-#' @param measure_y Vector of names names for measures associated with constructs initially designated as "Y".
+#' @param measure_y Vector of names for measures associated with constructs initially designated as "Y".
 #' @param construct_order Vector indicating the order in which Y variables should be arranged.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
 #' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rel Optional named vector that supercedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.
+#' @param correct_rel Optional named vector that supersedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.
 #' @param correct_rGg Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rr Optional named vector that supercedes \code{correct_rr_g} and \code{correct_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for range restriction.
+#' @param correct_rr Optional named vector that supersedes \code{correct_rr_g} and \code{correct_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for range restriction.
 #' @param correct_rr_g Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rr_y Logical scalar or vector or column name determining whether each \emph{d} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-#' @param indirect_rr Optional named vector that supercedes \code{indirect_rr_g} and \code{indirect_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.
+#' @param indirect_rr Optional named vector that supersedes \code{indirect_rr_g} and \code{indirect_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.
 #' @param indirect_rr_g Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
-#' Superceded in evaluation by \code{correct_rr_g} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).
+#' Superseded in evaluation by \code{correct_rr_g} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).
 #' @param indirect_rr_y Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-#' Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).
+#' Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).
 #' @param rGg Vector or column name of reliability estimates for X.
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
@@ -56,7 +53,7 @@
 #' @param pa Scalar or vector containing the unrestricted-group proportions of group membership (default = .5). If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param uy Vector or column name of u ratios for Y.
 #' @param uy_observed Logical vector or column name determining whether each element of \code{uy} is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
-#' @param sign_rz Optional named vector that supercedes \code{sign_rgz} and \code{sign_ryz}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.
+#' @param sign_rz Optional named vector that supersedes \code{sign_rgz} and \code{sign_ryz}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.
 #' @param sign_rgz Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
@@ -74,15 +71,16 @@
 #' @param collapse_method Character argument that determines how to collapase dependent studies. Options are "composite" (default), "average," and "stop."
 #' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs.
 #' @param partial_intercor Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).
-#' @param clean_artifacts If \code{TRUE}, mutliple instances of the same contruct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
+#' @param clean_artifacts If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
 #' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
 #' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
-#' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all rescrepancies among artifact entries before and after impuation.
+#' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.
 #' @param impute_method Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.
 #' @param decimals Number of decimal places to which results should be rounded (default is to perform no rounding).
 #' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 #' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
 #' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).
+#' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
@@ -152,12 +150,13 @@
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
-#' \item{\code{var_r}}{\cr Weighted variance of observed \emph{d} values.}
+#' \item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
 #' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
 #' \item{\code{var_art}}{\cr Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts.}
 #' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
 #' \item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
-#' \item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+#' \item{\code{sd_d}}{\cr Square root of \code{var_d}.}
+#' \item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
 #' \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
 #' \item{\code{sd_art}}{\cr Square root of \code{var_art}.}
 #' \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
@@ -178,13 +177,12 @@
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
 #' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 3.
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2017).
-#' \emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-#' Unpublished manuscript.
+#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+#' Accounting for indirect range restriction in organizational and psychological research}.
+#' Manuscript submitted for review.
 #'
 #' @examples
-#' \dontrun{
-#' ## The 'ma_d' function can compute multi-construct bare-bones meta-analyes:
+#' ## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:
 #' ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 #'
 #' ## It can also perform multiple individual-correction meta-analyses:
@@ -196,8 +194,7 @@
 #' ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
 #'      ryy = ryyi, correct_rr_y = FALSE,
 #'      construct_y = construct, data = data_d_meas_multi)
-#' }
-ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
+ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  treat_as_d = TRUE, ma_method = "bb", ad_type = "tsa", correction_method = "auto",
                  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
                  construct_y = NULL, measure_y = NULL, construct_order = NULL,
@@ -215,7 +212,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  pairwise_ads = FALSE, residual_ads = TRUE,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5, partial_intercor = FALSE,
                  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod",
-                 decimals = 2, hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL, data = NULL, ...){
+                 decimals = 2, hs_override = FALSE, use_all_arts = FALSE, estimate_pa = FALSE, supplemental_ads = NULL, data = NULL, ...){
 
      ##### Get inputs #####
      call <- match.call()
@@ -293,6 +290,9 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 
           if(deparse(substitute(sample_id))[1] != "NULL")
                sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
+
+          if(deparse(substitute(citekey))[1] != "NULL")
+               citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
@@ -455,7 +455,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      pa[is.na(pa)] <- pi[is.na(pa)]
 
      ## Compute meta-analysis
-     out <- ma_r(ma_method = ma_method, ad_type = ad_type, correction_method = correction_method,
+     out <- ma_r(ma_method = ma_method, ad_type = ad_type, correction_method = correction_method, citekey = citekey,
                  rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
                  construct_x = group_id, construct_y = construct_y,
                  measure_x = NULL, measure_y = measure_y,
@@ -479,7 +479,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                  ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
                  use_as_x = group_order, use_as_y = construct_order,
                  es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa,
-                 partial_intercor = partial_intercor)
+                 partial_intercor = partial_intercor, estimate_pa = estimate_pa)
 
      out$call_history <- append(list(call), out$call_history)
      if(ma_method != "bb"){

@@ -44,7 +44,7 @@ sensitivity_leave1out(ma_obj, ...)
 \value{
 An updated meta-analysis object with sensitivity analyses added.
 \itemize{
-\item When bootstrapping is performed, the \code{bootstrap} section of the \code{follow_up_analyses} section of the updated \code{ma_obj} returned by this function will contain both a matrix summarizing the mean, variance, and confidence intervals of the boostrapped samples and a table of meta-analytic results from all bootstrapped samples.
+\item When bootstrapping is performed, the \code{bootstrap} section of the \code{follow_up_analyses} section of the updated \code{ma_obj} returned by this function will contain both a matrix summarizing the mean, variance, and confidence intervals of the bootstrapped samples and a table of meta-analytic results from all bootstrapped samples.
 \item When leave-one-out analyses are performed, the \code{ma_obj} will acquire a list of leave-one-out results in its \code{follow_up_analyses} section that contains a table of all leave-one-out meta-analyses along with plots of the mean and residual variance of the effect sizes in the meta-analyses.
 \item When cumulative meta-analysis is performed, the \code{ma_obj} will acquire a list of cumulative meta-analysis results in its \code{follow_up_analyses} section that contains a table of all meta-analyses computed along with plots of the mean and residual variance of the effect sizes in the meta-analyses, sorted by the order in which studies were added to the meta-analysis.
 }

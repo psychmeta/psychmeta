@@ -1,3 +1,104 @@
+#' Estimate covariance matrices and mean vectors containing product terms
+#'
+#' @param sigma_mat Covariance parameter matrix.
+#' @param mu_vec Mean parameter matrix.
+#' @param prod_list List of 2-element vectors containing the names of variables in \code{sigma_mat}.
+#'
+#' @return Augmented covariance matrix and mean vector containing product terms.
+#' @export
+#'
+#' @keywords internal
+#'
+#' @examples
+#' ## Establish mean and covariance parameters
+#' mu_vec <- 1:4
+#' sigma_mat <- reshape_vec2mat(c(.1, .2, .3, .4, .5, .6), var_names = LETTERS[1:4])
+#' names(mu_vec) <- colnames(sigma_mat)
+#'
+#' ## Define a list of variables to be used in estimating products:
+#' prod_list <- list(c("A", "B"),
+#'                   c("A", "C"),
+#'                   c("A", "D"),
+#'                   c("B", "C"),
+#'                   c("B", "D"),
+#'                   c("C", "D"))
+#'
+#' ## Generate data for the purposes of comparison:
+#' set.seed(1)
+#' dat <- data.frame(MASS::mvrnorm(100000, mu = mu_vec, Sigma = sigma_mat, empirical = TRUE))
+#'
+#' ## Create product terms in simulated data:
+#' for(i in 1:length(prod_list))
+#'      dat[,paste(prod_list[[i]], collapse = "_x_")] <-
+#'      dat[,prod_list[[i]][1]] * dat[,prod_list[[i]][2]]
+#'
+#' ## Analytically estimate product variables and compare to simulated data:
+#' estimate_matrix_prods(sigma_mat = sigma_mat, mu_vec = mu_vec, prod_list = prod_list)
+#' round(cov(dat), 2)
+#' round(apply(dat, 2, mean), 2)
+estimate_matrix_prods <- function(sigma_mat, mu_vec, prod_list){
+
+     if(!is.matrix(sigma_mat)) stop("sigma_mat must be a matrix", call. = FALSE)
+     if(!is.numeric(sigma_mat)) stop("sigma_mat must be numeric", call. = FALSE)
+     if(nrow(sigma_mat) != ncol(sigma_mat)) stop("sigma_mat must be square", call. = FALSE)
+     if(!all(sigma_mat == t(sigma_mat))) stop("sigma_mat must be symmetric", call. = FALSE)
+
+     if(!is.list(prod_list)) prod_list <- list(prod_list)
+     if(any(unlist(lapply(prod_list, length)) != 2))
+          stop("Vectors within 'prod_list' may only contain two variables", call. = FALSE)
+
+     if(any(!(unlist(prod_list) %in% colnames(sigma_mat))))
+          stop("All vectors in 'prod_list' must contain variables represented in 'sigma_mat'", call. = FALSE)
+
+     prod_mu <- NULL
+     prod_names <- unlist(lapply(prod_list, paste, collapse = "_x_"))
+     prod_covs <- matrix(NA, length(prod_list), nrow(sigma_mat))
+     prod_vars <- matrix(NA, length(prod_list), length(prod_list))
+     dimnames(prod_covs) <- list(prod_names, colnames(sigma_mat))
+     dimnames(prod_vars) <- list(prod_names, prod_names)
+
+     for(i in 1:length(prod_list)){
+          prodi <- prod_list[[i]]
+          prod_mu[i] <- estimate_mean_prod(mu_x = mu_vec[prodi[1]],
+                                           mu_y = mu_vec[prodi[2]],
+                                           cov_xy = sigma_mat[prodi[1],prodi[2]])
+
+          for(j in 1:length(prod_list)){
+               prodj <- prod_list[[j]]
+               prod_vars[i,j] <- estimate_cov_prods(mu_x = mu_vec[prodi[1]],
+                                                    mu_y = mu_vec[prodi[2]],
+
+                                                    mu_u = mu_vec[prodj[1]],
+                                                    mu_v = mu_vec[prodj[2]],
+
+                                                    cov_xu = sigma_mat[prodi[1], prodj[1]],
+                                                    cov_xv = sigma_mat[prodi[1], prodj[2]],
+                                                    cov_yu = sigma_mat[prodi[2], prodj[1]],
+                                                    cov_yv = sigma_mat[prodi[2], prodj[2]])
+          }
+
+          for(j in 1:ncol(sigma_mat)){
+               prod_covs[i,j] <- estimate_cov_prods(mu_x = mu_vec[prodi[1]],
+                                                    mu_y = mu_vec[prodi[2]],
+
+                                                    mu_u = mu_vec[j],
+                                                    mu_v = 1,
+
+                                                    cov_xu = sigma_mat[prodi[1], j],
+                                                    cov_xv = 0,
+                                                    cov_yu = sigma_mat[prodi[2], j],
+                                                    cov_yv = 0)
+          }
+     }
+
+     names(prod_mu) <- colnames(prod_vars)
+     sigma <- cbind(rbind(sigma_mat, prod_covs), rbind(t(prod_covs), prod_vars))
+     list(sigma = (sigma + t(sigma)) / 2,
+          mu = c(mu_vec, prod_mu))
+}
+
+
+
 #' @name estimate_prod
 #' @rdname estimate_prod
 #'

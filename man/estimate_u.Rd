@@ -27,7 +27,7 @@ estimate_u(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL,
 
 \item{meani}{Vector of sample means.}
 
-\item{sr}{Vector of selection ratios (used only when no other usuable u-ratio inputs are available).}
+\item{sr}{Vector of selection ratios (used only when no other useable u-ratio inputs are available).}
 
 \item{rxya_est}{Vector of estimated unrestricted correlations between the selection mechanism and the variable of interest (used only when \code{sr} is used).}
 

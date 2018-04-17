@@ -15,7 +15,7 @@ The data set must contain a criterion variable, at least one predictor variable,
 
 \item{group}{Name or column-index number of the variable that identifies group membership in the data set.}
 
-\item{predictors}{Name(s) or column-index number(s) of the the predictor variable(s) in the data set. No predictor can be a factor-type variable.
+\item{predictors}{Name(s) or column-index number(s) of the predictor variable(s) in the data set. No predictor can be a factor-type variable.
 If multiple predictors are specified, they will be combined into a regression-weighted composite that will be carried forward to compute \eqn{d_{Mod}}{d_Mod} effect sizes.
 \itemize{
   \item {\emph{Note}: If weights other than regression weights should be used to combine the predictors into a composite, the user must manually compute such a composite,
@@ -36,11 +36,11 @@ If multiple predictors are specified, they will be combined into a regression-we
 
 \item{bootstrap}{Logical argument that indicates whether \eqn{d_{Mod}}{d_Mod} should be bootstrapped (\code{TRUE}; default) or not (\code{FALSE}).}
 
-\item{boot_iter}{Number of bootstrap interations to compute (default = \code{1000}).}
+\item{boot_iter}{Number of bootstrap iterations to compute (default = \code{1000}).}
 
-\item{stratify}{Logical argument that indicates whether the random bootstrap sampling should be stratified (\code{TRUE}) or unstratefied (\code{FALSE}; default).}
+\item{stratify}{Logical argument that indicates whether the random bootstrap sampling should be stratified (\code{TRUE}) or unstratified (\code{FALSE}; default).}
 
-\item{empirical_ci}{Logical argument that indicates whether the bootrapped confidence invervals should be computed from the observed empirical distributions (\code{TRUE}) or computed using
+\item{empirical_ci}{Logical argument that indicates whether the bootstrapped confidence invervals should be computed from the observed empirical distributions (\code{TRUE}) or computed using
 bootstrapped means and standard errors via the normal-theory approach (\code{FALSE}).}
 
 \item{cross_validate_wts}{Only relevant when multiple predictors are specified and bootstrapping is performed.

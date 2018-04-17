@@ -60,7 +60,7 @@ mix_dist <- function(mean_vec, var_vec, n_vec, unbiased = TRUE){
 #' @param dy Standardized mean difference between groups on Y.
 #' @param p Proportion of cases in one of the two groups.
 #'
-#' @return A vector of two-group mixture correlationa
+#' @return A vector of two-group mixture correlations
 #' @export
 #'
 #' @details
@@ -88,6 +88,11 @@ mix_r_2group <- function(rxy, dx, dy, p = .5){
 #'
 #' @return A vector of average within-group correlations
 #' @export
+#'
+#' @references
+#' Oswald, F. L., Converse, P. D., & Putka, D. J. (2014). Generating race, gender and other
+#' subgroup data in personnel selection simulations: A pervasive issue with a simple
+#' solution. \emph{International Journal of Selection and Assessment, 22}(3), 310-320.
 #'
 #' @details
 #' The mixture correlation for two groups is estimated as:

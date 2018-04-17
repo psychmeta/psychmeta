@@ -135,7 +135,7 @@ estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux, var_ux = 0,
 }
 \description{
 Taylor series approximations to estimate the variances of artifacts that have been estimated from other artifacts.
-These functions are implemented internally in the \code{\link{create_ad}} and related functions, but are useful as general tools for manipulating artifact distributions.
+These functions are implemented internally in the \code{\link{create_ad}} function and related functions, but are useful as general tools for manipulating artifact distributions.
 
 Available functions include:
 \itemize{

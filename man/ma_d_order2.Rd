@@ -4,14 +4,18 @@
 \alias{ma_d_order2}
 \title{Second-order meta-analysis function for \emph{d} values}
 \usage{
-ma_d_order2(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL,
-  k = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
-  moderators = NULL, moderator_type = "simple", construct_x = NULL,
-  construct_y = NULL, conf_level = 0.95, cred_level = 0.8,
-  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-  hs_override = FALSE, data = NULL)
+ma_d_order2(k, N = NULL, d = NULL, delta = NULL, var_d = NULL,
+  var_d_c = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
+  citekey = NULL, moderators = NULL, moderator_type = "simple",
+  construct_x = NULL, construct_y = NULL, conf_level = 0.95,
+  cred_level = 0.8, conf_method = "t", cred_method = "t",
+  var_unbiased = TRUE, hs_override = FALSE, data = NULL)
 }
 \arguments{
+\item{k}{Vector or column name of meta-analyses' k values.}
+
+\item{N}{Vector or column name of meta-analyses' total sample sizes (optional).}
+
 \item{d}{Vector or column name of mean observed \emph{d} values.}
 
 \item{delta}{Vector or column name of mean corrected \emph{d} values.}
@@ -20,11 +24,11 @@ ma_d_order2(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL,
 
 \item{var_d_c}{Vector or column name of observed variances of corrected \emph{d} values.}
 
-\item{k}{Vector or column name of meta-analyses' k values.}
-
 \item{ma_type}{Type of meta-analyses being analyzed: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).}
 
 \item{sample_id}{Vector or column name of study ID labels.}
+
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").}
 
 \item{moderators}{Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).}
 

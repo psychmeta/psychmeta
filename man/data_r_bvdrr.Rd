@@ -3,14 +3,14 @@
 \docType{data}
 \name{data_r_bvdrr}
 \alias{data_r_bvdrr}
-\title{Hypothetical dataset simulated to statisfy the assumptions of the bivariate correction for direct range restriction}
+\title{Hypothetical dataset simulated to satisfy the assumptions of the bivariate correction for direct range restriction}
 \format{data.frame}
 \usage{
 data(data_r_bvdrr)
 }
 \description{
 Data set for use in example meta-analyses of bivariate direct range restriction.
-Note that the BVDRR correction is only an approximation of the approproate range-restriction correction and tends to have a noticeable positive bias when applied in meta-analyses.
+Note that the BVDRR correction is only an approximation of the appropriate range-restriction correction and tends to have a noticeable positive bias when applied in meta-analyses.
 }
 \examples{
 data(data_r_bvdrr)

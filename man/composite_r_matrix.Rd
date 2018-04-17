@@ -32,10 +32,10 @@ This is computed as:
 where \eqn{\rho_{XY}}{r_composite} is the composite correlation, \eqn{\mathbf{w}}{wt} is a vector of weights, and \eqn{\mathbf{R}}{R} is a correlation matrix. The subscripts of \eqn{\mathbf{w}}{wt} and \eqn{\mathbf{R}}{R} indicate the variables indexed within the vector or matrix.
 }
 \examples{
-r_mat <- matrix(.4, 3, 3)
-r_mat[,1] <- r_mat[1,] <- .3
-diag(r_mat) <- 1
-composite_r_matrix(r_mat = r_mat, x_col = 2:3, y_col = 1)
+composite_r_scalar(mean_rxy = .3, k_vars_x = 4, mean_intercor_x = .4)
+R <- reshape_vec2mat(.4, order = 5)
+R[-1,1] <- R[1,-1] <- .3
+composite_r_matrix(r_mat = R, x_col = 2:5, y_col = 1)
 }
 \references{
 Mulaik, S. A. (2010). \emph{Foundations of factor analysis}.

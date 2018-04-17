@@ -27,5 +27,5 @@ See "Details" of \code{\link{composite_r_matrix}} for the composite computations
 }
 \examples{
 composite_d_matrix(d_vec = c(1, 1), r_mat = matrix(c(1, .7, .7, 1), 2, 2),
-wt_vec = c(1, 1), p = .5)
+                   wt_vec = c(1, 1), p = .5)
 }

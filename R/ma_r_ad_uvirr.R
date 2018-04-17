@@ -38,7 +38,6 @@
      mean_rxyi <- barebones[,"mean_r"]
      var_r <- barebones[,"var_r"]
      var_e <- barebones[,"var_e"]
-     var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
      se_r <- barebones[,"se_r"]
 
@@ -77,14 +76,14 @@
      mean_rtpa <- .correct_r_uvirr(rxyi = mean_rxyi, qxi = .mean_qxi, qyi = .mean_qyi, ut = .mean_ut)
      ci_tp <- .correct_r_uvirr(rxyi = ci_xy_i, qxi = .mean_qxi, qyi = .mean_qyi, ut = .mean_ut)
 
-     var_art_tp <- apply(t(mean_rtpa), 2, function(x){
+     var_art <- apply(t(mean_rtpa), 2, function(x){
           wt_var(x = .attenuate_r_uvirr(rtpa = x, qxi = .qxi, qyi = .qyi, ut = .ut), wt = wt_vec, unbiased = var_unbiased)
      })
-     var_pre_tp <- var_e + var_art_tp
-     var_res_tp <- var_r - var_pre_tp
-     var_rho_tp <-  estimate_var_rho_int_uvirr(mean_rxyi = mean_rxyi, mean_rtpa = mean_rtpa,
-                                               mean_qxi = .mean_qxi, mean_qyi = .mean_qyi,
-                                               mean_ut = .mean_ut, var_res = var_res_tp)
+     var_pre <- var_e + var_art
+     var_res <- var_r - var_pre
+     var_rho_tp <- estimate_var_rho_int_uvirr(mean_rxyi = mean_rxyi, mean_rtpa = mean_rtpa,
+                                              mean_qxi = .mean_qxi, mean_qyi = .mean_qyi,
+                                              mean_ut = .mean_ut, var_res = var_res)
 
 
      .mean_rxpa <- mean_rtpa * .mean_qxa
@@ -100,10 +99,40 @@
      sd_r <- var_r^.5
      sd_e <- var_e^.5
 
-     sd_art_tp <- var_art_tp^.5
-     sd_pre_tp <- var_pre_tp^.5
-     sd_res_tp <- var_res_tp^.5
+     sd_art <- var_art^.5
+     sd_pre <- var_pre^.5
+     sd_res <- var_res^.5
      sd_rho_tp <- var_rho_tp^.5
+
+     ## New variances
+     var_r_tp <- estimate_var_rho_int_uvirr(mean_rxyi = mean_rxyi, mean_rtpa = mean_rtpa,
+                                            mean_qxi = .mean_qxi, mean_qyi = .mean_qyi,
+                                            mean_ut = .mean_ut, var_res = var_r)
+     var_e_tp <- estimate_var_rho_int_uvirr(mean_rxyi = mean_rxyi, mean_rtpa = mean_rtpa,
+                                            mean_qxi = .mean_qxi, mean_qyi = .mean_qyi,
+                                            mean_ut = .mean_ut, var_res = var_e)
+     var_art_tp <- estimate_var_rho_int_uvirr(mean_rxyi = mean_rxyi, mean_rtpa = mean_rtpa,
+                                            mean_qxi = .mean_qxi, mean_qyi = .mean_qyi,
+                                            mean_ut = .mean_ut, var_res = var_art)
+     var_pre_tp <- estimate_var_rho_int_uvirr(mean_rxyi = mean_rxyi, mean_rtpa = mean_rtpa,
+                                            mean_qxi = .mean_qxi, mean_qyi = .mean_qyi,
+                                            mean_ut = .mean_ut, var_res = var_pre)
+     se_r_tp <- estimate_var_rho_int_uvirr(mean_rxyi = mean_rxyi, mean_rtpa = mean_rtpa,
+                                           mean_qxi = .mean_qxi, mean_qyi = .mean_qyi,
+                                           mean_ut = .mean_ut, var_res = se_r^2)^.5
+
+     .var_r_xp <- var_r_tp * .mean_qxa^2
+     .var_e_xp <- var_e_tp * .mean_qxa^2
+     .var_art_xp <- var_art_tp * .mean_qxa^2
+     .var_pre_xp <- var_pre_tp * .mean_qxa^2
+     .se_r_xp <- se_r_tp * .mean_qxa
+
+     .var_r_ty <- var_r_tp * .mean_qya^2
+     .var_e_ty <- var_e_tp * .mean_qya^2
+     .var_art_ty <- var_art_tp * .mean_qya^2
+     .var_pre_ty <- var_pre_tp * .mean_qya^2
+     .se_r_ty <- se_r_tp * .mean_qya
+     ##
 
      if(flip_xy){
           correct_meas_x <- .mean_qxa != 1
@@ -117,6 +146,18 @@
           mean_rtya <- .mean_rxpa
           ci_ty <- .ci_xp
           var_rho_ty <- .var_rho_xp
+
+          var_r_xp <- .var_r_ty
+          var_e_xp <- .var_e_ty
+          var_art_xp <- .var_art_ty
+          var_pre_xp <- .var_pre_ty
+          se_r_xp <- .se_r_ty
+
+          var_r_ty <- .var_r_xp
+          var_e_ty <- .var_e_xp
+          var_art_ty <- .var_art_xp
+          var_pre_ty <- .var_pre_xp
+          se_r_ty <- .se_r_xp
      }else{
           correct_meas_y <- .mean_qxa != 1
           correct_meas_x <- .mean_qyi != 1
@@ -129,10 +170,38 @@
           mean_rtya <- .mean_rtya
           ci_ty <- .ci_ty
           var_rho_ty <- .var_rho_ty
+
+          var_r_xp <- .var_r_xp
+          var_e_xp <- .var_e_xp
+          var_art_xp <- .var_art_xp
+          var_pre_xp <- .var_pre_xp
+          se_r_xp <- .se_r_xp
+
+          var_r_ty <- .var_r_ty
+          var_e_ty <- .var_e_ty
+          var_art_ty <- .var_art_ty
+          var_pre_ty <- .var_pre_ty
+          se_r_ty <- .se_r_ty
      }
 
      sd_rho_xp <- var_rho_xp^.5
      sd_rho_ty <- var_rho_ty^.5
+
+     sd_r_tp <- var_r_tp^.5
+     sd_r_xp <- var_r_xp^.5
+     sd_r_ty <- var_r_ty^.5
+
+     sd_e_tp <- var_e_tp^.5
+     sd_e_xp <- var_e_xp^.5
+     sd_e_ty <- var_e_ty^.5
+
+     sd_art_tp <- var_art_tp^.5
+     sd_art_xp <- var_art_xp^.5
+     sd_art_ty <- var_art_ty^.5
+
+     sd_pre_tp <- var_pre_tp^.5
+     sd_pre_xp <- var_pre_xp^.5
+     sd_pre_ty <- var_pre_ty^.5
 
      out <- as.list(environment())
      class(out) <- class(x)
@@ -172,7 +241,6 @@
      mean_rxyi <- barebones[,"mean_r"]
      var_r <- barebones[,"var_r"]
      var_e <- barebones[,"var_e"]
-     var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
      se_r <- barebones[,"se_r"]
 
@@ -220,9 +288,9 @@
                                               mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi,
                                               var_ut = .var_ut, var_qxa = .var_qxa, var_qyi = .var_qyi, show_variance_warnings = FALSE)
 
-     var_art_tp <- var_mat_tp$var_art
-     var_pre_tp <- var_mat_tp$var_pre
-     var_res_tp <- var_mat_tp$var_res
+     var_art <- var_mat_tp$var_art
+     var_pre <- var_mat_tp$var_pre
+     var_res <- var_mat_tp$var_res
      var_rho_tp <- var_mat_tp$var_rho
 
      .mean_rxpa <- mean_rtpa * .mean_qxa
@@ -237,10 +305,35 @@
      sd_r <- var_r^.5
      sd_e <- var_e^.5
 
-     sd_art_tp <- var_art_tp^.5
-     sd_pre_tp <- var_pre_tp^.5
-     sd_res_tp <- var_res_tp^.5
+     sd_art <- var_art^.5
+     sd_pre <- var_pre^.5
+     sd_res <- var_res^.5
      sd_rho_tp <- var_rho_tp^.5
+
+     ## New variances
+     var_r_tp <- estimate_var_tsa_uvirr(mean_rtpa = mean_rtpa, var = var_r,
+                                        mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi)
+     var_e_tp <- estimate_var_tsa_uvirr(mean_rtpa = mean_rtpa, var = var_e,
+                                        mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi)
+     var_art_tp <- estimate_var_tsa_uvirr(mean_rtpa = mean_rtpa, var = var_art,
+                                        mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi)
+     var_pre_tp <- estimate_var_tsa_uvirr(mean_rtpa = mean_rtpa, var = var_pre,
+                                        mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi)
+     se_r_tp <- estimate_var_tsa_uvirr(mean_rtpa = mean_rtpa, var = se_r^2,
+                                       mean_ut = .mean_ut, mean_qxa = .mean_qxa, mean_qyi = .mean_qyi)^.5
+
+     .var_r_xp <- var_r_tp * .mean_qxa^2
+     .var_e_xp <- var_e_tp * .mean_qxa^2
+     .var_art_xp <- var_art_tp * .mean_qxa^2
+     .var_pre_xp <- var_pre_tp * .mean_qxa^2
+     .se_r_xp <- se_r_tp * .mean_qxa
+
+     .var_r_ty <- var_r_tp * .mean_qya^2
+     .var_e_ty <- var_e_tp * .mean_qya^2
+     .var_art_ty <- var_art_tp * .mean_qya^2
+     .var_pre_ty <- var_pre_tp * .mean_qya^2
+     .se_r_ty <- se_r_tp * .mean_qya
+     ##
 
      if(flip_xy){
           correct_meas_x <- zapsmall(.mean_qxa) != 1
@@ -251,10 +344,21 @@
           ci_xp <- .ci_ty
           var_rho_xp <- .var_rho_ty
 
-
           mean_rtya <- .mean_rxpa
           ci_ty <- .ci_xp
           var_rho_ty <- .var_rho_xp
+
+          var_r_xp <- .var_r_ty
+          var_e_xp <- .var_e_ty
+          var_art_xp <- .var_art_ty
+          var_pre_xp <- .var_pre_ty
+          se_r_xp <- .se_r_ty
+
+          var_r_ty <- .var_r_xp
+          var_e_ty <- .var_e_xp
+          var_art_ty <- .var_art_xp
+          var_pre_ty <- .var_pre_xp
+          se_r_ty <- .se_r_xp
      }else{
           correct_meas_y <- zapsmall(.mean_qxa) != 1
           correct_meas_x <- zapsmall(.mean_qyi) != 1
@@ -264,14 +368,41 @@
           ci_xp <- .ci_xp
           var_rho_xp <- .var_rho_xp
 
-
           mean_rtya <- .mean_rtya
           ci_ty <- .ci_ty
           var_rho_ty <- .var_rho_ty
+
+          var_r_xp <- .var_r_xp
+          var_e_xp <- .var_e_xp
+          var_art_xp <- .var_art_xp
+          var_pre_xp <- .var_pre_xp
+          se_r_xp <- .se_r_xp
+
+          var_r_ty <- .var_r_ty
+          var_e_ty <- .var_e_ty
+          var_art_ty <- .var_art_ty
+          var_pre_ty <- .var_pre_ty
+          se_r_ty <- .se_r_ty
      }
 
      sd_rho_xp <- var_rho_xp^.5
      sd_rho_ty <- var_rho_ty^.5
+
+     sd_r_tp <- var_r_tp^.5
+     sd_r_xp <- var_r_xp^.5
+     sd_r_ty <- var_r_ty^.5
+
+     sd_e_tp <- var_e_tp^.5
+     sd_e_xp <- var_e_xp^.5
+     sd_e_ty <- var_e_ty^.5
+
+     sd_art_tp <- var_art_tp^.5
+     sd_art_xp <- var_art_xp^.5
+     sd_art_ty <- var_art_ty^.5
+
+     sd_pre_tp <- var_pre_tp^.5
+     sd_pre_xp <- var_pre_xp^.5
+     sd_pre_ty <- var_pre_ty^.5
 
      out <- as.list(environment())
      class(out) <- class(x)

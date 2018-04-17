@@ -33,3 +33,8 @@ where \eqn{\rho_{xy_{WG}}}{r_wg} is the average within-group correlation, \eqn{\
 \examples{
 unmix_r_2group(rxy = .5, dx = 1, dy = 1, p = .5)
 }
+\references{
+Oswald, F. L., Converse, P. D., & Putka, D. J. (2014). Generating race, gender and other
+subgroup data in personnel selection simulations: A pervasive issue with a simple
+solution. \emph{International Journal of Selection and Assessment, 22}(3), 310-320.
+}

@@ -3,7 +3,7 @@
 \docType{data}
 \name{data_r_meas}
 \alias{data_r_meas}
-\title{Hypothetical dataset simulated to statisfy the assumptions of the correction for measurement error only}
+\title{Hypothetical dataset simulated to satisfy the assumptions of the correction for measurement error only}
 \format{data.frame}
 \usage{
 data(data_r_meas)

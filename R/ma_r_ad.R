@@ -12,7 +12,7 @@
 #' @param correction_method One of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-#' be used when interative artifact distributions are provided). See "Details" for descriptions of the available methods.
+#' be used when interactive artifact distributions are provided). See "Details" for descriptions of the available methods.
 #' @param use_ic_ads Determines whether artifact distributions should be extracted from the individual correction results in \code{ma_obj}.
 #' Only evaluated when \code{ad_obj_x} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
 #' Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.
@@ -63,9 +63,9 @@
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
 #' \emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2017).
-#' \emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-#' Unpublished manuscript.
+#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+#' Accounting for indirect range restriction in organizational and psychological research}.
+#' Manuscript submitted for review.
 #'
 #' Raju, N. S., & Burke, M. J. (1983).
 #' Two new procedures for studying validity generalization.
@@ -236,36 +236,52 @@ gather_ma_ad <- function(x){
      if(length(meas_correction) == 2) meas_correction <- paste(meas_correction, collapse = " & ")
      if(x$correct_meas_x | x$correct_meas_y) meas_correction <- paste("Corrected for measurement error in", meas_correction)
 
-     x$sd_res_tp[x$k == 1] <-
-          x$var_res_tp[x$k == 1] <-
+     x$sd_res[x$k == 1] <- x$var_res[x$k == 1] <-
+
+          x$sd_art_tp[x$k == 1] <- x$sd_art_xp[x$k == 1] <- x$sd_art_ty[x$k == 1] <-
+          x$var_art_tp[x$k == 1] <- x$var_art_xp[x$k == 1] <- x$var_art_ty[x$k == 1] <-
+
+          x$sd_pre_tp[x$k == 1] <- x$sd_pre_xp[x$k == 1] <- x$sd_pre_ty[x$k == 1] <-
+          x$var_pre_tp[x$k == 1] <- x$var_pre_xp[x$k == 1] <- x$var_pre_ty[x$k == 1] <-
+
+          x$sd_res_tp[x$k == 1] <- x$sd_res_xp[x$k == 1] <- x$sd_res_ty[x$k == 1] <-
+          x$var_res_tp[x$k == 1] <- x$var_res_xp[x$k == 1] <- x$var_res_ty[x$k == 1] <-
+
           x$sd_rho_tp[x$k == 1] <- x$sd_rho_xp[x$k == 1] <- x$sd_rho_ty[x$k == 1] <-
           x$var_rho_tp[x$k == 1] <- x$var_rho_xp[x$k == 1] <- x$var_rho_ty[x$k == 1] <- NA
 
-     x$sd_art_tp[is.na(x$sd_art_tp) & x$k > 1] <-
-          x$sd_pre_tp[is.na(x$sd_pre_tp) & x$k > 1] <-
-          x$sd_res_tp[is.na(x$sd_res_tp) & x$k > 1] <-
+     x$sd_art[is.na(x$sd_art) & x$k > 1] <-
+          x$sd_pre[is.na(x$sd_pre) & x$k > 1] <-
+          x$sd_res[is.na(x$sd_res) & x$k > 1] <-
           x$sd_rho_tp[is.na(x$sd_rho_tp) & x$k > 1] <- x$sd_rho_xp[is.na(x$sd_rho_xp) & x$k > 1] <- x$sd_rho_ty[is.na(x$sd_rho_ty) & x$k > 1] <- 0
 
      cv_tp <- credibility(mean = x$mean_rtpa, sd = x$sd_rho_tp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
      cv_xp <- credibility(mean = x$mean_rxpa, sd = x$sd_rho_xp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
      cv_ty <- credibility(mean = x$mean_rtya, sd = x$sd_rho_ty, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
 
-     true_score <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxy,
-                         var_r = x$var_r, var_e = x$var_e, var_art = x$var_art_tp, var_pre = x$var_pre_tp, var_res = x$var_res_tp,
-                         sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
-                         mean_rho = x$mean_rtpa, var_rho = x$var_rho_tp, sd_rho = x$sd_rho_tp,
+     true_score <- cbind(k = x$k, N = x$N,
+                         mean_r = x$mean_rxy,
+                         var_r = x$var_r, var_e = x$var_e, var_art = x$var_art, var_pre = x$var_pre, var_res = x$var_res,
+                         sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art, sd_pre = x$sd_pre, sd_res = x$sd_res,
+                         mean_rho = x$mean_rtpa,
+                         var_r_c = x$var_r_tp, var_e_c = x$var_e_tp, var_art_c = x$var_art_tp, var_pre_c = x$var_pre_tp, var_rho = x$var_rho_tp,
+                         sd_r_c = x$sd_r_tp, se_r_c = x$se_r_tp, sd_e_c = x$sd_e_tp, sd_art_c = x$sd_art_tp, sd_pre_c = x$sd_pre_tp, sd_rho = x$sd_rho_tp,
                          x$ci_tp, cv_tp)
 
      validity_generalization_x <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxyi,
-                                        var_r = x$var_r, var_e = x$var_e, var_art = x$var_art_tp, var_pre = x$var_pre_tp, var_res = x$var_res_tp,
-                                        sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
-                                        mean_rho = x$mean_rxpa, var_rho = x$var_rho_xp, sd_rho = x$sd_rho_xp,
+                                        var_r = x$var_r, var_e = x$var_e, var_art = x$var_art, var_pre = x$var_pre, var_res = x$var_res,
+                                        sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art, sd_pre = x$sd_pre, sd_res = x$sd_res,
+                                        mean_rho = x$mean_rxpa,
+                                        var_r_c = x$var_r_xp, var_e_c = x$var_e_xp, var_art_c = x$var_art_xp, var_pre_c = x$var_pre_xp, var_rho = x$var_rho_xp,
+                                        sd_r_c = x$sd_r_xp, se_r_c = x$se_r_xp, sd_e_c = x$sd_e_xp, sd_art_c = x$sd_art_xp, sd_pre_c = x$sd_pre_xp, sd_rho = x$sd_rho_xp,
                                         x$ci_xp, cv_xp)
 
      validity_generalization_y <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxyi,
-                                        var_r = x$var_r, var_e = x$var_e, var_art = x$var_art_tp, var_pre = x$var_pre_tp, var_res = x$var_res_tp,
-                                        sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art_tp, sd_pre = x$sd_pre_tp, sd_res = x$sd_res_tp,
-                                        mean_rho = x$mean_rtya, var_rho = x$var_rho_ty, sd_rho = x$sd_rho_ty,
+                                        var_r = x$var_r, var_e = x$var_e, var_art = x$var_art, var_pre = x$var_pre, var_res = x$var_res,
+                                        sd_r = x$sd_r, se_r = x$se_r, sd_e = x$sd_e, sd_art = x$sd_art, sd_pre = x$sd_pre, sd_res = x$sd_res,
+                                        mean_rho = x$mean_rtya,
+                                        var_r_c = x$var_r_ty, var_e_c = x$var_e_ty, var_art_c = x$var_art_ty, var_pre_c = x$var_pre_ty, var_rho = x$var_rho_ty,
+                                        sd_r_c = x$sd_r_ty, se_r_c = x$se_r_ty, sd_e_c = x$sd_e_ty, sd_art_c = x$sd_art_ty, sd_pre_c = x$sd_pre_ty, sd_rho = x$sd_rho_ty,
                                         x$ci_ty, cv_ty)
 
      barebones <- x$barebones
@@ -646,7 +662,7 @@ gather_ma_ad <- function(x){
           }
 
           if(!matching_ads)
-               stop("'ad_obj_x' and 'ad_obj_y' are not of the same class: Both must be either interative or TSA artifact distributions", call. = FALSE)
+               stop("'ad_obj_x' and 'ad_obj_y' are not of the same class: Both must be either interactive or TSA artifact distributions", call. = FALSE)
 
           if(matching_ads_int & (correction_method == "rb1" | correction_method == "rb2")){
                correction_method <- "rb"
@@ -719,10 +735,46 @@ gather_ma_ad <- function(x){
      .ma_r_ad_internal <- function(x) UseMethod(generic = "ma_r_ad", object = x)
      out <- gather_ma_ad(.ma_r_ad_internal(x = ma_ad_dump))
 
+     out_ts <- out$true_score[,-1]
+     out_vgx <- out$validity_generalization_x[,-1]
+     out_vgy <- out$validity_generalization_y[,-1]
+
+     if(!is.null(ma_arg_list$convert_ma)){
+          if(ma_arg_list$convert_ma){
+               out_bb <- .convert_ma(ma_table = out_bb,
+                                     p_vec = rep(ma_arg_list$p_bb, nrow(out_bb)),
+                                     conf_level = ma_arg_list$conf_level,
+                                     cred_level = ma_arg_list$cred_level,
+                                     conf_method = ma_arg_list$conf_method,
+                                     cred_method = ma_arg_list$cred_method)
+
+               out_ts <- .convert_ma(ma_table = out_ts,
+                                     p_vec = rep(ma_arg_list$p_ts, nrow(out_ts)),
+                                     conf_level = ma_arg_list$conf_level,
+                                     cred_level = ma_arg_list$cred_level,
+                                     conf_method = ma_arg_list$conf_method,
+                                     cred_method = ma_arg_list$cred_method)
+
+               out_vgx <- .convert_ma(ma_table = out_vgx,
+                                      p_vec = rep(ma_arg_list$p_vgx, nrow(out_vgx)),
+                                      conf_level = ma_arg_list$conf_level,
+                                      cred_level = ma_arg_list$cred_level,
+                                      conf_method = ma_arg_list$conf_method,
+                                      cred_method = ma_arg_list$cred_method)
+
+               out_vgy <- .convert_ma(ma_table = out_vgy,
+                                      p_vec = rep(ma_arg_list$p_vgy, nrow(out_vgy)),
+                                      conf_level = ma_arg_list$conf_level,
+                                      cred_level = ma_arg_list$cred_level,
+                                      conf_method = ma_arg_list$conf_method,
+                                      cred_method = ma_arg_list$cred_method)
+          }
+     }
+
      out <- cbind(out_bb,
-                  out$true_score[,-1],
-                  out$validity_generalization_x[,-1],
-                  out$validity_generalization_y[,-1])
+                  out_ts,
+                  out_vgx,
+                  out_vgy)
      unlist(out)
 }
 

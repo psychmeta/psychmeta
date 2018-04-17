@@ -46,12 +46,12 @@ var_error_r <- function(r, n, correct_bias = TRUE){
 #' @export
 #'
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2017).
-#' \emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-#' Unpublished manuscript.
+#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+#' Accounting for indirect range restriction in organizational and psychological research}.
+#' Manuscript submitted for review.
 #'
 #' @details
-#' The sampling variance of a u ratio is computed differently for independent samples (i.e., settings where the referent unrestricted standard deviations comes from an different sample than the range-restricted standard deviation) than for dependent samples (i.e., unrestricted samples from which a subset of individuals are selected to be in the incumbent sample).
+#' The sampling variance of a u ratio is computed differently for independent samples (i.e., settings where the referent unrestricted standard deviation comes from an different sample than the range-restricted standard deviation) than for dependent samples (i.e., unrestricted samples from which a subset of individuals are selected to be in the incumbent sample).
 #'
 #' The sampling variance for independent samples (the more common case) is:
 #'
@@ -111,7 +111,7 @@ var_error_rel <- function(rel, n){
 
 #' Estimate the error variance of square roots of reliability estimates
 #'
-#' @param q Vector of of square roots of reliability estimates.
+#' @param q Vector of square roots of reliability estimates.
 #' @param n Vector of sample sizes.
 #'
 #' @return A vector of sampling-error variances.
@@ -277,7 +277,7 @@ var_error_g <- function(g, n1, n2 = NA){
 
 #' Analytic estimate of the sampling variance of alpha
 #'
-#' @param item_mat Item intercorrelation/intercovariance matrix. If item_mat is not supplied, the user must supply both alpha and k_items.
+#' @param item_mat Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both alpha and k_items.
 #' If item_mat is NULL, the program will assume that all item intercorrelations are equal.
 #' @param alpha Vector of population alpha values. Must be supplied if item_mat is NULL.
 #' @param k_items Vector of numbers of items to be simulated. Must be supplied if item_mat is NULL.
@@ -333,7 +333,7 @@ var_error_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_cas
 
 #' Estimate the error variance of the probability-based effect size (A, AUC, the common language effect size [CLES])
 #'
-#' @param A Vector of probaility-based effect sizes (common language effect sizes)
+#' @param A Vector of probability-based effect sizes (common language effect sizes)
 #' @param n1 Vector of sample sizes from group 1 (or the total sample size with the assumption that groups are of equal size, if no group 2 sample size is supplied).
 #' @param n2 Vector of sample sizes from group 2.
 #'

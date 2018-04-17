@@ -4,11 +4,11 @@
 \alias{ma_generic}
 \title{Bare-bones meta-analysis of generic effect sizes}
 \usage{
-ma_generic(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
-  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
-  cred_method = "t", var_unbiased = TRUE, moderators = NULL,
-  cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE,
-  data = NULL, ...)
+ma_generic(es, n, var_e, sample_id = NULL, citekey = NULL,
+  wt_type = "sample_size", conf_level = 0.95, cred_level = 0.8,
+  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
+  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
+  hs_override = FALSE, data = NULL, ...)
 }
 \arguments{
 \item{es}{Vector or column name of observed effect sizes.}
@@ -17,7 +17,9 @@ ma_generic(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
 
 \item{var_e}{Vector or column name of error variances.}
 
-\item{sample_id}{Optional vector of identification labels for samples/studies in the meta-analysis.
+\item{sample_id}{Optional vector of identification labels for samples/studies in the meta-analysis.}
+
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.}
 
 \item{wt_type}{Type of weight to use in the meta-analysis: native options are "sample_size", and "inv_var" (inverse error variance).

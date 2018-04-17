@@ -23,7 +23,7 @@ A vector of sampling-error variances.
 Estimate the error variance of u ratios
 }
 \details{
-The sampling variance of a u ratio is computed differently for independent samples (i.e., settings where the referent unrestricted standard deviations comes from an different sample than the range-restricted standard deviation) than for dependent samples (i.e., unrestricted samples from which a subset of individuals are selected to be in the incumbent sample).
+The sampling variance of a u ratio is computed differently for independent samples (i.e., settings where the referent unrestricted standard deviation comes from an different sample than the range-restricted standard deviation) than for dependent samples (i.e., unrestricted samples from which a subset of individuals are selected to be in the incumbent sample).
 
 The sampling variance for independent samples (the more common case) is:
 
@@ -40,7 +40,7 @@ var_error_u(u = .8, n_i = 100, n_a = 200)
 var_error_u(u = .8, n_i = 100, n_a = NA)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2017).
-\emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }

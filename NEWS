@@ -1,3 +1,10 @@
+Changes in Version 1.0.0 (2018-04-17)
+=====================================
+o New “citekey” arguments have been added to meta-analysis function that allow users to supply citation keys for use in reference-management programs. The new generate_bib() function can harvest the citation keys from studies that are included in meta-analysis objects and create formatted reference lists for use in publications. 
+o Plotting functions have been added. The plot_forest() and plot_funnel() functions use ggplot2 to create forest and funnel plots, respectively. These functions take a meta-analysis object as an input and add a list of plots to the object. 
+o New functions to retrieve results from within meta-analysis objects have been added. The “get_stuff” family of functions provide easy ways to extract meta-analysis tables, follow-up analyses (e.g., cumulative meta-analyses, leave-one-out meta-analyses, bootstrap results), plots, and more. 
+o Assorted bug fixes have been implemented to improve the stability of the dependency resolution process, the handling of artifact distributions, and the accommodation of continuous moderators. 
+
 Changes in Version 0.2.5 (2018-03-21)
 =====================================
 o Hot fix for consolidating dependent effect sizes. 

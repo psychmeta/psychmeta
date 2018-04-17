@@ -11,7 +11,7 @@ simulate_psych(n, rho_mat, mu_vec = rep(0, ncol(rho_mat)),
   composite_names = NULL)
 }
 \arguments{
-\item{n}{Number of cases to simulate before performing selection. If \code{Inf}, function will simulate parameter values.}
+\item{n}{Number of cases to simulate before performing selection.}
 
 \item{rho_mat}{Matrix of true-score correlations.}
 

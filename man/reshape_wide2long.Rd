@@ -4,8 +4,8 @@
 \alias{reshape_wide2long}
 \title{Reshape database from wide format to long format}
 \usage{
-reshape_wide2long(data, common_vars, es_design, n_design, other_design,
-  es_name = "rxyi")
+reshape_wide2long(data, common_vars = NULL, es_design, n_design,
+  other_design = NULL, es_name = "rxyi")
 }
 \arguments{
 \item{data}{Database of data for use in a meta-analysis in "wide" format.}
@@ -25,7 +25,7 @@ matrix must be column names of \code{data}.}
 A long-format database
 }
 \description{
-This function automates the process of converting a wide-format database (i.e,. a database in which intercorrelations between construct pairs define the columns, such that there are mutiple columns of correlations) to a long-format database (i.e., a database with just one column of correlations).
+This function automates the process of converting a wide-format database (i.e., a database in which intercorrelations between construct pairs define the columns, such that there are multiple columns of correlations) to a long-format database (i.e., a database with just one column of correlations).
 The meta-analysis functions in \pkg{psychmeta} work best with long-format databases, so this function can be a helpful addition to one's workflow when data are organized in a wide format.
 }
 \examples{
@@ -45,7 +45,7 @@ wt_params = list(list(c(1, 2, 3),
                       c(mean = 2, sd = .25),
                       rbind(value = c(1, 2, 3), weight = c(1, 2, 1))))
 
-## Simultate with wide format
+## Simulate with wide format
 data <- simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
                           rel_params = rel_params, sr_params = sr_params,
                           sr_composite_params = sr_composite_params, wt_params = wt_params,

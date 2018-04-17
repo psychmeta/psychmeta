@@ -42,9 +42,9 @@
 #' Lipsey, M. W., & Wilson, D. B. (2001).
 #' \emph{Practical meta-analysis}.
 #' Thousand Oaks, CA: SAGE.
-#' 
-#' Ruscio, J. (2008). 
-#' A probability-based measure of effect size: Robustness to base rates and other factors. 
+#'
+#' Ruscio, J. (2008).
+#' A probability-based measure of effect size: Robustness to base rates and other factors.
 #' \emph{Psychological Methods, 13}(1), 19–30. \url{https://doi.org/10.1037/1082-989X.13.1.19}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
@@ -186,7 +186,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           V.d[is.na(n2)] <- var_error_d(d=d.ci[is.na(n2)], n1=n[is.na(n2)], correct_bias=correct_bias)
           V.d[!is.na(n2)] <- var_error_d(d=d.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)], correct_bias=correct_bias)
 
-          CI <- confidence(d, se=sqrt(V.d), conf_level=conf_level)
+          CI <- confidence(d, se=sqrt(V.d), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
           meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
@@ -214,7 +214,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           }
 
           V.r <- var_error_r(r.ci, n, correct_bias)
-          CI <- confidence(r, se=sqrt(V.r), conf_level=conf_level)
+          CI <- confidence(r, se=sqrt(V.r), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
           meta_input <- data.frame(r = r, n_effective=n_effective)
@@ -249,7 +249,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           V.A[is.na(n2)]  <- var_error_A(A=A.ci[is.na(n2)], n1=n[is.na(n2)])
           V.A[!is.na(n2)] <- var_error_A(A=A.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)])
 
-          CI <- confidence(A, se=sqrt(V.A), conf_level=conf_level)
+          CI <- confidence(A, se=sqrt(V.A), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
           meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
@@ -822,17 +822,17 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 "convert_es.q_A_to_d"         <- "convert_es.q_cles_to_d"       <- "convert_es.q_auc_to_d"
 "convert_es.q_A_to_r"         <- "convert_es.q_cles_to_r"       <- "convert_es.q_auc_to_r"
-"convert_es.q_r_to_A"         <- "convert_es.q_r_to_cles"       <- "convert_es.q_r_to_auc"      
-"convert_es.q_delta_to_A"     <- "convert_es.q_delta_to_cles"   <- "convert_es.q_delta_to_auc"  
-"convert_es.q_g_to_A"         <- "convert_es.q_g_to_cles"       <- "convert_es.q_g_to_auc"      
-"convert_es.q_t_to_A"         <- "convert_es.q_t_to_cles"       <- "convert_es.q_t_to_auc"      
-"convert_es.p_t_to_A"         <- "convert_es.p_t_to_cles"       <- "convert_es.p_t_to_auc"      
-"convert_es.q_F_to_A"         <- "convert_es.q_F_to_cles"       <- "convert_es.q_F_to_auc"      
-"convert_es.p_F_to_A"         <- "convert_es.p_F_to_cles"       <- "convert_es.p_F_to_auc"      
-"convert_es.q_chisq_to_A"     <- "convert_es.q_chisq_to_cles"   <- "convert_es.q_chisq_to_auc"  
-"convert_es.p_chisq_to_A"     <- "convert_es.p_chisq_to_cles"   <- "convert_es.p_chisq_to_auc"  
-"convert_es.q_or_to_A"        <- "convert_es.q_or_to_cles"      <- "convert_es.q_or_to_auc"     
-"convert_es.q_lor_to_A"       <- "convert_es.q_lor_to_cles"     <- "convert_es.q_lor_to_auc"    
+"convert_es.q_r_to_A"         <- "convert_es.q_r_to_cles"       <- "convert_es.q_r_to_auc"
+"convert_es.q_delta_to_A"     <- "convert_es.q_delta_to_cles"   <- "convert_es.q_delta_to_auc"
+"convert_es.q_g_to_A"         <- "convert_es.q_g_to_cles"       <- "convert_es.q_g_to_auc"
+"convert_es.q_t_to_A"         <- "convert_es.q_t_to_cles"       <- "convert_es.q_t_to_auc"
+"convert_es.p_t_to_A"         <- "convert_es.p_t_to_cles"       <- "convert_es.p_t_to_auc"
+"convert_es.q_F_to_A"         <- "convert_es.q_F_to_cles"       <- "convert_es.q_F_to_auc"
+"convert_es.p_F_to_A"         <- "convert_es.p_F_to_cles"       <- "convert_es.p_F_to_auc"
+"convert_es.q_chisq_to_A"     <- "convert_es.q_chisq_to_cles"   <- "convert_es.q_chisq_to_auc"
+"convert_es.p_chisq_to_A"     <- "convert_es.p_chisq_to_cles"   <- "convert_es.p_chisq_to_auc"
+"convert_es.q_or_to_A"        <- "convert_es.q_or_to_cles"      <- "convert_es.q_or_to_auc"
+"convert_es.q_lor_to_A"       <- "convert_es.q_lor_to_cles"     <- "convert_es.q_lor_to_auc"
 "convert_es.q_Fisherz_to_A"   <- "convert_es.q_Fisherz_to_cles" <- "convert_es.q_Fisherz_to_auc"
 "covert_es.q_A_to_auc"        <- "covert_es.q_A_to_cles"        <- "covert_es.q_A_to_A"
 "covert_es.q_auc_to_auc"      <- "covert_es.q_auc_to_cles"      <- "covert_es.q_auc_to_A"        <- "covert_es.q_A_to_A"

@@ -84,7 +84,7 @@ var_error_r_bvirr(rxyi, var_e = NULL, ni, na = NA, ux, uy, qx,
 A vector of corrected correlations' sampling-error variances.
 }
 \description{
-This function propagates error in the bivariate indirect range-restriction correction forumula to allow for the computation of a pseudo compound attenutation factor in individual-correction meta-analysis.
+This function propagates error in the bivariate indirect range-restriction correction formula to allow for the computation of a pseudo compound attenuation factor in individual-correction meta-analysis.
 Traditional methods for estimating compound attenuation factors (i.e., dividing the observed correlation by the corrected correlation) do not work with the BVIRR correction because BVIRR has an additive term that makes the corrected correlation inappropriate for use in estimating the effect of the correction on the variance of the sampling distribution of correlations.
 The equation-implied adjustment for the BVIRR correction (i.e., the first derivative of the correction equation with respect to the observed correlation) underestimates the error of corrected correlations, so this function helps to account for that additional error.
 }
@@ -113,7 +113,7 @@ var_error_r_bvirr(rxyi = .3, var_e = var_error_r(r = .3, n = 100), ni = 100,
                 sign_rxz = 1, sign_ryz = 1)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2017).
-\emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }

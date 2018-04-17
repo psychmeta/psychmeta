@@ -3,10 +3,11 @@
 #' This function computes bare-bones meta-analyses of \emph{d} values.
 #'
 #' @param d Vector of \emph{d} values.
-#' @param n1 Vector or column name of primary sample sizes (if sugroup sample sizes are not known, these values are total sample sizes; if subgroup sample sizes are known, these values are sample sizes for the first of the two groups).
+#' @param n1 Vector or column name of primary sample sizes (if subgroup sample sizes are not known, these values are total sample sizes; if subgroup sample sizes are known, these values are sample sizes for the first of the two groups).
 #' @param n2 Optional: Vector or column name of secondary sample sizes. If subgroup sample sizes are known, these values are sample sizes for the second of the two groups. \code{NULL} by default.
 #' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
+#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
@@ -43,7 +44,7 @@
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 #' ma_d_bb(d = d, n1 = n1, n2 = n2,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL,
+ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL, citekey = NULL,
                                       wt_type = "sample_size", error_type = "mean", correct_bias = FALSE,
                                       conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                                       moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
@@ -75,16 +76,19 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      if(!is.null(data)){
           data <- as.data.frame(data)
 
-          d <- match_variables(call = call_full[[match("d",  names(call_full))]], arg = d, data = data)
-          n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], arg = n1, data = data)
-          n2 <- match_variables(call = call_full[[match("n2",  names(call_full))]], arg = n2, data = data)
-          n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], arg = n_adj, data = data)
+          d <- match_variables(call = call_full[[match("d",  names(call_full))]], arg = d, arg_name = "d", data = data)
+          n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], arg = n1, arg_name = "n1", data = data)
+          n2 <- match_variables(call = call_full[[match("n2",  names(call_full))]], arg = n2, arg_name = "n2", data = data)
+          n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], arg = n_adj, arg_name = "n_adj", data = data)
 
           if(deparse(substitute(sample_id))[1] != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
+               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, arg_name = "sample_id", data = data)
+
+          if(deparse(substitute(citekey))[1] != "NULL")
+               citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
+               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
 
      if(!is.null(moderators)){
@@ -98,12 +102,16 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                                   noncat = colnames(moderators)[!cat_moderators])
           moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
 
-          moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
-               lvls <- levels(x)
-               if(is.null(lvls)) lvls <- levels(factor(x))
-               lvls
-          })
-          names(moderator_levels) <- colnames(moderators)
+          if(any(cat_moderators)){
+               moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
+                    lvls <- levels(x)
+                    if(is.null(lvls)) lvls <- levels(factor(x))
+                    lvls
+               })
+               names(moderator_levels) <- colnames(as_tibble(moderators)[,cat_moderators])
+          }else{
+               moderator_levels <- NULL
+          }
 
           moderators <- as.data.frame(moderators)
      }else{
@@ -123,6 +131,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      es_data <- data.frame(d = d, n1 = n1, n2 = n2)
      es_data$n_adj <- n_adj
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
+     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
      es_data <- cbind(sample_id = sample_id, es_data)
 
      out <- ma_wrapper(es_data = es_data, es_type = "d", ma_type = "bb", ma_fun = .ma_d_bb,
@@ -155,6 +164,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 #' @keywords internal
 .ma_d_bb <- function(data, ma_arg_list, run_lean = FALSE){
      sample_id <- data$sample_id
+     citekey <- data$citekey
      d <- data$d
      n1 <- data$n1
      n2 <- data$n2
@@ -249,6 +259,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           escalc_obj$weight <- wt_vec
           escalc_obj$residual <- d - mean_d
 
+          if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
           if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj)
           class(escalc_obj) <- c("escalc", "data.frame")
      }

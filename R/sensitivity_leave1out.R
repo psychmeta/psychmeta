@@ -31,11 +31,10 @@ sensitivity_leave1out <- function(ma_obj, ...){
           record_call <- TRUE
      }
 
-     progbar <- progress_bar$new(format = " Computing leave-one-out meta-analyses [:bar] :percent est. time remaining: :eta",
+     progbar <- progress::progress_bar$new(format = " Computing leave-one-out meta-analyses [:bar] :percent est. time remaining: :eta",
                                  total = sum(unlist(lapply(ma_list, function(x){nrow(x$barebones$meta_table)}))),
                                  clear = FALSE, width = options()$width)
      ma_list <- lapply(ma_list, function(ma_obj_i){
-          progbar$tick()
 
           if(any(class(ma_obj_i) == "ma_ic")){
                ma_arg_list <- ma_obj_i$individual_correction$inputs
@@ -76,6 +75,15 @@ sensitivity_leave1out <- function(ma_obj, ...){
                pi <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$pi)
                n <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n)
 
+               if(any(class_ma == "ma_ic" | class_ma == "ma_ad")){
+                    sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
+                    rxy <-   lapply(ma_obj_i$barebones$escalc_list, function(x) x$yi)
+                    n <-     lapply(ma_obj_i$barebones$escalc_list, function(x) x$n1 + x$n2)
+                    n_adj <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n_adj)
+                    vi_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
+                    wt_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
+               }
+
                ts_label <- "latentGroup_latentY"
                vgx_label <- "observedGroup_latentY"
                vgy_label <- "latentGroup_observedY"
@@ -102,6 +110,12 @@ sensitivity_leave1out <- function(ma_obj, ...){
                correction_type <- lapply(ma_obj_i$individual_correction$true_score$escalc_list, function(x) x$correction_type)
           }
 
+          if(d_metric){
+               ts_label <- "latentGroup_latentY"
+               vgx_label <- "observedGroup_latentY"
+               vgy_label <- "latentGroup_observedY"
+          }
+
           list_null <- list()
           for(i in 1:k_analyses){
                list_null_i <- list(id = NULL)
@@ -112,6 +126,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
           out_list <- list(barebones = NULL,
                            artifact_distribution = NULL,
                            individual_correction = NULL)
+          plot_list <- out_list
 
           if("ma_bb" %in% class_ma) out_list$barebones <- list()
           if("ma_ad" %in% class_ma) out_list$barebones <- list()
@@ -140,13 +155,13 @@ sensitivity_leave1out <- function(ma_obj, ...){
                if(es_type == "es"){
                     es_data <- data.frame(yi = yi[[i]],
                                           n = n[[i]])
-                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
+                    if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
                }
                if(es_type == "r"){
                     es_data <- data.frame(rxy = rxy[[i]],
                                           n = n[[i]])
                     es_data$n_adj <- n_adj[[i]]
-                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
+                    if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
                }
                if(es_type == "d"){
                     es_data <- data.frame(d = d[[i]],
@@ -155,10 +170,13 @@ sensitivity_leave1out <- function(ma_obj, ...){
                     es_data$n <- n[[i]]
                     es_data$pi <- pi[[i]]
                     es_data$n_adj <- n_adj[[i]]
-                    if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "d")
+                    if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "d")
                }
 
                if(any(class_ma == "ma_ic")){
+                    es_data$rxy = rxy[[i]]
+                    es_data$n = n[[i]]
+
                     es_data$rtpa = rtpa[[i]]
                     es_data$rxpa = rxpa[[i]]
                     es_data$rtya = rtya[[i]]
@@ -167,6 +185,12 @@ sensitivity_leave1out <- function(ma_obj, ...){
                     es_data$A_ty = A_ty[[i]]
                     es_data$a = a[[i]]
                     es_data$correction_type = correction_type[[i]]
+               }
+
+               if(any(class_ma == "ma_ad")){
+                    es_data$rxy = rxy[[i]]
+                    es_data$n = n[[i]]
+                    es_data$n_adj <- n_adj[[i]]
                }
 
                if(any(class_ma == "ma_ic") | any(class_ma == "ma_ad")){
@@ -203,17 +227,28 @@ sensitivity_leave1out <- function(ma_obj, ...){
                                                        conf_method = conf_method, cred_method = cred_method)
                          }
 
-                         bb_plots <- .plot_forest(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
-                         ts_plots <- .plot_forest(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
-                         vgx_plots <- .plot_forest(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
-                         vgy_plots <- .plot_forest(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
+                         bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
+                         ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
+                         vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
+                         vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
 
-                         out_list$barebones[[analysis_id]] <- append(list(data = bb_table), bb_plots)
-                         out_list$individual_correction$true_score[[analysis_id]] <- append(list(data = ts_table), ts_plots)
-                         out_list$individual_correction$validity_generalization_x[[analysis_id]] <- append(list(data = vgx_table), vgx_plots)
-                         out_list$individual_correction$validity_generalization_y[[analysis_id]] <- append(list(data = vgy_table), vgy_plots)
+                         out_bb <- list(data = bb_table)
+                         out_ts <- list(data = ts_table)
+                         out_vgx <- list(data = vgx_table)
+                         out_vgy <- list(data = vgy_table)
+                         class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
 
-                         names(out_list$individual_correction) <- c(ts_label, vgx_label, vgy_label)
+                         out_list$barebones[[analysis_id]] <- out_bb
+                         out_list$individual_correction$true_score[[analysis_id]] <- out_ts
+                         out_list$individual_correction$validity_generalization_x[[analysis_id]] <- out_vgy
+                         out_list$individual_correction$validity_generalization_y[[analysis_id]] <- out_vgy
+
+                         plot_list$barebones[[analysis_id]] <- bb_plots
+                         plot_list$individual_correction$true_score[[analysis_id]] <- ts_plots
+                         plot_list$individual_correction$validity_generalization_x[[analysis_id]] <- vgx_plots
+                         plot_list$individual_correction$validity_generalization_y[[analysis_id]] <- vgy_plots
+
+                         names(out_list$individual_correction) <- names(plot_list$individual_correction) <- c(ts_label, vgx_label, vgy_label)
                     }
 
                     if(any(class_ma == "ma_ad")){
@@ -230,9 +265,9 @@ sensitivity_leave1out <- function(ma_obj, ...){
                          vgy_table <- rep_list$validity_generalization_y
 
                          bb_mat <- ma_obj_i$barebones$meta_table[i,]
-                         ts_mat <- ma_obj_i$artifact_distribution$true_score$meta_table[i,]
-                         vgx_mat <- ma_obj_i$artifact_distribution$validity_generalization_x$meta_table[i,]
-                         vgy_mat <- ma_obj_i$artifact_distribution$validity_generalization_y$meta_table[i,]
+                         ts_mat <- ma_obj_i$artifact_distribution$true_score[i,]
+                         vgx_mat <- ma_obj_i$artifact_distribution$validity_generalization_x[i,]
+                         vgy_mat <- ma_obj_i$artifact_distribution$validity_generalization_y[i,]
 
                          if(convert_back){
                               bb_mat <- .convert_ma(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -254,17 +289,28 @@ sensitivity_leave1out <- function(ma_obj, ...){
                                                        conf_method = conf_method, cred_method = cred_method)
                          }
 
-                         bb_plots <- .plot_forest(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
-                         ts_plots <- .plot_forest(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
-                         vgx_plots <- .plot_forest(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
-                         vgy_plots <- .plot_forest(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
+                         bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
+                         ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
+                         vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
+                         vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
 
-                         out_list$barebones[[analysis_id]] <- append(list(data = bb_table), bb_plots)
-                         out_list$artifact_distribution$true_score[[analysis_id]] <- append(list(data = ts_table), ts_plots)
-                         out_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- append(list(data = vgx_table), vgx_plots)
-                         out_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- append(list(data = vgy_table), vgy_plots)
+                         out_bb <- list(data = bb_table)
+                         out_ts <- list(data = ts_table)
+                         out_vgx <- list(data = vgx_table)
+                         out_vgy <- list(data = vgy_table)
+                         class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
 
-                         names(out_list$artifact_distribution) <- c(ts_label, vgx_label, vgy_label)
+                         out_list$barebones[[analysis_id]] <- out_bb
+                         out_list$artifact_distribution$true_score[[analysis_id]] <- out_ts
+                         out_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- out_vgy
+                         out_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- out_vgy
+
+                         plot_list$barebones[[analysis_id]] <- bb_plots
+                         plot_list$artifact_distribution$true_score[[analysis_id]] <- ts_plots
+                         plot_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- vgx_plots
+                         plot_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- vgy_plots
+
+                         names(out_list$artifact_distribution) <- names(plot_list$artifact_distribution) <- c(ts_label, vgx_label, vgy_label)
                     }
                }else{
                     if(any(class_ma == "ma_bb")){
@@ -303,14 +349,19 @@ sensitivity_leave1out <- function(ma_obj, ...){
                               }
                          }
 
-                         bb_plots <- .plot_forest(ma_mat = bb_table, ma_vec = bb_mat, analysis = "cumulative")
-                         out_list$barebones[[analysis_id]] <- append(list(data = bb_table), bb_plots)
+                         bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "cumulative")
+
+                         out_bb <- list(data = bb_table)
+                         class(out_bb) <- c("psychmeta", "ma_leave1out")
+                         out_list$barebones[[analysis_id]] <- out_bb
+                         plot_list$barebones[[analysis_id]] <- bb_plots
                     }
                }
 
           }
 
           ma_obj_i$follow_up_analyses$leave1out <- out_list
+          ma_obj_i$plots$leave1out <- plot_list
           ma_obj_i
      })
      if(any(class(ma_obj) == "ma_master")){

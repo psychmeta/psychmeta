@@ -4,21 +4,21 @@
 \alias{ma_r}
 \title{Master framework for meta-analysis of correlations}
 \usage{
-ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, ma_method = "bb",
-  ad_type = "tsa", correction_method = "auto", construct_x = NULL,
-  construct_y = NULL, measure_x = NULL, measure_y = NULL,
-  construct_order = NULL, wt_type = "sample_size", error_type = "mean",
-  correct_bias = TRUE, correct_rel = NULL, correct_rxx = TRUE,
-  correct_ryy = TRUE, correct_rr = NULL, correct_rr_x = TRUE,
-  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_x = TRUE,
-  indirect_rr_y = TRUE, rxx = NULL, rxx_restricted = TRUE,
-  rxx_type = "alpha", ryy = NULL, ryy_restricted = TRUE,
-  ryy_type = "alpha", ux = NULL, ux_observed = TRUE, uy = NULL,
-  uy_observed = TRUE, sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
-  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
-  cred_method = "t", var_unbiased = TRUE, moderators = NULL,
-  cat_moderators = TRUE, moderator_type = "simple", pairwise_ads = FALSE,
-  residual_ads = TRUE, check_dependence = TRUE,
+ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
+  ma_method = "bb", ad_type = "tsa", correction_method = "auto",
+  construct_x = NULL, construct_y = NULL, measure_x = NULL,
+  measure_y = NULL, construct_order = NULL, wt_type = "sample_size",
+  error_type = "mean", correct_bias = TRUE, correct_rel = NULL,
+  correct_rxx = TRUE, correct_ryy = TRUE, correct_rr = NULL,
+  correct_rr_x = TRUE, correct_rr_y = TRUE, indirect_rr = NULL,
+  indirect_rr_x = TRUE, indirect_rr_y = TRUE, rxx = NULL,
+  rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
+  ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
+  ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rz = NULL,
+  sign_rxz = 1, sign_ryz = 1, conf_level = 0.95, cred_level = 0.8,
+  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
+  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
+  pairwise_ads = FALSE, residual_ads = TRUE, check_dependence = TRUE,
   collapse_method = "composite", intercor = 0.5, clean_artifacts = TRUE,
   impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE),
   impute_method = "bootstrap_mod", decimals = 2, hs_override = FALSE,
@@ -32,6 +32,8 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, ma_method = "bb",
 \item{n_adj}{Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.}
 
 \item{sample_id}{Optional vector of identification labels for samples/studies in the meta-analysis.}
+
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").}
 
 \item{ma_method}{Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).}
 
@@ -47,9 +49,9 @@ be used when interative artifact distributions are provided). See "Details" of \
 
 \item{construct_y}{Vector of construct names for construct initially designated as Y.}
 
-\item{measure_x}{Vector of names names for measures associated with constructs initially designated as "X".}
+\item{measure_x}{Vector of names for measures associated with constructs initially designated as "X".}
 
-\item{measure_y}{Vector of names names for measures associated with constructs initially designated as "Y".}
+\item{measure_y}{Vector of names for measures associated with constructs initially designated as "Y".}
 
 \item{construct_order}{Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.}
 
@@ -61,25 +63,25 @@ be used when interative artifact distributions are provided). See "Details" of \
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rel}{Optional named vector that supercedes \code{correct_rxx} and \code{correct_ryy}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
+\item{correct_rel}{Optional named vector that supersedes \code{correct_rxx} and \code{correct_ryy}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
 
 \item{correct_rxx}{Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rr}{Optional named vector that supercedes \code{correct_rr_x} and \code{correct_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for range restriction.}
+\item{correct_rr}{Optional named vector that supersedes \code{correct_rr_x} and \code{correct_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for range restriction.}
 
 \item{correct_rr_x}{Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
 
 \item{correct_rr_y}{Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
 
-\item{indirect_rr}{Optional named vector that supercedes \code{indirect_rr_x} and \code{indirect_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.}
+\item{indirect_rr}{Optional named vector that supersedes \code{indirect_rr_x} and \code{indirect_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.}
 
 \item{indirect_rr_x}{Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in X (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_x} == \code{FALSE}, the value supplied for \code{indirect_rr_x} is disregarded).}
+Superseded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_x} == \code{FALSE}, the value supplied for \code{indirect_rr_x} is disregarded).}
 
 \item{indirect_rr_y}{Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
+Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
 
 \item{rxx}{Vector or column name of reliability estimates for X.}
 
@@ -122,7 +124,7 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{uy_observed}{Logical vector or column name determining whether each element of uy is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).}
 
-\item{sign_rz}{Optional named vector that supercedes \code{sign_rxz} and \code{sign_ryz}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.}
+\item{sign_rz}{Optional named vector that supersedes \code{sign_rxz} and \code{sign_ryz}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.}
 
 \item{sign_rxz}{Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).}
 
@@ -151,15 +153,15 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{check_dependence}{Logical scalar that determines whether database should be checked for violations of independence (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{collapse_method}{Character argument that determines how to collapase dependent studies. Options are "composite" (default), "average," and "stop."}
+\item{collapse_method}{Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."}
 
-\item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs.}
+\item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.}
 
-\item{clean_artifacts}{If \code{TRUE}, mutliple instances of the same contruct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
+\item{clean_artifacts}{If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
 in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.}
 
 \item{impute_artifacts}{If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
-When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all rescrepancies among artifact entries before and after impuation.}
+When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.}
 
 \item{impute_method}{Method to use for imputing artifacts. Choices are:
 \itemize{
@@ -262,6 +264,7 @@ Components of output tables for artifact-distribution meta-analyses:
 \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
 \item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance and predicted artifact variance.}
 \item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+\item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
 \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
 \item{\code{sd_art}}{\cr Square root of \code{var_art}.}
 \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
@@ -278,12 +281,12 @@ Components of output tables for artifact-distribution meta-analyses:
 \description{
 This is the master function for meta-analyses of correlations - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of construct pairs.
 When artifact-distribution meta-analyses are performed, this function will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
-This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, to impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
+This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
 The automatic compositing features are employed when \code{sample_id}s and/or construct names are provided.
-When multiple construct pairs are meta-analyzed, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
+When multiple construct pairs are meta-analyzed, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitivity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
 }
 \examples{
-## The 'ma_r' function can compute multi-construct bare-bones meta-analyes:
+## The 'ma_r' function can compute multi-construct bare-bones meta-analyses:
 ma_r(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
      moderators = moderator, data = data_r_meas_multi)
@@ -298,7 +301,41 @@ ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      correct_rr_x = FALSE, correct_rr_y = FALSE,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+     clean_artifacts = FALSE, impute_artifacts = FALSE,
      moderators = moderator, data = data_r_meas_multi)
+
+## Even if no studies in the database provide artifact information,
+## pre-specified artifact distributions from previous meta-analyses
+## can still be used! (These results should match the previous example.)
+ma_r(ma_method = "ad", rxyi = rxyi, n = n,
+     correct_rr_x = FALSE, correct_rr_y = FALSE,
+     construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+     clean_artifacts = FALSE, impute_artifacts = FALSE,
+     moderators = moderator, data = data_r_meas_multi,
+     supplemental_ads =
+          list(X = list(mean_qxi = 0.8927818, var_qxi = 0.0008095520, k_qxi = 40,
+                        mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
+               Y = list(mean_qxi = 0.8941266, var_qxi = 0.0009367234, k_qxi = 40,
+                        mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
+               Z = list(mean_qxi = 0.8962108, var_qxi = 0.0007840593, k_qxi = 40,
+                        mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha")))
+
+
+## Artifact information may also be supplied by passing "ad_obj" class objects with the
+## "supplemental_ads" argument.
+## Create a list of artifact-distribution objects:
+ad_list <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
+                          construct_x = x_name, construct_y = y_name,
+                          sample_id = sample_id,
+                          data = data_r_meas_multi)
+## Run the artifact-distribution meta-analysis:
+ma_r(ma_method = "ad", rxyi = rxyi, n = n,
+     correct_rr_x = FALSE, correct_rr_y = FALSE,
+     construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+     clean_artifacts = FALSE, impute_artifacts = FALSE,
+     moderators = moderator, data = data_r_meas_multi,
+     supplemental_ads = ad_list)
+
 
 ## Artifact information from studies not included in the meta-analysis can also be used to make
 ## corrections. Passing artifact information with the 'supplemental_ads' argument allows for
@@ -343,7 +380,7 @@ Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
 Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 3.
 
-Dahlke, J. A., & Wiernik, B. M. (2017).
-\emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }

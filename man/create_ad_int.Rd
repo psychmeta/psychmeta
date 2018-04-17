@@ -38,13 +38,13 @@ create_ad_int(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
 \item{wt_ut}{Vector of weights associated with the elements of \code{ut}.}
 
-\item{estimate_rxxa}{Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_rxxa}{Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_rxxi}{Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_rxxi}{Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_ux}{Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_ux}{Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.}
 
-\item{estimate_ut}{Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by  default.}
+\item{estimate_ut}{Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.}
 
 \item{...}{Further arguments.}
 }

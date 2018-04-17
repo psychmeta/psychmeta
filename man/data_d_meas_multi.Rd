@@ -3,7 +3,7 @@
 \docType{data}
 \name{data_d_meas_multi}
 \alias{data_d_meas_multi}
-\title{Hypothetical \emph{d} value dataset simulated to statisfy the assumptions of the correction for measurement error only in multiple constructs}
+\title{Hypothetical \emph{d} value dataset simulated to satisfy the assumptions of the correction for measurement error only in multiple constructs}
 \format{data.frame}
 \usage{
 data(data_d_meas_multi)

@@ -4,14 +4,18 @@
 \alias{ma_r_order2}
 \title{Second-order meta-analysis function for correlations}
 \usage{
-ma_r_order2(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL,
-  k = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
-  moderators = NULL, moderator_type = "simple", construct_x = NULL,
-  construct_y = NULL, conf_level = 0.95, cred_level = 0.8,
-  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-  hs_override = FALSE, data = NULL)
+ma_r_order2(k, N = NULL, r = NULL, rho = NULL, var_r = NULL,
+  var_r_c = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
+  citekey = NULL, moderators = NULL, moderator_type = "simple",
+  construct_x = NULL, construct_y = NULL, conf_level = 0.95,
+  cred_level = 0.8, conf_method = "t", cred_method = "t",
+  var_unbiased = TRUE, hs_override = FALSE, data = NULL)
 }
 \arguments{
+\item{k}{Vector or column name of meta-analyses' k values.}
+
+\item{N}{Vector or column name of meta-analyses' total sample sizes (optional).}
+
 \item{r}{Vector or column name of mean observed correlations.}
 
 \item{rho}{Vector or column name of mean corrected correlations.}
@@ -20,11 +24,11 @@ ma_r_order2(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL,
 
 \item{var_r_c}{Vector or column name of observed variances of corrected correlations.}
 
-\item{k}{Vector or column name of meta-analyses' k values.}
-
 \item{ma_type}{Type of meta-analyses being analyzed: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).}
 
 \item{sample_id}{Vector or column name of study ID labels.}
+
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").}
 
 \item{moderators}{Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).}
 
@@ -56,8 +60,8 @@ This function computes second-order meta-analysis function for correlations. It 
 }
 \examples{
 ## Analysis of the validity of conscientiousness as a predictor of job performance in East Asia
-ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, k = k, ma_type = "ad",
+ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+            var_r_c = NULL, ma_type = "ad",
             sample_id = NULL, moderators = NULL,
             construct_x = NULL, construct_y = NULL,
             conf_level = .95, cred_level = .8,
@@ -65,8 +69,8 @@ ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
             data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
 
 ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
-ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, k = k, ma_type = "ad",
+ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+            var_r_c = NULL, ma_type = "ad",
             sample_id = NULL, moderators = NULL, construct_x = Predictor,
             conf_level = .95, cred_level = .8,
             cred_method = "t", var_unbiased = TRUE,
@@ -74,8 +78,8 @@ ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 
 ## Analysis of the average validity of the Big Five traits as predictors of
 ## job performance by Eastern Asian country
-ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, k = k, ma_type = "ad",
+ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+            var_r_c = NULL, ma_type = "ad",
             sample_id = NULL, moderators = "Country",
             conf_level = .95, cred_level = .8, cred_method = "t",
             var_unbiased = TRUE, data = data_r_oh_2009)

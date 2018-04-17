@@ -26,7 +26,6 @@
      mean_rxyi <- barebones[,"mean_r"]
      var_r <- barebones[,"var_r"]
      var_e <- barebones[,"var_e"]
-     var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
      se_r <- barebones[,"se_r"]
 
@@ -79,13 +78,13 @@
 
      mean_rxpa <- mean_rtpa * mean_qxa
      ci_xp <- ci_tp * mean_qxa
-     var_art_tp <- apply(t(mean_rtpa), 2, function(x){
+     var_art <- apply(t(mean_rtpa), 2, function(x){
           wt_var(x = .attenuate_r_bvirr(rtpa = x, qxa = qxa, qya = qya, ux = ux, uy = uy,
                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz), wt = wt_vec, unbiased = var_unbiased)
      })
-     var_pre_tp <- var_e + var_art_tp
-     var_res_tp <- var_r - var_pre_tp
-     var_rho_tp <- var_res_tp * mean_ux^2 * mean_uy^2/(mean_qxa^2 * mean_qya^2)
+     var_pre <- var_e + var_art
+     var_res <- var_r - var_pre
+     var_rho_tp <- var_res * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
 
      mean_rxpa <- mean_rtpa * mean_qxa
      ci_xp <- ci_tp * mean_qxa
@@ -98,9 +97,9 @@
      sd_r <- var_r^.5
      sd_e <- var_e^.5
 
-     sd_art_tp <- var_art_tp^.5
-     sd_pre_tp <- var_pre_tp^.5
-     sd_res_tp <- var_res_tp^.5
+     sd_art <- var_art^.5
+     sd_pre <- var_pre^.5
+     sd_res <- var_res^.5
      sd_rho_tp <- var_rho_tp^.5
 
      sd_rho_xp <- var_rho_xp^.5
@@ -109,6 +108,42 @@
      correct_meas_x <- !(all(qxa == 1))
      correct_meas_y <- !(all(qya == 1))
      correct_irr <- !(all(ux == 1) & all(uy == 1))
+
+     ## New variances
+     var_r_tp <- var_r * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     var_e_tp <- var_e * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     var_art_tp <- var_art * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     var_pre_tp <- var_pre * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     se_r_tp <- se_r * mean_ux * mean_uy / (mean_qxa * mean_qya)
+
+     var_r_xp <- var_r_tp * mean_qxa^2
+     var_e_xp <- var_e_tp * mean_qxa^2
+     var_art_xp <- var_art_tp * mean_qxa^2
+     var_pre_xp <- var_pre_tp * mean_qxa^2
+     se_r_xp <- se_r_tp * mean_qxa
+
+     var_r_ty <- var_r_tp * mean_qya^2
+     var_e_ty <- var_e_tp * mean_qya^2
+     var_art_ty <- var_art_tp * mean_qya^2
+     var_pre_ty <- var_pre_tp * mean_qya^2
+     se_r_ty <- se_r_tp * mean_qya
+
+     sd_r_tp <- var_r_tp^.5
+     sd_r_xp <- var_r_xp^.5
+     sd_r_ty <- var_r_ty^.5
+
+     sd_e_tp <- var_e_tp^.5
+     sd_e_xp <- var_e_xp^.5
+     sd_e_ty <- var_e_ty^.5
+
+     sd_art_tp <- var_art_tp^.5
+     sd_art_xp <- var_art_xp^.5
+     sd_art_ty <- var_art_ty^.5
+
+     sd_pre_tp <- var_pre_tp^.5
+     sd_pre_xp <- var_pre_xp^.5
+     sd_pre_ty <- var_pre_ty^.5
+     ##
 
      out <- as.list(environment())
      class(out) <- class(x)
@@ -145,7 +180,6 @@
      mean_rxyi <- barebones[,"mean_r"]
      var_r <- barebones[,"var_r"]
      var_e <- barebones[,"var_e"]
-     var_res <- barebones[,"var_res"]
      ci_xy_i <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
      se_r <- barebones[,"se_r"]
 
@@ -186,9 +220,9 @@
                                 var_ux = var_ux, var_uy = var_uy, var_qxa = var_qxa, var_qya = var_qya,
                                 sign_rxz = sign_rxz, sign_ryz = sign_ryz)
 
-     var_art_tp <- var_mat_tp$var_art
-     var_pre_tp <- var_mat_tp$var_pre
-     var_res_tp <- var_mat_tp$var_res
+     var_art <- var_mat_tp$var_art
+     var_pre <- var_mat_tp$var_pre
+     var_res <- var_mat_tp$var_res
      var_rho_tp <- var_mat_tp$var_rho
 
      mean_rxpa <- mean_rtpa * mean_qxa
@@ -202,9 +236,9 @@
      sd_r <- var_r^.5
      sd_e <- var_e^.5
 
-     sd_art_tp <- var_art_tp^.5
-     sd_pre_tp <- var_pre_tp^.5
-     sd_res_tp <- var_res_tp^.5
+     sd_art <- var_art^.5
+     sd_pre <- var_pre^.5
+     sd_res <- var_res^.5
      sd_rho_tp <- var_rho_tp^.5
 
      sd_rho_xp <- var_rho_xp^.5
@@ -213,6 +247,42 @@
      correct_meas_x <- mean_qxa != 1
      correct_meas_y <- mean_qya != 1
      correct_irr <- mean_ux != 1 & mean_uy != 1
+
+     ## New variances
+     var_r_tp <- var_r * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     var_e_tp <- var_e * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     var_art_tp <- var_art * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     var_pre_tp <- var_pre * mean_ux^2 * mean_uy^2 / (mean_qxa^2 * mean_qya^2)
+     se_r_tp <- se_r * mean_ux * mean_uy / (mean_qxa * mean_qya)
+
+     var_r_xp <- var_r_tp * mean_qxa^2
+     var_e_xp <- var_e_tp * mean_qxa^2
+     var_art_xp <- var_art_tp * mean_qxa^2
+     var_pre_xp <- var_pre_tp * mean_qxa^2
+     se_r_xp <- se_r_tp * mean_qxa
+
+     var_r_ty <- var_r_tp * mean_qya^2
+     var_e_ty <- var_e_tp * mean_qya^2
+     var_art_ty <- var_art_tp * mean_qya^2
+     var_pre_ty <- var_pre_tp * mean_qya^2
+     se_r_ty <- se_r_tp * mean_qya
+
+     sd_r_tp <- var_r_tp^.5
+     sd_r_xp <- var_r_xp^.5
+     sd_r_ty <- var_r_ty^.5
+
+     sd_e_tp <- var_e_tp^.5
+     sd_e_xp <- var_e_xp^.5
+     sd_e_ty <- var_e_ty^.5
+
+     sd_art_tp <- var_art_tp^.5
+     sd_art_xp <- var_art_xp^.5
+     sd_art_ty <- var_art_ty^.5
+
+     sd_pre_tp <- var_pre_tp^.5
+     sd_pre_xp <- var_pre_xp^.5
+     sd_pre_ty <- var_pre_ty^.5
+     ##
 
      out <- as.list(environment())
      class(out) <- class(x)

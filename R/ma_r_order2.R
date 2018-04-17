@@ -2,13 +2,15 @@
 #'
 #' This function computes second-order meta-analysis function for correlations. It supports second-order analyses of bare-bones, artifact-distribution, and individual-correction meta-analyses.
 #'
+#' @param k Vector or column name of meta-analyses' k values.
+#' @param N Vector or column name of meta-analyses' total sample sizes (optional).
 #' @param r Vector or column name of mean observed correlations.
 #' @param rho Vector or column name of mean corrected correlations.
 #' @param var_r Vector or column name of observed variances of observed correlations.
 #' @param var_r_c Vector or column name of observed variances of corrected correlations.
-#' @param k Vector or column name of meta-analyses' k values.
 #' @param ma_type Type of meta-analyses being analyzed: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
 #' @param sample_id Vector or column name of study ID labels.
+#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
 #' @param construct_x Vector or column name of construct names for X.
@@ -26,8 +28,8 @@
 #'
 #' @examples
 #' ## Analysis of the validity of conscientiousness as a predictor of job performance in East Asia
-#' ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-#'             var_r_c = NULL, k = k, ma_type = "ad",
+#' ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+#'             var_r_c = NULL, ma_type = "ad",
 #'             sample_id = NULL, moderators = NULL,
 #'             construct_x = NULL, construct_y = NULL,
 #'             conf_level = .95, cred_level = .8,
@@ -35,8 +37,8 @@
 #'             data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
 #'
 #' ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
-#' ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-#'             var_r_c = NULL, k = k, ma_type = "ad",
+#' ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+#'             var_r_c = NULL, ma_type = "ad",
 #'             sample_id = NULL, moderators = NULL, construct_x = Predictor,
 #'             conf_level = .95, cred_level = .8,
 #'             cred_method = "t", var_unbiased = TRUE,
@@ -44,17 +46,18 @@
 #'
 #' ## Analysis of the average validity of the Big Five traits as predictors of
 #' ## job performance by Eastern Asian country
-#' ma_r_order2(r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-#'             var_r_c = NULL, k = k, ma_type = "ad",
+#' ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+#'             var_r_c = NULL, ma_type = "ad",
 #'             sample_id = NULL, moderators = "Country",
 #'             conf_level = .95, cred_level = .8, cred_method = "t",
 #'             var_unbiased = TRUE, data = data_r_oh_2009)
-ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = NULL, ma_type = c("bb", "ic", "ad"),
-                        sample_id = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
+ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, ma_type = c("bb", "ic", "ad"),
+                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
                         conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE, hs_override = FALSE, data = NULL){
 
-     warn_obj1 <- record_warnings()
      call <- match.call()
+     warn_obj1 <- record_warnings()
+     ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
 
      if(hs_override){
           conf_method <- cred_method <- "norm"
@@ -71,32 +74,37 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      if(!is.null(data)){
           data <- as.data.frame(data)
 
-          if(deparse(substitute(k))[1] != "NULL")
-               k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, data = data)
+          k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, arg_name = "k", data = data)
+
+          if(deparse(substitute(N))[1] != "NULL")
+               N <- match_variables(call = call_full[[match("N", names(call_full))]], arg = N, arg_name = "N", data = data)
 
           if(deparse(substitute(r))[1] != "NULL")
-               r <- match_variables(call = call_full[[match("r", names(call_full))]], arg = r, data = data)
+               r <- match_variables(call = call_full[[match("r", names(call_full))]], arg = r, arg_name = "r", data = data)
 
           if(deparse(substitute(rho))[1] != "NULL")
-               rho <- match_variables(call = call_full[[match("rho", names(call_full))]], arg = rho, data = data)
+               rho <- match_variables(call = call_full[[match("rho", names(call_full))]], arg = rho, arg_name = "rho", data = data)
 
           if(deparse(substitute(var_r))[1] != "NULL")
-               var_r <- match_variables(call = call_full[[match("var_r", names(call_full))]], arg = var_r, data = data)
+               var_r <- match_variables(call = call_full[[match("var_r", names(call_full))]], arg = var_r, arg_name = "var_r", data = data)
 
           if(deparse(substitute(var_r_c))[1] != "NULL")
-               var_r_c <- match_variables(call = call_full[[match("var_r_c", names(call_full))]], arg = var_r_c, data = data)
+               var_r_c <- match_variables(call = call_full[[match("var_r_c", names(call_full))]], arg = var_r_c, arg_name = "var_r_c", data = data)
 
           if(deparse(substitute(sample_id))[1] != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
+               sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, arg_name = "sample_id", data = data)
+
+          if(deparse(substitute(citekey))[1] != "NULL")
+               citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
 
           if(deparse(substitute(construct_x))[1] != "NULL")
-               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, data = data)
+               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
 
           if(deparse(substitute(construct_y))[1] != "NULL")
-               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
+               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
      }
 
      if(!is.null(moderators)){
@@ -121,11 +129,11 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
           moderator_levels <- NULL
      }
 
-     inputs <- list(r = r, rho = rho, var_r = var_r, var_r_c = var_r_c, k = k,
-                    sample_id = sample_id, moderators = moderators, construct_x = construct_x, construct_y = construct_y,
+     inputs <- list(k = k, N = N, r = r, rho = rho, var_r = var_r, var_r_c = var_r_c,
+                    sample_id = sample_id, citekey = citekey, moderators = moderators, construct_x = construct_x, construct_y = construct_y,
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased, data = data)
 
-     dat_var <- c("sample_id", "construct_x", "construct_y", "moderators", "r", "rho", "var_r", "var_r_c", "k")
+     dat_var <- c("sample_id", "citekey", "construct_x", "construct_y", "moderators", "k", "N", "r", "rho", "var_r", "var_r_c")
 
      dat <- NULL
      for(v in dat_var){
@@ -148,25 +156,26 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
                }
           }
      }
+     if(is.null(dat$N)) dat$N <- NA
 
-     bb_req <- c("r", "var_r", "k")
-     ic_req <- c("rho", "var_r_c", "k")
-     ad_req <- c("r", "rho", "var_r", "k")
+     bb_req <- c("k", "r", "var_r")
+     ic_req <- c("k", "rho", "var_r_c")
+     ad_req <- c("k", "r", "rho", "var_r")
 
      nonnull <- lapply(inputs, function(x) !is.null(x))
      nonnull <- names(nonnull)[unlist(nonnull)]
 
-     do_bb <- all(bb_req %in% nonnull)
-     do_ic <- all(ic_req %in% nonnull) & ma_type == "bb"
-     do_ad <- all(ad_req %in% nonnull) & ma_type == "ad"
+     do_bb <- all(bb_req %in% nonnull) & "bb" %in% ma_type
+     do_ic <- all(ic_req %in% nonnull) & "ic" %in% ma_type
+     do_ad <- all(ad_req %in% nonnull) & "ad" %in% ma_type
 
-     if(ma_type == "bb" & !do_bb)
+     if("bb" %in% ma_type & !do_bb)
           stop("For bare-bones meta-analyses, the following data arguments must be supplied: ", paste(bb_req, collapse = ", "), call. = FALSE)
 
-     if(ma_type == "ic" & !do_ic)
+     if("ic" %in% ma_type & !do_ic)
           stop("For individual-correction meta-analyses, the following data arguments must be supplied: ", paste(ic_req, collapse = ", "), call. = FALSE)
 
-     if(ma_type == "ad" & !do_ad)
+     if("ad" %in% ma_type & !do_ad)
           stop("For artifact-distribution, the following data arguments must be supplied: ", paste(ad_req, collapse = ", "), call. = FALSE)
 
      out <- ma_wrapper(es_data = dat, es_type = "r", ma_type = "r_order2", ma_fun = .ma_r_order2,
@@ -192,9 +201,10 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
 
 #' Second-order meta-analysis for bare-bones meta-analyses
 #'
+#' @param k_vec Vector of study counts in meta-analyses.
+#' @param N_vec Vector of total sample sizes of meta-analyses.
 #' @param r_vec Vector of mean observed correlations.
 #' @param var_r_vec Vector of variances of observed correlations.
-#' @param k_vec Vector of study counts in meta-analyses.
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
 #' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
 #' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for t distribution or "norm" for normal distribution.#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
@@ -212,11 +222,11 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
 #'
 #' @examples
 #' ## Example TBD
-.ma_r_order2_bb <- function(r_vec = NULL, var_r_vec = NULL, k_vec = NULL,
-                                   conf_level = .95, cred_level = .8,
+.ma_r_order2_bb <- function(k_vec = NULL, N_vec = NULL, r_vec = NULL, var_r_vec = NULL,
+                            conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE){
 
-     arg_list <- list(r_vec = r_vec, var_r_vec = var_r_vec, k_vec = k_vec)
+     arg_list <- list(k_vec = k_vec, N_vec = N_vec, r_vec = r_vec, var_r_vec = var_r_vec)
      check_null <- !unlist(lapply(arg_list, is.null))
      if(all(!check_null)){
           length_vec <- unlist(lapply(arg_list, length))
@@ -241,16 +251,18 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      }
 
      k <- sum(k_vec[!is.na(wt_vec) & !is.na(r_vec)])
+     N <- sum(N_vec[!is.na(wt_vec)])
      conf_int <- confidence(mean = mean_r, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)
      cred_int <- credibility(mean = mean_r, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))
      cred_int <- setNames(c(cred_int), colnames(cred_int))
+     se_r_bar <- sd_r / sqrt(k)
 
      prop_var <- var_e / var_r
      rel_r <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
-     meta <- as.data.frame(t(c(k = k, mean_r_bar = mean_r, var_r = var_r, var_e = var_e, var_r_bar = var_res,
-                               sd_r = sd_r, sd_e = sd_e, sd_r_bar = sd_res,
+     meta <- as.data.frame(t(c(k = k, N = N, mean_r_bar = mean_r, var_r_bar = var_r, var_e = var_e, var_r_bar_res = var_res,
+                               sd_r_bar = sd_r, se_r_bar = se_r_bar, sd_e = sd_e, sd_r_bar_res = sd_res,
                                conf_int, cred_int,
                                percent_var = prop_var * 100,
                                rel_r = rel_r,
@@ -263,9 +275,10 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
 
 #' Second-order meta-analysis for individual-correction meta-analyses
 #'
+#' @param k_vec Vector of study counts in meta-analyses.
+#' @param N_vec Vector of total sample sizes of meta-analyses.
 #' @param rho_vec Vector of mean corrected correlations.
 #' @param var_r_c_vec Vector of variances of corrected correlations.
-#' @param k_vec Vector of study counts in meta-analyses.
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
 #' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
 #' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
@@ -283,11 +296,11 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
 #'
 #' @examples
 #' ## Example TBD
-.ma_r_order2_ic <- function(rho_vec = NULL, var_r_c_vec = NULL, k_vec = NULL,
+.ma_r_order2_ic <- function(k_vec = NULL, N_vec = NULL, rho_vec = NULL, var_r_c_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE){
 
-     arg_list <- list(rho_vec = rho_vec, var_r_c_vec = var_r_c_vec, k_vec = k_vec)
+     arg_list <- list(k_vec = k_vec, N_vec = N_vec, rho_vec = rho_vec, var_r_c_vec = var_r_c_vec)
      check_null <- !unlist(lapply(arg_list, is.null))
      if(all(!check_null)){
           length_vec <- unlist(lapply(arg_list, length))
@@ -313,16 +326,18 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
 
 
      k <- sum(k_vec[!is.na(wt_vec) & !is.na(rho_vec)])
+     N <- sum(N_vec[!is.na(wt_vec)])
      conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
      cred_int <- credibility(mean = var_r_c, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))
      cred_int <- setNames(c(cred_int), colnames(cred_int))
+     se_rho_bar <- sd_r_c / sqrt(k)
 
      prop_var <- var_e / var_r_c
      rel_rho <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
-     meta <- as.data.frame(t(c(k = k, mean_rho_bar = mean_rho, var_rho = var_r_c, var_e = var_e, var_rho_bar = var_rho,
-                               sd_r_c = sd_r_c, sd_e = sd_e, sd_rho_bar = sd_rho,
+     meta <- as.data.frame(t(c(k = k, N = N, mean_rho_bar = mean_rho, var_rho_bar = var_r_c, var_e = var_e, var_rho_bar_res = var_rho,
+                               sd_rho_bar = sd_r_c, se_rho_bar = se_rho_bar, sd_e = sd_e, sd_rho_bar_res = sd_rho,
                                conf_int, cred_int,
                                percent_var = prop_var * 100,
                                rel_rho = rel_rho,
@@ -336,10 +351,11 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
 
 #' Second-order meta-analysis for artifact-distribution meta-analyses
 #'
+#' @param k_vec Vector of study counts in meta-analyses.
+#' @param N_vec Vector of total sample sizes of meta-analyses.
 #' @param r_vec Vector of mean observed correlations.
 #' @param rho_vec Vector of mean corrected correlations.
 #' @param var_r_vec Vector of variances of observed correlations.
-#' @param k_vec Vector of study counts in meta-analyses.
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
 #' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
 #' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
@@ -357,11 +373,11 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
 #'
 #' @examples
 #' ## Example TBD
-.ma_r_order2_ad <- function(r_vec = NULL, rho_vec = NULL, var_r_vec = NULL, k_vec = NULL,
+.ma_r_order2_ad <- function(k_vec = NULL, N_vec = NULL, r_vec = NULL, rho_vec = NULL, var_r_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE){
 
-     arg_list <- list(r_vec = r_vec, rho_vec = rho_vec, var_r_vec = var_r_vec, k_vec = k_vec)
+     arg_list <- list(k_vec = k_vec, N_vec = N_vec, r_vec = r_vec, rho_vec = rho_vec, var_r_vec = var_r_vec)
      check_null <- !unlist(lapply(arg_list, is.null))
      if(all(!check_null)){
           length_vec <- unlist(lapply(arg_list, length))
@@ -386,16 +402,18 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      }
 
      k <- sum(k_vec[!is.na(wt_vec)])
+     N <- sum(N_vec[!is.na(wt_vec)])
      conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
      cred_int <- credibility(mean = var_r_c, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))
      cred_int <- setNames(c(cred_int), colnames(cred_int))
+     se_rho_bar <- sd_r_c / sqrt(k)
 
      prop_var <- var_e / var_r_c
      rel_rho <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
-     meta <- as.data.frame(t(c(k = k, mean_rho_bar = mean_rho, var_rho = var_r_c, var_e = var_e, var_rho_bar = var_rho,
-                               sd_r_c = sd_r_c, sd_e = sd_e, sd_rho_bar = sd_rho,
+     meta <- as.data.frame(t(c(k = k, N = N, mean_rho_bar = mean_rho, var_rho_bar = var_r_c, var_e = var_e, var_rho_bar_res = var_rho,
+                               sd_rho_bar = sd_r_c, se_rho_bar = se_rho_bar, sd_e = sd_e, sd_rho_bar_res = sd_rho,
                                conf_int, cred_int,
                                percent_var = prop_var * 100,
                                rel_rho = rel_rho,
@@ -427,6 +445,7 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      var_r <- data$var_r
      var_r_c <- data$var_r_c
      k <- data$k
+     N <- data$N
 
      conf_level <- ma_arg_list$conf_level
      cred_level <- ma_arg_list$cred_level
@@ -439,15 +458,15 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      do_ad <- ma_arg_list$do_ad
 
      if((type == "all" | type == "bb") & do_bb){
-          out_bb <- .ma_r_order2_bb(r_vec = r, var_r_vec = var_r, k_vec = k,
-                                           conf_level = conf_level, cred_level = cred_level,
-                                           cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
+          out_bb <- .ma_r_order2_bb(k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
+                                    conf_level = conf_level, cred_level = cred_level,
+                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
      }else{
           out_bb <- NULL
      }
 
      if((type == "all" | type == "ic") & do_ic){
-          out_ic <- .ma_r_order2_ic(rho_vec = rho, var_r_c_vec = var_r_c, k_vec = k,
+          out_ic <- .ma_r_order2_ic(k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
      }else{
@@ -455,7 +474,7 @@ ma_r_order2 <- function(r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, k = 
      }
 
      if((type == "all" | type == "ad") & do_ad){
-          out_ad <- .ma_r_order2_ad(r_vec = r, rho_vec = rho, var_r_vec = var_r, k_vec = k,
+          out_ad <- .ma_r_order2_ad(k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
      }else{

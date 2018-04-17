@@ -4,11 +4,11 @@
 \alias{ma_r_ic}
 \title{Individual-correction meta-analysis of correlations}
 \usage{
-ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, wt_type = "sample_size",
-  error_type = "mean", correct_bias = TRUE, correct_rxx = TRUE,
-  correct_ryy = TRUE, correct_rr_x = TRUE, correct_rr_y = TRUE,
-  indirect_rr_x = TRUE, indirect_rr_y = TRUE, rxx = NULL,
-  rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
+ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
+  wt_type = "sample_size", error_type = "mean", correct_bias = TRUE,
+  correct_rxx = TRUE, correct_ryy = TRUE, correct_rr_x = TRUE,
+  correct_rr_y = TRUE, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
+  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
   ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
   ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rxz = 1,
   sign_ryz = 1, conf_level = 0.95, cred_level = 0.8, conf_method = "t",
@@ -27,6 +27,8 @@ ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, wt_type = "sample_size",
 
 \item{sample_id}{Optional vector of identification labels for studies in the meta-analysis.}
 
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").}
+
 \item{wt_type}{Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 (see metafor documentation for details about the metafor methods).}
@@ -44,10 +46,10 @@ ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, wt_type = "sample_size",
 \item{correct_rr_y}{Logical scalar or vector or column name determining whether each correlation in rxyi should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{indirect_rr_x}{Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in X (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_x} == \code{FALSE}, the value supplied for \code{indirect_rr_x} is disregarded).}
+Superseded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_x} == \code{FALSE}, the value supplied for \code{indirect_rr_x} is disregarded).}
 
 \item{indirect_rr_y}{Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
+Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
 
 \item{rxx}{Vector or column name of reliability estimates for X.}
 
@@ -114,14 +116,15 @@ ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr
 
 ## Published example from Gonzalez-Mule et al. (2014)
 ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
-        rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE, moderators = Complexity)
+        rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
+        moderators = c("Rating source", "Published", "Type", "Complexity"))
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
 Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. Chapter 3.
 
-Dahlke, J. A., & Wiernik, B. M. (2017). \emph{One of these artifacts is not like the others:
-New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }

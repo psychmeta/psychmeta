@@ -2,7 +2,8 @@
 #'
 #' Overview of the \pkg{psychmeta} package.
 #'
-#' The \pkg{psychmeta} package provides tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Currently supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and \emph{d} values.
+#' The \pkg{psychmeta} package provides tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Currently, \pkg{psychmeta} supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and \emph{d} values.
+#' Please refer to the overview tutorial vignette for an introduction to \pkg{psychmeta}'s functions and workflows.
 #'
 #' @section Running a meta-analysis:
 #' The main functions for conducting meta-analyses in \pkg{psychmeta} are \code{\link{ma_r}} for correlations and \code{\link{ma_d}} for \emph{d} values. These functions take meta-analytic dataframes including effect sizes and sample sizes (and, optionally, study labels, moderators, construct and measure labels, and psychometric artifact information) and return the full results of psychometric meta-analyses for all of the specified variable pairs. Examples of correctly formatted meta-analytic datasets for ma functions are \code{\link{data_r_roth_2015}}, \code{\link{data_r_gonzalezmule_2014}}, and \code{\link{data_r_mcdaniel_1994}}. Individual parts of the meta-analysis process can also be run separately; these functions are described in detail below.

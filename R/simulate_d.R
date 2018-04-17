@@ -204,7 +204,6 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
      groups <- rownames(x)
      vars <- colnames(x)
 
-     # mat1 <- mat2 <- gather(data.frame(group = groups, x), -group, key = y_name, value = stat_name)
      mat1 <- mat2 <- data.frame(group = rep(groups, ncol(x)),
                                 y_name = c(matrix(vars, nrow(x), ncol(x), T)),
                                 stat_name = c(unlist(x)))
@@ -272,7 +271,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
           key_mat$p1 <- key_mat$p2 <- NULL
      }
      overall[,2:3] <- overall[,2:3]^.5
-     colnames(overall) <- c("mean", "sd_pooled", "sd_mixture")
+     colnames(overall) <- c("mean", "sd_pooled", "sd_total")
      key_mat <- cbind(key_mat, overall)
 
      key_mat$d <- (key_mat$mean1 - key_mat$mean2) / key_mat$sd_pooled
@@ -280,28 +279,28 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
      if(is.null(p)){
           key_mat <- key_mat[,c("group1", "group2", "y_name", "n1", "n2", "d", "p",
                                 "mean", "mean1", "mean2",
-                                "sd_pooled", "sd_mixture", "sd1", "sd2")]
+                                "sd_pooled", "sd_total", "sd1", "sd2")]
           if(applicant){
                colnames(key_mat) <- c("group1", "group2", "y_name", "na1", "na2", "dya", "pa",
-                                      "meanya", "meanya1", "meanya2",
-                                      "sdya_pooled", "sdya_mixture", "sdya1", "sdya2")
+                                      "meanya_total", "meanya1", "meanya2",
+                                      "sdya_pooled", "sdya_total", "sdya1", "sdya2")
           }else{
                colnames(key_mat) <- c("group1", "group2", "y_name", "ni1", "ni2", "dyi", "pi",
-                                      "meanyi", "meanyi1", "meanyi2",
-                                      "sdyi_pooled", "sdyi_mixture", "sdyi1", "sdyi2")
+                                      "meanyi_total", "meanyi1", "meanyi2",
+                                      "sdyi_pooled", "sdyi_total", "sdyi1", "sdyi2")
           }
      }else{
           key_mat <- key_mat[,c("group1", "group2", "y_name", "d", "p",
                                 "mean", "mean1", "mean2",
-                                "sd_pooled", "sd_mixture", "sd1", "sd2")]
+                                "sd_pooled", "sd_total", "sd1", "sd2")]
           if(applicant){
                colnames(key_mat) <- c("group1", "group2", "y_name", "dya", "pa",
-                                      "meanya", "meanya1", "meanya2",
-                                      "sdya_pooled", "sdya_mixture", "sdya1", "sdya2")
+                                      "meanya_total", "meanya1", "meanya2",
+                                      "sdya_pooled", "sdya_total", "sdya1", "sdya2")
           }else{
                colnames(key_mat) <- c("group1", "group2", "y_name", "dyi", "pi",
-                                      "meanyi", "meanyi1", "meanyi2",
-                                      "sdyi_pooled", "sdyi_mixture", "sdyi1", "sdyi2")
+                                      "meanyi_total", "meanyi1", "meanyi2",
+                                      "sdyi_pooled", "sdyi_total", "sdyi1", "sdyi2")
           }
      }
 
@@ -311,8 +310,10 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
 
 append_dmat <- function(di_mat, da_mat,
                         ryya = NULL, std_alpha_a = NULL, raw_alpha_a = NULL,
+                        ryya_pool = NULL, std_alpha_a_pool = NULL, raw_alpha_a_pool = NULL,
                         ryya_group = NULL, std_alpha_a_group = NULL, raw_alpha_a_group = NULL,
                         ryyi = NULL, std_alpha_i = NULL, raw_alpha_i = NULL,
+                        ryyi_pool = NULL, std_alpha_i_pool = NULL, raw_alpha_i_pool = NULL,
                         ryyi_group = NULL, std_alpha_i_group = NULL, raw_alpha_i_group = NULL,
                         show_applicant){
      d_mat <- di_mat
@@ -321,21 +322,30 @@ append_dmat <- function(di_mat, da_mat,
      }else{
           d_mat$pa <- da_mat$pa
      }
-     d_mat$uy <- di_mat$sdyi_mixture / da_mat$sdya_mixture
+     d_mat$uy_total <- di_mat$sdyi_total / da_mat$sdya_total
+     d_mat$uy_pooled <- di_mat$sdyi_pooled / da_mat$sdya_pooled
      d_mat$uy1 <- di_mat$sdyi1 / da_mat$sdya1
      d_mat$uy2 <- di_mat$sdyi2 / da_mat$sdya2
 
-     if(show_applicant & !is.null(ryya)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = ryya, stat_name = "parallel_ryya")
-     if(show_applicant & !is.null(raw_alpha_a)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = raw_alpha_a, stat_name = "raw_alpha_ya")
-     if(show_applicant & !is.null(std_alpha_a)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = std_alpha_a, stat_name = "std_alpha_ya")
+     if(show_applicant & !is.null(ryya)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = ryya, stat_name = "parallel_ryya_total")
+     if(show_applicant & !is.null(raw_alpha_a)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = raw_alpha_a, stat_name = "raw_alpha_ya_total")
+     if(show_applicant & !is.null(std_alpha_a)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = std_alpha_a, stat_name = "std_alpha_ya_total")
+
+     if(show_applicant & !is.null(ryya_pool)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = ryya_pool, stat_name = "parallel_ryya_pooled")
+     if(show_applicant & !is.null(raw_alpha_a_pool)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = raw_alpha_a_pool, stat_name = "raw_alpha_ya_pooled")
+     if(show_applicant & !is.null(std_alpha_a_pool)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = std_alpha_a_pool, stat_name = "std_alpha_ya_pooled")
 
      if(show_applicant & !is.null(ryya_group)) d_mat <- .melt_mat_groups(key_mat = d_mat, x = ryya_group, stat_name = "parallel_ryya")
      if(show_applicant & !is.null(std_alpha_a_group)) d_mat <- .melt_mat_groups(key_mat = d_mat, x = std_alpha_a_group, stat_name = "std_alpha_ya")
      if(show_applicant & !is.null(raw_alpha_a_group)) d_mat <- .melt_mat_groups(key_mat = d_mat, x = raw_alpha_a_group, stat_name = "raw_alpha_ya")
 
-     if(!is.null(ryyi)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = ryyi, stat_name = "parallel_ryyi")
-     if(!is.null(raw_alpha_i)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = raw_alpha_i, stat_name = "raw_alpha_yi")
-     if(!is.null(std_alpha_i)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = std_alpha_i, stat_name = "std_alpha_yi")
+     if(!is.null(ryyi)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = ryyi, stat_name = "parallel_ryyi_total")
+     if(!is.null(raw_alpha_i)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = raw_alpha_i, stat_name = "raw_alpha_yi_total")
+     if(!is.null(std_alpha_i)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = std_alpha_i, stat_name = "std_alpha_yi_total")
+
+     if(!is.null(ryyi_pool)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = ryyi_pool, stat_name = "parallel_ryyi_pooled")
+     if(!is.null(raw_alpha_i_pool)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = raw_alpha_i_pool, stat_name = "raw_alpha_yi_pooled")
+     if(!is.null(std_alpha_i_pool)) d_mat <- .melt_mat_combined(key_mat = d_mat, x = std_alpha_i_pool, stat_name = "std_alpha_yi_pooled")
 
      if(!is.null(ryyi_group)) d_mat <- .melt_mat_groups(key_mat = d_mat, x = ryyi_group, stat_name = "parallel_ryyi")
      if(!is.null(std_alpha_i_group)) d_mat <- .melt_mat_groups(key_mat = d_mat, x = std_alpha_i_group, stat_name = "std_alpha_yi")
@@ -344,21 +354,21 @@ append_dmat <- function(di_mat, da_mat,
      name_template <- c("group1", "group2", "y_name", "ni1", "ni2", "na1", "na2",
                         "dyi", "dya", "pi", "pa",
 
-                        "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
-                        "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
-                        "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2",
+                        "parallel_ryyi", "parallel_ryyi_pooled", "parallel_ryyi_total", "parallel_ryyi1", "parallel_ryyi2",
+                        "raw_alpha_yi", "raw_alpha_yi_pooled", "raw_alpha_yi_total", "raw_alpha_yi1", "raw_alpha_yi2",
+                        "std_alpha_yi", "std_alpha_yi_pooled", "std_alpha_yi_total", "std_alpha_yi1", "std_alpha_yi2",
 
-                        "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
-                        "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
-                        "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2",
+                        "parallel_ryya", "parallel_ryya_pooled", "parallel_ryya_total", "parallel_ryya1", "parallel_ryya2",
+                        "raw_alpha_ya", "raw_alpha_ya_pooled", "raw_alpha_ya_total", "raw_alpha_ya1", "raw_alpha_ya2",
+                        "std_alpha_ya", "std_alpha_ya_pooled", "std_alpha_ya_total", "std_alpha_ya1", "std_alpha_ya2",
 
-                        "uy", "uy1", "uy2",
+                        "uy", "uy_pooled", "uy_total", "uy1", "uy2",
 
-                        "meanyi", "meanyi1", "meanyi2",
-                        "meanya", "meanya1", "meanya2",
+                        "meanyi", "meanyi_total", "meanyi1", "meanyi2",
+                        "meanya", "meanya_total", "meanya1", "meanya2",
 
-                        "sdyi", "sdyi_pooled", "sdyi_mixture", "sdyi1", "sdyi2",
-                        "sdya", "sdya_pooled", "sdya_mixture", "sdya1", "sdya2")
+                        "sdyi", "sdyi_pooled", "sdyi_total", "sdyi1", "sdyi2",
+                        "sdya", "sdya_pooled", "sdya_total", "sdya1", "sdya2")
 
      .colnames <- colnames(d_mat)
      d_mat[,name_template[name_template %in% .colnames]]
@@ -426,6 +436,22 @@ append_dmat <- function(di_mat, da_mat,
      names(group_list) <- group_names
      obs_a$group <- true_a$group <- error_a$group <- factor(obs_a$group, levels = group_names)
      var_names <- colnames(obs_a)[-1]
+
+     .pool_dat <- function(dat){
+          .dat_pool <- by(dat, dat[,1], function(x){
+               data.frame(cbind(group = x[,1], scale(x[,-1], scale = FALSE)))
+          })
+          out <- NULL
+          for(i in 1:length(.dat_pool)) out <- rbind(out, .dat_pool[[i]])
+          out
+     }
+     items_a_pool <- .pool_dat(dat = items_a)
+     obs_a_pool <- .pool_dat(dat = obs_a)
+     true_a_pool <- .pool_dat(dat = true_a)
+     obs_i_pool <- obs_a_pool[select_vec,]
+     true_i_pool <- true_a_pool[select_vec,]
+     ryya_pool <- diag(cor(obs_a_pool[,-1], true_a_pool[,-1]))^2
+     ryyi_pool <- diag(cor(obs_i_pool[,-1], true_i_pool[,-1]))^2
 
      obs_i <- obs_a[select_vec,]
      true_i <- true_a[select_vec,]
@@ -561,11 +587,19 @@ append_dmat <- function(di_mat, da_mat,
      alpha_a <- .alpha_items(item_dat = items_a[,-1], item_index = item_index)
      alpha_i <- .alpha_items(item_dat = items_a[select_vec,-1], item_index = item_index)
 
+     alpha_a_pool <- .alpha_items(item_dat = items_a_pool[,-1], item_index = item_index)
+     alpha_i_pool <- .alpha_items(item_dat = items_a_pool[select_vec,-1], item_index = item_index)
+
+     sdya_vec_obs_pool <- apply(obs_a_pool[,-1], 2, sd)
+     sdyi_vec_obs_pool <- apply(obs_i_pool[,-1], 2, sd)
+
      if(!is.null(wt_mat)){
           p <- ncol(rho_mat_list[[1]])
 
           alpha_a <- alpha_a[,1:p]
           alpha_i <- alpha_i[,1:p]
+          alpha_a_pool <- alpha_a_pool[,1:p]
+          alpha_i_pool <- alpha_i_pool[,1:p]
           raw_alpha_a_group <- raw_alpha_a_group[1:p,]
           raw_alpha_i_group <- raw_alpha_i_group[1:p,]
           std_alpha_a_group <- std_alpha_a_group[1:p,]
@@ -573,30 +607,52 @@ append_dmat <- function(di_mat, da_mat,
 
           ra <- cov2cor(sa[1:p, 1:p])
           ra_group <- lapply(sa_group, function(x) cov2cor(x[1:p, 1:p]))
+          ra_pool <- cor(obs_a_pool[,-1][,1:p])
 
           ri <- cov2cor(si[1:p, 1:p])
           ri_group <- lapply(si_group, function(x) cov2cor(x[1:p, 1:p]))
+          ri_pool <- cor(obs_i_pool[,-1][,1:p])
 
           for(i in 1:ncol(wt_mat)){
                alpha_a <- cbind(alpha_a, c(composite_rel_matrix(r_mat = ra,
-                                                                rel_vec = alpha_a[1,],
+                                                                rel_vec = alpha_a[1,1:p],
                                                                 sd_vec = sdya_vec[1:p],
                                                                 wt_vec = wt_mat[,i]),
 
                                            composite_rel_matrix(r_mat = ra,
-                                                                rel_vec = alpha_a[2,],
+                                                                rel_vec = alpha_a[2,1:p],
                                                                 sd_vec = rep(1, ncol(ra)),
                                                                 wt_vec = wt_mat[,i])))
 
                alpha_i <- cbind(alpha_i, c(composite_rel_matrix(r_mat = ri,
-                                                                rel_vec = alpha_i[1,],
+                                                                rel_vec = alpha_i[1,1:p],
                                                                 sd_vec = sdyi_vec[1:p],
                                                                 wt_vec = wt_mat[,i]),
 
                                            composite_rel_matrix(r_mat = ri,
-                                                                rel_vec = alpha_i[2,],
+                                                                rel_vec = alpha_i[2,1:p],
                                                                 sd_vec = rep(1, ncol(ri)),
                                                                 wt_vec = wt_mat[,i])))
+
+               alpha_a_pool <- cbind(alpha_a_pool, c(composite_rel_matrix(r_mat = ra_pool,
+                                                                          rel_vec = alpha_a_pool[1,1:p],
+                                                                          sd_vec = sdya_vec_obs_pool[1:p],
+                                                                          wt_vec = wt_mat[,i]),
+
+                                                     composite_rel_matrix(r_mat = ra_pool,
+                                                                          rel_vec = alpha_a_pool[2,1:p],
+                                                                          sd_vec = rep(1, ncol(ra)),
+                                                                          wt_vec = wt_mat[,i])))
+
+               alpha_i_pool <- cbind(alpha_i_pool, c(composite_rel_matrix(r_mat = ri_pool,
+                                                                          rel_vec = alpha_i_pool[1,1:p],
+                                                                          sd_vec = sdyi_vec_obs_pool[1:p],
+                                                                          wt_vec = wt_mat[,i]),
+
+                                                     composite_rel_matrix(r_mat = ri_pool,
+                                                                          rel_vec = alpha_i_pool[2,1:p],
+                                                                          sd_vec = rep(1, ncol(ri)),
+                                                                          wt_vec = wt_mat[,i])))
 
                raw_alpha_a_group <- rbind(raw_alpha_a_group,
                                           unlist(lapply(as.list(1:length(ra_group)), function(x){
@@ -632,13 +688,16 @@ append_dmat <- function(di_mat, da_mat,
                                           })))
           }
           colnames(alpha_a) <- colnames(alpha_i) <- var_names
+          colnames(alpha_a_pool) <- colnames(alpha_i_pool) <- var_names
           rownames(raw_alpha_a_group) <- rownames(std_alpha_a_group) <- rownames(raw_alpha_i_group) <- rownames(std_alpha_i_group) <- var_names
      }
 
      observed <- append_dmat(di_mat = di_obs, da_mat = da_obs,
                              ryya = ryya, std_alpha_a = alpha_a[2,], raw_alpha_a = alpha_a[1,],
+                             ryya_pool = ryya_pool, std_alpha_a_pool = alpha_a_pool[2,], raw_alpha_a_pool = alpha_a_pool[1,],
                              ryya_group = ryya_group, std_alpha_a_group = std_alpha_a_group, raw_alpha_a_group = raw_alpha_a_group,
                              ryyi = ryyi, std_alpha_i = alpha_i[2,], raw_alpha_i = alpha_i[1,],
+                             ryyi_pool = ryyi_pool, std_alpha_i_pool = alpha_i_pool[2,], raw_alpha_i_pool = alpha_i_pool[1,],
                              ryyi_group = ryyi_group, std_alpha_i_group = std_alpha_i_group, raw_alpha_i_group = raw_alpha_i_group, show_applicant = show_applicant)
      true <- append_dmat(di_mat = di_true, da_mat = da_true, show_applicant = show_applicant)
      error <- append_dmat(di_mat = di_error, da_mat = da_error, show_applicant = show_applicant)
@@ -688,8 +747,8 @@ append_dmat <- function(di_mat, da_mat,
                cut <- qnorm(sr_vec[i], mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
                sr_mat[,i] <- pnorm(cut, mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
           }else{
-               mix <- norMix(mu = mu_mat[,i], w = p_vec, sigma = sigma_mat[,i])
-               cut <- qnorMix(sr_vec[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
+               mix <- nor1mix::norMix(mu = mu_mat[,i], w = p_vec, sigma = sigma_mat[,i])
+               cut <- nor1mix::qnorMix(sr_vec[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
                sr_mat[,i] <- pnorm(cut, mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
           }
      }
@@ -712,7 +771,7 @@ append_dmat <- function(di_mat, da_mat,
                .mu_mat <- rbind(.mu_mat, .comp_out$mu_vec)
                .sigma_mat <- rbind(.sigma_mat, diag(s_list[[i]])^.5)
           }
-          mix_out <- mix_matrix(mat_list = s_list, mu_mat = .mu_mat, p_vec = p_vec,
+          mix_out <- mix_matrix(sigma_list = s_list, mu_mat = .mu_mat, p_vec = p_vec,
                                 group_names = group_names, var_names = c(var_names, composite_names))
 
           sr_composites_mat <- as.matrix(.mu_mat[,-(1:ncol(mu_mat))])
@@ -783,17 +842,30 @@ append_dmat <- function(di_mat, da_mat,
      meanya <- t(rbind(meanya_mat_obs, meanya_mat_true, meanya_mat_error))
      meanyi <- t(rbind(meanyi_mat_obs, meanyi_mat_true, meanyi_mat_error))
 
-     mix_out_a <- mix_matrix(mat_list = S_complete_a, mu_mat = meanya, p_vec = pa, N = NULL,
+     mix_out_a <- mix_matrix(sigma_list = S_complete_a, mu_mat = meanya, p_vec = pa, N = NULL,
                              group_names = group_names, var_names = colnames(S_complete_a[[1]]))
-
-     mix_out_i <- mix_matrix(mat_list = S_complete_i, mu_mat = meanyi, p_vec = pi, N = NULL,
+     mix_out_i <- mix_matrix(sigma_list = S_complete_i, mu_mat = meanyi, p_vec = pi, N = NULL,
                              group_names = group_names, var_names = colnames(S_complete_i[[1]]))
 
-     S_items_a <- mix_matrix(mat_list = S_items_a_groups, mu_mat = mean_items_a, p_vec = pa, N = NULL,
-                             group_names = group_names, var_names = colnames(S_items_a_groups[[1]]))$cov_unbiased
+     S_items_a <- mix_matrix(sigma_list = S_items_a_groups, mu_mat = mean_items_a, p_vec = pa, N = NULL,
+                             group_names = group_names, var_names = colnames(S_items_a_groups[[1]]))$cov_total_ml
+     S_items_i <- mix_matrix(sigma_list = S_items_i_groups, mu_mat = mean_items_i, p_vec = pi, N = NULL,
+                             group_names = group_names, var_names = colnames(S_items_i_groups[[1]]))$cov_total_ml
 
-     S_items_i <- mix_matrix(mat_list = S_items_i_groups, mu_mat = mean_items_i, p_vec = pi, N = NULL,
-                             group_names = group_names, var_names = colnames(S_items_i_groups[[1]]))$cov_unbiased
+     meany_pool <- meanya
+     meany_pool[1:length(meany_pool)] <- 0
+     mix_out_a_pool <- mix_matrix(sigma_list = S_complete_a, mu_mat = meany_pool, p_vec = pa, N = NULL,
+                                  group_names = group_names, var_names = colnames(S_complete_a[[1]]))
+     mix_out_i_pool <- mix_matrix(sigma_list = S_complete_i, mu_mat = meany_pool, p_vec = pi, N = NULL,
+                                  group_names = group_names, var_names = colnames(S_complete_i[[1]]))
+
+     mean_items_pool <- mean_items_a
+     mean_items_pool[1:length(mean_items_pool)] <- 0
+     S_items_a_pool <- mix_matrix(sigma_list = S_items_a_groups, mu_mat = mean_items_pool, p_vec = pa, N = NULL,
+                                  group_names = group_names, var_names = colnames(S_items_a_groups[[1]]))$cov_total_ml
+     S_items_i_pool <- mix_matrix(sigma_list = S_items_i_groups, mu_mat = mean_items_pool, p_vec = pi, N = NULL,
+                                  group_names = group_names, var_names = colnames(S_items_i_groups[[1]]))$cov_total_ml
+
 
      pi_mat <- matrix(pi, nrow(meanyi_mat_obs), ncol(meanyi_mat_obs), T)
      pa_mat <- matrix(pa, nrow(meanyi_mat_obs), ncol(meanyi_mat_obs), T)
@@ -807,21 +879,26 @@ append_dmat <- function(di_mat, da_mat,
      di_true <- .compute_d_internal(means = meanyi_mat_true, sds = sdyi_mat_true, p = pi_mat, applicant = FALSE, groups_on_cols = TRUE)
      di_error <- .compute_d_internal(means = meanyi_mat_error, sds = sdyi_mat_error, p = pi_mat, applicant = FALSE, groups_on_cols = TRUE)
 
-     ryya <- diag(suppressWarnings(cov2cor(mix_out_a$cov_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
-     ryyi <- diag(suppressWarnings(cov2cor(mix_out_i$cov_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+     ryya <- diag(suppressWarnings(cov2cor(mix_out_a$cov_total_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+     ryyi <- diag(suppressWarnings(cov2cor(mix_out_i$cov_total_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+
+     ryya_pool <- diag(suppressWarnings(cov2cor(mix_out_a_pool$cov_total_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+     ryyi_pool <- diag(suppressWarnings(cov2cor(mix_out_i_pool$cov_total_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
 
      ryya_group <- simplify2array(lapply(S_complete_a, function(x) diag(suppressWarnings(cov2cor(x))[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
      ryyi_group <- simplify2array(lapply(S_complete_i, function(x) diag(suppressWarnings(cov2cor(x))[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
 
-     sa <- mix_out_a$cov_ml
-     si <- mix_out_i$cov_ml
+     sa <- mix_out_a$cov_total_ml
+     si <- mix_out_i$cov_total_ml
 
      ## Extract vectors of overall descriptives
      meanyi_vec <- mix_out_i$means_raw[nrow(mix_out_a$means_raw),]
      meanya_vec <- mix_out_a$means_raw[nrow(mix_out_a$means_raw),]
-     sdyi_vec <- diag(mix_out_i$cov_ml)^.5
-     sdya_vec <- diag(mix_out_a$cov_ml)^.5
+     sdyi_vec <- diag(mix_out_i$cov_total_ml)^.5
+     sdya_vec <- diag(mix_out_a$cov_total_ml)^.5
      u_vec <- diag(si)^.5 / diag(sa)^.5
+     sdyi_vec_pool <- diag(mix_out_i_pool$cov_total_ml)^.5
+     sdya_vec_pool <- diag(mix_out_a_pool$cov_total_ml)^.5
 
      ## Organize incumbent SDs
      sdyi_vec_obs <- sdyi_vec[grepl(x = names(sdyi_vec), pattern = "Obs_")]
@@ -859,6 +936,8 @@ append_dmat <- function(di_mat, da_mat,
      alpha_i_group <- lapply(S_items_i_groups, function(x) .alpha_items(S = x, R = cov2cor(x), item_index = item_index))
      alpha_a <- .alpha_items(S = S_items_a, R = cov2cor(S_items_a), item_index = item_index)
      alpha_i <- .alpha_items(S = S_items_i, R = cov2cor(S_items_i), item_index = item_index)
+     alpha_a_pool <- .alpha_items(S = S_items_a_pool, R = cov2cor(S_items_a_pool), item_index = item_index)
+     alpha_i_pool <- .alpha_items(S = S_items_i_pool, R = cov2cor(S_items_i_pool), item_index = item_index)
 
      raw_alpha_a_group <- simplify2array(lapply(alpha_a_group, function(x) x[1,]))
      raw_alpha_i_group <- simplify2array(lapply(alpha_i_group, function(x) x[1,]))
@@ -871,49 +950,73 @@ append_dmat <- function(di_mat, da_mat,
 
           alpha_a <- alpha_a[,1:p]
           alpha_i <- alpha_i[,1:p]
+          alpha_a_pool <- alpha_a_pool[,1:p]
+          alpha_i_pool <- alpha_i_pool[,1:p]
 
           raw_alpha_a_group <- raw_alpha_a_group[1:p,]
           raw_alpha_i_group <- raw_alpha_i_group[1:p,]
           std_alpha_a_group <- std_alpha_a_group[1:p,]
           std_alpha_i_group <- std_alpha_i_group[1:p,]
 
-          sa <- mix_out_a$cov_ml
-          si <- mix_out_i$cov_ml
+          sa <- mix_out_a$cov_total_ml
+          si <- mix_out_i$cov_total_ml
 
           sa_group <- S_complete_a
           si_group <- S_complete_i
 
           ra <- cov2cor(sa[1:p, 1:p])
           ra_group <- lapply(sa_group, function(x) cov2cor(x[1:p, 1:p]))
+          ra_pool <- cov2cor(mix_out_a_pool$cov_total_ml[1:p, 1:p])
 
           ri <- cov2cor(si[1:p, 1:p])
           ri_group <- lapply(si_group, function(x) cov2cor(x[1:p, 1:p]))
+          ri_pool <- cov2cor(mix_out_i_pool$cov_total_ml[1:p, 1:p])
 
           for(i in 1:ncol(wt_mat)){
                alpha_a <- cbind(alpha_a, c(composite_rel_matrix(r_mat = ra,
-                                                                rel_vec = alpha_a[1,],
+                                                                rel_vec = alpha_a[1,1:p],
                                                                 sd_vec = sdya_vec[1:p],
                                                                 wt_vec = wt_mat[,i]),
 
                                            composite_rel_matrix(r_mat = ra,
-                                                                rel_vec = alpha_a[2,],
+                                                                rel_vec = alpha_a[2,1:p],
                                                                 sd_vec = rep(1, ncol(ra)),
                                                                 wt_vec = wt_mat[,i])))
 
                alpha_i <- cbind(alpha_i, c(composite_rel_matrix(r_mat = ri,
-                                                                rel_vec = alpha_i[1,],
+                                                                rel_vec = alpha_i[1,1:p],
                                                                 sd_vec = sdyi_vec[1:p],
                                                                 wt_vec = wt_mat[,i]),
 
                                            composite_rel_matrix(r_mat = ri,
-                                                                rel_vec = alpha_i[2,],
+                                                                rel_vec = alpha_i[2,1:p],
                                                                 sd_vec = rep(1, ncol(ri)),
                                                                 wt_vec = wt_mat[,i])))
+
+               alpha_a_pool <- cbind(alpha_a_pool, c(composite_rel_matrix(r_mat = ra_pool,
+                                                                          rel_vec = alpha_a_pool[1,1:p],
+                                                                          sd_vec = sdya_vec_pool[1:p],
+                                                                          wt_vec = wt_mat[,i]),
+
+                                                     composite_rel_matrix(r_mat = ra_pool,
+                                                                          rel_vec = alpha_a_pool[2,1:p],
+                                                                          sd_vec = rep(1, ncol(ra_pool)),
+                                                                          wt_vec = wt_mat[,i])))
+
+               alpha_i_pool <- cbind(alpha_i_pool, c(composite_rel_matrix(r_mat = ri_pool,
+                                                                          rel_vec = alpha_i_pool[1,1:p],
+                                                                          sd_vec = sdyi_vec_pool[1:p],
+                                                                          wt_vec = wt_mat[,i]),
+
+                                                     composite_rel_matrix(r_mat = ri_pool,
+                                                                          rel_vec = alpha_i_pool[2,1:p],
+                                                                          sd_vec = rep(1, ncol(ri_pool)),
+                                                                          wt_vec = wt_mat[,i])))
 
                raw_alpha_a_group <- rbind(raw_alpha_a_group,
                                           unlist(lapply(as.list(1:length(ra_group)), function(x){
                                                composite_rel_matrix(r_mat = ra_group[[x]],
-                                                                    rel_vec = raw_alpha_a_group[,x],
+                                                                    rel_vec = raw_alpha_a_group[1:p,x],
                                                                     sd_vec = sdya_mat_obs[1:p,x],
                                                                     wt_vec = wt_mat[,i])
                                           })))
@@ -921,7 +1024,7 @@ append_dmat <- function(di_mat, da_mat,
                std_alpha_a_group <- rbind(std_alpha_a_group,
                                           unlist(lapply(as.list(1:length(ra_group)), function(x){
                                                composite_rel_matrix(r_mat = ra_group[[x]],
-                                                                    rel_vec = std_alpha_a_group[,x],
+                                                                    rel_vec = std_alpha_a_group[1:p,x],
                                                                     sd_vec = rep(1, ncol(ra_group[[x]])),
                                                                     wt_vec = wt_mat[,i])
                                           })))
@@ -930,7 +1033,7 @@ append_dmat <- function(di_mat, da_mat,
                raw_alpha_i_group <- rbind(raw_alpha_i_group,
                                           unlist(lapply(as.list(1:length(ri_group)), function(x){
                                                composite_rel_matrix(r_mat = ri_group[[x]],
-                                                                    rel_vec = raw_alpha_i_group[,x],
+                                                                    rel_vec = raw_alpha_i_group[1:p,x],
                                                                     sd_vec = sdyi_mat_obs[1:p,x],
                                                                     wt_vec = wt_mat[,i])
                                           })))
@@ -938,24 +1041,23 @@ append_dmat <- function(di_mat, da_mat,
                std_alpha_i_group <- rbind(std_alpha_i_group,
                                           unlist(lapply(as.list(1:length(ri_group)), function(x){
                                                composite_rel_matrix(r_mat = ri_group[[x]],
-                                                                    rel_vec = std_alpha_i_group[,x],
+                                                                    rel_vec = std_alpha_i_group[1:p,x],
                                                                     sd_vec = rep(1, ncol(ri_group[[x]])),
                                                                     wt_vec = wt_mat[,i])
                                           })))
           }
           colnames(alpha_a) <- colnames(alpha_i) <- var_names
+          colnames(alpha_a_pool) <- colnames(alpha_i_pool) <- var_names
           rownames(raw_alpha_a_group) <- rownames(std_alpha_a_group) <- rownames(raw_alpha_i_group) <- rownames(std_alpha_i_group) <- var_names
      }
-     raw_alpha_a <- alpha_a[1,]
-     raw_alpha_i <- alpha_i[1,]
-     std_alpha_a <- alpha_a[2,]
-     std_alpha_i <- alpha_i[2,]
 
-     names(ryya) <- names(ryyi) <- rownames(ryya_group) <- rownames(ryyi_group) <- var_names
+     names(ryya_pool) <- names(ryyi_pool) <- names(ryya) <- names(ryyi) <- rownames(ryya_group) <- rownames(ryyi_group) <- var_names
      observed <- append_dmat(di_mat = di_obs, da_mat = da_obs,
                              ryya = ryya, std_alpha_a = alpha_a[2,], raw_alpha_a = alpha_a[1,],
+                             ryya_pool = ryya_pool, std_alpha_a_pool = alpha_a_pool[2,], raw_alpha_a_pool = alpha_a_pool[1,],
                              ryya_group = ryya_group, std_alpha_a_group = std_alpha_a_group, raw_alpha_a_group = raw_alpha_a_group,
                              ryyi = ryyi, std_alpha_i = alpha_i[2,], raw_alpha_i = alpha_i[1,],
+                             ryyi_pool = ryyi_pool, std_alpha_i_pool = alpha_i_pool[2,], raw_alpha_i_pool = alpha_i_pool[1,],
                              ryyi_group = ryyi_group, std_alpha_i_group = std_alpha_i_group, raw_alpha_i_group = raw_alpha_i_group, show_applicant = show_applicant)
      true <- append_dmat(di_mat = di_true, da_mat = da_true, show_applicant = show_applicant)
      error <- append_dmat(di_mat = di_error, da_mat = da_error, show_applicant = show_applicant)
@@ -993,7 +1095,7 @@ append_dmat <- function(di_mat, da_mat,
 #' The \code{simulate_d_database} function generates databases of psychometric d value data from sample-size parameters, correlation parameters, mean parameters, standard deviation parameters, reliability parameters, and selection-ratio parameters.
 #' The output database can be provided in a long format.
 #' If composite variables are to be formed, parameters can also be defined for the weights used to form the composites as well as the selection ratios applied to the composites.
-#' This function will return a database of statistics as well as a database of parameters - the parameter database contains the actual study parameters for each simulated samples (without sampleing error) to allow comparisons between meta-analytic results computed from the statistics and the actual means and variances of parameters.
+#' This function will return a database of statistics as well as a database of parameters - the parameter database contains the actual study parameters for each simulated sample (without sampleing error) to allow comparisons between meta-analytic results computed from the statistics and the actual means and variances of parameters.
 #' The \code{\link{merge_simdat_d}} function can be used to merge multiple simulated databases and the \code{\link{sparsify_simdat_d}} function can be used to randomly delete artifact information (a procedure commonly done in simulations of artifact-distribution methods).
 #'
 #' @param k Number of studies to simulate.
@@ -1028,7 +1130,7 @@ append_dmat <- function(di_mat, da_mat,
 #' with the values to be sampled.
 #' \item A matrix containing a column of values (this column must be named "values") from which study parameters should be sampled and a column of weights (this column must be labeled 'weights') associated
 #' with the values to be sampled.
-#' \item A function that is configured to generate data using only one argument that definines the number of cases to generate, e.g., \code{fun(n = 10)}.
+#' \item A function that is configured to generate data using only one argument that defines the number of cases to generate, e.g., \code{fun(n = 10)}.
 #' }
 #'
 #' @return A database of simulated primary studies' statistics and analytically determined parameter values.
@@ -1139,6 +1241,9 @@ simulate_d_database <- function(k, n_params, rho_params,
                stop("If 'keep_vars' is not NULL, all values in 'keep_vars' must correspond to variable names supplied as 'var_names' and 'composite_names' arguments", call. = FALSE)
           }
      }
+
+     if(is.null(composite_names) & !is.null(wt_params))
+          composite_names <- paste0("composite", 1:length(sr_composite_params))
 
      if(is.null(max_iter)) stop("'max_iter' cannot be NULL", call. = FALSE)
      if(is.na(max_iter)) stop("'max_iter' cannot be NA", call. = FALSE)
@@ -1340,15 +1445,11 @@ simulate_d_database <- function(k, n_params, rho_params,
           rm(out_params)
      }
 
-     if(!is.null(keep_vars)) var_names <- keep_vars
-
      dat_stats <- dat_params <- NULL
      for(i in 1:length(sim_dat_stats)){
           dat_stats <- rbind(dat_stats, data.frame(sample_id = i, sim_dat_stats[[i]]))
           dat_params <- rbind(dat_params, data.frame(sample_id = i, sim_dat_params[[i]]))
      }
-     dat_stats <- dat_stats[dat_stats$y_name %in% var_names,]
-     dat_params <- dat_params[dat_params$y_name %in% var_names,]
      rownames(dat_stats) <- rownames(dat_params) <- NULL
      rm(sim_dat_stats, sim_dat_params)
 
@@ -1357,19 +1458,14 @@ simulate_d_database <- function(k, n_params, rho_params,
      }else{
           dat_first <- dat_stats[,1:which(colnames(dat_stats) == "std_alpha_yi2")]
      }
-     dat_u_local <- dat_stats[,which(colnames(dat_stats) == "uy"):which(colnames(dat_stats) == "uy2")]
-     dat_sdyi_stats <- dat_stats[,c("sdyi_mixture", "sdyi1", "sdyi2")]
-     dat_sdya_param <- dat_params[,c("sdya_mixture", "sdya1", "sdya2")]
+     dat_u_local <- dat_stats[,which(colnames(dat_stats) == "uy_pooled"):which(colnames(dat_stats) == "uy2")]
+     dat_sdyi_stats <- dat_stats[,c("sdyi_pooled", "sdyi_total", "sdyi1", "sdyi2")]
+     dat_sdya_param <- dat_params[,c("sdyi_pooled", "sdya_total", "sdya1", "sdya2")]
      dat_u_external <- dat_sdyi_stats / dat_sdya_param
-     colnames(dat_u_local) <- paste0(c("uy", "uy1", "uy2"), "_local")
-     colnames(dat_u_external) <- paste0(c("uy", "uy1", "uy2"), "_external")
-     dat_last <- dat_stats[,which(colnames(dat_stats) == "meanyi"):ncol(dat_stats)]
+     colnames(dat_u_local) <- paste0(c("uy_pooled", "uy_total", "uy1", "uy2"), "_local")
+     colnames(dat_u_external) <- paste0(c("uy_pooled", "uy_total", "uy1", "uy2"), "_external")
+     dat_last <- dat_stats[,which(colnames(dat_stats) == "meanyi_total"):ncol(dat_stats)]
      dat_stats <- cbind(dat_first, dat_u_local, dat_u_external, dat_last)
-
-     # if(!show_applicant) dat_params[,c("da", "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
-     #                                   "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
-     #                                   "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2",
-     #                                   "sdya_pooled", "sdya_mixture", "sdya1", "sdya2", "meanya", "meanya1", "meanya2")] <- NULL
 
      numeric_vars_stats <- rep(TRUE, ncol(dat_stats))
      numeric_vars_params <- rep(TRUE, ncol(dat_params))
@@ -1393,7 +1489,7 @@ simulate_d_database <- function(k, n_params, rho_params,
 #' Create sparse artifact information in a "simdat_d" class object
 #'
 #' This function can be used to randomly delete artifact from databases produced by the \code{\link{simulate_d_database}} function.
-#' Deletion of artifacts can be performed in either a study-wise fashion for complete missingness within randomly selected studies or element-wise missingness for compeltely random deletion of artifacts in the database.
+#' Deletion of artifacts can be performed in either a study-wise fashion for complete missingness within randomly selected studies or element-wise missingness for completely random deletion of artifacts in the database.
 #' Deletion can be applied to reliability estimates and/or u ratios.
 #'
 #' @param data_obj Object created by the "simdat_d" function.

@@ -9,9 +9,17 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
      class_ma <- class(ma_obj)
 
      if(any(class_ma == "ma_generic")) es_type <- "es"
-     if(any(class_ma == "ma_r_as_r" | class_ma == "ma_d_as_r")) es_type <- "r"
-     if(any(class_ma == "ma_d_as_d" | class_ma == "ma_r_as_d")) es_type <- "d"
+     if(any(class_ma == "ma_r_as_r" | class_ma == "ma_r_as_d")) es_type <- "r"
+     if(any(class_ma == "ma_d_as_d" | class_ma == "ma_d_as_r")) es_type <- "d"
      if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)
+
+     d_metric <- ifelse(any((class_ma == "ma_d_as_d" & (any(class_ma == "ma_ic") | any(class_ma == "ma_ad"))) | class_ma == "ma_r_as_d"), TRUE, FALSE)
+     if(d_metric){
+          ma_obj <- convert_ma(ma_obj)
+          convert_back <- TRUE
+     }else{
+          convert_back <- FALSE
+     }
 
      if(any(class(ma_obj) == "ma_master")){
           ma_list <- ma_obj$construct_pairs
@@ -33,9 +41,9 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
      }
 
 
-     progbar <- progress_bar$new(format = " Computing bootstrapped meta-analyses [:bar] :percent est. time remaining: :eta",
-                                 total = sum(unlist(lapply(ma_list, function(x){nrow(x$barebones$meta_table)}))),
-                                 clear = FALSE, width = options()$width)
+     progbar <- progress::progress_bar$new(format = " Computing bootstrapped meta-analyses [:bar] :percent est. time remaining: :eta",
+                                           total = sum(unlist(lapply(ma_list, function(x){nrow(x$barebones$meta_table)}))),
+                                           clear = FALSE, width = options()$width)
      ma_list <- lapply(ma_list, function(ma_obj_i){
 
           if(any(class(ma_obj_i) == "ma_ic")){
@@ -68,6 +76,19 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
 
           if(es_type == "d"){
                sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
+
+               if(any(class_ma == "ma_ic" | class_ma == "ma_ad")){
+                    sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
+                    rxy <-   lapply(ma_obj_i$barebones$escalc_list, function(x) x$yi)
+                    n_adj <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n_adj)
+                    vi_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
+                    wt_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
+               }
+
+               ts_label <- "latentGroup_latentY"
+               vgx_label <- "observedGroup_latentY"
+               vgy_label <- "latentGroup_observedY"
+
                d <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$d)
                n1 <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n1)
                n2 <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n2)
@@ -75,9 +96,12 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                vi <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
                wt <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
 
-               ts_label <- "latentGroup_latentY"
-               vgx_label <- "observedGroup_latentY"
-               vgy_label <- "latentGroup_observedY"
+               if(any(class_ma == "ma_ic" | class_ma == "ma_ad")){
+                    n <-     lapply(ma_obj_i$barebones$escalc_list, function(x) x$n1 + x$n2)
+                    ts_label <- "true_score"
+                    vgx_label <- "validity_generalization_x"
+                    vgy_label <- "validity_generalization_y"
+               }
           }
 
           if(any(class_ma == "ma_ic")){
@@ -101,6 +125,12 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                correction_type <- lapply(ma_obj_i$individual_correction[[ts_label]]$escalc_list, function(x) x$correction_type)
           }
 
+          if(any(class_ma == "ma_d_as_d" | class_ma == "ma_r_as_d")){
+               ts_label <- "latentGroup_latentY"
+               vgx_label <- "observedGroup_latentY"
+               vgy_label <- "latentGroup_observedY"
+          }
+
           list_null <- list()
           for(i in 1:k_analyses){
                list_null_i <- list(id = NULL)
@@ -121,32 +151,52 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
           }else{
                ma_arg_list <- ma_obj_i$barebones$inputs
           }
+
           for(i in 1:k_analyses){
                progbar$tick()
 
                analysis_id <- paste0("Analysis ID = ", i)
 
                if(ma_obj_i$barebones$meta_table$k[i] >= min_k){
+                    if(!is.null(ma_obj_i$barebones$escalc_list[[i]]$pi)){
+                         p <- wt_mean(x = ma_obj_i$barebones$escalc_list[[i]]$pi, wt = ma_obj_i$barebones$escalc_list[[i]]$n_adj)
+                    }else{
+                         p <- .5
+                    }
+                    conf_level <- ma_obj_i$barebones$inputs$conf_level
+                    cred_level <- ma_obj_i$barebones$inputs$cred_level
+                    conf_method <- ma_obj_i$barebones$inputs$conf_method
+                    cred_method <- ma_obj_i$barebones$inputs$cred_method
+
                     if(es_type == "es"){
                          es_data <- data.frame(yi = yi[[i]],
                                                n = n[[i]])
-                         if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
+                         if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
                     }
                     if(es_type == "r"){
                          es_data <- data.frame(rxy = rxy[[i]],
                                                n = n[[i]])
                          es_data$n_adj <- n_adj[[i]]
-                         if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
+                         if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
                     }
                     if(es_type == "d"){
                          es_data <- data.frame(d = d[[i]],
                                                n1 = n1[[i]])
                          es_data$n2 <- n2[[i]]
                          es_data$n_adj <- n_adj[[i]]
-                         if(!is.null(sample_id[[i]])) add_column(es_data, sample_id = sample_id[[i]], .before = "d")
+                         if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "d")
+                         es_data$pi <-
+                              if(!is.null(ma_obj_i$barebones$escalc_list[[i]]$pi)){
+                                   ma_obj_i$barebones$escalc_list[[i]]$pi
+                              }else{
+                                   .5
+                              }
                     }
 
                     if(any(class_ma == "ma_ic")){
+                         es_data$rxy = rxy[[i]]
+                         es_data$n = n[[i]]
+
                          es_data$rtpa = rtpa[[i]]
                          es_data$rxpa = rxpa[[i]]
                          es_data$rtya = rtya[[i]]
@@ -158,10 +208,43 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                          es_data$n_adj <- n_adj[[i]]
                     }
 
+                    if(any(class_ma == "ma_ad")){
+                         es_data$rxy = rxy[[i]]
+                         es_data$n = n[[i]]
+                         es_data$n_adj <- n_adj[[i]]
+                    }
+
                     if(any(class_ma == "ma_ic") | any(class_ma == "ma_ad")){
                          if(any(class_ma == "ma_ic")){
+                              if(!is.null(ma_obj_i$individual_correction$true_score$escalc_list[[i]]$pa)){
+                                   p_ts <- wt_mean(x = ma_obj_i$individual_correction$true_score$escalc_list[[i]]$pa,
+                                                   wt = ma_obj_i$individual_correction$true_score$escalc_list[[i]]$weight)
+                              }else{
+                                   p_ts <- .5
+                              }
+                              if(!is.null(ma_obj_i$individual_correction$validity_generalization_x$escalc_list[[i]]$pa)){
+                                   p_vgx <- wt_mean(x = ma_obj_i$individual_correction$validity_generalization_x$escalc_list[[i]]$pa,
+                                                    wt = ma_obj_i$individual_correction$validity_generalization_x$escalc_list[[i]]$weight)
+                              }else{
+                                   p_vgx <- .5
+                              }
+                              if(!is.null(ma_obj_i$individual_correction$validity_generalization_y$escalc_list[[i]]$pa)){
+                                   p_vgy <- wt_mean(x = ma_obj_i$individual_correction$validity_generalization_y$escalc_list[[i]]$pa,
+                                                    wt = ma_obj_i$individual_correction$validity_generalization_y$escalc_list[[i]]$weight)
+                              }else{
+                                   p_vgy <- .5
+                              }
+                              ma_arg_list$p_bb <- p
+                              ma_arg_list$p_ts <- p_ts
+                              ma_arg_list$p_vgx <- p_vgx
+                              ma_arg_list$p_vgy <- p_vgy
+                              ma_arg_list$convert_ma <- d_metric
+
                               boot_list <- .separate_boot(boot_list = .ma_bootstrap(data = es_data, ma_fun_boot = .ma_r_ic_boot, boot_iter = boot_iter,
                                                                                     boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
+
+                              class(boot_list$barebones) <- class(boot_list$true_score) <- class(boot_list$validity_generalization_x) <-
+                                   class(boot_list$validity_generalization_y) <- c("psychmeta", "ma_bootstrap")
 
                               out_list$barebones[[analysis_id]] <- boot_list$barebones
                               out_list$individual_correction$true_score[[analysis_id]] <- boot_list$true_score
@@ -174,9 +257,14 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                               ma_ad_dump <- ma_ad_dump_full$x
                               ma_ad_dump$art_grid <- ma_ad_dump_full$art_grid
                               ma_arg_list$ma_ad_dump <- ma_ad_dump
+                              ma_arg_list$p_bb <- ma_arg_list$p_ts <- ma_arg_list$p_vgx <- ma_arg_list$p_vgy <- p
+                              ma_arg_list$convert_ma <- d_metric
 
                               boot_list <- .separate_boot(boot_list = .ma_bootstrap(data = es_data, ma_fun_boot = .ma_r_ad_boot, boot_iter = boot_iter,
                                                                                     boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
+
+                              class(boot_list$barebones) <- class(boot_list$true_score) <- class(boot_list$validity_generalization_x) <-
+                                   class(boot_list$validity_generalization_y) <- c("psychmeta", "ma_bootstrap")
 
                               out_list$barebones[[analysis_id]] <- boot_list$barebones
                               out_list$artifact_distribution$true_score[[analysis_id]] <- boot_list$true_score
@@ -199,6 +287,14 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                               out_list$barebones[[analysis_id]] <- .ma_bootstrap(data = es_data, ma_fun_boot = .ma_d_bb_boot, boot_iter = boot_iter,
                                                                                  boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list)
 
+                         class(out_list$barebones[[analysis_id]]) <- c("psychmeta", "ma_bootstrap")
+                    }
+
+                    if(d_metric){
+                         if(!is.null(out_list$artifact_distribution))
+                              names(out_list$artifact_distribution) <- c("latentGroup_latentY", "observedGroup_latentY", "latentGroup_observedY")
+                         if(!is.null(out_list$individual_correction))
+                              names(out_list$individual_correction) <- c("latentGroup_latentY", "observedGroup_latentY", "latentGroup_observedY")
                     }
                }
 
@@ -212,6 +308,8 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
      }else{
           ma_obj <- ma_list[[1]]
      }
+
+     if(convert_back) ma_obj <- convert_ma(ma_obj)
 
      if(record_call) ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 

@@ -15,7 +15,7 @@ adjust_n_r(r, var_e)
 A vector of adjusted sample sizes.
 }
 \description{
-This function is used to compute the adjusted sample size of a non-Pearsonian correlation (e.g., a tetrachoric correlation) based on the correlation and its estimated error variance.
+This function is used to compute the adjusted sample size of a non-Pearson correlation (e.g., a tetrachoric correlation) based on the correlation and its estimated error variance.
 This function allows users to adjust the sample size of a correlation corrected for sporadic artifacts (e.g., unequal splits of dichotomous variables, artificial dichotomization of continuous variables) prior to use in a meta-analysis.
 }
 \details{

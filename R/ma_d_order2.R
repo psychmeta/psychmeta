@@ -2,13 +2,15 @@
 #'
 #' This function computes second-order meta-analysis function for \emph{d} values. It supports second-order analyses of bare-bones, artifact-distribution, and individual-correction meta-analyses.
 #'
+#' @param k Vector or column name of meta-analyses' k values.
+#' @param N Vector or column name of meta-analyses' total sample sizes (optional).
 #' @param d Vector or column name of mean observed \emph{d} values.
 #' @param delta Vector or column name of mean corrected \emph{d} values.
 #' @param var_d Vector or column name of observed variances of observed \emph{d} values.
 #' @param var_d_c Vector or column name of observed variances of corrected \emph{d} values.
-#' @param k Vector or column name of meta-analyses' k values.
 #' @param ma_type Type of meta-analyses being analyzed: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
 #' @param sample_id Vector or column name of study ID labels.
+#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
 #' @param construct_x Vector or column name of construct names for X.
@@ -23,11 +25,12 @@
 #'
 #' @return An object of the classes \code{psychmeta}, \code{ma_d_as_d}, \code{ma_order2}, and \code{ma_bb}, \code{ma_ic}, and/or \code{ma_ad}.
 #' @export
-ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k = NULL, ma_type = c("bb", "ic", "ad"),
-                        sample_id = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
+ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, ma_type = c("bb", "ic", "ad"),
+                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
                         conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE, hs_override = FALSE, data = NULL){
      warn_obj1 <- record_warnings()
      call <- match.call()
+     ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
 
      if(hs_override){
           conf_method <- cred_method <- "norm"
@@ -44,32 +47,37 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
      if(!is.null(data)){
           data <- as.data.frame(data)
 
-          if(deparse(substitute(k))[1] != "NULL")
-               k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, data = data)
+          k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, arg_name = "k", data = data)
+
+          if(deparse(substitute(N))[1] != "NULL")
+               N <- match_variables(call = call_full[[match("N", names(call_full))]], arg = N, arg_name = "N", data = data)
 
           if(deparse(substitute(d))[1] != "NULL")
-               d <- match_variables(call = call_full[[match("d", names(call_full))]], arg = d, data = data)
+               d <- match_variables(call = call_full[[match("d", names(call_full))]], arg = d, arg_name = "d", data = data)
 
           if(deparse(substitute(delta))[1] != "NULL")
-               delta <- match_variables(call = call_full[[match("delta", names(call_full))]], arg = delta, data = data)
+               delta <- match_variables(call = call_full[[match("delta", names(call_full))]], arg = delta, arg_name = "delta", data = data)
 
           if(deparse(substitute(var_d))[1] != "NULL")
-               var_d <- match_variables(call = call_full[[match("var_d", names(call_full))]], arg = var_d, data = data)
+               var_d <- match_variables(call = call_full[[match("var_d", names(call_full))]], arg = var_d, arg_name = "var_d", data = data)
 
           if(deparse(substitute(var_d_c))[1] != "NULL")
-               var_d_c <- match_variables(call = call_full[[match("var_d_c", names(call_full))]], arg = var_d_c, data = data)
+               var_d_c <- match_variables(call = call_full[[match("var_d_c", names(call_full))]], arg = var_d_c, arg_name = "var_d_c", data = data)
 
           if(deparse(substitute(sample_id))[1] != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
+               sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, arg_name = "sample_id", data = data)
+
+          if(deparse(substitute(citekey))[1] != "NULL")
+               citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
 
           if(deparse(substitute(construct_x)) != "NULL")
-               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, data = data)
+               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
 
           if(deparse(substitute(construct_y)) != "NULL")
-               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
+               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
      }
 
      if(!is.null(moderators)){
@@ -99,11 +107,11 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
           moderator_levels <- NULL
      }
 
-     inputs <- list(d = d, delta = delta, var_d = var_d, var_d_c = var_d_c, k = k,
-                    sample_id = sample_id, moderators = moderators, construct_x = construct_x, construct_y = construct_y,
+     inputs <- list(k = k, N = N, d = d, delta = delta, var_d = var_d, var_d_c = var_d_c,
+                    sample_id = sample_id, citekey = citekey, moderators = moderators, construct_x = construct_x, construct_y = construct_y,
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, data = data)
 
-     dat_var <- c("sample_id", "construct_x", "construct_y", "moderators", "d", "delta", "var_d", "var_d_c", "k")
+     dat_var <- c("sample_id", "citekey", "construct_x", "construct_y", "moderators", "k", "N", "d", "delta", "var_d", "var_d_c")
 
      dat <- NULL
      for(v in dat_var){
@@ -126,25 +134,26 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
                }
           }
      }
+     if(is.null(dat$N)) dat$N <- NA
 
-     bb_req <- c("d", "var_d", "k")
-     ic_req <- c("delta", "var_d_c", "k")
-     ad_req <- c("d", "delta", "var_d", "k")
+     bb_req <- c("k", "d", "var_d")
+     ic_req <- c("k", "delta", "var_d_c")
+     ad_req <- c("k", "d", "delta", "var_d")
 
      nonnull <- lapply(inputs, function(x) !is.null(x))
      nonnull <- names(nonnull)[unlist(nonnull)]
 
-     do_bb <- all(bb_req %in% nonnull)
-     do_ic <- all(ic_req %in% nonnull) & ma_type == "bb"
-     do_ad <- all(ad_req %in% nonnull) & ma_type == "ad"
+     do_bb <- all(bb_req %in% nonnull) & "bb" %in% ma_type
+     do_ic <- all(ic_req %in% nonnull) & "ic" %in% ma_type
+     do_ad <- all(ad_req %in% nonnull) & "ad" %in% ma_type
 
-     if(ma_type == "bb" & !do_bb)
+     if("bb" %in% ma_type & !do_bb)
           stop("For bare-bones meta-analyses, the following data arguments must be supplied: ", paste(bb_req, collapse = ", "), call. = FALSE)
 
-     if(ma_type == "ic" & !do_ic)
+     if("ic" %in% ma_type & !do_ic)
           stop("For individual-correction meta-analyses, the following data arguments must be supplied: ", paste(ic_req, collapse = ", "), call. = FALSE)
 
-     if(ma_type == "ad" & !do_ad)
+     if("ad" %in% ma_type & !do_ad)
           stop("For artifact-distribution, the following data arguments must be supplied: ", paste(ad_req, collapse = ", "), call. = FALSE)
 
      out <- ma_wrapper(es_data = dat, es_type = "d", ma_type = "d_order2", ma_fun = .ma_d_order2,
@@ -189,6 +198,7 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
      var_r <- data$var_d
      var_r_c <- data$var_d_c
      k <- data$k
+     N <- data$N
 
      conf_level <- ma_arg_list$conf_level
      cred_level <- ma_arg_list$cred_level
@@ -201,31 +211,34 @@ ma_d_order2 <- function(d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, k 
      do_ad <- ma_arg_list$do_ad
 
      if((type == "all" | type == "bb") & do_bb){
-          out_bb <- .ma_r_order2_bb(r_vec = r, var_r_vec = var_r, k_vec = k,
+          out_bb <- .ma_r_order2_bb(k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
           colnames(out_bb$meta)[ncol(out_bb$meta)] <- "cor(d, error)"
           colnames(out_bb$meta) <- gsub(x = colnames(out_bb$meta), pattern = "_r", replacement = "_d")
+          colnames(out_bb$meta) <- gsub(x = colnames(out_bb$meta), pattern = "_bar_des", replacement = "_bar_res")
      }else{
           out_bb <- NULL
      }
 
      if((type == "all" | type == "ic") & do_ic){
-          out_ic <- .ma_r_order2_ic(rho_vec = rho, var_r_c_vec = var_r_c, k_vec = k,
+          out_ic <- .ma_r_order2_ic(k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
           colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "rho", replacement = "delta")
           colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "_r", replacement = "_d")
+          colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "_bar_des", replacement = "_bar_res")
      }else{
           out_ic <- NULL
      }
 
      if((type == "all" | type == "ad") & do_ad){
-          out_ad <- .ma_r_order2_ad(r_vec = r, rho_vec = rho, var_r_vec = var_r, k_vec = k,
+          out_ad <- .ma_r_order2_ad(k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
           colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "rho", replacement = "delta")
           colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "_r", replacement = "_d")
+          colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "_bar_des", replacement = "_bar_res")
      }else{
           out_ad <- NULL
      }

@@ -1,6 +1,6 @@
 #' Simulate Monte Carlo psychometric data (observed, true, and error scores)
 #'
-#' @param n Number of cases to simulate before performing selection. If \code{Inf}, function will simulate parameter values.
+#' @param n Number of cases to simulate before performing selection.
 #' @param rho_mat Matrix of true-score correlations.
 #' @param mu_vec Vector of means.
 #' @param sigma_vec Vector of observed-score standard deviations.

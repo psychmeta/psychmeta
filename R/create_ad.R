@@ -20,10 +20,10 @@
 #' @param ut Vector of true-score u ratios.
 #' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
 #' @param wt_ut Vector of weights associated with the elements of \code{ut}.
-#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by  default.
+#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
 #' @param ... Further arguments.
 #'
 #' @return Artifact distribution object (list of artifact-distribution tables) for use in interactive artifact-distribution meta-analyses.
@@ -47,6 +47,12 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           ...){
+
+     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
+                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
+                    ux = ux, ni_ux = ni_ux, wt_ux = wt_ux,
+                    ut = ut, ni_ut = ni_ut, wt_ut = wt_ut,
+                    ...)
 
      if(is.null(wt_rxxi)) wt_rxxi <- rep(1, length(rxxi))
      if(is.null(wt_rxxa)) wt_rxxa <- rep(1, length(rxxa))
@@ -150,6 +156,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                var_e_rxxa_c <- var_error_rel(rel = rxxa_mean_c, n = mean_n_rxxa_c)
                var_e_qxa_c <- var_error_q(q = qxa_mean_c, n = mean_n_rxxa_c)
           }else{
+               qxa_mean_c <- rxxa_mean_c <- qxa_var_c <- rxxa_var_c <- NULL
                rxxa_c <- wt_rxxa_c <- NULL
                var_e_rxxa_c <- var_e_qxa_c <- NULL
           }
@@ -169,10 +176,13 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                var_e_rxxa_m <- var_error_rel(rel = rxxa_mean_m, n = mean_n_rxxa_m)
                var_e_qxa_m <- var_error_q(q = qxa_mean_m, n = mean_n_rxxa_m)
           }else{
+               qxa_mean_m <- rxxa_mean_m <- qxa_var_m <- rxxa_var_m <- NULL
                rxxa_m <- wt_rxxa_m <- NULL
                var_e_rxxa_m <- var_e_qxa_m <- NULL
           }
      }else{
+          qxa_mean_c <- rxxa_mean_c <- qxa_var_c <- rxxa_var_c <- NULL
+          qxa_mean_m <- rxxa_mean_m <- qxa_var_m <- rxxa_var_m <- NULL
           rxxa_c <- wt_rxxa_c <- NULL
           rxxa_m <- wt_rxxa_m <- NULL
           var_e_rxxa <- var_e_rxxa_c <- var_e_rxxa_m <- NULL
@@ -200,6 +210,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                var_e_rxxi_c <- var_error_rel(rel = rxxi_mean_c, n = mean_n_rxxi_c)
                var_e_qxi_c <- var_error_q(q = qxi_mean_c, n = mean_n_rxxi_c)
           }else{
+               qxi_mean_c <- rxxi_mean_c <- qxi_var_c <- rxxi_var_c <- NULL
                rxxi_c <- wt_rxxi_c <- NULL
                var_e_rxxi_c <- var_e_qxi_c <- NULL
           }
@@ -219,10 +230,13 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                var_e_rxxi_m <- var_error_rel(rel = rxxi_mean_m, n = mean_n_rxxi_m)
                var_e_qxi_m <- var_error_q(q = qxi_mean_m, n = mean_n_rxxi_m)
           }else{
+               qxi_mean_m <- rxxi_mean_m <- qxi_var_m <- rxxi_var_m <- NULL
                rxxi_m <- wt_rxxi_m <- NULL
                var_e_qxi_m <- var_e_rxxi_m <- NULL
           }
      }else{
+          qxi_mean_c <- rxxi_mean_c <- qxi_var_c <- rxxi_var_c <- NULL
+          qxi_mean_m <- rxxi_mean_m <- qxi_var_m <- rxxi_var_m <- NULL
           rxxi_c <- wt_rxxi_c <- NULL
           rxxi_m <- wt_rxxi_m <- NULL
           var_e_rxxi <- var_e_rxxi_c <- var_e_rxxi_m <- NULL
@@ -245,445 +259,570 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           var_e_ut <- NA
      }
 
-     ux_wt <- sum(wt_ux)
-     ut_wt <- sum(wt_ut)
-     p_ux <- ux_wt / (ux_wt + ut_wt)
-     p_ut <- ut_wt / (ux_wt + ut_wt)
+     .arglist <- list(rxxa = rxxa,
+                      n_rxxa = n_rxxa,
+                      wt_rxxa = wt_rxxa,
+                      rxxa_type = rxxa_type,
+                      qxa_mean_c = qxa_mean_c,
+                      rxxa_mean_c = rxxa_mean_c,
+                      qxa_var_c = qxa_var_c,
+                      rxxa_var_c = rxxa_var_c,
+                      qxa_mean_m = qxa_mean_m,
+                      rxxa_mean_m = rxxa_mean_m,
+                      qxa_var_m = qxa_var_m,
+                      rxxa_var_m = rxxa_var_m,
+                      qxa_mean = qxa_mean,
+                      rxxa_mean = rxxa_mean,
+                      qxa_var = qxa_var,
+                      rxxa_var = rxxa_var,
+                      rxxa_c = rxxa_c,
+                      wt_rxxa_c = wt_rxxa_c,
+                      rxxa_m = rxxa_m,
+                      wt_rxxa_m = wt_rxxa_m,
+                      var_e_rxxa = var_e_rxxa,
+                      var_e_rxxa_c = var_e_rxxa_c,
+                      var_e_rxxa_m = var_e_rxxa_m,
+                      var_e_qxa = var_e_qxa,
+                      var_e_qxa_c = var_e_qxa_c,
+                      var_e_qxa_m = var_e_qxa_m,
 
-     rxxa_wt <- sum(wt_rxxa)
-     rxxa_wt_c <- sum(wt_rxxa_c)
-     rxxa_wt_m <- sum(wt_rxxa_m)
-     rxxi_wt <- sum(wt_rxxi)
-     rxxi_wt_c <- sum(wt_rxxi_c)
-     rxxi_wt_m <- sum(wt_rxxi_m)
-     p_rxxa <- rxxa_wt / (rxxi_wt + rxxa_wt)
-     p_rxxi <- rxxi_wt / (rxxi_wt + rxxa_wt)
+                      rxxi = rxxi,
+                      n_rxxi = n_rxxi,
+                      wt_rxxi = wt_rxxi,
+                      rxxi_type = rxxi_type,
+                      qxi_mean_c = qxi_mean_c,
+                      rxxi_mean_c = rxxi_mean_c,
+                      qxi_var_c = qxi_var_c,
+                      rxxi_var_c = rxxi_var_c,
+                      qxi_mean_m = qxi_mean_m,
+                      rxxi_mean_m = rxxi_mean_m,
+                      qxi_var_m = qxi_var_m,
+                      rxxi_var_m = rxxi_var_m,
+                      qxi_mean = qxi_mean,
+                      rxxi_mean = rxxi_mean,
+                      qxi_var = qxi_var,
+                      rxxi_var = rxxi_var,
+                      rxxi_c = rxxi_c,
+                      wt_rxxi_c = wt_rxxi_c,
+                      rxxi_m = rxxi_m,
+                      wt_rxxi_m = wt_rxxi_m,
+                      var_e_rxxi = var_e_rxxi,
+                      var_e_rxxi_c = var_e_rxxi_c,
+                      var_e_rxxi_m = var_e_rxxi_m,
+                      var_e_qxi = var_e_qxi,
+                      var_e_qxi_c = var_e_qxi_c,
+                      var_e_qxi_m = var_e_qxi_m,
 
-     if(estimate_rxxa){
-          if(!is.null(ux_mean) & !is.null(rxxi)){
-               rxxa_ux_irr <- estimate_rxxa(rxxi = rxxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-               if(!is.null(var_e_rxxi)){
-                    var_e_rxxa_ux_irr <- estimate_var_rxxa(rxxi = rxxi_mean, var_rxxi = var_e_rxxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-                    var_e_qxa_ux_irr <- estimate_var_qxa(qxi = qxi_mean, var_qxi = var_e_qxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-               }else{
-                    var_e_rxxa_ux_irr <- var_e_qxa_ux_irr <- NULL
-               }
-               wt_rxxa_ux <- wt_rxxi * p_ux
+                      ux = ux,
+                      ni_ux = ni_ux,
+                      wt_ux = wt_ux,
+                      ux_mean = ux_mean,
+                      mean_ni_ux = mean_ni_ux,
+                      var_e_ux = var_e_ux,
 
-               if(!is.null(rxxi_c)){
-                    rxxa_ux_drr_c <- estimate_rxxa(rxxi = rxxi_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
-                    if(!is.null(var_e_rxxi_c)){
-                         var_e_rxxa_ux_drr_c <- estimate_var_rxxa(rxxi = rxxi_mean_c, var_rxxi = var_e_rxxi_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
-                         var_e_qxa_ux_drr_c <- estimate_var_qxa(qxi = qxi_mean_c, var_qxi = var_e_qxi_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "internal_consistency")
+                      ut = ut,
+                      ni_ut = ni_ut,
+                      wt_ut = wt_ut,
+                      ut_mean = ut_mean,
+                      mean_ni_ut = mean_ni_ut,
+                      var_e_ut = var_e_ut)
+
+     est_summaries <- function(rxxa, n_rxxa, wt_rxxa, rxxa_type,
+                               qxa_mean, rxxa_mean,
+                               qxa_var, rxxa_var,
+                               var_e_rxxa, var_e_qxa,
+
+                               rxxa_c, wt_rxxa_c,
+                               qxa_mean_c, rxxa_mean_c,
+                               qxa_var_c, rxxa_var_c,
+                               var_e_rxxa_c, var_e_qxa_c,
+
+                               rxxa_m, wt_rxxa_m,
+                               qxa_mean_m, rxxa_mean_m,
+                               qxa_var_m, rxxa_var_m,
+                               var_e_rxxa_m, var_e_qxa_m,
+
+                               rxxi, n_rxxi, wt_rxxi, rxxi_type,
+                               qxi_mean, rxxi_mean,
+                               qxi_var, rxxi_var,
+                               var_e_rxxi, var_e_qxi,
+
+                               rxxi_c, wt_rxxi_c,
+                               qxi_mean_c, rxxi_mean_c,
+                               qxi_var_c, rxxi_var_c,
+                               var_e_rxxi_c, var_e_qxi_c,
+
+                               rxxi_m, wt_rxxi_m,
+                               qxi_mean_m, rxxi_mean_m,
+                               qxi_var_m, rxxi_var_m,
+                               var_e_rxxi_m, var_e_qxi_m,
+
+                               ux, ni_ux, wt_ux,
+                               ux_mean, mean_ni_ux, var_e_ux,
+
+                               ut, ni_ut, wt_ut,
+                               ut_mean, mean_ni_ut, var_e_ut,
+
+                               estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+                               estimate_ux = TRUE, estimate_ut = TRUE){
+          ux_wt <- sum(wt_ux)
+          ut_wt <- sum(wt_ut)
+          p_ux <- ux_wt / (ux_wt + ut_wt)
+          p_ut <- ut_wt / (ux_wt + ut_wt)
+
+          rxxa_wt <- sum(wt_rxxa)
+          rxxa_wt_c <- sum(wt_rxxa_c)
+          rxxa_wt_m <- sum(wt_rxxa_m)
+          rxxi_wt <- sum(wt_rxxi)
+          rxxi_wt_c <- sum(wt_rxxi_c)
+          rxxi_wt_m <- sum(wt_rxxi_m)
+          p_rxxa <- rxxa_wt / (rxxi_wt + rxxa_wt)
+          p_rxxi <- rxxi_wt / (rxxi_wt + rxxa_wt)
+
+          if(estimate_rxxa){
+               if(!is.null(ux_mean) & !is.null(rxxi)){
+                    rxxa_ux_irr <- estimate_rxxa(rxxi = rxxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
+                    if(!is.null(var_e_rxxi)){
+                         var_e_rxxa_ux_irr <- estimate_var_rxxa(rxxi = rxxi_mean, var_rxxi = var_e_rxxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
+                         var_e_qxa_ux_irr <- estimate_var_qxa(qxi = qxi_mean, var_qxi = var_e_qxi, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
                     }else{
-                         var_e_rxxa_ux_drr_c <- var_e_qxa_ux_drr_c <- NULL
+                         var_e_rxxa_ux_irr <- var_e_qxa_ux_irr <- NULL
                     }
-                    wt_rxxa_ux_c <- wt_rxxi_c * p_ux
+                    wt_rxxa_ux <- wt_rxxi * p_ux
+
+                    if(!is.null(rxxi_c)){
+                         rxxa_ux_drr_c <- estimate_rxxa(rxxi = rxxi_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                         if(!is.null(var_e_rxxi_c)){
+                              var_e_rxxa_ux_drr_c <- estimate_var_rxxa(rxxi = rxxi_mean_c, var_rxxi = var_e_rxxi_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                              var_e_qxa_ux_drr_c <- estimate_var_qxa(qxi = qxi_mean_c, var_qxi = var_e_qxi_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "internal_consistency")
+                         }else{
+                              var_e_rxxa_ux_drr_c <- var_e_qxa_ux_drr_c <- NULL
+                         }
+                         wt_rxxa_ux_c <- wt_rxxi_c * p_ux
+                    }else{
+                         rxxa_ux_drr_c <- wt_rxxa_ux_c <- var_e_rxxa_ux_drr_c <- var_e_qxa_ux_drr_c <- NULL
+                    }
+
+                    if(!is.null(rxxi_m)){
+                         rxxa_ux_drr_m <- estimate_rxxa(rxxi = rxxi_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                         if(!is.null(var_e_rxxi_m)){
+                              var_e_rxxa_ux_drr_m <- estimate_var_rxxa(rxxi = rxxi_mean_m, var_rxxi = var_e_rxxi_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                              var_e_qxa_ux_drr_m <- estimate_var_qxa(qxi = qxi_mean_m, var_qxi = var_e_qxi_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "multiple_administrations")
+                         }else{
+                              var_e_rxxa_ux_drr_m <- var_e_qxa_ux_drr_m <- NULL
+                         }
+                         wt_rxxa_ux_m <- wt_rxxi_m * p_ux
+                    }else{
+                         rxxa_ux_drr_m <- wt_rxxa_ux_m <- var_e_rxxa_ux_drr_m <- var_e_qxa_ux_drr_m <- NULL
+                    }
                }else{
+                    rxxa_ux_irr <- wt_rxxa_ux <- var_e_rxxa_ux_irr <- var_e_qxa_ux_irr <- NULL
                     rxxa_ux_drr_c <- wt_rxxa_ux_c <- var_e_rxxa_ux_drr_c <- var_e_qxa_ux_drr_c <- NULL
+                    rxxa_ux_drr_m <- wt_rxxa_ux_m <- var_e_rxxa_ux_drr_m <- var_e_qxa_ux_drr_m <- NULL
                }
 
-               if(!is.null(rxxi_m)){
-                    rxxa_ux_drr_m <- estimate_rxxa(rxxi = rxxi_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
-                    if(!is.null(var_e_rxxi_m)){
-                         var_e_rxxa_ux_drr_m <- estimate_var_rxxa(rxxi = rxxi_mean_m, var_rxxi = var_e_rxxi_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
-                         var_e_qxa_ux_drr_m <- estimate_var_qxa(qxi = qxi_mean_m, var_qxi = var_e_qxi_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "multiple_administrations")
+               if(!is.null(ut_mean) & !is.null(rxxi)){
+                    rxxa_ut <- estimate_rxxa(rxxi = rxxi, ux = ut_mean, ux_observed = FALSE)
+                    if(!is.null(var_e_rxxi)){
+                         var_e_rxxa_ut <- estimate_var_rxxa(rxxi = rxxi_mean, var_rxxi = var_e_rxxi, ux = ut_mean, ux_observed = FALSE)
+                         var_e_qxa_ut <- estimate_var_qxa(qxi = qxi_mean, var_qxi = var_e_qxi, ux = ut_mean, ux_observed = FALSE)
                     }else{
-                         var_e_rxxa_ux_drr_m <- var_e_qxa_ux_drr_m <- NULL
+                         var_e_rxxa_ut <- var_e_qxa_ut <- NULL
                     }
-                    wt_rxxa_ux_m <- wt_rxxi_m * p_ux
+                    wt_rxxa_ut <- wt_rxxi * p_ut
+
+                    if(!is.null(rxxi_c)){
+                         .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxi_mean_c, rxx_restricted = TRUE)
+                         rxxa_ut_drr_c <- estimate_rxxa(rxxi = rxxi_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                         if(!is.null(var_e_rxxi_c)){
+                              var_e_rxxa_ut_drr_c <- estimate_var_rxxa(rxxi = rxxi_mean_c, var_rxxi = var_e_rxxi_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                              var_e_qxa_ut_drr_c <- estimate_var_qxa(qxi = qxi_mean_c, var_qxi = var_e_qxi_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "internal_consistency")
+                         }else{
+                              var_e_rxxa_ut_drr_c <- var_e_qxa_ut_drr_c <- NULL
+                         }
+                         wt_rxxa_ut_c <- wt_rxxi_c * p_ut
+                    }else{
+                         rxxa_ut_drr_c <- wt_rxxa_ut_c <- var_e_rxxa_ut_drr_c <- var_e_qxa_ut_drr_c <- NULL
+                    }
+
+                    if(!is.null(rxxi_m)){
+                         .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxi_mean_m, rxx_restricted = TRUE)
+                         rxxa_ut_drr_m <- estimate_rxxa(rxxi = rxxi_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                         if(!is.null(var_e_rxxi_m)){
+                              var_e_rxxa_ut_drr_m <- estimate_var_rxxa(rxxi = rxxi_mean_m, var_rxxi = var_e_rxxi_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                              var_e_qxa_ut_drr_m <- estimate_var_qxa(qxi = qxi_mean_m, var_qxi = var_e_qxi_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "multiple_administrations")
+                         }else{
+                              var_e_rxxa_ut_drr_m <- var_e_qxa_ut_drr_m <- NULL
+                         }
+                         wt_rxxa_ut_m <- wt_rxxi_m * p_ut
+                    }else{
+                         rxxa_ut_drr_m <- wt_rxxa_ut_m <- var_e_rxxa_ut_drr_m <- var_e_qxa_ut_drr_m <- NULL
+                    }
                }else{
-                    rxxa_ux_drr_m <- wt_rxxa_ux_m <- var_e_rxxa_ux_drr_m <- var_e_qxa_ux_drr_m <- NULL
+                    rxxa_ut <- wt_rxxa_ut <- var_e_rxxa_ut <- var_e_qxa_ut <- NULL
+                    rxxa_ut_drr_c <- wt_rxxa_ut_c <- var_e_rxxa_ut_drr_c <- var_e_qxa_ut_drr_c <- NULL
+                    rxxa_ut_drr_m <- wt_rxxa_ut_m <- var_e_rxxa_ut_drr_m <- var_e_qxa_ut_drr_m <- NULL
                }
           }else{
                rxxa_ux_irr <- wt_rxxa_ux <- var_e_rxxa_ux_irr <- var_e_qxa_ux_irr <- NULL
                rxxa_ux_drr_c <- wt_rxxa_ux_c <- var_e_rxxa_ux_drr_c <- var_e_qxa_ux_drr_c <- NULL
                rxxa_ux_drr_m <- wt_rxxa_ux_m <- var_e_rxxa_ux_drr_m <- var_e_qxa_ux_drr_m <- NULL
-          }
 
-          if(!is.null(ut_mean) & !is.null(rxxi)){
-               rxxa_ut <- estimate_rxxa(rxxi = rxxi, ux = ut_mean, ux_observed = FALSE)
-               if(!is.null(var_e_rxxi)){
-                    var_e_rxxa_ut <- estimate_var_rxxa(rxxi = rxxi_mean, var_rxxi = var_e_rxxi, ux = ut_mean, ux_observed = FALSE)
-                    var_e_qxa_ut <- estimate_var_qxa(qxi = qxi_mean, var_qxi = var_e_qxi, ux = ut_mean, ux_observed = FALSE)
-               }else{
-                    var_e_rxxa_ut <- var_e_qxa_ut <- NULL
-               }
-               wt_rxxa_ut <- wt_rxxi * p_ut
-
-               if(!is.null(rxxi_c)){
-                    .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxi_mean_c, rxx_restricted = TRUE)
-                    rxxa_ut_drr_c <- estimate_rxxa(rxxi = rxxi_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
-                    if(!is.null(var_e_rxxi_c)){
-                         var_e_rxxa_ut_drr_c <- estimate_var_rxxa(rxxi = rxxi_mean_c, var_rxxi = var_e_rxxi_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
-                         var_e_qxa_ut_drr_c <- estimate_var_qxa(qxi = qxi_mean_c, var_qxi = var_e_qxi_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "internal_consistency")
-                    }else{
-                         var_e_rxxa_ut_drr_c <- var_e_qxa_ut_drr_c <- NULL
-                    }
-                    wt_rxxa_ut_c <- wt_rxxi_c * p_ut
-               }else{
-                    rxxa_ut_drr_c <- wt_rxxa_ut_c <- var_e_rxxa_ut_drr_c <- var_e_qxa_ut_drr_c <- NULL
-               }
-
-               if(!is.null(rxxi_m)){
-                    .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxi_mean_m, rxx_restricted = TRUE)
-                    rxxa_ut_drr_m <- estimate_rxxa(rxxi = rxxi_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
-                    if(!is.null(var_e_rxxi_m)){
-                         var_e_rxxa_ut_drr_m <- estimate_var_rxxa(rxxi = rxxi_mean_m, var_rxxi = var_e_rxxi_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
-                         var_e_qxa_ut_drr_m <- estimate_var_qxa(qxi = qxi_mean_m, var_qxi = var_e_qxi_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxi_type = "multiple_administrations")
-                    }else{
-                         var_e_rxxa_ut_drr_m <- var_e_qxa_ut_drr_m <- NULL
-                    }
-                    wt_rxxa_ut_m <- wt_rxxi_m * p_ut
-               }else{
-                    rxxa_ut_drr_m <- wt_rxxa_ut_m <- var_e_rxxa_ut_drr_m <- var_e_qxa_ut_drr_m <- NULL
-               }
-          }else{
                rxxa_ut <- wt_rxxa_ut <- var_e_rxxa_ut <- var_e_qxa_ut <- NULL
                rxxa_ut_drr_c <- wt_rxxa_ut_c <- var_e_rxxa_ut_drr_c <- var_e_qxa_ut_drr_c <- NULL
                rxxa_ut_drr_m <- wt_rxxa_ut_m <- var_e_rxxa_ut_drr_m <- var_e_qxa_ut_drr_m <- NULL
           }
-     }else{
-          rxxa_ux_irr <- wt_rxxa_ux <- var_e_rxxa_ux_irr <- var_e_qxa_ux_irr <- NULL
-          rxxa_ux_drr_c <- wt_rxxa_ux_c <- var_e_rxxa_ux_drr_c <- var_e_qxa_ux_drr_c <- NULL
-          rxxa_ux_drr_m <- wt_rxxa_ux_m <- var_e_rxxa_ux_drr_m <- var_e_qxa_ux_drr_m <- NULL
 
-          rxxa_ut <- wt_rxxa_ut <- var_e_rxxa_ut <- var_e_qxa_ut <- NULL
-          rxxa_ut_drr_c <- wt_rxxa_ut_c <- var_e_rxxa_ut_drr_c <- var_e_qxa_ut_drr_c <- NULL
-          rxxa_ut_drr_m <- wt_rxxa_ut_m <- var_e_rxxa_ut_drr_m <- var_e_qxa_ut_drr_m <- NULL
-     }
-
-     if(estimate_rxxi){
-          if(!is.null(ux_mean) & !is.null(rxxa)){
-               rxxi_ux_irr <- estimate_rxxi(rxxa = rxxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-               if(!is.null(var_e_rxxa)){
-                    var_e_rxxi_ux_irr <- estimate_var_rxxi(rxxa = rxxa_mean, var_rxxa = var_e_rxxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-                    var_e_qxi_ux_irr <- estimate_var_qxi(qxa = qxa_mean, var_qxa = var_e_qxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
-               }else{
-                    var_e_rxxi_ux_irr <- var_e_qxi_ux_irr <- NULL
-               }
-               wt_rxxi_ux <- wt_rxxa * p_ux
-
-               if(!is.null(rxxa_c)){
-                    rxxi_ux_drr_c <- estimate_rxxi(rxxa = rxxa_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
-                    if(!is.null(var_e_rxxa_c)){
-                         var_e_rxxi_ux_drr_c <- estimate_var_rxxi(rxxa = rxxa_mean_c, var_rxxa = var_e_rxxa_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
-                         var_e_qxi_ux_drr_c <- estimate_var_qxi(qxa = qxa_mean_c, var_qxa = var_e_qxa_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "internal_consistency")
+          if(estimate_rxxi){
+               if(!is.null(ux_mean) & !is.null(rxxa)){
+                    rxxi_ux_irr <- estimate_rxxi(rxxa = rxxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
+                    if(!is.null(var_e_rxxa)){
+                         var_e_rxxi_ux_irr <- estimate_var_rxxi(rxxa = rxxa_mean, var_rxxa = var_e_rxxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
+                         var_e_qxi_ux_irr <- estimate_var_qxi(qxa = qxa_mean, var_qxa = var_e_qxa, ux = ux_mean, ux_observed = TRUE, indirect_rr = TRUE)
                     }else{
-                         var_e_rxxi_ux_drr_c <- var_e_qxi_ux_drr_c <- NULL
+                         var_e_rxxi_ux_irr <- var_e_qxi_ux_irr <- NULL
                     }
-                    wt_rxxi_ux_c <- wt_rxxa_c * p_ux
+                    wt_rxxi_ux <- wt_rxxa * p_ux
+
+                    if(!is.null(rxxa_c)){
+                         rxxi_ux_drr_c <- estimate_rxxi(rxxa = rxxa_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                         if(!is.null(var_e_rxxa_c)){
+                              var_e_rxxi_ux_drr_c <- estimate_var_rxxi(rxxa = rxxa_mean_c, var_rxxa = var_e_rxxa_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                              var_e_qxi_ux_drr_c <- estimate_var_qxi(qxa = qxa_mean_c, var_qxa = var_e_qxa_c, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "internal_consistency")
+                         }else{
+                              var_e_rxxi_ux_drr_c <- var_e_qxi_ux_drr_c <- NULL
+                         }
+                         wt_rxxi_ux_c <- wt_rxxa_c * p_ux
+                    }else{
+                         rxxi_ux_drr_c <- wt_rxxi_ux_c <- var_e_rxxi_ux_drr_c <- var_e_qxi_ux_drr_c <- NULL
+                    }
+
+                    if(!is.null(rxxa_m)){
+                         rxxi_ux_drr_m <- estimate_rxxi(rxxa = rxxa_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                         if(!is.null(var_e_rxxa_m)){
+                              var_e_rxxi_ux_drr_m <- estimate_var_rxxi(rxxa = rxxa_mean_m, var_rxxa = var_e_rxxa_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                              var_e_qxi_ux_drr_m <- estimate_var_qxi(qxa = qxa_mean_m, var_qxa = var_e_qxa_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "multiple_administrations")
+                         }else{
+                              var_e_rxxi_ux_drr_m <- var_e_qxi_ux_drr_m <- NULL
+                         }
+                         wt_rxxi_ux_m <- wt_rxxa_m * p_ux
+                    }else{
+                         rxxi_ux_drr_m <- wt_rxxi_ux_m <- var_e_rxxi_ux_drr_m <- var_e_qxi_ux_drr_m <- NULL
+                    }
                }else{
+                    rxxi_ux_irr <- wt_rxxi_ux <- var_e_rxxi_ux_irr <- var_e_qxi_ux_irr <- NULL
                     rxxi_ux_drr_c <- wt_rxxi_ux_c <- var_e_rxxi_ux_drr_c <- var_e_qxi_ux_drr_c <- NULL
+                    rxxi_ux_drr_m <- wt_rxxi_ux_m <- var_e_rxxi_ux_drr_m <- var_e_qxi_ux_drr_m <- NULL
                }
 
-               if(!is.null(rxxa_m)){
-                    rxxi_ux_drr_m <- estimate_rxxi(rxxa = rxxa_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
-                    if(!is.null(var_e_rxxa_m)){
-                         var_e_rxxi_ux_drr_m <- estimate_var_rxxi(rxxa = rxxa_mean_m, var_rxxa = var_e_rxxa_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
-                         var_e_qxi_ux_drr_m <- estimate_var_qxi(qxa = qxa_mean_m, var_qxa = var_e_qxa_m, ux = ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "multiple_administrations")
+               if(!is.null(ut_mean) & !is.null(rxxa)){
+                    rxxi_ut <- estimate_rxxi(rxxa = rxxa, ux = ut_mean, ux_observed = FALSE)
+                    if(!is.null(var_e_rxxa)){
+                         var_e_rxxi_ut <- estimate_var_rxxi(rxxa = rxxa_mean, var_rxxa = var_e_rxxa, ux = ut_mean, ux_observed = FALSE)
+                         var_e_qxi_ut <- estimate_var_qxi(qxa = qxa_mean, var_qxa = var_e_qxa, ux = ut_mean, ux_observed = FALSE)
                     }else{
-                         var_e_rxxi_ux_drr_m <- var_e_qxi_ux_drr_m <- NULL
+                         var_e_rxxi_ut <- var_e_qxi_ut <- NULL
                     }
-                    wt_rxxi_ux_m <- wt_rxxa_m * p_ux
+                    wt_rxxi_ut <- wt_rxxa * p_ut
+
+                    if(!is.null(rxxa_c)){
+                         .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxa_mean_c, rxx_restricted = FALSE)
+                         rxxi_ut_drr_c <- estimate_rxxi(rxxa = rxxa_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                         if(!is.null(var_e_rxxa_c)){
+                              var_e_rxxi_ut_drr_c <- estimate_var_rxxi(rxxa = rxxa_mean_c, var_rxxa = var_e_rxxa_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                              var_e_qxi_ut_drr_c <- estimate_var_qxi(qxa = qxa_mean_c, var_qxa = var_e_qxa_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "internal_consistency")
+                         }else{
+                              var_e_rxxi_ut_drr_c <- var_e_qxi_ut_drr_c <- NULL
+                         }
+                         wt_rxxi_ut_c <- wt_rxxa_c * p_ut
+                    }else{
+                         rxxi_ut_drr_c <- wt_rxxi_ut_c <- var_e_rxxi_ut_drr_c <- var_e_qxi_ut_drr_c <- NULL
+                    }
+
+                    if(!is.null(rxxa_m)){
+                         .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxa_mean_m, rxx_restricted = FALSE)
+                         rxxi_ut_drr_m <- estimate_rxxi(rxxa = rxxa_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                         if(!is.null(var_e_rxxa_m)){
+                              var_e_rxxi_ut_drr_m <- estimate_var_rxxi(rxxa = rxxa_mean_m, var_rxxa = var_e_rxxa_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                              var_e_qxi_ut_drr_m <- estimate_var_qxi(qxa = qxa_mean_m, var_qxa = var_e_qxa_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "multiple_administrations")
+                         }else{
+                              var_e_rxxi_ut_drr_m <- var_e_qxi_ut_drr_m <- NULL
+                         }
+                         wt_rxxi_ut_m <- wt_rxxa_m * p_ut
+                    }else{
+                         rxxi_ut_drr_m <- wt_rxxi_ut_m <- var_e_rxxi_ut_drr_m <- var_e_qxi_ut_drr_m <- NULL
+                    }
                }else{
-                    rxxi_ux_drr_m <- wt_rxxi_ux_m <- var_e_rxxi_ux_drr_m <- var_e_qxi_ux_drr_m <- NULL
+                    rxxi_ut <- wt_rxxi_ut <- var_e_rxxi_ut <- var_e_qxi_ut <- NULL
+                    rxxi_ut_drr_c <- wt_rxxi_ut_c <- var_e_rxxi_ut_drr_c <- var_e_qxi_ut_drr_c <- NULL
+                    rxxi_ut_drr_m <- wt_rxxi_ut_m <- var_e_rxxi_ut_drr_m <- var_e_qxi_ut_drr_m <- NULL
                }
           }else{
                rxxi_ux_irr <- wt_rxxi_ux <- var_e_rxxi_ux_irr <- var_e_qxi_ux_irr <- NULL
                rxxi_ux_drr_c <- wt_rxxi_ux_c <- var_e_rxxi_ux_drr_c <- var_e_qxi_ux_drr_c <- NULL
                rxxi_ux_drr_m <- wt_rxxi_ux_m <- var_e_rxxi_ux_drr_m <- var_e_qxi_ux_drr_m <- NULL
-          }
 
-          if(!is.null(ut_mean) & !is.null(rxxa)){
-               rxxi_ut <- estimate_rxxi(rxxa = rxxa, ux = ut_mean, ux_observed = FALSE)
-               if(!is.null(var_e_rxxa)){
-                    var_e_rxxi_ut <- estimate_var_rxxi(rxxa = rxxa_mean, var_rxxa = var_e_rxxa, ux = ut_mean, ux_observed = FALSE)
-                    var_e_qxi_ut <- estimate_var_qxi(qxa = qxa_mean, var_qxa = var_e_qxa, ux = ut_mean, ux_observed = FALSE)
-               }else{
-                    var_e_rxxi_ut <- var_e_qxi_ut <- NULL
-               }
-               wt_rxxi_ut <- wt_rxxa * p_ut
-
-               if(!is.null(rxxa_c)){
-                    .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxa_mean_c, rxx_restricted = FALSE)
-                    rxxi_ut_drr_c <- estimate_rxxi(rxxa = rxxa_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
-                    if(!is.null(var_e_rxxa_c)){
-                         var_e_rxxi_ut_drr_c <- estimate_var_rxxi(rxxa = rxxa_mean_c, var_rxxa = var_e_rxxa_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
-                         var_e_qxi_ut_drr_c <- estimate_var_qxi(qxa = qxa_mean_c, var_qxa = var_e_qxa_c, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "internal_consistency")
-                    }else{
-                         var_e_rxxi_ut_drr_c <- var_e_qxi_ut_drr_c <- NULL
-                    }
-                    wt_rxxi_ut_c <- wt_rxxa_c * p_ut
-               }else{
-                    rxxi_ut_drr_c <- wt_rxxi_ut_c <- var_e_rxxi_ut_drr_c <- var_e_qxi_ut_drr_c <- NULL
-               }
-
-               if(!is.null(rxxa_m)){
-                    .ux_mean <- estimate_ux(ut = ut_mean, rxx = rxxa_mean_m, rxx_restricted = FALSE)
-                    rxxi_ut_drr_m <- estimate_rxxi(rxxa = rxxa_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
-                    if(!is.null(var_e_rxxa_m)){
-                         var_e_rxxi_ut_drr_m <- estimate_var_rxxi(rxxa = rxxa_mean_m, var_rxxa = var_e_rxxa_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
-                         var_e_qxi_ut_drr_m <- estimate_var_qxi(qxa = qxa_mean_m, var_qxa = var_e_qxa_m, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, qxa_type = "multiple_administrations")
-                    }else{
-                         var_e_rxxi_ut_drr_m <- var_e_qxi_ut_drr_m <- NULL
-                    }
-                    wt_rxxi_ut_m <- wt_rxxa_m * p_ut
-               }else{
-                    rxxi_ut_drr_m <- wt_rxxi_ut_m <- var_e_rxxi_ut_drr_m <- var_e_qxi_ut_drr_m <- NULL
-               }
-          }else{
                rxxi_ut <- wt_rxxi_ut <- var_e_rxxi_ut <- var_e_qxi_ut <- NULL
                rxxi_ut_drr_c <- wt_rxxi_ut_c <- var_e_rxxi_ut_drr_c <- var_e_qxi_ut_drr_c <- NULL
                rxxi_ut_drr_m <- wt_rxxi_ut_m <- var_e_rxxi_ut_drr_m <- var_e_qxi_ut_drr_m <- NULL
           }
-     }else{
-          rxxi_ux_irr <- wt_rxxi_ux <- var_e_rxxi_ux_irr <- var_e_qxi_ux_irr <- NULL
-          rxxi_ux_drr_c <- wt_rxxi_ux_c <- var_e_rxxi_ux_drr_c <- var_e_qxi_ux_drr_c <- NULL
-          rxxi_ux_drr_m <- wt_rxxi_ux_m <- var_e_rxxi_ux_drr_m <- var_e_qxi_ux_drr_m <- NULL
 
-          rxxi_ut <- wt_rxxi_ut <- var_e_rxxi_ut <- var_e_qxi_ut <- NULL
-          rxxi_ut_drr_c <- wt_rxxi_ut_c <- var_e_rxxi_ut_drr_c <- var_e_qxi_ut_drr_c <- NULL
-          rxxi_ut_drr_m <- wt_rxxi_ut_m <- var_e_rxxi_ut_drr_m <- var_e_qxi_ut_drr_m <- NULL
-     }
-
-     if(estimate_ut){
-          if(!is.null(rxxa_mean) & !is.null(ux)){
-               ut_rxxa <- estimate_ut(ux = ux, rxx = rxxa_mean, rxx_restricted = FALSE)
-               if(!is.null(var_e_ux)){
-                    var_e_ut_rxxa <- estimate_var_ut(ux = ux_mean, var_ux = var_e_ux, rxx = rxxa_mean, rxx_restricted = FALSE)
+          if(estimate_ut){
+               if(!is.null(rxxa_mean) & !is.null(ux)){
+                    ut_rxxa <- estimate_ut(ux = ux, rxx = rxxa_mean, rxx_restricted = FALSE)
+                    if(!is.null(var_e_ux)){
+                         var_e_ut_rxxa <- estimate_var_ut(ux = ux_mean, var_ux = var_e_ux, rxx = rxxa_mean, rxx_restricted = FALSE)
+                    }else{
+                         var_e_ut_rxxa <- NULL
+                    }
+                    wt_ut_rxxa <- wt_ux * p_rxxa
                }else{
-                    var_e_ut_rxxa <- NULL
+                    ut_rxxa <- wt_ut_rxxa <- var_e_ut_rxxa <- NULL
                }
-               wt_ut_rxxa <- wt_ux * p_rxxa
+
+               if(!is.null(rxxi_mean) & !is.null(ux)){
+                    ut_rxxi <- estimate_ut(ux = ux, rxx = rxxi_mean, rxx_restricted = TRUE)
+                    if(!is.null(var_e_ux)){
+                         var_e_ut_rxxi <- estimate_var_ut(ux = ux_mean, var_ux = var_e_ux, rxx = rxxi_mean, rxx_restricted = TRUE)
+                    }else{
+                         var_e_ut_rxxi <- NULL
+                    }
+                    wt_ut_rxxi <- wt_ux * p_rxxi
+               }else{
+                    ut_rxxi <- wt_ut_rxxi <- var_e_ut_rxxi <- NULL
+               }
           }else{
                ut_rxxa <- wt_ut_rxxa <- var_e_ut_rxxa <- NULL
-          }
-
-          if(!is.null(rxxi_mean) & !is.null(ux)){
-               ut_rxxi <- estimate_ut(ux = ux, rxx = rxxi_mean, rxx_restricted = TRUE)
-               if(!is.null(var_e_ux)){
-                    var_e_ut_rxxi <- estimate_var_ut(ux = ux_mean, var_ux = var_e_ux, rxx = rxxi_mean, rxx_restricted = TRUE)
-               }else{
-                    var_e_ut_rxxi <- NULL
-               }
-               wt_ut_rxxi <- wt_ux * p_rxxi
-          }else{
                ut_rxxi <- wt_ut_rxxi <- var_e_ut_rxxi <- NULL
           }
-     }else{
-          ut_rxxa <- wt_ut_rxxa <- var_e_ut_rxxa <- NULL
-          ut_rxxi <- wt_ut_rxxi <- var_e_ut_rxxi <- NULL
-     }
 
-     if(estimate_ux){
-          if(!is.null(rxxa_mean) & !is.null(ut)){
-               ux_rxxa <- estimate_ux(ut = ut, rxx = rxxa_mean, rxx_restricted = FALSE)
-               if(!is.null(var_e_ut)){
-                    var_e_ux_rxxa <- estimate_var_ux(ut = ut_mean, var_ut = var_e_ut, rxx = rxxa_mean, rxx_restricted = FALSE)
+          if(estimate_ux){
+               if(!is.null(rxxa_mean) & !is.null(ut)){
+                    ux_rxxa <- estimate_ux(ut = ut, rxx = rxxa_mean, rxx_restricted = FALSE)
+                    if(!is.null(var_e_ut)){
+                         var_e_ux_rxxa <- estimate_var_ux(ut = ut_mean, var_ut = var_e_ut, rxx = rxxa_mean, rxx_restricted = FALSE)
+                    }else{
+                         var_e_ux_rxxa <- NULL
+                    }
+                    wt_ux_rxxa <- wt_ut * p_rxxa
                }else{
-                    var_e_ux_rxxa <- NULL
+                    ux_rxxa <- wt_ux_rxxa <- var_e_ux_rxxa <- NULL
                }
-               wt_ux_rxxa <- wt_ut * p_rxxa
+               if(!is.null(rxxi_mean) & !is.null(ut)){
+                    ux_rxxi <- estimate_ux(ut = ut, rxx = rxxi_mean, rxx_restricted = TRUE)
+                    if(!is.null(var_e_ut)){
+                         var_e_ux_rxxi <- estimate_var_ux(ut = ut_mean, var_ut = var_e_ut, rxx = rxxi_mean, rxx_restricted = TRUE)
+                    }else{
+                         var_e_ux_rxxi <- NULL
+                    }
+                    wt_ux_rxxi <- wt_ut * p_rxxi
+               }else{
+                    ux_rxxi <- wt_ux_rxxi <- var_e_ux_rxxi <- NULL
+               }
           }else{
                ux_rxxa <- wt_ux_rxxa <- var_e_ux_rxxa <- NULL
-          }
-          if(!is.null(rxxi_mean) & !is.null(ut)){
-               ux_rxxi <- estimate_ux(ut = ut, rxx = rxxi_mean, rxx_restricted = TRUE)
-               if(!is.null(var_e_ut)){
-                    var_e_ux_rxxi <- estimate_var_ux(ut = ut_mean, var_ut = var_e_ut, rxx = rxxi_mean, rxx_restricted = TRUE)
-               }else{
-                    var_e_ux_rxxi <- NULL
-               }
-               wt_ux_rxxi <- wt_ut * p_rxxi
-          }else{
                ux_rxxi <- wt_ux_rxxi <- var_e_ux_rxxi <- NULL
           }
-     }else{
-          ux_rxxa <- wt_ux_rxxa <- var_e_ux_rxxa <- NULL
-          ux_rxxi <- wt_ux_rxxi <- var_e_ux_rxxi <- NULL
+
+          rxxa_vec_irr <- c(rxxa, rxxa_ux_irr, rxxa_ut)
+          rxxa_vec_drr <- c(rxxa, rxxa_ux_drr_c, rxxa_ux_drr_m,
+                            rxxa_ut_drr_c, rxxa_ut_drr_m)
+          wt_rxxa_irr <- c(wt_rxxa, wt_rxxa_ux, wt_rxxa_ut)
+          wt_rxxa_drr <- c(wt_rxxa, wt_rxxa_ux_c, wt_rxxa_ux_m,
+                           wt_rxxa_ut_c, wt_rxxa_ut_m)
+
+          rxxi_vec_irr <- c(rxxi, rxxi_ux_irr, rxxi_ut)
+          rxxi_vec_drr <- c(rxxi, rxxi_ux_drr_c, rxxi_ux_drr_m,
+                            rxxi_ut_drr_c, rxxi_ut_drr_m)
+          wt_rxxi_irr <- c(wt_rxxi, wt_rxxi_ux, wt_rxxi_ut)
+          wt_rxxi_drr <- c(wt_rxxi, wt_rxxi_ux_c, wt_rxxi_ux_m,
+                           wt_rxxi_ut_c, wt_rxxi_ut_m)
+
+          .ux <- ux
+          .wt_ux <- wt_ux
+          ux <- c(ux, ux_rxxa, ux_rxxi)
+          wt_ux <- c(wt_ux, wt_ux_rxxa, wt_ux_rxxi)
+
+          .ut <- ut
+          .wt_ut <- wt_ut
+          ut <- c(ut, ut_rxxa, ut_rxxi)
+          wt_ut <- c(wt_ut, wt_ut_rxxa, wt_ut_rxxi)
+
+
+          mean_qxi_irr <- art_mean(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr, null_value = NA)
+          mean_qxi_drr <- art_mean(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr, null_value = NA)
+          mean_qxa_irr <- art_mean(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr, null_value = NA)
+          mean_qxa_drr <- art_mean(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr, null_value = NA)
+          mean_rxxi_irr <- art_mean(art_vec = rxxi_vec_irr, wt_vec = wt_rxxi_irr, null_value = NA)
+          mean_rxxi_drr <- art_mean(art_vec = rxxi_vec_drr, wt_vec = wt_rxxi_drr, null_value = NA)
+          mean_rxxa_irr <- art_mean(art_vec = rxxa_vec_irr, wt_vec = wt_rxxa_irr, null_value = NA)
+          mean_rxxa_drr <- art_mean(art_vec = rxxa_vec_drr, wt_vec = wt_rxxa_drr, null_value = NA)
+          mean_ux <- art_mean(art_vec = ux, wt_vec = wt_ux, null_value = NA)
+          mean_ut <- art_mean(art_vec = ut, wt_vec = wt_ut, null_value = NA)
+
+          var_qxi_irr <- art_var(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr, null_value = NA)
+          var_qxi_drr <- art_var(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr, null_value = NA)
+          var_qxa_irr <- art_var(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr, null_value = NA)
+          var_qxa_drr <- art_var(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr, null_value = NA)
+          var_rxxi_irr <- art_var(art_vec = rxxi_vec_irr, wt_vec = wt_rxxi_irr, null_value = NA)
+          var_rxxi_drr <- art_var(art_vec = rxxi_vec_drr, wt_vec = wt_rxxi_drr, null_value = NA)
+          var_rxxa_irr <- art_var(art_vec = rxxa_vec_irr, wt_vec = wt_rxxa_irr, null_value = NA)
+          var_rxxa_drr <- art_var(art_vec = rxxa_vec_drr, wt_vec = wt_rxxa_drr, null_value = NA)
+          var_ux <- art_var(art_vec = ux, wt_vec = wt_ux, null_value = NA)
+          var_ut <- art_var(art_vec = ut, wt_vec = wt_ut, null_value = NA)
+
+          .sum_weights <- function(x) if(length(x) == 0){NULL}else{sum(x)}
+          wtsum_vec_rxxa_irr <- unlist(lapply(list(wt_rxxa, wt_rxxa_ux, wt_rxxa_ut), .sum_weights))
+          wtsum_vec_rxxa_drr <- unlist(lapply(list(wt_rxxa, wt_rxxa_ux_c, wt_rxxa_ux_m,
+                                                   wt_rxxa_ut_c, wt_rxxa_ut_m), .sum_weights))
+          wtsum_vec_rxxi_irr <- unlist(lapply(list(wt_rxxi, wt_rxxi_ux, wt_rxxi_ut), .sum_weights))
+          wtsum_vec_rxxi_drr <- unlist(lapply(list(wt_rxxi, wt_rxxi_ux_c, wt_rxxi_ux_m,
+                                                   wt_rxxi_ut_c, wt_rxxi_ut_m), .sum_weights))
+          wtsum_vec_ux <- unlist(lapply(list(wt_ux, wt_ux_rxxa, wt_ux_rxxi), .sum_weights))
+          wtsum_vec_ut <- unlist(lapply(list(wt_ut, wt_ut_rxxa, wt_ut_rxxi), .sum_weights))
+
+          vare_vec_qxi_irr <- c(var_e_qxi, var_e_qxi_ux_irr, var_e_qxi_ut)
+          vare_vec_qxi_drr <- c(var_e_qxi, var_e_qxi_ux_drr_c, var_e_qxi_ux_drr_m,
+                                var_e_qxi_ut_drr_c, var_e_qxi_ut_drr_m)
+          vare_vec_qxa_irr <- c(var_e_qxa, var_e_qxa_ux_irr, var_e_qxa_ut)
+          vare_vec_qxa_drr <- c(var_e_qxa, var_e_qxa_ux_drr_c, var_e_qxa_ux_drr_m,
+                                var_e_qxa_ut_drr_c, var_e_qxa_ut_drr_m)
+          vare_vec_rxxi_irr <- c(var_e_rxxi, var_e_rxxi_ux_irr, var_e_rxxi_ut)
+          vare_vec_rxxi_drr <- c(var_e_rxxi, var_e_rxxi_ux_drr_c, var_e_rxxi_ux_drr_m,
+                                 var_e_rxxi_ut_drr_c, var_e_rxxi_ut_drr_m)
+          vare_vec_rxxa_irr <- c(var_e_rxxa, var_e_rxxa_ux_irr, var_e_rxxa_ut)
+          vare_vec_rxxa_drr <- c(var_e_rxxa, var_e_rxxa_ux_drr_c, var_e_rxxa_ux_drr_m,
+                                 var_e_rxxa_ut_drr_c, var_e_rxxa_ut_drr_m)
+          vare_vec_ux <- c(var_e_ux, var_e_ux_rxxa, var_e_ux_rxxi)
+          vare_vec_ut <- c(var_e_ut, var_e_ut_rxxa, var_e_ut_rxxi)
+
+          vare_qxi_irr <- art_mean(art_vec = vare_vec_qxi_irr, wt_vec = wtsum_vec_rxxi_irr, null_value = NA)
+          vare_qxi_drr <- art_mean(art_vec = vare_vec_qxi_drr, wt_vec = wtsum_vec_rxxi_drr, null_value = NA)
+          vare_qxa_irr <- art_mean(art_vec = vare_vec_qxa_irr, wt_vec = wtsum_vec_rxxa_irr, null_value = NA)
+          vare_qxa_drr <- art_mean(art_vec = vare_vec_qxa_drr, wt_vec = wtsum_vec_rxxa_drr, null_value = NA)
+          vare_rxxi_irr <- art_mean(art_vec = vare_vec_rxxi_irr, wt_vec = wtsum_vec_rxxi_irr, null_value = NA)
+          vare_rxxi_drr <- art_mean(art_vec = vare_vec_rxxi_drr, wt_vec = wtsum_vec_rxxi_drr, null_value = NA)
+          vare_rxxa_irr <- art_mean(art_vec = vare_vec_rxxa_irr, wt_vec = wtsum_vec_rxxa_irr, null_value = NA)
+          vare_rxxa_drr <- art_mean(art_vec = vare_vec_rxxa_drr, wt_vec = wtsum_vec_rxxa_drr, null_value = NA)
+          vare_ux <- art_mean(art_vec = vare_vec_ux, wt_vec = wtsum_vec_ux, null_value = NA)
+          vare_ut <- art_mean(art_vec = vare_vec_ut, wt_vec = wtsum_vec_ut, null_value = NA)
+
+          name_vec <- c("qxi_irr", "qxi_drr",
+                        "qxa_irr", "qxa_drr",
+                        "rxxi_irr", "rxxi_drr",
+                        "rxxa_irr", "rxxa_drr",
+                        "ux", "ut")
+
+          k_vec <- c(length(rxxi), length(rxxi), length(rxxa), length(rxxa),
+                     length(rxxi), length(rxxi), length(rxxa), length(rxxa),
+                     length(.ux), length(.ut))
+
+          N_vec <- c(sum(n_rxxi), sum(n_rxxi), sum(n_rxxa), sum(n_rxxa),
+                     sum(n_rxxi), sum(n_rxxi), sum(n_rxxa), sum(n_rxxa),
+                     sum(ni_ux), sum(ni_ut))
+
+          if(estimate_rxxa){
+               k_vec <- k_vec + c(0, 0, length(rxxi), length(rxxi),
+                                  0, 0, length(rxxi), length(rxxi),
+                                  0, 0)
+               N_vec <- N_vec + c(0, 0, sum(n_rxxi), sum(n_rxxi),
+                                  0, 0, sum(n_rxxi), sum(n_rxxi),
+                                  0, 0)
+          }
+
+          if(estimate_rxxi){
+               k_vec <- k_vec + c(length(rxxa), length(rxxa), 0, 0,
+                                  length(rxxa), length(rxxa), 0, 0,
+                                  0, 0)
+               N_vec <- N_vec + c(sum(n_rxxa), sum(n_rxxa), 0, 0,
+                                  sum(n_rxxa), sum(n_rxxa), 0, 0,
+                                  0, 0)
+          }
+
+          if(estimate_ux){
+               k_vec <- k_vec + c(rep(0, 8),
+                                  length(.ut), 0)
+               N_vec <- N_vec + c(rep(0, 8),
+                                  sum(ni_ut), 0)
+          }
+
+          if(estimate_ut){
+               k_vec <- k_vec + c(rep(0, 8),
+                                  0, length(.ux))
+               N_vec <- N_vec + c(rep(0, 8),
+                                  0, sum(ni_ux))
+          }
+
+          mean_vec <- c(mean_qxi_irr, mean_qxi_drr,
+                        mean_qxa_irr, mean_qxa_drr,
+                        mean_rxxi_irr, mean_rxxi_drr,
+                        mean_rxxa_irr, mean_rxxa_drr,
+                        mean_ux, mean_ut)
+          var_vec <- c(var_qxi_irr, var_qxi_drr,
+                       var_qxa_irr, var_qxa_drr,
+                       var_rxxi_irr, var_rxxi_drr,
+                       var_rxxa_irr, var_rxxa_drr,
+                       var_ux, var_ut)
+          vare_vec <- c(vare_qxi_irr, vare_qxi_drr,
+                        vare_qxa_irr, vare_qxa_drr,
+                        vare_rxxi_irr, vare_rxxi_drr,
+                        vare_rxxa_irr, vare_rxxa_drr,
+                        vare_ux, vare_ut)
+
+          .vare_vec <- vare_vec
+          .vare_vec[is.na(.vare_vec)] <- 0
+          var_res_vec <- var_vec - .vare_vec
+          var_res_vec[var_res_vec < 0] <- 0
+          rel_vec <- setNames(var_res_vec / var_vec, name_vec)
+          rel_vec[is.na(rel_vec)] <- 0
+
+          summary_mat <- cbind(k = k_vec, N = N_vec,
+                               mean = mean_vec,
+                               var = var_vec, var_e = vare_vec, var_res = var_res_vec,
+                               sd = var_vec^.5, sd_e = vare_vec^.5, sd_res = var_res_vec^.5,
+                               rel_coef = rel_vec, rel_index = sqrt(rel_vec))
+          rownames(summary_mat) <- name_vec
+          summary_mat[is.na(summary_mat[,"mean"]),] <- NA
+
+          out <- list(qxa_irr = .create_ad_int(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr),
+                      qxa_drr = .create_ad_int(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr),
+
+                      qxi_irr = .create_ad_int(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr),
+                      qxi_drr = .create_ad_int(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr),
+
+                      ux = .create_ad_int(art_vec = ux, wt_vec = wt_ux),
+                      ut = .create_ad_int(art_vec = ut, wt_vec = wt_ut))
+
+          valid_rxxa_irr <- !is.null(rxxa_vec_irr) & length(rxxa_vec_irr) > 0
+          valid_rxxa_drr <- !is.null(rxxa_vec_drr) & length(rxxa_vec_drr) > 0
+          valid_rxxi_irr <- !is.null(rxxi_vec_irr) & length(rxxi_vec_irr) > 0
+          valid_rxxi_drr <- !is.null(rxxi_vec_drr) & length(rxxi_vec_drr) > 0
+          valid_ux <- !is.null(ux) & length(ux) > 0
+          valid_ut <- !is.null(ut) & length(ut) > 0
+
+          ad_contents <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr", "ux", "ut")[c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)]
+          if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
+
+          attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
+
+          out
      }
 
-     rxxa_vec_irr <- c(rxxa, rxxa_ux_irr, rxxa_ut)
-     rxxa_vec_drr <- c(rxxa, rxxa_ux_drr_c, rxxa_ux_drr_m,
-                       rxxa_ut_drr_c, rxxa_ut_drr_m)
-     wt_rxxa_irr <- c(wt_rxxa, wt_rxxa_ux, wt_rxxa_ut)
-     wt_rxxa_drr <- c(wt_rxxa, wt_rxxa_ux_c, wt_rxxa_ux_m,
-                      wt_rxxa_ut_c, wt_rxxa_ut_m)
+     arglist <- append(.arglist,
+                       list(estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                            estimate_ux = estimate_ux, estimate_ut = estimate_ut))
+     arglist_raw <- append(.arglist,
+                           list(estimate_rxxa = FALSE, estimate_rxxi = FALSE,
+                                estimate_ux = FALSE, estimate_ut = FALSE))
 
-     rxxi_vec_irr <- c(rxxi, rxxi_ux_irr, rxxi_ut)
-     rxxi_vec_drr <- c(rxxi, rxxi_ux_drr_c, rxxi_ux_drr_m,
-                       rxxi_ut_drr_c, rxxi_ut_drr_m)
-     wt_rxxi_irr <- c(wt_rxxi, wt_rxxi_ux, wt_rxxi_ut)
-     wt_rxxi_drr <- c(wt_rxxi, wt_rxxi_ux_c, wt_rxxi_ux_m,
-                      wt_rxxi_ut_c, wt_rxxi_ut_m)
+     out <- do.call(est_summaries, args = arglist)
 
-     .ux <- ux
-     .wt_ux <- wt_ux
-     ux <- c(ux, ux_rxxa, ux_rxxi)
-     wt_ux <- c(wt_ux, wt_ux_rxxa, wt_ux_rxxi)
+     out_raw <- do.call(est_summaries, args = arglist_raw)
 
-     .ut <- ut
-     .wt_ut <- wt_ut
-     ut <- c(ut, ut_rxxa, ut_rxxi)
-     wt_ut <- c(wt_ut, wt_ut_rxxa, wt_ut_rxxi)
-
-
-     mean_qxi_irr <- art_mean(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr, null_value = NA)
-     mean_qxi_drr <- art_mean(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr, null_value = NA)
-     mean_qxa_irr <- art_mean(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr, null_value = NA)
-     mean_qxa_drr <- art_mean(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr, null_value = NA)
-     mean_rxxi_irr <- art_mean(art_vec = rxxi_vec_irr, wt_vec = wt_rxxi_irr, null_value = NA)
-     mean_rxxi_drr <- art_mean(art_vec = rxxi_vec_drr, wt_vec = wt_rxxi_drr, null_value = NA)
-     mean_rxxa_irr <- art_mean(art_vec = rxxa_vec_irr, wt_vec = wt_rxxa_irr, null_value = NA)
-     mean_rxxa_drr <- art_mean(art_vec = rxxa_vec_drr, wt_vec = wt_rxxa_drr, null_value = NA)
-     mean_ux <- art_mean(art_vec = ux, wt_vec = wt_ux, null_value = NA)
-     mean_ut <- art_mean(art_vec = ut, wt_vec = wt_ut, null_value = NA)
-
-     var_qxi_irr <- art_var(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr, null_value = NA)
-     var_qxi_drr <- art_var(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr, null_value = NA)
-     var_qxa_irr <- art_var(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr, null_value = NA)
-     var_qxa_drr <- art_var(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr, null_value = NA)
-     var_rxxi_irr <- art_var(art_vec = rxxi_vec_irr, wt_vec = wt_rxxi_irr, null_value = NA)
-     var_rxxi_drr <- art_var(art_vec = rxxi_vec_drr, wt_vec = wt_rxxi_drr, null_value = NA)
-     var_rxxa_irr <- art_var(art_vec = rxxa_vec_irr, wt_vec = wt_rxxa_irr, null_value = NA)
-     var_rxxa_drr <- art_var(art_vec = rxxa_vec_drr, wt_vec = wt_rxxa_drr, null_value = NA)
-     var_ux <- art_var(art_vec = ux, wt_vec = wt_ux, null_value = NA)
-     var_ut <- art_var(art_vec = ut, wt_vec = wt_ut, null_value = NA)
-
-     .sum_weights <- function(x) if(length(x) == 0){NULL}else{sum(x)}
-     wtsum_vec_rxxa_irr <- unlist(lapply(list(wt_rxxa, wt_rxxa_ux, wt_rxxa_ut), .sum_weights))
-     wtsum_vec_rxxa_drr <- unlist(lapply(list(wt_rxxa, wt_rxxa_ux_c, wt_rxxa_ux_m,
-                                              wt_rxxa_ut_c, wt_rxxa_ut_m), .sum_weights))
-     wtsum_vec_rxxi_irr <- unlist(lapply(list(wt_rxxi, wt_rxxi_ux, wt_rxxi_ut), .sum_weights))
-     wtsum_vec_rxxi_drr <- unlist(lapply(list(wt_rxxi, wt_rxxi_ux_c, wt_rxxi_ux_m,
-                                              wt_rxxi_ut_c, wt_rxxi_ut_m), .sum_weights))
-     wtsum_vec_ux <- unlist(lapply(list(wt_ux, wt_ux_rxxa, wt_ux_rxxi), .sum_weights))
-     wtsum_vec_ut <- unlist(lapply(list(wt_ut, wt_ut_rxxa, wt_ut_rxxi), .sum_weights))
-
-     vare_vec_qxi_irr <- c(var_e_qxi, var_e_qxi_ux_irr, var_e_qxi_ut)
-     vare_vec_qxi_drr <- c(var_e_qxi, var_e_qxi_ux_drr_c, var_e_qxi_ux_drr_m,
-                           var_e_qxi_ut_drr_c, var_e_qxi_ut_drr_m)
-     vare_vec_qxa_irr <- c(var_e_qxa, var_e_qxa_ux_irr, var_e_qxa_ut)
-     vare_vec_qxa_drr <- c(var_e_qxa, var_e_qxa_ux_drr_c, var_e_qxa_ux_drr_m,
-                           var_e_qxa_ut_drr_c, var_e_qxa_ut_drr_m)
-     vare_vec_rxxi_irr <- c(var_e_rxxi, var_e_rxxi_ux_irr, var_e_rxxi_ut)
-     vare_vec_rxxi_drr <- c(var_e_rxxi, var_e_rxxi_ux_drr_c, var_e_rxxi_ux_drr_m,
-                            var_e_rxxi_ut_drr_c, var_e_rxxi_ut_drr_m)
-     vare_vec_rxxa_irr <- c(var_e_rxxa, var_e_rxxa_ux_irr, var_e_rxxa_ut)
-     vare_vec_rxxa_drr <- c(var_e_rxxa, var_e_rxxa_ux_drr_c, var_e_rxxa_ux_drr_m,
-                            var_e_rxxa_ut_drr_c, var_e_rxxa_ut_drr_m)
-     vare_vec_ux <- c(var_e_ux, var_e_ux_rxxa, var_e_ux_rxxi)
-     vare_vec_ut <- c(var_e_ut, var_e_ut_rxxa, var_e_ut_rxxi)
-
-     vare_qxi_irr <- art_mean(art_vec = vare_vec_qxi_irr, wt_vec = wtsum_vec_rxxi_irr, null_value = NA)
-     vare_qxi_drr <- art_mean(art_vec = vare_vec_qxi_drr, wt_vec = wtsum_vec_rxxi_drr, null_value = NA)
-     vare_qxa_irr <- art_mean(art_vec = vare_vec_qxa_irr, wt_vec = wtsum_vec_rxxa_irr, null_value = NA)
-     vare_qxa_drr <- art_mean(art_vec = vare_vec_qxa_drr, wt_vec = wtsum_vec_rxxa_drr, null_value = NA)
-     vare_rxxi_irr <- art_mean(art_vec = vare_vec_rxxi_irr, wt_vec = wtsum_vec_rxxi_irr, null_value = NA)
-     vare_rxxi_drr <- art_mean(art_vec = vare_vec_rxxi_drr, wt_vec = wtsum_vec_rxxi_drr, null_value = NA)
-     vare_rxxa_irr <- art_mean(art_vec = vare_vec_rxxa_irr, wt_vec = wtsum_vec_rxxa_irr, null_value = NA)
-     vare_rxxa_drr <- art_mean(art_vec = vare_vec_rxxa_drr, wt_vec = wtsum_vec_rxxa_drr, null_value = NA)
-     vare_ux <- art_mean(art_vec = vare_vec_ux, wt_vec = wtsum_vec_ux, null_value = NA)
-     vare_ut <- art_mean(art_vec = vare_vec_ut, wt_vec = wtsum_vec_ut, null_value = NA)
-
-     name_vec <- c("qxi_irr", "qxi_drr",
-                   "qxa_irr", "qxa_drr",
-                   "rxxi_irr", "rxxi_drr",
-                   "rxxa_irr", "rxxa_drr",
-                   "ux", "ut")
-
-     k_vec <- c(length(rxxi), length(rxxi), length(rxxa), length(rxxa),
-                length(rxxi), length(rxxi), length(rxxa), length(rxxa),
-                length(.ux), length(.ut))
-
-     N_vec <- c(sum(n_rxxi), sum(n_rxxi), sum(n_rxxa), sum(n_rxxa),
-                sum(n_rxxi), sum(n_rxxi), sum(n_rxxa), sum(n_rxxa),
-                sum(ni_ux), sum(ni_ut))
-
-     if(estimate_rxxa){
-          k_vec <- k_vec + c(0, 0, length(rxxi), length(rxxi),
-                             0, 0, length(rxxi), length(rxxi),
-                             0, 0)
-          N_vec <- N_vec + c(0, 0, sum(n_rxxi), sum(n_rxxi),
-                             0, 0, sum(n_rxxi), sum(n_rxxi),
-                             0, 0)
-     }
-
-     if(estimate_rxxi){
-          k_vec <- k_vec + c(length(rxxa), length(rxxa), 0, 0,
-                             length(rxxa), length(rxxa), 0, 0,
-                             0, 0)
-          N_vec <- N_vec + c(sum(n_rxxa), sum(n_rxxa), 0, 0,
-                             sum(n_rxxa), sum(n_rxxa), 0, 0,
-                             0, 0)
-     }
-
-     if(estimate_ux){
-          k_vec <- k_vec + c(rep(0, 8),
-                             length(.ut), 0)
-          N_vec <- N_vec + c(rep(0, 8),
-                             sum(ni_ut), 0)
-     }
-
-     if(estimate_ut){
-          k_vec <- k_vec + c(rep(0, 8),
-                             0, length(.ux))
-          N_vec <- N_vec + c(rep(0, 8),
-                             0, sum(ni_ux))
-     }
-
-     mean_vec <- c(mean_qxi_irr, mean_qxi_drr,
-                   mean_qxa_irr, mean_qxa_drr,
-                   mean_rxxi_irr, mean_rxxi_drr,
-                   mean_rxxa_irr, mean_rxxa_drr,
-                   mean_ux, mean_ut)
-     var_vec <- c(var_qxi_irr, var_qxi_drr,
-                  var_qxa_irr, var_qxa_drr,
-                  var_rxxi_irr, var_rxxi_drr,
-                  var_rxxa_irr, var_rxxa_drr,
-                  var_ux, var_ut)
-     vare_vec <- c(vare_qxi_irr, vare_qxi_drr,
-                   vare_qxa_irr, vare_qxa_drr,
-                   vare_rxxi_irr, vare_rxxi_drr,
-                   vare_rxxa_irr, vare_rxxa_drr,
-                   vare_ux, vare_ut)
-
-     .vare_vec <- vare_vec
-     .vare_vec[is.na(.vare_vec)] <- 0
-     var_res_vec <- var_vec - .vare_vec
-     var_res_vec[var_res_vec < 0] <- 0
-     rel_vec <- setNames(var_res_vec / var_vec, name_vec)
-     rel_vec[is.na(rel_vec)] <- 0
-
-     summary_mat <- cbind(k = k_vec, N = N_vec,
-                          mean = mean_vec,
-                          var = var_vec, var_e = vare_vec, var_res = var_res_vec,
-                          sd = var_vec^.5, sd_e = vare_vec^.5, sd_res = var_res_vec^.5,
-                          rel_coef = rel_vec, rel_index = sqrt(rel_vec))
-     rownames(summary_mat) <- name_vec
-     summary_mat[is.na(summary_mat[,"mean"]),] <- NA
-
-     out <- list(qxa_irr = .create_ad_int(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr),
-                 qxa_drr = .create_ad_int(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr),
-
-                 qxi_irr = .create_ad_int(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr),
-                 qxi_drr = .create_ad_int(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr),
-
-                 ux = .create_ad_int(art_vec = ux, wt_vec = wt_ux),
-                 ut = .create_ad_int(art_vec = ut, wt_vec = wt_ut))
-
-     valid_rxxa_irr <- !is.null(rxxa_vec_irr) & length(rxxa_vec_irr) > 0
-     valid_rxxa_drr <- !is.null(rxxa_vec_drr) & length(rxxa_vec_drr) > 0
-     valid_rxxi_irr <- !is.null(rxxi_vec_irr) & length(rxxi_vec_irr) > 0
-     valid_rxxi_drr <- !is.null(rxxi_vec_drr) & length(rxxi_vec_drr) > 0
-     valid_ux <- !is.null(ux) & length(ux) > 0
-     valid_ut <- !is.null(ut) & length(ut) > 0
-
-     ad_contents <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr", "ux", "ut")[c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)]
-     if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
-
-     attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
+     attributes(out) <- append(attributes(out),
+                               list(summary_raw = attributes(out_raw)$summary,
+                                    ad_contents_raw = attributes(out_raw)$ad_contents,
+                                    inputs = inputs))
 
      class(out) <- c("psychmeta", "ad_obj", "ad_int")
      out
@@ -737,33 +876,33 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 #' @param wt_ux Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).
 #' @param na_ux Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ux values. \code{NULL} by default.
 #' Only used when ni_ux is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ux}.
-#' @param dep_sds_ux_obs Logical scalar or vector determinining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#' @param dep_sds_ux_obs Logical scalar or vector determining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
 #'
 #' @param mean_ux Vector that can be used to supply the means of externally computed distributions of observed-score u ratios.
 #' @param var_ux Vector that can be used to supply the variances of externally computed distributions of observed-score u ratios.
 #' @param k_ux Vector that can be used to supply the number of studies included in externally computed distributions of observed-score u ratios.
 #' @param mean_ni_ux Vector that can be used to supply the mean incumbent sample sizes of externally computed distributions of observed-score u ratios.
 #' @param mean_na_ux Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.
-#' @param dep_sds_ux_spec Logical scalar or vector determinining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#' @param dep_sds_ux_spec Logical scalar or vector determining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
 #'
 #' @param ut Vector of true-score u ratios.
 #' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
 #' @param wt_ut Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).
 #' @param na_ut Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ut values. \code{NULL} by default.
 #' Only used when ni_ut is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ut}.
-#' @param dep_sds_ut_obs Logical scalar or vector determinining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#' @param dep_sds_ut_obs Logical scalar or vector determining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
 #'
 #' @param mean_ut Vector that can be used to supply the means of externally computed distributions of true-score u ratios.
 #' @param var_ut Vector that can be used to supply the variances of externally computed distributions of true-score u ratios.
 #' @param k_ut Vector that can be used to supply the number of studies included in externally computed distributions of true-score u ratios.
 #' @param mean_ni_ut Vector that can be used to supply the mean sample sizes for of externally computed distributions of true-score u ratios.
 #' @param mean_na_ut Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of true-score u ratios.
-#' @param dep_sds_ut_spec Logical scalar or vector determinining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#' @param dep_sds_ut_spec Logical scalar or vector determining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
 #'
-#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by  default.
+#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
 #' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
 #' @param ... Further arguments.
 #'
@@ -851,6 +990,22 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           var_unbiased = TRUE, ...){
 
+     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
+                    mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type,
+                    mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type,
+
+                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
+                    mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa, qxa_dist_type = qxa_dist_type,
+                    mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa, rxxa_dist_type = rxxa_dist_type,
+
+                    ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
+                    mean_ux = mean_ux, var_ux = var_ux, k_ux = k_ux, mean_ni_ux = mean_ni_ux, mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
+
+                    ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
+                    mean_ut = mean_ut, var_ut = var_ut, k_ut = k_ut, mean_ni_ut = mean_ni_ut, mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
+
+                    ...)
+
      N_qxi <- mean_n_qxi * k_qxi
      N_rxxi <- mean_n_rxxi * k_rxxi
      N_qxa <- mean_n_qxa * k_qxa
@@ -909,15 +1064,18 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(art == "u") screen_u(u_vec = mean_art_1, art_name = "Mean u ratio")
                art_desc_spec_1 <- cbind(mean = mean_art_1, var = var_art_1)
 
-               if(!is.null(k_art_1) & !is.null(mean_ni_art_1)){
+               if(!is.null(mean_ni_art_1)){
                     valid_n <- !is.na(mean_ni_art_1)
                     var_res <- as.numeric(art_desc_spec_1[,"var"])
                     if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_q(q = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n]))
                     if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_rel(rel = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n]))
                     if(art == "u") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_u(u = art_desc_spec_1[valid_n,"mean"], n_i = mean_ni_art_1[valid_n],
                                                                                                                n_a = mean_na_art_1, dependent_sds = dependent_sds_art_1))
-
-                    art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = var_res, total_n = k_art_1 * mean_ni_art_1, n_wt = as.numeric(valid_n))
+                    if(!is.null(k_art_1)){
+                         art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = var_res, total_n = k_art_1 * mean_ni_art_1, n_wt = as.numeric(valid_n))
+                    }else{
+                         art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = var_res, total_n = 1, n_wt = 0)
+                    }
                     art_desc_spec_1[,"var_res"] <- ifelse(art_desc_spec_1[,"var_res"] < 0, 0, as.numeric(art_desc_spec_1[,"var_res"]))
                }else{
                     art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = as.numeric(art_desc_spec_1[,"var"]), total_n = 1, n_wt = 0)
@@ -931,13 +1089,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(art == "rel") screen_rel(rel_vec = mean_art_2, art_name = "Mean square root of reliability")
                art_desc_spec_2 <- cbind(mean = mean_art_2, var = var_art_2)
 
-               if(!is.null(k_art_2) & !is.null(mean_n_art_2)){
+               if(!is.null(mean_n_art_2)){
                     valid_n <- !is.na(mean_n_art_2)
                     var_res <- as.numeric(art_desc_spec_2[,"var"])
                     if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_rel(rel = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n]))
                     if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_q(q = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n]))
 
-                    art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = var_res, total_n = k_art_2 * mean_n_art_2, n_wt = as.numeric(valid_n))
+                    if(!is.null(k_art_2)){
+                         art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = var_res, total_n = k_art_2 * mean_n_art_2, n_wt = as.numeric(valid_n))
+                    }else{
+                         art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = var_res, total_n = 1, n_wt = 0)
+                    }
                     art_desc_spec_2[,"var_res"] <- ifelse(art_desc_spec_2[,"var_res"] < 0, 0, as.numeric(art_desc_spec_2[,"var_res"]))
                }else{
                     art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = as.numeric(art_desc_spec_2[,"var"]), total_n = 1, n_wt = 0)
@@ -959,6 +1121,19 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           }
 
           art_desc_mat <- rbind(art_desc_obs, art_desc_spec_1, art_desc_spec_2)
+          if(!is.null(art_desc_mat)){
+               art_desc_mat <- art_desc_mat[!is.na(art_desc_mat[,"mean"]),]
+               if(!is.matrix(art_desc_mat)){
+                    if(length(art_desc_mat) == 0){
+                         art_desc_mat <- NULL
+                    }else{
+                         art_desc_mat <- t(art_desc_mat)
+                    }
+               }else{
+                    if(nrow(art_desc_mat) == 0)
+                         art_desc_mat <- NULL
+               }
+          }
 
           if(!is.null(art_desc_mat)){
                if(nrow(art_desc_mat) > 1){
@@ -1196,7 +1371,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                               mean_art_2 = mean_qxa, var_art_2 = var_qxa, k_art_2 = k_qxa, mean_n_art_2 = mean_n_qxa, art = "rel", var_unbiased = var_unbiased)
      rxxi_desc <- art_summary(art_vec = rxxi, wt_vec = wt_rxxi, ni_vec = n_rxxi,
                               mean_art_1 = mean_rxxi, var_art_1 = var_rxxi, k_art_1 = k_rxxi, mean_ni_art_1 = mean_n_rxxi,
-                              mean_art_2 = mean_qxi, var_art_2 = var_qxa, k_art_2 = k_qxi, mean_n_art_2 = mean_n_qxi, art = "rel", var_unbiased = var_unbiased)
+                              mean_art_2 = mean_qxi, var_art_2 = var_qxi, k_art_2 = k_qxi, mean_n_art_2 = mean_n_qxi, art = "rel", var_unbiased = var_unbiased)
 
      ## Consistency estimates of reliability indices
      qxa_desc_c <- art_summary(art_vec = rxxa_c, wt_vec = wt_rxxa_c, ni_vec = n_rxxa_c,
@@ -1220,7 +1395,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                 mean_art_2 = mean_qxa_c, var_art_2 = var_qxa_c, k_art_2 = k_qxa_c, mean_n_art_2 = mean_n_qxa_c, art = "rel", var_unbiased = var_unbiased)
      rxxi_desc_c <- art_summary(art_vec = rxxi_c, wt_vec = wt_rxxi_c, ni_vec = n_rxxi_c,
                                 mean_art_1 = mean_rxxi_c, var_art_1 = var_rxxi_c, k_art_1 = k_rxxi_c, mean_ni_art_1 = mean_n_rxxi_c,
-                                mean_art_2 = mean_qxi_c, var_art_2 = var_qxa_c, k_art_2 = k_qxi_c, mean_n_art_2 = mean_n_qxi_c, art = "rel", var_unbiased = var_unbiased)
+                                mean_art_2 = mean_qxi_c, var_art_2 = var_qxi_c, k_art_2 = k_qxi_c, mean_n_art_2 = mean_n_qxi_c, art = "rel", var_unbiased = var_unbiased)
 
      ## Multi-administration estimates of reliability coefficients
      rxxa_desc_m <- art_summary(art_vec = rxxa_m, wt_vec = wt_rxxa_m, ni_vec = n_rxxa_m,
@@ -1228,11 +1403,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                 mean_art_2 = mean_qxa_m, var_art_2 = var_qxa_m, k_art_2 = k_qxa_m, mean_n_art_2 = mean_n_qxa_m, art = "rel", var_unbiased = var_unbiased)
      rxxi_desc_m <- art_summary(art_vec = rxxi_m, wt_vec = wt_rxxi_m, ni_vec = n_rxxi_m,
                                 mean_art_1 = mean_rxxi_m, var_art_1 = var_rxxi_m, k_art_1 = k_rxxi_m, mean_ni_art_1 = mean_n_rxxi_m,
-                                mean_art_2 = mean_qxi_m, var_art_2 = var_qxa_m, k_art_2 = k_qxi_m, mean_n_art_2 = mean_n_qxi_m, art = "rel", var_unbiased = var_unbiased)
-
-     inputs <- list(art_vec = ux, wt_vec = wt_ux, ni_vec = ni_ux, na_vec = na_ux, dependent_sds = dep_sds_ux_obs,
-                                mean_art_1 = mean_ux, var_art_1 = var_ux, k_art_1 = k_ux,
-                                mean_ni_art_1 = mean_ni_ux, mean_na_art_1 = mean_na_ux, dependent_sds_art_1 = dep_sds_ux_spec, art = "u", var_unbiased = var_unbiased)
+                                mean_art_2 = mean_qxi_m, var_art_2 = var_qxi_m, k_art_2 = k_qxi_m, mean_n_art_2 = mean_n_qxi_m, art = "rel", var_unbiased = var_unbiased)
 
      ## u ratios
      ux_desc <- art_summary(art_vec = ux, wt_vec = wt_ux, ni_vec = ni_ux, na_vec = na_ux, dependent_sds = dep_sds_ux_obs,
@@ -1651,24 +1822,113 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                }
           }
 
-          rbind(qxa_irr = summarize_ad(rbind(qxa_desc, est_qxa_desc_ux_irr, est_qxa_desc_ut_irr), var_unbiased = var_unbiased),
-                qxa_drr = summarize_ad(rbind(qxa_desc, est_qxa_desc_ux_drr_c, est_qxa_desc_ux_drr_m,
-                                             est_qxa_desc_ut_drr_c, est_qxa_desc_ut_drr_m), var_unbiased = var_unbiased),
+          out <- rbind(qxa_irr = summarize_ad(rbind(qxa_desc, est_qxa_desc_ux_irr, est_qxa_desc_ut_irr), var_unbiased = var_unbiased),
+                       qxa_drr = summarize_ad(rbind(qxa_desc, est_qxa_desc_ux_drr_c, est_qxa_desc_ux_drr_m,
+                                                    est_qxa_desc_ut_drr_c, est_qxa_desc_ut_drr_m), var_unbiased = var_unbiased),
 
-                qxi_irr = summarize_ad(rbind(qxi_desc, est_qxi_desc_ux_irr, est_qxi_desc_ut_irr), var_unbiased = var_unbiased),
-                qxi_drr = summarize_ad(rbind(qxi_desc, est_qxi_desc_ux_drr_c, est_qxi_desc_ux_drr_m,
-                                             est_qxi_desc_ut_drr_c, est_qxi_desc_ut_drr_m), var_unbiased = var_unbiased),
+                       qxi_irr = summarize_ad(rbind(qxi_desc, est_qxi_desc_ux_irr, est_qxi_desc_ut_irr), var_unbiased = var_unbiased),
+                       qxi_drr = summarize_ad(rbind(qxi_desc, est_qxi_desc_ux_drr_c, est_qxi_desc_ux_drr_m,
+                                                    est_qxi_desc_ut_drr_c, est_qxi_desc_ut_drr_m), var_unbiased = var_unbiased),
 
-                rxxa_irr = summarize_ad(rbind(rxxa_desc, est_rxxa_desc_ux_irr, est_rxxa_desc_ut_irr), var_unbiased = var_unbiased),
-                rxxa_drr = summarize_ad(rbind(rxxa_desc, est_rxxa_desc_ux_drr_c, est_rxxa_desc_ux_drr_m,
-                                              est_rxxa_desc_ut_drr_c, est_rxxa_desc_ut_drr_m), var_unbiased = var_unbiased),
+                       rxxa_irr = summarize_ad(rbind(rxxa_desc, est_rxxa_desc_ux_irr, est_rxxa_desc_ut_irr), var_unbiased = var_unbiased),
+                       rxxa_drr = summarize_ad(rbind(rxxa_desc, est_rxxa_desc_ux_drr_c, est_rxxa_desc_ux_drr_m,
+                                                     est_rxxa_desc_ut_drr_c, est_rxxa_desc_ut_drr_m), var_unbiased = var_unbiased),
 
-                rxxi_irr = summarize_ad(rbind(rxxi_desc, est_rxxi_desc_ux_irr, est_rxxi_desc_ut_irr), var_unbiased = var_unbiased),
-                rxxi_drr = summarize_ad(rbind(rxxi_desc, est_rxxi_desc_ux_drr_c, est_rxxi_desc_ux_drr_m,
-                                              est_rxxi_desc_ut_drr_c, est_rxxi_desc_ut_drr_m), var_unbiased = var_unbiased),
+                       rxxi_irr = summarize_ad(rbind(rxxi_desc, est_rxxi_desc_ux_irr, est_rxxi_desc_ut_irr), var_unbiased = var_unbiased),
+                       rxxi_drr = summarize_ad(rbind(rxxi_desc, est_rxxi_desc_ux_drr_c, est_rxxi_desc_ux_drr_m,
+                                                     est_rxxi_desc_ut_drr_c, est_rxxi_desc_ut_drr_m), var_unbiased = var_unbiased),
 
-                ux = summarize_ad(rbind(ux_desc, est_ux_desc_qxi, est_ux_desc_qxa), var_unbiased = var_unbiased),
-                ut = summarize_ad(rbind(ut_desc, est_ut_desc_qxi, est_ut_desc_qxa), var_unbiased = var_unbiased))
+                       ux = summarize_ad(rbind(ux_desc, est_ux_desc_qxi, est_ux_desc_qxa), var_unbiased = var_unbiased),
+                       ut = summarize_ad(rbind(ut_desc, est_ut_desc_qxi, est_ut_desc_qxa), var_unbiased = var_unbiased))
+
+          if(is.null(out)){
+               out <- matrix(0, 0, 3)
+               colnames(out) <- c("mean", "var", "var_res")
+          }
+
+          valid_rxxa_irr <- any(grepl(x = rownames(out), pattern = "qxa_irr"))
+          valid_rxxa_drr <- any(grepl(x = rownames(out), pattern = "qxa_drr"))
+          valid_rxxi_irr <- any(grepl(x = rownames(out), pattern = "qxi_irr"))
+          valid_rxxi_drr <- any(grepl(x = rownames(out), pattern = "qxi_drr"))
+          valid_ux <- any(grepl(x = rownames(out), pattern = "ux"))
+          valid_ut <- any(grepl(x = rownames(out), pattern = "ut"))
+
+          if(!valid_rxxa_irr) out <- rbind(out, qxa_irr = c(1, 0, 0), rxxa_irr = c(1, 0, 0))
+          if(!valid_rxxa_drr) out <- rbind(out, qxa_drr = c(1, 0, 0), rxxa_drr = c(1, 0, 0))
+          if(!valid_rxxi_irr) out <- rbind(out, qxi_irr = c(1, 0, 0), rxxi_irr = c(1, 0, 0))
+          if(!valid_rxxi_drr) out <- rbind(out, qxi_drr = c(1, 0, 0), rxxi_drr = c(1, 0, 0))
+          if(!valid_ux) out <- rbind(out, ux = c(1, 0, 0))
+          if(!valid_ut) out <- rbind(out, ut = c(1, 0, 0))
+
+          if(valid_rxxa_irr) if(is.na(out["qxa_irr",1])) valid_rxxa_irr <- FALSE
+          if(valid_rxxa_drr) if(is.na(out["qxa_drr",1])) valid_rxxa_drr <- FALSE
+          if(valid_rxxi_irr) if(is.na(out["qxi_irr",1])) valid_rxxi_irr <- FALSE
+          if(valid_rxxi_drr) if(is.na(out["qxi_drr",1])) valid_rxxi_drr <- FALSE
+          if(valid_ux) if(is.na(out["ux",1])) valid_ux <- FALSE
+          if(valid_ut) if(is.na(out["ut",1])) valid_ut <- FALSE
+
+          out[is.na(out[,1]),1] <- 1
+          out[is.na(out[,2]),2] <- 0
+          out[is.na(out[,3]),3] <- 0
+
+          out <- out[c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
+                       "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
+                       "ux", "ut"),]
+
+          ad_contents <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
+                           "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
+                           "ux", "ut")[c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr,
+                                         valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)]
+          if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
+
+          .valid_rxxa <- filter_rel(rel_vec = rxxa, wt_vec = wt_rxxa)
+          .valid_rxxi <- filter_rel(rel_vec = rxxi, wt_vec = wt_rxxi)
+          .valid_ux <- filter_u(u_vec = ux, wt_vec = wt_ux)
+          .valid_ut <- filter_u(u_vec = ut, wt_vec = wt_ut)
+
+          summary_mat <- cbind(k_obs = c(length(rxxa[.valid_rxxa]), length(rxxa[.valid_rxxa]), length(rxxi[.valid_rxxi]), length(rxxi[.valid_rxxi]),
+                                         length(rxxa[.valid_rxxa]), length(rxxa[.valid_rxxa]), length(rxxi[.valid_rxxi]), length(rxxi[.valid_rxxi]),
+                                         length(ux[.valid_ux]), length(ut[.valid_ut])),
+
+                               N_obs = c(sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
+                                         sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
+                                         sum(ni_ux[.valid_ux]), sum(ni_ut[.valid_ut])),
+
+                               p_dists = c(length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
+                                           length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
+                                           length(mean_ux), length(mean_ut)),
+
+                               k_dists = c(sum(c(k_qxa, k_rxxa)), sum(c(k_qxa, k_rxxa)), sum(c(k_qxi, k_rxxi)), sum(c(k_qxi, k_rxxi)),
+                                           sum(c(k_qxa, k_rxxa)), sum(c(k_qxa, k_rxxa)), sum(c(k_qxi, k_rxxi)), sum(c(k_qxi, k_rxxi)),
+                                           sum(k_ux), sum(k_ut)),
+
+                               N_dists = c(sum(c(N_qxa, N_rxxa)), sum(c(N_qxa, N_rxxa)), sum(c(N_qxi, N_rxxi)), sum(c(N_qxi, N_rxxi)),
+                                           sum(c(N_qxa, N_rxxa)), sum(c(N_qxa, N_rxxa)), sum(c(N_qxi, N_rxxi)), sum(c(N_qxi, N_rxxi)),
+                                           sum(Ni_ux), sum(Ni_ut))
+          )
+          rownames(summary_mat) <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
+                                     "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
+                                     "ux", "ut")
+          .summary_mat <- summary_mat
+
+          if(estimate_rxxa){
+               summary_mat[c("qxa_irr", "qxa_drr"),] <- .summary_mat[c("qxa_irr", "qxa_drr"),] + .summary_mat[c("qxi_irr", "qxi_drr"),]
+               summary_mat[c("rxxa_irr", "rxxa_drr"),] <- .summary_mat[c("rxxa_irr", "rxxa_drr"),] + .summary_mat[c("rxxi_irr", "rxxi_drr"),]
+          }
+          if(estimate_rxxi){
+               summary_mat[c("qxi_irr", "qxi_drr"),] <- .summary_mat[c("qxi_irr", "qxi_drr"),] + .summary_mat[c("qxa_irr", "qxa_drr"),]
+               summary_mat[c("rxxi_irr", "rxxi_drr"),] <- .summary_mat[c("rxxi_irr", "rxxi_drr"),] + .summary_mat[c("rxxa_irr", "rxxa_drr"),]
+          }
+          if(estimate_ux) summary_mat["ux",] <- .summary_mat["ux",] + .summary_mat["ut",]
+          if(estimate_ut) summary_mat["ut",] <- .summary_mat["ut",] + .summary_mat["ux",]
+
+          summary_mat <- cbind(k_total = apply(summary_mat[,c("k_obs", "k_dists")], 1, sum, na.rm = TRUE),
+                               N_total = apply(summary_mat[,c("N_obs", "N_dists")], 1, sum, na.rm = TRUE),
+                               summary_mat, out)
+          summary_mat <- cbind(summary_mat, sd = summary_mat[,"var"]^.5, sd_res = summary_mat[,"var_res"]^.5)
+          attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
+
+          out
      }
 
      out <- est_summaries(qxi_desc = qxi_desc, qxa_desc = qxa_desc,
@@ -1685,93 +1945,59 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                           estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                           estimate_ux = estimate_ux, estimate_ut = estimate_ut)
 
-     if(is.null(out)){
-          out <- matrix(0, 0, 3)
-          colnames(out) <- c("mean", "var", "var_res")
-     }
+     out_raw <- est_summaries(qxi_desc = qxi_desc, qxa_desc = qxa_desc,
+                              rxxi_desc = rxxi_desc, rxxa_desc = rxxa_desc,
 
-     valid_rxxa_irr <- any(grepl(x = rownames(out), pattern = "qxa_irr"))
-     valid_rxxa_drr <- any(grepl(x = rownames(out), pattern = "qxa_drr"))
-     valid_rxxi_irr <- any(grepl(x = rownames(out), pattern = "qxi_irr"))
-     valid_rxxi_drr <- any(grepl(x = rownames(out), pattern = "qxi_drr"))
-     valid_ux <- any(grepl(x = rownames(out), pattern = "ux"))
-     valid_ut <- any(grepl(x = rownames(out), pattern = "ut"))
+                              qxi_desc_c = qxi_desc_c, qxa_desc_c = qxa_desc_c,
+                              rxxi_desc_c = rxxi_desc_c, rxxa_desc_c = rxxa_desc_c,
 
-     if(!valid_rxxa_irr) out <- rbind(out, qxa_irr = c(1, 0, 0), rxxa_irr = c(1, 0, 0))
-     if(!valid_rxxa_drr) out <- rbind(out, qxa_drr = c(1, 0, 0), rxxa_drr = c(1, 0, 0))
-     if(!valid_rxxi_irr) out <- rbind(out, qxi_irr = c(1, 0, 0), rxxi_irr = c(1, 0, 0))
-     if(!valid_rxxi_drr) out <- rbind(out, qxi_drr = c(1, 0, 0), rxxi_drr = c(1, 0, 0))
-     if(!valid_ux) out <- rbind(out, ux = c(1, 0, 0))
-     if(!valid_ut) out <- rbind(out, ut = c(1, 0, 0))
+                              qxi_desc_m = qxi_desc_m, qxa_desc_m = qxa_desc_m,
+                              rxxi_desc_m = rxxi_desc_m, rxxa_desc_m = rxxa_desc_m,
 
-     if(valid_rxxa_irr) if(is.na(out["qxa_irr",1])) valid_rxxa_irr <- FALSE
-     if(valid_rxxa_drr) if(is.na(out["qxa_drr",1])) valid_rxxa_drr <- FALSE
-     if(valid_rxxi_irr) if(is.na(out["qxi_irr",1])) valid_rxxi_irr <- FALSE
-     if(valid_rxxi_drr) if(is.na(out["qxi_drr",1])) valid_rxxi_drr <- FALSE
-     if(valid_ux) if(is.na(out["ux",1])) valid_ux <- FALSE
-     if(valid_ut) if(is.na(out["ut",1])) valid_ut <- FALSE
+                              ux_desc = ux_desc, ut_desc = ut_desc,
 
-     out[is.na(out[,1]),1] <- 1
-     out[is.na(out[,2]),2] <- 0
-     out[is.na(out[,3]),3] <- 0
+                              estimate_rxxa = FALSE, estimate_rxxi = FALSE,
+                              estimate_ux = FALSE, estimate_ut = FALSE)
 
-     out <- out[c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
-                  "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
-                  "ux", "ut"),]
-
-     ad_contents <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
-                      "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
-                      "ux", "ut")[c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr,
-                                    valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)]
-     if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
-
-     .valid_rxxa <- filter_rel(rel_vec = rxxa, wt_vec = wt_rxxa)
-     .valid_rxxi <- filter_rel(rel_vec = rxxi, wt_vec = wt_rxxi)
-     .valid_ux <- filter_u(u_vec = ux, wt_vec = wt_ux)
-     .valid_ut <- filter_u(u_vec = ut, wt_vec = wt_ut)
-
-     summary_mat <- cbind(k_obs = c(length(rxxa[.valid_rxxa]), length(rxxa[.valid_rxxa]), length(rxxi[.valid_rxxi]), length(rxxi[.valid_rxxi]),
-                                    length(rxxa[.valid_rxxa]), length(rxxa[.valid_rxxa]), length(rxxi[.valid_rxxi]), length(rxxi[.valid_rxxi]),
-                                    length(ux[.valid_ux]), length(ut[.valid_ut])),
-
-                          N_obs = c(sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
-                                    sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
-                                    sum(ni_ux[.valid_ux]), sum(ni_ut[.valid_ut])),
-
-                          p_dists = c(length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
-                                     length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
-                                     length(mean_ux), length(mean_ut)),
-
-                          k_dists = c(sum(c(k_qxa, k_rxxa)), sum(c(k_qxa, k_rxxa)), sum(c(k_qxi, k_rxxi)), sum(c(k_qxi, k_rxxi)),
-                                      sum(c(k_qxa, k_rxxa)), sum(c(k_qxa, k_rxxa)), sum(c(k_qxi, k_rxxi)), sum(c(k_qxi, k_rxxi)),
-                                      sum(k_ux), sum(k_ut)),
-
-                          N_dists = c(sum(c(N_qxa, N_rxxa)), sum(c(N_qxa, N_rxxa)), sum(c(N_qxi, N_rxxi)), sum(c(N_qxi, N_rxxi)),
-                                      sum(c(N_qxa, N_rxxa)), sum(c(N_qxa, N_rxxa)), sum(c(N_qxi, N_rxxi)), sum(c(N_qxi, N_rxxi)),
-                                      sum(Ni_ux), sum(Ni_ut))
-                          )
-     rownames(summary_mat) <- c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
-                                "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
-                                "ux", "ut")
-     .summary_mat <- summary_mat
-
-     if(estimate_rxxa){
-          summary_mat[c("qxa_irr", "qxa_drr"),] <- .summary_mat[c("qxa_irr", "qxa_drr"),] + .summary_mat[c("qxi_irr", "qxi_drr"),]
-          summary_mat[c("rxxa_irr", "rxxa_drr"),] <- .summary_mat[c("rxxa_irr", "rxxa_drr"),] + .summary_mat[c("rxxi_irr", "rxxi_drr"),]
-     }
-     if(estimate_rxxi){
-          summary_mat[c("qxi_irr", "qxi_drr"),] <- .summary_mat[c("qxi_irr", "qxi_drr"),] + .summary_mat[c("qxa_irr", "qxa_drr"),]
-          summary_mat[c("rxxi_irr", "rxxi_drr"),] <- .summary_mat[c("rxxi_irr", "rxxi_drr"),] + .summary_mat[c("rxxa_irr", "rxxa_drr"),]
-     }
-     if(estimate_ux) summary_mat["ux",] <- .summary_mat["ux",] + .summary_mat["ut",]
-     if(estimate_ut) summary_mat["ut",] <- .summary_mat["ut",] + .summary_mat["ux",]
-
-     summary_mat <- cbind(k_total = apply(summary_mat[,c("k_obs", "k_dists")], 1, sum, na.rm = TRUE),
-                          N_total = apply(summary_mat[,c("N_obs", "N_dists")], 1, sum, na.rm = TRUE),
-                          summary_mat, out)
-     summary_mat <- cbind(summary_mat, sd = summary_mat[,"var"]^.5, sd_res = summary_mat[,"var_res"]^.5)
-     attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
+     attributes(out) <- append(attributes(out),
+                               list(summary_raw = attributes(out_raw)$summary,
+                                    ad_contents_raw = attributes(out_raw)$ad_contents,
+                                    inputs = inputs))
 
      class(out) <- c("psychmeta", "ad_obj", "ad_tsa")
      out
 }
+
+
+#' Create a tabular array of artifact information summarizing values and weights of values in an interactive artifact distribution
+#'
+#' This is an internal function that constructs a data frame of artifact estimates (in the Value column) and corresponding weights (in the Weight column), consolidated according to the specified number of digits used in rounding.
+#'
+#' @param art_vec Vector of artifact values (i.e., u ratios, reliability coefficients, square-root reliabilities).
+#' @param wt_vec Vector for weights to assign to individual artifact values.
+#' @param decimals Number of decimals to which artifact values should be rounded and consolidated.
+#'
+#' @return Data frame with two columns: One containing artifact values and the other containing weights associated with artifact values.
+#'
+#' @import dplyr
+#' @examples
+#' # .create_ad_int(art_vec = c(.8, .8, .9), wt_vec = c(100, 200, 100), decimals = 2)
+#'
+#' @keywords internal
+.create_ad_int <- function(art_vec, wt_vec = rep(1, length(art_vec)), decimals = Inf){
+     if(is.null(art_vec) | is.null(wt_vec) | length(art_vec) == 0 | length(wt_vec) == 0){
+          data.frame(Value = 1, Weight = 1)
+     }else{
+          if(all(is.na(art_vec))){
+               data.frame(Value = 1, Weight = 1)
+          }else{
+               if(length(art_vec) != length(wt_vec)) stop("Lengths of art_vec and wt_vec differ")
+               art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec)
+               art_tab <- as.data.frame(ungroup(art_tab %>% group_by(Value) %>% do(data.frame(Value = .$Value[1], Weight = sum(.$Weight)))))
+               art_tab <- art_tab[!is.na(art_tab[,1]),]
+               art_tab[,"Weight"] <- art_tab[,"Weight"] / sum(art_tab[,"Weight"])
+               art_tab
+          }
+     }
+}
+

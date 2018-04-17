@@ -9,7 +9,7 @@
 #' @param standardize Should the function's output matrix be returned in standardized form (\code{TRUE}) or in unstandardized form (\code{FALSE}; the default).
 #' @param var_names Optional vector of names for the variables in \code{Sigma_i}, in order of appearance in the matrix.
 #'
-#' @return A matrix that has been manipuated by the multivariate range-restriction formula.
+#' @return A matrix that has been manipulated by the multivariate range-restriction formula.
 #' @export
 #'
 #' @references
@@ -20,10 +20,8 @@
 #' \emph{Proceedings of the Royal Society of Edinburgh. Section A. Mathematical and Physical Sciences, 62}(1), 28–30.
 #'
 #' @examples
-#' Sigma_i <- matrix(.2, 5, 5)
-#' diag(Sigma_i) <- 1
-#' Sigma_xx_a <- matrix(.4, 2, 2)
-#' diag(Sigma_xx_a) <- .8
+#' Sigma_i <- reshape_vec2mat(cov = .2, var = .8, order = 4)
+#' Sigma_xx_a <- reshape_vec2mat(cov = .5, order = 2)
 #' correct_matrix_mvrr(Sigma_i = Sigma_i, Sigma_xx_a = Sigma_xx_a, x_col = 1:2, standardize = TRUE)
 correct_matrix_mvrr <- function(Sigma_i, Sigma_xx_a, x_col, y_col = NULL, standardize = FALSE, var_names = NULL){
      Sigma_i <- as.matrix(Sigma_i)
@@ -109,7 +107,7 @@ correct_matrix_mvrr <- function(Sigma_i, Sigma_xx_a, x_col, y_col = NULL, standa
 #' @param y_col Optional: The variables in \code{Sigma} not listed in \code{x_col} that are to be manipuated by the multivariate range-restriction formula.
 #' @param var_names Optional vector of names for the variables in \code{Sigma}, in order of appearance in the matrix.
 #'
-#' @return A vector of means that has been manipuated by the multivariate range-restriction formula.
+#' @return A vector of means that has been manipulated by the multivariate range-restriction formula.
 #' @export
 #'
 #' @references

@@ -61,7 +61,7 @@ A database of simulated primary studies' statistics and analytically determined 
 The \code{simulate_d_database} function generates databases of psychometric d value data from sample-size parameters, correlation parameters, mean parameters, standard deviation parameters, reliability parameters, and selection-ratio parameters.
 The output database can be provided in a long format.
 If composite variables are to be formed, parameters can also be defined for the weights used to form the composites as well as the selection ratios applied to the composites.
-This function will return a database of statistics as well as a database of parameters - the parameter database contains the actual study parameters for each simulated samples (without sampleing error) to allow comparisons between meta-analytic results computed from the statistics and the actual means and variances of parameters.
+This function will return a database of statistics as well as a database of parameters - the parameter database contains the actual study parameters for each simulated sample (without sampleing error) to allow comparisons between meta-analytic results computed from the statistics and the actual means and variances of parameters.
 The \code{\link{merge_simdat_d}} function can be used to merge multiple simulated databases and the \code{\link{sparsify_simdat_d}} function can be used to randomly delete artifact information (a procedure commonly done in simulations of artifact-distribution methods).
 }
 \details{
@@ -73,7 +73,7 @@ Values supplied as any argument with the suffix "params" can take any of three f
 with the values to be sampled.
 \item A matrix containing a column of values (this column must be named "values") from which study parameters should be sampled and a column of weights (this column must be labeled 'weights') associated
 with the values to be sampled.
-\item A function that is configured to generate data using only one argument that definines the number of cases to generate, e.g., \code{fun(n = 10)}.
+\item A function that is configured to generate data using only one argument that defines the number of cases to generate, e.g., \code{fun(n = 10)}.
 }
 }
 \examples{

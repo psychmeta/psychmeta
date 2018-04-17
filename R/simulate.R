@@ -74,7 +74,7 @@ simulate_matrix <- function(sigma, n, k=1, as_cor = FALSE) {
 #'
 #' This function generates inter-item covariance matrices from a population matrix and computes a coefficient alpha reliability estimate for each matrix.
 #'
-#' @param item_mat Item intercorrelation/intercovariance matrix. If item_mat is not supplied, the user must supply both \code{alpha} and \code{k_items}.
+#' @param item_mat Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both \code{alpha} and \code{k_items}.
 #' If item_mat is \code{NULL}, the program will assume that all item intercorrelations are equal.
 #' @param alpha Population alpha value. Must be supplied if \code{item_mat} is \code{NULL}.
 #' @param k_items Number of items on the test to be simulated. Must be supplied if \code{item_mat} is \code{NULL.}

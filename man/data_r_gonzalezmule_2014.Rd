@@ -11,6 +11,7 @@ data(data_r_gonzalezmule_2014)
 \description{
 Data set to demonstrate corrections for univariate range restriction and measurement error using
 individual corrections or artifact distributions.
+NOTE: This is an updated version of the data set reported in the Gonzalez-Mulé, Mount, an Oh (2014) article that was obtained from the first author.
 }
 \examples{
 data(data_r_gonzalezmule_2014)

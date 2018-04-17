@@ -16,7 +16,7 @@ mix_r_2group(rxy, dx, dy, p = 0.5)
 \item{p}{Proportion of cases in one of the two groups.}
 }
 \value{
-A vector of two-group mixture correlationa
+A vector of two-group mixture correlations
 }
 \description{
 Estimate the mixture correlation for two groups

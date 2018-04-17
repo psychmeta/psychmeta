@@ -7,6 +7,7 @@
 #' @param n2 Vector or column name of sample sizes.
 #' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
+#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' @param treat_as_d Logical scalar determining whether \emph{d} values are to be meta-analyzed as d values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
@@ -18,9 +19,9 @@
 #' @param correct_rr_g Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rr_y Logical scalar or vector or column name determining whether each \emph{d} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
 #' @param indirect_rr_g Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
-#' Superceded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).
+#' Superseded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).
 #' @param indirect_rr_y Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-#' Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).
+#' Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).
 #' @param rGg Vector or column name of reliability estimates for X.
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
@@ -45,7 +46,8 @@
 #' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 #' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
 #' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).
-#' @param supplemental_ads_y List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.
+#' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
+#' @param supplemental_ads_y List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
@@ -57,9 +59,9 @@
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
 #' Thousand Oaks, California: SAGE Publications, Inc. Chapter 3.
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2017). \emph{One of these artifacts is not like the others:
-#' New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-#' Unpublished manuscript.
+#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+#' Accounting for indirect range restriction in organizational and psychological research}.
+#' Manuscript submitted for review.
 #'
 #' @examples
 #' ## Example meta-analyses using simulated data:
@@ -67,7 +69,7 @@
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 #' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
+ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     treat_as_d = TRUE, wt_type = "inv_var_mean", error_type = "mean",
                     correct_bias = TRUE,
                     correct_rGg = FALSE, correct_ryy = TRUE,
@@ -80,7 +82,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                     conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                     moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", impute_method = "bootstrap_mod",
                     decimals = 2, hs_override = FALSE,
-                    use_all_arts = FALSE, supplemental_ads_y = NULL, data = NULL, ...){
+                    use_all_arts = FALSE, estimate_pa = FALSE, supplemental_ads_y = NULL, data = NULL, ...){
 
      ##### Get inputs #####
      call <- match.call()
@@ -112,51 +114,54 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      if(!is.null(data)){
           data <- as.data.frame(data)
 
-          d <- match_variables(call = call_full[[match("d",  names(call_full))]], arg = d, data = data)
+          d <- match_variables(call = call_full[[match("d",  names(call_full))]], arg = d, arg_name = "d", data = data)
 
-          n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], arg = n1, data = data)
+          n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], arg = n1, arg_name = "n1", data = data)
 
           if(deparse(substitute(n2))[1] != "NULL")
-               n2 <- match_variables(call = call_full[[match("n2",  names(call_full))]], arg = n2, data = data)
+               n2 <- match_variables(call = call_full[[match("n2",  names(call_full))]], arg = n2, arg_name = "n2", data = data)
 
           if(deparse(substitute(n_adj))[1] != "NULL")
-               n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], arg = n_adj, data = data)
+               n_adj <- match_variables(call = call_full[[match("n_adj",  names(call_full))]], arg = n_adj, arg_name = "n_adj", data = data)
 
           if(deparse(substitute(rGg))[1] != "NULL")
-               rGg <- match_variables(call = call_full[[match("rGg",  names(call_full))]], arg = rGg, data = data)
+               rGg <- match_variables(call = call_full[[match("rGg",  names(call_full))]], arg = rGg, arg_name = "rGg", data = data)
 
           if(deparse(substitute(ryy))[1] != "NULL")
-               ryy <- match_variables(call = call_full[[match("ryy",  names(call_full))]], arg = ryy, data = data)
+               ryy <- match_variables(call = call_full[[match("ryy",  names(call_full))]], arg = ryy, arg_name = "ryy", data = data)
 
           if(deparse(substitute(ryy_restricted))[1] != "NULL")
-               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted",  names(call_full))]], arg = ryy_restricted, data = data)
+               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted",  names(call_full))]], arg = ryy_restricted, arg_name = "ryy_restricted", data = data)
 
           if(deparse(substitute(ryy_type))[1] != "NULL")
-               ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, data = data)
+               ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
 
           if(deparse(substitute(uy))[1] != "NULL")
-               uy <- match_variables(call = call_full[[match("uy",  names(call_full))]], arg = uy, data = data)
+               uy <- match_variables(call = call_full[[match("uy",  names(call_full))]], arg = uy, arg_name = "uy", data = data)
 
           if(deparse(substitute(uy_observed))[1] != "NULL")
-               uy_observed <- match_variables(call = call_full[[match("uy_observed",  names(call_full))]], arg = uy_observed, data = data)
+               uy_observed <- match_variables(call = call_full[[match("uy_observed",  names(call_full))]], arg = uy_observed, arg_name = "uy_observed", data = data)
 
           if(deparse(substitute(sample_id))[1] != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
+               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, arg_name = "sample_id", data = data)
+
+          if(deparse(substitute(citekey))[1] != "NULL")
+               citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
+               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
 
           if(deparse(substitute(correct_rr_g))[1] != "NULL")
-               correct_rr_g <- match_variables(call = call_full[[match("correct_rr_g",  names(call_full))]], arg = correct_rr_g, data = data)
+               correct_rr_g <- match_variables(call = call_full[[match("correct_rr_g",  names(call_full))]], arg = correct_rr_g, arg_name = "correct_rr_g", data = data)
 
           if(deparse(substitute(correct_rr_y))[1] != "NULL")
-               correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y",  names(call_full))]], arg = correct_rr_y, data = data)
+               correct_rr_y <- match_variables(call = call_full[[match("correct_rr_y",  names(call_full))]], arg = correct_rr_y, arg_name = "correct_rr_y", data = data)
 
           if(deparse(substitute(indirect_rr_g))[1] != "NULL")
-               indirect_rr_g <- match_variables(call = call_full[[match("indirect_rr_g",  names(call_full))]], arg = indirect_rr_g, data = data)
+               indirect_rr_g <- match_variables(call = call_full[[match("indirect_rr_g",  names(call_full))]], arg = indirect_rr_g, arg_name = "indirect_rr_g", data = data)
 
           if(deparse(substitute(indirect_rr_y))[1] != "NULL")
-               indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y",  names(call_full))]], arg = indirect_rr_y, data = data)
+               indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y",  names(call_full))]], arg = indirect_rr_y, arg_name = "indirect_rr_y", data = data)
      }
 
      ## Reliabilities of grouping variables are correlations, so we will square them to put them in the same metric as other reliability statistics
@@ -209,7 +214,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
      pa[is.na(pa)] <- pi[is.na(pa)]
 
      ## Compute meta-analysis
-     out <- ma_r_ic(rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
+     out <- ma_r_ic(rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id, citekey = citekey,
                     construct_order = NULL,
                     wt_type = wt_type, error_type = error_type,
                     correct_bias = correct_bias, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
@@ -226,7 +231,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
                     use_all_arts = use_all_arts, supplemental_ads_x = NULL, supplemental_ads_y = supplemental_ads_y, data = NULL,
 
                     ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
-                    es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa)
+                    es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa, estimate_pa = estimate_pa)
      if(treat_as_d){
           class(out)[2] <- "ma_d_as_r"
      }else{

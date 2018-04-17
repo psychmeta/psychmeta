@@ -29,6 +29,7 @@
 #'
 #' Data set to demonstrate corrections for univariate range restriction and measurement error using
 #' individual corrections or artifact distributions.
+#' NOTE: This is an updated version of the data set reported in the Gonzalez-Mulé, Mount, an Oh (2014) article that was obtained from the first author.
 #'
 #' @docType data
 #'
@@ -129,7 +130,7 @@
 
 #### Simulated datasets ####
 
-#' Hypothetical dataset simulated to statisfy the assumptions of the correction for measurement error only
+#' Hypothetical dataset simulated to satisfy the assumptions of the correction for measurement error only
 #'
 #' Data set for use in example meta-analyses correcting for measurement error in two variables.
 #'
@@ -147,7 +148,7 @@
 
 
 
-#' Hypothetical dataset simulated to statisfy the assumptions of the univariate correction for direct range restriction
+#' Hypothetical dataset simulated to satisfy the assumptions of the univariate correction for direct range restriction
 #'
 #' Data set for use in example meta-analyses correcting for univariate direct range restriction.
 #'
@@ -165,7 +166,7 @@
 
 
 
-#' Hypothetical dataset simulated to statisfy the assumptions of the univariate correction for indirect range restriction
+#' Hypothetical dataset simulated to satisfy the assumptions of the univariate correction for indirect range restriction
 #'
 #' Data set for use in example meta-analyses correcting for univariate indirect range restriction.
 #'
@@ -183,7 +184,7 @@
 
 
 
-#' Hypothetical dataset simulated to statisfy the assumptions of the bivariate correction for indirect range restriction
+#' Hypothetical dataset simulated to satisfy the assumptions of the bivariate correction for indirect range restriction
 #'
 #' Data set for use in example meta-analyses of bivariate indirect range restriction.
 #'
@@ -201,10 +202,10 @@
 
 
 
-#' Hypothetical dataset simulated to statisfy the assumptions of the bivariate correction for direct range restriction
+#' Hypothetical dataset simulated to satisfy the assumptions of the bivariate correction for direct range restriction
 #'
 #' Data set for use in example meta-analyses of bivariate direct range restriction.
-#' Note that the BVDRR correction is only an approximation of the approproate range-restriction correction and tends to have a noticeable positive bias when applied in meta-analyses.
+#' Note that the BVDRR correction is only an approximation of the appropriate range-restriction correction and tends to have a noticeable positive bias when applied in meta-analyses.
 #'
 #' @docType data
 #'
@@ -222,7 +223,7 @@
 
 
 
-#' Hypothetical correlation dataset simulated to statisfy the assumptions of the correction for measurement error only in multiple constructs
+#' Hypothetical correlation dataset simulated to satisfy the assumptions of the correction for measurement error only in multiple constructs
 #'
 #' Data set for use in example meta-analyses correcting for measurement error in multiple variables.
 #'
@@ -240,7 +241,7 @@
 
 
 
-#' Hypothetical \emph{d} value dataset simulated to statisfy the assumptions of the correction for measurement error only in multiple constructs
+#' Hypothetical \emph{d} value dataset simulated to satisfy the assumptions of the correction for measurement error only in multiple constructs
 #'
 #' Data set for use in example meta-analyses correcting for measurement error in multiple variables.
 #'

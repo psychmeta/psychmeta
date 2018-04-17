@@ -13,7 +13,7 @@ var_error_auc(A, n1, n2 = NA)
 var_error_cles(A, n1, n2 = NA)
 }
 \arguments{
-\item{A}{Vector of probaility-based effect sizes (common language effect sizes)}
+\item{A}{Vector of probability-based effect sizes (common language effect sizes)}
 
 \item{n1}{Vector of sample sizes from group 1 (or the total sample size with the assumption that groups are of equal size, if no group 2 sample size is supplied).}
 

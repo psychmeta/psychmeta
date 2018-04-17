@@ -483,10 +483,10 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
      meanya <- cbind(meanya_mat_obs, meanya_mat_true, meanya_mat_error)
      meanyi <- cbind(meanyi_mat_obs, meanyi_mat_true, meanyi_mat_error)
 
-     mix_out_a <- mix_matrix(mat_list = S_complete_a, mu_mat = meanya, p_vec = pa, N = NULL,
+     mix_out_a <- mix_matrix(sigma_list = S_complete_a, mu_mat = meanya, p_vec = pa, N = NULL,
                              group_names = group_names, var_names = colnames(S_complete_a[[1]]))
 
-     mix_out_i <- mix_matrix(mat_list = S_complete_i, mu_mat = meanyi, p_vec = pi, N = NULL,
+     mix_out_i <- mix_matrix(sigma_list = S_complete_i, mu_mat = meanyi, p_vec = pi, N = NULL,
                              group_names = group_names, var_names = colnames(S_complete_i[[1]]))
 
      .compute_d_internal <- function(mean_mat, sd_mat, p_vec){
@@ -516,20 +516,20 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
      da_error <- .compute_d_internal(mean_mat = meanya_mat_error, sd_mat = sdya_mat_error, p_vec = pa)
 
 
-     ryya <- diag(suppressWarnings(cov2cor(mix_out_a$cov_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
-     ryyi <- diag(suppressWarnings(cov2cor(mix_out_i$cov_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+     ryya <- diag(suppressWarnings(cov2cor(mix_out_a$cov_total_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
+     ryyi <- diag(suppressWarnings(cov2cor(mix_out_i$cov_total_ml))[paste0("True_", var_names),paste0("Obs_", var_names)])^2
 
      ryya_group <- simplify2array(lapply(S_complete_a, function(x) diag(suppressWarnings(cov2cor(x))[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
      ryyi_group <- simplify2array(lapply(S_complete_i, function(x) diag(suppressWarnings(cov2cor(x))[paste0("True_", var_names),paste0("Obs_", var_names)])^2))
 
-     sa <- mix_out_a$cov_ml
-     si <- mix_out_i$cov_ml
+     sa <- mix_out_a$cov_total_ml
+     si <- mix_out_i$cov_total_ml
 
      ## Extract vectors of overall descriptives
      meanyi_vec <- mix_out_i$means_raw[nrow(mix_out_a$means_raw),]
      meanya_vec <- mix_out_a$means_raw[nrow(mix_out_a$means_raw),]
-     sdyi_vec <- diag(mix_out_i$cov_ml)^.5
-     sdya_vec <- diag(mix_out_a$cov_ml)^.5
+     sdyi_vec <- diag(mix_out_i$cov_total_ml)^.5
+     sdya_vec <- diag(mix_out_a$cov_total_ml)^.5
      u_vec <- diag(si)^.5 / diag(sa)^.5
 
      ## Organize incumbent SDs

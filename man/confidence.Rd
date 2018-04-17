@@ -4,21 +4,21 @@
 \alias{confidence}
 \title{Construct a confidence interval}
 \usage{
-confidence(mean, se = NULL, sd = NULL, k = 1, conf_level = 0.95,
-  conf_method = "t")
+confidence(mean, se = NULL, df = NULL, conf_level = 0.95,
+  conf_method = "t", ...)
 }
 \arguments{
 \item{mean}{Mean effect size (if used in a meta-analysis) or observed effect size (if used on individual statistics).}
 
-\item{se}{For individual statistic.: standard error of the statistic.}
+\item{se}{Standard error of the statistic.}
 
-\item{sd}{For meta-analyses: Observed standard deviation of effect sizes, before accouting for variance from artifacts.}
-
-\item{k}{For meta-analyses: Number of studies in the meta-analysis.}
+\item{df}{Degrees of freedom of the statistic (necessary if using the \emph{t} distribution).}
 
 \item{conf_level}{Confidence level that defines the width of the confidence interval (default = .95).}
 
 \item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
+
+\item{...}{Additional arguments}
 }
 \value{
 A matrix of confidence intervals of the specified width.
@@ -30,7 +30,6 @@ Function to construct a confidence interval around an effect size or mean effect
 \deqn{CI=mean_{es}\pm quantile\times SE_{es}}{CI = mean_es +/- quantile * SE_es}
 }
 \examples{
-confidence(mean = .3, sd = .15, k = 10, conf_level = .95)
-confidence(mean = c(.3, .5), sd = c(.15, .2), k = c(10, 5), conf_level = .95)
-confidence(mean = c(.3, .5), se = c(.15, .2), conf_level = .95)
+confidence(mean = c(.3, .5), se = c(.15, .2), df = c(100, 200), conf_level = .95, conf_method = "t")
+confidence(mean = c(.3, .5), se = c(.15, .2), conf_level = .95, conf_method = "norm")
 }

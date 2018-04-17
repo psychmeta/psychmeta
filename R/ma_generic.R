@@ -6,6 +6,7 @@
 #' @param n Vector or column name of sample sizes.
 #' @param var_e Vector or column name of error variances.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
+#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.
 #' @param wt_type Type of weight to use in the meta-analysis: native options are "sample_size", and "inv_var" (inverse error variance).
 #' Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
@@ -34,7 +35,7 @@
 #' n <- c(100, 200, 150)
 #' var_e <- 1 / n
 #' ma_generic(es = es, n = n, var_e = var_e)
-ma_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
+ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type = "sample_size",
                          conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
                          moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
      warn_obj1 <- record_warnings()
@@ -61,16 +62,18 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
      if(!is.null(data)){
           data <- as.data.frame(data)
 
-          es <- match_variables(call = call_full[[match("es",  names(call_full))]], arg = es, data = data)
-          n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, data = data)
-          var_e <- match_variables(call = call_full[[match("var_e",  names(call_full))]], arg = var_e, data = data)
-          sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
+          es <- match_variables(call = call_full[[match("es",  names(call_full))]], arg = es, arg_name = "es", data = data)
+          n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, arg_name = "n", data = data)
+          var_e <- match_variables(call = call_full[[match("var_e",  names(call_full))]], arg = var_e, arg_name = "var_e", data = data)
 
           if(deparse(substitute(sample_id))[1] != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, data = data)
+               sample_id <- match_variables(call = call_full[[match("sample_id",  names(call_full))]], arg = sample_id, arg_name = "sample_id", data = data)
+
+          if(deparse(substitute(citekey))[1] != "NULL")
+               citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, data = as_tibble(data), as_array = TRUE)
+               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
 
      if(!is.null(moderators)){
@@ -84,12 +87,16 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
                                   noncat = colnames(moderators)[!cat_moderators])
           moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
 
-          moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
-               lvls <- levels(x)
-               if(is.null(lvls)) lvls <- levels(factor(x))
-               lvls
-          })
-          names(moderator_levels) <- colnames(moderators)
+          if(any(cat_moderators)){
+               moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
+                    lvls <- levels(x)
+                    if(is.null(lvls)) lvls <- levels(factor(x))
+                    lvls
+               })
+               names(moderator_levels) <- colnames(as_tibble(moderators)[,cat_moderators])
+          }else{
+               moderator_levels <- NULL
+          }
 
           moderators <- as.data.frame(moderators)
      }else{
@@ -107,6 +114,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
 
      es_data <- data.frame(es = es, n = n, var_e = var_e)
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
+     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
      es_data <- cbind(sample_id = sample_id, es_data)
 
      out <- ma_wrapper(es_data = es_data, es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
@@ -142,6 +150,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
 
      es <- data$es
      sample_id <- data$sample_id
+     citekey <- data$citekey
      n <- data$n
      var_e_vec <- data$var_e
      if(is.null(es)) es <- data$yi
@@ -183,6 +192,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, wt_type = "sample_size",
           escalc_obj <- data.frame(yi = es, vi = var_e_vec,
                                    n = n, weight = wt_vec,
                                    residual = es - mean_es)
+          if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
           if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj)
           class(escalc_obj) <- c("escalc", "data.frame")
      }

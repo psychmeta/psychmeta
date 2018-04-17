@@ -7,7 +7,7 @@
 estimate_rel_dist(mean_q, var_q)
 }
 \arguments{
-\item{mean_q}{Mean square-rootreliability value.}
+\item{mean_q}{Mean square-root reliability value.}
 
 \item{var_q}{Variance of square-root reliability values.}
 }

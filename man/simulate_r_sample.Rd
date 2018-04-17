@@ -56,7 +56,7 @@ simulate_r_sample(n = 1000, rho_mat = matrix(c(1, .5, .5, 1), 2, 2),
 rho_mat <- matrix(.5, 5, 5)
 diag(rho_mat) <- 1
 
-## Simulate paramters by supply n = Inf
+## Simulate parameters by supply n = Inf
 simulate_r_sample(n = Inf, rho_mat = rho_mat,
                 rel_vec = rep(.8, 5), sr_vec = c(1, 1, 1, 1, .5),
                 wt_mat = cbind(c(0, 0, 0, .3, 1), c(1, .3, 0, 0, 0)), sr_composites = c(.7, .5))

@@ -16,7 +16,7 @@ reshape_mat2dat(var_names, cor_data, common_data = NULL, unique_data = NULL,
 
 \item{unique_data}{Vector or matrix (or vector of column names to match with \code{data}) of data unique to X and Y variables (e.g., mean, SD, reliability).}
 
-\item{diag_label}{Optional name to attrible to values extracted from the diagonal of the matrix (if NULL, no values are extracted from the diagonal).}
+\item{diag_label}{Optional name to attribute to values extracted from the diagonal of the matrix (if NULL, no values are extracted from the diagonal).}
 
 \item{lower_tri}{Logical scalar that identifies whether the correlations are in the lower triangle (\code{TRUE}) or in the upper triangle \code{FALSE} of the matrix.}
 

@@ -4,7 +4,7 @@
 \alias{ma_d}
 \title{Master framework for meta-analysis of \emph{d} values}
 \usage{
-ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
+ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
   treat_as_d = TRUE, ma_method = "bb", ad_type = "tsa",
   correction_method = "auto", group_id = NULL, group1 = NULL,
   group2 = NULL, group_order = NULL, construct_y = NULL,
@@ -22,8 +22,8 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   collapse_method = "composite", intercor = 0.5, partial_intercor = FALSE,
   clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad",
   FALSE, TRUE), impute_method = "bootstrap_mod", decimals = 2,
-  hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL,
-  data = NULL, ...)
+  hs_override = FALSE, use_all_arts = FALSE, estimate_pa = FALSE,
+  supplemental_ads = NULL, data = NULL, ...)
 }
 \arguments{
 \item{d}{Vector or column name of observed \emph{d} values.}
@@ -36,6 +36,8 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 
 \item{sample_id}{Optional vector of identification labels for samples/studies in the meta-analysis.}
 
+\item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").}
+
 \item{treat_as_d}{Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).}
 
 \item{ma_method}{Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).}
@@ -46,24 +48,20 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.}
+be used when interactive artifact distributions are provided). See "Details" of \code{\link{ma_d_ad}} for descriptions of the available methods.}
 
 \item{group_id}{Vector of group comparison IDs (e.g., Treatment1-Control, Treatment2-Control).
-The \code{group_id} argument supercedes the \code{group1} and \code{group2} arguments.
+The \code{group_id} argument supersedes the \code{group1} and \code{group2} arguments.
 If \code{group_id} is not \code{NULL}, the values supplied to the \code{group_order} argument must correspond to \code{group_id} values.}
 
-\item{group1, group2}{Vector of names for groups in a comparison (e.g., group1 = "Control" and group2 = "Treatment", group1 = "Majority" and group2 = "Minority").
-The \code{group1} and \code{group2} arguments are superceded by the \code{group_id} argument.
-If \code{group_id} is \code{NULL}, the values supplied to the \code{group_order} argument must correspond to individual \code{group1} and \code{group2} values - the order of group pairings will be determined interally.
-IMPORTANT: Groups whose names appear before other groups' names in the \code{group_order} vector  will be treated as referent groups for the focal groups whose names occur later in the \code{group_order} vector (the referent group is the group from whose mean the focal group's mean is subtracted when computing a \emph{d} value).
-If a \code{group2} value comes before a \code{group1} value according to the \code{group_order} vector, the groups' positions in all other arguments will be swapped and the sign of the \emph{d} value will be reversed so that \code{group1} is always the referent group.}
+\item{group1, group2}{Vector of group identification labels (e.g., Treatment1, Treatment2, Control)}
 
 \item{group_order}{Optional vector indicating the order in which (1) \code{group1} and \code{group2} values or (2) \code{group_ids} should be arranged.
 If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.}
 
 \item{construct_y}{Vector of construct names for construct initially designated as Y.}
 
-\item{measure_y}{Vector of names names for measures associated with constructs initially designated as "Y".}
+\item{measure_y}{Vector of names for measures associated with constructs initially designated as "Y".}
 
 \item{construct_order}{Vector indicating the order in which Y variables should be arranged.}
 
@@ -75,25 +73,25 @@ If \code{group_order} is \code{NULL}, the order of group pairings will be determ
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rel}{Optional named vector that supercedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
+\item{correct_rel}{Optional named vector that supersedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
 
 \item{correct_rGg}{Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{correct_rr}{Optional named vector that supercedes \code{correct_rr_g} and \code{correct_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for range restriction.}
+\item{correct_rr}{Optional named vector that supersedes \code{correct_rr_g} and \code{correct_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for range restriction.}
 
 \item{correct_rr_g}{Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_rr_y}{Logical scalar or vector or column name determining whether each \emph{d} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{indirect_rr}{Optional named vector that supercedes \code{indirect_rr_g} and \code{indirect_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.}
+\item{indirect_rr}{Optional named vector that supersedes \code{indirect_rr_g} and \code{indirect_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.}
 
 \item{indirect_rr_g}{Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_g} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).}
+Superseded in evaluation by \code{correct_rr_g} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).}
 
 \item{indirect_rr_y}{Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
+Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).}
 
 \item{rGg}{Vector or column name of reliability estimates for X.}
 
@@ -111,7 +109,7 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{uy_observed}{Logical vector or column name determining whether each element of \code{uy} is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).}
 
-\item{sign_rz}{Optional named vector that supercedes \code{sign_rgz} and \code{sign_ryz}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.}
+\item{sign_rz}{Optional named vector that supersedes \code{sign_rgz} and \code{sign_ryz}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.}
 
 \item{sign_rgz}{Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).}
 
@@ -146,11 +144,11 @@ Superceded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{partial_intercor}{Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).}
 
-\item{clean_artifacts}{If \code{TRUE}, mutliple instances of the same contruct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
+\item{clean_artifacts}{If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
 in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.}
 
 \item{impute_artifacts}{If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
-When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all rescrepancies among artifact entries before and after impuation.}
+When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.}
 
 \item{impute_method}{Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.}
 
@@ -160,6 +158,8 @@ When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} s
 \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
 
 \item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{estimate_pa}{Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).}
 
 \item{supplemental_ads}{Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.}
 
@@ -233,12 +233,13 @@ Components of output tables for artifact-distribution meta-analyses:
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
-\item{\code{var_r}}{\cr Weighted variance of observed \emph{d} values.}
+\item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
 \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
 \item{\code{var_art}}{\cr Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts.}
 \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
 \item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
-\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
+\item{\code{sd_d}}{\cr Square root of \code{var_d}.}
+\item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
 \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
 \item{\code{sd_art}}{\cr Square root of \code{var_art}.}
 \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
@@ -255,13 +256,12 @@ Components of output tables for artifact-distribution meta-analyses:
 \description{
 This is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
 When artifact-distribution meta-analyses are performed, this function will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
-This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, to impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
+This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
 The automatic compositing features are employed when \code{sample_id}s and/or construct names are provided.
-When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
+When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitivity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
 }
 \examples{
-\dontrun{
-## The 'ma_d' function can compute multi-construct bare-bones meta-analyes:
+## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:
 ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 
 ## It can also perform multiple individual-correction meta-analyses:
@@ -274,13 +274,12 @@ ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
      ryy = ryyi, correct_rr_y = FALSE,
      construct_y = construct, data = data_d_meas_multi)
 }
-}
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
 Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 3.
 
-Dahlke, J. A., & Wiernik, B. M. (2017).
-\emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
-Unpublished manuscript.
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }

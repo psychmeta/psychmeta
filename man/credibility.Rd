@@ -9,7 +9,7 @@ credibility(mean, sd, k = NULL, cred_level = 0.8, cred_method = "t")
 \arguments{
 \item{mean}{Mean effect size.}
 
-\item{sd}{Residual/true standard deviation of effect sizes, after accouting for variance from artifacts.}
+\item{sd}{Residual/true standard deviation of effect sizes, after accounting for variance from artifacts.}
 
 \item{k}{Number of studies in the meta-analysis.}
 

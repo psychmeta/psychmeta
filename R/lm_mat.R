@@ -122,6 +122,7 @@ matreg <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf, 
           if (!is.numeric(n)) stop("n must be numeric", call. = FALSE)
      }
 
+     S <- cov_mat
      if(is.null(mean_vec)){
           mean_vec <- rep(0, ncol(S))
      }else{
@@ -136,16 +137,18 @@ matreg <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf, 
      }
      names(mean_vec) <- colnames(cov_mat)
 
+     formula <- as.formula(formula)
      y_col <- as.character(formula[[2]])
      y_col <- unique(y_col[y_col %in% rownames(S)])
      if(length(y_col) > 1)
           stop("This function currently only supports models with one left-hand-side (i.e., criterion) variable", call. = F)
-     x_col <- as.character(formula[[3]])
+     x_col <- as.character(formula)[[3]]
+     x_col <- str_split(x_col, pattern = "[+]")[[1]]
+     x_col <- .remove_charmargins(x = x_col)
      if(any(grepl(x = x_col, pattern = "[*]")))
           stop("Interactions cannot be computed from variables in covariance matrices: Please include interactions as variables in the covariance matrix", call. = F)
      x_col <- unique(x_col[x_col %in% rownames(S)])
 
-     S <- cov_mat
      R <- cov2cor(S[c(y_col, x_col), c(y_col, x_col)])
      Sxx_inv <- solve(S[x_col,x_col])
      Rxx_inv <- solve(R[-1,-1])
@@ -246,7 +249,7 @@ matreg <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf, 
                           coefficients.std = beta_mat,
                           composite = c(mean = comp_mean, var = comp_var),
                           cov.is.cor = all(zapsmall(diag(cov_mat[c(y_col, x_col),c(y_col, x_col)])) == 1))
-     class(summary_info) <- "summary_lm_mat"
+     class(summary_info) <- "summary.lm_mat"
 
      out <- list(coefficients = setNames(b_mat[,"Estimate"], rownames(b_mat)),
                  residuals = qnorm(seq(0, 1, .25)) * as.numeric(se_reg),
@@ -279,29 +282,50 @@ matreg <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf, 
      attr(eval(mf, parent.frame()), "terms")
 }
 
-#' Print method for objects of the class "summary_lm_mat "
-#' @keywords internal
-.print.summary_lm_mat <- stats:::print.summary.lm
 
-#' Print method for objects of the class "summary_lm_mat "
+#' Print method for objects of the class "summary.lm_mat"
 #' @keywords internal
-print.summary_lm_mat <- function(x, digits = max(3L, getOption("digits") - 3L), symbolic.cor = x$symbolic.cor,
+.print.summary.lm_mat <- stats:::print.summary.lm
+
+
+
+#' Print method for objects of the class "summary.lm_mat"
+#'
+#' @param x an object of class "summary.lm_mat", usually, a result of a call to summary.lm_mat.
+#' @param digits Number of digits to which result should be rounded
+#' @param symbolic.cor logical. If TRUE, print the correlations in a symbolic form (see symnum) rather than as numbers.
+#' @param signif.stars logical. If TRUE, ‘significance stars’ are printed for each coefficient.
+#' @param ... Additional arguments
+#'
+#' @return Regression results printed in console
+#' @export
+print.summary.lm_mat <- function(x, digits = max(3L, getOption("digits") - 3L), symbolic.cor = x$symbolic.cor,
                                  signif.stars = getOption("show.signif.stars"), ...){
-     .print.summary_lm_mat(x = x, digits = digits, symbolic.cor = symbolic.cor,
+     .print.summary.lm_mat(x = x, digits = digits, symbolic.cor = symbolic.cor,
                            signif.stars = signif.stars, ...)
      if(x$cov.is.cor)
           message("Note: cov_mat is a standardized matrix, interpret coefficients' significance tests with caution. \nFor best results, use an unstandardized covariance matrix as the cov_mat argument.")
 }
 
-#' Print method for objects of the class "lm_mat "
+
+#' Print method for objects of the class "lm_mat"
 #' @keywords internal
 .print.lm_mat <- stats:::print.lm
 
-#' Print method for objects of the class "lm_mat "
-#' @keywords internal
+
+#' Print method for objects of the class "lm_mat"
+#'
+#' @param x Output from the \code{lm_mat()} function.
+#' @param digits Number of digits to which result should be rounded
+#' @param ... Additional arguments
+#'
+#' @return Regression results printed in console
+#' @export
 print.lm_mat <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
      .print.lm_mat(x = x, digits = digits, ...)
 }
+
+
 
 
 
@@ -316,9 +340,9 @@ summary.lm_mat <- function(object, ...){
      attributes(object)$summary_info
 }
 
-#' Prediction method for objects of the class "summary_lm_mat"
+#' Prediction method for objects of the class "summary.lm_mat"
 #'
-#' @param object Object of class inheriting from "summary_lm_mat"
+#' @param object Object of class inheriting from "summary.lm_mat"
 #' @param newdata An optional data frame in which to look for variables with which to predict. If omitted, the fitted values are used.
 #' @param se.fit A switch indicating if standard errors are required.
 #' @param df Degrees of freedom for scale.
@@ -328,7 +352,7 @@ summary.lm_mat <- function(object, ...){
 #'
 #' @return An set of predicted values
 #' @export
-predict.summary_lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
+predict.summary.lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
                                    interval = "none", level = 0.95, ...){
 
      if(rownames(object$coefficients)[1] == "(Intercept)"){
@@ -412,23 +436,23 @@ predict.summary_lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
 #' @export
 predict.lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
                            interval = "none", level = 0.95, ...){
-     predict.summary_lm_mat(object = summary(object),
+     predict.summary.lm_mat(object = summary(object),
                             newdata = newdata, se.fit = se.fit, df = df,
                             interval = interval, level = level, ...)
 }
 
-#' Anova method for objects of the class "summary_lm_mat"
+#' Anova method for objects of the class "summary.lm_mat"
 #'
 #' @param ... Arguments
 #'
 #' @return An anova table
 #' @export
-anova.summary_lm_mat <- function(...){
+anova.summary.lm_mat <- function(...){
      lm_list <- list(...)
 
      lm_class <- unlist(lapply(lm_list, function(x) any(class(x) == "lm_mat")))
      if(any(lm_class)) lm_list[lm_class] <- lapply(lm_list[lm_class], summary)
-     summary_class <- unlist(lapply(lm_list, function(x) any(class(x) == "summary_lm_mat")))
+     summary_class <- unlist(lapply(lm_list, function(x) any(class(x) == "summary.lm_mat")))
      lm_list <- lm_list[summary_class]
 
      n_obs <- unlist(lapply(lm_list, function(x) x[["ftest"]]["n"]))
@@ -481,7 +505,7 @@ anova.summary_lm_mat <- function(...){
 #' @return An anova table
 #' @export
 anova.lm_mat <- function(...){
-     do.call("anova.summary_lm_mat", args = list(...))
+     do.call("anova.summary.lm_mat", args = list(...))
 }
 
 #' @rdname matreg
@@ -506,19 +530,19 @@ lm_matrix <- matreg
 #' @return Lower and upper bounds of confidence intervals for regression coefficients.
 #' @export
 confint.lm_mat <- function(object, parm, level = 0.95, ...){
-     confint.summary_lm_mat(object = summary(object), parm = parm, level = level)
+     confint.summary.lm_mat(object = summary(object), parm = parm, level = level)
 }
 
-#' Confidence interval method for objects of the class "summary_lm_mat"
+#' Confidence interval method for objects of the class "summary.lm_mat"
 #'
-#' @param object Object of class "summary_lm_mat"
+#' @param object Object of class "summary.lm_mat"
 #' @param parm a specification of which parameters are to be given confidence intervals, either a vector of numbers or a vector of names. If missing, all parameters are considered.
 #' @param level Confidence level
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return Lower and upper bounds of confidence intervals for regression coefficients.
 #' @export
-confint.summary_lm_mat <- function(object, parm, level = 0.95, ...){
+confint.summary.lm_mat <- function(object, parm, level = 0.95, ...){
      pnames <- rownames(object$coefficients)
      if(missing(parm)){
           parm <- pnames
@@ -532,3 +556,19 @@ confint.summary_lm_mat <- function(object, parm, level = 0.95, ...){
      ci
 }
 
+
+.remove_charmargins <- function(x){
+     needs_trim <- nchar(x) > 1 & substr(x, nchar(x), nchar(x)) == " "
+     while(any(needs_trim)){
+          x[needs_trim] <- substr(x[needs_trim], 1, nchar(x[needs_trim]) - 1)
+          needs_trim <- nchar(x) > 1 & substr(x, nchar(x), nchar(x)) == " "
+     }
+
+     needs_trim <- nchar(x) > 1 & substr(x, 1, 1) == " "
+     while(any(needs_trim)){
+          x[needs_trim] <- substr(x[needs_trim], 2, nchar(x[needs_trim]))
+          needs_trim <- nchar(x) > 1 & substr(x, 1, 1) == " "
+     }
+
+     x
+}

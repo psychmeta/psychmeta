@@ -1,31 +1,486 @@
-#' Create a tabular array of artifact information summarizing values and weights of values in an interactive artifact distribution
+#' Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
 #'
-#' This is an internal function that constructs a data frame of artifact estiamtes (in the Value column) and corresponding weights (in the Weight column), consolidated according to the specified number of digits used in rounding.
+#' This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions.
+#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
-#' @param art_vec Vector of artifact values (i.e., u ratios, reliability coefficients, square-root reliabilities).
-#' @param wt_vec Vector for weights to assign to individual artifact values.
-#' @param decimals Number of decimals to which artifact values should be rounded and consolidated.
+#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
 #'
-#' @return Data frame with two columns: One containing artifact values and the other containing weights associated with artifact values.
+#' For u ratios, error variances can be computed for independent samples (i.e., settings in which the unrestricted standard deviation comes from an external study) or
+#' dependent samples (i.e., settings in which the range-restricted standard deviation comes from a sample that represents a subset of the applicant sample that provided the
+#' unrestricted standard deviation). The former circumstance is presumed to be more common, so error variances are computed for independent samples by default.
 #'
-#' @import dplyr
+#' @param ad_type Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
+#'
+#' @param rxxi Vector of incumbent reliability estimates.
+#' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
+#' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).
+#' @param rxxi_type,rxxa_type,qxi_dist_type,rxxi_dist_type,qxa_dist_type,rxxa_dist_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
+#'
+#' @param rxxa Vector of applicant reliability estimates.
+#' @param n_rxxa Vector of sample sizes associated with the elements of \code{rxxa}.
+#' @param wt_rxxa Vector of weights associated with the elements of \code{rxxa} (by default, sample sizes will be used as weights).
+#'
+#' @param mean_qxi Vector that can be used to supply the means of externally computed distributions of incumbent square-root reliabilities.
+#' @param var_qxi Vector that can be used to supply the variances of externally computed distributions of incumbent square-root reliabilities.
+#' @param k_qxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent square-root reliabilities.
+#' @param mean_n_qxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent square-root reliabilities.
+#'
+#' @param mean_rxxi Vector that can be used to supply the means of externally computed distributions of incumbent reliabilities.
+#' @param var_rxxi Vector that can be used to supply the variances of externally computed distributions of incumbent reliabilities.
+#' @param k_rxxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent reliabilities.
+#' @param mean_n_rxxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent reliabilities.
+#'
+#' @param ux Vector of observed-score u ratios.
+#' @param ni_ux Vector of incumbent sample sizes associated with the elements of \code{ux}.
+#' @param wt_ux Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).
+#' @param na_ux Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ux values. \code{NULL} by default.
+#' Only used when ni_ux is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ux}.
+#' @param dep_sds_ux_obs Logical scalar or vector determining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#'
+#' @param ut Vector of true-score u ratios.
+#' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
+#' @param wt_ut Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).
+#' @param na_ut Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ut values. \code{NULL} by default.
+#' Only used when ni_ut is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ut}.
+#' @param dep_sds_ut_obs Logical scalar or vector determining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#'
+#' @param mean_qxa Vector that can be used to supply the means of externally computed distributions of applicant square-root reliabilities.
+#' @param var_qxa Vector that can be used to supply the variances of externally computed distributions of applicant square-root reliabilities.
+#' @param k_qxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant square-root reliabilities.
+#' @param mean_n_qxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant square-root reliabilities.
+#'
+#' @param mean_rxxa Vector that can be used to supply the means of externally computed distributions of applicant reliabilities.
+#' @param var_rxxa Vector that can be used to supply the variances of externally computed distributions of applicant reliabilities.
+#' @param k_rxxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant reliabilities.
+#' @param mean_n_rxxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant reliabilities.
+#'
+#' @param mean_ux Vector that can be used to supply the means of externally computed distributions of observed-score u ratios.
+#' @param var_ux Vector that can be used to supply the variances of externally computed distributions of observed-score u ratios.
+#' @param k_ux Vector that can be used to supply the number of studies included in externally computed distributions of observed-score u ratios.
+#' @param mean_ni_ux Vector that can be used to supply the mean incumbent sample sizes of externally computed distributions of observed-score u ratios.
+#' @param mean_na_ux Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.
+#' @param dep_sds_ux_spec Logical scalar or vector determining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#'
+#' @param mean_ut Vector that can be used to supply the means of externally computed distributions of true-score u ratios.
+#' @param var_ut Vector that can be used to supply the variances of externally computed distributions of true-score u ratios.
+#' @param k_ut Vector that can be used to supply the number of studies included in externally computed distributions of true-score u ratios.
+#' @param mean_ni_ut Vector that can be used to supply the mean sample sizes for of externally computed distributions of true-score u ratios.
+#' @param mean_na_ut Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of true-score u ratios.
+#' @param dep_sds_ut_spec Logical scalar or vector determining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
+#'
+#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
+#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
+#' @param ... Further arguments.
+#'
+#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use artifact-distribution meta-analyses.
+#' @export
+#'
 #' @examples
-#' # .create_ad_int(art_vec = c(.8, .8, .9), wt_vec = c(100, 200, 100), decimals = 2)
+#' ## Example computed using observed values only:
+#' create_ad(ad_type = "tsa", rxxa = c(.9, .8), n_rxxa = c(50, 150),
+#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
+#'               ux = c(.9, .8), ni_ux = c(50, 150))
 #'
-#' @keywords internal
-.create_ad_int <- function(art_vec, wt_vec = rep(1, length(art_vec)), decimals = Inf){
-     if(is.null(art_vec) | is.null(wt_vec) | length(art_vec) == 0 | length(wt_vec) == 0){
-          data.frame(Value = 1, Weight = 1)
+#' create_ad(ad_type = "int", rxxa = c(.9, .8), n_rxxa = c(50, 150),
+#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
+#'               ux = c(.9, .8), ni_ux = c(50, 150))
+#'
+#' ## Example computed using all possible input arguments (arbitrary values):
+#' rxxa <- rxxi <- ux <- ut <- c(.7, .8)
+#' n_rxxa <- n_rxxi <- ni_ux <- ni_ut <- c(50, 100)
+#' na_ux <- na_ut <- c(200, 200)
+#' mean_qxa <- mean_qxi <- mean_ux <- mean_ut <- mean_rxxi <- mean_rxxa <- c(.7, .8)
+#' var_qxa <- var_qxi <- var_ux <- var_ut <- var_rxxi <- var_rxxa <- c(.1, .05)
+#' k_qxa <- k_qxi <- k_ux <- k_ut <- k_rxxa <- k_rxxi <- 2
+#' mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- c(100, 100)
+#' dep_sds_ux_obs <- dep_sds_ux_spec <- dep_sds_ut_obs <- dep_sds_ut_spec <- FALSE
+#' mean_na_ux <- mean_na_ut <- c(200, 200)
+#'
+#' wt_rxxa <- n_rxxa
+#' wt_rxxi <- n_rxxi
+#' wt_ux <- ni_ux
+#' wt_ut <- ni_ut
+#'
+#' estimate_rxxa <- TRUE
+#' estimate_rxxi <- TRUE
+#' estimate_ux <- TRUE
+#' estimate_ut <- TRUE
+#' var_unbiased <- TRUE
+#'
+#' create_ad(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
+#'               mean_qxa = mean_qxa, var_qxa = var_qxa,
+#'               k_qxa = k_qxa, mean_n_qxa = mean_n_qxa,
+#'               mean_rxxa = mean_rxxa, var_rxxa = var_rxxa,
+#'               k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa,
+#'
+#'               rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi,
+#'               mean_qxi = mean_qxi, var_qxi = var_qxi,
+#'               k_qxi = k_qxi, mean_n_qxi = mean_n_qxi,
+#'               mean_rxxi = mean_rxxi, var_rxxi = var_rxxi,
+#'               k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi,
+#'
+#'               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
+#'               dep_sds_ux_obs = dep_sds_ux_obs,
+#'               mean_ux = mean_ux, var_ux = var_ux, k_ux =
+#'                k_ux, mean_ni_ux = mean_ni_ux,
+#'               mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
+#'
+#'               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut,
+#'               dep_sds_ut_obs = dep_sds_ut_obs,
+#'               mean_ut = mean_ut, var_ut = var_ut,
+#'               k_ut = k_ut, mean_ni_ut = mean_ni_ut,
+#'               mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
+#'
+#'               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+#'               estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
+create_ad <- function(ad_type = "tsa",
+                      rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
+                      rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
+                      ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux, length(mean_ux)),
+                      ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
+
+                      mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)),
+                      mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
+
+                      mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)),
+                      mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)),
+
+                      mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL,
+                      mean_na_ux = rep(NA, length(mean_ux)), dep_sds_ux_spec = rep(FALSE, length(mean_ux)),
+
+                      mean_ut = NULL, var_ut = NULL, k_ut = NULL, mean_ni_ut = NULL,
+                      mean_na_ut = rep(NA, length(mean_ut)), dep_sds_ut_spec = rep(FALSE, length(mean_ut)),
+
+                      estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+                      estimate_ux = TRUE, estimate_ut = TRUE,
+                      var_unbiased = TRUE, ...){
+
+     ad_type <- match.arg(ad_type, c("tsa", "int"))
+
+     if(ad_type == "tsa"){
+          out <- create_ad_tsa(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
+                               mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type,
+                               mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type,
+
+                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
+                               mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa, qxa_dist_type = qxa_dist_type,
+                               mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa, rxxa_dist_type = rxxa_dist_type,
+
+                               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
+                               mean_ux = mean_ux, var_ux = var_ux, k_ux = k_ux, mean_ni_ux = mean_ni_ux, mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
+
+                               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
+                               mean_ut = mean_ut, var_ut = var_ut, k_ut = k_ut, mean_ni_ut = mean_ni_ut, mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
+
+                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                               estimate_ux = estimate_ux, estimate_ut = estimate_ut,
+                               var_unbiased = var_unbiased)
      }else{
-          if(all(is.na(art_vec))){
-               data.frame(Value = 1, Weight = 1)
-          }else{
-               if(length(art_vec) != length(wt_vec)) stop("Lengths of art_vec and wt_vec differ")
-               art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec)
-               art_tab <- as.data.frame(ungroup(art_tab %>% group_by(Value) %>% do(data.frame(Value = .$Value[1], Weight = sum(.$Weight)))))
-               art_tab[!is.na(art_tab[,1]),]
-          }
+          out <- create_ad_int(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
+                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
+
+                               ux = ux, ni_ux = ni_ux, wt_ux = wt_ux,
+                               ut = ut, ni_ut = ni_ut, wt_ut = wt_ut,
+
+                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                               estimate_ux = estimate_ux, estimate_ut = estimate_ut)
      }
+     out
+}
+
+
+#' Create a list of artifact distributions by construct
+#'
+#' @param ad_type Type of artifact distributions to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
+#' @param n Vector or column name of sample sizes.
+#' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
+#' @param construct_x Vector of construct names for construct initially designated as X.
+#' @param construct_y Vector of construct names for construct initially designated as Y.
+#' @param measure_x Vector of names for measures associated with constructs initially designated as "X".
+#' @param measure_y Vector of names for measures associated with constructs initially designated as "Y".
+#' @param rxx Vector or column name of reliability estimates for X.
+#' @param rxx_restricted Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param ryy Vector or column name of reliability estimates for Y.
+#' @param ryy_restricted Logical vector or column name determining whether each element of ryy is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. Acceptable reliability types are:
+#' @param ux Vector or column name of u ratios for X.
+#' @param ux_observed Logical vector or column name determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
+#' @param uy Vector or column name of u ratios for Y.
+#' @param uy_observed Logical vector or column name determining whether each element of uy is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
+#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.
+#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
+#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
+#' @param process_ads Logical scalar determining whether artifact information should be processed into "ad_obj" class objects (\code{TRUE}; default) or reported in list form (\code{FALSE}).
+#' @param collapse_method Character argument that determines how to collapse multiple measures of a construct within a single study (used when \code{measure_x} and/or \code{measure_y} are supplied).
+#' Options are "composite" (default), "average," and "stop." When measure names are not supplied, multiple entries for a given construct within a given study will be averaged.
+#' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.
+#' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
+#' @param data Data frame containing columns whose names may be provided as arguments to vector arguments.
+#' @param ... Additional arguments
+#'
+#' @return A list of artifact distributions
+#' @export
+#'
+#' @examples
+#' create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
+#'                construct_x = x_name, construct_y = y_name,
+#'                sample_id = sample_id,
+#'                data = data_r_meas_multi)
+create_ad_list <- function(ad_type = "tsa", n, sample_id = NULL,
+                           construct_x, measure_x = NULL,
+                           construct_y, measure_y = NULL,
+                           rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
+                           ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                           ux = NULL, ux_observed = TRUE,
+                           uy = NULL, uy_observed = TRUE,
+                           estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+                           estimate_ux = TRUE, estimate_ut = TRUE,
+                           var_unbiased = TRUE, process_ads = TRUE,
+                           collapse_method = c("composite", "average", "stop"), intercor = .5,
+                           supplemental_ads = NULL, data = NULL, ...){
+
+     call <- match.call()
+     formal_args <- formals(create_ad_list)
+     formal_args[["..."]] <- NULL
+     for(i in names(formal_args)) if(i %in% names(call)) formal_args[[i]] <- NULL
+     call_full <- as.call(append(as.list(call), formal_args))
+     collapse_method <- match.arg(collapse_method, c("composite", "average", "stop"))
+
+     if(!is.null(data)){
+          data <- as.data.frame(data)
+
+          if(deparse(substitute(n))[1] != "NULL")
+               n <- match_variables(call = call_full[[match("n", names(call_full))]], arg = n, arg_name = "n", data = data)
+
+          if(deparse(substitute(sample_id))[1] != "NULL")
+               sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, arg_name = "sample_id", data = data)
+
+          if(deparse(substitute(construct_x))[1] != "NULL")
+               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
+
+          if(deparse(substitute(construct_y))[1] != "NULL")
+               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+
+          if(deparse(substitute(measure_x))[1] != "NULL")
+               measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, arg_name = "measure_x", data = data)
+
+          if(deparse(substitute(measure_y))[1] != "NULL")
+               measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, arg_name = "measure_y", data = data)
+
+          if(deparse(substitute(rxx))[1] != "NULL")
+               rxx <- match_variables(call = call_full[[match("rxx", names(call_full))]], arg = rxx, arg_name = "rxx", data = data)
+
+          if(deparse(substitute(rxx_restricted))[1] != "NULL")
+               rxx_restricted <- match_variables(call = call_full[[match("rxx_restricted", names(call_full))]], arg = rxx_restricted, arg_name = "rxx_restricted", data = data)
+
+          if(deparse(substitute(rxx_type))[1] != "NULL")
+               rxx_type <- match_variables(call = call_full[[match("rxx_type", names(call_full))]], arg = rxx_type, arg_name = "rxx_type", data = data)
+
+          if(deparse(substitute(ryy))[1] != "NULL")
+               ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, arg_name = "ryy", data = data)
+
+          if(deparse(substitute(ryy_restricted))[1] != "NULL")
+               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted", names(call_full))]], arg = ryy_restricted, arg_name = "ryy_restricted", data = data)
+
+          if(deparse(substitute(ryy_type))[1] != "NULL")
+               ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
+
+          if(deparse(substitute(ux))[1] != "NULL")
+               ux <- match_variables(call = call_full[[match("ux", names(call_full))]], arg = ux, arg_name = "ux", data = data)
+
+          if(deparse(substitute(ux_observed))[1] != "NULL")
+               ux_observed <- match_variables(call = call_full[[match("ux_observed", names(call_full))]], arg = ux_observed, arg_name = "ux_observed", data = data)
+
+          if(deparse(substitute(uy))[1] != "NULL")
+               uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, arg_name = "uy", data = data)
+
+          if(deparse(substitute(uy_observed))[1] != "NULL")
+               uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, arg_name = "uy_observed", data = data)
+     }
+
+     full_data <- list(sample_id = sample_id, n = n,
+                       construct_x = construct_x, measure_x = measure_x,
+                       construct_y = construct_y, measure_y = measure_y,
+                       rxx = rxx, rxx_restricted = rxx_restricted, rxx_type = rxx_type,
+                       ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
+                       ux = ux, ux_observed = ux_observed,
+                       uy = uy, uy_observed = uy_observed)
+     if(is.null(measure_x)) full_data$measure_x <- "No measure specified"
+     if(is.null(measure_y)) full_data$measure_y <- "No measure specified"
+
+     for(i in names(full_data)) if(is.null(full_data[[i]])) full_data[[i]] <- rep(NA, length(n))
+     if(any(is.na(full_data$measure_x))) full_data$measure_x[is.na(full_data$measure_x)] <- "No measure specified"
+     if(any(is.na(full_data$measure_y))) full_data$measure_y[is.na(full_data$measure_y)] <- "No measure specified"
+     full_data <- as.data.frame(full_data)
+
+     construct_pair <- paste0("X = ", construct_x, ", Y = ", construct_y)
+     data_x <- full_data[,c("sample_id", "n", "construct_x", "measure_x", "rxx", "rxx_restricted", "rxx_type", "ux", "ux_observed")]
+     data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "uy", "uy_observed")]
+     colnames(data_y) <- colnames(data_x)
+     full_data <- rbind(data_x, data_y)
+     construct_pair <- c(construct_pair, construct_pair)
+
+     i <- which(full_data$construct_x == full_data$construct_x[1])
+     j <- (1:length(i))[full_data$sample_id[i] == full_data$sample_id[i][1]]
+     .ad_obj_list <- by(1:length(construct_pair), full_data$construct_x, function(i){
+
+          if(!is.null(sample_id)){
+               independent_arts <- by(1:length(i), full_data$sample_id[i], function(j){
+
+                    .data <- full_data[i,][j,]
+                    measure_averages <- by(.data, .data$measure_x, function(x){
+                         out <- x[1,]
+                         out$n <- mean(x$n)
+                         out$rxx <- mean(x$rxx)
+                         out$rxx_restricted <- as.logical(mean(x$rxx_restricted))
+                         out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type))))
+                         out$ux <- round(mean(x$ux))
+                         out$ux_observed <- as.logical(mean(x$ux_observed))
+                         out
+                    })
+                    .data <- NULL
+                    for(d in 1:length(measure_averages)) .data <- rbind(.data, measure_averages[[d]])
+
+                    if(nrow(.data) > 1){
+                         if(collapse_method == "composite"){
+                              if(length(intercor) > 1){
+                                   if(is.null(names(intercor)))
+                                        stop("The values in the intercor vector must be named", call. = FALSE)
+                                   if(!(as.character(.data$construct_x) %in% names(intercor)))
+                                        stop("The intercor vector is missing a value for construct ", as.character(.data$construct_x), call. = FALSE)
+                                   .intercor <- intercor[as.character(.data$construct_x)]
+                              }else{
+                                   .intercor <- intercor
+                              }
+                              n <- mean(.data$n)
+                              rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = length(.data$n), mean_intercor = .intercor)
+                              rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
+                              rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
+                              ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = length(.data$n), mean_ri = .intercor)
+                              ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))
+                         }else{
+                              n <- mean(.data$n)
+                              rxx <- mean(.data$rxx)
+                              rxx_restricted <- as.logical(mean(.data$rxx_restricted))
+                              rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type))))
+                              ux <- round(mean(.data$ux))
+                              ux_observed <- as.logical(mean(.data$ux_observed))
+                         }
+                    }else{
+                         n <- as.numeric(.data$n)
+                         rxx <- as.numeric(.data$rxx)
+                         rxx_restricted <- as.logical(.data$rxx_restricted)
+                         rxx_type <- as.character(.data$rxx_type)
+                         ux  <- as.numeric(.data$ux)
+                         ux_observed <- as.logical(.data$ux_observed)
+                    }
+
+                    list(n = n,
+                         rxx = rxx,
+                         rxx_restricted = rxx_restricted,
+                         rxx_type = rxx_type,
+                         ux = ux,
+                         ux_observed = ux_observed)
+               })
+
+               n              <- unlist(lapply(independent_arts, function(x) x$n))
+               rxx            <- unlist(lapply(independent_arts, function(x) x$rxx))
+               rxx_restricted <- unlist(lapply(independent_arts, function(x) x$rxx_restricted))
+               rxx_type       <- unlist(lapply(independent_arts, function(x) x$rxx_type))
+               ux             <- unlist(lapply(independent_arts, function(x) x$ux))
+               ux_observed    <- unlist(lapply(independent_arts, function(x) x$ux_observed))
+          }else{
+               n <- full_data$n[i]
+               rxx <- full_data$rxx[i]
+               rxx_restricted <- full_data$rxx_restricted[i]
+               rxx_type <- full_data$rxx_type[i]
+               ux <- full_data$ux[i]
+               ux_observed <- full_data$ux_observed[i]
+          }
+
+          rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
+          n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
+          rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
+          n_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){n[rxx_restricted]}else{NULL}}else{NULL}
+          ux <-     if(!is.null(ux)){if(any(ux_observed)){ux[ux_observed]}else{NULL}}else{NULL}
+          n_ux <-   if(!is.null(ux)){if(any(ux_observed)){n[ux_observed]}else{NULL}}else{NULL}
+          ut <-     if(!is.null(ux)){if(any(!ux_observed)){ux[!ux_observed]}else{NULL}}else{NULL}
+          n_ut <-   if(!is.null(ux)){if(any(!ux_observed)){n[!ux_observed]}else{NULL}}else{NULL}
+
+          rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
+          rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
+
+          if(!is.null(rxxa)){
+               rxxa_type <- rxxa_type[!is.na(rxxa)]
+               n_rxxa <- n_rxxa[!is.na(rxxa)]
+               rxxa <- rxxa[!is.na(rxxa)]
+          }else{
+               rxxa_type <- n_rxxa <- rxxa <- NULL
+          }
+
+          if(!is.null(rxxi)){
+               rxxi_type <- rxxi_type[!is.na(rxxi)]
+               n_rxxi <- n_rxxi[!is.na(rxxi)]
+               rxxi <- rxxi[!is.na(rxxi)]
+          }else{
+               rxxi_type <- n_rxxi <- rxxi <- NULL
+          }
+
+          if(!is.null(ux)){
+               n_ux <- n_ux[!is.na(ux)]
+               ux <- ux[!is.na(ux)]
+          }else{
+               n_ux <- ux <- NULL
+          }
+
+          if(!is.null(ut)){
+               n_ut <- n_ut[!is.na(ut)]
+               ut <- ut[!is.na(ut)]
+          }else{
+               n_ut <- ut <- NULL
+          }
+
+          if(!is.null(supplemental_ads)){
+               if(full_data$construct_x[i][1] %in% names(supplemental_ads)){
+                    .supplemental_ads <- supplemental_ads[[full_data$construct_x[i][1]]]
+               }else{
+                    .supplemental_ads <- NULL
+               }
+          }else{
+               .supplemental_ads <- NULL
+          }
+
+          if(process_ads){
+               ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
+                                                                 rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+                                                                 ux = ux, ni_ux = n_ux, wt_ux = n_ux,
+                                                                 ut = ut, ni_ut = n_ut, wt_ut = n_ut,
+                                                                 estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                                                                 estimate_ux = estimate_ux, estimate_ut = estimate_ut,
+                                                                 var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads))
+          }else{
+               ad_obj <- list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
+                              rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+                              ux = ux, ni_ux = n_ux, wt_ux = n_ux,
+                              ut = ut, ni_ut = n_ut, wt_ut = n_ut)
+               if(!is.null(.supplemental_ads))
+                    ad_obj <- consolidate_ads(ad_obj, .supplemental_ads)
+          }
+
+          list(ad_obj = ad_obj,
+               construct = as.character(full_data$construct_x[i][1]))
+     })
+
+     ad_obj_list <- list()
+     for(i in 1:length(.ad_obj_list)) ad_obj_list[[i]] <- .ad_obj_list[[i]][[1]]
+     names(ad_obj_list) <- as.character(lapply(.ad_obj_list, function(x) x[[2]]))
+
+     ad_obj_list
 }
 
 
@@ -270,200 +725,6 @@ create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
 
 
 
-
-#' Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
-#'
-#' This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' For u ratios, error variances can be computed for independent samples (i.e., settings in which the unrestricted standard deviation comes from an external study) or
-#' dependent samples (i.e., settings in which the range-restricted standard deviation comes from a sample that represents a subset of the applicant sample that provided the
-#' unrestricted standard deviation). The former circumstance is presumed to be more common, so error variances are computed for independent samples by default.
-#'
-#' @param ad_type Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
-#'
-#' @param rxxi Vector of incumbent reliability estimates.
-#' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
-#' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).
-#' @param rxxi_type,rxxa_type,qxi_dist_type,rxxi_dist_type,qxa_dist_type,rxxa_dist_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#'
-#' @param rxxa Vector of applicant reliability estimates.
-#' @param n_rxxa Vector of sample sizes associated with the elements of \code{rxxa}.
-#' @param wt_rxxa Vector of weights associated with the elements of \code{rxxa} (by default, sample sizes will be used as weights).
-#'
-#' @param mean_qxi Vector that can be used to supply the means of externally computed distributions of incumbent square-root reliabilities.
-#' @param var_qxi Vector that can be used to supply the variances of externally computed distributions of incumbent square-root reliabilities.
-#' @param k_qxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent square-root reliabilities.
-#' @param mean_n_qxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent square-root reliabilities.
-#'
-#' @param mean_rxxi Vector that can be used to supply the means of externally computed distributions of incumbent reliabilities.
-#' @param var_rxxi Vector that can be used to supply the variances of externally computed distributions of incumbent reliabilities.
-#' @param k_rxxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent reliabilities.
-#' @param mean_n_rxxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent reliabilities.
-#'
-#' @param ux Vector of observed-score u ratios.
-#' @param ni_ux Vector of incumbent sample sizes associated with the elements of \code{ux}.
-#' @param wt_ux Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).
-#' @param na_ux Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ux values. \code{NULL} by default.
-#' Only used when ni_ux is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ux}.
-#' @param dep_sds_ux_obs Logical scalar or vector determinining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param ut Vector of true-score u ratios.
-#' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
-#' @param wt_ut Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).
-#' @param na_ut Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ut values. \code{NULL} by default.
-#' Only used when ni_ut is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ut}.
-#' @param dep_sds_ut_obs Logical scalar or vector determinining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param mean_qxa Vector that can be used to supply the means of externally computed distributions of applicant square-root reliabilities.
-#' @param var_qxa Vector that can be used to supply the variances of externally computed distributions of applicant square-root reliabilities.
-#' @param k_qxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant square-root reliabilities.
-#' @param mean_n_qxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant square-root reliabilities.
-#'
-#' @param mean_rxxa Vector that can be used to supply the means of externally computed distributions of applicant reliabilities.
-#' @param var_rxxa Vector that can be used to supply the variances of externally computed distributions of applicant reliabilities.
-#' @param k_rxxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant reliabilities.
-#' @param mean_n_rxxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant reliabilities.
-#'
-#' @param mean_ux Vector that can be used to supply the means of externally computed distributions of observed-score u ratios.
-#' @param var_ux Vector that can be used to supply the variances of externally computed distributions of observed-score u ratios.
-#' @param k_ux Vector that can be used to supply the number of studies included in externally computed distributions of observed-score u ratios.
-#' @param mean_ni_ux Vector that can be used to supply the mean incumbent sample sizes of externally computed distributions of observed-score u ratios.
-#' @param mean_na_ux Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.
-#' @param dep_sds_ux_spec Logical scalar or vector determinining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param mean_ut Vector that can be used to supply the means of externally computed distributions of true-score u ratios.
-#' @param var_ut Vector that can be used to supply the variances of externally computed distributions of true-score u ratios.
-#' @param k_ut Vector that can be used to supply the number of studies included in externally computed distributions of true-score u ratios.
-#' @param mean_ni_ut Vector that can be used to supply the mean sample sizes for of externally computed distributions of true-score u ratios.
-#' @param mean_na_ut Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of true-score u ratios.
-#' @param dep_sds_ut_spec Logical scalar or vector determinining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by  default.
-#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by  default.
-#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use artifact-distribution meta-analyses.
-#' @export
-#'
-#' @examples
-#' ## Example computed using observed values only:
-#' create_ad(ad_type = "tsa", rxxa = c(.9, .8), n_rxxa = c(50, 150),
-#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
-#'               ux = c(.9, .8), ni_ux = c(50, 150))
-#'
-#' create_ad(ad_type = "int", rxxa = c(.9, .8), n_rxxa = c(50, 150),
-#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
-#'               ux = c(.9, .8), ni_ux = c(50, 150))
-#'
-#' ## Example computed using all possible input arguments (arbitrary values):
-#' rxxa <- rxxi <- ux <- ut <- c(.7, .8)
-#' n_rxxa <- n_rxxi <- ni_ux <- ni_ut <- c(50, 100)
-#' na_ux <- na_ut <- c(200, 200)
-#' mean_qxa <- mean_qxi <- mean_ux <- mean_ut <- mean_rxxi <- mean_rxxa <- c(.7, .8)
-#' var_qxa <- var_qxi <- var_ux <- var_ut <- var_rxxi <- var_rxxa <- c(.1, .05)
-#' k_qxa <- k_qxi <- k_ux <- k_ut <- k_rxxa <- k_rxxi <- 2
-#' mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- c(100, 100)
-#' dep_sds_ux_obs <- dep_sds_ux_spec <- dep_sds_ut_obs <- dep_sds_ut_spec <- FALSE
-#' mean_na_ux <- mean_na_ut <- c(200, 200)
-#'
-#' wt_rxxa <- n_rxxa
-#' wt_rxxi <- n_rxxi
-#' wt_ux <- ni_ux
-#' wt_ut <- ni_ut
-#'
-#' estimate_rxxa <- TRUE
-#' estimate_rxxi <- TRUE
-#' estimate_ux <- TRUE
-#' estimate_ut <- TRUE
-#' var_unbiased <- TRUE
-#'
-#' create_ad(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
-#'               mean_qxa = mean_qxa, var_qxa = var_qxa,
-#'               k_qxa = k_qxa, mean_n_qxa = mean_n_qxa,
-#'               mean_rxxa = mean_rxxa, var_rxxa = var_rxxa,
-#'               k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa,
-#'
-#'               rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi,
-#'               mean_qxi = mean_qxi, var_qxi = var_qxi,
-#'               k_qxi = k_qxi, mean_n_qxi = mean_n_qxi,
-#'               mean_rxxi = mean_rxxi, var_rxxi = var_rxxi,
-#'               k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi,
-#'
-#'               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
-#'               dep_sds_ux_obs = dep_sds_ux_obs,
-#'               mean_ux = mean_ux, var_ux = var_ux, k_ux =
-#'                k_ux, mean_ni_ux = mean_ni_ux,
-#'               mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
-#'
-#'               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut,
-#'               dep_sds_ut_obs = dep_sds_ut_obs,
-#'               mean_ut = mean_ut, var_ut = var_ut,
-#'               k_ut = k_ut, mean_ni_ut = mean_ni_ut,
-#'               mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
-#'
-#'               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-#'               estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
-create_ad <- function(ad_type = "tsa",
-                      rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
-                      rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
-                      ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
-                      ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = FALSE,
-
-                      mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)),
-                      mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
-
-                      mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)),
-                      mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)),
-
-                      mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = NA, dep_sds_ux_spec = FALSE,
-
-                      mean_ut = NULL, var_ut = NULL, k_ut = NULL, mean_ni_ut = NULL, mean_na_ut = NA, dep_sds_ut_spec = FALSE,
-
-                      estimate_rxxa = TRUE, estimate_rxxi = TRUE,
-                      estimate_ux = TRUE, estimate_ut = TRUE,
-                      var_unbiased = TRUE, ...){
-
-     ad_type <- match.arg(ad_type, c("tsa", "int"))
-
-     if(ad_type == "tsa"){
-          out <- create_ad_tsa(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
-                               mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type,
-                               mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type,
-
-                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
-                               mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa, qxa_dist_type = qxa_dist_type,
-                               mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa, rxxa_dist_type = rxxa_dist_type,
-
-                               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
-                               mean_ux = mean_ux, var_ux = var_ux, k_ux = k_ux, mean_ni_ux = mean_ni_ux, mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
-
-                               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
-                               mean_ut = mean_ut, var_ut = var_ut, k_ut = k_ut, mean_ni_ut = mean_ni_ut, mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
-
-                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                               estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                               var_unbiased = var_unbiased)
-     }else{
-          out <- create_ad_int(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
-                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
-
-                               ux = ux, ni_ux = ni_ux, wt_ux = wt_ux,
-                               ut = ut, ni_ut = ni_ut, wt_ut = wt_ut,
-
-                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                               estimate_ux = estimate_ux, estimate_ut = estimate_ut)
-     }
-     out
-}
-
-
-
 #' Generate an artifact distribution object for a dichotomous grouping variable.
 #'
 #' This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
@@ -530,7 +791,21 @@ create_ad_group <- function(ad_type = "tsa",
 ## Internal function to harvest lists of artifact distributions from dataframes matching a known, internally imposed structure
 .create_ad_list <- function(ad_type = "tsa", sample_id, construct_x, construct_y, construct_pair, es_data, data_x, data_y, pairwise_ads = FALSE,
                             estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE, estimate_ut = TRUE,
-                            var_unbiased = TRUE, supplemental_ads = NULL){
+                            var_unbiased = TRUE, supplemental_ads = NULL, ...){
+
+     additional_args <- list(...)
+     if(!is.null(additional_args$estimate_rxxa))
+          estimate_rxxa <- additional_args$estimate_rxxa
+     if(!is.null(additional_args$estimate_rxxi))
+          estimate_rxxi <- additional_args$estimate_rxxi
+     if(!is.null(additional_args$estimate_ux))
+          estimate_ux <- additional_args$estimate_ux
+     if(!is.null(additional_args$estimate_ut))
+          estimate_ut <- additional_args$estimate_ut
+     if(is.null(estimate_rxxa)) estimate_rxxa <- TRUE
+     if(is.null(estimate_rxxi)) estimate_rxxi <- TRUE
+     if(is.null(estimate_ux)) estimate_ux <- TRUE
+     if(is.null(estimate_ut)) estimate_ut <- TRUE
 
      if(pairwise_ads){
           if(!is.null(sample_id)){
@@ -543,8 +818,8 @@ create_ad_group <- function(ad_type = "tsa",
           data <- data.frame(es_data, data_x, data_y)
           ad_obj_list <- by(1:length(construct_pair), construct_pair, function(i){
 
-               if(!is.null(construct_x)) data$construct_x <- construct_x[i]
-               if(!is.null(construct_y)) data$construct_y <- construct_y[i]
+               if(is.null(construct_x)) data$construct_x <- construct_x[i]
+               if(is.null(construct_y)) data$construct_y <- construct_y[i]
 
                n <- data$n[i][unique_x[i] & unique_y[i]]
 
@@ -585,13 +860,30 @@ create_ad_group <- function(ad_type = "tsa",
                ryyi_type <- if(!is.null(ryy)){if(any(ryy_restricted)){ryy_type[ryy_restricted]}else{NULL}}else{NULL}
                ryya_type <- if(!is.null(ryy)){if(any(!ryy_restricted)){ryy_type[!ryy_restricted]}else{NULL}}else{NULL}
 
+               if(!is.null(supplemental_ads)){
+                    if(construct_x[i][1] %in% names(supplemental_ads)){
+                         .supplemental_ads_x <- supplemental_ads[[construct_x[i][1]]]
+                    }else{
+                         .supplemental_ads_x <- NULL
+                    }
+
+                    if(construct_y[i][1] %in% names(supplemental_ads)){
+                         .supplemental_ads_y <- supplemental_ads[[construct_y[i][1]]]
+                    }else{
+                         .supplemental_ads_y <- NULL
+                    }
+               }else{
+                    .supplemental_ads_x <- .supplemental_ads_y <- NULL
+               }
+
+
                ad_obj_x <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
                                                                    rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
                                                                    ux = ux, ni_ux = n_ux, wt_ux = n_ux,
                                                                    ut = ut, ni_ut = n_ut, wt_ut = n_ut,
                                                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                                    estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                   var_unbiased = var_unbiased, supplemental_ads = supplemental_ads[[construct_x[i][1]]]))
+                                                                   var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads_x))
 
                ad_obj_y <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = ryya, n_rxxa = n_ryya, wt_rxxa = n_ryya, rxxa_type = ryya_type,
                                                                    rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi, rxxi_type = ryyi_type,
@@ -599,7 +891,7 @@ create_ad_group <- function(ad_type = "tsa",
                                                                    ut = up, ni_ut = n_up, wt_ut = n_up,
                                                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                                    estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                   var_unbiased = var_unbiased, supplemental_ads = supplemental_ads[[construct_y[i][1]]]))
+                                                                   var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads_y))
 
                list(ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y)
           })
@@ -641,13 +933,23 @@ create_ad_group <- function(ad_type = "tsa",
                rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
                rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
 
+               if(!is.null(supplemental_ads)){
+                    if(construct_x[i][1] %in% names(supplemental_ads)){
+                         .supplemental_ads_x <- supplemental_ads[[construct_x[i][1]]]
+                    }else{
+                         .supplemental_ads_x <- NULL
+                    }
+               }else{
+                    .supplemental_ads_x <- NULL
+               }
+
                ad_obj_x <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
                                                                    rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
                                                                    ux = ux, ni_ux = n_ux, wt_ux = n_ux,
                                                                    ut = ut, ni_ut = n_ut, wt_ut = n_ut,
                                                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                                    estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                   var_unbiased = var_unbiased, supplemental_ads = supplemental_ads[[construct_x[i][1]]]))
+                                                                   var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads_x))
                list(ad_obj_x = ad_obj_x)
           })
 
@@ -676,197 +978,6 @@ create_ad_group <- function(ad_type = "tsa",
 
 
 
-
-create_ad_list <- function(ad_type = "tsa", sample_id = NULL, n,
-                           construct_x, measure_x = NULL,
-                           construct_y, measure_y = NULL,
-                           rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
-                           ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
-                           ux = NULL, ux_observed = TRUE,
-                           uy = NULL, uy_observed = TRUE,
-                           estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE, estimate_ut = TRUE,
-                           var_unbiased = TRUE, process_ads = TRUE, supplemental_ads = NULL, data = NULL, ...){
-
-     call <- match.call()
-     formal_args <- formals(create_ad_list)
-     formal_args[["..."]] <- NULL
-     for(i in names(formal_args)) if(i %in% names(call)) formal_args[[i]] <- NULL
-     call_full <- as.call(append(as.list(call), formal_args))
-
-     if(!is.null(data)){
-          data <- as.data.frame(data)
-
-          if(deparse(substitute(n))[1] != "NULL")
-               n <- match_variables(call = call_full[[match("n", names(call_full))]], arg = n, data = data)
-
-          if(deparse(substitute(sample_id))[1] != "NULL")
-               sample_id <- match_variables(call = call_full[[match("sample_id", names(call_full))]], arg = sample_id, data = data)
-
-          if(deparse(substitute(construct_x))[1] != "NULL")
-               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, data = data)
-
-          if(deparse(substitute(construct_y))[1] != "NULL")
-               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
-
-          if(deparse(substitute(measure_x))[1] != "NULL")
-               measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, data = data)
-
-          if(deparse(substitute(measure_y))[1] != "NULL")
-               measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, data = data)
-
-          if(deparse(substitute(rxx))[1] != "NULL")
-               rxx <- match_variables(call = call_full[[match("rxx", names(call_full))]], arg = rxx, data = data)
-
-          if(deparse(substitute(rxx_restricted))[1] != "NULL")
-               rxx_restricted <- match_variables(call = call_full[[match("rxx_restricted", names(call_full))]], arg = rxx_restricted, data = data)
-
-          if(deparse(substitute(rxx_type))[1] != "NULL")
-               rxx_type <- match_variables(call = call_full[[match("rxx_type", names(call_full))]], arg = rxx_type, data = data)
-
-          if(deparse(substitute(ryy))[1] != "NULL")
-               ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, data = data)
-
-          if(deparse(substitute(ryy_restricted))[1] != "NULL")
-               ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted", names(call_full))]], arg = ryy_restricted, data = data)
-
-          if(deparse(substitute(ryy_type))[1] != "NULL")
-               ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, data = data)
-
-          if(deparse(substitute(ux))[1] != "NULL")
-               ux <- match_variables(call = call_full[[match("ux", names(call_full))]], arg = ux, data = data)
-
-          if(deparse(substitute(ux_observed))[1] != "NULL")
-               ux_observed <- match_variables(call = call_full[[match("ux_observed", names(call_full))]], arg = ux_observed, data = data)
-
-          if(deparse(substitute(uy))[1] != "NULL")
-               uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, data = data)
-
-          if(deparse(substitute(uy_observed))[1] != "NULL")
-               uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, data = data)
-     }
-
-     full_data <- list(sample_id = sample_id, n = n,
-                       construct_x = construct_x, measure_x = measure_x,
-                       construct_y = construct_y, measure_y = measure_y,
-                       rxx = rxx, rxx_restricted = rxx_restricted, rxx_type = rxx_type,
-                       ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
-                       ux = ux, ux_observed = ux_observed,
-                       uy = uy, uy_observed = uy_observed)
-
-     for(i in names(full_data)) if(is.null(full_data[[i]])) full_data[[i]] <- rep(NA, length(n))
-     full_data <- as.data.frame(full_data)
-
-     construct_pair <- paste0("X = ", construct_x, ", Y = ", construct_y)
-     data_x <- full_data[,c("sample_id", "n", "construct_x", "measure_x", "rxx", "rxx_restricted", "rxx_type", "ux", "ux_observed")]
-     data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "uy", "uy_observed")]
-     colnames(data_y) <- colnames(data_x)
-     full_data <- rbind(data_x, data_y)
-     construct_pair <- c(construct_pair, construct_pair)
-
-     .ad_obj_list <- by(1:length(construct_pair), full_data$construct_x, function(i){
-
-          if(!is.null(sample_id)){
-               independent_arts <- by(1:length(i), full_data$sample_id[i], function(j){
-                    n <- mean(full_data$n[i][j])
-                    rxx <- mean(full_data$rxx[i][j])
-                    rxx_restricted <- as.logical(mean(full_data$rxx_restricted[i][j]))
-                    rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = full_data$rxx_type[i][j]))))
-                    ux <- round(mean(full_data$ux[i][j]))
-                    ux_observed <- as.logical(mean(full_data$ux_observed[i][j]))
-
-                    list(n = n,
-                         rxx = rxx,
-                         rxx_restricted = rxx_restricted,
-                         rxx_type = rxx_type,
-                         ux = ux,
-                         ux_observed = ux_observed)
-               })
-
-               n              <- unlist(lapply(independent_arts, function(x) x$n))
-               rxx            <- unlist(lapply(independent_arts, function(x) x$rxx))
-               rxx_restricted <- unlist(lapply(independent_arts, function(x) x$rxx_restricted))
-               rxx_type       <- unlist(lapply(independent_arts, function(x) x$rxx_type))
-               ux             <- unlist(lapply(independent_arts, function(x) x$ux))
-               ux_observed    <- unlist(lapply(independent_arts, function(x) x$ux_observed))
-          }else{
-               n <- full_data$n[i]
-               rxx <- full_data$rxx[i]
-               rxx_restricted <- full_data$rxx_restricted[i]
-               rxx_type <- full_data$rxx_type[i]
-               ux <- full_data$ux[i]
-               ux_observed <- full_data$ux_observed[i]
-          }
-
-          rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
-          n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
-          rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
-          n_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){n[rxx_restricted]}else{NULL}}else{NULL}
-          ux <-     if(!is.null(ux)){if(any(ux_observed)){ux[ux_observed]}else{NULL}}else{NULL}
-          n_ux <-   if(!is.null(ux)){if(any(ux_observed)){n[ux_observed]}else{NULL}}else{NULL}
-          ut <-     if(!is.null(ux)){if(any(!ux_observed)){ux[!ux_observed]}else{NULL}}else{NULL}
-          n_ut <-   if(!is.null(ux)){if(any(!ux_observed)){n[!ux_observed]}else{NULL}}else{NULL}
-
-          rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
-          rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
-
-          if(!is.null(rxxa)){
-               rxxa_type <- rxxa_type[!is.na(rxxa)]
-               n_rxxa <- n_rxxa[!is.na(rxxa)]
-               rxxa <- rxxa[!is.na(rxxa)]
-          }else{
-               rxxa_type <- n_rxxa <- rxxa <- NULL
-          }
-
-          if(!is.null(rxxi)){
-               rxxi_type <- rxxi_type[!is.na(rxxi)]
-               n_rxxi <- n_rxxi[!is.na(rxxi)]
-               rxxi <- rxxi[!is.na(rxxi)]
-          }else{
-               rxxi_type <- n_rxxi <- rxxi <- NULL
-          }
-
-          if(!is.null(ux)){
-               n_ux <- n_ux[!is.na(ux)]
-               ux <- ux[!is.na(ux)]
-          }else{
-               n_ux <- ux <- NULL
-          }
-
-          if(!is.null(ut)){
-               n_ut <- n_ut[!is.na(ut)]
-               ut <- ut[!is.na(ut)]
-          }else{
-               n_ut <- ut <- NULL
-          }
-
-          if(process_ads){
-               ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
-                                                                   ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                                                                   ut = ut, ni_ut = n_ut, wt_ut = n_ut,
-                                                                   estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                                   estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                   var_unbiased = var_unbiased, supplemental_ads = supplemental_ads[[full_data$construct_x[i][1]]]))
-          }else{
-               ad_obj <- append(list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                       rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
-                                       ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                                       ut = ut, ni_ut = n_ut, wt_ut = n_ut), supplemental_ads[[full_data$construct_x[i][1]]])
-          }
-
-          list(ad_obj = ad_obj,
-               construct = as.character(full_data$construct_x[i][1]))
-     })
-
-     ad_obj_list <- list()
-     for(i in 1:length(.ad_obj_list)) ad_obj_list[[i]] <- .ad_obj_list[[i]][[1]]
-     names(ad_obj_list) <- as.character(lapply(.ad_obj_list, function(x) x[[2]]))
-
-     ad_obj_list
-}
-
-
-
 create_ad_supplemental <- function(ad_type = "tsa",
                                    rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
                                    rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
@@ -879,132 +990,35 @@ create_ad_supplemental <- function(ad_type = "tsa",
 
      ad_type <- match.arg(ad_type, c("tsa", "int"))
 
+     art_distributions <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
+                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
+                               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
+                               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut)
+
      if(!is.null(supplemental_ads)){
-          art_distributions                  <- supplemental_ads
-          art_distributions$estimate_rxxa    <- estimate_rxxa
-          art_distributions$estimate_rxxi    <- estimate_rxxi
-          art_distributions$estimate_ux      <- estimate_ux
-          art_distributions$estimate_ut      <- estimate_ut
-          art_distributions$var_unbiased     <- var_unbiased
-
-          external_rxxa       <- supplemental_ads$rxxa
-          external_n_rxxa     <- supplemental_ads$n_rxxa
-          external_wt_rxxa    <- supplemental_ads$wt_rxxa
-
-          external_rxxi       <- supplemental_ads$rxxi
-          external_n_rxxi     <- supplemental_ads$n_rxxi
-          external_wt_rxxi    <- supplemental_ads$wt_rxxi
-
-          external_ux         <- supplemental_ads$ux
-          external_ni_ux      <- supplemental_ads$ni_ux
-          external_na_ux      <- supplemental_ads$na_ux
-          external_wt_ux      <- supplemental_ads$wt_ux
-
-          external_ut         <- supplemental_ads$ut
-          external_ni_ut      <- supplemental_ads$ni_ut
-          external_na_ut      <- supplemental_ads$na_ut
-          external_wt_ut      <- supplemental_ads$wt_ut
-
-          external_rxxi_type  <- supplemental_ads$rxxi_type
-          external_rxxa_type  <- supplemental_ads$rxxa_type
-
-          if(!is.null(external_rxxi_type)) external_rxxi_type <- as.character(external_rxxi_type)
-          if(!is.null(external_rxxa_type)) external_rxxa_type <- as.character(external_rxxa_type)
-
-          combine_arts <- function(art = NULL, external_art = NULL,
-                                   ni = NULL, external_ni = NULL,
-                                   na = NULL, external_na = NULL,
-                                   wt = NULL, external_wt = NULL,
-                                   type, external_type = NULL,
-                                   art_type = "rel"){
-
-               if(is.null(ni)) ni <- rep(NA, length(art))
-
-               if(is.null(external_ni)){
-                    external_ni <- rep(NA, length(external_art))
-                    wt <- rep(1, length(art))
-                    external_wt <- rep(1, length(external_art))
+          supplemental_ads <-
+               if(is.list(supplemental_ads)){
+                    if("ad_obj" %in% class(supplemental_ads)){
+                         list(supplemental_ads)
+                    }else{
+                         supplemental_ads
+                    }
+               }else{
+                    list(supplemental_ads)
                }
 
-
-               out <- list(art = c(art, external_art),
-                           ni = c(ni, external_ni),
-                           wt = c(wt, external_wt))
-
-               if(art_type == "rel"){
-                    if(is.null(type)) type <- rep("alpha", length(art))
-                    if(is.null(external_type)) external_type <- rep("alpha", length(external_art))
-
-                    out <- append(out, list(type = as.character(c(type, external_type))))
-               }else if(art_type == "u"){
-                    if(is.null(na)) na <- rep(NA, length(art))
-                    if(is.null(external_na)) external_na <- rep(NA, length(external_art))
-
-                    out <- append(out, list(na = c(na, external_na)))
-               }
-
-               out
+          is_adobj <- unlist(lapply(supplemental_ads, function(x) "ad_obj" %in% class(x)))
+          if(any(!is_adobj)){
+               if(any(names(supplemental_ads)[!is_adobj] == ""))
+                    warning("Some elements in 'supplemental_ads' were not named: These elements were NOT included in artifact distributions", call. = FALSE)
           }
 
-          if(!is.null(rxxi)){
-               out <- combine_arts(art = rxxi, external_art = external_rxxi,
-                                   ni = n_rxxi, external_ni = external_n_rxxi,
-                                   wt = wt_rxxi, external_wt = external_wt_rxxi,
-                                   type = rxxi_type, external_type = external_rxxi_type,
-                                   art_type = "rel")
-
-               art_distributions$rxxi <- out$art
-               art_distributions$n_rxxi <- out$ni
-               art_distributions$wt_rxxi <- out$wt
-               art_distributions$rxxi_type <- as.character(out$type)
-          }
-
-          if(!is.null(rxxa)){
-               out <- combine_arts(art = rxxa, external_art = external_rxxa,
-                                   ni = n_rxxa, external_ni = external_n_rxxa,
-                                   wt = wt_rxxa, external_wt = external_wt_rxxa,
-                                   type = rxxa_type, external_type = external_rxxa_type,
-                                   art_type = "rel")
-
-               art_distributions$rxxa <- out$art
-               art_distributions$n_rxxa <- out$ni
-               art_distributions$wt_rxxa <- out$wt
-               art_distributions$rxxa_type <- as.character(out$type)
-          }
-
-          if(!is.null(ux)){
-               out <- combine_arts(art = ux, external_art = external_ux,
-                                   ni = ni_ux, external_ni = external_ni_ux,
-                                   na = na_ux, external_na = external_na_ux,
-                                   wt = wt_ux, external_wt = external_wt_ux,
-                                   art_type = "u")
-               art_distributions$ux <- out$art
-               art_distributions$ni_ux <- out$ni
-               art_distributions$na_ux <- out$na
-               art_distributions$wt_ux <- out$wt
-          }
-
-          if(!is.null(ut)){
-               out <- combine_arts(art = ut, external_art = external_ut,
-                                   ni = ni_ut, external_ni = external_ni_ut,
-                                   na = na_ut, external_na = external_na_ut,
-                                   wt = wt_ut, external_wt = external_wt_ut,
-                                   art_type = "u")
-
-               art_distributions$ut <- out$art
-               art_distributions$ni_ut <- out$ni
-               art_distributions$na_ut <- out$na
-               art_distributions$wt_ut <- out$wt
-          }
-     }else{
-          art_distributions <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
-                                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
-                                    ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
-                                    ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut,
-
-                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                    estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
+          art_distributions <- consolidate_ads(art_distributions, supplemental_ads)
      }
+
+     art_distributions <- append(art_distributions,
+                                 list(estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                                      estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased))
 
      if(ad_type == "tsa"){
           out <- do.call(what = create_ad_tsa, args = art_distributions)

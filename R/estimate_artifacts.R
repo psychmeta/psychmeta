@@ -141,7 +141,7 @@ estimate_q_dist <- function(mean_rel, var_rel){
 #'
 #' @description Estimate descriptive statistics of reliabilities from descriptive statistics of square-root reliabilities via Taylor series approximation
 #'
-#' @param mean_q Mean square-rootreliability value.
+#' @param mean_q Mean square-root reliability value.
 #' @param var_q Variance of square-root reliability values.
 #'
 #' @return The estimated mean and variance of a distribution of reliability values.

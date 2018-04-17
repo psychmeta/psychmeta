@@ -69,7 +69,7 @@ Available functions include:
 }
 \section{Notes}{
 
-\code{estimate_var_rho_int_meas} and \code{estimate_var_rho_int_bvirr} do not make use of numeric integraction because they are linear functions.
+\code{estimate_var_rho_int_meas} and \code{estimate_var_rho_int_bvirr} do not make use of numeric integration because they are linear functions.
 }
 
 \references{

@@ -22,7 +22,7 @@ composite_d_scalar(mean_d, mean_intercor, k_vars, p = 0.5,
 The estimated standardized mean difference associated with the composite variable.
 }
 \description{
-This functions estimates the \emph{d} value of a composite of X variables, given the mean \emph{d} value of the individual X values and the mean correlation among those variables.
+This function estimates the \emph{d} value of a composite of X variables, given the mean \emph{d} value of the individual X values and the mean correlation among those variables.
 }
 \details{
 There are two different methods available for computing such a composite, one that uses the partial intercorrelation among the X variables (i.e., the average within-group correlation)

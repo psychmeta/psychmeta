@@ -20,7 +20,7 @@
 #'
 #' @return An updated meta-analysis object with sensitivity analyses added.
 #' \itemize{
-#' \item When bootstrapping is performed, the \code{bootstrap} section of the \code{follow_up_analyses} section of the updated \code{ma_obj} returned by this function will contain both a matrix summarizing the mean, variance, and confidence intervals of the boostrapped samples and a table of meta-analytic results from all bootstrapped samples.
+#' \item When bootstrapping is performed, the \code{bootstrap} section of the \code{follow_up_analyses} section of the updated \code{ma_obj} returned by this function will contain both a matrix summarizing the mean, variance, and confidence intervals of the bootstrapped samples and a table of meta-analytic results from all bootstrapped samples.
 #' \item When leave-one-out analyses are performed, the \code{ma_obj} will acquire a list of leave-one-out results in its \code{follow_up_analyses} section that contains a table of all leave-one-out meta-analyses along with plots of the mean and residual variance of the effect sizes in the meta-analyses.
 #' \item When cumulative meta-analysis is performed, the \code{ma_obj} will acquire a list of cumulative meta-analysis results in its \code{follow_up_analyses} section that contains a table of all meta-analyses computed along with plots of the mean and residual variance of the effect sizes in the meta-analyses, sorted by the order in which studies were added to the meta-analysis.
 #' }
@@ -79,7 +79,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #'
 #' @return A list of forest plots
 #' @keywords internal
-.plot_forest <-function(ma_mat, ma_vec = NULL, analysis = "leave1out"){
+.plot_forest_meta <-function(ma_mat, ma_vec = NULL, analysis = "leave1out"){
      label <- ma_mat[,1]
 
      es_type <- ifelse("mean_r" %in% colnames(ma_mat), "r",
@@ -168,6 +168,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 
      if(analysis == "cumulative"){
           plot.df[,1] <- factor(plot.df[,1], levels = rev(plot.df[,1]))
+          plot.df[1, c("lower.ci", "upper.ci", "ci.width", "lower.cr", "upper.cr")] <- NA
      }
      if(analysis == "leave1out"){
           plot.df <- plot.df[order(plot.df$sd.value),]
@@ -237,7 +238,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #' output of the bootstrapping function.
 #'
 #' @keywords internal
-.ma_bootstrap <- function(data, ma_fun_boot, boot_iter = 1000, boot_conf_level = .95, boot_ci_type = "norm", ma_arg_list){
+.ma_bootstrap <- function(data, ma_fun_boot, boot_iter = 1000, boot_conf_level = .95, boot_ci_type = "norm", ma_arg_list, convert_ma = FALSE){
      boot_out <- suppressWarnings(boot(data = data, statistic = ma_fun_boot, stype = "i", R = boot_iter, ma_arg_list = ma_arg_list))
      boot_names <- names(boot_out$t0)
      boot_ids <- which(apply(boot_out$t, 2, var) != 0)

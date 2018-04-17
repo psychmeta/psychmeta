@@ -599,3 +599,25 @@ convert_consistency2reltype <- function(consistency){
      }
 }
 
+
+#' Filter a list to remove NULL entries
+#'
+#' @param x A list
+#'
+#' @return A list with NULL entries removed.
+#' @export
+#'
+#' @keywords internal
+filter_listnonnull <- function(x){
+     if(length(x) == 0) x <- NULL
+     if(!is.list(x)){
+          x
+     }else{
+          x <- x[!unlist(lapply(x, function(i){length(i) == 0}))]
+          if(length(x) == 0){
+               NULL
+          }else{
+               x
+          }
+     }
+}

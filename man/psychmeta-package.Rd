@@ -9,7 +9,8 @@
 Overview of the \pkg{psychmeta} package.
 }
 \details{
-The \pkg{psychmeta} package provides tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Currently supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and \emph{d} values.
+The \pkg{psychmeta} package provides tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Currently, \pkg{psychmeta} supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and \emph{d} values.
+Please refer to the overview tutorial vignette for an introduction to \pkg{psychmeta}'s functions and workflows.
 }
 \section{Running a meta-analysis}{
 
