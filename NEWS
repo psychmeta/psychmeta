@@ -1,3 +1,8 @@
+Changes in Version 1.0.1 (2018-04-25)
+=====================================
+o Bug fixes for using true-score u ratios in individual-correction meta-analyses.
+o Bug fix for appropriately returning results from the compute_dmod function.
+
 Changes in Version 1.0.0 (2018-04-17)
 =====================================
 o New “citekey” arguments have been added to meta-analysis function that allow users to supply citation keys for use in reference-management programs. The new generate_bib() function can harvest the citation keys from studies that are included in meta-analysis objects and create formatted reference lists for use in publications. 
