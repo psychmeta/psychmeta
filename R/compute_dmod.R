@@ -817,7 +817,7 @@ compute_dmod <- function(data, group, predictors, criterion,
      }else{
           class(out) <- c("psychmeta", "dmod", "npar")
      }
-
+     out
 }
 
 
