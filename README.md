@@ -2,7 +2,7 @@
 
 ### Version Information ###
 * psychmeta R package
-* Version 1.0.0
+* Version 1.0.1
 
 ### Authors ###
 * Jeffrey A. Dahlke
