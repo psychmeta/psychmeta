@@ -7,7 +7,7 @@ psychmeta: Psychometric Meta-Analysis Toolkit
 [![Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/psychmeta)](http://cranlogs.r-pkg.org/badges/grand-total/psychmeta)
 
 ## Overview
-The `psychmeta` package provides tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Currently, the package supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and *d* values. Please refer to the [overview tutorial vignette](https://cran.r-project.org/web/packages/psychmeta/vignettes/overview.html) for an introduction to `psychmeta`'s functions and workflows.
+The `psychmeta` package provides tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Currently, the package supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and *d* values. Please refer to the overview tutorial vignette for an introduction to `psychmeta`'s functions and workflows.
 
 ## Authors
 `psychmeta` was written by [Jeffrey A. Dahlke](http://www.jeffreydahlke.com/) and [Brenton M. Wiernik](http://wiernik.org/).
