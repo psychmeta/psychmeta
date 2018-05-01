@@ -1,3 +1,9 @@
+Changes in Version 1.0.2 (2018-05-01)
+=====================================
+o Bug fixes have been made for defining confidence-interval method in bare-bones and artifact-distribution meta-analyses computed with the ma_r function. 
+o A new “seed” argument has been added to ma_r and ma_d to set the seed value when imputing artifacts for greater reproducibility. 
+o New console messages have been introduced for when follow-up results are added to a meta-analysis object. 
+
 Changes in Version 1.0.1 (2018-04-25)
 =====================================
 o Bug fixes for using true-score u ratios in individual-correction meta-analyses.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_stuff.R
 \name{get_stuff}
 \alias{get_stuff}
-\alias{get_escalc}
+\alias{get_metafor}
 \alias{get_metatab}
 \alias{get_ad}
 \alias{get_followup}
@@ -15,7 +15,7 @@
 \alias{get_plots}
 \title{Estimation of applicant and incumbent reliabilities and of true- and observed-score u ratios}
 \usage{
-get_escalc(ma_obj, analyses = "all", match = c("all", "any"),
+get_metafor(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
 
 get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
@@ -95,7 +95,8 @@ Available functions include:
 \item{\code{get_metatab}}{\cr Retrieve list of meta-analytic tables.}
 \item{\code{get_ad}}{\cr Retrieve list of artifact-distribution objects or a summary table of artifact descriptive statistics.}
 \item{\code{get_plots}}{\cr Retrieve list of meta-analytic plots.}
-\item{\code{get_escalc}}{\cr Retrieve list of escalc objects (i.e., effect-size data).}
+\item{\code{get_escalc}}{\cr Retrieve list of escalc objects (i.e., effect-size data) for use with \pkg{metafor}.}
+\item{\code{get_metafor}}{\cr Alias for \code{get_escalc}.}
 \item{\code{get_followup}}{\cr Retrieve list of follow-up analyses.}
 \item{\code{get_leave1out}}{\cr Retrieve list of leave-one-out meta-analyses (special case of \code{get_followup}).}
 \item{\code{get_cumulative}}{\cr Retrieve list of cumulative meta-analyses (special case of \code{get_followup}).}

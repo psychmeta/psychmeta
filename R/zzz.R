@@ -15,10 +15,32 @@ globalVariables(c(".", "Value",                                  ## Global varia
 ## Messages to be displayed when the user loads psychmeta:
 .onAttach <- function(libname, pkgname) {
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
-    packageStartupMessage("This is ", paste(pkgname, " version ", version))
-    packageStartupMessage("Please report any bugs to improve functionality. \n")
-    # packageStartupMessage("We work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \nDahlke, J. A. & Wiernik, B. M. (2017/2018). \n   psychmeta: Psychometric meta-analysis toolkit. R package version ", version)
+    packageStartupMessage("This is ", paste(pkgname, "version", version))
+    packageStartupMessage("Please report any bugs to: \nhttps://github.com/jadahlke/psychmeta/issues or issues@psychmeta.com \n")
     packageStartupMessage("We work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \nDahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for \n   psychometric meta-analysis. Applied Psychological Measurement.")
+
+    ## Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.
+    if(try(is.character(RCurl::getURL("http://www.r-pkg.org/badges/version/psychmeta")), silent = TRUE) == TRUE){
+         pkg_badge <- xml2::read_html("http://www.r-pkg.org/badges/version/psychmeta")
+         cran_v_char <- gsub(x = stringr::str_split(as.character(pkg_badge), "\n")[[1]][9], pattern = " ", replacement = "")
+         cran_v_num <- as.numeric(stringr::str_split(cran_v_char, "[.]")[[1]])
+         sys_v_num <- as.numeric(stringr::str_split(version, "[.]")[[1]])
+
+         if(length(cran_v_num) == 3) cran_v_num <- c(cran_v_num, 0)
+         if(length(sys_v_num) == 3) sys_v_num <- c(sys_v_num, 0)
+         vcheck <- sys_v_num < cran_v_num
+
+         out_of_date <- vcheck[1] | all(vcheck[1:2]) | all(vcheck[1:3]) | all(vcheck[1:4])
+         if(out_of_date){
+              # packageStartupMessage(paste("\n", crayon::red(cli::symbol$cross), "Oh no! It looks like your copy of psychmeta is out of date!"))
+              packageStartupMessage("\nOh no! It looks like your copy of psychmeta is out of date!")
+              packageStartupMessage("No worries, it's easy to obtain the latest version - just run the following command: \n")
+              packageStartupMessage('                       update.packages("psychmeta")')
+         }else{
+              # packageStartupMessage(paste("\n", crayon::green(cli::symbol$tick), 'Yay! Your copy of psychmeta is up to date!'))
+              packageStartupMessage(paste("\nYay! Your copy of psychmeta is up to date!"))
+         }
+    }
 }
 
 

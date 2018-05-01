@@ -287,6 +287,8 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
 
      ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 
+     message("Heterogeneity analyses have been added to 'ma_obj' - use get_heterogeneity() to retrieve them.")
+
      ma_obj
 }
 

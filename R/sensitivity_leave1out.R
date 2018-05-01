@@ -374,6 +374,8 @@ sensitivity_leave1out <- function(ma_obj, ...){
 
      if(record_call) ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 
+     message("Leave-1-out meta-analyses have been added to 'ma_obj' - use get_leave1out() to retrieve them.")
+
      ma_obj
 }
 

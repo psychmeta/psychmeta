@@ -1,8 +1,8 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 1.0.1
-Date: 2018-04-25
+Version: 1.0.2
+Date: 2018-05-01
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "dahlk068@umn.edu"),
               person("Brenton M.", "Wiernik", role = "aut", email = "psychmeta@wiernik.org"),
@@ -11,7 +11,8 @@ Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
               person("Sean", "Potter", role = "ctb"),
               person("Yuejia (Mandy)", "Teng", role = "ctb"))
 Maintainer: Jeffrey A. Dahlke <dahlk068@umn.edu>
-Description: Tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and d values. Includes tools for converting effect sizes, computing sporadic artifact corrections, reshaping meta-analytic databases, computing multivariate corrections for range variation, and more.
+BugReports: https://github.com/jadahlke/psychmeta/issues
+Description: Tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and d values. Includes tools for converting effect sizes, computing sporadic artifact corrections, reshaping meta-analytic databases, computing multivariate corrections for range variation, and more. Bugs can be reported to https://github.com/jadahlke/psychmeta/issues or issues@psychmeta.com.
 License: GPL (>= 3)
 Depends: R (>= 3.4.0)
 Encoding: UTF-8
@@ -19,10 +20,10 @@ LazyData: true
 VignetteBuilder: knitr
 Imports: stats, methods, knitr, MASS, boot, tmvtnorm, tibble, reshape2,
         ggplot2, dplyr, metafor, nor1mix, progress, tidyr, rtf,
-        fungible, stringr , rmarkdown, RefManageR, rlang, RCurl
+        fungible, stringr , rmarkdown, RefManageR, rlang, RCurl, xml2
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2018-04-17 17:32:55 UTC; dahlk068
+Packaged: 2018-05-01 06:23:38 UTC; dahlk068
 Author: Jeffrey A. Dahlke [aut, cre],
   Brenton M. Wiernik [aut],
   Michael T. Brannick [ctb],

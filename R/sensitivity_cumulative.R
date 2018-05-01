@@ -415,6 +415,8 @@ sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
 
      if(record_call) ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 
+     message("Cumulative meta-analyses have been added to 'ma_obj' - use get_cumulative() to retrieve them.")
+
      ma_obj
 }
 

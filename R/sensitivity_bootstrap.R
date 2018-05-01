@@ -313,6 +313,8 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
 
      if(record_call) ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 
+     message("Bootstrapped meta-analyses have been added to 'ma_obj' - use get_bootstrap() to retrieve them.")
+
      ma_obj
 }
 

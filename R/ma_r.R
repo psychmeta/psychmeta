@@ -92,6 +92,7 @@
 #' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
 #' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
 #' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.
+#' @param seed Seed value to use for imputing artifacts. Default value is 42.
 #' @param impute_method Method to use for imputing artifacts. Choices are:
 #' \itemize{
 #' \item{bootstrap_mod}{\cr Select random values from the most specific moderator categories available (default).}
@@ -183,7 +184,7 @@
 #' \item{\code{var_r}}{\cr Weighted variance of observed correlations.}
 #' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
 #' \item{\code{var_art}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts.}
-#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
+#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}).}
 #' \item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance and predicted artifact variance.}
 #' \item{\code{sd_r}}{\cr Square root of \code{var_r}.}
 #' \item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
@@ -192,7 +193,16 @@
 #' \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
 #' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
 #' \item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
+#' \item{\code{var_r_c}}{\cr Weighted variance of observed correlations corrected to the metric of rho.}
+#' \item{\code{var_e_c}}{\cr Predicted sampling-error variance of observed correlations corrected to the metric of rho.}
+#' \item{\code{var_art_c}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts corrected to the metric of rho.}
+#' \item{\code{var_pre_c}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}) corrected to the metric of rho.}
 #' \item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance and predicted artifact variance.}
+#' \item{\code{sd_r_c}}{\cr Square root of \code{var_r} corrected to the metric of rho.}
+#' \item{\code{se_r_c}}{\cr Standard error of \code{mean_r} corrected to the metric of rho.}
+#' \item{\code{sd_e_c}}{\cr Square root of \code{var_e} corrected to the metric of rho.}
+#' \item{\code{sd_art_c}}{\cr Square root of \code{var_art} corrected to the metric of rho.}
+#' \item{\code{sd_pre_c}}{\cr Square root of \code{var_pre} corrected to the metric of rho.}
 #' \item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
 #' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
 #' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
@@ -320,7 +330,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
                  pairwise_ads = FALSE,  residual_ads = TRUE,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5,
-                 clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod",
+                 clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42,
                  decimals = 2, hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL, data = NULL, ...){
 
      ##### Get inputs #####
@@ -332,6 +342,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
      additional_args <- list(...)
      inputs <- append(inputs, additional_args)
+
+     if(any(is.na(seed))) seed <- NULL
+     if(length(seed) == 0) seed <- NULL
+     set.seed(seed)
 
      if(is.null(inputs$es_d)) cat(" **** Running ma_r: Meta-analysis of correlations **** \n")
 
@@ -1136,8 +1150,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "d", ma_type = "bb", ma_fun = .ma_d_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
 
-                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
-                                                         cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
+                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias,
+                                                         conf_level = conf_level, cred_level = cred_level,
+                                                         conf_method = conf_method, cred_method = cred_method,
+                                                         var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
                                       presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
@@ -1145,8 +1161,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "r", ma_type = "bb", ma_fun = .ma_r_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
 
-                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
-                                                         cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
+                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias,
+                                                         conf_level = conf_level, cred_level = cred_level,
+                                                         conf_method = conf_method, cred_method = cred_method,
+                                                         var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
                                       presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
@@ -1314,8 +1332,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "d", ma_type = "bb", ma_fun = .ma_d_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
 
-                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
-                                                         cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
+                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias,
+                                                         conf_level = conf_level, cred_level = cred_level,
+                                                         conf_method = conf_method, cred_method = cred_method,
+                                                         var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
                                       presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
@@ -1323,8 +1343,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "r", ma_type = "bb", ma_fun = .ma_r_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
 
-                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level,
-                                                         cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type,
+                                      ma_arg_list = list(error_type = error_type, correct_bias = correct_bias,
+                                                         conf_level = conf_level, cred_level = cred_level,
+                                                         conf_method = conf_method, cred_method = cred_method,
+                                                         var_unbiased = var_unbiased, wt_type = wt_type,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
                                       presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)

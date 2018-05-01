@@ -1613,6 +1613,9 @@ print.psychmeta.get_plots <- function(x, ..., digits = 3){
      cat("List of meta-analysis plots \n")
      cat("---------------------------------------- \n")
      cat("To view plots, use the '$' operator to search this list object. \n")
+     cat(paste0("For example, get_plots()$", names(x)[1], "\n"))
+     cat("\n")
+     cat("Plots available in this list are:", paste(names(x), collapse = ", "), "\n")
 }
 
 #' print method for meta-analytic matrices retrieved with \code{get_matrix()}
@@ -1661,6 +1664,9 @@ print.psychmeta.get_followup <- function(x, ..., digits = 3){
      cat("List of meta-analytic follow-up analyses \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")
+     cat(paste0("For example, get_followup()$", names(x)[1], "\n"))
+     cat("\n")
+     cat("Analyses included in this list are:", paste(names(x), collapse = ", "), "\n")
 }
 
 #' print method for lists of heterogeneity analyses retrieved with \code{get_heterogeneity()}

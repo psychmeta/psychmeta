@@ -26,14 +26,13 @@ confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method
      sd <- list(...)$sd
      k <- list(...)$k
      if(is.null(df) & !is.null(k)){
-          df <- k
-          df[k > 1] <- k[k > 1] - 1
+          df <- k - 1
      }
 
      if(is.null(se)){
           if(!is.null(sd) & !is.null(k)){
-               sd[is.na(sd)] <- 0
                se <- sd / sqrt(k)
+               sd[is.na(sd)] <- NA
           }else{
                warning("'se' must be supplied")
           }
@@ -45,7 +44,6 @@ confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method
                if(any(!valid_df))
                     warning("Some df values were not valid: The normal distribution was used for these cases instead of the t distribution", call. = FALSE)
                conf_quantile <- rep(qnorm((1 - conf_level) / 2, lower.tail = FALSE), length(df))
-               # conf_quantile <- rep(NA, length(df))
                conf_quantile[valid_df] <- qt(p = (1 - conf_level) / 2, df = df[valid_df], lower.tail = FALSE)
           }else{
                warning("df is NULL: The normal distribution was used to define confidence intervals instead of the t distribution", call. = FALSE)
@@ -92,7 +90,6 @@ credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = "t"){
 
      if(cred_method == "t"){
           if(!is.null(k)){
-               # cred_quantile <- rep(qnorm((1 - cred_level) / 2, lower.tail = FALSE), length(k))
                cred_quantile <- rep(NA, length(k))
                cred_quantile[k > 1] <- qt(p = (1 - cred_level) / 2, df = k[k > 1] - 1, lower.tail = FALSE)
           }else{

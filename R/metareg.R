@@ -117,6 +117,8 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
      ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 
+     message("Meta-regressions have been added to 'ma_obj' - use get_metareg() to retrieve them.")
+
      ma_obj
 }
 

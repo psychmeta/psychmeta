@@ -208,9 +208,13 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type =
 
      if(k == 1){
           var_es <- sd_es <- NA
-          se_es <- sd_e
-          ci <- confidence(mean = mean_es, sd = sd_e, k = 1, conf_level = conf_level, conf_method = conf_method)
           var_res <- sd_res <- NA
+          # se_es <- sd_e
+          # ci <- confidence(mean = mean_es, sd = sd_e, k = 1, conf_level = conf_level, conf_method = conf_method)
+
+          se_es <- NA
+          ci <- cbind(NA, NA)
+          colnames(ci) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
      }else{
           se_es <- sd_es / sqrt(k)
           ci <- confidence(mean = mean_es, sd = sd_es, k = k, conf_level = conf_level, conf_method = conf_method)

@@ -77,6 +77,8 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           ma_obj$plots$funnel <- out
      }
 
+     message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
+
      ma_obj
 }
 
@@ -188,6 +190,8 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      }else{
           ma_obj <- ma_list[[1]]
      }
+
+     message("Forest plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
 
      ma_obj
 }

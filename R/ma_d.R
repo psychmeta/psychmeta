@@ -76,6 +76,7 @@
 #' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
 #' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.
 #' @param impute_method Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.
+#' @param seed Seed value to use for imputing artifacts. Default value is 42.
 #' @param decimals Number of decimal places to which results should be rounded (default is to perform no rounding).
 #' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 #' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
@@ -153,7 +154,7 @@
 #' \item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
 #' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
 #' \item{\code{var_art}}{\cr Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts.}
-#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
+#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}).}
 #' \item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
 #' \item{\code{sd_d}}{\cr Square root of \code{var_d}.}
 #' \item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
@@ -162,7 +163,16 @@
 #' \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
 #' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
 #' \item{\code{mean_delta}}{\cr Mean artifact-corrected \emph{d} value.}
+#' \item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values corrected to the metric of delta.}
+#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values corrected to the metric of delta.}
+#' \item{\code{var_art}}{\cr Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts corrected to the metric of delta.}
+#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}) corrected to the metric of delta.}
 #' \item{\code{var_delta}}{\cr Variance of artifact-corrected \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
+#' \item{\code{sd_d}}{\cr Square root of \code{var_d} corrected to the metric of delta.}
+#' \item{\code{se_d}}{\cr Standard error of \code{mean_d} corrected to the metric of delta.}
+#' \item{\code{sd_e}}{\cr Square root of \code{var_e} corrected to the metric of delta.}
+#' \item{\code{sd_art}}{\cr Square root of \code{var_art} corrected to the metric of delta.}
+#' \item{\code{sd_pre}}{\cr Square root of \code{var_pre} corrected to the metric of delta.}
 #' \item{\code{sd_delta}}{\cr Square root of \code{var_delta}.}
 #' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
 #' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
@@ -211,7 +221,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
                  pairwise_ads = FALSE, residual_ads = TRUE,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5, partial_intercor = FALSE,
-                 clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod",
+                 clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42,
                  decimals = 2, hs_override = FALSE, use_all_arts = FALSE, estimate_pa = FALSE, supplemental_ads = NULL, data = NULL, ...){
 
      ##### Get inputs #####
@@ -473,7 +483,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  moderators = moderators, cat_moderators = cat_moderators, moderator_type = moderator_type,
                  pairwise_ads = pairwise_ads, residual_ads = residual_ads,
                  check_dependence = check_dependence, collapse_method = collapse_method, intercor = intercor,
-                 clean_artifacts = clean_artifacts, impute_artifacts = impute_artifacts, impute_method = impute_method,
+                 clean_artifacts = clean_artifacts, impute_artifacts = impute_artifacts, impute_method = impute_method, seed = seed,
                  hs_override = hs_override, decimals = decimals, use_all_arts = use_all_arts, supplemental_ads = supplemental_ads, data = NULL,
 
                  ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions

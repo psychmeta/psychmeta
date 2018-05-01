@@ -195,6 +195,8 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL, correction_method 
 
      ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
 
+     message("Artifact-distribution meta-analyses have been added to 'ma_obj'")
+
      ma_obj
 
 }

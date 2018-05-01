@@ -21,8 +21,9 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   pairwise_ads = FALSE, residual_ads = TRUE, check_dependence = TRUE,
   collapse_method = "composite", intercor = 0.5, clean_artifacts = TRUE,
   impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE),
-  impute_method = "bootstrap_mod", decimals = 2, hs_override = FALSE,
-  use_all_arts = FALSE, supplemental_ads = NULL, data = NULL, ...)
+  impute_method = "bootstrap_mod", seed = 42, decimals = 2,
+  hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL,
+  data = NULL, ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations}
@@ -179,6 +180,8 @@ When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} s
 }
 If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".}
 
+\item{seed}{Seed value to use for imputing artifacts. Default value is 42.}
+
 \item{decimals}{Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).}
 
 \item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
@@ -261,7 +264,7 @@ Components of output tables for artifact-distribution meta-analyses:
 \item{\code{var_r}}{\cr Weighted variance of observed correlations.}
 \item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
 \item{\code{var_art}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts.}
-\item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art})}
+\item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}).}
 \item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance and predicted artifact variance.}
 \item{\code{sd_r}}{\cr Square root of \code{var_r}.}
 \item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
@@ -270,7 +273,16 @@ Components of output tables for artifact-distribution meta-analyses:
 \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
 \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
 \item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
+\item{\code{var_r_c}}{\cr Weighted variance of observed correlations corrected to the metric of rho.}
+\item{\code{var_e_c}}{\cr Predicted sampling-error variance of observed correlations corrected to the metric of rho.}
+\item{\code{var_art_c}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts corrected to the metric of rho.}
+\item{\code{var_pre_c}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}) corrected to the metric of rho.}
 \item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance and predicted artifact variance.}
+\item{\code{sd_r_c}}{\cr Square root of \code{var_r} corrected to the metric of rho.}
+\item{\code{se_r_c}}{\cr Standard error of \code{mean_r} corrected to the metric of rho.}
+\item{\code{sd_e_c}}{\cr Square root of \code{var_e} corrected to the metric of rho.}
+\item{\code{sd_art_c}}{\cr Square root of \code{var_art} corrected to the metric of rho.}
+\item{\code{sd_pre_c}}{\cr Square root of \code{var_pre} corrected to the metric of rho.}
 \item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
 \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
 \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}

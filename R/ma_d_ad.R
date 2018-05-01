@@ -253,6 +253,8 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
 
      if(convert_metric) ma_obj <- convert_ma(ma_obj)
 
+     message("Artifact-distribution meta-analyses have been added to 'ma_obj'")
+
      ma_obj
 
 }

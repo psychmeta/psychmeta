@@ -1050,9 +1050,13 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(k == 1){
                var_rtpa <- sd_rtpa <- NA
-               se_rtpa <- sd_e_tp_a
-               ci_tp_a <- confidence(mean = mean_rtpa, sd = var_e_tp_a^.5, k = 1, conf_level = conf_level, conf_method = conf_method)
                var_rho_tp_a <- sd_rho_tp_a <- NA
+               se_rtpa <- sd_e_tp_a
+               ci_tp_a <- confidence(mean = mean_rtpa, sd = var_e_tp_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
+
+               # se_rtpa <- NA
+               # ci_tp_a <- cbind(NA, NA)
+               # colnames(ci_tp_a) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
           }else{
                se_rtpa <- sd_rtpa / sqrt(k)
                ci_tp_a <- confidence(mean = mean_rtpa, sd = var_rtpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -1118,9 +1122,13 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(k == 1){
                var_rxpa <- sd_rxpa <- NA
-               se_rxpa <- sd_e_xp_a
-               ci_xp_a <- confidence(mean = mean_rxpa, sd = var_e_xp_a^.5, k = 1, conf_level = conf_level, conf_method = conf_method)
                var_rho_xp_a <- sd_rho_xp_a <- NA
+               se_rxpa <- sd_e_xp_a
+               ci_xp_a <- confidence(mean = mean_rxpa, sd = var_e_xp_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
+
+               # se_rxpa <- NA
+               # ci_xp_a <- cbind(NA, NA)
+               # colnames(ci_xp_a) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
           }else{
                se_rxpa <- sd_rxpa / sqrt(k)
                ci_xp_a <- confidence(mean = mean_rxpa, sd = var_rxpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -1185,9 +1193,13 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(k == 1){
                var_rtya <- sd_rtya <- NA
-               se_rtya <- sd_e_ty_a
-               ci_ty_a <- confidence(mean = mean_rtya, sd = var_e_ty_a^.5, k = 1, conf_level = conf_level, conf_method = conf_method)
                var_rho_ty_a <- sd_rho_ty_a <- NA
+               se_rtya <- sd_e_ty_a
+               ci_ty_a <- confidence(mean = mean_rtya, sd = var_e_ty_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
+
+               # se_rtya <- NA
+               # ci_ty_a <- cbind(NA, NA)
+               # colnames(ci_ty_a) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
           }else{
                se_rtya <- sd_rtya / sqrt(k)
                ci_ty_a <- confidence(mean = mean_rtya, sd = var_rtya^.5, k = k, conf_level = conf_level, conf_method = conf_method)
