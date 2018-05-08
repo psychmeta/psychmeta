@@ -1,8 +1,8 @@
 psychmeta: Psychometric Meta-Analysis Toolkit
 ======================================
 
-[![Build Status](https://travis-ci.org/jadahlke/psychmeta.svg?branch=master)](https://travis-ci.org/jadahlke/psychmeta)
 [![CRAN Version](http://www.r-pkg.org/badges/version/psychmeta)](https://cran.r-project.org/package=psychmeta)
+[![Build Status](https://travis-ci.org/psychmeta/psychmeta.svg?branch=master)](https://travis-ci.org/psychmeta/psychmeta)
 [![Monthly Downloads](http://cranlogs.r-pkg.org/badges/psychmeta)](http://cranlogs.r-pkg.org/badges/psychmeta)
 [![Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/psychmeta)](http://cranlogs.r-pkg.org/badges/grand-total/psychmeta)
 
@@ -18,7 +18,7 @@ The official [CRAN release](https://cran.r-project.org/package=psychmeta) of `ps
 install.packages("psychmeta")
 ```
 
-The unofficial [GitHub release](https://github.com/jadahlke/psychmeta) of `psychmeta` reflects updates made to the package between official CRAN releases. Using the [devtools](https://cran.r-project.org/package=devtools) package, the GitHub release can be installed with the following code:
+Development versions of `psychmeta` from [GitHub](https://github.com/jadahlke/psychmeta) reflect updates made to the package between official CRAN releases. Using the [devtools](https://cran.r-project.org/package=devtools) package, the GitHub release can be installed with the following code:
 ```r
 install.packages("devtools")
 devtools::install_github("jadahlke/psychmeta")

@@ -22,7 +22,7 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   collapse_method = "composite", intercor = 0.5, clean_artifacts = TRUE,
   impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE),
   impute_method = "bootstrap_mod", seed = 42, decimals = 2,
-  hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL,
+  hs_override = FALSE, use_all_arts = TRUE, supplemental_ads = NULL,
   data = NULL, ...)
 }
 \arguments{
@@ -184,10 +184,15 @@ If an imputation method ending in "mod" is selected but no moderators are provid
 
 \item{decimals}{Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).}
 
-\item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-\code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
+\item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
+\code{error_type} (will set to "mean"),
+\code{correct_bias} (will set to \code{TRUE}), 
+\code{conf_method} (will set to "norm"),
+\code{cred_method} (will set to "norm"), 
+\code{var_unbiased} (will set to \code{FALSE}), 
+and \code{use_all_arts} (will set to \code{FALSE}).}
 
-\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).}
+\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
 
 \item{supplemental_ads}{Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.}
 
