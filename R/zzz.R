@@ -24,12 +24,13 @@ globalVariables(c(".", "Value",                                  ## Global varia
          pkg_badge <- xml2::read_html("http://www.r-pkg.org/badges/version/psychmeta")
          cran_v_char <- gsub(x = stringr::str_split(as.character(pkg_badge), "\n")[[1]][9], pattern = " ", replacement = "")
          cran_v_num <- as.numeric(stringr::str_split(cran_v_char, "[.]")[[1]])
-         sys_v_num <- as.numeric(stringr::str_split(version, "[.]")[[1]])
+         sys_v_char <- stringr::str_split(version, "[.]")[[1]]
+         sys_v_num <- as.numeric(sys_v_char)
 
          if(length(cran_v_num) == 3) cran_v_num <- c(cran_v_num, 0)
          if(length(sys_v_num) == 3) sys_v_num <- c(sys_v_num, 0)
          vcheck <- sys_v_num < cran_v_num
-
+         
          out_of_date <- vcheck[1] | all(vcheck[1:2]) | all(vcheck[1:3]) | all(vcheck[1:4])
          if(out_of_date){
               # packageStartupMessage(paste("\n", crayon::red(cli::symbol$cross), "Oh no! It looks like your copy of psychmeta is out of date!"))
@@ -38,8 +39,12 @@ globalVariables(c(".", "Value",                                  ## Global varia
               packageStartupMessage('                       update.packages("psychmeta")')
          }else{
               # packageStartupMessage(paste("\n", crayon::green(cli::symbol$tick), 'Yay! Your copy of psychmeta is up to date!'))
-              packageStartupMessage(paste("\nYay! Your copy of psychmeta is up to date!"))
+              packageStartupMessage("\nYay! Your copy of psychmeta is up to date!")
          }
+         
+         
+         if(sys_v_num[4] > 0)
+              packageStartupMessage(paste0("\nNOTE: You are currently using a DEVELOPMENT build of psychmeta (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
     }
 }
 

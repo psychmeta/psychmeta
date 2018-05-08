@@ -80,7 +80,7 @@
 #' @param decimals Number of decimal places to which results should be rounded (default is to perform no rounding).
 #' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 #' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
-#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).
+#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
@@ -222,10 +222,20 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  pairwise_ads = FALSE, residual_ads = TRUE,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5, partial_intercor = FALSE,
                  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42,
-                 decimals = 2, hs_override = FALSE, use_all_arts = FALSE, estimate_pa = FALSE, supplemental_ads = NULL, data = NULL, ...){
+                 decimals = 2, hs_override = FALSE, use_all_arts = TRUE, estimate_pa = FALSE, supplemental_ads = NULL, data = NULL, ...){
 
      ##### Get inputs #####
      call <- match.call()
+     
+     if(hs_override){
+          wt_type <- "sample_size"
+          error_type <- "mean"
+          correct_bias <- TRUE
+          conf_method <- cred_method <- "norm"
+          var_unbiased <- FALSE
+          residual_ads <- FALSE
+     }
+     
      inputs <- list(wt_type = wt_type, error_type = error_type,
                     correct_bias = correct_bias, correct_rGg = correct_rGg, correct_ryy = correct_ryy,
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased,
@@ -484,7 +494,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  pairwise_ads = pairwise_ads, residual_ads = residual_ads,
                  check_dependence = check_dependence, collapse_method = collapse_method, intercor = intercor,
                  clean_artifacts = clean_artifacts, impute_artifacts = impute_artifacts, impute_method = impute_method, seed = seed,
-                 hs_override = hs_override, decimals = decimals, use_all_arts = use_all_arts, supplemental_ads = supplemental_ads, data = NULL,
+                 decimals = decimals, use_all_arts = use_all_arts, supplemental_ads = supplemental_ads, data = NULL,
 
                  ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
                  use_as_x = group_order, use_as_y = construct_order,

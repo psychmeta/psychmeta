@@ -22,7 +22,7 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
   collapse_method = "composite", intercor = 0.5, partial_intercor = FALSE,
   clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad",
   FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42, decimals = 2,
-  hs_override = FALSE, use_all_arts = FALSE, estimate_pa = FALSE,
+  hs_override = FALSE, use_all_arts = TRUE, estimate_pa = FALSE,
   supplemental_ads = NULL, data = NULL, ...)
 }
 \arguments{
@@ -159,7 +159,7 @@ When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} s
 \item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
 
-\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).}
+\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
 
 \item{estimate_pa}{Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).}
 
