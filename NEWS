@@ -1,4 +1,4 @@
-Changes in Version 1.0.2.99
+Changes in Version 1.0.3 (2018-05-08)
 =====================================
 - The performance of the "hs_override" argument has been improved in ma_r and ma_d by correcting a bug that caused the argument to not be evaluated when running an artifact-distribution meta-analysis or only a bare-bones meta-analysis.  
 
