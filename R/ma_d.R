@@ -78,8 +78,13 @@
 #' @param impute_method Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.
 #' @param seed Seed value to use for imputing artifacts. Default value is 42.
 #' @param decimals Number of decimal places to which results should be rounded (default is to perform no rounding).
-#' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-#' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
+#' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
+#' \code{error_type} (will set to "mean"),
+#' \code{correct_bias} (will set to \code{TRUE}), 
+#' \code{conf_method} (will set to "norm"),
+#' \code{cred_method} (will set to "norm"), 
+#' \code{var_unbiased} (will set to \code{FALSE}), 
+#' and \code{use_all_arts} (will set to \code{FALSE}).
 #' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.

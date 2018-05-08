@@ -184,8 +184,13 @@ If an imputation method ending in "mod" is selected but no moderators are provid
 
 \item{decimals}{Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).}
 
-\item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-\code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
+\item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
+\code{error_type} (will set to "mean"),
+\code{correct_bias} (will set to \code{TRUE}), 
+\code{conf_method} (will set to "norm"),
+\code{cred_method} (will set to "norm"), 
+\code{var_unbiased} (will set to \code{FALSE}), 
+and \code{use_all_arts} (will set to \code{FALSE}).}
 
 \item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
 

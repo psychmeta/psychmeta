@@ -27,24 +27,36 @@ globalVariables(c(".", "Value",                                  ## Global varia
          sys_v_char <- stringr::str_split(version, "[.]")[[1]]
          sys_v_num <- as.numeric(sys_v_char)
 
+         if(cran_v_char == version){
+              out_of_date <- FALSE
+         }else{
+              best_version <- sort(c(CRAN = cran_v_char, Local = version), decreasing = TRUE)[1]
+              out_of_date <- names(best_version) == "CRAN"
+         }
+
          if(length(cran_v_num) == 3) cran_v_num <- c(cran_v_num, 0)
          if(length(sys_v_num) == 3) sys_v_num <- c(sys_v_num, 0)
-         vcheck <- sys_v_num < cran_v_num
+         vcheck_equal <- sys_v_num == cran_v_num
+         vcheck_greater <- zapsmall(sys_v_num) > zapsmall(cran_v_num)
+         vcheck <- vcheck_equal | vcheck_greater
+         development <- all(vcheck) & any(vcheck_greater)
          
-         out_of_date <- vcheck[1] | all(vcheck[1:2]) | all(vcheck[1:3]) | all(vcheck[1:4])
          if(out_of_date){
               # packageStartupMessage(paste("\n", crayon::red(cli::symbol$cross), "Oh no! It looks like your copy of psychmeta is out of date!"))
               packageStartupMessage("\nOh no! It looks like your copy of psychmeta is out of date!")
               packageStartupMessage("No worries, it's easy to obtain the latest version - just run the following command: \n")
               packageStartupMessage('                       update.packages("psychmeta")')
          }else{
-              # packageStartupMessage(paste("\n", crayon::green(cli::symbol$tick), 'Yay! Your copy of psychmeta is up to date!'))
-              packageStartupMessage("\nYay! Your copy of psychmeta is up to date!")
+              if(development){
+                   packageStartupMessage("\nKudos! Your copy of psychmeta is more recent than the current CRAN release!")    
+              }else{
+                   # packageStartupMessage(paste("\n", crayon::green(cli::symbol$tick), 'Yay! Your copy of psychmeta is up to date!'))
+                   packageStartupMessage("\nYay! Your copy of psychmeta is up to date!")    
+              }
          }
          
-         
          if(sys_v_num[4] > 0)
-              packageStartupMessage(paste0("\nNOTE: You are currently using a DEVELOPMENT build of psychmeta (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
+              packageStartupMessage(paste0("\nNOTE: You are currently using a UNRELEASED development build of psychmeta (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
     }
 }
 
