@@ -109,9 +109,14 @@
 #' }
 #' If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
 #' @param decimals Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
-#' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-#' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
-#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).
+#' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
+#' \code{error_type} (will set to "mean"),
+#' \code{correct_bias} (will set to \code{TRUE}), 
+#' \code{conf_method} (will set to "norm"),
+#' \code{cred_method} (will set to "norm"), 
+#' \code{var_unbiased} (will set to \code{FALSE}), 
+#' and \code{use_all_arts} (will set to \code{FALSE}).
+#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
@@ -331,11 +336,21 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  pairwise_ads = FALSE,  residual_ads = TRUE,
                  check_dependence = TRUE, collapse_method = "composite", intercor = .5,
                  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42,
-                 decimals = 2, hs_override = FALSE, use_all_arts = FALSE, supplemental_ads = NULL, data = NULL, ...){
+                 decimals = 2, hs_override = FALSE, use_all_arts = TRUE, supplemental_ads = NULL, data = NULL, ...){
 
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
+     
+     if(hs_override){
+          wt_type <- "sample_size"
+          error_type <- "mean"
+          correct_bias <- TRUE
+          conf_method <- cred_method <- "norm"
+          var_unbiased <- FALSE
+          residual_ads <- FALSE
+     }
+     
      inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads,
                     correct_bias = correct_bias, correct_rxx = correct_rxx, correct_ryy = correct_ryy,
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased,
@@ -1239,7 +1254,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
 
                out <- ma_r_ic(rxyi = "rxyi", n = "n", n_adj = "n_adj", sample_id = "sample_id", citekey = "citekey",
-                              hs_override = hs_override, wt_type = wt_type, error_type = error_type,
+                              wt_type = wt_type, error_type = error_type,
                               correct_bias = correct_bias, correct_rxx = "correct_rxx", correct_ryy = "correct_ryy",
                               correct_rr_x = "correct_rr_x", correct_rr_y = "correct_rr_y",
                               indirect_rr_x = "indirect_rr_x", indirect_rr_y = "indirect_rr_y",
