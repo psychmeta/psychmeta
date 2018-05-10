@@ -35,14 +35,16 @@
 #' }
 metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se = FALSE){
 
-     ma_class <- class(ma_obj)
-     is_r <- any(ma_class %in% c("ma_r_as_r", "ma_d_as_r"))
-     is_d <- any(ma_class %in% c("ma_r_as_d", "ma_d_as_d"))
-     is_generic <- any(ma_class == "ma_generic")
-     is_master <- any(ma_class %in% "ma_master")
-     is_bb <- any(ma_class %in% "ma_bb")
-     is_ic <- any(ma_class %in% "ma_ic")
-     is_ad <- any(ma_class %in% "ma_ad")
+     ma_metric <- attributes(ma_obj)$ma_metric
+     ma_methods <- attributes(ma_obj)$ma_methods
+     is_r <- any(ma_metric %in% c("r_as_r", "d_as_r"))
+     is_d <- any(ma_metric %in% c("r_as_d", "d_as_d"))
+     is_generic <- any(ma_metric == "generic")
+     ## TODO remove master stuff
+     # is_master <- any(ma_class %in% "ma_master") 
+     is_bb <- any(ma_methods %in% "bb")
+     is_ic <- any(ma_methods %in% "ic")
+     is_ad <- any(ma_methods %in% "ad")
 
      if(is_r){
           es_type <- "r"

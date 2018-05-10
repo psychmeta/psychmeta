@@ -30,7 +30,7 @@
 #' Rounding artifact distributions can help to consolidate trivially different values and speed up the computation of meta-analyses (especially in simulations).
 #' @param ... Additional arguments.
 #'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_d} or \code{ma_d_as_d}, \code{ma_bb}, and \code{ma_ad} (and that inherits class \code{ma_ic} from \code{ma_obj})
+#' @return A list object of the classes \code{psychmeta}, \code{r_as_d} or \code{d_as_d}, \code{ma_bb}, and \code{ma_ad} (and that inherits class \code{ma_ic} from \code{ma_obj})
 #' @export
 #'
 #' @details
@@ -76,12 +76,15 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                     indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                     residual_ads = TRUE, sign_rgz = 1, sign_ryz = 1, decimals = 2, ...){
 
-     convert_metric <- ifelse(any(class(ma_obj) == "ma_r_as_d") | any(class(ma_obj) == "ma_d_as_d"), TRUE, FALSE)
+     ma_metric <- attributes(ma_obj)
+     convert_metric <- ifelse(any(ma_metric == "r_as_d" | ma_metric == "d_as_d"), TRUE, FALSE)
      if(convert_metric) ma_obj <- convert_ma(ma_obj)
-
-     run_as_master <- any(class(ma_obj) == "ma_master")
+     
+     run_as_master <- any(colnames(ma_obj) == "group_contrast") & any(colnames(ma_obj) == "construct_y")
+     if(run_as_master)
+          run_as_master <- length(table(ma_obj[,"group_contrast"])) > 1 | length(table(ma_obj[,"construct_y"])) > 1
+     
      if(run_as_master){
-          ma_list <- ma_obj$construct_pairs
           if(!any(class(ma_obj) == "ma_ic")){
                if(!is.null(ad_obj_g)){
                     if(!is.list(ad_obj_g)){
@@ -103,8 +106,6 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                     }
                }
           }
-     }else{
-          ma_list <- list(ma_obj)
      }
 
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
@@ -120,7 +121,8 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
      residual_ads <- scalar_arg_warning(arg = residual_ads, arg_name = "residual_ads")
      decimals <- scalar_arg_warning(arg = decimals, arg_name = "decimals")
 
-     ma_list <- lapply(ma_list, function(ma_obj_i){
+     ma_obj_i <- ma_obj[1,]
+     ma_list <- apply(ma_obj, 1, function(ma_obj_i){
           if(is.null(ad_obj_g) | is.null(ad_obj_y)){
                if(any(class(ma_obj_i) == "ma_ic")){
                     ad_obj_g_i <- NULL
@@ -143,15 +145,60 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                     ad_obj_y_i <- ad_obj_y
                }
           }
-
-          out <- .ma_r_ad(ma_r_obj = ma_obj_i, ad_obj_x = ad_obj_g_i, ad_obj_y = ad_obj_y_i, correction_method = correction_method, use_ic_ads = use_ic_ads,
+          
+          if(is.null(ad_obj_g_i) | is.null(ad_obj_y_i)){
+               # if(any(class(ma_obj) == "psychmeta") & any(attributes(ma_obj)$ma_methods == "ic")){
+               if(any(attributes(ma_obj)$ma_methods == "ic")){
+                    if(use_ic_ads != "tsa" & use_ic_ads != "int")
+                         stop("The only acceptable values for 'use_ic_ads' are 'tsa' and 'int'")
+                    
+                    if(use_ic_ads == "tsa"){
+                         ad_obj_g_i <- ma_obj_i$ad$ic$ad_x_tsa
+                         ad_obj_y_i <- ma_obj_i$ad$ic$ad_y_tsa
+                    }
+                    if(use_ic_ads == "int"){
+                         ad_obj_g_i <- ma_obj_i$ad$ic$ad_x_int
+                         ad_obj_y_i <- ma_obj_i$ad$ic$ad_y_int
+                    }
+               }else{
+                    if(is.null(ad_obj_g_i) & is.null(ad_obj_y_i)){
+                         stop("'ad_obj_x' and 'ad_obj_y' cannot both be NULL unless 'ma_r_obj' contains individual-correction results", call. = FALSE)
+                    }else{
+                         if(is.null(ad_obj_g_i)){
+                              if(any(class(ad_obj_y_i) == "tsa")){
+                                   ad_obj_g_i <- create_ad_tsa()
+                              }else{
+                                   ad_obj_g_i <- create_ad_int()
+                              }
+                         }
+                         
+                         if(is.null(ad_obj_y_i)){
+                              if(any(class(ad_obj_g_i) == "tsa")){
+                                   ad_obj_y_i <- create_ad_tsa()
+                              }else{
+                                   ad_obj_y_i <- create_ad_int()
+                              }
+                         }
+                    }
+               }
+          }
+          
+          if(length(ma_obj_i$meta_tables) == 1){
+               meta <- ma_obj_i$meta_tables[[1]]
+          }else{
+               meta <- ma_obj_i$meta_tables
+          }
+          
+          out <- .ma_r_ad(ma_r_obj = list(meta = meta, inputs = attributes(ma_obj)$inputs),
+                          ad_obj_x = ad_obj_g_i, ad_obj_y = ad_obj_y_i, correction_method = correction_method, use_ic_ads = use_ic_ads,
                           correct_rxx = correct_rGg, correct_ryy = correct_ryy,
                           correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
                           indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
-                          residual_ads = residual_ads, sign_rxz = sign_rgz, sign_ryz = sign_ryz, decimals = decimals, ...)
+                          residual_ads = residual_ads, sign_rxz = sign_rgz, sign_ryz = sign_ryz, decimals = decimals)#, ...)
 
-          ad_method <- out$artifact_distribution$method_details["ad_method"]
-          rr_method <- out$artifact_distribution$method_details["range_restriction"]
+          method_details <- attributes(out$meta$artifact_distribution)$method_details
+          ad_method <- method_details["ad_method"]
+          rr_method <- method_details["range_restriction"]
 
           if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)" |
              rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)" |
@@ -164,13 +211,11 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                     }else{
                          uy <- ad_obj_y["ux", "mean"]
                     }
-                    rxyi <- out$barebones$meta_table$mean_r
-                    for(i in 1:length(out$barebones$escalc_list)){
-                         pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
-                         pqa <- pi * (1 - pi) * ((1 / uy^2 - 1) * rxyi[i]^2 + 1)
-                         pqa[pqa > .25] <- .25
-                         out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
-                    }
+                    rxyi <- out$meta_tables[[1]]$barebones$mean_r
+                    pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
+                    pqa <- pi * (1 - pi) * ((1 / uy^2 - 1) * rxyi[i]^2 + 1)
+                    pqa[pqa > .25] <- .25
+                    out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
                }
 
                if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
@@ -184,18 +229,18 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                          up <- ad_obj_y["ut", "mean"]
                          qyi <- ad_obj_y["qxi", "mean"]
                     }
-                    rxpi <- out$barebones$meta_table$mean_r / qyi
-                    for(i in 1:length(out$barebones$escalc_list)){
-                         pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
+                    rxpi <- out$meta_tables[[1]]$barebones$mean_r / qyi
+                    for(i in 1:length(out$escalc[[1]]$barebones)){
+                         pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
                          pqa <- pi * (1 - pi) * ((1 / up^2 - 1) * rxpi[i]^2 + 1)
                          pqa[pqa > .25] <- .25
-                         out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
+                         out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
                     }
                }
 
                if(rr_method == "Made no corrections for range restriction"){
                     for(i in 1:length(out$barebones$escalc_list))
-                         out$barebones$escalc_list[[i]]$pa_ad <- out$barebones$escalc_list[[i]]$pi
+                         out$escalc[[1]]$barebones$pa_ad <- out$escalc[[1]]$barebones$pi
                }
           }else{
                if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
@@ -214,42 +259,18 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                     }
                }
 
-               for(i in 1:length(out$barebones$escalc_list)){
-                    pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
+               for(i in 1:length(out$escalc[[1]]$barebones)){
+                    pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
                     pqa <- 1 / ug^2 * pi * (1 - pi)
                     pqa[pqa > .25] <- .25
-                    out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
+                    out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
                }
           }
 
           out
      })
-
-     if(any(class(ma_obj) == "ma_master")){
-          ma_obj$construct_pairs <- ma_list
-
-          if(any(class(ma_obj) == "ma_master")){
-               ma_obj$construct_pairs <- ma_list
-
-               ts_meta_mat <- vgx_meta_mat <- vgy_meta_mat <- NULL
-               for(i in 1:length(ma_list)){
-                    ts_meta_mat <- rbind(ts_meta_mat, cbind(Pair_ID = i, ma_list[[i]]$artifact_distribution$true_score))
-                    vgx_meta_mat <- rbind(vgx_meta_mat, cbind(Pair_ID = i, ma_list[[i]]$artifact_distribution$validity_generalization_x))
-                    vgy_meta_mat <- rbind(vgy_meta_mat, cbind(Pair_ID = i, ma_list[[i]]$artifact_distribution$validity_generalization_y))
-               }
-               ma_obj$grand_tables$artifact_distribution  <- list(true_score = ts_meta_mat,
-                                                                  validity_generalization_x = vgx_meta_mat,
-                                                                  validity_generalization_y = vgy_meta_mat)
-               new_class <- class(ma_obj)
-               if(!any(new_class == "ma_ad")) new_class <- c(new_class, "ma_ad")
-               class(ma_obj) <- new_class
-          }else{
-               ma_obj <- ma_list[[1]]
-          }
-     }else{
-          ma_obj <- ma_list[[1]]
-     }
-     ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
+     
+     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 
      if(convert_metric) ma_obj <- convert_ma(ma_obj)
 

@@ -179,10 +179,10 @@ A list object of the classes \code{psychmeta}, \code{ma_d_as_r} or \code{ma_d_as
 Components of output tables for bare-bones meta-analyses:
 \itemize{
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-\item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -202,10 +202,10 @@ Components of output tables for bare-bones meta-analyses:
 Components of output tables for individual-correction meta-analyses:
 \itemize{
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-\item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -233,10 +233,10 @@ Components of output tables for individual-correction meta-analyses:
 Components of output tables for artifact-distribution meta-analyses:
 \itemize{
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-\item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -277,6 +277,7 @@ The automatic compositing features are employed when \code{sample_id}s and/or co
 When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitivity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
 }
 \examples{
+\dontrun{
 ## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:
 ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 
@@ -289,6 +290,7 @@ ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
 ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
      ryy = ryyi, correct_rr_y = FALSE,
      construct_y = construct, data = data_d_meas_multi)
+}
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).

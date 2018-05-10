@@ -60,27 +60,30 @@ This function computes second-order meta-analysis function for correlations. It 
 }
 \examples{
 ## Analysis of the validity of conscientiousness as a predictor of job performance in East Asia
-ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, ma_type = "ad",
-            sample_id = NULL, moderators = NULL,
-            construct_x = NULL, construct_y = NULL,
-            conf_level = .95, cred_level = .8,
-            cred_method = "t", var_unbiased = TRUE,
-            data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
+out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+                   var_r_c = NULL, ma_type = c("bb", "ad"),
+                   sample_id = NULL, moderators = NULL,
+                   construct_x = NULL, construct_y = NULL,
+                   conf_level = .95, cred_level = .8,
+                   cred_method = "t", var_unbiased = TRUE,
+                   data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
+out$meta_tables[[1]]
 
 ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
-ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, ma_type = "ad",
-            sample_id = NULL, moderators = NULL, construct_x = Predictor,
-            conf_level = .95, cred_level = .8,
-            cred_method = "t", var_unbiased = TRUE,
-            data = data_r_oh_2009)
+out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+                   var_r_c = NULL, ma_type = c("bb", "ad"),
+                   sample_id = NULL, moderators = NULL, construct_x = Predictor,
+                   conf_level = .95, cred_level = .8,
+                   cred_method = "t", var_unbiased = TRUE,
+                   data = data_r_oh_2009)
+out$meta_tables[[1]]
 
 ## Analysis of the average validity of the Big Five traits as predictors of
 ## job performance by Eastern Asian country
-ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, ma_type = "ad",
-            sample_id = NULL, moderators = "Country",
-            conf_level = .95, cred_level = .8, cred_method = "t",
-            var_unbiased = TRUE, data = data_r_oh_2009)
+out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+                   var_r_c = NULL, ma_type = c("bb", "ad"),
+                   sample_id = NULL, moderators = "Country",
+                   conf_level = .95, cred_level = .8, cred_method = "t",
+                   var_unbiased = TRUE, data = data_r_oh_2009)
+out$meta_tables[[1]]
 }

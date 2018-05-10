@@ -28,6 +28,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' ## Run a meta-analysis using simulated UVIRR data:
 #' ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
 #' correct_rr_y = FALSE, data = data_r_uvirr)
@@ -47,6 +48,7 @@
 #' ma_obj$follow_up_analyses$bootstrap$artifact_distribution$true_score$`Analysis ID = 1`
 #' ma_obj$follow_up_analyses$leave1out$artifact_distribution$true_score$`Analysis ID = 1`
 #' ma_obj$follow_up_analyses$cumulative$artifact_distribution$true_score$`Analysis ID = 1`
+#' }
 sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative = TRUE,
                         sort_method = "weight",
                         boot_iter = 1000, boot_conf_level = .95, boot_ci_type = "bca", ...){

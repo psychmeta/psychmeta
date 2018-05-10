@@ -28,29 +28,32 @@
 #'
 #' @examples
 #' ## Analysis of the validity of conscientiousness as a predictor of job performance in East Asia
-#' ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-#'             var_r_c = NULL, ma_type = "ad",
-#'             sample_id = NULL, moderators = NULL,
-#'             construct_x = NULL, construct_y = NULL,
-#'             conf_level = .95, cred_level = .8,
-#'             cred_method = "t", var_unbiased = TRUE,
-#'             data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
-#'
+#' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+#'                    var_r_c = NULL, ma_type = c("bb", "ad"),
+#'                    sample_id = NULL, moderators = NULL,
+#'                    construct_x = NULL, construct_y = NULL,
+#'                    conf_level = .95, cred_level = .8,
+#'                    cred_method = "t", var_unbiased = TRUE,
+#'                    data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
+#' out$meta_tables[[1]]
+#' 
 #' ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
-#' ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-#'             var_r_c = NULL, ma_type = "ad",
-#'             sample_id = NULL, moderators = NULL, construct_x = Predictor,
-#'             conf_level = .95, cred_level = .8,
-#'             cred_method = "t", var_unbiased = TRUE,
-#'             data = data_r_oh_2009)
-#'
+#' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+#'                    var_r_c = NULL, ma_type = c("bb", "ad"),
+#'                    sample_id = NULL, moderators = NULL, construct_x = Predictor,
+#'                    conf_level = .95, cred_level = .8,
+#'                    cred_method = "t", var_unbiased = TRUE,
+#'                    data = data_r_oh_2009)
+#' out$meta_tables[[1]]
+#' 
 #' ## Analysis of the average validity of the Big Five traits as predictors of
 #' ## job performance by Eastern Asian country
-#' ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-#'             var_r_c = NULL, ma_type = "ad",
-#'             sample_id = NULL, moderators = "Country",
-#'             conf_level = .95, cred_level = .8, cred_method = "t",
-#'             var_unbiased = TRUE, data = data_r_oh_2009)
+#' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+#'                    var_r_c = NULL, ma_type = c("bb", "ad"),
+#'                    sample_id = NULL, moderators = "Country",
+#'                    conf_level = .95, cred_level = .8, cred_method = "t",
+#'                    var_unbiased = TRUE, data = data_r_oh_2009)
+#' out$meta_tables[[1]]
 ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
                         conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE, hs_override = FALSE, data = NULL){
@@ -185,17 +188,90 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                        ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad)),
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
 
-     out <- append(list(call = call, inputs = inputs), out)
-
-     out$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                          fyi = record_fyis(es_metric = "r_order2",
-                                            neg_var_r_order2 = sum(out$barebones$meta_table$var_r_bar < 0),
-                                            neg_var_rho_ic_order2 = sum(out$individual_correction$meta_table$var_rho_bar < 0),
-                                            neg_var_rho_ad_order2 = sum(out$artifact_distribution$meta_table$var_rho_bar < 0)))
-
-     class(out) <- c("psychmeta", "ma_r_as_r", "ma_order2", c("ma_bb", "ma_ic", "ma_ad")[c(do_bb, do_ic, do_ad)])
-
+     neg_var_r_order2 <- sum(unlist(map(out$meta_tables, function(x) x$barebones$var_r_bar < 0)), na.rm = TRUE)
+     neg_var_rho_ic_order2 <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$var_rho_bar < 0)), na.rm = TRUE)
+     neg_var_rho_ad_order2 <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$var_rho_bar < 0)), na.rm = TRUE)
+     
+     out <- bind_cols(analysis_id = 1:nrow(out), out)
+     attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                     inputs = inputs, 
+                                                     ma_methods = c("bb", "ic", "ad")[c(do_bb, do_ic, do_ad)],
+                                                     ma_metric = "r_order2",
+                                                     warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
+                                                     fyi = record_fyis(es_metric = "r_order2",
+                                                                       neg_var_r_order2 = neg_var_r_order2,
+                                                                       neg_var_rho_ic_order2 = neg_var_rho_ic_order2,
+                                                                       neg_var_rho_ad_order2 = neg_var_rho_ad_order2)))
+     
+     # class(out) <- c("psychmeta", "ma_r_as_r", "ma_order2", c("ma_bb", "ma_ic", "ma_ad")[c(do_bb, do_ic, do_ad)])
+     class(out) <- c(class(out))
+     
      out
+}
+
+
+#' Internal function for computing individual-correction meta-analyses of correlations
+#'
+#' @param data Data frame of individual-correction information.
+#' @param type Type of correlation to be meta-analyzed: "ts" for true score, "vgx" for validity generalization with "X" as the predictor,
+#' "vgy" for for validity generalization with "X" as the predictor, and "all" for the complete set of results.
+#' @param run_lean If TRUE, the meta-analysis will not generate a data object. Meant to speed up bootstrap analyses that do not require supplemental output.
+#' @param ma_arg_list List of arguments to be used in the meta-analysis function.
+#'
+#' @return A meta-analytic table and a data frame.
+#' @export
+#'
+#' @examples
+#' ## Example TBD
+.ma_r_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
+     
+     r <- data$r
+     rho <- data$rho
+     var_r <- data$var_r
+     var_r_c <- data$var_r_c
+     k <- data$k
+     N <- data$N
+     
+     conf_level <- ma_arg_list$conf_level
+     cred_level <- ma_arg_list$cred_level
+     conf_method <- ma_arg_list$conf_method
+     cred_method <- ma_arg_list$cred_method
+     var_unbiased <- ma_arg_list$var_unbiased
+     
+     do_bb <- ma_arg_list$do_bb
+     do_ic <- ma_arg_list$do_ic
+     do_ad <- ma_arg_list$do_ad
+     
+     if((type == "all" | type == "bb") & do_bb){
+          out_bb <- .ma_r_order2_bb(k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
+                                    conf_level = conf_level, cred_level = cred_level,
+                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
+     }else{
+          out_bb <- NULL
+     }
+     
+     if((type == "all" | type == "ic") & do_ic){
+          out_ic <- .ma_r_order2_ic(k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
+                                    conf_level = conf_level, cred_level = cred_level,
+                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
+     }else{
+          out_ic <- NULL
+     }
+     
+     if((type == "all" | type == "ad") & do_ad){
+          out_ad <- .ma_r_order2_ad(k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
+                                    conf_level = conf_level, cred_level = cred_level,
+                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
+     }else{
+          out_ad <- NULL
+     }
+     
+     list(meta = list(barebones = out_bb$meta, 
+                      individual_correction = out_ic$meta, 
+                      artifact_distribution = out_ad$meta),
+          escalc = list(barebones = out_bb$escalc, 
+                        individual_correction = out_ic$escalc, 
+                        artifact_distribution = out_ad$escalc))
 }
 
 
@@ -269,7 +345,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                `cor(r, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
 
      list(meta = meta,
-          data = dat)
+          escalc = dat)
 }
 
 
@@ -344,7 +420,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
 
      list(meta = meta,
-          data = dat)
+          escalc = dat)
 }
 
 
@@ -420,71 +496,9 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
 
      list(meta = meta,
-          data = dat)
+          escalc = dat)
 }
 
-
-
-#' Internal function for computing individual-correction meta-analyses of correlations
-#'
-#' @param data Data frame of individual-correction information.
-#' @param type Type of correlation to be meta-analyzed: "ts" for true score, "vgx" for validity generalization with "X" as the predictor,
-#' "vgy" for for validity generalization with "X" as the predictor, and "all" for the complete set of results.
-#' @param run_lean If TRUE, the meta-analysis will not generate a data object. Meant to speed up bootstrap analyses that do not require supplemental output.
-#' @param ma_arg_list List of arguments to be used in the meta-analysis function.
-#'
-#' @return A meta-analytic table and a data frame.
-#' @export
-#'
-#' @examples
-#' ## Example TBD
-.ma_r_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
-
-     r <- data$r
-     rho <- data$rho
-     var_r <- data$var_r
-     var_r_c <- data$var_r_c
-     k <- data$k
-     N <- data$N
-
-     conf_level <- ma_arg_list$conf_level
-     cred_level <- ma_arg_list$cred_level
-     conf_method <- ma_arg_list$conf_method
-     cred_method <- ma_arg_list$cred_method
-     var_unbiased <- ma_arg_list$var_unbiased
-
-     do_bb <- ma_arg_list$do_bb
-     do_ic <- ma_arg_list$do_ic
-     do_ad <- ma_arg_list$do_ad
-
-     if((type == "all" | type == "bb") & do_bb){
-          out_bb <- .ma_r_order2_bb(k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
-                                    conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
-     }else{
-          out_bb <- NULL
-     }
-
-     if((type == "all" | type == "ic") & do_ic){
-          out_ic <- .ma_r_order2_ic(k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
-                                    conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
-     }else{
-          out_ic <- NULL
-     }
-
-     if((type == "all" | type == "ad") & do_ad){
-          out_ad <- .ma_r_order2_ad(k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
-                                    conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
-     }else{
-          out_ad <- NULL
-     }
-
-     list(barebones = out_bb,
-          individual_correction = out_ic,
-          artifact_distribution = out_ad)
-}
 
 
 #' Internal function for computing bootstrapped second-order bare-bones meta-analyses of correlations
@@ -499,7 +513,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 .ma_r_order2_bb_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_order2(data = data, type = "bb", run_lean = TRUE, ma_arg_list = ma_arg_list)
-     unlist(out$barebones$meta)
+     unlist(out$meta$barebones)
 }
 
 
@@ -517,7 +531,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 .ma_r_order2_ic_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_order2(data = data, type = "ic", run_lean = TRUE, ma_arg_list = ma_arg_list)
-     unlist(out$individual_correction$meta)
+     unlist(out$meta$individual_correction)
 }
 
 
@@ -534,7 +548,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 .ma_r_order2_ad_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_order2(data = data, type = "ad", run_lean = TRUE, ma_arg_list = ma_arg_list)
-     unlist(out$artifact_distribution$meta)
+     unlist(out$meta$artifact_distribution)
 }
 
 

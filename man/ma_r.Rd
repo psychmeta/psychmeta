@@ -205,9 +205,9 @@ A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (a
 Components of output tables for bare-bones meta-analyses:
 \itemize{
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
-\item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
-\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
+\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
 \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -228,9 +228,9 @@ Components of output tables for bare-bones meta-analyses:
 Components of output tables for individual-correction meta-analyses:
 \itemize{
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
-\item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
-\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
+\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
 \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -259,9 +259,9 @@ Components of output tables for individual-correction meta-analyses:
 Components of output tables for artifact-distribution meta-analyses:
 \itemize{
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
-\item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
-\item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
+\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
 \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}

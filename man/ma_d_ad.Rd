@@ -55,7 +55,7 @@ Rounding artifact distributions can help to consolidate trivially different valu
 \item{...}{Additional arguments.}
 }
 \value{
-A list object of the classes \code{psychmeta}, \code{ma_r_as_d} or \code{ma_d_as_d}, \code{ma_bb}, and \code{ma_ad} (and that inherits class \code{ma_ic} from \code{ma_obj})
+A list object of the classes \code{psychmeta}, \code{r_as_d} or \code{d_as_d}, \code{ma_bb}, and \code{ma_ad} (and that inherits class \code{ma_ic} from \code{ma_obj})
 }
 \description{
 This function computes artifact distribution meta-analyses of \emph{d} values. It supports interactive methods as well as Taylor series methods for all available corrections.

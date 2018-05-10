@@ -16,6 +16,7 @@
 #' @keywords regression
 #'
 #' @examples
+#' \dontrun{
 #' ## Meta-analyze the data from Gonzalez-Mule et al. (2014)
 #' ## Note: These are corrected data and we have confirmed with the author that
 #' ## these results are accurate:
@@ -29,6 +30,7 @@
 #' ## Examine the meta-regression results for the bare-bones and corrected data:
 #' ma_obj$follow_up_analyses$metareg$barebones$`Main Effects`
 #' ma_obj$follow_up_analyses$metareg$individual_correction$true_score$`Main Effects`
+#' }
 metareg <- function(ma_obj, formula_list = NULL, ...){
      es_type <- NULL
      class_ma <- class(ma_obj)

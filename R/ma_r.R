@@ -125,9 +125,9 @@
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
-#' \item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
 #' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -148,9 +148,9 @@
 #' Components of output tables for individual-correction meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
-#' \item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
 #' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -179,9 +179,9 @@
 #' Components of output tables for artifact-distribution meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
-#' \item{\code{Construct_X}}{\cr Name of the variable analyzed as construct X.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
 #' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -218,6 +218,7 @@
 #' @export
 #'
 #' @importFrom tibble as_tibble
+#' @importFrom data.table rbindlist
 #'
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
@@ -351,10 +352,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           residual_ads <- FALSE
      }
      
-     inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads,
-                    correct_bias = correct_bias, correct_rxx = correct_rxx, correct_ryy = correct_ryy,
-                    conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased,
-                    cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
+     inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads, correct_bias = correct_bias, 
+                    conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased)
      additional_args <- list(...)
      inputs <- append(inputs, additional_args)
 
@@ -1049,7 +1048,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           analysis_id_variables <- full_data_mod$id_variables
           full_data_mod <- full_data_mod$data
 
-          sample_id_mod <- paste(full_data_mod$Analysis_ID, full_data_mod$sample_id, full_data_mod$construct_x, full_data_mod$construct_y)
+          sample_id_mod <- paste(full_data_mod$analysis_id, full_data_mod$sample_id, full_data_mod$construct_x, full_data_mod$construct_y)
           duplicate_samples <- duplicated(sample_id_mod) | duplicated(sample_id_mod, fromLast=TRUE)
 
           duplicates <- full_data_mod[duplicate_samples,]
@@ -1078,15 +1077,15 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                }
 
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
-                                      total = length(duplicates$Analysis_ID), clear = FALSE, width = options()$width)
-          collapsed_data_list <- by(1:length(duplicates$Analysis_ID), duplicates$Analysis_ID, function(i){
+                                      total = length(duplicates$analysis_id), clear = FALSE, width = options()$width)
+          collapsed_data_list <- by(1:length(duplicates$analysis_id), duplicates$analysis_id, function(i){
                progbar$tick()
                out <- .remove_dependency(sample_id = "sample_id", citekey = "citekey", es_data = str_es_data,
                                          data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
                                          intercor=intercor, partial_intercor = partial_intercor, construct_x = "construct_x", construct_y = "construct_y",
                                          measure_x = "measure_x", measure_y = "measure_y",
                                          es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
-               cbind(duplicates[i, c("Analysis_ID", "Analysis_Type", str_moderators, str_compmod_temp)][rep(1, nrow(out)),], out)
+               cbind(duplicates[i, c("analysis_id", "Analysis_Type", str_moderators, str_compmod_temp)][rep(1, nrow(out)),], out)
           })
 
           collapsed_data <- NULL
@@ -1097,9 +1096,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           full_data_mod$composited <- FALSE
           collapsed_data$composited <- TRUE
           indep_data <- as_tibble(rbind(full_data_mod[!duplicate_samples,], collapsed_data))
-          indep_data <- indep_data[order(indep_data$Analysis_ID),]
+          indep_data <- indep_data[order(indep_data$analysis_id),]
 
-          if(ma_method == "ad") indep_data[indep_data$Analysis_ID != 1, c("rxx", "ryy", "ux", "uy")] <- NA
+          if(ma_method == "ad") indep_data[indep_data$analysis_id != 1, c("rxx", "ryy", "ux", "uy")] <- NA
 
           sample_id   <- indep_data$sample_id
           citekey     <- as.data.frame(indep_data)$citekey
@@ -1110,11 +1109,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(!is.null(data_y)) data_y <- indep_data[,str_data_y]
           if(!is.null(str_moderators)) categorical_moderators <- apply(indep_data[,str_moderators],2,as.character)
           if(!is.null(str_compmod_temp)) complete_moderators <- indep_data[, str_compmod_temp]
-          analysis_id <- indep_data$Analysis_ID
+          analysis_id <- indep_data$analysis_id
           analysis_type <- as.character(indep_data$Analysis_Type)
 
           if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
-          presorted_data <- as_tibble(cbind(Analysis_ID=analysis_id, Analysis_Type=analysis_type, categorical_moderators))
+          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, Analysis_Type=analysis_type, categorical_moderators))
 
           if(!is.null(moderator_names[["cat"]])){
                moderator_ids <- (length(analysis_id_variables) - length(moderator_names[["cat"]]) + 1):length(analysis_id_variables)
@@ -1148,13 +1147,13 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                            total = n_pairs, clear = FALSE, width = options()$width)
 
      if(ma_method == "bb"){
-          ma_list <- by(1:length(construct_pair), construct_pair, function(i){
+          out <- by(1:length(construct_pair), construct_pair, function(i){
                progbar$tick()
 
                if(!is.null(presorted_data)){
-                    id2logic <- rep(FALSE, length(presorted_data$Analysis_ID))
+                    id2logic <- rep(FALSE, length(presorted_data$analysis_id))
                     id2logic[i] <- TRUE
-                    j <- presorted_data$Analysis_ID == 1 & id2logic
+                    j <- presorted_data$analysis_id == 1 & id2logic
                     presorted_data_i <- presorted_data[i,]
                }else{
                     j <- i
@@ -1185,48 +1184,43 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
                }
 
-               if(!is.null(construct_y)) out$barebones$meta_table <- cbind(Construct_Y = construct_y[i][1], out$barebones$meta_table)
-               if(!is.null(construct_x)) out$barebones$meta_table <- cbind(Construct_X = construct_x[i][1], out$barebones$meta_table)
+               if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
+               if(!is.null(construct_x)) out <- bind_cols(construct_x = rep(construct_x[i][1], nrow(out)), out)
 
-               out$barebones$messages <- record_warnings()
-               out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
-               out <- append(list(call_history = list(call)), out)
-
-               if(es_d & treat_as_d){
-                    class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
-               }else{
-                    class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
-               }
+               # out$barebones$messages <- record_warnings()
+               # out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
+               # out <- append(list(call_history = list(call)), out)
+               # 
+               # if(es_d & treat_as_d){
+               #      class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
+               # }else{
+               #      class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
+               # }
 
                out
           })
-
-          bb_metas <- lapply(ma_list, function(x) x$barebones$meta_table)
-          bb_meta_mat <- NULL
-          for(i in 1:length(bb_metas)) bb_meta_mat <- rbind(bb_meta_mat, cbind(Pair_ID = i, bb_metas[[i]]))
-          table_list <- list(barebones = bb_meta_mat,
-                             individual_correction = NULL,
-                             artifact_distribution = NULL)
+          
+          out <- as_tibble(data.table::rbindlist(out))
      }
 
      if(ma_method == "ic"){
           ad_obj_list_tsa <- .create_ad_list(ad_type = "tsa", sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
                                              construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
-                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads, ...)
+                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads)#, ...)
           ad_obj_list_int <- .create_ad_list(ad_type = "int", sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
                                              construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
-                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads, ...)
+                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads)#, ...)
 
-          ma_list <- by(1:length(construct_pair), construct_pair, function(i){
+          out <- by(1:length(construct_pair), construct_pair, function(i){
                progbar$tick()
 
                mod_names <- colnames(complete_moderators)
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
 
                if(!is.null(presorted_data)){
-                    id2logic <- rep(FALSE, length(presorted_data$Analysis_ID))
+                    id2logic <- rep(FALSE, length(presorted_data$analysis_id))
                     id2logic[i] <- TRUE
-                    j <- presorted_data$Analysis_ID == 1 & id2logic
+                    j <- presorted_data$analysis_id == 1 & id2logic
                     presorted_data_i <- presorted_data[i,]
                }else{
                     j <- i
@@ -1271,60 +1265,33 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               ## Ellipsis arguments
                               presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables, es_d = inputs$es_d, treat_as_d = inputs$treat_as_d,
                               d_orig = data$d, n1_d = data$n1, n2_d = data$n2, pi_d = data$pi, pa_d = data$pa, estimate_pa = estimate_pa,
-                              ad_x_tsa = ad_x_tsa, ad_y_tsa = ad_y_tsa, ad_x_int = ad_x_int, ad_y_int = ad_y_int)
-
-               if(es_d & treat_as_d) class(out)[2] <- "ma_d_as_r"
-
-               if(!is.null(construct_y)){
-                    out$barebones$meta_table <- cbind(Construct_Y = construct_y[i][1], out$barebones$meta_table)
-                    out$individual_correction$true_score$meta_table <- cbind(Construct_Y = construct_y[i][1], out$individual_correction$true_score$meta_table)
-                    out$individual_correction$validity_generalization_x$meta_table <- cbind(Construct_Y = construct_y[i][1], out$individual_correction$validity_generalization_x$meta_table)
-                    out$individual_correction$validity_generalization_y$meta_table <- cbind(Construct_Y = construct_y[i][1], out$individual_correction$validity_generalization_y$meta_table)
-               }
-               if(!is.null(construct_x)){
-                    out$barebones$meta_table <- cbind(Construct_X = construct_x[i][1], out$barebones$meta_table)
-                    out$individual_correction$true_score$meta_table <- cbind(Construct_X = construct_x[i][1], out$individual_correction$true_score$meta_table)
-                    out$individual_correction$validity_generalization_x$meta_table <- cbind(Construct_X = construct_x[i][1], out$individual_correction$validity_generalization_x$meta_table)
-                    out$individual_correction$validity_generalization_y$meta_table <- cbind(Construct_X = construct_x[i][1], out$individual_correction$validity_generalization_y$meta_table)
-               }
+                              ad_x_tsa = ad_x_tsa, ad_y_tsa = ad_y_tsa, ad_x_int = ad_x_int, ad_y_int = ad_y_int, as_worker = TRUE)
+               
+               if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
+               if(!is.null(construct_x)) out <- bind_cols(construct_x = rep(construct_x[i][1], nrow(out)), out)
+               
                out
           })
-
-          bb_metas <- lapply(ma_list, function(x) x$barebones$meta_table)
-          ts_metas <- lapply(ma_list, function(x) x$individual_correction$true_score$meta_table)
-          vgx_metas <- lapply(ma_list, function(x) x$individual_correction$validity_generalization_x$meta_table)
-          vgy_metas <- lapply(ma_list, function(x) x$individual_correction$validity_generalization_y$meta_table)
-
-          bb_meta_mat <- ts_meta_mat <- vgx_meta_mat <- vgy_meta_mat <- NULL
-          for(i in 1:length(bb_metas)){
-               bb_meta_mat <- rbind(bb_meta_mat, cbind(Pair_ID = i, bb_metas[[i]]))
-               ts_meta_mat <- rbind(ts_meta_mat, cbind(Pair_ID = i, ts_metas[[i]]))
-               vgx_meta_mat <- rbind(vgx_meta_mat, cbind(Pair_ID = i, vgx_metas[[i]]))
-               vgy_meta_mat <- rbind(vgy_meta_mat, cbind(Pair_ID = i, vgy_metas[[i]]))
-          }
-
-          table_list <- list(barebones = bb_meta_mat,
-                             individual_correction = list(true_score = ts_meta_mat,
-                                                          validity_generalization_x = vgx_meta_mat,
-                                                          validity_generalization_y = vgy_meta_mat),
-                             artifact_distribution = NULL)
+         
+          out <- as_tibble(rbindlist(out))
      }
 
      if(ma_method == "ad"){
           ad_obj_list <- .create_ad_list(ad_type = ad_type, sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
                                          construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
-                                         pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads, ...)
+                                         pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads)#, ...)
 
-          ma_list <- by(1:length(construct_pair), construct_pair, function(i){
+          i <- which(construct_pair == construct_pair[1])
+          out <- by(1:length(construct_pair), construct_pair, function(i){
                progbar$tick()
 
                mod_names <- colnames(complete_moderators)
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
 
                if(!is.null(presorted_data)){
-                    id2logic <- rep(FALSE, length(presorted_data$Analysis_ID))
+                    id2logic <- rep(FALSE, length(presorted_data$analysis_id))
                     id2logic[i] <- TRUE
-                    j <- presorted_data$Analysis_ID == 1 & id2logic
+                    j <- presorted_data$analysis_id == 1 & id2logic
                     presorted_data_i <- presorted_data[i,]
                }else{
                     j <- i
@@ -1354,6 +1321,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
                                       presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
+                    
+                    out <- bind_cols(analysis_id = 1:nrow(out), out)
+                    out <- convert_ma(ma_obj = out, ma_methods = "bb", ma_metric = "d_as_d")
                }else{
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "r", ma_type = "bb", ma_fun = .ma_r_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
@@ -1367,22 +1337,21 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
                }
 
-               if(!is.null(construct_y)) out$barebones$meta_table <- cbind(Construct_Y = construct_y[i][1], out$barebones$meta_table)
-               if(!is.null(construct_x)) out$barebones$meta_table <- cbind(Construct_X = construct_x[i][1], out$barebones$meta_table)
+               if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
+               if(!is.null(construct_x)) out <- bind_cols(construct_x = rep(construct_x[i][1], nrow(out)), out)
 
+               # out$barebones$messages <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
+               # out$barebones <- append(list(call = call, inputs = inputs), out)
+               # out <- append(list(call_history = list(call)), out)
 
-               out$barebones$messages <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-               out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
-               out <- append(list(call_history = list(call)), out)
-
-               if(es_d & treat_as_d){
-                    ## If the bare-bones meta-analysis was computed for d values, convert to the r metric before applying the artifact-distribution model
-                    class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
-                    if(es_d & treat_as_d) out <- convert_ma(ma_obj = out)
-               }else{
-                    class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
-               }
-
+               # if(es_d & treat_as_d){
+               #      ## If the bare-bones meta-analysis was computed for d values, convert to the r metric before applying the artifact-distribution model
+               #      class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
+               #      if(es_d & treat_as_d) out <- convert_ma(ma_obj = out)
+               # }else{
+               #      class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
+               # }
+               
                .construct_x <- as.character(data$construct_x[1])
                .construct_y <- as.character(data$construct_y[1])
                if(!all(data$correct_rxx[1] == data$correct_rxx))
@@ -1402,13 +1371,29 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                if(!all(data$sign_ryz[1] == data$sign_ryz))
                     stop("Inconsistent sign_ryz values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the sign_rz argument", call. = FALSE)
 
-               out <- .ma_r_ad(ma_r_obj = out, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
-                               correction_method = correction_method[.construct_x, .construct_y],
-                               correct_rxx = data$correct_rxx[1], correct_ryy = data$correct_ryy[1],
-                               correct_rr_x = data$correct_rr_x[1], correct_rr_y = data$correct_rr_y[1],
-                               indirect_rr_x = data$indirect_rr_x[1], indirect_rr_y = data$indirect_rr_y[1],
-                               residual_ads = residual_ads, sign_rxz = data$sign_rxz[1], sign_ryz = data$sign_ryz[1], decimals = decimals)
-
+               .out <- list()
+               for(i in 1:nrow(out))
+                    .out[[i]] <- .ma_r_ad(ma_r_obj = list(meta = out$meta_tables[[1]], inputs = inputs), ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
+                                          correction_method = correction_method[.construct_x, .construct_y],
+                                          correct_rxx = data$correct_rxx[1], correct_ryy = data$correct_ryy[1],
+                                          correct_rr_x = data$correct_rr_x[1], correct_rr_y = data$correct_rr_y[1],
+                                          indirect_rr_x = data$indirect_rr_x[1], indirect_rr_y = data$indirect_rr_y[1],
+                                          residual_ads = residual_ads, sign_rxz = data$sign_rxz[1], sign_ryz = data$sign_ryz[1], decimals = decimals)
+               
+               attributes(out)$ma_methods <- NULL
+               attributes(out)$ma_metric <- NULL
+               attributes(out)$inputs <- NULL
+               
+               out$meta_tables <- .out
+               out$ad <- rep(list(list(ic = NULL, ad = NULL)))
+               
+               for(i in 1:nrow(out)){
+                    out$ad[[i]] <- list(ic = out$ad[[i]]$ic, 
+                                           ad = out$meta_tables[[i]]$artifact_distributions)
+                    out$meta_tables[[i]]$artifact_distributions <- NULL
+                    out$meta_tables[[i]] <- out$meta_tables[[i]]$meta
+               }
+               
                if(es_d){
                     ad_method <- out$artifact_distribution$method_details["ad_method"]
                     rr_method <- out$artifact_distribution$method_details["range_restriction"]
@@ -1485,55 +1470,44 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
                out
           })
-
-          bb_metas <- lapply(ma_list, function(x) x$barebones$meta_table)
-          ts_metas <- lapply(ma_list, function(x) x$artifact_distribution$true_score)
-          vgx_metas <- lapply(ma_list, function(x) x$artifact_distribution$validity_generalization_x)
-          vgy_metas <- lapply(ma_list, function(x) x$artifact_distribution$validity_generalization_y)
-
-          bb_meta_mat <- ts_meta_mat <- vgx_meta_mat <- vgy_meta_mat <- NULL
-          for(i in 1:length(bb_metas)){
-               bb_meta_mat <- rbind(bb_meta_mat, cbind(Pair_ID = i, bb_metas[[i]]))
-               if(!is.null(ts_metas[[i]])) ts_meta_mat <- rbind(ts_meta_mat, cbind(Pair_ID = i, ts_metas[[i]]))
-               if(!is.null(vgx_metas[[i]])) vgx_meta_mat <- rbind(vgx_meta_mat, cbind(Pair_ID = i, vgx_metas[[i]]))
-               if(!is.null(vgy_metas[[i]])) vgy_meta_mat <- rbind(vgy_meta_mat, cbind(Pair_ID = i, vgy_metas[[i]]))
-          }
-
-          table_list <- list(barebones = bb_meta_mat,
-                             individual_correction = NULL,
-                             artifact_distribution = list(true_score = ts_meta_mat,
-                                                          validity_generalization_x = vgx_meta_mat,
-                                                          validity_generalization_y = vgy_meta_mat))
+          
+          out <- as_tibble(data.table::rbindlist(out))
      }
-
-     if(length(ma_list) > 1){
-          names(ma_list) <- paste0("Pair ID = ", 1:length(ma_list), ": ",  names(ma_list))
-
-          out <- list(call_history = list(call), inputs = inputs,
-                      grand_tables = table_list,
-                      construct_pairs = ma_list,
-                      messages = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()))
-
-          if(es_d & treat_as_d){
-               if(ma_method != "bb"){
-                    class(out) <- c("psychmeta", "ma_d_as_r", "ma_master", "ma_bb", paste0("ma_", ma_method))
-               }else{
-                    class(out) <- c("psychmeta", "ma_d_as_d", "ma_master", "ma_bb")
-               }
+     
+     if(ma_method == "bb"){
+          ma_methods = "bb"
+     }else if(ma_method == "ic"){
+          ma_methods = c("bb", "ic")
+     }else if(ma_method == "ad"){
+          ma_methods = c("bb", "ad")
+     }
+     
+     if(es_d & treat_as_d){
+          if(ma_method != "bb"){
+               ma_metric <- "d_as_r"
           }else{
-               if(ma_method != "bb"){
-                    class(out) <- c("psychmeta", "ma_r_as_r", "ma_master", "ma_bb", paste0("ma_", ma_method))
-               }else{
-                    class(out) <- c("psychmeta", "ma_r_as_r", "ma_master", "ma_bb")
-               }
+               ma_metric <- "d_as_d"
           }
      }else{
-          out <- ma_list[[1]]
-          out$call_history[[1]] <- call
-          warn_obj <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-          if(is.null(out$messages$warnings) | !is.null(out$messages)) out$messages$warnings <- rbind(out$messages$warnings, warn_obj)
+          if(ma_method != "bb"){
+               ma_metric <- "r_as_r"
+          }else{
+               ma_metric <- "r_as_r"
+          }
      }
+     
+     attributes(out) <- append(attributes(out), list(call_history = list(call), inputs = inputs))
+     out$analysis_id <- NULL
+     out <- bind_cols(analysis_id = 1:nrow(out), out)
+     attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                     inputs = inputs,
+                                                     ma_methods = ma_methods, 
+                                                     default_print = ma_method,
+                                                     ma_metric = ma_metric, 
+                                                     warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())))
 
+     class(out) <- c("ma_r", class(out))
+     
      return(out)
 }
 

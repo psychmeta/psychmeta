@@ -95,10 +95,10 @@
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -118,10 +118,10 @@
 #' Components of output tables for individual-correction meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -149,10 +149,10 @@
 #' Components of output tables for artifact-distribution meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -197,6 +197,7 @@
 #' Manuscript submitted for review.
 #'
 #' @examples
+#' \dontrun{
 #' ## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:
 #' ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 #'
@@ -209,6 +210,7 @@
 #' ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
 #'      ryy = ryyi, correct_rr_y = FALSE,
 #'      construct_y = construct, data = data_d_meas_multi)
+#' }
 ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  treat_as_d = TRUE, ma_method = "bb", ad_type = "tsa", correction_method = "auto",
                  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
@@ -506,15 +508,17 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa,
                  partial_intercor = partial_intercor, estimate_pa = estimate_pa)
 
-     out$call_history <- append(list(call), out$call_history)
+     attributes(out)$call_history <- list(call)
      if(ma_method != "bb"){
           if(treat_as_d){
-               class(out)[2] <- "ma_d_as_r"
+               attributes(out)$ma_metric <- "d_as_r"
           }else{
-               class(out)[2] <- "ma_r_as_r"
+               attributes(out)$ma_metric <- "r_as_r"
           }
           out <- convert_ma(ma_obj = out)
      }
 
+     class(out) <- gsub(x = class(out), pattern = "ma_r", replacement = "ma_d")
+     
      return(out)
 }

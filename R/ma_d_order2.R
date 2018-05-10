@@ -243,9 +243,12 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
           out_ad <- NULL
      }
 
-     list(barebones = out_bb,
-          individual_correction = out_ic,
-          artifact_distribution = out_ad)
+     list(meta = list(barebones = out_bb$meta, 
+                      individual_correction = out_ic$meta, 
+                      artifact_distribution = out_ad$meta),
+          escalc = list(barebones = out_bb$escalc, 
+                        individual_correction = out_ic$escalc, 
+                        artifact_distribution = out_ad$escalc))
 }
 
 

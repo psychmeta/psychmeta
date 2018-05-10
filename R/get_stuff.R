@@ -621,3 +621,49 @@ get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "c
      class(out) <- c("psychmeta", "get_plots")
      out
 }
+
+compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_type = c("ts", "vgx", "vgy")){
+     ma_method <- match.arg(arg = ma_method, choices = c("bb", "ic", "ad"))
+     correction_type <- match.arg(arg = correction_type, choices = c("ts", "vgx", "vgy"))
+     ma_metric <- attributes(ma_obj)$ma_metric
+     
+     if(ma_method %in% attributes(ma_obj)$ma_methods)
+          ma_method <- "bb"
+     
+     if(ma_method == "bb"){
+          correction_type <- NULL
+          out <- bind_cols(ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)], bind_rows(map(ma_obj$meta_tables, function(x) x$barebones)))
+     }else if(ma_method == "ic" | ma_method == "ad"){
+          if(ma_method == "ic"){
+               ma_label <- "individual_correction"
+          }else{
+               ma_label <- "artifact_distribution"
+          }
+          if(ma_metric == "r_order2" | ma_metric == "d_order2"){
+               out <- bind_cols(ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)], bind_rows(map(ma_obj$meta_tables, function(x) x[[ma_label]])))
+          }else{
+               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                    ts_label <- "true_score"
+                    vgx_label <- "validity_generalization_x"
+                    vgy_label <- "validity_generalization_y"
+               }else{
+                    ts_label <- "latentGroup_latentY"
+                    vgx_label <- "observedGroup_latentY"
+                    vgy_label <- "latentGroup_observedY"
+               }
+               if(correction_type == "ts"){
+                    out <- bind_cols(ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)], bind_rows(map(ma_obj$meta_tables, function(x) x[[ma_label]][[ts_label]])))
+               }else if(correction_type == "vgx"){
+                    out <- bind_cols(ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)], bind_rows(map(ma_obj$meta_tables, function(x) x[[ma_label]][[vgx_label]])))
+               }else{
+                    out <- bind_cols(ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)], bind_rows(map(ma_obj$meta_tables, function(x) x[[ma_label]][[vgy_label]])))
+               }  
+          }
+          
+     }
+     attributes(out) <- append(attributes(out), list(ma_method = ma_method, 
+                                                     correction_type = correction_type, 
+                                                     ma_metric = attributes(out)$ma_metric))
+     class(out) <- c("ma_table", class(out))
+     out
+}

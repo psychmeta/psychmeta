@@ -36,10 +36,10 @@
 #' var_e <- 1 / n
 #' ma_generic(es = es, n = n, var_e = var_e)
 ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type = "sample_size",
-                         conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-                         moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
-     warn_obj1 <- record_warnings()
+                       conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
+                       moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
      call <- match.call()
+     warn_obj1 <- record_warnings()
 
      if(hs_override){
           wt_type <- "sample_size"
@@ -109,8 +109,10 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type =
 
      additional_args <- list(...)
 
-     inputs <- list(wt_type = wt_type, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method,
-                    var_unbiased = var_unbiased, cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
+     inputs <- list(wt_type = wt_type, 
+                    conf_level = conf_level, cred_level = cred_level, 
+                    conf_method = conf_method, cred_method = cred_method,
+                    var_unbiased = var_unbiased)
 
      es_data <- data.frame(es = es, n = n, var_e = var_e)
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
@@ -124,13 +126,16 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type =
                                           conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
                        presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
-     out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
-     out <- append(list(call_history = list(call)), out)
-
-     out$barebones$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                                    fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0, na.rm = TRUE)))
-
-     class(out) <- c("psychmeta", "ma_generic", "ma_bb")
+     
+     out <- bind_cols(analysis_id = 1:nrow(out), out)
+     attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                     inputs = inputs, 
+                                                     ma_methods = "bb",
+                                                     ma_metric = "generic", 
+                                                     warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
+                                                     fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
+     
+     # class(out) <- c("psychmeta", "ma_generic", "ma_bb")
      return(out)
 }
 
@@ -223,7 +228,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type =
      ci <- setNames(c(ci), colnames(ci))
      cv <- setNames(c(cv), colnames(cv))
 
-     list(barebones = list(meta = data.frame(t(c(k = k,
+     list(meta = list(barebones = data.frame(t(c(k = k,
                                                  N = N,
                                                  mean_es = mean_es,
                                                  var_es = var_es,
@@ -233,8 +238,9 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type =
                                                  se_es = se_es,
                                                  sd_e = sd_e,
                                                  sd_res = sd_res,
-                                                 ci, cv))),
-                           data = escalc_obj))
+                                                 ci, cv)))),
+          escalc = list(barebones = escalc_obj))
+
 }
 
 
@@ -250,7 +256,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type =
 .ma_generic_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_generic(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)
-     unlist(out$barebones$meta)
+     unlist(out$meta$barebones)
 }
 
 

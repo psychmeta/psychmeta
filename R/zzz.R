@@ -1,13 +1,13 @@
 ## Global variables to be called from data frames with known variables names:
 globalVariables(c(".", "Value",                                  ## Global variables defined for the create_ad function
-                  "Analysis_ID",                                 ## Global variable defined for the organize_moderators function
+                  "Analysis_ID", "analysis_id",                  ## Global variable defined for the organize_moderators function
                   "vi", "yi",                                    ## Global variables defined for the create_ad function
                   "mean_r", "sd_res", "rtpa", "rxpa", "rtya",    ## Global variables defined for the .ma_r_ic function
                   "rxy",                                         ## Global variables defined for the .ma_r_bb function
                   "d", "n_1", "n_2", "n_1_split", "n_2_split",   ## Global variables defined for the .ma_d_bb function
                   "difference", "construct_x", "construct_y",
                   "group", "y_name", "na.pass",
-                  "cite", "k", "lowerci", "tester", "upperci",
+                  "cite", "k", "lowerci", "tester", "upperci", 
                   "Construct_X", "Construct_Y"))
 
 
@@ -16,7 +16,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
 .onAttach <- function(libname, pkgname) {
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage("This is ", paste(pkgname, "version", version))
-    packageStartupMessage("Please report any bugs to: \nhttps://github.com/jadahlke/psychmeta/issues or issues@psychmeta.com \n")
+    packageStartupMessage("Please report any bugs to: \ngithub.com/psychmeta/psychmeta/issues or issues@psychmeta.com \n")
     packageStartupMessage("We work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \nDahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for \n   psychometric meta-analysis. Applied Psychological Measurement.")
 
     ## Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.

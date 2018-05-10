@@ -124,9 +124,12 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 
      additional_args <- list(...)
 
-     inputs <- list(wt_type = wt_type, error_type = error_type,
-                    correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method,
-                    var_unbiased = var_unbiased, moderators = moderators, cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
+     as_worker <- additional_args$as_worker
+     if(is.null(as_worker)) as_worker <- FALSE
+     
+     inputs <- list(wt_type = wt_type, error_type = error_type, correct_bias = correct_bias, 
+                    conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, 
+                    var_unbiased = var_unbiased)
 
      es_data <- data.frame(d = d, n1 = n1, n2 = n2)
      es_data$n_adj <- n_adj
@@ -142,13 +145,19 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                        presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
 
-     out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
-     out <- append(list(call_history = list(call)), out)
-
-     out$barebones$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                                    fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0, na.rm = TRUE)))
-
-     class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
+     if(!as_worker){
+          out <- bind_cols(analysis_id = 1:nrow(out), out)
+          attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                          inputs = inputs, 
+                                                          ma_methods = "bb",
+                                                          ma_metric = "d_as_d", 
+                                                          default_print = "bb",
+                                                          warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
+                                                          fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
+     }
+     
+     class(out) <- c("ma_d", class(out))
+     
      return(out)
 }
 
@@ -298,7 +307,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      cv <- setNames(c(cv), colnames(cv))
 
      ## Compile results
-     list(barebones = list(meta = as.data.frame(t(c(k = k,
+     list(meta = list(barebones = as.data.frame(t(c(k = k,
                                                     N = N,
                                                     mean_d = mean_d,
                                                     var_d = var_d,
@@ -308,8 +317,13 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                                                     se_d = se_d,
                                                     sd_e = var_e^.5,
                                                     sd_res = sd_res,
-                                                    ci, cv))),
-                           data = escalc_obj))
+                                                    ci, cv))), 
+                      individual_correction = NULL, 
+                      artifact_distribution = NULL),
+          escalc = list(barebones = escalc_obj, 
+                        individual_correction = NULL, 
+                        artifact_distribution = NULL))
+                      
 }
 
 
@@ -325,7 +339,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 .ma_d_bb_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_d_bb(data = data, ma_arg_list = ma_arg_list, run_lean = TRUE)
-     unlist(out$barebones$meta)
+     unlist(out$meta$barebones)
 }
 
 

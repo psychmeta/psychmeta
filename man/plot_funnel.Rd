@@ -33,6 +33,7 @@ A list of funnel plots.
 Create funnel plots
 }
 \examples{
+\dontrun{
 ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
                moderators = moderator, data = data_r_meas_multi,
@@ -41,4 +42,5 @@ plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1))
 plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 2))
 plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 plot_funnel(ma_obj = ma_obj$construct_pairs[[1]])
+}
 }
