@@ -8,7 +8,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
                   "difference", "construct_x", "construct_y",
                   "group", "y_name", "na.pass",
                   "cite", "k", "lowerci", "tester", "upperci", 
-                  "Construct_X", "Construct_Y"))
+                  "Construct_X", "Construct_Y", "x"))
 
 
 

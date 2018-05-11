@@ -347,7 +347,8 @@ gather_ma_ad <- function(x){
      
      warn_obj1 <- record_warnings()
      # inputs <- as.list(environment())
-     inputs <- list(correction_method = correction_method, use_ic_ads = use_ic_ads,
+     inputs <- list(ma_r_obj = ma_r_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
+                    correction_method = correction_method, use_ic_ads = use_ic_ads,
                     correct_rxx = correct_rxx, correct_ryy = correct_ryy,
                     correct_rr_x = correct_rr_x, correct_rr_y = correct_rr_y,
                     indirect_rr_x = indirect_rr_x, indirect_rr_y = indirect_rr_y,
@@ -739,7 +740,8 @@ gather_ma_ad <- function(x){
                ma_r_obj$meta$artifact_distribution <- list(true_score = out$true_score, 
                                                            validity_generalization_x = out$validity_generalization_x, 
                                                            validity_generalization_y = out$validity_generalization_y)
-               attributes(ma_r_obj$meta$artifact_distribution) <- append(attributes(ma_r_obj$meta$artifact_distribution), list(method_details = out$method_details))
+               attributes(ma_r_obj$meta$artifact_distribution) <- append(attributes(ma_r_obj$meta$artifact_distribution), 
+                                                                         list(method_details = out$method_details, inputs = inputs))
                ma_r_obj$artifact_distributions <- out$artifact_distributions
                rm(out)
                
@@ -774,16 +776,16 @@ gather_ma_ad <- function(x){
 .ma_r_ad_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      
-     out_bb <- .ma_r_bb(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)$barebones$meta
+     out_bb <- .ma_r_bb(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)$meta$barebones
      ma_ad_dump <- ma_arg_list$ma_ad_dump
      ma_ad_dump$barebones <- out_bb
      
      .ma_r_ad_internal <- function(x) UseMethod(generic = "ma_r_ad", object = x)
      out <- gather_ma_ad(.ma_r_ad_internal(x = ma_ad_dump))
      
-     out_ts <- out$true_score[,-1]
-     out_vgx <- out$validity_generalization_x[,-1]
-     out_vgy <- out$validity_generalization_y[,-1]
+     out_ts <- out$true_score
+     out_vgx <- out$validity_generalization_x
+     out_vgy <- out$validity_generalization_y
      
      if(!is.null(ma_arg_list$convert_ma)){
           if(ma_arg_list$convert_ma){

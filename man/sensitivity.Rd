@@ -54,7 +54,6 @@ Wrapper function to compute bootstrap analyses, leave-one-out analyses, and cumu
 This function helps researchers to examine the stability/fragility of their meta-analytic results with bootstrapping and leave-one-out analyses, as well as detect initial evidence of publication bias with cumulative meta-analyses.
 }
 \examples{
-\dontrun{
 ## Run a meta-analysis using simulated UVIRR data:
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
 correct_rr_y = FALSE, data = data_r_uvirr)
@@ -65,14 +64,13 @@ ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10, cumulative = TRUE,
 boot_ci_type = "norm", sort_method = "inv_var")
 
 ## Examine the tables and plots produced for the IC meta-analysis:
-ma_obj$follow_up_analyses$bootstrap$barebones$`Analysis ID = 1`
-ma_obj$follow_up_analyses$bootstrap$individual_correction$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$leave1out$individual_correction$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$cumulative$individual_correction$true_score$`Analysis ID = 1`
+ma_obj$bootstrap[[1]]$barebones
+ma_obj$bootstrap[[1]]$individual_correction$true_score
+ma_obj$leave1out[[1]]$individual_correction$true_score
+ma_obj$cumulative[[1]]$individual_correction$true_score
 
 ## Examine the tables and plots produced for the AD meta-analysis:
-ma_obj$follow_up_analyses$bootstrap$artifact_distribution$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$leave1out$artifact_distribution$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$cumulative$artifact_distribution$true_score$`Analysis ID = 1`
-}
+ma_obj$bootstrap[[1]]$artifact_distribution$true_score
+ma_obj$leave1out[[1]]$artifact_distribution$true_score
+ma_obj$cumulative[[1]]$artifact_distribution$true_score
 }

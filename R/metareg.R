@@ -16,45 +16,39 @@
 #' @keywords regression
 #'
 #' @examples
-#' \dontrun{
 #' ## Meta-analyze the data from Gonzalez-Mule et al. (2014)
 #' ## Note: These are corrected data and we have confirmed with the author that
 #' ## these results are accurate:
 #' ma_obj <- ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
-#'         rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
-#'         correct_rr_x = TRUE, moderators = Complexity)
+#'                   rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
+#'                   correct_rr_x = TRUE, moderators = Complexity)
 #'
 #' ## Pass the meta-analysis object to the meta-regression function:
 #' ma_obj <- metareg(ma_obj)
 #'
 #' ## Examine the meta-regression results for the bare-bones and corrected data:
-#' ma_obj$follow_up_analyses$metareg$barebones$`Main Effects`
-#' ma_obj$follow_up_analyses$metareg$individual_correction$true_score$`Main Effects`
-#' }
+#' ma_obj$metareg[[1]]$barebones$`Main Effects`
+#' ma_obj$metareg[[1]]$individual_correction$true_score$`Main Effects`
 metareg <- function(ma_obj, formula_list = NULL, ...){
      es_type <- NULL
-     class_ma <- class(ma_obj)
-
+     ma_methods <- attributes(ma_obj)$ma_methods
+     ma_metric <- attributes(ma_obj)$ma_metric
+     
      max_interaction <- list(...)$max_interaction
      if(is.null(max_interaction)) max_interaction <- 1
 
-     if(any(class_ma == "ma_r_as_r" | class_ma == "ma_d_as_r")) es_type <- "r"
-     if(any(class_ma == "ma_d_as_d" | class_ma == "ma_r_as_d")) es_type <- "d"
+     if(any(ma_metric == "generic")) es_type <- "es"
+     if(any(ma_metric == "r_as_r" | ma_metric == "d_as_r")) es_type <- "r"
+     if(any(ma_metric == "d_as_d" | ma_metric == "r_as_d")) es_type <- "d"
      if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)
 
-     if(any(class_ma == "ma_master")){
-          ma_list <- ma_obj$construct_pairs
-     }else{
-          ma_list <- list(ma_obj)
-     }
+     out_list <- apply(ma_obj[ma_obj$analysis_type == "Overall",], 1, function(ma_obj_i){
 
-     ma_obj_i <- ma_obj
-     ma_list <- lapply(ma_list, function(ma_obj_i){
-          if(is.null(ma_obj_i$follow_up_analyses)) ma_obj_i$follow_up_analyses <- list()
-
+          escalc <- ma_obj_i$escalc
+          
           moderator_matrix <- ma_obj_i$moderator_info$moderator_matrix
           cat_moderator_matrix <- ma_obj_i$moderator_info$cat_moderator_matrix
-          es_data <- ma_obj_i$barebones$escalc_list$`Analysis ID = 1`
+          es_data <- ma_obj_i$moderator_info$data$barebones
 
           moderator_names <- colnames(moderator_matrix)
           if(!is.null(moderator_matrix)){
@@ -75,23 +69,23 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                     }
                }
 
-               if("ma_bb" %in% class_ma){
-                    data_bb <- data.frame(moderator_matrix, ma_obj_i$barebones$escalc_list$`Analysis ID = 1`)
+               if("bb" %in% ma_methods){
+                    data_bb <- data.frame(moderator_matrix, escalc$barebones)
                     metareg_bb <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_bb))
                }else{
                     metareg_bb <- NULL
                }
 
-               if("ma_ic" %in% class_ma){
+               if("ic" %in% ma_methods){
                     if(es_type == "r"){
-                         data_ts <- data.frame(moderator_matrix, ma_obj_i$individual_correction$true_score$escalc_list$`Analysis ID = 1`)
-                         data_vgx <- data.frame(moderator_matrix, ma_obj_i$individual_correction$validity_generalization_x$escalc_list$`Analysis ID = 1`)
-                         data_vgy <- data.frame(moderator_matrix, ma_obj_i$individual_correction$validity_generalization_y$escalc_list$`Analysis ID = 1`)
+                         data_ts <- data.frame(moderator_matrix, escalc$individual_correction$true_score)
+                         data_vgx <- data.frame(moderator_matrix, escalc$individual_correction$validity_generalization_x)
+                         data_vgy <- data.frame(moderator_matrix, escalc$individual_correction$validity_generalization_y)
                     }
                     if(es_type == "d"){
-                         data_ts <- data.frame(moderator_matrix, ma_obj_i$individual_correction$latentGroup_latentY$escalc_list$`Analysis ID = 1`)
-                         data_vgx <- data.frame(moderator_matrix, ma_obj_i$individual_correction$observedGroup_latentY$escalc_list$`Analysis ID = 1`)
-                         data_vgy <- data.frame(moderator_matrix, ma_obj_i$individual_correction$latentGroup_observedY$escalc_list$`Analysis ID = 1`)
+                         data_ts <- data.frame(moderator_matrix, escalc$individual_correction$latentGroup_latentY)
+                         data_vgx <- data.frame(moderator_matrix, escalc$individual_correction$observedGroup_latentY)
+                         data_vgy <- data.frame(moderator_matrix, escalc$individual_correction$latentGroup_observedY)
                     }
 
                     metareg_ts <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_ts))
@@ -104,21 +98,17 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                metareg_bb <- metareg_ts <- metareg_vgx <- metareg_vgy <- NULL
           }
 
-          ma_obj_i$follow_up_analyses$metareg <- list(barebones = metareg_bb,
-                                                      individual_correction = list(true_score = metareg_ts,
-                                                                                   validity_generalization_x = metareg_vgx,
-                                                                                   validity_generalization_y = metareg_vgy))
-          ma_obj_i
+          list(barebones = metareg_bb,
+               individual_correction = list(true_score = metareg_ts,
+                                            validity_generalization_x = metareg_vgx,
+                                            validity_generalization_y = metareg_vgy))
      })
 
-     if(any(class(ma_obj) == "ma_master")){
-          ma_obj$construct_pairs <- ma_list
-     }else{
-          ma_obj <- ma_list[[1]]
-     }
-
-     ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
-
+     .out_list <- rep(list(NULL), nrow(ma_obj))
+     .out_list[ma_obj$analysis_type == "Overall"] <- out_list
+     ma_obj$metareg <- .out_list
+     
+     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      message("Meta-regressions have been added to 'ma_obj' - use get_metareg() to retrieve them.")
 
      ma_obj

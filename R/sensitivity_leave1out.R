@@ -1,27 +1,22 @@
 #' @name sensitivity
 #' @rdname sensitivity
 sensitivity_leave1out <- function(ma_obj, ...){
+     es_type <- NULL
+     ma_methods <- attributes(ma_obj)$ma_methods
+     ma_metric <- attributes(ma_obj)$ma_metric
      
-     class_ma <- class(ma_obj)
-     
-     if(any(class_ma == "ma_generic")) es_type <- "es"
-     if(any(class_ma == "ma_r_as_r" | class_ma == "ma_r_as_d")) es_type <- "r"
-     if(any(class_ma == "ma_d_as_d" | class_ma == "ma_d_as_r")) es_type <- "d"
+     if(any(ma_metric == "generic")) es_type <- "es"
+     if(any(ma_metric == "r_as_r" | ma_metric == "r_as_d")) es_type <- "r"
+     if(any(ma_metric == "d_as_d" | ma_metric == "d_as_r")) es_type <- "d"
      
      if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)
      
-     d_metric <- ifelse(any((class_ma == "ma_d_as_d" & (any(class_ma == "ma_ic") | any(class_ma == "ma_ad"))) | class_ma == "ma_r_as_d"), TRUE, FALSE)
+     d_metric <- ifelse(any((ma_metric == "d_as_d" & (any(ma_methods == "ic") | any(ma_methods == "ad"))) | ma_metric == "r_as_d"), TRUE, FALSE)
      if(d_metric){
           ma_obj <- convert_ma(ma_obj)
           convert_back <- TRUE
      }else{
           convert_back <- FALSE
-     }
-     
-     if(any(class(ma_obj) == "ma_master")){
-          ma_list <- ma_obj$construct_pairs
-     }else{
-          ma_list <- list(ma_obj)
      }
      
      additional_args <- list(...)
@@ -31,57 +26,56 @@ sensitivity_leave1out <- function(ma_obj, ...){
           record_call <- TRUE
      }
      
-     progbar <- progress::progress_bar$new(format = " Computing leave-one-out meta-analyses [:bar] :percent est. time remaining: :eta",
-                                           total = sum(unlist(lapply(ma_list, function(x){nrow(x$barebones$meta_table)}))),
+     inputs <- ma_arg_list <- attributes(ma_obj)$inputs
+     
+     progbar <- progress::progress_bar$new(format = " Computing leave-1-out meta-analyses [:bar] :percent est. time remaining: :eta",
+                                           total = nrow(ma_obj),
                                            clear = FALSE, width = options()$width)
-     ma_list <- lapply(ma_list, function(ma_obj_i){
+     out_list <- apply(ma_obj, 1, function(ma_obj_i){
+          progbar$tick()
           
-          if(any(class(ma_obj_i) == "ma_ic")){
-               ma_arg_list <- ma_obj_i$individual_correction$inputs
-          }else{
-               ma_arg_list <- ma_obj_i$barebones$inputs
-          }
+          escalc <- ma_obj_i$escalc
+          meta_tables <- ma_obj_i$meta_tables
           
-          k_analyses <- nrow(ma_obj_i$barebones$meta_table)
           if(es_type == "es"){
-               sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
-               yi <-   lapply(ma_obj_i$barebones$escalc_list, function(x) x$yi)
-               n <-     lapply(ma_obj_i$barebones$escalc_list, function(x) x$n)
-               vi_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
-               wt_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
+               sample_id <- escalc$barebones$sample_id
+               yi <-    escalc$barebones$yi
+               n <-     escalc$barebones$n
+               vi_xy <- escalc$barebones$vi
+               wt_xy <- escalc$barebones$weight
           }
           
           if(es_type == "r"){
-               sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
-               rxy <-   lapply(ma_obj_i$barebones$escalc_list, function(x) x$rxy)
-               n <-     lapply(ma_obj_i$barebones$escalc_list, function(x) x$n)
-               n_adj <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n_adj)
-               vi_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
-               wt_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
-               
+               sample_id <- escalc$barebones$sample_id
+               rxy <-   escalc$barebones$rxy
+               n <-     escalc$barebones$n
+               n_adj <- escalc$barebones$n_adj
+               vi_xy <- escalc$barebones$vi
+               wt_xy <- escalc$barebones$weight
+          
                ts_label <- "true_score"
                vgx_label <- "validity_generalization_x"
                vgy_label <- "validity_generalization_y"
           }
           
           if(es_type == "d"){
-               sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
-               d <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$d)
-               n1 <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n1)
-               n2 <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n2)
-               n_adj <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n_adj)
-               vi <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
-               wt <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
-               pi <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$pi)
-               n <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n)
-               
-               if(any(class_ma == "ma_ic" | class_ma == "ma_ad")){
-                    sample_id <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$sample_id)
-                    rxy <-   lapply(ma_obj_i$barebones$escalc_list, function(x) x$yi)
-                    n <-     lapply(ma_obj_i$barebones$escalc_list, function(x) x$n1 + x$n2)
-                    n_adj <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$n_adj)
-                    vi_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$vi)
-                    wt_xy <- lapply(ma_obj_i$barebones$escalc_list, function(x) x$weight)
+               sample_id <- escalc$barebones$sample_id
+               d <- escalc$barebones$d
+               n1 <- escalc$barebones$n1
+               n2 <- escalc$barebones$n2
+               n_adj <- escalc$barebones$n_adj
+               vi <- escalc$barebones$vi
+               wt <- escalc$barebones$weight
+               pi <- escalc$barebones$pi
+               n <- escalc$barebones$n
+          
+               if(any(ma_methods == "ic" | ma_methods == "ad")){
+                    sample_id <- escalc$barebones$sample_id
+                    rxy <-   escalc$barebones$yi
+                    n <-     escalc$barebones$n1 + x$n2
+                    n_adj <- escalc$barebones$n_adj
+                    vi_xy <- escalc$barebones$vi
+                    wt_xy <- escalc$barebones$weight
                }
                
                ts_label <- "latentGroup_latentY"
@@ -89,25 +83,25 @@ sensitivity_leave1out <- function(ma_obj, ...){
                vgy_label <- "latentGroup_observedY"
           }
           
-          if(any(class_ma == "ma_ic")){
-               rtpa <- lapply(ma_obj_i$individual_correction$true_score$escalc_list, function(x) x$yi)
-               rxpa <- lapply(ma_obj_i$individual_correction$validity_generalization_x$escalc_list, function(x) x$yi)
-               rtya <- lapply(ma_obj_i$individual_correction$validity_generalization_y$escalc_list, function(x) x$yi)
+          if(any(ma_methods == "ic")){
+               rtpa <- escalc$individual_correction$true_score$yi
+               rxpa <- escalc$individual_correction$validity_generalization_x$yi
+               rtya <- escalc$individual_correction$validity_generalization_y$yi
                
-               vi_tp <- lapply(ma_obj_i$individual_correction$true_score$escalc_list, function(x) x$vi)
-               vi_xp <- lapply(ma_obj_i$individual_correction$validity_generalization_x$escalc_list, function(x) x$vi)
-               vi_ty <- lapply(ma_obj_i$individual_correction$validity_generalization_y$escalc_list, function(x) x$vi)
+               vi_tp <- escalc$individual_correction$true_score$vi
+               vi_xp <- escalc$individual_correction$validity_generalization_x$vi
+               vi_ty <- escalc$individual_correction$validity_generalization_y$vi
                
-               A_tp <- lapply(ma_obj_i$individual_correction$true_score$escalc_list, function(x) x$A)
-               A_xp <- lapply(ma_obj_i$individual_correction$validity_generalization_x$escalc_list, function(x) x$A)
-               A_ty <- lapply(ma_obj_i$individual_correction$validity_generalization_y$escalc_list, function(x) x$A)
+               A_tp <- escalc$individual_correction$true_score$A
+               A_xp <- escalc$individual_correction$validity_generalization_x$A
+               A_ty <- escalc$individual_correction$validity_generalization_y$A
                
-               wt_tp <- lapply(ma_obj_i$individual_correction$true_score$escalc_list, function(x) x$weight)
-               wt_xp <- lapply(ma_obj_i$individual_correction$validity_generalization_x$escalc_list, function(x) x$weight)
-               wt_ty <- lapply(ma_obj_i$individual_correction$validity_generalization_y$escalc_list, function(x) x$weight)
+               wt_tp <- escalc$individual_correction$true_score$weight
+               wt_xp <- escalc$individual_correction$validity_generalization_x$weight
+               wt_ty <- escalc$individual_correction$validity_generalization_y$weight
                
-               a <- lapply(ma_obj_i$individual_correction$true_score$escalc_list, function(x) x$a)
-               correction_type <- lapply(ma_obj_i$individual_correction$true_score$escalc_list, function(x) x$correction_type)
+               a <- escalc$individual_correction$true_score$a
+               correction_type <- escalc$individual_correction$true_score$correction_type
           }
           
           if(d_metric){
@@ -116,267 +110,273 @@ sensitivity_leave1out <- function(ma_obj, ...){
                vgy_label <- "latentGroup_observedY"
           }
           
-          list_null <- list()
-          for(i in 1:k_analyses){
-               list_null_i <- list(id = NULL)
-               names(list_null_i) <- paste0("Analysis ID = ", i)
-               list_null <- append(list_null, list_null_i)
-          }
-          
           out_list <- list(barebones = NULL,
-                           artifact_distribution = NULL,
-                           individual_correction = NULL)
-          plot_list <- out_list
+                           individual_correction = NULL,
+                           artifact_distribution = NULL)
           
-          if("ma_bb" %in% class_ma) out_list$barebones <- list()
-          if("ma_ad" %in% class_ma) out_list$barebones <- list()
-          if("ma_ic" %in% class_ma) out_list$barebones <- list()
-          
-          if(any(class_ma == "ma_ic")){
-               ma_arg_list <- ma_obj_i$individual_correction$inputs
+          if(!is.null(escalc$barebones$pi)){
+               p <- wt_mean(x = escalc$barebones$pi, wt = escalc$barebones$n_adj)
           }else{
-               ma_arg_list <- ma_obj_i$barebones$inputs
+               p <- .5
+          }
+          conf_level <- inputs$conf_level
+          cred_level <- inputs$cred_level
+          conf_method <- inputs$conf_method
+          cred_method <- inputs$cred_method
+          
+          if(es_type == "es"){
+               es_data <- data.frame(yi = yi,
+                                     n = n)
+               es_data$vi <- vi_xy
+               es_data$weight <- wt_xy
+               if(!is.null(sample_id)) es_data <- add_column(es_data, sample_id = sample_id, .before = "yi")
+          }
+          if(es_type == "r"){
+               es_data <- data.frame(rxy = rxy,
+                                     n = n)
+               es_data$n_adj <- n_adj
+               es_data$vi <- vi_xy
+               es_data$weight <- wt_xy
+               if(!is.null(sample_id)) es_data <- add_column(es_data, sample_id = sample_id, .before = "rxy")
+          }
+          if(es_type == "d"){
+               es_data <- data.frame(d = d,
+                                     n1 = n1)
+               es_data$n2 <- n2
+               es_data$n <- n
+               es_data$pi <- pi
+               es_data$n_adj <- n_adj
+               es_data$vi <- vi
+               es_data$weight <- wt
+               if(!is.null(sample_id)) es_data <- add_column(es_data, sample_id = sample_id, .before = "d")
           }
           
-          for(i in 1:k_analyses){
-               analysis_id <- paste0("Analysis ID = ", i)
-               progbar$tick()
+          if(any(ma_methods == "ic")){
+               es_data$rxy = rxy
+               es_data$n = n
                
-               if(!is.null(ma_obj_i$barebones$escalc_list[[i]]$pi)){
-                    p <- wt_mean(x = ma_obj_i$barebones$escalc_list[[i]]$pi, wt = ma_obj_i$barebones$escalc_list[[i]]$n_adj)
-               }else{
-                    p <- .5
-               }
-               conf_level <- ma_obj_i$barebones$inputs$conf_level
-               cred_level <- ma_obj_i$barebones$inputs$cred_level
-               conf_method <- ma_obj_i$barebones$inputs$conf_method
-               cred_method <- ma_obj_i$barebones$inputs$cred_method
-               
-               if(es_type == "es"){
-                    es_data <- data.frame(yi = yi[[i]],
-                                          n = n[[i]])
-                    if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "yi")
-               }
-               if(es_type == "r"){
-                    es_data <- data.frame(rxy = rxy[[i]],
-                                          n = n[[i]])
-                    es_data$n_adj <- n_adj[[i]]
-                    if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "rxy")
-               }
-               if(es_type == "d"){
-                    es_data <- data.frame(d = d[[i]],
-                                          n1 = n1[[i]])
-                    es_data$n2 <- n2[[i]]
-                    es_data$n <- n[[i]]
-                    es_data$pi <- pi[[i]]
-                    es_data$n_adj <- n_adj[[i]]
-                    if(!is.null(sample_id[[i]])) es_data <- add_column(es_data, sample_id = sample_id[[i]], .before = "d")
-               }
-               
-               if(any(class_ma == "ma_ic")){
-                    es_data$rxy = rxy[[i]]
-                    es_data$n = n[[i]]
+               es_data$rtpa = rtpa
+               es_data$rxpa = rxpa
+               es_data$rtya = rtya
+               es_data$A_tp = A_tp
+               es_data$A_xp = A_xp
+               es_data$A_ty = A_ty
+               es_data$a = a
+               es_data$correction_type = correction_type
+          }
+          
+          if(any(ma_methods == "ad")){
+               es_data$rxy = rxy
+               es_data$n = n
+               es_data$n_adj <- n_adj
+          }
+          
+          if(any(ma_methods == "ic") | any(ma_methods == "ad")){
+               if(any(ma_methods == "ic")){
                     
-                    es_data$rtpa = rtpa[[i]]
-                    es_data$rxpa = rxpa[[i]]
-                    es_data$rtya = rtya[[i]]
-                    es_data$A_tp = A_tp[[i]]
-                    es_data$A_xp = A_xp[[i]]
-                    es_data$A_ty = A_ty[[i]]
-                    es_data$a = a[[i]]
-                    es_data$correction_type = correction_type[[i]]
-               }
-               
-               if(any(class_ma == "ma_ad")){
-                    es_data$rxy = rxy[[i]]
-                    es_data$n = n[[i]]
-                    es_data$n_adj <- n_adj[[i]]
-               }
-               
-               if(any(class_ma == "ma_ic") | any(class_ma == "ma_ad")){
-                    if(any(class_ma == "ma_ic")){
-                         rep_list <- .separate_repmat(rep_mat = .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_ic_boot, ma_arg_list = ma_arg_list))
+                    bb_mat <- meta_tables$barebones
+                    
+                    if(es_type == "es"){
+                         es_data$vi <- vi_xy
+                         es_data$weight <- wt_xy
+                         bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
+                    }
+                    
+                    if(es_type == "r"){
+                         es_data$vi <- vi_xy
+                         es_data$weight <- wt_xy
+                         bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_bb_boot, ma_arg_list = ma_arg_list)
                          
-                         bb_table <- rep_list$barebones
-                         ts_table <- rep_list$true_score
-                         vgx_table <- rep_list$validity_generalization_x
-                         vgy_table <- rep_list$validity_generalization_y
-                         
-                         bb_mat <- ma_obj_i$barebones$meta_table[i,]
-                         ts_mat <- ma_obj_i$individual_correction$true_score$meta_table[i,]
-                         vgx_mat <- ma_obj_i$individual_correction$validity_generalization_x$meta_table[i,]
-                         vgy_mat <- ma_obj_i$individual_correction$validity_generalization_y$meta_table[i,]
+                         if(d_metric){
+                              bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                         conf_method = conf_method, cred_method = cred_method)
+                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
+                                                           conf_method = conf_method, cred_method = cred_method)
+                         }
+                    }
+                    
+                    if(es_type == "d"){
+                         es_data$vi <- vi
+                         es_data$weight <- wt
+                         bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
                          
                          if(convert_back){
                               bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
-                              ts_mat <- .convert_metatab(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                         conf_method = conf_method, cred_method = cred_method)
-                              vgx_mat <- .convert_metatab(ma_table = vgx_mat, p_vec = rep(p, nrow(vgx_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                          conf_method = conf_method, cred_method = cred_method)
-                              vgy_mat <- .convert_metatab(ma_table = vgy_mat, p_vec = rep(p, nrow(vgy_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                          conf_method = conf_method, cred_method = cred_method)
-                              
                               bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
                                                            conf_method = conf_method, cred_method = cred_method)
-                              ts_table <- .convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
-                                                           conf_method = conf_method, cred_method = cred_method)
-                              vgx_table <- .convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
-                                                            conf_method = conf_method, cred_method = cred_method)
-                              vgy_table <- .convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
-                                                            conf_method = conf_method, cred_method = cred_method)
                          }
-                         
-                         bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
-                         ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
-                         vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
-                         vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
-                         
-                         out_bb <- list(data = bb_table)
-                         out_ts <- list(data = ts_table)
-                         out_vgx <- list(data = vgx_table)
-                         out_vgy <- list(data = vgy_table)
-                         class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
-                         
-                         out_list$barebones[[analysis_id]] <- out_bb
-                         out_list$individual_correction$true_score[[analysis_id]] <- out_ts
-                         out_list$individual_correction$validity_generalization_x[[analysis_id]] <- out_vgy
-                         out_list$individual_correction$validity_generalization_y[[analysis_id]] <- out_vgy
-                         
-                         plot_list$barebones[[analysis_id]] <- bb_plots
-                         plot_list$individual_correction$true_score[[analysis_id]] <- ts_plots
-                         plot_list$individual_correction$validity_generalization_x[[analysis_id]] <- vgx_plots
-                         plot_list$individual_correction$validity_generalization_y[[analysis_id]] <- vgy_plots
-                         
-                         names(out_list$individual_correction) <- names(plot_list$individual_correction) <- c(ts_label, vgx_label, vgy_label)
                     }
                     
-                    if(any(class_ma == "ma_ad")){
-                         ma_ad_dump_full <- do.call(.ma_r_ad, append(ma_obj_i$artifact_distribution$inputs, list(.psychmeta_internal_request_datadump = TRUE)))
-                         ma_ad_dump <- ma_ad_dump_full$x
-                         ma_ad_dump$art_grid <- ma_ad_dump_full$art_grid
-                         ma_arg_list$ma_ad_dump <- ma_ad_dump
+                    es_data$vi <- vi_tp
+                    es_data$weight <- wt_tp
+                    ts_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_icts_boot, ma_arg_list = ma_arg_list)
+                    
+                    es_data$vi <- vi_xp
+                    es_data$weight <- wt_xp
+                    vgx_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_icvgx_boot, ma_arg_list = ma_arg_list)
+                    
+                    es_data$vi <- vi_ty
+                    es_data$weight <- wt_ty
+                    vgy_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_icvgy_boot, ma_arg_list = ma_arg_list)
+                    
+                    ts_mat <- meta_tables$individual_correction$true_score
+                    vgx_mat <- meta_tables$individual_correction$validity_generalization_x
+                    vgy_mat <- meta_tables$individual_correction$validity_generalization_y
+                    
+                    if(convert_back){
+                         ts_mat <- .convert_metatab(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                    conf_method = conf_method, cred_method = cred_method)
+                         vgx_mat <- .convert_metatab(ma_table = vgx_mat, p_vec = rep(p, nrow(vgx_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                     conf_method = conf_method, cred_method = cred_method)
+                         vgy_mat <- .convert_metatab(ma_table = vgy_mat, p_vec = rep(p, nrow(vgy_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                     conf_method = conf_method, cred_method = cred_method)
                          
-                         rep_list <- .separate_repmat(rep_mat = .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_ad_boot, ma_arg_list = ma_arg_list))
+                         ts_table <- .convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
+                                                      conf_method = conf_method, cred_method = cred_method)
+                         vgx_table <- .convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
+                                                       conf_method = conf_method, cred_method = cred_method)
+                         vgy_table <- .convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
+                                                       conf_method = conf_method, cred_method = cred_method)
+                    }
+                    
+                    bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
+                    ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
+                    vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
+                    vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
+                    
+                    out_bb <- list(data = bb_table, 
+                                   plots = bb_plots)
+                    out_ts <- list(data = ts_table, 
+                                   plots = ts_plots)
+                    out_vgx <- list(data = vgx_table, 
+                                    plots = vgx_plots)
+                    out_vgy <- list(data = vgy_table, 
+                                    plots = vgy_plots)
+                    class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
+                    
+                    out_list$barebones <- out_bb
+                    out_list$individual_correction$true_score <- out_ts
+                    out_list$individual_correction$validity_generalization_x <- out_vgy
+                    out_list$individual_correction$validity_generalization_y <- out_vgy
+                    
+                    names(out_list$individual_correction) <- c(ts_label, vgx_label, vgy_label)
+               }
+               
+               if(any(ma_methods == "ad")){
+                    ma_ad_dump_full <- do.call(.ma_r_ad, append(attributes(meta_tables$artifact_distribution)$inputs, list(.psychmeta_internal_request_datadump = TRUE)))
+                    ma_ad_dump <- ma_ad_dump_full[["x"]]
+                    ma_ad_dump$art_grid <- ma_ad_dump_full$art_grid
+                    ma_arg_list$ma_ad_dump <- ma_ad_dump
+                    
+                    rep_list <- .separate_repmat(rep_mat = .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_ad_boot, ma_arg_list = ma_arg_list), analysis="leave1out")
+                    
+                    bb_table <- rep_list$barebones
+                    ts_table <- rep_list$true_score
+                    vgx_table <- rep_list$validity_generalization_x
+                    vgy_table <- rep_list$validity_generalization_y
+                    
+                    bb_mat <- meta_tables$barebones
+                    ts_mat <- meta_tables$artifact_distribution$true_score
+                    vgx_mat <- meta_tables$artifact_distribution$validity_generalization_x
+                    vgy_mat <- meta_tables$artifact_distribution$validity_generalization_y
+                    
+                    if(convert_back){
+                         bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                    conf_method = conf_method, cred_method = cred_method)
+                         ts_mat <- .convert_metatab(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                    conf_method = conf_method, cred_method = cred_method)
+                         vgx_mat <- .convert_metatab(ma_table = vgx_mat, p_vec = rep(p, nrow(vgx_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                     conf_method = conf_method, cred_method = cred_method)
+                         vgy_mat <- .convert_metatab(ma_table = vgy_mat, p_vec = rep(p, nrow(vgy_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                     conf_method = conf_method, cred_method = cred_method)
                          
-                         bb_table <- rep_list$barebones
-                         ts_table <- rep_list$true_score
-                         vgx_table <- rep_list$validity_generalization_x
-                         vgy_table <- rep_list$validity_generalization_y
-                         
-                         bb_mat <- ma_obj_i$barebones$meta_table[i,]
-                         ts_mat <- ma_obj_i$artifact_distribution$true_score[i,]
-                         vgx_mat <- ma_obj_i$artifact_distribution$validity_generalization_x[i,]
-                         vgy_mat <- ma_obj_i$artifact_distribution$validity_generalization_y[i,]
+                         bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
+                                                      conf_method = conf_method, cred_method = cred_method)
+                         ts_table <- .convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
+                                                      conf_method = conf_method, cred_method = cred_method)
+                         vgx_table <- .convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
+                                                       conf_method = conf_method, cred_method = cred_method)
+                         vgy_table <- .convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
+                                                       conf_method = conf_method, cred_method = cred_method)
+                    }
+                   
+                    out_bb <- list(data = bb_table, 
+                                   plots = bb_plots)
+                    out_ts <- list(data = ts_table, 
+                                   plots = ts_plots)
+                    out_vgx <- list(data = vgx_table, 
+                                    plots = vgx_plots)
+                    out_vgy <- list(data = vgy_table, 
+                                    plots = vgy_plots)
+                    class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
+                    
+                    out_list$barebones <- out_bb
+                    out_list$artifact_distribution$true_score <- out_ts
+                    out_list$artifact_distribution$validity_generalization_x <- out_vgy
+                    out_list$artifact_distribution$validity_generalization_y <- out_vgy
+                    
+                    names(out_list$artifact_distribution) <- c(ts_label, vgx_label, vgy_label)
+               }
+          }else{
+               if(any(ma_methods == "bb")){
+                    bb_mat <- meta_tables$barebones
+                    
+                    if(es_type == "es"){
+                         es_data$vi <- vi_xy
+                         es_data$weight <- wt_xy
+                         bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
+                    }
+                    
+                    if(es_type == "r"){
+                         es_data$vi <- vi_xy
+                         es_data$weight <- wt_xy
+                         bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_bb_boot, ma_arg_list = ma_arg_list)
                          
                          if(convert_back){
                               bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
-                              ts_mat <- .convert_metatab(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
+                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                           conf_method = conf_method, cred_method = cred_method)
+                         }
+                    }
+                    
+                    if(es_type == "d"){
+                         es_data$vi <- vi
+                         es_data$weight <- wt
+                         bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
+                         
+                         if(convert_back){
+                              bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
-                              vgx_mat <- .convert_metatab(ma_table = vgx_mat, p_vec = rep(p, nrow(vgx_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                          conf_method = conf_method, cred_method = cred_method)
-                              vgy_mat <- .convert_metatab(ma_table = vgy_mat, p_vec = rep(p, nrow(vgy_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                          conf_method = conf_method, cred_method = cred_method)
-                              
-                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
+                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                            conf_method = conf_method, cred_method = cred_method)
-                              ts_table <- .convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
-                                                           conf_method = conf_method, cred_method = cred_method)
-                              vgx_table <- .convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
-                                                            conf_method = conf_method, cred_method = cred_method)
-                              vgy_table <- .convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
-                                                            conf_method = conf_method, cred_method = cred_method)
                          }
-                         
-                         bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
-                         ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
-                         vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
-                         vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
-                         
-                         out_bb <- list(data = bb_table)
-                         out_ts <- list(data = ts_table)
-                         out_vgx <- list(data = vgx_table)
-                         out_vgy <- list(data = vgy_table)
-                         class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
-                         
-                         out_list$barebones[[analysis_id]] <- out_bb
-                         out_list$artifact_distribution$true_score[[analysis_id]] <- out_ts
-                         out_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- out_vgy
-                         out_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- out_vgy
-                         
-                         plot_list$barebones[[analysis_id]] <- bb_plots
-                         plot_list$artifact_distribution$true_score[[analysis_id]] <- ts_plots
-                         plot_list$artifact_distribution$validity_generalization_x[[analysis_id]] <- vgx_plots
-                         plot_list$artifact_distribution$validity_generalization_y[[analysis_id]] <- vgy_plots
-                         
-                         names(out_list$artifact_distribution) <- names(plot_list$artifact_distribution) <- c(ts_label, vgx_label, vgy_label)
                     }
-               }else{
-                    if(any(class_ma == "ma_bb")){
-                         
-                         bb_mat <- ma_obj_i$barebones$meta_table[i,]
-                         
-                         if(es_type == "es"){
-                              es_data$vi <- vi_xy[[i]]
-                              es_data$weight <- wt_xy[[i]]
-                              bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
-                         }
-                         
-                         if(es_type == "r"){
-                              es_data$vi <- vi_xy[[i]]
-                              es_data$weight <- wt_xy[[i]]
-                              bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_r_bb_boot, ma_arg_list = ma_arg_list)
-                              
-                              if(convert_back){
-                                   bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                              conf_method = conf_method, cred_method = cred_method)
-                                   bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                                conf_method = conf_method, cred_method = cred_method)
-                              }
-                         }
-                         
-                         if(es_type == "d"){
-                              es_data$vi <- vi[[i]]
-                              es_data$weight <- wt[[i]]
-                              bb_table <- .ma_leave1out(data = es_data, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
-                              
-                              if(convert_back){
-                                   bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                              conf_method = conf_method, cred_method = cred_method)
-                                   bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                                conf_method = conf_method, cred_method = cred_method)
-                              }
-                         }
-                         
-                         bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "cumulative")
-                         
-                         out_bb <- list(data = bb_table)
-                         class(out_bb) <- c("psychmeta", "ma_leave1out")
-                         out_list$barebones[[analysis_id]] <- out_bb
-                         plot_list$barebones[[analysis_id]] <- bb_plots
-                    }
+                    
+                    bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
+                    
+                    out_bb <- list(data = bb_table, 
+                                   plots = bb_plots)
+                    class(out_bb) <- c("psychmeta", "ma_leave1out")
+                    out_list$barebones <- out_bb
                }
-               
           }
           
-          ma_obj_i$follow_up_analyses$leave1out <- out_list
-          ma_obj_i$plots$leave1out <- plot_list
-          ma_obj_i
+          out_list
      })
-     if(any(class(ma_obj) == "ma_master")){
-          ma_obj$construct_pairs <- ma_list
-     }else{
-          ma_obj <- ma_list[[1]]
-     }
+     
+     ma_obj$leave1out <- out_list
      
      if(convert_back) ma_obj <- convert_ma(ma_obj)
      
-     if(record_call) ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
+     if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      
-     message("Leave-1-out meta-analyses have been added to 'ma_obj' - use get_leave1out() to retrieve them.")
+     message("leave-1-out meta-analyses have been added to 'ma_obj' - use get_leave1out() to retrieve them.")
      
      ma_obj
 }
+
+
 
 

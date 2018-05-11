@@ -28,7 +28,6 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' ## Run a meta-analysis using simulated UVIRR data:
 #' ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
 #' correct_rr_y = FALSE, data = data_r_uvirr)
@@ -39,16 +38,15 @@
 #' boot_ci_type = "norm", sort_method = "inv_var")
 #'
 #' ## Examine the tables and plots produced for the IC meta-analysis:
-#' ma_obj$follow_up_analyses$bootstrap$barebones$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$bootstrap$individual_correction$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$leave1out$individual_correction$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$cumulative$individual_correction$true_score$`Analysis ID = 1`
-#'
+#' ma_obj$bootstrap[[1]]$barebones
+#' ma_obj$bootstrap[[1]]$individual_correction$true_score
+#' ma_obj$leave1out[[1]]$individual_correction$true_score
+#' ma_obj$cumulative[[1]]$individual_correction$true_score
+#' 
 #' ## Examine the tables and plots produced for the AD meta-analysis:
-#' ma_obj$follow_up_analyses$bootstrap$artifact_distribution$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$leave1out$artifact_distribution$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$cumulative$artifact_distribution$true_score$`Analysis ID = 1`
-#' }
+#' ma_obj$bootstrap[[1]]$artifact_distribution$true_score
+#' ma_obj$leave1out[[1]]$artifact_distribution$true_score
+#' ma_obj$cumulative[[1]]$artifact_distribution$true_score
 sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative = TRUE,
                         sort_method = "weight",
                         boot_iter = 1000, boot_conf_level = .95, boot_ci_type = "bca", ...){
@@ -62,8 +60,8 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      if(leave1out) ma_obj <- sensitivity_leave1out(ma_obj = ma_obj, record_call = FALSE, ...)
      if(cumulative) ma_obj <- sensitivity_cumulative(ma_obj = ma_obj, sort_method = sort_method, record_call = FALSE, ...)
 
-     ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
-
+     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
+     
      ma_obj
 }
 

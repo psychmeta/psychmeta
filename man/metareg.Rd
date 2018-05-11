@@ -24,20 +24,18 @@ If using this function with a multi-construct meta-analysis object from \code{\l
 to a specific construct pair within the \code{construct_pairs} list.
 }
 \examples{
-\dontrun{
 ## Meta-analyze the data from Gonzalez-Mule et al. (2014)
 ## Note: These are corrected data and we have confirmed with the author that
 ## these results are accurate:
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
-        rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
-        correct_rr_x = TRUE, moderators = Complexity)
+                  rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
+                  correct_rr_x = TRUE, moderators = Complexity)
 
 ## Pass the meta-analysis object to the meta-regression function:
 ma_obj <- metareg(ma_obj)
 
 ## Examine the meta-regression results for the bare-bones and corrected data:
-ma_obj$follow_up_analyses$metareg$barebones$`Main Effects`
-ma_obj$follow_up_analyses$metareg$individual_correction$true_score$`Main Effects`
-}
+ma_obj$metareg[[1]]$barebones$`Main Effects`
+ma_obj$metareg[[1]]$individual_correction$true_score$`Main Effects`
 }
 \keyword{regression}

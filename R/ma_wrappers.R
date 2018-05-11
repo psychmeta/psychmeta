@@ -340,6 +340,8 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
      
      results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
      results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
+     results_df$moderator_info <- rep(list(NULL), nrow(results_df))
+     results_df$moderator_info[[1]] <- append(moderators, list(data = results_df$escalc[[1]]))
      
      results_df$ma_out <- NULL          
      
