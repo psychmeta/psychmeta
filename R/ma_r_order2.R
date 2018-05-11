@@ -203,8 +203,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                                                        neg_var_rho_ic_order2 = neg_var_rho_ic_order2,
                                                                        neg_var_rho_ad_order2 = neg_var_rho_ad_order2)))
      
-     # class(out) <- c("psychmeta", "ma_r_as_r", "ma_order2", c("ma_bb", "ma_ic", "ma_ad")[c(do_bb, do_ic, do_ad)])
-     class(out) <- c(class(out))
+     class(out) <- c("ma_psychmeta", class(out))
      
      out
 }

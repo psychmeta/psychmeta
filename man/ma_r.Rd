@@ -208,7 +208,7 @@ Components of output tables for bare-bones meta-analyses:
 \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
 \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
-\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 \item{\code{mean_r}}{\cr Mean observed correlation.}
@@ -231,7 +231,7 @@ Components of output tables for individual-correction meta-analyses:
 \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
 \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
-\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 \item{\code{mean_r}}{\cr Mean observed correlation.}
@@ -262,7 +262,7 @@ Components of output tables for artifact-distribution meta-analyses:
 \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
 \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
-\item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 \item{\code{mean_r}}{\cr Mean observed correlation.}

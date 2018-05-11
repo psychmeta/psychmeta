@@ -135,7 +135,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, wt_type =
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                      fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
      
-     # class(out) <- c("psychmeta", "ma_generic", "ma_bb")
+     class(out) <- c("ma_psychmeta", class(out))
      return(out)
 }
 

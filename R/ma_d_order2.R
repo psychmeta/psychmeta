@@ -171,8 +171,8 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
                                             neg_var_delta_ic_order2 = sum(out$individual_correction$meta_table$var_delta_bar < 0),
                                             neg_var_delta_ad_order2 = sum(out$artifact_distribution$meta_table$var_delta_bar < 0)))
 
-     class(out) <- c("psychmeta", "ma_d_as_d", "ma_order2", c("ma_bb", "ma_ic", "ma_ad")[c(do_bb, do_ic, do_ad)])
-
+     class(out) <- c("ma_psychmeta", class(out))
+     
      out
 }
 

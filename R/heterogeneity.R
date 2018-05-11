@@ -79,6 +79,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      progbar <- progress::progress_bar$new(format = " Computing heterogeneity analyses [:bar] :percent est. time remaining: :eta",
                                            total = nrow(ma_obj),
                                            clear = FALSE, width = options()$width)
+     ma_obj_i <- ma_obj[1,]
+     escalc <- ma_obj_i$escalc[[1]]
+     meta_tables <- ma_obj_i$meta_tables[[1]]
      out_list <- apply(ma_obj, 1, function(ma_obj_i){
           progbar$tick()
           
@@ -327,9 +330,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      percent_var_total <- var_pre / var_es * 100
 
      ## Correlations between effect sizes and artifactual perturbations
-     cor_es_error <- sqrt(var_e / var_es)
-     cor_es_art <- sqrt(var_art / var_es)
-     cor_es_total <- sqrt(var_pre / var_es)
+     cor_es_error <- (var_e / var_es)^.5
+     cor_es_art <- (var_art / var_es)^.5
+     cor_es_total <- (var_pre / var_es)^.5
      cor_es_error[cor_es_error > 1] <- cor_es_art[cor_es_art > 1] <- cor_es_total[cor_es_total > 1] <- 1
 
      # Reliability of observed effect size differences
@@ -337,7 +340,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
 
      ## H^2
      H_squared <- var_es / var_pre
-     H <- sqrt(H_squared)
+     H <- (H_squared)^.5
 
      ## I^2
      I_squared <- rel_es_obs * 100
@@ -356,10 +359,10 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
 
      ## Outlier-robust estimators (mean)
      abs_dev_sums <- sum(abs(es_vec - mean_es))
-     wt_root_sums <- sum(sqrt(wt_vec))
+     wt_root_sums <- sum((wt_vec)^.5)
      Q_r <- wt_root_sums * abs_dev_sums
      H_r_squared <- (pi * Q_r^2) / (2 * k * df)
-     H_r <- sqrt(H_r_squared)
+     H_r <- (H_r_squared)^.5
      I_r_squared <- (Q_r^2 - (2 * k * df)/pi) / Q_r^2
      tau_r_squared <- .tau_r_squared_solver(Q_r, wt_vec)
 
@@ -370,7 +373,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      med_dev_sums <- sum(abs(es_vec - median_es))
      Q_m <- wt_root_sums * med_dev_sums
      H_m_squared <- (pi * Q_m^2) / (2 * k^2)
-     H_m <- sqrt(H_m_squared)
+     H_m <- (H_m_squared)^.5
      I_m_squared <- (Q_m^2 - (2 * k^2)/pi) / Q_m^2
      tau_m_squared <- .tau_m_squared_solver(Q_m, wt_vec, k)
 
@@ -401,7 +404,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                            tau_m_squared = tau_m_squared,
                                            tau_m = tau_m_squared^.5),
                  file_drawer = file_drawer)
-     class(out) <- c("psychmeta", "heterogeneity")
+     class(out) <- c("psychmeta_heterogeneity")
      out
 }
 

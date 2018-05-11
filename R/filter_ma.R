@@ -135,10 +135,10 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
 filter_meta <- filter_ma
 
 
-#' @method filter ma_r
-filter.ma_r <- function(.data, ...){
+#' @method filter ma_psychmeta
+filter.ma_psychmeta <- function(.data, ...){
      .class <- class(.data)
-     class(.data) <- .class[.class != "ma_r"]
+     class(.data) <- .class[.class != "ma_psychmeta"]
      .attributes <- attributes(.data)
      
      .filter <- function (.data, ...) UseMethod("filter") 
@@ -150,10 +150,10 @@ filter.ma_r <- function(.data, ...){
 }
 
 
-#' @method arrange ma_r
-arrange.ma_r <- function(.data, ...){
+#' @method arrange ma_psychmeta
+arrange.ma_psychmeta <- function(.data, ...){
      .class <- class(.data)
-     class(.data) <- .class[.class != "ma_r"]
+     class(.data) <- .class[.class != "ma_psychmeta"]
      .attributes <- attributes(.data)
      
      .arrange <- function (.data, ...) UseMethod("filter") 
@@ -164,10 +164,10 @@ arrange.ma_r <- function(.data, ...){
 }
 
 
-#' @method arrange_all ma_r
-arrange_all.ma_r <- function(.tbl, .funs = list(), ...){
+#' @method arrange_all ma_psychmeta
+arrange_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
      .class <- class(.tbl)
-     class(.tbl) <- .class[.class != "ma_r"]
+     class(.tbl) <- .class[.class != "ma_psychmeta"]
      .attributes <- attributes(.tbl)
      
      .arrange_all <- function (.tbl, .funs = list(), ...) UseMethod("arrange_all") 
@@ -178,10 +178,10 @@ arrange_all.ma_r <- function(.tbl, .funs = list(), ...){
 }
 
 
-#' @method arrange_at ma_r
-arrange_at.ma_r <- function(.tbl, .vars, .funs = list(), ...){
+#' @method arrange_at ma_psychmeta
+arrange_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
      .class <- class(.tbl)
-     class(.tbl) <- .class[.class != "ma_r"]
+     class(.tbl) <- .class[.class != "ma_psychmeta"]
      .attributes <- attributes(.tbl)
      
      .arrange_at <- function (.tbl, .funs = list(), ...) UseMethod("arrange_at") 
@@ -192,10 +192,10 @@ arrange_at.ma_r <- function(.tbl, .vars, .funs = list(), ...){
 }
 
 
-#' @method arrange_if ma_r
-arrange_if.ma_r <- function(.tbl, .predicate, .funs = list(), ...){
+#' @method arrange_if ma_psychmeta
+arrange_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
      .class <- class(.tbl)
-     class(.tbl) <- .class[.class != "ma_r"]
+     class(.tbl) <- .class[.class != "ma_psychmeta"]
      .attributes <- attributes(.tbl)
      
      .arrange_if <- function (.tbl, .funs = list(), ...) UseMethod("arrange_if") 

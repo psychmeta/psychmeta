@@ -27,6 +27,7 @@
 convert_ma <- function(ma_obj, ...){
 
      additional_args <- list(...)
+     .attributes <- attributes(ma_obj)
      
      if(is.null(additional_args$ma_metric)){
           ma_metric <- attributes(ma_obj)$ma_metric
@@ -49,12 +50,6 @@ convert_ma <- function(ma_obj, ...){
      
      if(ma_metric == "r_as_d") .ma_metric <- "r_as_r"
      if(ma_metric == "d_as_d") .ma_metric <- "d_as_r"
-
-     attributes(ma_obj)$ma_metric <- .ma_metric
-     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, 
-                                               list(match.call()))
-     
-     
      
      if("construct_x" %in% colnames(ma_obj)){
           colnames(ma_obj)[colnames(ma_obj) == "construct_x"] <- "group_contrast"
@@ -62,6 +57,12 @@ convert_ma <- function(ma_obj, ...){
           if("group_contrast" %in% colnames(ma_obj)) 
                colnames(ma_obj)[colnames(ma_obj) == "group_contrast"] <- "construct_x"
      }
+     
+     .attributes$names <- attributes(ma_obj)$names
+     attributes(ma_obj) <- .attributes
+     attributes(ma_obj)$ma_metric <- .ma_metric
+     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, 
+                                               list(match.call()))
      
      ma_obj
 }
@@ -189,7 +190,7 @@ convert_ma <- function(ma_obj, ...){
           }
           
           if(any(ma_methods == "ad")){
-               ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$artifact_distribution$latentGroup_latentY, 
+               ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_latentY, 
                                                                                                        p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
                ma_obj_i$meta_tables[[1]]$artifact_distribution$observedGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$observedGroup_latentY, 
                                                                                                          p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)

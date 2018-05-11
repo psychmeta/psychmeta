@@ -337,8 +337,13 @@ impute_artifact_2col <- function(logic_vec_x, logic_vec_y,
           measure_id_all <- c(measure_x[logic_vec_x], measure_y[logic_vec_y])
           art_vec_all <- c(art_vec_x[logic_vec_x], art_vec_y[logic_vec_y])
           n_vec_all <- c(n_vec[logic_vec_x], n_vec[logic_vec_y])
-          cat_moderator_matrix_all <- rbind(cat_moderator_matrix[logic_vec_x,], cat_moderator_matrix[logic_vec_y,])
-
+          
+          if(nrow(cat_moderator_matrix) > 1){
+               cat_moderator_matrix_all <- rbind(cat_moderator_matrix[!logic_vec_x,], cat_moderator_matrix[!logic_vec_y,])
+          }else{
+               cat_moderator_matrix_all <- rbind(cat_moderator_matrix, cat_moderator_matrix)
+          }
+          
           ## Perform imputation and insert values back into the initial vectors
           art_vec_imputed <- impute_artifacts(sample_id = sample_id_all,
                                               construct_id = construct_id_all,
@@ -363,7 +368,12 @@ impute_artifact_2col <- function(logic_vec_x, logic_vec_y,
           measure_id_all <- c(measure_x[!logic_vec_x], measure_y[!logic_vec_y])
           art_vec_all <- c(art_vec_x[!logic_vec_x], art_vec_y[!logic_vec_y])
           n_vec_all <- c(n_vec[!logic_vec_x], n_vec[!logic_vec_y])
-          cat_moderator_matrix_all <- rbind(cat_moderator_matrix[!logic_vec_x,], cat_moderator_matrix[!logic_vec_y,])
+         
+          if(nrow(cat_moderator_matrix) > 1){
+               cat_moderator_matrix_all <- rbind(cat_moderator_matrix[!logic_vec_x,], cat_moderator_matrix[!logic_vec_y,])
+          }else{
+               cat_moderator_matrix_all <- rbind(cat_moderator_matrix, cat_moderator_matrix)
+          }
 
           ## Perform imputation and insert values back into the initial vectors
           art_vec_imputed <- impute_artifacts(sample_id = sample_id_all,

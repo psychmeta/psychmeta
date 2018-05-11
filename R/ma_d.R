@@ -510,7 +510,5 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      attributes(out)$call_history <- list(call)
 
-     class(out) <- gsub(x = class(out), pattern = "ma_r", replacement = "ma_d")
-     
      return(out)
 }

@@ -59,6 +59,15 @@ sensitivity_leave1out <- function(ma_obj, ...){
           }
           
           if(es_type == "d"){
+               if(any(ma_methods == "ic" | ma_methods == "ad")){
+                    sample_id <- escalc$barebones$sample_id
+                    rxy <-   escalc$barebones$yi
+                    n <-     escalc$barebones$n1 + escalc$bareboness$n2
+                    n_adj <- escalc$barebones$n_adj
+                    vi_xy <- escalc$barebones$vi
+                    wt_xy <- escalc$barebones$weight
+               }
+               
                sample_id <- escalc$barebones$sample_id
                d <- escalc$barebones$d
                n1 <- escalc$barebones$n1
@@ -68,15 +77,6 @@ sensitivity_leave1out <- function(ma_obj, ...){
                wt <- escalc$barebones$weight
                pi <- escalc$barebones$pi
                n <- escalc$barebones$n
-          
-               if(any(ma_methods == "ic" | ma_methods == "ad")){
-                    sample_id <- escalc$barebones$sample_id
-                    rxy <-   escalc$barebones$yi
-                    n <-     escalc$barebones$n1 + x$n2
-                    n_adj <- escalc$barebones$n_adj
-                    vi_xy <- escalc$barebones$vi
-                    wt_xy <- escalc$barebones$weight
-               }
                
                ts_label <- "latentGroup_latentY"
                vgx_label <- "observedGroup_latentY"
@@ -301,6 +301,11 @@ sensitivity_leave1out <- function(ma_obj, ...){
                                                        conf_method = conf_method, cred_method = cred_method)
                     }
                    
+                    bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
+                    ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
+                    vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
+                    vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
+                    
                     out_bb <- list(data = bb_table, 
                                    plots = bb_plots)
                     out_ts <- list(data = ts_table, 

@@ -567,9 +567,23 @@ compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_
      if(!(ma_method %in% attributes(ma_obj)$ma_methods))
           ma_method <- "bb"
      
+     ma_type <- NULL
+     if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+          ma_type <- paste0("r_", ma_method)
+     }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+          ma_type <- paste0("d_", ma_method)
+     }else if(ma_metric == "r_order2"){
+          ma_type <- paste0("r_", ma_method, "_order2")
+     }else if(ma_metric == "d_order2"){
+          ma_type <- paste0("d_", ma_method, "_order2")
+     }else if(ma_metric == "generic"){
+          ma_type <- paste0("generic_", ma_method)
+     }
+     
      if(ma_method == "bb"){
           correction_type <- NULL
           out <- bind_cols(ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)], bind_rows(map(ma_obj$meta_tables, function(x) x$barebones)))
+          
      }else if(ma_method == "ic" | ma_method == "ad"){
           if(ma_method == "ic"){
                ma_label <- "individual_correction"
@@ -588,6 +602,7 @@ compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_
                     vgx_label <- "observedGroup_latentY"
                     vgy_label <- "latentGroup_observedY"
                }
+               
                if(correction_type == "ts"){
                     out <- bind_cols(ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)], bind_rows(map(ma_obj$meta_tables, function(x) x[[ma_label]][[ts_label]])))
                }else if(correction_type == "vgx"){
@@ -598,7 +613,8 @@ compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_
           }
           
      }
-     attributes(out) <- append(attributes(out), list(ma_method = ma_method, 
+     attributes(out) <- append(attributes(out), list(ma_type = ma_type, 
+                                                     ma_method = ma_method, 
                                                      correction_type = correction_type, 
                                                      ma_metric = attributes(out)$ma_metric))
      class(out) <- c("ma_table", class(out))

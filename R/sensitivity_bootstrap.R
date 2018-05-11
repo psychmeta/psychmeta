@@ -70,6 +70,15 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
           }
           
           if(es_type == "d"){
+               if(any(ma_methods == "ic" | ma_methods == "ad")){
+                    sample_id <- escalc$barebones$sample_id
+                    rxy <-   escalc$barebones$yi
+                    n <-     escalc$barebones$n1 + escalc$bareboness$n2
+                    n_adj <- escalc$barebones$n_adj
+                    vi_xy <- escalc$barebones$vi
+                    wt_xy <- escalc$barebones$weight
+               }
+               
                sample_id <- escalc$barebones$sample_id
                d <- escalc$barebones$d
                n1 <- escalc$barebones$n1
@@ -79,15 +88,6 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                wt <- escalc$barebones$weight
                pi <- escalc$barebones$pi
                n <- escalc$barebones$n
-               
-               if(any(ma_methods == "ic" | ma_methods == "ad")){
-                    sample_id <- escalc$barebones$sample_id
-                    rxy <-   escalc$barebones$yi
-                    n <-     escalc$barebones$n1 + x$n2
-                    n_adj <- escalc$barebones$n_adj
-                    vi_xy <- escalc$barebones$vi
-                    wt_xy <- escalc$barebones$weight
-               }
                
                ts_label <- "latentGroup_latentY"
                vgx_label <- "observedGroup_latentY"

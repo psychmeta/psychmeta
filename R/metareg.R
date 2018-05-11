@@ -94,14 +94,23 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                }else{
                     metareg_ts <- metareg_vgx <- metareg_vgy <- NULL
                }
+               
+               out <- list(barebones = metareg_bb,
+                           individual_correction = list(true_score = metareg_ts,
+                                                        validity_generalization_x = metareg_vgx,
+                                                        validity_generalization_y = metareg_vgy))
           }else{
-               metareg_bb <- metareg_ts <- metareg_vgx <- metareg_vgy <- NULL
+               out <- list(NULL)
           }
-
-          list(barebones = metareg_bb,
-               individual_correction = list(true_score = metareg_ts,
-                                            validity_generalization_x = metareg_vgx,
-                                            validity_generalization_y = metareg_vgy))
+          out
+     })
+     
+     out_list <- lapply(out_list, function(x){
+          if(is.null(x[[1]])){
+               NULL
+          }else{
+               x
+          }
      })
 
      .out_list <- rep(list(NULL), nrow(ma_obj))

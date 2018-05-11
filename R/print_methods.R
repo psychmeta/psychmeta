@@ -383,8 +383,8 @@ print.dmod <- function(x, ..., digits = 3){
 
 
 
-#' @method print heterogeneity
-print.heterogeneity <- function(x, ..., digits = 3){
+#' @method print psychmeta_heterogeneity
+print.psychmeta_heterogeneity <- function(x, ..., digits = 3){
      es_type <- x$es_type
 
      cat("Heterogeneity results for", es_type, "\n")
@@ -528,49 +528,31 @@ print.get_cumulative <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
-#' @method print ma_r
-print.ma_r <- function(x, ..., digits = 3, verbose = FALSE){
-     default_print <- attributes(x)$default_print
-     additional_args <- list(...)
-     
-     
-     cat("Meta-analysis of correlations \n")
-     if("ma_method" %in% names(additional_args)){
-          meta_tab <- compile_metatab(ma_obj = x, ...)
-     }else{
-          meta_tab <- compile_metatab(ma_obj = x, ma_method = default_print, ...)
-     }
-     class(meta_tab) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
-     print(meta_tab)
-     
-     cat("\n")
-     cat("Summary tibble of all meta-analytic information \n")
-     x <- ungroup(x)
-     class(x) <- c("tbl_df", "tbl", "data.frame")
-     print(x)
-}
 
-#' @method print ma_d
-print.ma_d <- function(x, ..., digits = 3, verbose = FALSE){
-     # default_print <- attributes(x)$default_print
-     # additional_args <- list(...)
-     # 
-     # cat("Meta-analysis of correlations \n")
-     # if("ma_method" %in% names(additional_args)){
-     #      tibble:::print.tbl(compile_metatab(ma_obj = x, ...))
-     # }else{
-     #      tibble:::print.tbl(compile_metatab(ma_obj = x, ma_method = default_print, ...))
-     # }
-     
-     cat("\n")
-     cat("Summary tibble of all meta-analytic information \n")
-     x <- ungroup(x)
-     class(x) <- c("tbl_df", "tbl", "data.frame")
-     print(x)
-}
+# print.ma_r <- function(x, ..., digits = 3, verbose = FALSE){
+#      default_print <- attributes(x)$default_print
+#      additional_args <- list(...)
+#      
+#      
+#      cat("Meta-analysis of correlations \n")
+#      if("ma_method" %in% names(additional_args)){
+#           meta_tab <- compile_metatab(ma_obj = x, ...)
+#      }else{
+#           meta_tab <- compile_metatab(ma_obj = x, ma_method = default_print, ...)
+#      }
+#      class(meta_tab) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
+#      print(meta_tab)
+#      
+#      cat("\n")
+#      cat("Summary tibble of all meta-analytic information \n")
+#      x <- ungroup(x)
+#      class(x) <- c("tbl_df", "tbl", "data.frame")
+#      print(x)
+# }
 
 
-print.ma_r <- function(x, ..., digits = 3, verbose = FALSE){
+
+print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      ma_method <- attributes(x)$ma_method
      correction_type <- attributes(x)$correction_type 
      ma_metric <- attributes(x)$ma_metric 
@@ -587,7 +569,7 @@ print.ma_r <- function(x, ..., digits = 3, verbose = FALSE){
           es <- "second-order correlations"
      }
 
-     cat("Meta-analysis of correlations \n")
+     cat("Summary tibble of all meta-analytic information \n")
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)

@@ -8,7 +8,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
                   "difference", "construct_x", "construct_y",
                   "group", "y_name", "na.pass",
                   "cite", "k", "lowerci", "tester", "upperci", 
-                  "Construct_X", "Construct_Y", "x", "analysis_type"))
+                  "Construct_X", "Construct_Y", "analysis_type"))
 
 
 
@@ -59,6 +59,11 @@ globalVariables(c(".", "Value",                                  ## Global varia
               packageStartupMessage(paste0("\nNOTE: You are currently using a UNRELEASED development build of psychmeta (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
     }
 }
+
+.onLoad <- function(libname, pkgname){
+     psychmeta <- new.env()
+}
+
 
 
 #' Retrieve the NEWS file for the psychmeta package

@@ -128,7 +128,7 @@
 #' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 #' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
 #' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_r}}{\cr Mean observed correlation.}
@@ -151,7 +151,7 @@
 #' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 #' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
 #' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_r}}{\cr Mean observed correlation.}
@@ -182,7 +182,7 @@
 #' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 #' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
 #' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_r}}{\cr Mean observed correlation.}
@@ -571,7 +571,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                sample_id[na_sample_id] <- paste0("psychmeta generated sample ID #", 1:sum(na_sample_id))
           }
      }
-
+     
      if(!is.null(construct_order)){
           if(any(duplicated(construct_order))){
                warning("Each element of 'construct_order' must have a unique value: First occurence of each value used", call. = FALSE)
@@ -839,7 +839,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }
      }
 
-     if(!is.null(sample_id)) sample_id <- as.character(sample_id)[valid_r]
+     if(!is.null(sample_id)){
+          sample_id <- as.character(sample_id)[valid_r]
+     }else{
+          sample_id <- paste0("Sample #", 1:sum(valid_r))
+     }
      if(!is.null(measure_x)) measure_x <- as.character(measure_x)[valid_r]
      if(!is.null(measure_y)) measure_y <- as.character(measure_y)[valid_r]
 
@@ -1085,7 +1089,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                          intercor=intercor, partial_intercor = partial_intercor, construct_x = "construct_x", construct_y = "construct_y",
                                          measure_x = "measure_x", measure_y = "measure_y",
                                          es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
-               cbind(duplicates[i, c("analysis_id", "Analysis_Type", str_moderators, str_compmod_temp)][rep(1, nrow(out)),], out)
+               cbind(duplicates[i, c("analysis_id", "analysis_type", str_moderators, str_compmod_temp)][rep(1, nrow(out)),], out)
           })
 
           collapsed_data <- NULL
@@ -1110,10 +1114,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(!is.null(str_moderators)) categorical_moderators <- apply(indep_data[,str_moderators],2,as.character)
           if(!is.null(str_compmod_temp)) complete_moderators <- indep_data[, str_compmod_temp]
           analysis_id <- indep_data$analysis_id
-          analysis_type <- as.character(indep_data$Analysis_Type)
+          analysis_type <- as.character(indep_data$analysis_type)
 
           if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
-          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, Analysis_Type=analysis_type, categorical_moderators))
+          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, analysis_type=analysis_type, categorical_moderators))
 
           if(!is.null(moderator_names[["cat"]])){
                moderator_ids <- (length(analysis_id_variables) - length(moderator_names[["cat"]]) + 1):length(analysis_id_variables)
@@ -1532,7 +1536,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(attributes(out)$ma_metric == "d_as_r")
           out <- convert_ma(ma_obj = out)
      
-     class(out) <- c("ma_r", class(out))
+     class(out) <- c("ma_psychmeta", class(out))
      
      return(out)
 }

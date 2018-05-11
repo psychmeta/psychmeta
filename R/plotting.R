@@ -139,6 +139,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      pair_id <- as.list(unique(ma_obj_filtered$pair_id))
      names(pair_id) <- unlist(pair_id)
      
+     i <- 1
      out <- lapply(pair_id, function(i){
           x <- filter(ma_obj_filtered, pair_id == i)
           
@@ -259,8 +260,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_method[ma_method == "ad"] <- "artifact_distribution"
 
      .attributes <- attributes(ma_obj)
-     .attributes$ma_metric
-     
+
      .correction_type <- correction_type
      if(any(c("r_as_r", "d_as_r") %in% .attributes$ma_metric)){
           correction_type[correction_type == "ts"] <- "true_score"
@@ -280,7 +280,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_methods <- attributes(ma_obj)$ma_methods
      ma_metric <- attributes(ma_obj)$ma_metric
      
-     .mat <- as_tibble(select(mat, analysis_type:k))
+     .mat <- as_tibble(select(as.data.frame(mat), analysis_type:k))
      .mat <- .mat[,-c(1, ncol(.mat))]
      if(ncol(.mat) > 1) stop("Forest plots currently only support unmoderated or single-moderator meta-analysis")
 
@@ -288,7 +288,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           setting <- as.character(unlist(.mat[,1]))
           setting[setting == "All Levels"] <- "Overall"
      }else{
-          setting <- paste("analysis id:", mat$analysis_id)
+          setting <- paste("Analysis ID:", mat$analysis_id)
      }
      
      if(any(c("r_as_r", "d_as_r") %in% ma_metric)){
