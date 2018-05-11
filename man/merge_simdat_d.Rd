@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_d.R
 \name{merge_simdat_d}
 \alias{merge_simdat_d}
-\title{Merge multiple "simdat_d" class objects}
+\title{Merge multiple "simdat_d_database" class objects}
 \usage{
 merge_simdat_d(...)
 }

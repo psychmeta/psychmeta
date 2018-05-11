@@ -227,6 +227,8 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL, correction_method 
                                  ad = ma_obj$meta_tables[[i]]$artifact_distributions)
           ma_obj$meta_tables[[i]]$artifact_distributions <- NULL
           ma_obj$meta_tables[[i]] <- ma_obj$meta_tables[[i]]$meta
+          
+          class(ma_obj$meta_tables[[i]]$artifact_distribution) <- c("ma_ad_list", class(ma_obj$meta_tables[[i]]$artifact_distribution))
      }
      
      if(!("ad" %in% attributes(ma_obj)$ma_methods))
@@ -325,9 +327,16 @@ gather_ma_ad <- function(x){
                                         x$ci_ty, cv_ty)
      
      barebones <- x$barebones
-     # true_score <- cbind(barebones, as.data.frame(true_score))
-     # validity_generalization_x <- cbind(barebones, as.data.frame(validity_generalization_x))
-     # validity_generalization_y <- cbind(barebones, as.data.frame(validity_generalization_y))
+     
+     class(true_score) <- c("ma_table", class(true_score))
+     attributes(true_score) <- append(attributes(true_score), list(ma_type = "r_ad"))
+     
+     class(validity_generalization_x) <- c("ma_table", class(validity_generalization_x))
+     attributes(validity_generalization_x) <- append(attributes(validity_generalization_x), list(ma_type = "r_ad"))
+     
+     class(validity_generalization_y) <- c("ma_table", class(validity_generalization_y))
+     attributes(validity_generalization_y) <- append(attributes(validity_generalization_y), list(ma_type = "r_ad"))
+          
      
      list(method_details = c(ad_method = ad_method, measurement = meas_correction, range_restriction = range_restriction),
           true_score = true_score,
@@ -685,7 +694,7 @@ gather_ma_ad <- function(x){
                          stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvirr, collapse = ", "))
                }
           }
-          }
+     }
      
      if(correction_method == "NULL"){
           ma_r_obj
@@ -745,24 +754,7 @@ gather_ma_ad <- function(x){
                ma_r_obj$artifact_distributions <- out$artifact_distributions
                rm(out)
                
-               # neg_var_rtpa <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$true_score$meta_table$var_rho < 0)), na.rm = TRUE)
-               # neg_var_rxpa <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$validity_generalization_x$meta_table$var_rho < 0)), na.rm = TRUE)
-               # neg_var_rtya <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$validity_generalization_y$meta_table$var_rho < 0)), na.rm = TRUE)
-               # ma_r_obj$artifact_distribution$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-               #                                                 fyi = record_fyis(fyi_messages = fyi_messages,
-               #                                                                   neg_var_res = neg_var_res,
-               #                                                                   neg_var_rtpa = neg_var_rtpa,
-               #                                                                   neg_var_rxpa = neg_var_rxpa,
-               #                                                                   neg_var_rtya = neg_var_rtya))
-               
                new_class <- class(ma_r_obj)
-               
-               # new_class <- new_class[new_class != "tsa" & new_class != "int"]
-               # new_class <- new_class[!grepl(x = new_class, pattern = "ma_tsa_") & !grepl(x = new_class, pattern = "ma_int_")]
-               # if(!any(new_class == "ma_ad")) new_class <- c(new_class, "ma_ad")
-               # if(matching_ads_int) new_class <- c(new_class, paste0("ma_", ad_class))
-               # if(matching_ads_tsa) new_class <- c(new_class, paste0("ma_", ad_class))
-               # class(ma_r_obj) <- new_class
                
                return(ma_r_obj)
           }

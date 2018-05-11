@@ -8,7 +8,7 @@ ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
   correction_method = "auto", use_ic_ads = "tsa", correct_rGg = FALSE,
   correct_ryy = TRUE, correct_rr_g = TRUE, correct_rr_y = TRUE,
   indirect_rr_g = TRUE, indirect_rr_y = TRUE, residual_ads = TRUE,
-  sign_rgz = 1, sign_ryz = 1, decimals = 2, ...)
+  sign_rgz = 1, sign_ryz = 1, decimals = 2, estimate_pa = FALSE, ...)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object of correlations or \emph{d} values (regardless of input metric, output metric will be \emph{d}).}
@@ -51,6 +51,8 @@ Use one of the following commands: \code{tsa} to use the Taylor series method or
 
 \item{decimals}{Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
 Rounding artifact distributions can help to consolidate trivially different values and speed up the computation of meta-analyses (especially in simulations).}
+
+\item{estimate_pa}{Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).}
 
 \item{...}{Additional arguments.}
 }

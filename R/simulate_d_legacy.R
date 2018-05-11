@@ -22,7 +22,6 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                                           show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }
 
-     class(out) <- c("psychmeta", "simulate_d", "data.frame")
      out
 }
 
@@ -414,7 +413,7 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                  data = list(observed = data.frame(obs_a, selected = select_vec),
                              true = data.frame(true_a, selected = select_vec),
                              error = data.frame(error_a, selected = select_vec)))
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- "simdat_d_sample"
      out
 }
 
@@ -717,7 +716,7 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                  S_complete_a = sa,
                  S_complete_i = si,
                  data = NULL)
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- "simdat_d_sample"
      out
 }
 
@@ -1025,6 +1024,6 @@ simulate_d_database_noalpha <- function(k, n_params, rho_params,
      out <- list(call_history = list(call), inputs = inputs,
                  statistics = dat_stats,
                  parameters = dat_params)
-     class(out) <- c("psychmeta", "simdat_d", "long")
+     class(out) <- "simdat_d_database"
      out
 }

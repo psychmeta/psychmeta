@@ -124,7 +124,7 @@ credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = "t"){
 confidence_r <- function(r, n, conf_level=.95) {
     z <- convert_es.q_r_to_Fisherz(r)
     if (n < 4) se <- 1 else se <- 1/sqrt(n - 3)
-    CI.z <- confidence(mean = z, se=se, conf_level=conf_level)
+    CI.z <- confidence(mean = z, se=se, conf_level=conf_level, conf_method = "norm")
     return(convert_es.q_Fisherz_to_r(CI.z))
 }
 

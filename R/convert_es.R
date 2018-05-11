@@ -263,7 +263,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
                  conf_int = conf_int,
                  messages = warning_out)
 
-     class(out) <- c("psychmeta", "es", output_es)
+     class(out) <- c("convert_es", output_es)
      return(out)
 
 }

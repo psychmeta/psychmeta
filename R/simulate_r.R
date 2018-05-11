@@ -485,7 +485,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                                                          true = item_true_scores_a[,export_ids],
                                                                          error = item_error_scores_a[,export_ids]))))
 
-     class(out) <- c("psychmeta", "simulate_r")
+     class(out) <- "simdat_r_sample"
      out
 }
 
@@ -753,7 +753,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 
      if(show_items) out <- append(out, list(item_info = itemdat))
 
-     class(out) <- c("psychmeta", "simulate_r")
+     class(out) <- "simdat_r_sample"
      out
 }
 
@@ -1214,7 +1214,7 @@ simulate_r_database <- function(k, n_params, rho_params,
      out <- list(call_history = list(call), inputs = inputs,
                  statistics = dat_stats,
                  parameters = dat_params)
-     class(out) <- c("psychmeta", "simdat_r", format)
+     class(out) <- c("simdat_r_database", format)
      out
 }
 
@@ -1665,13 +1665,13 @@ format_long <- function(x, param, sample_id, var_names, show_applicant, decimals
 }
 
 
-#' Create sparse artifact information in a "simdat_r" class object
+#' Create sparse artifact information in a "simdat_r_database" class object
 #'
 #' This function can be used to randomly delete artifact from databases produced by the \code{\link{simulate_r_database}} function.
 #' Deletion of artifacts can be performed in either a study-wise fashion for complete missingness within randomly selected studies or element-wise missingness for completely random deletion of artifacts in the database.
 #' Deletion can be applied to reliability estimates and/or u ratios.
 #'
-#' @param data_obj Object created by the "simdat_r" function.
+#' @param data_obj Object created by the "simdat_r_database" function.
 #' @param prop_missing Proportion of studies in from which artifact information should be deleted.
 #' @param sparify_arts Vector of codes for the artifacts to be sparsified: "rel" for reliabilities, "u" for u ratios, or c("rel", "u") for both.
 #' @param study_wise Logical scalar argument determining whether artifact deletion should occur for all variables in a study (\code{TRUE}) or randomly across variables within studies (\code{FALSE}).
@@ -1681,8 +1681,8 @@ format_long <- function(x, param, sample_id, var_names, show_applicant, decimals
 sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u"), study_wise = TRUE){
      sparify_arts <- match.arg(sparify_arts, c("rel", "u"), several.ok  = TRUE)
 
-     if(!any(class(data_obj) == "simdat_r"))
-          stop("'data_obj' must be of class 'simdat_r'", call. = FALSE)
+     if(!any(class(data_obj) == "simdat_r_database"))
+          stop("'data_obj' must be of class 'simdat_r_database'", call. = FALSE)
 
      call <- match.call()
 
@@ -1832,28 +1832,28 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
 
 
 
-#' Merge multiple "simdat_r" class objects
+#' Merge multiple "simdat_r_database" class objects
 #'
 #' This function allows for multiple simulated databases from \code{\link{simulate_r_database}} to be merged together into a single database. Merged databases will be assigned moderator variable codes.
 #'
 #' @param ... Collection of objects created by the "simulate_r_database" function. Simply enter the database objects as \code{merge_simdat_r}(data_obj1, data_obj2, data_obj_3).
 #'
-#' @return A merged database of class \code{simdat_r}
+#' @return A merged database of class \code{simdat_r_database}
 #' @export
 merge_simdat_r <- function(...){
      call <- match.call()
 
      data_list <- list(...)
 
-     if(!all(unlist(lapply(data_list, function(x) any(class(x) == "simdat_r")))))
-          stop("All elements in 'data_list' must be of class 'simdat_r'", call. = FALSE)
+     if(!all(unlist(lapply(data_list, function(x) any(class(x) == "simdat_r_database")))))
+          stop("All elements in 'data_list' must be of class 'simdat_r_database'", call. = FALSE)
 
      long_format <- unlist(lapply(data_list, function(x) any(class(x) == "long")))
      if(!all(long_format) & !all(!long_format))
           stop("All objects in data_list must have the same format: Either all must be wide or all must be long", call. = FALSE)
 
      if(length(long_format) == 1)
-          stop("data_list must be a list of multiple objects of class 'simdat_r'", call. = FALSE)
+          stop("data_list must be a list of multiple objects of class 'simdat_r_database'", call. = FALSE)
 
      long_format <- long_format[1]
 

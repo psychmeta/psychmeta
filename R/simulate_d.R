@@ -91,7 +91,6 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
                                           show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }
 
-     class(out) <- c("psychmeta", "simulate_d", "data.frame")
      out
 }
 
@@ -726,7 +725,7 @@ append_dmat <- function(di_mat, da_mat,
                  data = list(observed = data.frame(obs_a, selected = select_vec),
                              true = data.frame(true_a, selected = select_vec),
                              error = data.frame(error_a, selected = select_vec)))
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- c("simdat_d_sample")
      out
 }
 
@@ -1083,7 +1082,7 @@ append_dmat <- function(di_mat, da_mat,
                  S_complete_a = sa,
                  S_complete_i = si,
                  data = NULL)
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- c("simdat_d_sample")
      out
 }
 
@@ -1477,7 +1476,7 @@ simulate_d_database <- function(k, n_params, rho_params,
      out <- list(call_history = list(call), inputs = inputs,
                  statistics = dat_stats,
                  parameters = dat_params)
-     class(out) <- c("psychmeta", "simdat_d", "long")
+     class(out) <- "simdat_d_database"
      out
 }
 
@@ -1486,13 +1485,13 @@ simulate_d_database <- function(k, n_params, rho_params,
 
 
 
-#' Create sparse artifact information in a "simdat_d" class object
+#' Create sparse artifact information in a "simdat_d_database" class object
 #'
 #' This function can be used to randomly delete artifact from databases produced by the \code{\link{simulate_d_database}} function.
 #' Deletion of artifacts can be performed in either a study-wise fashion for complete missingness within randomly selected studies or element-wise missingness for completely random deletion of artifacts in the database.
 #' Deletion can be applied to reliability estimates and/or u ratios.
 #'
-#' @param data_obj Object created by the "simdat_d" function.
+#' @param data_obj Object created by the "simdat_d_database" function.
 #' @param prop_missing Proportion of studies in from which artifact information should be deleted.
 #' @param sparify_arts Vector of codes for the artifacts to be sparsified: "rel" for reliabilities, "u" for u ratios, or c("rel", "u") for both.
 #' @param study_wise Logical scalar argument determining whether artifact deletion should occur for all variables in a study (\code{TRUE}) or randomly across variables within studies (\code{FALSE}).
@@ -1502,8 +1501,8 @@ simulate_d_database <- function(k, n_params, rho_params,
 sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u"), study_wise = TRUE){
      sparify_arts <- match.arg(sparify_arts, c("rel", "u"), several.ok  = TRUE)
 
-     if(!any(class(data_obj) == "simdat_d"))
-          stop("'data_obj' must be of class 'simdat_d'", call. = FALSE)
+     if(!any(class(data_obj) == "simdat_d_database"))
+          stop("'data_obj' must be of class 'simdat_d_database'", call. = FALSE)
 
      call <- match.call()
 
@@ -1597,7 +1596,7 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
 
 
 
-#' Merge multiple "simdat_d" class objects
+#' Merge multiple "simdat_d_database" class objects
 #'
 #' This function allows for multiple simulated databases from \code{\link{simulate_d_database}} to be merged together into a single database. Merged databases will be assigned moderator variable codes.
 #'
@@ -1610,8 +1609,8 @@ merge_simdat_d <- function(...){
 
      data_list <- list(...)
 
-     if(!all(unlist(lapply(data_list, function(x) any(class(x) == "simdat_d")))))
-          stop("All elements in 'data_list' must be of class 'simdat_d'", call. = FALSE)
+     if(!all(unlist(lapply(data_list, function(x) any(class(x) == "simdat_d_database")))))
+          stop("All elements in 'data_list' must be of class 'simdat_d_database'", call. = FALSE)
 
      data_obj <- data_list[[1]]
 

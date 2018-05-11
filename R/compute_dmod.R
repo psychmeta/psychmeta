@@ -241,7 +241,7 @@ compute_dmod_npar <- function(referent_int, referent_slope,
      out <- list(call = call, inputs = inputs,
                  point_estimate = out)
 
-     class(out) <- c("psychmeta", "dmod", "npar")
+     class(out) <- c("dmod", "npar")
      out
 }
 
@@ -522,7 +522,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
 
      out <- list(call = call, inputs = inputs, point_estimate = outSummary)
 
-     class(out) <- c("psychmeta", "dmod", "par")
+     class(out) <- c("dmod", "par")
 
      out
 }
@@ -813,9 +813,9 @@ compute_dmod <- function(data, group, predictors, criterion,
      out <- append(list(call = call, inputs = inputs), out)
 
      if(parametric){
-          class(out) <- c("psychmeta", "dmod", "par")
+          class(out) <- c("dmod", "par")
      }else{
-          class(out) <- c("psychmeta", "dmod", "npar")
+          class(out) <- c("dmod", "npar")
      }
      out
 }

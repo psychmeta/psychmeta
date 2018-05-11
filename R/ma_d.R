@@ -509,14 +509,6 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  partial_intercor = partial_intercor, estimate_pa = estimate_pa)
 
      attributes(out)$call_history <- list(call)
-     if(ma_method != "bb"){
-          if(treat_as_d){
-               attributes(out)$ma_metric <- "d_as_r"
-          }else{
-               attributes(out)$ma_metric <- "r_as_r"
-          }
-          out <- convert_ma(ma_obj = out)
-     }
 
      class(out) <- gsub(x = class(out), pattern = "ma_r", replacement = "ma_d")
      

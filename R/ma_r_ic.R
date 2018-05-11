@@ -1091,17 +1091,22 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                class(escalc_tp) <- c("escalc", "data.frame")
           }
           
-          out$meta$individual_correction$true_score <- data.frame(t(c(k = k, N = N,
-                                                                      unlist(select(out$meta$barebones, mean_r:sd_res)),
-                                                                      mean_rho = mean_rtpa,
-                                                                      var_r_c = var_rtpa,
-                                                                      var_e_c = var_e_tp_a,
-                                                                      var_rho = var_rho_tp_a,
-                                                                      sd_r_c = sd_rtpa,
-                                                                      se_r_c = se_rtpa,
-                                                                      sd_e_c = sd_e_tp_a,
-                                                                      sd_rho = sd_rho_tp_a,
-                                                                      ci_tp_a, cv_tp_a)))
+          meta <- data.frame(t(c(k = k, N = N,
+                                 unlist(select(out$meta$barebones, mean_r:sd_res)),
+                                 mean_rho = mean_rtpa,
+                                 var_r_c = var_rtpa,
+                                 var_e_c = var_e_tp_a,
+                                 var_rho = var_rho_tp_a,
+                                 sd_r_c = sd_rtpa,
+                                 se_r_c = se_rtpa,
+                                 sd_e_c = sd_e_tp_a,
+                                 sd_rho = sd_rho_tp_a,
+                                 ci_tp_a, cv_tp_a)))
+          
+          class(meta) <- c("ma_table", class(meta))
+          attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
+          
+          out$meta$individual_correction$true_score <- meta
           out$escalc$individual_correction$true_score <- escalc_tp
      }
      if(type == "vgx" | type == "all"){
@@ -1163,17 +1168,22 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                class(escalc_xp) <- c("escalc", "data.frame")
           }
           
-          out$meta$individual_correction$validity_generalization_x <- data.frame(t(c(k = k, N = N,
-                                                                                     unlist(select(out$meta$barebones, mean_r:sd_res)),
-                                                                                     mean_rho = mean_rxpa,
-                                                                                     var_r_c = var_rxpa,
-                                                                                     var_e_c = var_e_xp_a,
-                                                                                     var_rho = var_rho_xp_a,
-                                                                                     sd_r_c = sd_rxpa,
-                                                                                     se_r_c = se_rxpa,
-                                                                                     sd_e_c = sd_e_xp_a,
-                                                                                     sd_rho = sd_rho_xp_a,
-                                                                                     ci_xp_a, cv_xp_a)))
+          meta <- data.frame(t(c(k = k, N = N,
+                                 unlist(select(out$meta$barebones, mean_r:sd_res)),
+                                 mean_rho = mean_rxpa,
+                                 var_r_c = var_rxpa,
+                                 var_e_c = var_e_xp_a,
+                                 var_rho = var_rho_xp_a,
+                                 sd_r_c = sd_rxpa,
+                                 se_r_c = se_rxpa,
+                                 sd_e_c = sd_e_xp_a,
+                                 sd_rho = sd_rho_xp_a,
+                                 ci_xp_a, cv_xp_a)))
+          
+          class(meta) <- c("ma_table", class(meta))
+          attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
+          
+          out$meta$individual_correction$validity_generalization_x <- meta
           out$escalc$individual_correction$validity_generalization_x <- escalc_xp
      }
      if(type == "vgy" | type == "all"){
@@ -1234,20 +1244,27 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                class(escalc_ty) <- c("escalc", "data.frame")
           }
           
-          out$meta$individual_correction$validity_generalization_y <- data.frame(t(c(k = k, N = N,
-                                                                                     unlist(select(out$meta$barebones, mean_r:sd_res)),
-                                                                                     mean_rho = mean_rtya,
-                                                                                     var_r_c = var_rtya,
-                                                                                     var_e_c = var_e_ty_a,
-                                                                                     var_rho = var_rho_ty_a,
-                                                                                     sd_r_c = sd_rtya,
-                                                                                     se_r_c = se_rtya,
-                                                                                     sd_e_c = sd_e_ty_a,
-                                                                                     sd_rho = sd_rho_ty_a,
-                                                                                     ci_ty_a, cv_ty_a)))
+          meta <- data.frame(t(c(k = k, N = N,
+                                 unlist(select(out$meta$barebones, mean_r:sd_res)),
+                                 mean_rho = mean_rtya,
+                                 var_r_c = var_rtya,
+                                 var_e_c = var_e_ty_a,
+                                 var_rho = var_rho_ty_a,
+                                 sd_r_c = sd_rtya,
+                                 se_r_c = se_rtya,
+                                 sd_e_c = sd_e_ty_a,
+                                 sd_rho = sd_rho_ty_a,
+                                 ci_ty_a, cv_ty_a)))
+          
+          class(meta) <- c("ma_table", class(meta))
+          attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
+          
+          out$meta$individual_correction$validity_generalization_y <- meta
           out$escalc$individual_correction$validity_generalization_y <- escalc_ty
      }
      
+     class(out$meta$individual_correction) <- c("ma_ic_list", class(out$meta$individual_correction))
+
      return(out)
 }
 

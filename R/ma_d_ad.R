@@ -28,6 +28,7 @@
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with the bvirr \code{correction_method} only).
 #' @param decimals Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
 #' Rounding artifact distributions can help to consolidate trivially different values and speed up the computation of meta-analyses (especially in simulations).
+#' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param ... Additional arguments.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{r_as_d} or \code{d_as_d}, \code{ma_bb}, and \code{ma_ad} (and that inherits class \code{ma_ic} from \code{ma_obj})
@@ -74,7 +75,7 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
                     correct_rGg = FALSE, correct_ryy = TRUE,
                     correct_rr_g = TRUE, correct_rr_y = TRUE,
                     indirect_rr_g = TRUE, indirect_rr_y = TRUE,
-                    residual_ads = TRUE, sign_rgz = 1, sign_ryz = 1, decimals = 2, ...){
+                    residual_ads = TRUE, sign_rgz = 1, sign_ryz = 1, decimals = 2, estimate_pa = FALSE, ...){
 
      ma_metric <- attributes(ma_obj)
      convert_metric <- ifelse(any(ma_metric == "r_as_d" | ma_metric == "d_as_d"), TRUE, FALSE)
@@ -200,71 +201,70 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
           ad_method <- method_details["ad_method"]
           rr_method <- method_details["range_restriction"]
 
-          if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)" |
-             rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)" |
-             rr_method == "Made no corrections for range restriction"){
-
-               if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)"){
-                    if(ad_method == "Interactive method"){
-                         uy <- ad_obj_y[["ux"]]
-                         uy <- wt_mean(x = uy[,"Value"], wt = uy[,"Weight"])
-                    }else{
-                         uy <- ad_obj_y["ux", "mean"]
-                    }
-                    rxyi <- out$meta_tables[[1]]$barebones$mean_r
-                    pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
-                    pqa <- pi * (1 - pi) * ((1 / uy^2 - 1) * rxyi[i]^2 + 1)
-                    pqa[pqa > .25] <- .25
-                    out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
-               }
-
-               if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
-                    if(ad_method == "Interactive method"){
-                         up <- ad_obj_y[["ut"]]
-                         up <- wt_mean(x = up[,"Value"], wt = up[,"Weight"])
-
-                         qyi <- ad_obj_y[["qxi"]]
-                         qyi <- wt_mean(x = qyi[,"Value"], wt = qyi[,"Weight"])
-                    }else{
-                         up <- ad_obj_y["ut", "mean"]
-                         qyi <- ad_obj_y["qxi", "mean"]
-                    }
-                    rxpi <- out$meta_tables[[1]]$barebones$mean_r / qyi
-                    for(i in 1:length(out$escalc[[1]]$barebones)){
+          if(estimate_pa){
+               if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)" |
+                  rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)" |
+                  rr_method == "Made no corrections for range restriction"){
+                    
+                    if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)"){
+                         if(ad_method == "Interactive method"){
+                              uy <- ad_obj_y[["ux"]]
+                              uy <- wt_mean(x = uy[,"Value"], wt = uy[,"Weight"])
+                         }else{
+                              uy <- ad_obj_y["ux", "mean"]
+                         }
+                         rxyi <- out$meta_tables[[1]]$barebones$mean_r
                          pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
-                         pqa <- pi * (1 - pi) * ((1 / up^2 - 1) * rxpi[i]^2 + 1)
+                         pqa <- pi * (1 - pi) * ((1 / uy^2 - 1) * rxyi^2 + 1)
                          pqa[pqa > .25] <- .25
                          out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
                     }
-               }
-
-               if(rr_method == "Made no corrections for range restriction"){
-                    for(i in 1:length(out$barebones$escalc_list))
+                    
+                    if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
+                         if(ad_method == "Interactive method"){
+                              up <- ad_obj_y[["ut"]]
+                              up <- wt_mean(x = up[,"Value"], wt = up[,"Weight"])
+                              
+                              qyi <- ad_obj_y[["qxi"]]
+                              qyi <- wt_mean(x = qyi[,"Value"], wt = qyi[,"Weight"])
+                         }else{
+                              up <- ad_obj_y["ut", "mean"]
+                              qyi <- ad_obj_y["qxi", "mean"]
+                         }
+                         rxpi <- out$meta_tables[[1]]$barebones$mean_r / qyi
+                         pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
+                         pqa <- pi * (1 - pi) * ((1 / up^2 - 1) * rxpi^2 + 1)
+                         pqa[pqa > .25] <- .25
+                         out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
+                    }
+                    
+                    if(rr_method == "Made no corrections for range restriction"){
                          out$escalc[[1]]$barebones$pa_ad <- out$escalc[[1]]$barebones$pi
-               }
-          }else{
-               if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
-                    if(ad_method == "Interactive method"){
-                         ug <- ad_obj_g[["ut"]]
-                         ug <- wt_mean(x = ug[,"Value"], wt = ug[,"Weight"])
-                    }else{
-                         ug <- ad_obj_g["ut", "mean"]
                     }
                }else{
-                    if(ad_method == "Interactive method"){
-                         ug <- ad_obj_g[["ux"]]
-                         ug <- wt_mean(x = ug[,"Value"], wt = ug[,"Weight"])
+                    if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
+                         if(ad_method == "Interactive method"){
+                              ug <- ad_obj_g[["ut"]]
+                              ug <- wt_mean(x = ug[,"Value"], wt = ug[,"Weight"])
+                         }else{
+                              ug <- ad_obj_g["ut", "mean"]
+                         }
                     }else{
-                         ug <- ad_obj_g["ux", "mean"]
+                         if(ad_method == "Interactive method"){
+                              ug <- ad_obj_g[["ux"]]
+                              ug <- wt_mean(x = ug[,"Value"], wt = ug[,"Weight"])
+                         }else{
+                              ug <- ad_obj_g["ux", "mean"]
+                         }
                     }
-               }
-
-               for(i in 1:length(out$escalc[[1]]$barebones)){
+                    
                     pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
                     pqa <- 1 / ug^2 * pi * (1 - pi)
                     pqa[pqa > .25] <- .25
                     out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
-               }
+               }    
+          }else{
+               out$escalc[[1]]$barebones$pa_ad <- out$escalc[[1]]$barebones$pi
           }
 
           out

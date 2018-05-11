@@ -40,6 +40,7 @@ convert_ma <- function(ma_obj, ...){
           ma_methods <- additional_args$ma_methods
      }
      
+     ma_obj_i <- ma_obj[1,]
      ma_obj <- ma_obj %>% group_by(analysis_id) %>% 
           do(.convert_ma(ma_obj_i = .data, ma_obj = ma_obj, ma_metric = ma_metric, ma_methods = ma_methods))
      
@@ -53,12 +54,19 @@ convert_ma <- function(ma_obj, ...){
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, 
                                                list(match.call()))
      
+     
+     
+     if("construct_x" %in% colnames(ma_obj)){
+          colnames(ma_obj)[colnames(ma_obj) == "construct_x"] <- "group_contrast"
+     }else{
+          if("group_contrast" %in% colnames(ma_obj)) 
+               colnames(ma_obj)[colnames(ma_obj) == "group_contrast"] <- "construct_x"
+     }
+     
      ma_obj
 }
 
 .convert_ma <- function(ma_obj_i, ma_obj, ma_methods, ma_metric){
-     
-     # class(ma_obj_i) <- c(class(ma_obj_i), "r_as_r")
      
      k <- ma_obj_i$meta_tables[[1]]$barebones$k
      att <- attributes(ma_obj)
@@ -169,7 +177,7 @@ convert_ma <- function(ma_obj, ...){
           if(any(ma_methods == "bb")){
                
                if(error_type == "mean"){
-                    mean_d <- ma_obj_i$barebones$meta_table$mean_d
+                    mean_d <- ma_obj_i$meta_tables[[1]]$barebone$mean_d
                     ma_obj_i$escalc[[1]]$barebones$vi <- convert_vard_to_varr(d = mean_d, var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }else{
@@ -236,13 +244,7 @@ convert_ma <- function(ma_obj, ...){
      
      ## Re-define class of converted object
      if(any(ma_metric == "r_as_r") | any(ma_metric == "d_as_r")){
-          # if(any(class(ma_obj_i) == "r_as_r")){
-          #      class(ma_obj_i)[which(class(ma_obj_i) == "r_as_r")] <- "r_as_d"
-          # }
-          # if(any(class(ma_obj_i) == "d_as_r")){
-          #      class(ma_obj_i)[which(class(ma_obj_i) == "d_as_r")] <- "d_as_d"
-          # }
-          
+
           names_ic <- names(ma_obj_i$meta_tables[[1]]$individual_correction)
           names_ad <- names(ma_obj_i$meta_tables[[1]]$artifact_distribution)
 
@@ -263,15 +265,7 @@ convert_ma <- function(ma_obj, ...){
           }
           
      }else{
-          # if(any(class(ma_obj_i) == "d_as_d") | any(class(ma_obj_i) == "r_as_d")){
-          #      if(any(class(ma_obj_i) == "d_as_d")){
-          #           class(ma_obj_i)[which(class(ma_obj_i) == "d_as_d")] <- "d_as_r"
-          #      }
-          #      if(any(class(ma_obj_i) == "r_as_d")){
-          #           class(ma_obj_i)[which(class(ma_obj_i) == "r_as_d")] <- "r_as_r"
-          #      }
-          # }
-          
+
           names_ic <- names(ma_obj_i$meta_tables[[1]]$individual_correction)
           names_ad <- names(ma_obj_i$meta_tables[[1]]$artifact_distribution)
           
@@ -292,8 +286,7 @@ convert_ma <- function(ma_obj, ...){
           }
           
      }
-     # ma_obj_i$call_history <- append(ma_obj_i$call_history, list("Effect-size metric converted (call details not recorded)"))
-     
+
      ma_obj_i
 }
 
@@ -600,13 +593,6 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      ma_table[,col_ids$old_cols] <- ma_table_subset
      colnames(ma_table)[colnames(ma_table) %in% col_ids$old_cols] <- col_ids$new_cols
-
-
-     if(colnames(ma_table)[1] == "construct_x"){
-          colnames(ma_table)[1] <- "group_contrast"
-     }else{
-          if(colnames(ma_table)[1] == "group_contrast") colnames(ma_table)[1] <- "construct_x"
-     }
 
      fix_df(ma_table)
 }

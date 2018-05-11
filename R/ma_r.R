@@ -1187,22 +1187,26 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
                if(!is.null(construct_x)) out <- bind_cols(construct_x = rep(construct_x[i][1], nrow(out)), out)
 
-               # out$barebones$messages <- record_warnings()
-               # out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
-               # out <- append(list(call_history = list(call)), out)
-               # 
-               # if(es_d & treat_as_d){
-               #      class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
-               # }else{
-               #      class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
-               # }
-
                out
           })
           
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
           
           out <- as_tibble(data.table::rbindlist(out))
+          
+          if(es_d & treat_as_d){
+               attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                               inputs = inputs,
+                                                               ma_methods = ma_method,
+                                                               default_print = ma_method,
+                                                               ma_metric = "d_as_d"))
+          }else{
+               attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                               inputs = inputs,
+                                                               ma_methods = ma_method,
+                                                               default_print = ma_method,
+                                                               ma_metric = "r_as_r"))  
+          }
      }
 
      if(ma_method == "ic"){
@@ -1278,6 +1282,20 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
           
           out <- as_tibble(rbindlist(out))
+          
+          if(es_d & treat_as_d){
+               attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                               inputs = inputs,
+                                                               ma_methods = c("bb", "ic"),
+                                                               default_print = ma_method,
+                                                               ma_metric = "d_as_r"))
+          }else{
+               attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                               inputs = inputs,
+                                                               ma_methods = c("bb", "ic"),
+                                                               default_print = ma_method,
+                                                               ma_metric = "r_as_r"))  
+          }
      }
 
      if(ma_method == "ad"){
@@ -1326,8 +1344,17 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                       presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
                     
+                    if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
+                    if(!is.null(construct_x)) out <- bind_cols(group_contrast = rep(construct_x[i][1], nrow(out)), out)
+                    
+                    out$analysis_id <- NULL
                     out <- bind_cols(analysis_id = 1:nrow(out), out)
-                    out <- convert_ma(ma_obj = out, ma_methods = "bb", ma_metric = "d_as_d")
+                    attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                                    inputs = inputs,
+                                                                    ma_methods = "bb", 
+                                                                    default_print = ma_method,
+                                                                    ma_metric = "d_as_d"))
+                    out <- convert_ma(ma_obj = out, ma_methods = "bb")
                }else{
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "r", ma_type = "bb", ma_fun = .ma_r_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
@@ -1339,22 +1366,19 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                          sign_rxz = sign_rxz, sign_ryz = sign_ryz),
                                       presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables,
                                       moderator_levels = moderator_levels, moderator_names = moderator_names)
+                    out <- bind_cols(analysis_id = 1:nrow(out), out)
+                    
+                    if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
+                    if(!is.null(construct_x)) out <- bind_cols(construct_x = rep(construct_x[i][1], nrow(out)), out)
+                    
+                    out$analysis_id <- NULL
+                    out <- bind_cols(analysis_id = 1:nrow(out), out)
+                    attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                                    inputs = inputs,
+                                                                    ma_methods = "bb", 
+                                                                    default_print = ma_method,
+                                                                    ma_metric = "r_as_r"))
                }
-
-               if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
-               if(!is.null(construct_x)) out <- bind_cols(construct_x = rep(construct_x[i][1], nrow(out)), out)
-
-               # out$barebones$messages <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-               # out$barebones <- append(list(call = call, inputs = inputs), out)
-               # out <- append(list(call_history = list(call)), out)
-
-               # if(es_d & treat_as_d){
-               #      ## If the bare-bones meta-analysis was computed for d values, convert to the r metric before applying the artifact-distribution model
-               #      class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
-               #      if(es_d & treat_as_d) out <- convert_ma(ma_obj = out)
-               # }else{
-               #      class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
-               # }
                
                .construct_x <- as.character(data$construct_x[1])
                .construct_y <- as.character(data$construct_y[1])
@@ -1375,37 +1399,37 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                if(!all(data$sign_ryz[1] == data$sign_ryz))
                     stop("Inconsistent sign_ryz values submitted for construct pair ", .construct_x, " and ", .construct_y, ": Please resolve or use the sign_rz argument", call. = FALSE)
 
-               .out <- list()
-               for(i in 1:nrow(out))
-                    .out[[i]] <- .ma_r_ad(ma_r_obj = list(meta = out$meta_tables[[1]], inputs = inputs), ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
-                                          correction_method = correction_method[.construct_x, .construct_y],
-                                          correct_rxx = data$correct_rxx[1], correct_ryy = data$correct_ryy[1],
-                                          correct_rr_x = data$correct_rr_x[1], correct_rr_y = data$correct_rr_y[1],
-                                          indirect_rr_x = data$indirect_rr_x[1], indirect_rr_y = data$indirect_rr_y[1],
-                                          residual_ads = residual_ads, sign_rxz = data$sign_rxz[1], sign_ryz = data$sign_ryz[1], decimals = decimals)
+
+               out$ad <- rep(list(list(ic = NULL, ad = NULL)), nrow(out))
+               
+               for(i in 1:nrow(out)){
+                    out$meta_tables[[i]] <- .ma_r_ad(ma_r_obj = list(meta = out$meta_tables[[i]], inputs = inputs),
+                                                     ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
+                                                     correction_method = correction_method[.construct_x, .construct_y],
+                                                     correct_rxx = data$correct_rxx[1], correct_ryy = data$correct_ryy[1],
+                                                     correct_rr_x = data$correct_rr_x[1], correct_rr_y = data$correct_rr_y[1],
+                                                     indirect_rr_x = data$indirect_rr_x[1], indirect_rr_y = data$indirect_rr_y[1],
+                                                     residual_ads = residual_ads, sign_rxz = data$sign_rxz[1], sign_ryz = data$sign_ryz[1], decimals = decimals)
+                    out$ad[[i]] <- list(ic = out$ad[[i]]$ic,
+                                        ad = out$meta_tables[[i]]$artifact_distributions)
+                    out$meta_tables[[i]]$artifact_distributions <- NULL
+                    out$meta_tables[[i]] <- out$meta_tables[[i]]$meta
+                    class(out$meta_tables[[i]]$artifact_distribution) <- c("ma_ad_list", class(out$meta_tables[[i]]$artifact_distribution))
+               }
                
                attributes(out)$ma_methods <- NULL
                attributes(out)$ma_metric <- NULL
                attributes(out)$inputs <- NULL
-               
-               out$meta_tables <- .out
-               out$ad <- rep(list(list(ic = NULL, ad = NULL)))
-               
-               for(i in 1:nrow(out)){
-                    out$ad[[i]] <- list(ic = out$ad[[i]]$ic, 
-                                           ad = out$meta_tables[[i]]$artifact_distributions)
-                    out$meta_tables[[i]]$artifact_distributions <- NULL
-                    out$meta_tables[[i]] <- out$meta_tables[[i]]$meta
-               }
-               
-               if(es_d){
-                    ad_method <- out$artifact_distribution$method_details["ad_method"]
-                    rr_method <- out$artifact_distribution$method_details["range_restriction"]
 
+               method_details <- attributes(out$meta_tables[[1]]$artifact_distribution)$method_details
+               ad_method <- method_details["ad_method"]
+               rr_method <- method_details["range_restriction"]
+
+               if(estimate_pa){
                     if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)" |
                        rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)" |
                        rr_method == "Made no corrections for range restriction"){
-
+                         
                          if(rr_method == "Corrected for univariate direct range restriction in Y (i.e., Case II)"){
                               if(ad_method == "Interactive method"){
                                    uy <- ad_obj_y[["ux"]]
@@ -1413,38 +1437,33 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               }else{
                                    uy <- ad_obj_y["ux", "mean"]
                               }
-                              rxyi <- out$barebones$meta_table$mean_r
-                              for(i in 1:length(out$barebones$escalc_list)){
-                                   pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
-                                   pqa <- pi * (1 - pi) * ((1 / uy^2 - 1) * rxyi[i]^2 + 1)
-                                   pqa[pqa > .25] <- .25
-                                   out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
-                              }
+                              rxyi <- out$meta_tables[[1]]$barebones$mean_r
+                              pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
+                              pqa <- pi * (1 - pi) * ((1 / uy^2 - 1) * rxyi[i]^2 + 1)
+                              pqa[pqa > .25] <- .25
+                              out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
                          }
-
+                         
                          if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
                               if(ad_method == "Interactive method"){
                                    up <- ad_obj_y[["ut"]]
                                    up <- wt_mean(x = up[,"Value"], wt = up[,"Weight"])
-
+                                   
                                    qyi <- ad_obj_y[["qxi"]]
                                    qyi <- wt_mean(x = qyi[,"Value"], wt = qyi[,"Weight"])
                               }else{
                                    up <- ad_obj_y["ut", "mean"]
                                    qyi <- ad_obj_y["qxi", "mean"]
                               }
-                              rxpi <- out$barebones$meta_table$mean_r / qyi
-                              for(i in 1:length(out$barebones$escalc_list)){
-                                   pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
-                                   pqa <- pi * (1 - pi) * ((1 / up^2 - 1) * rxpi[i]^2 + 1)
-                                   pqa[pqa > .25] <- .25
-                                   out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
-                              }
+                              rxpi <- out$meta_tables[[1]]$barebones$mean_r / qyi
+                              pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
+                              pqa <- pi * (1 - pi) * ((1 / up^2 - 1) * rxpi^2 + 1)
+                              pqa[pqa > .25] <- .25
+                              out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
                          }
-
+                         
                          if(rr_method == "Made no corrections for range restriction"){
-                              for(i in 1:length(out$barebones$escalc_list))
-                                   out$barebones$escalc_list[[i]]$pa_ad <- out$barebones$escalc_list[[i]]$pi
+                              out$escalc[[1]]$barebones$pa_ad <- out$escalc[[1]]$barebones$pi
                          }
                     }else{
                          if(rr_method == "Corrected for univariate indirect range restriction in Y (i.e., Case IV)"){
@@ -1462,14 +1481,14 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                    ug <- ad_obj_x["ux", "mean"]
                               }
                          }
-
-                         for(i in 1:length(out$barebones$escalc_list)){
-                              pi <- wt_mean(x = out$barebones$escalc_list[[i]]$pi, wt = out$barebones$escalc_list[[i]]$n_adj)
-                              pqa <- 1 / ug^2 * pi * (1 - pi)
-                              pqa[pqa > .25] <- .25
-                              out$barebones$escalc_list[[i]]$pa_ad <- convert_pq_to_p(pq = pqa)
-                         }
-                    }
+                         
+                         pi <- wt_mean(x = out$escalc[[1]]$barebones$pi, wt = out$escalc[[1]]$barebones$n_adj)
+                         pqa <- 1 / ug^2 * pi * (1 - pi)
+                         pqa[pqa > .25] <- .25
+                         out$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
+                    }    
+               }else{
+                    out$escalc[[1]]$barebones$pa_ad <- out$escalc[[1]]$barebones$pi
                }
 
                out
@@ -1478,40 +1497,41 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
           
           out <- as_tibble(data.table::rbindlist(out))
-     }
-     
-     if(ma_method == "bb"){
-          ma_methods = "bb"
-     }else if(ma_method == "ic"){
-          ma_methods = c("bb", "ic")
-     }else if(ma_method == "ad"){
-          ma_methods = c("bb", "ad")
-     }
-     
-     if(es_d & treat_as_d){
-          if(ma_method != "bb"){
-               ma_metric <- "d_as_r"
+          
+          if(es_d & treat_as_d){
+               out$analysis_id <- NULL
+               out <- bind_cols(analysis_id = 1:nrow(out), out)
+               attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                               inputs = inputs,
+                                                               ma_methods = c("bb", "ad"), 
+                                                               default_print = ma_method,
+                                                               ma_metric = "d_as_r"))
           }else{
-               ma_metric <- "d_as_d"
+               out$analysis_id <- NULL
+               out <- bind_cols(analysis_id = 1:nrow(out), out)
+               attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                               inputs = inputs,
+                                                               ma_methods = c("bb", "ad"), 
+                                                               default_print = ma_method,
+                                                               ma_metric = "r_as_r"))
           }
-     }else{
-          if(ma_method != "bb"){
-               ma_metric <- "r_as_r"
-          }else{
-               ma_metric <- "r_as_r"
-          }
+          
+          attributes(out)$ma_method <- c("bb", "ad")
      }
      
-     attributes(out) <- append(attributes(out), list(call_history = list(call), inputs = inputs))
+
+     
+     .attributes <- attributes(out)
      out$analysis_id <- NULL
      out <- bind_cols(analysis_id = 1:nrow(out), out)
-     attributes(out) <- append(attributes(out), list(call_history = list(call), 
-                                                     inputs = inputs,
-                                                     ma_methods = ma_methods, 
-                                                     default_print = ma_method,
-                                                     ma_metric = ma_metric, 
-                                                     warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())))
+     .attributes$names <- attributes(out)$names
+     attributes(out) <- .attributes
 
+     attributes(out) <- append(attributes(out), list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())))
+
+     if(attributes(out)$ma_metric == "d_as_r")
+          out <- convert_ma(ma_obj = out)
+     
      class(out) <- c("ma_r", class(out))
      
      return(out)

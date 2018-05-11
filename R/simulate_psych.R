@@ -126,7 +126,7 @@ simulate_psych <- function(n, rho_mat,
      }
 
      out <- list(observed = obs, true = true, error = error)
-     class(out) <- c("psychmeta", "simulate_psych")
+     class(out) <- "simdat_psych"
      out
 }
 

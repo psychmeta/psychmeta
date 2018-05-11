@@ -316,17 +316,22 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      ci <- setNames(c(ci), colnames(ci))
      cv <- setNames(c(cv), colnames(cv))
 
-     list(meta = list(barebones = data.frame(t(c(k = k,
-                                                 N = N,
-                                                 mean_r = mean_r_xy,
-                                                 var_r = var_r,
-                                                 var_e = var_e,
-                                                 var_res = var_res,
-                                                 sd_r = sd_r,
-                                                 se_r = se_r,
-                                                 sd_e = sd_e,
-                                                 sd_res = sd_res,
-                                                 ci, cv))),
+     barebones <- data.frame(t(c(k = k,
+                                 N = N,
+                                 mean_r = mean_r_xy,
+                                 var_r = var_r,
+                                 var_e = var_e,
+                                 var_res = var_res,
+                                 sd_r = sd_r,
+                                 se_r = se_r,
+                                 sd_e = sd_e,
+                                 sd_res = sd_res,
+                                 ci, cv)))
+     
+     class(barebones) <- c("ma_table", class(barebones))
+     attributes(barebones) <- append(attributes(barebones), list(ma_type = "r_bb"))
+     
+     list(meta = list(barebones = barebones,
                       individual_correction = NULL, 
                       artifact_distribution = NULL), 
           escalc = list(barebones = escalc_obj,
