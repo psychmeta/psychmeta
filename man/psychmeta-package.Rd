@@ -56,11 +56,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jeffrey A. Dahlke \email{dahlk068@umn.edu}
+\strong{Maintainer}: Jeffrey A. Dahlke \email{jeff@psychmeta.com}
 
 Authors:
 \itemize{
-  \item Brenton M. Wiernik \email{psychmeta@wiernik.org}
+  \item Brenton M. Wiernik \email{brenton@psychmeta.com}
 }
 
 Other contributors:

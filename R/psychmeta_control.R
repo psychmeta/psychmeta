@@ -40,7 +40,6 @@
 #' \code{var_unbiased} (will set to \code{FALSE}), 
 #' and \code{use_all_arts} (will set to \code{FALSE}).
 #' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
-#' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list of control arguments in the package environment. 
@@ -57,7 +56,7 @@ psychmeta_control <- function(error_type = "mean",
                               collapse_method = "composite",
                               intercor = .5,
                               clean_artifacts = TRUE, 
-                              impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE),
+                              impute_artifacts = FALSE,
                               impute_method = "bootstrap_mod",
                               seed = 42,
                               decimals = 2, hs_override = FALSE,

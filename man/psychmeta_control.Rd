@@ -8,8 +8,8 @@ psychmeta_control(error_type = "mean", conf_level = 0.95,
   cred_level = 0.8, conf_method = "t", cred_method = "t",
   var_unbiased = TRUE, pairwise_ads = FALSE, residual_ads = TRUE,
   check_dependence = TRUE, collapse_method = "composite", intercor = 0.5,
-  clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad",
-  FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42, decimals = 2,
+  clean_artifacts = TRUE, impute_artifacts = FALSE,
+  impute_method = "bootstrap_mod", seed = 42, decimals = 2,
   hs_override = FALSE, use_all_arts = TRUE, ...)
 }
 \arguments{
@@ -72,8 +72,6 @@ and \code{use_all_arts} (will set to \code{FALSE}).}
 \item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
-
-\item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 }
 \value{
 A list of control arguments in the package environment.
