@@ -1,0 +1,10 @@
+.DS_Store
+.Rproj.user
+.RData
+.Rhistory
+.Rapp.history
+*.DS_Store
+*.Rproj.user
+*.RData
+*.Rhistory
+*.Rapp.history

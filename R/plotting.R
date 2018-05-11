@@ -16,6 +16,8 @@
 #'
 #' @return A list of funnel plots.
 #' @export
+#' 
+#' @author Based on code by John Sakaluk
 #'
 #' @examples
 #' \dontrun{
@@ -101,6 +103,8 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #'
 #' @return A list of forest plots.
 #' @export
+#' 
+#' @author Based on code by John Sakaluk
 #'
 #' @importFrom stringr str_split
 #'
