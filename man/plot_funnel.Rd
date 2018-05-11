@@ -44,3 +44,6 @@ plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show
 plot_funnel(ma_obj = ma_obj$construct_pairs[[1]])
 }
 }
+\author{
+Based on code by John Sakaluk
+}

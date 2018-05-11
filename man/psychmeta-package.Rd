@@ -65,10 +65,11 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Michael T. Brannick [contributor]
-  \item Jack Kostal [contributor]
-  \item Sean Potter [contributor]
-  \item Yuejia (Mandy) Teng [contributor]
+  \item Michael T. Brannick (Testing) [contributor]
+  \item Jack Kostal (reshape_mat2dat function) [contributor]
+  \item Sean Potter (Cumulative and leave1out plots) [contributor]
+  \item John Sakaluk (Code for funnel and forest plots) [contributor]
+  \item Yuejia (Mandy) Teng (Testing) [contributor]
 }
 
 }

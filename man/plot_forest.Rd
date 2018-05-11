@@ -62,3 +62,6 @@ plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1), show_filtered = TRUE)
 plot_forest(ma_obj = ma_obj$construct_pairs[[1]])
 }
 }
+\author{
+Based on code by John Sakaluk
+}
