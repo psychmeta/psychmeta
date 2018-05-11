@@ -19,7 +19,8 @@ get_metafor(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
 
 get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+  case_sensitive = TRUE, ma_methods = c("bb", "ic", "ad"),
+  correction_types = c("ts", "vgx", "vgy"), ...)
 
 get_ad(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, as_ad_obj = FALSE, inputs_only = TRUE,
@@ -59,8 +60,8 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 \item{construct:}{ A list or vector of construct names to search for.}
 \item{construct_pair:}{ A list of vectors of construct pairs to search for. \cr
 (e.g., \code{list(c("X", "Y"), c("X", "Z"))}).}
-\item{pair_id:}{ A list or vector of numeric construct Pair IDs.}
-\item{analysis_id:}{ A list or vector of analysis IDs (combinations of moderator levels).}
+\item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
+\item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
 \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
 \item{N_minv}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 }}
@@ -70,6 +71,10 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 \item{case_sensitive}{Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).}
 
 \item{...}{Additional arguments.}
+
+\item{ma_methods}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
+
+\item{correction_types}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
 
 \item{as_ad_obj}{Logical scalar that determines whether artifact information should be returned as artifact-distribution objects (\code{TRUE}) or a summary table of artifact-distribution descriptive statistics (\code{FALSE}; default).}
 

@@ -265,6 +265,8 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
           out_list
      })
 
+     names(out_list) <- paste0("analysis id: ", ma_obj$analysis_id)
+     
      ma_obj$heterogeneity <- out_list
      
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))

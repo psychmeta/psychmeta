@@ -341,27 +341,27 @@ print.psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
 
 
      if(any(class(x) == "get_plots"))
-          print.psychmeta.get_plots(x, ..., digits = digits)
+          print.get_plots(x, ..., digits = digits)
      if(any(class(x) == "get_matrix"))
-          print.psychmeta.get_matrix(x, ..., digits = digits)
+          print.get_matrix(x, ..., digits = digits)
      if(any(class(x) == "get_escalc"))
-          print.psychmeta.get_escalc(x, ..., digits = digits)
+          print.get_escalc(x, ..., digits = digits)
      if(any(class(x) == "get_metatab"))
-          print.psychmeta.get_metatab(x, ..., digits = digits)
+          print.get_metatab(x, ..., digits = digits)
 
 
      if(any(class(x) == "get_followup"))
-          print.psychmeta.get_followup(x, ..., digits = digits)
+          print.get_followup(x, ..., digits = digits)
      if(any(class(x) == "get_heterogeneity"))
-          print.psychmeta.get_heterogeneity(x, ..., digits = digits)
+          print.get_heterogeneity(x, ..., digits = digits)
      if(any(class(x) == "get_metareg"))
-          print.psychmeta.get_metareg(x, ..., digits = digits)
+          print.get_metareg(x, ..., digits = digits)
      if(any(class(x) == "get_bootstrap"))
-          print.psychmeta.get_bootstrap(x, ..., digits = digits)
+          print.get_bootstrap(x, ..., digits = digits)
      if(any(class(x) == "get_leave1out"))
-          print.psychmeta.get_leave1out(x, ..., digits = digits)
+          print.get_leave1out(x, ..., digits = digits)
      if(any(class(x) == "get_cumulative"))
-          print.psychmeta.get_cumulative(x, ..., digits = digits)
+          print.get_cumulative(x, ..., digits = digits)
 
 }
 
@@ -1593,10 +1593,13 @@ print.psychmeta.ma_bootstrap <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_metatab <- function(x, ..., digits = 3){
+print.get_metatab <- function(x, ..., digits = 3){
      cat("List of meta-analytic tables \n")
      cat("---------------------------------------- \n")
      cat("To view specific tables, use the '$' operator to search this list object. \n")
+     cat("\n")
+     cat("Meta-analyses available in this list are:\n")
+     cat(attributes(x)$contents)
 }
 
 #' print method for meta-analysis plots retrieved with \code{get_plots()}
@@ -1609,7 +1612,7 @@ print.psychmeta.get_metatab <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_plots <- function(x, ..., digits = 3){
+print.get_plots <- function(x, ..., digits = 3){
      cat("List of meta-analysis plots \n")
      cat("---------------------------------------- \n")
      cat("To view plots, use the '$' operator to search this list object. \n")
@@ -1628,7 +1631,7 @@ print.psychmeta.get_plots <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_matrix <- function(x, ..., digits = 3){
+print.get_matrix <- function(x, ..., digits = 3){
      cat("List of meta-analytic matrices \n")
      cat("---------------------------------------- \n")
      cat("To view matrices, use the '$' operator to search this list object. \n")
@@ -1644,7 +1647,7 @@ print.psychmeta.get_matrix <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_escalc <- function(x, ..., digits = 3){
+print.get_escalc <- function(x, ..., digits = 3){
      cat("List of escalc objects \n")
      cat("---------------------------------------- \n")
      cat("To view specific escalc data frames, use the '$' operator to search this list object. \n")
@@ -1660,7 +1663,7 @@ print.psychmeta.get_escalc <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_followup <- function(x, ..., digits = 3){
+print.get_followup <- function(x, ..., digits = 3){
      cat("List of meta-analytic follow-up analyses \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")
@@ -1679,7 +1682,7 @@ print.psychmeta.get_followup <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_heterogeneity <- function(x, ..., digits = 3){
+print.get_heterogeneity <- function(x, ..., digits = 3){
      cat("List of heterogeneity analyses \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")
@@ -1695,7 +1698,7 @@ print.psychmeta.get_heterogeneity <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_metareg <- function(x, ..., digits = 3){
+print.get_metareg <- function(x, ..., digits = 3){
      cat("List of meta-regression analyses \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")
@@ -1711,7 +1714,7 @@ print.psychmeta.get_metareg <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_bootstrap <- function(x, ..., digits = 3){
+print.get_bootstrap <- function(x, ..., digits = 3){
      cat("List of bootstrap meta-analyses \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")
@@ -1727,7 +1730,7 @@ print.psychmeta.get_bootstrap <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_leave1out <- function(x, ..., digits = 3){
+print.get_leave1out <- function(x, ..., digits = 3){
      cat("List of leave-one-out meta-analyses \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")
@@ -1743,7 +1746,7 @@ print.psychmeta.get_leave1out <- function(x, ..., digits = 3){
 #' @export
 #'
 #' @keywords internal
-print.psychmeta.get_cumulative <- function(x, ..., digits = 3){
+print.get_cumulative <- function(x, ..., digits = 3){
      cat("List of cumulative meta-analyses \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")

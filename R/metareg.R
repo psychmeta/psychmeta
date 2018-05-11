@@ -107,6 +107,7 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
      .out_list <- rep(list(NULL), nrow(ma_obj))
      .out_list[ma_obj$analysis_type == "Overall"] <- out_list
      ma_obj$metareg <- .out_list
+     names(.out_list) <- paste0("analysis id: ", ma_obj$analysis_id)
      
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      message("Meta-regressions have been added to 'ma_obj' - use get_metareg() to retrieve them.")

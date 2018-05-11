@@ -30,8 +30,8 @@
 #' \item{construct:}{ A list or vector of construct names to search for.}
 #' \item{construct_pair:}{ A list of vectors of construct pairs to search for. \cr
 #' (e.g., \code{list(c("X", "Y"), c("X", "Z"))}).}
-#' \item{pair_id:}{ A list or vector of numeric construct Pair IDs.}
-#' \item{analysis_id:}{ A list or vector of analysis IDs (combinations of moderator levels).}
+#' \item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
+#' \item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
 #' \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
 #' \item{N_minv}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 #' }
@@ -41,6 +41,8 @@
 #' @param inputs_only Used only if \code{as_ad_obj = TRUE}: Logical scalar that determines whether artifact information should be returned as summaries of the raw input values (\code{TRUE}; default) or artifact values that have been cross-corrected for range restriction and measurement error (\code{FALSE}).
 #' @param ma_method Character scalar indicating whether artifact distributions should be retrieved from artifact-distribution meta-analyses ("ad"; default) or from individual-correction meta-analyses ("ic").
 #' @param ad_type Used only if \code{ma_method} = "ic": Character scalar indicating whether Taylor-series approximation artifact distributions ("tsa") or interactive artifact distributions ("int") should be retrieved.
+#' @param ma_methods Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"
+#' @param correction_types Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"
 #' @param ... Additional arguments.
 #'
 #' @return Selected set of results.
@@ -81,78 +83,115 @@
 #' @export
 get_metafor <- get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
-     ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
-
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj_filtered))){
-          ts <- "true_score"
-          vgx <- "validity_generalization_x"
-          vgy <- "validity_generalization_y"
-     }else{
-          ts <- "latentGroup_latentY"
-          vgx <- "observedGroup_latentY"
-          vgy <- "latentGroup_observedY"
-     }
-
-     if("ma_master" %in% class(ma_obj_filtered)){
-          barebones <- lapply(ma_obj_filtered$construct_pairs, function(x) x$barebones$escalc_list)
-
-          if(!is.null(ma_obj_filtered$grand_tables$individual_correction)){
-               individual_correction <- list(lapply(ma_obj_filtered$construct_pairs, function(x) x$individual_correction[[ts]]$escalc_list),
-                                             lapply(ma_obj_filtered$construct_pairs, function(x) x$individual_correction[[vgx]]$escalc_list),
-                                             lapply(ma_obj_filtered$construct_pairs, function(x) x$individual_correction[[vgy]]$escalc_list))
-               names(individual_correction) <- c(ts, vgx, vgy)
-               out <- list(barebones = barebones,
-                           individual_correction = individual_correction)
-          }else{
-               out <- barebones
-          }
-     }else{
-          barebones <- ma_obj_filtered$barebones$escalc_list
-
-          if(!is.null(ma_obj_filtered$individual_correction)){
-               individual_correction <- list(ma_obj_filtered$individual_correction[[ts]]$escalc_list,
-                                             ma_obj_filtered$individual_correction[[vgx]]$escalc_list,
-                                             ma_obj_filtered$individual_correction[[vgy]]$escalc_list)
-               names(individual_correction) <- c(ts, vgx, vgy)
-               out <- list(barebones = barebones,
-                           individual_correction = individual_correction)
-          }else{
-               out <- barebones
-          }
-     }
-     class(out) <- c("psychmeta", "get_escalc")
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     
+     out <- ma_obj$escalc
+     names(out) <- paste0("analysis_id: ", ma_obj$analysis_id)
+     
+     class(out) <- "get_escalc"
      out
 }
 
 #' @rdname get_stuff
 #' @export
-get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
-
-     ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
-
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj_filtered))){
-          ts <- "true_score"
-          vgx <- "validity_generalization_x"
-          vgy <- "validity_generalization_y"
-     }else{
-          ts <- "latentGroup_latentY"
-          vgx <- "observedGroup_latentY"
-          vgy <- "latentGroup_observedY"
+get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, 
+                        ma_methods = c("bb", "ic", "ad"), correction_types = c("ts", "vgx", "vgy"), ...){
+     
+     ma_methods <- match.arg(ma_methods, c("bb", "ic", "ad"), several.ok = TRUE)
+     correction_types <- match.arg(correction_types, c("ts", "vgx", "vgy"), several.ok = TRUE)
+     
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     
+     ma_methods <- ma_methods[ma_methods %in% attributes(ma_obj)$ma_methods]
+     
+     out <- list(barebones = NULL, 
+                 individual_correction = NULL, 
+                 artifact_distribution = NULL)[c("bb", "ic", "ad") %in% ma_methods]
+     
+     contents <- NULL
+     total_tables <- 0
+     
+     if("bb" %in% ma_methods){
+          out$barebones <- compile_metatab(ma_obj = ma_obj, ma_method = "bb")
+          contents <- c(contents, "- barebones")
+          total_tables <- total_tables + 1
      }
-
-     if("ma_master" %in% class(ma_obj_filtered)){
-          out <- ma_obj_filtered$grand_tables
+     
+     
+     if("ic" %in% ma_methods){
+          .contents <- NULL
+          if("ts" %in% correction_types){
+               out$individual_correction$true_score <- 
+                    compile_metatab(ma_obj = ma_obj, ma_method = "ic", 
+                                    correction_type = "ts")   
+               .contents <- c(.contents, "true score")
+               total_tables <- total_tables + 1
+          }
+          
+          if("vgx" %in% correction_types){
+               out$individual_correction$validity_generalization_x <- 
+                    compile_metatab(ma_obj = ma_obj, ma_method = "ic", 
+                                    correction_type = "vgx")
+               .contents <- c(.contents, "validity generalization (X as predictor)")
+               total_tables <- total_tables + 1
+          }
+          
+          if("vgy" %in% correction_types){
+               out$individual_correction$validity_generalization_y <-
+                    compile_metatab(ma_obj = ma_obj, ma_method = "ic", 
+                                    correction_type = "vgy")
+               .contents <- c(.contents, "validity generalization (Y as predictor)")
+               total_tables <- total_tables + 1
+          }
+          
+          if(!is.null(.contents))
+               contents <- c(contents, paste0("- individual correction \n     - ", 
+                                              paste0(.contents, collapse = "\n     - ")))
+     }
+     
+     if("ad" %in% ma_methods){
+          .contents <- NULL
+          if("ts" %in% correction_types){
+               out$artifact_distribution$true_score <- 
+                    compile_metatab(ma_obj = ma_obj, ma_method = "ad", 
+                                    correction_type = "ts")   
+               .contents <- c(.contents, "true score")
+               total_tables <- total_tables + 1
+          }
+          
+          if("vgx" %in% correction_types){
+               out$artifact_distribution$validity_generalization_x <- 
+                    compile_metatab(ma_obj = ma_obj, ma_method = "ad", 
+                                    correction_type = "vgx")
+               .contents <- c(.contents, "validity generalization (X as predictor)")
+               total_tables <- total_tables + 1
+          }
+          
+          if("vgy" %in% correction_types){
+               out$artifact_distribution$validity_generalization_y <-
+                    compile_metatab(ma_obj = ma_obj, ma_method = "ad", 
+                                    correction_type = "vgy")
+               .contents <- c(.contents, "validity generalization (Y as predictor)")
+               total_tables <- total_tables + 1
+          }
+          
+          if(!is.null(.contents))
+               contents <- c(contents, paste0("- artifact distribution \n     - ",
+                                              paste0(.contents, collapse = "\n     - ")))
+     }
+     
+     
+     if(total_tables > 1){
+          attributes(out) <- append(attributes(out), list(contents = paste0(contents, collapse = "\n")))
+          class(out) <- c("get_metatab")   
      }else{
-          barebones <- ma_obj_filtered$barebones$meta_table
-          individual_correction <- ma_obj_filtered$individual_correction[c(ts, vgx, vgy)]
-          artifact_distribution <- ma_obj_filtered$artifact_distribution[c(ts, vgx, vgy)]
-          if(!is.null(individual_correction) | !is.null(artifact_distribution)){
-               out <- list(barebones = barebones)
-               if(!is.null(individual_correction)) out$individual_correction <- lapply(individual_correction, function(x) x$meta_table)
-               if(!is.null(artifact_distribution)) out$artifact_distribution <- artifact_distribution
+          if(names(out) == "barebones"){
+               out <- out[[1]]
+          }else{
+               out <- out[[1]][[1]]
           }
      }
-     class(out) <- c("psychmeta", "get_metatab")
+
      out
 }
 
@@ -161,73 +200,76 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @export
 get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
                    as_ad_obj = FALSE, inputs_only = TRUE, ma_method = c("ad", "ic"), ad_type = c("tsa", "int"), ...){
+     
      ad_type <- match.arg(ad_type, c("tsa", "int"))
      ma_method <- match.arg(ma_method, c("ad", "ic"))
 
-     ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)#, ...)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
 
+     
      if(ma_method == "ad"){
-          if(!("ma_ad" %in% class(ma_obj_filtered)))
+          if(!("ad" %in% attributes(ma_obj)$ma_methods))
                stop("'ma_obj' does not contain artifact-distribution meta-analyses: Please adjust the 'ma_method' argument.", call. = FALSE)
      }else{
-          if(!("ma_ic" %in% class(ma_obj_filtered)))
+          if(!("ic" %in% attributes(ma_obj)$ma_methods))
                stop("'ma_obj' does not contain individual-correction meta-analyses: Please adjust the 'ma_method' argument.", call. = FALSE)
      }
-     if(!("ma_master" %in% class(ma_obj_filtered))){
-          ma_obj_filtered <- list(inputs = list(pairwise_ads = TRUE),
-                                  construct_pairs = list("Pair ID = 1: X = X, Y = Y" = ma_obj_filtered))
-     }
-
+     
+     ad_list <- map(ma_obj$ad, function(x) x[[ma_method]])
+     
      if(as_ad_obj){
-          ad_list_x <- lapply(ma_obj_filtered$construct_pairs, function(pair){
-               if(ma_method == "ad"){
-                    pair$artifact_distribution$artifact_distributions$ad_x
+          ad_list_x <- map(ad_list, function(x){
+               if(ma_method == "ic"){
+                    out <- x[[paste0("ad_x_", ad_type)]]
                }else{
-                    pair$individual_correction$artifact_distributions[[paste0("ad_x_", ad_type)]]
+                    out <- x[["ad_x"]]
                }
           })
-          ad_list_y <- lapply(ma_obj_filtered$construct_pairs, function(pair){
-               if(ma_method == "ad"){
-                    pair$artifact_distribution$artifact_distributions$ad_y
+          
+          ad_list_y <- map(ad_list, function(x){
+               if(ma_method == "ic"){
+                    out <- x[[paste0("ad_y_", ad_type)]]
                }else{
-                    pair$individual_correction$artifact_distributions[[paste0("ad_y_", ad_type)]]
+                    out <- x[["ad_y"]]
                }
           })
      }else{
           if(inputs_only){
-               ad_list_x <- lapply(ma_obj_filtered$construct_pairs, function(pair){
-                    if(ma_method == "ad"){
-                         out <- pair$artifact_distribution$artifact_distributions$ad_x
+               ad_list_x <- map(ad_list, function(x){
+                    if(ma_method == "ic"){
+                         out <- x[[paste0("ad_x_", ad_type)]]
                     }else{
-                         out <- pair$individual_correction$artifact_distributions[[paste0("ad_x_", ad_type)]]
+                         out <- x[["ad_x"]]
                     }
                     .att <- attributes(out)
                     .att$summary_raw[.att$ad_contents_raw,]
                })
-               ad_list_y <- lapply(ma_obj_filtered$construct_pairs, function(pair){
-                    if(ma_method == "ad"){
-                         out <- pair$artifact_distribution$artifact_distributions$ad_y
+               
+               ad_list_y <- map(ad_list, function(x){
+                    if(ma_method == "ic"){
+                         out <- x[[paste0("ad_y_", ad_type)]]
                     }else{
-                         out <- pair$individual_correction$artifact_distributions[[paste0("ad_y_", ad_type)]]
+                         out <- x[["ad_y"]]
                     }
                     .att <- attributes(out)
                     .att$summary_raw[.att$ad_contents_raw,]
                })
           }else{
-               ad_list_x <- lapply(ma_obj_filtered$construct_pairs, function(pair){
-                    if(ma_method == "ad"){
-                         out <- pair$artifact_distribution$artifact_distributions$ad_x
+               ad_list_x <- map(ad_list, function(x){
+                    if(ma_method == "ic"){
+                         out <- x[[paste0("ad_x_", ad_type)]]
                     }else{
-                         out <- pair$individual_correction$artifact_distributions[[paste0("ad_x_", ad_type)]]
+                         out <- x[["ad_x"]]
                     }
                     .att <- attributes(out)
                     .att$summary[.att$ad_contents,]
                })
-               ad_list_y <- lapply(ma_obj_filtered$construct_pairs, function(pair){
-                    if(ma_method == "ad"){
-                         out <- pair$artifact_distribution$artifact_distributions$ad_y
+               
+               ad_list_y <- map(ad_list, function(x){
+                    if(ma_method == "ic"){
+                         out <- x[[paste0("ad_y_", ad_type)]]
                     }else{
-                         out <- pair$individual_correction$artifact_distributions[[paste0("ad_y_", ad_type)]]
+                         out <- x[["ad_y"]]
                     }
                     .att <- attributes(out)
                     .att$summary[.att$ad_contents,]
@@ -235,27 +277,18 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
           }
      }
 
-     construct_pairs <- names(ma_obj_filtered$construct_pairs)
-     if(case_sensitive){
-          construct_pairs <- t(simplify2array(lapply(str_split(construct_pairs, pattern = ": "), function(x){
-               gsub(x = gsub(x = str_split(x[[2]], pattern = ", ")[[1]],
-                             pattern = "X = ", replacement = ""),
-                    pattern = "Y = ", replacement = "")
-          })))
-     }else{
-          construct_pairs <- tolower(construct_pairs)
-          construct_pairs <- t(simplify2array(lapply(str_split(construct_pairs, pattern = ": "), function(x){
-               gsub(x = gsub(x = str_split(x[[2]], pattern = ", ")[[1]],
-                             pattern = "x = ", replacement = ""),
-                    pattern = "y = ", replacement = "")
-          })))
-     }
+     construct_x <- ma_obj$construct_x
+     construct_y <- ma_obj$construct_y
 
+     construct_pairs <- cbind(construct_x, construct_y)
+     if(case_sensitive) construct_pairs <- tolower(construct_pairs)
+     
      names(ad_list_x) <- construct_pairs[,1]
      names(ad_list_y) <- construct_pairs[,2]
 
+     pairwise_ads <- attributes(ma_obj)$inputs$pairwise_ads
      if(as_ad_obj){
-          if(!ma_obj_filtered$inputs$pairwise_ads){
+          if(!pairwise_ads){
                ad <- append(ad_list_x, ad_list_y)
                ad <- ad[!duplicated(names(ad))]
           }else{
@@ -296,16 +329,16 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                                            ux = "Observed-score u-ratio",
                                            ut = "True-score u-ratio")
 
-               ad_x <- rbind(ad_x, cbind(pair_id = i, construct = construct_pairs[i,1],
+               ad_x <- rbind(ad_x, cbind(pair_id = i, construct = rep(construct_pairs[i,1], length(artifact_x)),
                                          data.frame(artifact = artifact_x,
                                                     ad_list_x[[i]])))
-               ad_y <- rbind(ad_y, cbind(pair_id = i, construct = construct_pairs[i,2],
+               ad_y <- rbind(ad_y, cbind(pair_id = i, construct = rep(construct_pairs[i,2], length(artifact_x)),
                                          data.frame(artifact = artifact_y,
                                                     ad_list_y[[i]])))
           }
           ad <- rbind(ad_x, ad_y)
 
-          if(!ma_obj_filtered$inputs$pairwise_ads){
+          if(!pairwise_ads){
                ad <- ad[!duplicated(paste(ad$construct, ad$artifact)),]
                ad$pair_id <- NULL
           }
@@ -321,75 +354,23 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
 get_followup <- function(ma_obj, follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"),
                          analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
-     ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
-
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj_filtered))){
-          ts <- "true_score"
-          vgx <- "validity_generalization_x"
-          vgy <- "validity_generalization_y"
-     }else{
-          ts <- "latentGroup_latentY"
-          vgx <- "observedGroup_latentY"
-          vgy <- "latentGroup_observedY"
+     follow_up <- match.arg(follow_up, c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"), 
+                            several.ok = TRUE)
+     
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     
+     follow_up <- follow_up[follow_up %in% colnames(ma_obj)]
+     .followup <- ma_obj[,follow_up]
+     
+     out <- apply(.followup, 2, function(x){
+          as.list(x)
+     })
+     for(i in names(out)) names(out[[i]]) <- paste0("analysis id: ", ma_obj$analysis_id)
+     if(any(names(out) == "metareg")){
+          out$metareg <- out$metareg[!unlist(map(out$metareg, is.null))]
      }
-
-     if("ma_master" %in% class(ma_obj_filtered)){
-          out <- list()
-          follow_up <- follow_up[follow_up %in% names(ma_obj_filtered$construct_pairs[[1]]$follow_up_analyses)]
-          for(i in follow_up){
-               barebones <- lapply(ma_obj_filtered$construct_pairs, function(x) x$follow_up_analyses[[i]]$barebones)
-               if(!is.null(ma_obj_filtered$grand_tables$individual_correction) | !is.null(ma_obj_filtered$grand_tables$artifact_distribution)){
-                    .out <- list(barebones = barebones)
-                    if(!is.null(ma_obj_filtered$grand_tables$individual_correction)){
-                         individual_correction <- list(lapply(ma_obj_filtered$construct_pairs, function(x) x$follow_up_analyses[[i]]$individual_correction[[ts]]),
-                                                       lapply(ma_obj_filtered$construct_pairs, function(x) x$follow_up_analyses[[i]]$individual_correction[[vgx]]),
-                                                       lapply(ma_obj_filtered$construct_pairs, function(x) x$follow_up_analyses[[i]]$individual_correction[[vgy]]))
-                         names(individual_correction) <- c(ts, vgx, vgy)
-                         .out$individual_correction <- individual_correction
-                    }
-                    if(i != "metareg")
-                         if(!is.null(ma_obj_filtered$grand_tables$artifact_distribution)){
-                              artifact_distribution <- list(lapply(ma_obj_filtered$construct_pairs, function(x) x$follow_up_analyses[[i]]$artifact_distribution[[ts]]),
-                                                            lapply(ma_obj_filtered$construct_pairs, function(x) x$follow_up_analyses[[i]]$artifact_distribution[[vgx]]),
-                                                            lapply(ma_obj_filtered$construct_pairs, function(x) x$follow_up_analyses[[i]]$artifact_distribution[[vgy]]))
-                              names(artifact_distribution) <- c(ts, vgx, vgy)
-                              .out$artifact_distribution <- artifact_distribution
-                         }
-               }else{
-                    .out <- barebones
-               }
-               out[[i]] <- .out
-          }
-     }else{
-          out <- list()
-          follow_up <- follow_up[follow_up %in% names(ma_obj_filtered$follow_up_analyses)]
-          for(i in follow_up){
-               barebones <- ma_obj_filtered$follow_up_analyses[[i]]$barebones
-               ma_obj_filtered$follow_up_analyses$metareg$barebones
-               if(!is.null(ma_obj_filtered$individual_correction) | !is.null(ma_obj_filtered$artifact_distribution)){
-                    .out <- list(barebones = barebones)
-                    if(!is.null(ma_obj_filtered$individual_correction)){
-                         individual_correction <- list(ma_obj_filtered$follow_up_analyses[[i]]$individual_correction[[ts]],
-                                                       ma_obj_filtered$follow_up_analyses[[i]]$individual_correction[[vgx]],
-                                                       ma_obj_filtered$follow_up_analyses[[i]]$individual_correction[[vgy]])
-                         names(individual_correction) <- c(ts, vgx, vgy)
-                         .out$individual_correction <- individual_correction
-                    }
-                    if(i != "metareg")
-                         if(!is.null(ma_obj_filtered$artifact_distribution)){
-                              artifact_distribution <- list(ma_obj_filtered$follow_up_analyses[[i]]$artifact_distribution[[ts]],
-                                                            ma_obj_filtered$follow_up_analyses[[i]]$artifact_distribution[[vgx]],
-                                                            ma_obj_filtered$follow_up_analyses[[i]]$artifact_distribution[[vgy]])
-                              names(artifact_distribution) <- c(ts, vgx, vgy)
-                              .out$artifact_distribution <- artifact_distribution
-                         }
-               }else{
-                    .out <- barebones
-               }
-               out[[i]] <- .out
-          }
-     }
-     class(out) <- c("psychmeta", "get_followup")
+     
+     class(out) <- c("get_followup")
 
      out
 }
@@ -399,7 +380,7 @@ get_followup <- function(ma_obj, follow_up = c("heterogeneity", "leave1out", "cu
 get_heterogeneity <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
      out <- get_followup(ma_obj = ma_obj, follow_up = "heterogeneity",
                          analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("psychmeta", "get_heterogeneity")
+     class(out) <- c("get_heterogeneity")
      out
 }
 
@@ -408,7 +389,7 @@ get_heterogeneity <- function(ma_obj, analyses = "all", match = c("all", "any"),
 get_leave1out <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
      out <- get_followup(ma_obj = ma_obj, follow_up = "leave1out",
                          analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("psychmeta", "get_leave1out")
+     class(out) <- c("get_leave1out")
      out
 }
 
@@ -417,7 +398,7 @@ get_leave1out <- function(ma_obj, analyses = "all", match = c("all", "any"), cas
 get_cumulative <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
      out <- get_followup(ma_obj = ma_obj, follow_up = "cumulative",
                          analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("psychmeta", "get_cumulative")
+     class(out) <- c("get_cumulative")
      out
 }
 
@@ -426,7 +407,7 @@ get_cumulative <- function(ma_obj, analyses = "all", match = c("all", "any"), ca
 get_bootstrap <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
      out <- get_followup(ma_obj = ma_obj, follow_up = "bootstrap",
                          analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("psychmeta", "get_bootstrap")
+     class(out) <- c("get_bootstrap")
      out
 }
 
@@ -435,7 +416,7 @@ get_bootstrap <- function(ma_obj, analyses = "all", match = c("all", "any"), cas
 get_metareg <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
      out <- get_followup(ma_obj = ma_obj, follow_up = "metareg",
                          analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("psychmeta", "get_metareg")
+     class(out) <- c("get_metareg")
      out
 }
 
@@ -444,31 +425,26 @@ get_metareg <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @export
 get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
-     ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
-
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj_filtered))){
-          ts <- "true_score"
-          vgx <- "validity_generalization_x"
-          vgy <- "validity_generalization_y"
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     
+     if(!is.null(ma_obj$pair_id)){
+          do_matrix <- length(unique(ma_obj$pair_id)) > 1
      }else{
-          ts <- "latentGroup_latentY"
-          vgx <- "observedGroup_latentY"
-          vgy <- "latentGroup_observedY"
+          do_matrix <- FALSE
      }
-
-     if("ma_master" %in% class(ma_obj_filtered)){
-          ma_list <- ma_obj_filtered$grand_tables
-          ma_list <- ma_list[!unlist(lapply(ma_list, is.null))]
+     
+     if(do_matrix){
+          ma_list <- get_metatab(ma_obj = ma_obj)
           ma_methods <- names(ma_list)
 
-          constructs <- unique(c(as.character(ma_list$barebones$Construct_X),
-                                 as.character(ma_list$barebones$Construct_Y)))
-          analysis_ids <- unique(ma_list$barebones$Analysis_ID)
+          constructs <- unique(c(as.character(ma_list$barebones$construct_x),
+                                 as.character(ma_list$barebones$construct_y)))
+          analysis_ids <- unique(ma_list$barebones$analysis_id)
           .rmat <- reshape_vec2mat(cov = NA, var = rep(1, length(constructs)), var_names = constructs)
           .mat <- reshape_vec2mat(cov = NA, var = rep(NA, length(constructs)), var_names = constructs)
           .rmat_list <- rep(list(.rmat), length(analysis_ids))
           .mat_list <- rep(list(.mat), length(analysis_ids))
-          names(.rmat_list) <- names(.mat_list) <- paste("Analysis ID =", analysis_ids)
+          names(.rmat_list) <- names(.mat_list) <- paste("analysis id: ", analysis_ids)
           r_list <- ma_list
 
           for(i in ma_methods){
@@ -498,10 +474,10 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 
                          for(x in constructs){
                               for(y in constructs){
-                                   .out <- dplyr::filter(ma_list$barebones, Construct_X == x, Construct_Y == y, Analysis_ID == a)
+                                   .out <- dplyr::filter(ma_list$barebones, construct_x == x, construct_y == y, analysis_id == a)
                                    if(nrow(.out) > 0){
                                         for(.name in .names){
-                                             .out_list[[.name]][x,y] <- .out_list[[.name]][y,x] <- .out[,.name]
+                                             .out_list[[.name]][x,y] <- .out_list[[.name]][y,x] <- unlist(.out[,.name])
                                         }
                                    }
                               }
@@ -524,10 +500,10 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 
                               for(x in constructs){
                                    for(y in constructs){
-                                        .out <- dplyr::filter(ma_list[[i]][[j]], Construct_X == x, Construct_Y == y, Analysis_ID == a)
+                                        .out <- dplyr::filter(ma_list[[i]][[j]], construct_x == x, construct_y == y, analysis_id == a)
                                         if(nrow(.out) > 0){
                                              for(.name in .names){
-                                                  .out_list[[.name]][x,y] <- .out_list[[.name]][y,x] <- .out[,.name]
+                                                  .out_list[[.name]][x,y] <- .out_list[[.name]][y,x] <- unlist(.out[,.name])
                                              }
                                         }
                                    }
@@ -537,7 +513,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                     }
                }
           }
-          class(r_list) <- c("psychmeta", "get_matrix")
+          class(r_list) <- "get_matrix"
           r_list
      }else{
           NULL
@@ -550,9 +526,14 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 #' @export
 get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "cumulative"),
                       analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
-     ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     
+     plot_types <- match.arg(plot_types, c("funnel", "forest", "leave1out", "cumulative"), several.ok = TRUE)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
 
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj_filtered))){
+     ma_metric <- attributes(ma_obj)$ma_metric
+     ma_methods <- attributes(ma_obj)$ma_methods
+     
+     if(any(c("r_as_r", "d_as_r") %in% ma_metric)){
           ts <- "true_score"
           vgx <- "validity_generalization_x"
           vgy <- "validity_generalization_y"
@@ -561,73 +542,29 @@ get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "c
           vgx <- "observedGroup_latentY"
           vgy <- "latentGroup_observedY"
      }
-
-     if("ma_master" %in% class(ma_obj_filtered)){
-          out <- list()
-          .plot_types <- unique(unlist(lapply(ma_obj_filtered$construct_pairs, function(.x) names(.x$plots))))
-          plot_types <- plot_types[plot_types %in% .plot_types]
-          for(i in plot_types){
-               barebones <- lapply(ma_obj_filtered$construct_pairs, function(x) x$plots[[i]]$barebones)
-               if(!is.null(ma_obj_filtered$grand_tables$individual_correction) | !is.null(ma_obj_filtered$grand_tables$artifact_distribution)){
-                    .out <- list(barebones = barebones)
-                    if(!is.null(ma_obj_filtered$grand_tables$individual_correction)){
-                         individual_correction <- list(lapply(ma_obj_filtered$construct_pairs, function(x) x$plots[[i]]$individual_correction[[ts]]),
-                                                       lapply(ma_obj_filtered$construct_pairs, function(x) x$plots[[i]]$individual_correction[[vgx]]),
-                                                       lapply(ma_obj_filtered$construct_pairs, function(x) x$plots[[i]]$individual_correction[[vgy]]))
-                         names(individual_correction) <- c(ts, vgx, vgy)
-                         .out$individual_correction <- individual_correction
-                    }
-                    if(i %in% c("leave1out", "cumulative"))
-                         if(!is.null(ma_obj_filtered$grand_tables$artifact_distribution)){
-                              artifact_distribution <- list(lapply(ma_obj_filtered$construct_pairs, function(x) x$plots[[i]]$artifact_distribution[[ts]]),
-                                                            lapply(ma_obj_filtered$construct_pairs, function(x) x$plots[[i]]$artifact_distribution[[vgx]]),
-                                                            lapply(ma_obj_filtered$construct_pairs, function(x) x$plots[[i]]$artifact_distribution[[vgy]]))
-                              names(artifact_distribution) <- c(ts, vgx, vgy)
-                              .out$artifact_distribution <- artifact_distribution
-                         }
-               }else{
-                    .out <- barebones
-               }
-               out[[i]] <- .out
-          }
-     }else{
-          out <- list()
-          plot_types <- plot_types[plot_types %in% names(ma_obj_filtered$plots)]
-          for(i in plot_types){
-               barebones <- ma_obj_filtered$plots[[i]]$barebones
-               if(!is.null(ma_obj_filtered$individual_correction) | !is.null(ma_obj_filtered$artifact_distribution)){
-                    .out <- list(barebones = barebones)
-                    if(!is.null(ma_obj_filtered$individual_correction)){
-                         individual_correction <- list(ma_obj_filtered$plots[[i]]$individual_correction[[ts]],
-                                                       ma_obj_filtered$plots[[i]]$individual_correction[[vgx]],
-                                                       ma_obj_filtered$plots[[i]]$individual_correction[[vgy]])
-                         names(individual_correction) <- c(ts, vgx, vgy)
-                         .out$individual_correction <- individual_correction
-                    }
-                    if(i %in% c("leave1out", "cumulative"))
-                         if(!is.null(ma_obj_filtered$artifact_distribution)){
-                              artifact_distribution <- list(ma_obj_filtered$plots[[i]]$artifact_distribution[[ts]],
-                                                            ma_obj_filtered$plots[[i]]$artifact_distribution[[vgx]],
-                                                            ma_obj_filtered$plots[[i]]$artifact_distribution[[vgy]])
-                              names(artifact_distribution) <- c(ts, vgx, vgy)
-                              .out$artifact_distribution <- artifact_distribution
-                         }
-               }else{
-                    .out <- barebones
-               }
-               out[[i]] <- .out
-          }
+     
+     plot_types <- plot_types[plot_types %in% colnames(ma_obj)]
+     .plots <- ma_obj[,plot_types]
+     
+     out <- apply(.plots, 2, function(x){
+          as.list(x)
+     })
+     for(i in names(out)) names(out[[i]]) <- paste0("analysis id: ", ma_obj$analysis_id)
+     if(any(names(out) == "forest")){
+          out$forest <- out$forest[!unlist(map(out$forest, is.null))]
      }
-     class(out) <- c("psychmeta", "get_plots")
+     
+     class(out) <- c("get_plots")
      out
 }
+
 
 compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_type = c("ts", "vgx", "vgy")){
      ma_method <- match.arg(arg = ma_method, choices = c("bb", "ic", "ad"))
      correction_type <- match.arg(arg = correction_type, choices = c("ts", "vgx", "vgy"))
      ma_metric <- attributes(ma_obj)$ma_metric
      
-     if(ma_method %in% attributes(ma_obj)$ma_methods)
+     if(!(ma_method %in% attributes(ma_obj)$ma_methods))
           ma_method <- "bb"
      
      if(ma_method == "bb"){

@@ -366,6 +366,8 @@ sensitivity_leave1out <- function(ma_obj, ...){
           out_list
      })
      
+     names(out_list) <- paste0("analysis id: ", ma_obj$analysis_id)
+     
      ma_obj$leave1out <- out_list
      
      if(convert_back) ma_obj <- convert_ma(ma_obj)

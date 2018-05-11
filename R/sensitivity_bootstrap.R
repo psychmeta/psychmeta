@@ -269,6 +269,8 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
           out_list
      })
      
+     names(out_list) <- paste0("analysis id: ", ma_obj$analysis_id)
+     
      ma_obj$bootstrap <- out_list
      
      if(convert_back) ma_obj <- convert_ma(ma_obj)
