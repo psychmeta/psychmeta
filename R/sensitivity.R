@@ -13,7 +13,8 @@
 #' @param sort_method Method to sort samples in the cumulative meta-analysis. Options are "weight" to sort by weight (default), "n" to sort by sample size, and "inv_var" to sort by inverse variance.
 #' @param boot_iter Number of bootstrap iterations to be computed.
 #' @param boot_conf_level Width of confidence intervals to be constructed for all bootstrapped statistics.
-#' @param boot_ci_type Type of bootstrapped confidence interval. Options are "bca", "norm","basic", "stud", and "perc" (these are "type" options from the boot::boot.ci function). Default is "bca".
+#' @param boot_ci_type Type of bootstrapped confidence interval. Options are "bca", "norm", "basic", "stud", and "perc" (these are "type" options from the boot::boot.ci function). Default is "bca".
+#' Note: If you have too few iterations, the "bca" method will not work and you will need to either increase the iterations or choose a different method. 
 #' @param ... Additional arguments.
 #'
 #' @importFrom tibble add_column
@@ -50,7 +51,7 @@
 sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative = TRUE,
                         sort_method = c("weight", "n", "inv_var"),
                         boot_iter = 1000, boot_conf_level = .95, 
-                        boot_ci_type = c("bca", "norm","basic", "stud", "perc"), ...){
+                        boot_ci_type = c("bca", "norm", "basic", "stud", "perc"), ...){
 
      cat(" **** Computing sensitivity analyses **** \n")
      bootstrap <- scalar_arg_warning(arg = bootstrap, arg_name = "bootstrap")

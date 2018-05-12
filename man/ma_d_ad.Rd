@@ -5,12 +5,10 @@
 \title{Artifact-distribution meta-analysis of \emph{d} values}
 \usage{
 ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
-  correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
-  "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
-  use_ic_ads = c("tsa", "int"), correct_rGg = FALSE, correct_ryy = TRUE,
-  correct_rr_g = TRUE, correct_rr_y = TRUE, indirect_rr_g = TRUE,
-  indirect_rr_y = TRUE, sign_rgz = 1, sign_ryz = 1,
-  control = control_psychmeta(), ...)
+  correction_method = "auto", use_ic_ads = c("tsa", "int"),
+  correct_rGg = FALSE, correct_ryy = TRUE, correct_rr_g = TRUE,
+  correct_rr_y = TRUE, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
+  sign_rgz = 1, sign_ryz = 1, control = control_psychmeta(), ...)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object of correlations or \emph{d} values (regardless of input metric, output metric will be \emph{d}).}

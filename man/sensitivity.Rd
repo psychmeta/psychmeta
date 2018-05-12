@@ -38,7 +38,8 @@ sensitivity_leave1out(ma_obj, ...)
 
 \item{boot_conf_level}{Width of confidence intervals to be constructed for all bootstrapped statistics.}
 
-\item{boot_ci_type}{Type of bootstrapped confidence interval. Options are "bca", "norm","basic", "stud", and "perc" (these are "type" options from the boot::boot.ci function). Default is "bca".}
+\item{boot_ci_type}{Type of bootstrapped confidence interval. Options are "bca", "norm", "basic", "stud", and "perc" (these are "type" options from the boot::boot.ci function). Default is "bca".
+Note: If you have too few iterations, the "bca" method will not work and you will need to either increase the iterations or choose a different method.}
 
 \item{...}{Additional arguments.}
 }

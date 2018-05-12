@@ -85,10 +85,10 @@
 #' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
-#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+#' \item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
 #' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 #' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 #' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -108,10 +108,10 @@
 #'
 #' Components of output tables for individual-correction meta-analyses:
 #' \itemize{
-#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+#' \item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
 #' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 #' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 #' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -139,10 +139,10 @@
 #'
 #' Components of output tables for artifact-distribution meta-analyses:
 #' \itemize{
-#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+#' \item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
 #' \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 #' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 #' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -282,8 +282,7 @@
 ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  ma_method = c("bb", "ic", "ad"), 
                  ad_type = c("tsa", "int"), 
-                 correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
-                                       "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
+                 correction_method = "auto",
                  construct_x = NULL, construct_y = NULL,
                  measure_x = NULL, measure_y = NULL,
                  construct_order = NULL,
@@ -310,10 +309,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
-     .correction_methods <- c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
-                              "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none")
-     match.arg(arg = c(correction_method), 
-               choices = c(.correction_methods, paste0(.correction_methods, "_force")), several.ok = TRUE)
      
      control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
                                   .psychmeta_control_arg = control)
@@ -337,8 +332,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      hs_override <- control$hs_override
      use_all_arts <- control$use_all_arts
      estimate_pa <- control$estimate_pa
-     
-     if(ma_method == "ad") impute_artifacts <- FALSE
      
      if(hs_override){
           wt_type <- "sample_size"
@@ -934,8 +927,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(!is.null(cleaned_data$sample_id)) es_data <- cbind(sample_id = cleaned_data$sample_id, es_data)
 
      if(ma_method != "bb" & !is.null(sample_id)){
-          if(impute_artifacts){
-               cat(" Imputing reliability information \n")
+          if(impute_artifacts & ma_method == "ic"){
+               cat(" Cleaning and imputing reliability information \n")
                rel_imputed <- impute_artifact_2col(logic_vec_x = data_x$rxx_restricted,
                                                    logic_vec_y = data_y$ryy_restricted,
                                                    sample_id = sample_id, n_vec = n,
@@ -948,7 +941,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                    cat_moderator_matrix = categorical_moderators,
                                                    impute_method = impute_method, art_type = "reliability")
 
-               cat(" Imputing range-restriction information \n")
+               cat(" Cleaning and imputing range-restriction information \n")
                u_imputed <- impute_artifact_2col(logic_vec_x = data_x$ux_observed,
                                                  logic_vec_y = data_y$uy_observed,
                                                  sample_id = sample_id, n_vec = n,

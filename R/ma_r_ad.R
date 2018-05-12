@@ -91,8 +91,7 @@
 #' ma_r_ad(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y, correction_method = "uvdrr",
 #'         correct_rr_y = FALSE, indirect_rr_x = FALSE)
 ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL, 
-                    correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
-                                          "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"), 
+                    correction_method = "auto", 
                     use_ic_ads = c("tsa", "int"),
                     correct_rxx = TRUE, correct_ryy = TRUE,
                     correct_rr_x = TRUE, correct_rr_y = TRUE,
@@ -100,10 +99,6 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                     sign_rxz = 1, sign_ryz = 1, control = control_psychmeta(), ...){
      
      use_ic_ads <- match.arg(use_ic_ads, choices = c("tsa", "int"))
-     .correction_methods <- c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
-                              "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none")
-     match.arg(arg = c(correction_method), 
-               choices = c(.correction_methods, paste0(.correction_methods, "_force")), several.ok = TRUE)
      
      control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
                                   .psychmeta_control_arg = control)

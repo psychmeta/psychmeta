@@ -1,7 +1,7 @@
 #' @name sensitivity
 #' @rdname sensitivity
 sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_var"), ...){
-    
+     
      sort_method <- match.arg(sort_method, choices = c("weight", "n", "inv_var"))
      
      es_type <- NULL
@@ -55,7 +55,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                n_adj <- escalc$barebones$n_adj
                vi_xy <- escalc$barebones$vi
                wt_xy <- escalc$barebones$weight
-          
+               
                ts_label <- "true_score"
                vgx_label <- "validity_generalization_x"
                vgy_label <- "validity_generalization_y"
@@ -193,8 +193,8 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                          if(d_metric){
                               bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
-                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
-                                                           conf_method = conf_method, cred_method = cred_method)
+                              bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                            conf_method = conf_method, cred_method = cred_method))
                          }
                     }
                     
@@ -206,8 +206,8 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                          if(convert_back){
                               bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
-                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
-                                                           conf_method = conf_method, cred_method = cred_method)
+                              bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                            conf_method = conf_method, cred_method = cred_method))
                          }
                     }
                     
@@ -235,12 +235,12 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                          vgy_mat <- .convert_metatab(ma_table = vgy_mat, p_vec = rep(p, nrow(vgy_mat)), conf_level = conf_level, cred_level = cred_level,
                                                      conf_method = conf_method, cred_method = cred_method)
                          
-                         ts_table <- .convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
-                                                      conf_method = conf_method, cred_method = cred_method)
-                         vgx_table <- .convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
-                                                       conf_method = conf_method, cred_method = cred_method)
-                         vgy_table <- .convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
-                                                       conf_method = conf_method, cred_method = cred_method)
+                         ts_table <- suppressWarnings(.convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                       conf_method = conf_method, cred_method = cred_method))
+                         vgx_table <- suppressWarnings(.convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                        conf_method = conf_method, cred_method = cred_method))
+                         vgy_table <- suppressWarnings(.convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                        conf_method = conf_method, cred_method = cred_method))
                     }
                     
                     bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "cumulative")
@@ -294,16 +294,16 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                          vgy_mat <- .convert_metatab(ma_table = vgy_mat, p_vec = rep(p, nrow(vgy_mat)), conf_level = conf_level, cred_level = cred_level,
                                                      conf_method = conf_method, cred_method = cred_method)
                          
-                         bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
-                                                      conf_method = conf_method, cred_method = cred_method)
-                         ts_table <- .convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
-                                                      conf_method = conf_method, cred_method = cred_method)
-                         vgx_table <- .convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
-                                                       conf_method = conf_method, cred_method = cred_method)
-                         vgy_table <- .convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
-                                                       conf_method = conf_method, cred_method = cred_method)
+                         bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                       conf_method = conf_method, cred_method = cred_method))
+                         ts_table <- suppressWarnings(.convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                       conf_method = conf_method, cred_method = cred_method))
+                         vgx_table <- suppressWarnings(.convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                        conf_method = conf_method, cred_method = cred_method))
+                         vgy_table <- suppressWarnings(.convert_metatab(ma_table = vgy_table, p_vec = rep(p, nrow(vgy_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                        conf_method = conf_method, cred_method = cred_method))
                     }
-
+                    
                     bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
                     ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
                     vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
@@ -344,8 +344,8 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                          if(convert_back){
                               bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
-                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                           conf_method = conf_method, cred_method = cred_method)
+                              bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                                            conf_method = conf_method, cred_method = cred_method))
                          }
                     }
                     
@@ -357,8 +357,8 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                          if(convert_back){
                               bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
                                                          conf_method = conf_method, cred_method = cred_method)
-                              bb_table <- .convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                           conf_method = conf_method, cred_method = cred_method)
+                              bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                                            conf_method = conf_method, cred_method = cred_method))
                          }
                     }
                     

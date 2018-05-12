@@ -62,7 +62,7 @@ psychmeta_control <- function(error_type = c("mean", "sample"),
                               intercor = .5,
                               partial_intercor = FALSE,
                               clean_artifacts = TRUE, 
-                              impute_artifacts = FALSE,
+                              impute_artifacts = TRUE,
                               impute_method = c("bootstrap_mod", "bootstrap_full", 
                                                 "simulate_mod", "simulate_full", 
                                                 "wt_mean_mod", "wt_mean_full", 
@@ -163,4 +163,5 @@ psychmeta_control <- function(error_type = c("mean", "sample"),
 #' @rdname psychmeta_control
 #' @export
 control_psychmeta <- psychmeta_control
+
 

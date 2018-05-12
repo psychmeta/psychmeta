@@ -6,20 +6,19 @@
 \usage{
 ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
   treat_as_d = TRUE, ma_method = c("bb", "ic", "ad"), ad_type = c("tsa",
-  "int"), correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr",
-  "bvirr", "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
-  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
-  construct_y = NULL, measure_y = NULL, construct_order = NULL,
-  wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE",
-  "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
-  correct_rel = NULL, correct_rGg = FALSE, correct_ryy = TRUE,
-  correct_rr = NULL, correct_rr_g = TRUE, correct_rr_y = TRUE,
-  indirect_rr = NULL, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
-  rGg = NULL, pi = NULL, pa = NULL, ryy = NULL, ryy_restricted = TRUE,
-  ryy_type = "alpha", uy = NULL, uy_observed = TRUE, sign_rz = NULL,
-  sign_rgz = 1, sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = c("simple", "hierarchical", "none"),
-  supplemental_ads = NULL, data = NULL, control = psychmeta_control, ...)
+  "int"), correction_method = "auto", group_id = NULL, group1 = NULL,
+  group2 = NULL, group_order = NULL, construct_y = NULL,
+  measure_y = NULL, construct_order = NULL, wt_type = c("sample_size",
+  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
+  "PM"), correct_bias = TRUE, correct_rel = NULL, correct_rGg = FALSE,
+  correct_ryy = TRUE, correct_rr = NULL, correct_rr_g = TRUE,
+  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_g = TRUE,
+  indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
+  ryy_restricted = TRUE, ryy_type = "alpha", uy = NULL,
+  uy_observed = TRUE, sign_rz = NULL, sign_rgz = 1, sign_ryz = 1,
+  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
+  "hierarchical", "none"), supplemental_ads = NULL, data = NULL,
+  control = psychmeta_control(), ...)
 }
 \arguments{
 \item{d}{Vector or column name of observed \emph{d} values.}
@@ -131,7 +130,7 @@ Components of output tables for bare-bones meta-analyses:
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
 \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -151,10 +150,10 @@ Components of output tables for bare-bones meta-analyses:
 
 Components of output tables for individual-correction meta-analyses:
 \itemize{
-\item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
+\item{\code{pair_id}}{\cr Unique identification number for each construct-contrast pairing.}
 \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -182,10 +181,10 @@ Components of output tables for individual-correction meta-analyses:
 
 Components of output tables for artifact-distribution meta-analyses:
 \itemize{
-\item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
+\item{\code{pair_id}}{\cr Unique identification number for each construct-contrast pairing.}
 \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
+\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -227,7 +226,6 @@ The automatic compositing features are employed when \code{sample_id}s and/or co
 When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitivity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
 }
 \examples{
-\dontrun{
 ## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:
 ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 
@@ -240,7 +238,6 @@ ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
 ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
      ryy = ryyi, correct_rr_y = FALSE,
      construct_y = construct, data = data_d_meas_multi)
-}
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).

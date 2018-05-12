@@ -6,21 +6,20 @@
 \usage{
 ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   ma_method = c("bb", "ic", "ad"), ad_type = c("tsa", "int"),
-  correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
-  "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
-  construct_x = NULL, construct_y = NULL, measure_x = NULL,
-  measure_y = NULL, construct_order = NULL, wt_type = c("sample_size",
-  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
-  "PM"), correct_bias = TRUE, correct_rel = NULL, correct_rxx = TRUE,
-  correct_ryy = TRUE, correct_rr = NULL, correct_rr_x = TRUE,
-  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_x = TRUE,
-  indirect_rr_y = TRUE, rxx = NULL, rxx_restricted = TRUE,
-  rxx_type = "alpha", ryy = NULL, ryy_restricted = TRUE,
-  ryy_type = "alpha", ux = NULL, ux_observed = TRUE, uy = NULL,
-  uy_observed = TRUE, sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
-  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
-  "hierarchical", "none"), supplemental_ads = NULL, data = NULL,
-  control = psychmeta_control(), ...)
+  correction_method = "auto", construct_x = NULL, construct_y = NULL,
+  measure_x = NULL, measure_y = NULL, construct_order = NULL,
+  wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE",
+  "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
+  correct_rel = NULL, correct_rxx = TRUE, correct_ryy = TRUE,
+  correct_rr = NULL, correct_rr_x = TRUE, correct_rr_y = TRUE,
+  indirect_rr = NULL, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
+  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
+  ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
+  ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rz = NULL,
+  sign_rxz = 1, sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
+  moderator_type = c("simple", "hierarchical", "none"),
+  supplemental_ads = NULL, data = NULL, control = psychmeta_control(),
+  ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations}
@@ -145,10 +144,10 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
 Components of output tables for bare-bones meta-analyses:
 \itemize{
-\item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+\item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
 \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -168,10 +167,10 @@ Components of output tables for bare-bones meta-analyses:
 
 Components of output tables for individual-correction meta-analyses:
 \itemize{
-\item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+\item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
 \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
@@ -199,10 +198,10 @@ Components of output tables for individual-correction meta-analyses:
 
 Components of output tables for artifact-distribution meta-analyses:
 \itemize{
-\item{\code{Pair_ID}}{\cr Unique identification number for each construct pairing.}
+\item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
 \item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
 \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each moderator analysis within a construct pairing.}
+\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
 \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}

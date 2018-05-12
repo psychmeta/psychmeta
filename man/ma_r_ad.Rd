@@ -5,12 +5,10 @@
 \title{Artifact-distribution meta-analysis of correlations}
 \usage{
 ma_r_ad(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
-  correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
-  "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
-  use_ic_ads = c("tsa", "int"), correct_rxx = TRUE, correct_ryy = TRUE,
-  correct_rr_x = TRUE, correct_rr_y = TRUE, indirect_rr_x = TRUE,
-  indirect_rr_y = TRUE, sign_rxz = 1, sign_ryz = 1,
-  control = control_psychmeta(), ...)
+  correction_method = "auto", use_ic_ads = c("tsa", "int"),
+  correct_rxx = TRUE, correct_ryy = TRUE, correct_rr_x = TRUE,
+  correct_rr_y = TRUE, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
+  sign_rxz = 1, sign_ryz = 1, control = control_psychmeta(), ...)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object of correlations or d values (regardless of input metric, output metric will be r).}
