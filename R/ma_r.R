@@ -338,6 +338,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      use_all_arts <- control$use_all_arts
      estimate_pa <- control$estimate_pa
      
+     if(ma_method == "ad") impute_artifacts <- FALSE
+     
      if(hs_override){
           wt_type <- "sample_size"
           error_type <- "mean"
