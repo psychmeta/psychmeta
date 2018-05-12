@@ -5,25 +5,22 @@
 \title{Master framework for meta-analysis of correlations}
 \usage{
 ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
-  ma_method = "bb", ad_type = "tsa", correction_method = "auto",
+  ma_method = c("bb", "ic", "ad"), ad_type = c("tsa", "int"),
+  correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+  "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
   construct_x = NULL, construct_y = NULL, measure_x = NULL,
-  measure_y = NULL, construct_order = NULL, wt_type = "sample_size",
-  error_type = "mean", correct_bias = TRUE, correct_rel = NULL,
-  correct_rxx = TRUE, correct_ryy = TRUE, correct_rr = NULL,
-  correct_rr_x = TRUE, correct_rr_y = TRUE, indirect_rr = NULL,
-  indirect_rr_x = TRUE, indirect_rr_y = TRUE, rxx = NULL,
-  rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
-  ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rz = NULL,
-  sign_rxz = 1, sign_ryz = 1, conf_level = 0.95, cred_level = 0.8,
-  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
-  pairwise_ads = FALSE, residual_ads = TRUE, check_dependence = TRUE,
-  collapse_method = "composite", intercor = 0.5, clean_artifacts = TRUE,
-  impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE),
-  impute_method = "bootstrap_mod", seed = 42, decimals = 2,
-  hs_override = FALSE, use_all_arts = TRUE, supplemental_ads = NULL,
-  data = NULL, ...)
+  measure_y = NULL, construct_order = NULL, wt_type = c("sample_size",
+  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
+  "PM"), correct_bias = TRUE, correct_rel = NULL, correct_rxx = TRUE,
+  correct_ryy = TRUE, correct_rr = NULL, correct_rr_x = TRUE,
+  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_x = TRUE,
+  indirect_rr_y = TRUE, rxx = NULL, rxx_restricted = TRUE,
+  rxx_type = "alpha", ryy = NULL, ryy_restricted = TRUE,
+  ryy_type = "alpha", ux = NULL, ux_observed = TRUE, uy = NULL,
+  uy_observed = TRUE, sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
+  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
+  "hierarchical", "none"), supplemental_ads = NULL, data = NULL,
+  control = psychmeta_control(), ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations}
@@ -59,8 +56,6 @@ be used when interative artifact distributions are provided). See "Details" of \
 \item{wt_type}{Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).}
-
-\item{error_type}{Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.}
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -131,16 +126,6 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{sign_ryz}{Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).}
 
-\item{conf_level}{Confidence level to define the width of the confidence interval (default = .95).}
-
-\item{cred_level}{Credibility level to define the width of the credibility interval (default = .80).}
-
-\item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{cred_method}{Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
-
 \item{moderators}{Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).}
 
 \item{cat_moderators}{Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).}
@@ -148,55 +133,11 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 \item{moderator_type}{Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time, and
 "hierarchical" means that all possible combinations and subsets of moderators are to be examined.}
 
-\item{pairwise_ads}{Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).}
-
-\item{residual_ads}{Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_rho}.}
-
-\item{check_dependence}{Logical scalar that determines whether database should be checked for violations of independence (\code{TRUE}) or not (\code{FALSE}).}
-
-\item{collapse_method}{Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."}
-
-\item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.}
-
-\item{clean_artifacts}{If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
-in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.}
-
-\item{impute_artifacts}{If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
-When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.}
-
-\item{impute_method}{Method to use for imputing artifacts. Choices are:
-\itemize{
-\item{bootstrap_mod}{\cr Select random values from the most specific moderator categories available (default).}
-\item{bootstrap_full}{\cr Select random values from the full vector of artifacts.}
-\item{simulate_mod}{\cr Generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
-(uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
-\item{simulate_full}{\cr Generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
-\item{wt_mean_mod}{\cr Replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
-\item{wt_mean_full}{\cr Replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).}
-\item{unwt_mean_mod}{\cr Replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
-\item{unwt_mean_full}{\cr Replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).}
-\item{replace_unity}{\cr Replace missing values with 1 (not recommended).}
-\item{stop}{\cr Stop evaluations when missing artifacts are encountered.}
-}
-If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".}
-
-\item{seed}{Seed value to use for imputing artifacts. Default value is 42.}
-
-\item{decimals}{Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).}
-
-\item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
-\code{error_type} (will set to "mean"),
-\code{correct_bias} (will set to \code{TRUE}), 
-\code{conf_method} (will set to "norm"),
-\code{cred_method} (will set to "norm"), 
-\code{var_unbiased} (will set to \code{FALSE}), 
-and \code{use_all_arts} (will set to \code{FALSE}).}
-
-\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
-
 \item{supplemental_ads}{Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.}
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
+
+\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

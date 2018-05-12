@@ -4,7 +4,7 @@
 \alias{create_ad_list}
 \title{Create a list of artifact distributions by construct}
 \usage{
-create_ad_list(ad_type = "tsa", n, sample_id = NULL, construct_x,
+create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
   measure_x = NULL, construct_y, measure_y = NULL, rxx = NULL,
   rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
   ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,

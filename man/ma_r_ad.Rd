@@ -5,10 +5,12 @@
 \title{Artifact-distribution meta-analysis of correlations}
 \usage{
 ma_r_ad(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
-  correction_method = "auto", use_ic_ads = "tsa", correct_rxx = TRUE,
-  correct_ryy = TRUE, correct_rr_x = TRUE, correct_rr_y = TRUE,
-  indirect_rr_x = TRUE, indirect_rr_y = TRUE, residual_ads = TRUE,
-  sign_rxz = 1, sign_ryz = 1, decimals = 2, ...)
+  correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+  "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
+  use_ic_ads = c("tsa", "int"), correct_rxx = TRUE, correct_ryy = TRUE,
+  correct_rr_x = TRUE, correct_rr_y = TRUE, indirect_rr_x = TRUE,
+  indirect_rr_y = TRUE, sign_rxz = 1, sign_ryz = 1,
+  control = control_psychmeta(), ...)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object of correlations or d values (regardless of input metric, output metric will be r).}
@@ -42,14 +44,11 @@ Use one of the following commands: \code{tsa} to use the Taylor series method or
 
 \item{indirect_rr_y}{If \code{correct_rr_y} = \code{TRUE}: Logical argument that determines whether to correct for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{residual_ads}{Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_rho}.}
-
 \item{sign_rxz}{Sign of the relationship between X and the selection mechanism (for use with the bvirr \code{correction_method} only).}
 
 \item{sign_ryz}{Sign of the relationship between Y and the selection mechanism (for use with the bvirr \code{correction_method} only).}
 
-\item{decimals}{Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
-Rounding artifact distributions can help to consolidate trivially different values and speed up the computation of meta-analyses (especially in simulations).}
+\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Additional arguments.}
 }

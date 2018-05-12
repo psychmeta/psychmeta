@@ -4,12 +4,12 @@
 \alias{create_ad}
 \title{Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.}
 \usage{
-create_ad(ad_type = "tsa", rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
-  rxxi_type = rep("alpha", length(rxxi)), rxxa = NULL, n_rxxa = NULL,
-  wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), ux = NULL,
-  ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux,
-  length(mean_ux)), ut = NULL, ni_ut = NULL, na_ut = NULL,
-  wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
+create_ad(ad_type = c("tsa", "int"), rxxi = NULL, n_rxxi = NULL,
+  wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), rxxa = NULL,
+  n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
+  ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux,
+  dep_sds_ux_obs = rep(ux, length(mean_ux)), ut = NULL, ni_ut = NULL,
+  na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
   mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL,
   qxi_dist_type = rep("alpha", length(mean_qxi)), mean_rxxi = NULL,
   var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL,

@@ -2,15 +2,30 @@
 % Please edit documentation in R/psychmeta_control.R
 \name{psychmeta_control}
 \alias{psychmeta_control}
+\alias{control_psychmeta}
 \title{Control for \pkg{psychmeta} meta-analyses}
 \usage{
-psychmeta_control(error_type = "mean", conf_level = 0.95,
-  cred_level = 0.8, conf_method = "t", cred_method = "t",
-  var_unbiased = TRUE, pairwise_ads = FALSE, residual_ads = TRUE,
-  check_dependence = TRUE, collapse_method = "composite", intercor = 0.5,
+psychmeta_control(error_type = c("mean", "sample"), conf_level = 0.95,
+  cred_level = 0.8, conf_method = c("t", "norm"), cred_method = c("t",
+  "norm"), var_unbiased = TRUE, pairwise_ads = FALSE, residual_ads = TRUE,
+  check_dependence = TRUE, collapse_method = c("composite", "average",
+  "stop"), intercor = 0.5, partial_intercor = FALSE,
   clean_artifacts = TRUE, impute_artifacts = FALSE,
-  impute_method = "bootstrap_mod", seed = 42, decimals = 2,
-  hs_override = FALSE, use_all_arts = TRUE, ...)
+  impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod",
+  "simulate_full", "wt_mean_mod", "wt_mean_full", "unwt_mean_mod",
+  "unwt_mean_full", "replace_unity", "stop"), seed = 42, decimals = 2,
+  hs_override = FALSE, use_all_arts = TRUE, estimate_pa = FALSE, ...)
+
+control_psychmeta(error_type = c("mean", "sample"), conf_level = 0.95,
+  cred_level = 0.8, conf_method = c("t", "norm"), cred_method = c("t",
+  "norm"), var_unbiased = TRUE, pairwise_ads = FALSE, residual_ads = TRUE,
+  check_dependence = TRUE, collapse_method = c("composite", "average",
+  "stop"), intercor = 0.5, partial_intercor = FALSE,
+  clean_artifacts = TRUE, impute_artifacts = FALSE,
+  impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod",
+  "simulate_full", "wt_mean_mod", "wt_mean_full", "unwt_mean_mod",
+  "unwt_mean_full", "replace_unity", "stop"), seed = 42, decimals = 2,
+  hs_override = FALSE, use_all_arts = TRUE, estimate_pa = FALSE, ...)
 }
 \arguments{
 \item{error_type}{Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.}
@@ -34,6 +49,8 @@ psychmeta_control(error_type = "mean", conf_level = 0.95,
 \item{collapse_method}{Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."}
 
 \item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.}
+
+\item{partial_intercor}{For \emph{d} values only: Logical value that determines whether the values in \code{intercor} are to be treated as within-group correlations (i.e., partial correlation controlling for group membership; \code{TRUE}) or not (\code{FALSE}; default).}
 
 \item{clean_artifacts}{If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
 in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.}
@@ -71,6 +88,8 @@ and \code{use_all_arts} (will set to \code{FALSE}).}
 
 \item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
 
+\item{estimate_pa}{Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).}
+
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }
 \value{
@@ -78,4 +97,7 @@ A list of control arguments in the package environment.
 }
 \description{
 Control for \pkg{psychmeta} meta-analyses
+}
+\examples{
+psychmeta_control()
 }

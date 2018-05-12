@@ -26,7 +26,6 @@
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
-#' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rel Optional named vector that supersedes \code{correct_rxx} and \code{correct_ryy}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for unreliability.
 #' @param correct_rxx Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
@@ -74,51 +73,13 @@
 #' @param sign_rz Optional named vector that supersedes \code{sign_rxz} and \code{sign_ryz}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.
 #' @param sign_rxz Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
 #' @param moderator_type Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time, and
 #' "hierarchical" means that all possible combinations and subsets of moderators are to be examined.
-#' @param pairwise_ads Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).
-#' @param residual_ads Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_rho}.
-#' @param check_dependence Logical scalar that determines whether database should be checked for violations of independence (\code{TRUE}) or not (\code{FALSE}).
-#' @param collapse_method Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."
-#' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.
-#' @param clean_artifacts If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
-#' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
-#' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
-#' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.
-#' @param seed Seed value to use for imputing artifacts. Default value is 42.
-#' @param impute_method Method to use for imputing artifacts. Choices are:
-#' \itemize{
-#' \item{bootstrap_mod}{\cr Select random values from the most specific moderator categories available (default).}
-#' \item{bootstrap_full}{\cr Select random values from the full vector of artifacts.}
-#' \item{simulate_mod}{\cr Generate random values from the distribution with the mean and variance of observed artifacts from the most specific moderator categories available.
-#' (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
-#' \item{simulate_full}{\cr Generate random values from the distribution with the mean and variance of all observed artifacts (uses \code{rnorm} for u ratios and \code{rbeta} for reliability values).}
-#' \item{wt_mean_mod}{\cr Replace missing values with the sample-size weighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
-#' \item{wt_mean_full}{\cr Replace missing values with the sample-size weighted mean of the full distribution of artifacts (not recommended).}
-#' \item{unwt_mean_mod}{\cr Replace missing values with the unweighted mean of the distribution of artifacts from the most specific moderator categories available (not recommended).}
-#' \item{unwt_mean_full}{\cr Replace missing values with the unweighted mean of the full distribution of artifacts (not recommended).}
-#' \item{replace_unity}{\cr Replace missing values with 1 (not recommended).}
-#' \item{stop}{\cr Stop evaluations when missing artifacts are encountered.}
-#' }
-#' If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
-#' @param decimals Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
-#' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
-#' \code{error_type} (will set to "mean"),
-#' \code{correct_bias} (will set to \code{TRUE}), 
-#' \code{conf_method} (will set to "norm"),
-#' \code{cred_method} (will set to "norm"), 
-#' \code{var_unbiased} (will set to \code{FALSE}), 
-#' and \code{use_all_arts} (will set to \code{FALSE}).
-#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
+#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
@@ -319,11 +280,16 @@
 #'      sample_id = sample_id, moderators = moderator,
 #'      use_all_arts = TRUE, data = dat)
 ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                 ma_method = "bb", ad_type = "tsa", correction_method = "auto",
+                 ma_method = c("bb", "ic", "ad"), 
+                 ad_type = c("tsa", "int"), 
+                 correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+                                       "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"),
                  construct_x = NULL, construct_y = NULL,
                  measure_x = NULL, measure_y = NULL,
                  construct_order = NULL,
-                 wt_type = "sample_size", error_type = "mean", correct_bias = TRUE,
+                 wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                             "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
+                 correct_bias = TRUE,
                  correct_rel = NULL, correct_rxx = TRUE, correct_ryy = TRUE,
                  correct_rr = NULL, correct_rr_x = TRUE, correct_rr_y = TRUE,
                  indirect_rr = NULL, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
@@ -332,16 +298,45 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  ux = NULL, ux_observed = TRUE,
                  uy = NULL, uy_observed = TRUE,
                  sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
-                 conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-                 moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
-                 pairwise_ads = FALSE,  residual_ads = TRUE,
-                 check_dependence = TRUE, collapse_method = "composite", intercor = .5,
-                 clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42,
-                 decimals = 2, hs_override = FALSE, use_all_arts = TRUE, supplemental_ads = NULL, data = NULL, ...){
+                 moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
+                 supplemental_ads = NULL, data = NULL, control = psychmeta_control(), ...){
 
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
+     
+     ma_method <- match.arg(ma_method, choices = c("bb", "ic", "ad"))
+     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
+     ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
+     .correction_methods <- c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+                              "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none")
+     match.arg(arg = c(correction_method), 
+               choices = c(.correction_methods, paste0(.correction_methods, "_force")), several.ok = TRUE)
+     
+     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
+                                  .psychmeta_control_arg = control)
+     error_type <- control$error_type
+     conf_level <- control$conf_level
+     cred_level <- control$cred_level
+     conf_method <- control$conf_method
+     cred_method <- control$cred_method
+     var_unbiased <- control$var_unbiased
+     pairwise_ads <- control$pairwise_ad
+     residual_ads <- control$residual_ads
+     check_dependence <- control$check_dependence
+     collapse_method <- control$collapse_method
+     intercor <- control$intercor
+     partial_intercor <- control$intercor
+     clean_artifacts <- control$clean_artifacts
+     impute_artifacts <- control$impute_artifacts
+     impute_method <- control$impute_method
+     seed <- control$seed
+     decimals <- control$decimals
+     hs_override <- control$hs_override
+     use_all_arts <- control$use_all_arts
+     estimate_pa <- control$estimate_pa
      
      if(hs_override){
           wt_type <- "sample_size"
@@ -351,15 +346,12 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           var_unbiased <- FALSE
           residual_ads <- FALSE
      }
+     set.seed(seed)
      
      inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads, correct_bias = correct_bias, 
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased)
      additional_args <- list(...)
      inputs <- append(inputs, additional_args)
-
-     if(any(is.na(seed))) seed <- NULL
-     if(length(seed) == 0) seed <- NULL
-     set.seed(seed)
 
      if(is.null(inputs$es_d)) cat(" **** Running ma_r: Meta-analysis of correlations **** \n")
 
@@ -380,8 +372,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      n2 <- inputs$n2_d
      pi <- inputs$pi_d
      pa <- inputs$pa_d
-     estimate_pa <- inputs$estimate_pa
-     if(is.null(estimate_pa)) estimate_pa <- FALSE
 
      if(!is.null(inputs$partial_intercor)){
           partial_intercor <- inputs$partial_intercor
@@ -391,9 +381,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      ma_method <- scalar_arg_warning(arg = ma_method, arg_name = "ma_method")
      ad_type <- scalar_arg_warning(arg = ad_type, arg_name = "ad_type")
-     pairwise_ads <- scalar_arg_warning(arg = pairwise_ads, arg_name = "pairwise_ads")
-     check_dependence <- scalar_arg_warning(arg = check_dependence, arg_name = "check_dependence")
-     collapse_method <- scalar_arg_warning(arg = collapse_method, arg_name = "collapse_method")
 
      if(ma_method == "barebones") ma_method <- "bb"
 
@@ -401,11 +388,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
-     error_type <- scalar_arg_warning(arg = error_type, arg_name = "error_type")
-     use_all_arts <- scalar_arg_warning(arg = use_all_arts, arg_name = "use_all_arts")
-
-     conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
-     cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
 
      formal_args <- formals(ma_r)
      formal_args[["..."]] <- NULL
@@ -1258,7 +1240,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
 
                out <- ma_r_ic(rxyi = "rxyi", n = "n", n_adj = "n_adj", sample_id = "sample_id", citekey = "citekey",
-                              wt_type = wt_type, error_type = error_type,
+                              wt_type = wt_type, 
                               correct_bias = correct_bias, correct_rxx = "correct_rxx", correct_ryy = "correct_ryy",
                               correct_rr_x = "correct_rr_x", correct_rr_y = "correct_rr_y",
                               indirect_rr_x = "indirect_rr_x", indirect_rr_y = "indirect_rr_y",
@@ -1267,14 +1249,34 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               ux = "ux", ux_observed = "ux_observed",
                               uy = "uy", uy_observed = "uy_observed",
                               sign_rxz = "sign_rxz", sign_ryz = "sign_ryz",
-                              conf_level = conf_level, cred_level = cred_level,
-                              conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased,
                               moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz, cat_moderators = cat_moderators, moderator_type = moderator_type,
-                              impute_method = impute_method, data = data,
+                              data = data,
+                              
+                              control = psychmeta_control(error_type = error_type,
+                                                          conf_level = conf_level, 
+                                                          cred_level = cred_level, 
+                                                          conf_method = conf_method, 
+                                                          cred_method = cred_method, 
+                                                          var_unbiased = var_unbiased,
+                                                          pairwise_ads = pairwise_ads,
+                                                          residual_ads = residual_ads,
+                                                          check_dependence = check_dependence, 
+                                                          collapse_method = collapse_method,
+                                                          intercor = intercor,
+                                                          partial_intercor = partial_intercor,
+                                                          clean_artifacts = clean_artifacts, 
+                                                          impute_artifacts = impute_artifacts,
+                                                          impute_method = impute_method,
+                                                          seed = seed,
+                                                          decimals = decimals,
+                                                          hs_override = hs_override,
+                                                          use_all_arts = use_all_arts, 
+                                                          estimate_pa = estimate_pa),
 
                               ## Ellipsis arguments
-                              presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables, es_d = inputs$es_d, treat_as_d = inputs$treat_as_d,
-                              d_orig = data$d, n1_d = data$n1, n2_d = data$n2, pi_d = data$pi, pa_d = data$pa, estimate_pa = estimate_pa,
+                              presorted_data = presorted_data_i, analysis_id_variables = analysis_id_variables, 
+                              es_d = inputs$es_d, treat_as_d = inputs$treat_as_d,
+                              d_orig = data$d, n1_d = data$n1, n2_d = data$n2, pi_d = data$pi, pa_d = data$pa, 
                               ad_x_tsa = ad_x_tsa, ad_y_tsa = ad_y_tsa, ad_x_int = ad_x_int, ad_y_int = ad_y_int, as_worker = TRUE)
                
                if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)

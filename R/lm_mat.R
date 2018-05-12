@@ -89,8 +89,10 @@
 #' confint(object = lm_out2)
 #' confint(object = matreg_out2)
 #' confint(object = summary(matreg_out2))
-matreg <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf, se_beta_method = "lm", ...){
-
+matreg <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf, 
+                   se_beta_method = c("lm", "normal"), ...){
+     se_beta_method <- match.arg(se_beta_method, c("lm", "normal"))
+     
      if(length(se_beta_method) > 1){
           warning("se_beta_method argument must be a scalar: First value used")
           se_beta_method <- c(unlist(se_beta_method))[1]

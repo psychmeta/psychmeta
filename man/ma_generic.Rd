@@ -5,10 +5,10 @@
 \title{Bare-bones meta-analysis of generic effect sizes}
 \usage{
 ma_generic(es, n, var_e, sample_id = NULL, citekey = NULL,
-  wt_type = "sample_size", conf_level = 0.95, cred_level = 0.8,
-  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
-  hs_override = FALSE, data = NULL, ...)
+  wt_type = c("sample_size", "inv_var", "DL", "HE", "HS", "SJ", "ML", "REML",
+  "EB", "PM"), moderators = NULL, cat_moderators = TRUE,
+  moderator_type = c("simple", "hierarchical", "none"), data = NULL,
+  control = control_psychmeta(), ...)
 }
 \arguments{
 \item{es}{Vector or column name of observed effect sizes.}
@@ -26,26 +26,15 @@ When \code{TRUE}, program will use sample-size weights, error variances estimate
 Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 (see metafor documentation for details about the metafor methods).}
 
-\item{conf_level}{Confidence level to define the width of the confidence interval (default = .95).}
-
-\item{cred_level}{Credibility level to define the width of the credibility interval (default = .80).}
-
-\item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{cred_method}{Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
-
 \item{moderators}{Matrix of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).}
 
 \item{cat_moderators}{Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).}
 
 \item{moderator_type}{Type of moderator analysis ("none", "simple", or "hierarchical").}
 
-\item{hs_override}{When TRUE, this will override settings for \code{wt_type} (will set to "sample_size"),
-\code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
-
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
+
+\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

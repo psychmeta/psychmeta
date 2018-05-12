@@ -4,7 +4,8 @@
 \alias{credibility}
 \title{Construct a credibility interval}
 \usage{
-credibility(mean, sd, k = NULL, cred_level = 0.8, cred_method = "t")
+credibility(mean, sd, k = NULL, cred_level = 0.8, cred_method = c("t",
+  "norm"))
 }
 \arguments{
 \item{mean}{Mean effect size.}

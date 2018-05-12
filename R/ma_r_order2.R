@@ -15,13 +15,9 @@
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
 #' @param construct_x Vector or column name of construct names for X.
 #' @param construct_y Vector or column name of construct names for Y.
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param hs_override When \code{TRUE}, this will override settings for \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
+#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
+#' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return An object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_order2}, and \code{ma_bb}, \code{ma_ic}, and/or \code{ma_ad}.
 #' @export
@@ -32,8 +28,6 @@
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
 #'                    sample_id = NULL, moderators = NULL,
 #'                    construct_x = NULL, construct_y = NULL,
-#'                    conf_level = .95, cred_level = .8,
-#'                    cred_method = "t", var_unbiased = TRUE,
 #'                    data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
 #' out$meta_tables[[1]]
 #' 
@@ -41,8 +35,6 @@
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
 #'                    sample_id = NULL, moderators = NULL, construct_x = Predictor,
-#'                    conf_level = .95, cred_level = .8,
-#'                    cred_method = "t", var_unbiased = TRUE,
 #'                    data = data_r_oh_2009)
 #' out$meta_tables[[1]]
 #' 
@@ -50,25 +42,29 @@
 #' ## job performance by Eastern Asian country
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
-#'                    sample_id = NULL, moderators = "Country",
-#'                    conf_level = .95, cred_level = .8, cred_method = "t",
-#'                    var_unbiased = TRUE, data = data_r_oh_2009)
+#'                    sample_id = NULL, moderators = "Country", data = data_r_oh_2009)
 #' out$meta_tables[[1]]
 ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, ma_type = c("bb", "ic", "ad"),
-                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
-                        conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE, hs_override = FALSE, data = NULL){
+                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
+                        construct_x = NULL, construct_y = NULL, data = NULL, control = psychmeta_control(), ...){
 
      call <- match.call()
      warn_obj1 <- record_warnings()
      ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
 
+     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
+                                  .psychmeta_control_arg = control)
+     conf_level <- control$conf_level
+     cred_level <- control$cred_level
+     conf_method <- control$conf_method
+     cred_method <- control$cred_method
+     var_unbiased <- control$var_unbiased
+     hs_override <- control$hs_override
+     
      if(hs_override){
           conf_method <- cred_method <- "norm"
           var_unbiased <- FALSE
      }
-
-     conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
-     cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
 
      formal_args <- formals(ma_r_order2)
      for(i in names(formal_args)) if(i %in% names(call)) formal_args[[i]] <- NULL
@@ -343,6 +339,9 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                rel_r = rel_r,
                                `cor(r, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
 
+     class(meta) <- c("ma_table", class(meta))
+     attributes(meta) <- append(attributes(meta), list(ma_type = "r_bb_order2"))
+     
      list(meta = meta,
           escalc = dat)
 }
@@ -418,6 +417,9 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                rel_rho = rel_rho,
                                `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
 
+     class(meta) <- c("ma_table", class(meta))
+     attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic_order2"))
+     
      list(meta = meta,
           escalc = dat)
 }
@@ -493,7 +495,10 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                percent_var = prop_var * 100,
                                rel_rho = rel_rho,
                                `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
-
+     
+     class(meta) <- c("ma_table", class(meta))
+     attributes(meta) <- append(attributes(meta), list(ma_type = "r_ad_order2"))
+     
      list(meta = meta,
           escalc = dat)
 }

@@ -8,16 +8,16 @@
 \title{Compute linear regression models and generate "lm" objects from covariance matrices.}
 \usage{
 matreg(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
-  se_beta_method = "lm", ...)
+  se_beta_method = c("lm", "normal"), ...)
 
 matrixreg(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
-  se_beta_method = "lm", ...)
+  se_beta_method = c("lm", "normal"), ...)
 
 lm_mat(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
-  se_beta_method = "lm", ...)
+  se_beta_method = c("lm", "normal"), ...)
 
 lm_matrix(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
-  se_beta_method = "lm", ...)
+  se_beta_method = c("lm", "normal"), ...)
 }
 \arguments{
 \item{formula}{Regression formula with a single outcome variable on the left-hand side and one or more predictor variables on the right-hand side (e.g., Y ~ X1 + X2).}

@@ -15,30 +15,32 @@
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
 #' @param construct_x Vector or column name of construct names for X.
 #' @param construct_y Vector or column name of construct names for Y.
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param hs_override When \code{TRUE}, this will override settings for \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
+#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
+#' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return An object of the classes \code{psychmeta}, \code{ma_d_as_d}, \code{ma_order2}, and \code{ma_bb}, \code{ma_ic}, and/or \code{ma_ad}.
 #' @export
 ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, ma_type = c("bb", "ic", "ad"),
-                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", construct_x = NULL, construct_y = NULL,
-                        conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE, hs_override = FALSE, data = NULL){
+                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
+                        construct_x = NULL, construct_y = NULL, data = NULL, control = psychmeta_control(), ...){
      warn_obj1 <- record_warnings()
      call <- match.call()
      ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
 
+     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
+                                  .psychmeta_control_arg = control)
+     conf_level <- control$conf_level
+     cred_level <- control$cred_level
+     conf_method <- control$conf_method
+     cred_method <- control$cred_method
+     var_unbiased <- control$var_unbiased
+     hs_override <- control$hs_override
+     
      if(hs_override){
           conf_method <- cred_method <- "norm"
           var_unbiased <- FALSE
      }
-
-     conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
-     cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
 
      formal_args <- formals(ma_d_order2)
      for(i in names(formal_args)) if(i %in% names(call)) formal_args[[i]] <- NULL
@@ -217,6 +219,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
           colnames(out_bb$meta)[ncol(out_bb$meta)] <- "cor(d, error)"
           colnames(out_bb$meta) <- gsub(x = colnames(out_bb$meta), pattern = "_r", replacement = "_d")
           colnames(out_bb$meta) <- gsub(x = colnames(out_bb$meta), pattern = "_bar_des", replacement = "_bar_res")
+          attributes(out_bb$meta)$ma_type <- "d_bb_order2"
      }else{
           out_bb <- NULL
      }
@@ -228,6 +231,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
           colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "rho", replacement = "delta")
           colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "_r", replacement = "_d")
           colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "_bar_des", replacement = "_bar_res")
+          attributes(out_ic$meta)$ma_type <- "d_ic_order2"
      }else{
           out_ic <- NULL
      }
@@ -239,6 +243,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
           colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "rho", replacement = "delta")
           colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "_r", replacement = "_d")
           colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "_bar_des", replacement = "_bar_res")
+          attributes(out_ad$meta)$ma_type <- "d_ad_order2"
      }else{
           out_ad <- NULL
      }

@@ -6,11 +6,11 @@
 \title{Bare-bones meta-analysis of \emph{d} values}
 \usage{
 ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL,
-  citekey = NULL, wt_type = "sample_size", error_type = "mean",
-  correct_bias = FALSE, conf_level = 0.95, cred_level = 0.8,
-  conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-  moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
-  hs_override = FALSE, data = NULL, ...)
+  citekey = NULL, wt_type = c("sample_size", "inv_var_mean",
+  "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
+  correct_bias = FALSE, moderators = NULL, cat_moderators = TRUE,
+  moderator_type = c("simple", "hierarchical", "none"), data = NULL,
+  control = psychmeta_control(), ...)
 }
 \arguments{
 \item{d}{Vector of \emph{d} values.}
@@ -30,19 +30,7 @@ When \code{TRUE}, program will use sample-size weights, error variances estimate
 "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 (see metafor documentation for details about the metafor methods).}
 
-\item{error_type}{Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.}
-
 \item{correct_bias}{Logical argument that determines whether to correct effect sizes and error variances for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
-
-\item{conf_level}{Width of confidence interval. Set to .95 by default.}
-
-\item{cred_level}{Width of credibility interval. Set to .80 by default.}
-
-\item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{cred_method}{Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
 
 \item{moderators}{Matrix of moderator variables or column names of \code{data} to be used in the meta-analysis (can be a vector in the case of one moderator).}
 
@@ -50,10 +38,9 @@ When \code{TRUE}, program will use sample-size weights, error variances estimate
 
 \item{moderator_type}{Type of moderator analysis ("none", "simple", or "hierarchical").}
 
-\item{hs_override}{When TRUE, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-\code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
-
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
+
+\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

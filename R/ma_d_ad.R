@@ -23,12 +23,9 @@
 #' @param correct_rr_y Logical argument that determines whether to correct the Y variable for range restriction (\code{TRUE}) or not (\code{FALSE}).
 #' @param indirect_rr_g If \code{correct_rr_g} = \code{TRUE}: Logical argument that determines whether to correct for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
 #' @param indirect_rr_y If \code{correct_rr_y} = \code{TRUE}: Logical argument that determines whether to correct for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-#' @param residual_ads Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_delta}.
 #' @param sign_rgz Sign of the relationship between the grouping variable and the selection mechanism (for use with the bvirr \code{correction_method} only).
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with the bvirr \code{correction_method} only).
-#' @param decimals Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
-#' Rounding artifact distributions can help to consolidate trivially different values and speed up the computation of meta-analyses (especially in simulations).
-#' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
+#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Additional arguments.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{r_as_d} or \code{d_as_d}, \code{ma_bb}, and \code{ma_ad} (and that inherits class \code{ma_ic} from \code{ma_obj})
@@ -71,12 +68,27 @@
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
 #' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
-ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method = "auto", use_ic_ads = "tsa",
+ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, 
+                    correction_method = c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+                                          "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none"), 
+                    use_ic_ads = c("tsa", "int"),
                     correct_rGg = FALSE, correct_ryy = TRUE,
                     correct_rr_g = TRUE, correct_rr_y = TRUE,
                     indirect_rr_g = TRUE, indirect_rr_y = TRUE,
-                    residual_ads = TRUE, sign_rgz = 1, sign_ryz = 1, decimals = 2, estimate_pa = FALSE, ...){
+                    sign_rgz = 1, sign_ryz = 1, control = control_psychmeta(), ...){
 
+     use_ic_ads <- match.arg(use_ic_ads, choices = c("tsa", "int"))
+     .correction_methods <- c("auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+                              "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj", "none")
+     match.arg(arg = c(correction_method), 
+               choices = c(.correction_methods, paste0(.correction_methods, "_force")), several.ok = TRUE)
+     
+     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
+                                  .psychmeta_control_arg = control)
+     residual_ads <- control$residual_ads
+     decimals <- control$decimals
+     estimate_pa <- control$decimals
+     
      ma_metric <- attributes(ma_obj)
      convert_metric <- ifelse(any(ma_metric == "r_as_d" | ma_metric == "d_as_d"), TRUE, FALSE)
      if(convert_metric) ma_obj <- convert_ma(ma_obj)
@@ -119,8 +131,6 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL, correction_method 
      indirect_rr_y <- scalar_arg_warning(arg = indirect_rr_y, arg_name = "indirect_rr_y")
      correction_method <- scalar_arg_warning(arg = correction_method, arg_name = "correction_method")
      use_ic_ads <- scalar_arg_warning(arg = use_ic_ads, arg_name = "use_ic_ads")
-     residual_ads <- scalar_arg_warning(arg = residual_ads, arg_name = "residual_ads")
-     decimals <- scalar_arg_warning(arg = decimals, arg_name = "decimals")
 
      ma_obj_i <- ma_obj[1,]
      ma_list <- apply(ma_obj, 1, function(ma_obj_i){

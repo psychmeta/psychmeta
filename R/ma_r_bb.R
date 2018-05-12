@@ -11,19 +11,13 @@
 #' @param wt_type Type of weight to use in the meta-analysis: native options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see metafor documentation for details about the metafor methods).
-#' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical argument that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
 #' @param moderators Matrix of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
-#' @param hs_override When TRUE, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
 #' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
+#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, and \code{ma_bb}.
@@ -57,12 +51,29 @@
 #' ## a noticeable difference for small studies like the textbook example:
 #' ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
 ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                                      wt_type = "sample_size", error_type = "mean", correct_bias = TRUE,
-                                      conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-                                      moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
+                                      wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                                  "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
+                                      correct_bias = TRUE,
+                                      moderators = NULL, cat_moderators = TRUE, 
+                                      moderator_type = c("simple", "hierarchical", "none"), 
+                                      data = NULL, control = psychmeta_control(), ...){
 
      warn_obj1 <- record_warnings()
      call <- match.call()
+
+     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
+     
+     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
+                                  .psychmeta_control_arg = control)
+     error_type <- control$error_type
+     conf_level <- control$conf_level
+     cred_level <- control$cred_level
+     conf_method <- control$conf_method
+     cred_method <- control$cred_method
+     var_unbiased <- control$var_unbiased
+     hs_override <- control$hs_override
 
      if(hs_override){
           wt_type <- "sample_size"
@@ -75,11 +86,6 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      correct_bias <- scalar_arg_warning(arg = correct_bias, arg_name = "correct_bias")
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
-     error_type <- scalar_arg_warning(arg = error_type, arg_name = "error_type")
-     conf_method <- scalar_arg_warning(arg = conf_method, arg_name = "conf_method")
-     cred_method <- scalar_arg_warning(arg = cred_method, arg_name = "cred_method")
-     conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
-     cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
 
      formal_args <- formals(ma_r_bb)
      formal_args[["..."]] <- NULL

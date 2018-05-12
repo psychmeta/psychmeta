@@ -1,6 +1,9 @@
 #' @name sensitivity
 #' @rdname sensitivity
-sensitivity_cumulative <- function(ma_obj, sort_method = "weight", ...){
+sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_var"), ...){
+    
+     sort_method <- match.arg(sort_method, choices = c("weight", "n", "inv_var"))
+     
      es_type <- NULL
      ma_methods <- attributes(ma_obj)$ma_methods
      ma_metric <- attributes(ma_obj)$ma_metric

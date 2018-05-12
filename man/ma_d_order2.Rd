@@ -7,9 +7,8 @@
 ma_d_order2(k, N = NULL, d = NULL, delta = NULL, var_d = NULL,
   var_d_c = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
   citekey = NULL, moderators = NULL, moderator_type = "simple",
-  construct_x = NULL, construct_y = NULL, conf_level = 0.95,
-  cred_level = 0.8, conf_method = "t", cred_method = "t",
-  var_unbiased = TRUE, hs_override = FALSE, data = NULL)
+  construct_x = NULL, construct_y = NULL, data = NULL,
+  control = psychmeta_control(), ...)
 }
 \arguments{
 \item{k}{Vector or column name of meta-analyses' k values.}
@@ -38,19 +37,11 @@ ma_d_order2(k, N = NULL, d = NULL, delta = NULL, var_d = NULL,
 
 \item{construct_y}{Vector or column name of construct names for Y.}
 
-\item{conf_level}{Confidence level to define the width of the confidence interval (default = .95).}
-
-\item{cred_level}{Credibility level to define the width of the credibility interval (default = .80).}
-
-\item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{cred_method}{Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
-
-\item{hs_override}{When \code{TRUE}, this will override settings for \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
-
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
+
+\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+
+\item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }
 \value{
 An object of the classes \code{psychmeta}, \code{ma_d_as_d}, \code{ma_order2}, and \code{ma_bb}, \code{ma_ic}, and/or \code{ma_ad}.

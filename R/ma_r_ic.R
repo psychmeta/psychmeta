@@ -10,7 +10,6 @@
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see metafor documentation for details about the metafor methods).
-#' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rxx Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
@@ -31,22 +30,14 @@
 #' @param uy_observed Logical vector or column name determining whether each element of \code{uy} is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
 #' @param sign_rxz Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param moderator_type Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time, and
 #' "hierarchical" means that all possible combinations and subsets of moderators are to be examined.
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
-#' @param impute_method Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.
-#' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-#' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
-#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).
 #' @param supplemental_ads_x,supplemental_ads_y List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param ... Further arguments to be passed to functions called within the meta-analysis (e.g., create_ad_int and create_ad_tsa).
+#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
+#' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb}, and \code{ma_ic}.
 #' @export
@@ -70,7 +61,8 @@
 #'         rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
 #'         moderators = c("Rating source", "Published", "Type", "Complexity"))
 ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                    wt_type = "sample_size", error_type = "mean",
+                    wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
                     correct_bias = TRUE, correct_rxx = TRUE, correct_ryy = TRUE,
                     correct_rr_x = TRUE, correct_rr_y = TRUE,
                     indirect_rr_x = TRUE, indirect_rr_y = TRUE,
@@ -79,13 +71,30 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     ux = NULL, ux_observed = TRUE,
                     uy = NULL, uy_observed = TRUE,
                     sign_rxz = 1, sign_ryz = 1,
-                    conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-                    moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
-                    impute_method = "bootstrap_mod", hs_override = FALSE,
-                    use_all_arts = FALSE, supplemental_ads_x = NULL, supplemental_ads_y = NULL, data = NULL, ...){
+                    moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
+                    supplemental_ads_x = NULL, supplemental_ads_y = NULL,
+                    data = NULL, control = psychmeta_control(), ...){
      
      warn_obj1 <- record_warnings()
      call <- match.call()
+     
+     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
+     
+     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
+                                  .psychmeta_control_arg = control)
+     error_type <- control$error_type
+     conf_level <- control$conf_level
+     cred_level <- control$cred_level
+     conf_method <- control$conf_method
+     cred_method <- control$cred_method
+     var_unbiased <- control$var_unbiased
+     impute_method <- control$impute_method
+     seed <- control$seed
+     hs_override <- control$hs_override
+     use_all_arts <- control$use_all_arts
+     estimate_pa <- control$estimate_pa
      
      if(hs_override){
           wt_type <- "sample_size"
@@ -94,6 +103,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           conf_method <- cred_method <- "norm"
           var_unbiased <- FALSE
      }
+     set.seed(seed)
      
      fyi_messages <- NULL
      
@@ -139,8 +149,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      n2 <- inputs$n2_d
      pi <- inputs$pi_d
      pa <- inputs$pa_d
-     estimate_pa <- inputs$estimate_pa
-     if(is.null(estimate_pa)) estimate_pa <- FALSE
      
      formal_args <- formals(ma_r_ic)
      formal_args[["..."]] <- NULL

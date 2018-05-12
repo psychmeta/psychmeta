@@ -5,18 +5,17 @@
 \title{Individual-correction meta-analysis of correlations}
 \usage{
 ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
-  wt_type = "sample_size", error_type = "mean", correct_bias = TRUE,
+  wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE",
+  "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
   correct_rxx = TRUE, correct_ryy = TRUE, correct_rr_x = TRUE,
   correct_rr_y = TRUE, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
   rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
   ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
   ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rxz = 1,
-  sign_ryz = 1, conf_level = 0.95, cred_level = 0.8, conf_method = "t",
-  cred_method = "t", var_unbiased = TRUE, moderators = NULL,
-  cat_moderators = TRUE, moderator_type = "simple",
-  impute_method = "bootstrap_mod", hs_override = FALSE,
-  use_all_arts = FALSE, supplemental_ads_x = NULL,
-  supplemental_ads_y = NULL, data = NULL, ...)
+  sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
+  moderator_type = c("simple", "hierarchical", "none"),
+  supplemental_ads_x = NULL, supplemental_ads_y = NULL, data = NULL,
+  control = psychmeta_control(), ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations.}
@@ -32,8 +31,6 @@ ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 \item{wt_type}{Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 (see metafor documentation for details about the metafor methods).}
-
-\item{error_type}{Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.}
 
 \item{correct_bias}{Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -73,16 +70,6 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{sign_ryz}{Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).}
 
-\item{conf_level}{Confidence level to define the width of the confidence interval (default = .95).}
-
-\item{cred_level}{Credibility level to define the width of the credibility interval (default = .80).}
-
-\item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{cred_method}{Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
-
 \item{moderators}{Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).}
 
 \item{cat_moderators}{Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).}
@@ -90,18 +77,13 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 \item{moderator_type}{Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time, and
 "hierarchical" means that all possible combinations and subsets of moderators are to be examined.}
 
-\item{impute_method}{Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.}
-
-\item{hs_override}{When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-\code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
-
-\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}) or not (\code{FALSE}).}
-
 \item{supplemental_ads_x, supplemental_ads_y}{List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.}
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
-\item{...}{Further arguments to be passed to functions called within the meta-analysis (e.g., create_ad_int and create_ad_tsa).}
+\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+
+\item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }
 \value{
 A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb}, and \code{ma_ic}.

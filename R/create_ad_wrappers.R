@@ -136,7 +136,7 @@
 #'
 #'               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
 #'               estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
-create_ad <- function(ad_type = "tsa",
+create_ad <- function(ad_type = c("tsa", "int"),
                       rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
                       rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
                       ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux, length(mean_ux)),
@@ -231,7 +231,7 @@ create_ad <- function(ad_type = "tsa",
 #'                construct_x = x_name, construct_y = y_name,
 #'                sample_id = sample_id,
 #'                data = data_r_meas_multi)
-create_ad_list <- function(ad_type = "tsa", n, sample_id = NULL,
+create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                            construct_x, measure_x = NULL,
                            construct_y, measure_y = NULL,
                            rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
@@ -244,6 +244,7 @@ create_ad_list <- function(ad_type = "tsa", n, sample_id = NULL,
                            collapse_method = c("composite", "average", "stop"), intercor = .5,
                            supplemental_ads = NULL, data = NULL, ...){
 
+     ad_type <- match.arg(ad_type, c("tsa", "int"))
      call <- match.call()
      formal_args <- formals(create_ad_list)
      formal_args[["..."]] <- NULL
@@ -762,7 +763,7 @@ create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
 #'                     k_rGg = 5, mean_n_rGg = 100,
 #'                     pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = 300,
 #'                     var_unbiased = TRUE)
-create_ad_group <- function(ad_type = "tsa",
+create_ad_group <- function(ad_type = c("tsa", "int"),
                             rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
                             pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
                             mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
@@ -789,10 +790,12 @@ create_ad_group <- function(ad_type = "tsa",
 
 
 ## Internal function to harvest lists of artifact distributions from dataframes matching a known, internally imposed structure
-.create_ad_list <- function(ad_type = "tsa", sample_id, construct_x, construct_y, construct_pair, es_data, data_x, data_y, pairwise_ads = FALSE,
+.create_ad_list <- function(ad_type = c("tsa", "int"), sample_id, construct_x, construct_y, construct_pair, es_data, data_x, data_y, pairwise_ads = FALSE,
                             estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE, estimate_ut = TRUE,
                             var_unbiased = TRUE, supplemental_ads = NULL, ...){
 
+     ad_type <- match.arg(ad_type, c("tsa", "int"))
+     
      additional_args <- list(...)
      if(!is.null(additional_args$estimate_rxxa))
           estimate_rxxa <- additional_args$estimate_rxxa
@@ -978,7 +981,7 @@ create_ad_group <- function(ad_type = "tsa",
 
 
 
-create_ad_supplemental <- function(ad_type = "tsa",
+create_ad_supplemental <- function(ad_type = c("tsa", "int"),
                                    rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
                                    rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
                                    ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux,
