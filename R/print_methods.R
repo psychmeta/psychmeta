@@ -700,22 +700,42 @@ print.ma_table <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
 
 
 #' @method print ma_ic_list
-print.ma_ic_list <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
-     cat("Individual-correction meta-analysis: Fully corrected \n")
-     print(x$true_score, suppress_title = TRUE)
-     cat("\nIndividual-correction meta-analysis: With measurement error in X \n")
-     print(x$validity_generalization_x, suppress_title = TRUE)
-     cat("\nIndividual-correction meta-analysis: With measurement error in Y \n")
-     print(x$validity_generalization_y, suppress_title = TRUE)
+print.ma_ic_list <- function(x, ..., digits = 3, verbose = FALSE){
+     cat("Individual-correction meta-analysis results")
+     if(any(names(x) == "true_score")){
+          cat("\nFully corrected \n")
+          print(x$true_score, suppress_title = TRUE)
+          cat("\nWith measurement error in X \n")
+          print(x$validity_generalization_x, suppress_title = TRUE)
+          cat("\nWith measurement error in Y \n")
+          print(x$validity_generalization_y, suppress_title = TRUE)    
+     }else{
+          cat("\nFully corrected \n")
+          print(x$latentGroup_latentY, suppress_title = TRUE)
+          cat("\nWith measurement error in X \n")
+          print(x$observedGroup_latentY, suppress_title = TRUE)
+          cat("\nWith measurement error in Y \n")
+          print(x$latentGroup_observedY, suppress_title = TRUE)
+     }
 }
 
 #' @method print ma_ad_list
-print.ma_ad_list <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
-     cat("Artifact-distribution meta-analysis: Fully corrected \n")
-     print(x$true_score, suppress_title = TRUE)
-     cat("\nArtifact-distribution meta-analysis: With measurement error in X \n")
-     print(x$validity_generalization_x, suppress_title = TRUE)
-     cat("\nArtifact-distribution meta-analysis: With measurement error in Y \n")
-     print(x$validity_generalization_y, suppress_title = TRUE)
+print.ma_ad_list <- function(x, ..., digits = 3, verbose = FALSE){
+     cat("Artifact-distribution meta-analysis results")
+     if(any(names(x) == "true_score")){
+          cat("\nFully corrected \n")
+          print(x$true_score, suppress_title = TRUE)
+          cat("\nWith measurement error in X \n")
+          print(x$validity_generalization_x, suppress_title = TRUE)
+          cat("\nWith measurement error in Y \n")
+          print(x$validity_generalization_y, suppress_title = TRUE)    
+     }else{
+          cat("\nFully corrected \n")
+          print(x$latentGroup_latentY, suppress_title = TRUE)
+          cat("\nWith measurement error in X \n")
+          print(x$observedGroup_latentY, suppress_title = TRUE)
+          cat("\nWith measurement error in Y \n")
+          print(x$latentGroup_observedY, suppress_title = TRUE)
+     }
 }
 

@@ -1,37 +1,9 @@
-#' Bare-bones meta-analysis of \emph{d} values
-#'
-#' This function computes bare-bones meta-analyses of \emph{d} values.
-#'
-#' @param d Vector of \emph{d} values.
-#' @param n1 Vector or column name of primary sample sizes (if subgroup sample sizes are not known, these values are total sample sizes; if subgroup sample sizes are known, these values are sample sizes for the first of the two groups).
-#' @param n2 Optional: Vector or column name of secondary sample sizes. If subgroup sample sizes are known, these values are sample sizes for the second of the two groups. \code{NULL} by default.
-#' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
-#' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
-#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
-#' When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.
-#' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
-#' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
-#' (see metafor documentation for details about the metafor methods).
-#' @param correct_bias Logical argument that determines whether to correct effect sizes and error variances for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param moderators Matrix of moderator variables or column names of \code{data} to be used in the meta-analysis (can be a vector in the case of one moderator).
-#' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
-#' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
-#' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
-#' @param ... Further arguments to be passed to functions called within the meta-analysis.
-#'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_d_as_d}, and \code{ma_bb}.
+#' @rdname ma_d
 #' @export
 #' @import dplyr
-#'
 #' @aliases ma_d_barebones
-#'
-#' @references
-#' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 7.
-#'
 #' @examples
+#' ### Demonstration of ma_d_bb ###
 #' ## Example meta-analyses using simulated data:
 #' ma_d_bb(d = d, n1 = n1, n2 = n2,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
@@ -316,18 +288,23 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      ci <- setNames(c(ci), colnames(ci))
      cv <- setNames(c(cv), colnames(cv))
 
+     barebones <- as.data.frame(t(c(k = k,
+                                    N = N,
+                                    mean_d = mean_d,
+                                    var_d = var_d,
+                                    var_e = var_e,
+                                    var_res = var_res,
+                                    sd_d = var_d^.5,
+                                    se_d = se_d,
+                                    sd_e = var_e^.5,
+                                    sd_res = sd_res,
+                                    ci, cv)))
+     
+     class(barebones) <- c("ma_table", class(barebones))
+     attributes(barebones) <- append(attributes(barebones), list(ma_type = "d_bb"))
+     
      ## Compile results
-     list(meta = list(barebones = as.data.frame(t(c(k = k,
-                                                    N = N,
-                                                    mean_d = mean_d,
-                                                    var_d = var_d,
-                                                    var_e = var_e,
-                                                    var_res = var_res,
-                                                    sd_d = var_d^.5,
-                                                    se_d = se_d,
-                                                    sd_e = var_e^.5,
-                                                    sd_res = sd_res,
-                                                    ci, cv))), 
+     list(meta = list(barebones = barebones, 
                       individual_correction = NULL, 
                       artifact_distribution = NULL),
           escalc = list(barebones = escalc_obj, 

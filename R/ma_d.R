@@ -1,10 +1,10 @@
-#' Master framework for meta-analysis of \emph{d} values
+#' Meta-analysis of \emph{d} values
 #'
-#' This is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
-#' When artifact-distribution meta-analyses are performed, this function will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
-#' This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
-#' The automatic compositing features are employed when \code{sample_id}s and/or construct names are provided.
-#' When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitivity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
+#' The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for \emph{d} values, respectively. 
+#' The \code{ma_d} function is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
+#' When artifact-distribution meta-analyses are performed, \code{ma_d} will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
+#' \code{ma_d} is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
+#' The automatic compositing features in \code{ma_d} are employed when \code{sample_id}s and/or construct names are provided.
 #'
 #' @param d Vector or column name of observed \emph{d} values.
 #' @param n1 Vector or column name of sample sizes.
@@ -63,6 +63,19 @@
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
+#' 
+#' @param supplemental_ads_y For \code{ma_d_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.
+#' @param ma_obj For \code{ma_d_ad} only: Meta-analysis object of correlations or \emph{d} values (regardless of input metric, output metric will be \emph{d}).
+#' @param ad_obj_g For \code{ma_d_ad} only: Artifact-distribution object for the grouping variable (output of the \code{link{create_ad}} or \code{link{create_ad_group}} functions).
+#' If ma_obj is of the class \code{ma_master} (i.e., the output of \code{\link{ma_r}} or \code{\link{ma_d}}), the object supplied for
+#' \code{ad_obj_g} must be a named list of artifact distributions with names.
+#' corresponding to the "X" constructs in the meta-analyses contained within \code{ma_obj}.
+#' @param ad_obj_y For \code{ma_d_ad} only: AArtifact-distribution object for the Y variable (output of the \code{create_ad} function).
+#' If ma_obj is of the class \code{ma_master}, the object supplied for \code{ad_obj_y} must be a named list of artifact distributions with names
+#' corresponding to the "Y" constructs in the meta-analyses contained within \code{ma_obj}.
+#' @param use_ic_ads For \code{ma_d_ad} only: Determines whether artifact distributions should be extracted from the individual correction results in \code{ma_obj}.
+#' Only evaluated when \code{ad_obj_g} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
+#' Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{ma_d_as_r} or \code{ma_d_as_d}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
 #' Components of output tables for bare-bones meta-analyses:
@@ -160,14 +173,43 @@
 #'
 #' @export
 #'
+#' @details
+#' The options for \code{correction_method} are:
+#' \itemize{
+#' \item{"auto"}{\cr Automatic selection of the most appropriate correction procedure, based on the available artifacts and the logical arguments provided to the function. (default)}
+#' \item{"meas"}{\cr Correction for measurement error only.}
+#' \item{"uvdrr"}{\cr Correction for univariate direct range restriction (i.e., Case II). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+#' \item{"uvirr"}{\cr Correction for univariate indirect range restriction (i.e., Case IV). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+#' \item{"bvdrr"}{\cr Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
+#' \item{"bvirr"}{\cr Correction for bivariate indirect range restriction (i.e., Case V).}
+#' \item{"rbOrig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. We recommend using "uvdrr" instead.}
+#' \item{"rbAdj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' \item{"rb1Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. We recommend using "uvdrr" instead.}
+#' \item{"rb1Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' \item{"rb2Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. We recommend using "uvdrr" instead.}
+#' \item{"rb2Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' }
+#'
+#' @section Note:
+#' The difference between "rb" methods with the "orig" and "adj" suffixes is that the original does not account for the impact of range restriction on criterion reliabilities, whereas
+#' the adjusted procedure attempts to estimate the applicant reliability information for the criterion. The "rb" procedures are included for posterity: We strongly recommend using
+#' the "uvdrr" procedure to appropriately correct for univariate range restriction.
+#'
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 3.
+#' \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
+#' Thousand Oaks, California: SAGE Publications, Inc. Chapter 4.
+#'
+#' Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
+#' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
+#' \emph{Journal of Applied Psychology, 79}(3), 425.
 #'
 #' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
 #' Accounting for indirect range restriction in organizational and psychological research}.
 #' Manuscript submitted for review.
+#'
+#' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
+#' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
 #'
 #' @examples
 #' ## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:

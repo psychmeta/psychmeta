@@ -1,41 +1,8 @@
-#' Bare-bones meta-analysis of correlations
-#'
-#' This function computes bare-bones meta-analyses of correlations.
-#'
-#' @param r Vector or column name of observed correlations.
-#' @param n Vector or column name of sample sizes.
-#' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
-#' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
-#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
-#' When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.
-#' @param wt_type Type of weight to use in the meta-analysis: native options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
-#' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
-#' (see metafor documentation for details about the metafor methods).
-#' @param correct_bias Logical argument that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param moderators Matrix of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
-#' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
-#' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
-#' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
-#' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
-#' @param ... Further arguments to be passed to functions called within the meta-analysis.
-#'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, and \code{ma_bb}.
-#'
+#' @rdname ma_r
 #' @export
-#' @import metafor
-#' @importFrom boot boot
-#' @importFrom boot boot.ci
-#' @importFrom stats as.formula
-#'
 #' @aliases ma_r_barebones
-#'
-#' @references
-#' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 3.
-#'
 #' @examples
+#' ### Demonstration of ma_r_bb ###
 #' ## Example analysis using data from Gonzalez-Mule et al. (2014):
 #'
 #' ## Not correcting for bias and using normal distributions to compute uncertainty intervals

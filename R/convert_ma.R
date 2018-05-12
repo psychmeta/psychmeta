@@ -109,6 +109,7 @@ convert_ma <- function(ma_obj, ...){
                
                if(error_type == "mean"){
                     mean_r <- ma_obj_i$meta_tables[[1]]$barebones$mean_r
+
                     ma_obj_i$escalc[[1]]$barebones$vi <- convert_varr_to_vard(r = mean_r, var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_r_to_d(r =  ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }else{
@@ -178,7 +179,8 @@ convert_ma <- function(ma_obj, ...){
           if(any(ma_methods == "bb")){
                
                if(error_type == "mean"){
-                    mean_d <- ma_obj_i$meta_tables[[1]]$barebone$mean_d
+                    mean_d <- ma_obj_i$meta_tables[[1]]$barebones$mean_d
+
                     ma_obj_i$escalc[[1]]$barebones$vi <- convert_vard_to_varr(d = mean_d, var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }else{
@@ -414,7 +416,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      ## Column swap for meta-analyses of correlations
      if(all(bb_names_r %in% col_names)){
-          method <- "bb_r"
+          method <- "r_bb"
           old_cols <- bb_names_r
           new_cols <- bb_names_d
           col_type <- c("NA" ,"NA",
@@ -422,7 +424,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
                         "es3", "es3", "es4", "es4")
      }
      if(all(ic_names_r %in% col_names)){
-          method <- "ic_r"
+          method <- "r_ic"
           old_cols <- ic_names_r
           new_cols <- ic_names_d
           col_type <- c("NA", "NA", "es1", "var1", "var1", "var1", "sd1", "se1", "sd1", "sd1",
@@ -430,7 +432,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
                         "es3", "es3", "es4", "es4")
      }
      if(all(ad_names_r %in% col_names)){
-          method <- "ad_r"
+          method <- "r_ad"
           old_cols <- ad_names_r
           new_cols <- ad_names_d
           col_type <- c("NA", "NA",
@@ -441,14 +443,14 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      ## Column swap for meta-analyses of d values
      if(all(bb_names_d %in% col_names)){
-          method <- "bb_d"
+          method <- "d_bb"
           old_cols <- bb_names_d
           new_cols <- bb_names_r
           col_type <- c("NA" ,"NA", "es1", "var1", "var1", "var1", "sd1", "se1", "sd1", "sd1",
                         "es3", "es3", "es4", "es4")
      }
      if(all(ic_names_d %in% col_names)){
-          method <- "ic_d"
+          method <- "d_ic"
           old_cols <- ic_names_d
           new_cols <- ic_names_r
           col_type <- c("NA", "NA", "es1", "var1", "var1", "var1", "sd1", "se1", "sd1", "sd1",
@@ -456,7 +458,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
                         "es3", "es3", "es4", "es4")
      }
      if(all(ad_names_d %in% col_names)){
-          method <- "ad_d"
+          method <- "d_ad"
           old_cols <- ad_names_d
           new_cols <- ad_names_r
           col_type <- c("NA", "NA", "es1", "var1", "var1", "var1", "var1", "var1", "sd1", "se1", "sd1", "sd1", "sd1", "sd1",
@@ -485,9 +487,11 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 #' @keywords internal
 .convert_metatab <- function(ma_table, p_vec = rep(.5, nrow(ma_table)), conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t"){
 
-     col_ids <- .identify_ma_cols(col_names = colnames(ma_table))
-     as.data.frame(col_ids)
+     .attributes <- attributes(ma_table)
+     .class <- class(ma_table)
      
+     col_ids <- .identify_ma_cols(col_names = colnames(ma_table))
+
      ma_table_subset <- ma_table[,col_ids$old_cols]
      k <- ma_table_subset$k
 
@@ -504,7 +508,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
      es3_col <- which(col_ids$col_type == "es3")
      es4_col <- which(col_ids$col_type == "es4")
 
-     if(any(col_ids$method == c("bb_r", "ad_r", "ic_r"))){
+     if(any(col_ids$method == c("r_bb", "r_ad", "r_ic"))){
           ma_table_subset[,var1_col] <- convert_varr_to_vard(r = matrix(ma_table_subset[,es1_col], length(p_vec), length(var1_col)),
                                                              var = ma_table_subset[,var1_col],
                                                              p = matrix(p_vec, length(p_vec), length(var1_col)))
@@ -518,7 +522,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
                                                           sd = ma_table_subset[,se1_col],
                                                           p = matrix(p_vec, length(p_vec), length(se1_col)))
 
-          if(col_ids$method != "bb_r"){
+          if(col_ids$method != "r_bb"){
                ma_table_subset[,se2_col] <- convert_sdr_to_sdd(r = matrix(ma_table_subset[,es2_col], length(p_vec), length(se2_col)),
                                                                sd = ma_table_subset[,se2_col],
                                                                p = matrix(p_vec, length(p_vec), length(se2_col)))
@@ -532,23 +536,23 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
                                                             p = matrix(p_vec, length(p_vec), length(es2_col)))
           }
 
-          if(col_ids$method == "bb_r"){
+          if(col_ids$method == "r_bb"){
                ma_table_subset[,es3_col] <- confidence(mean = ma_table_subset[,es1_col], se = ma_table_subset[,se1_col], k = k, conf_level = conf_level, conf_method = conf_method)
                ma_table_subset[,es4_col] <- credibility(mean = ma_table_subset[,es1_col], sd = ma_table_subset[,sd1_col[3]], k = k, cred_level = cred_level, cred_method = cred_method)
           }
 
-          if(col_ids$method == "ad_r"){
+          if(col_ids$method == "r_ad"){
                ma_table_subset[,es3_col] <- .convert_r_to_d(r = ma_table_subset[,es3_col], p = matrix(p_vec, length(p_vec), length(es3_col)))
                ma_table_subset[,es4_col] <- credibility(mean = ma_table_subset[,es2_col], sd = ma_table_subset[,"sd_rho"], k = k, cred_level = cred_level, cred_method = cred_method)
           }
 
-          if(col_ids$method == "ic_r"){
+          if(col_ids$method == "r_ic"){
                ma_table_subset[,es3_col] <- confidence(mean = ma_table_subset[,es2_col], se = ma_table_subset[,se2_col], k = k, conf_level = conf_level, conf_method = conf_method)
                ma_table_subset[,es4_col] <- credibility(mean = ma_table_subset[,es2_col], sd = ma_table_subset[,sd2_col[3]], k = k, cred_level = cred_level, cred_method = cred_method)
           }
      }
 
-     if(any(col_ids$method == c("bb_d", "ad_d", "ic_d"))){
+     if(any(col_ids$method == c("d_bb", "d_ad", "d_ic"))){
           ma_table_subset[,var1_col] <- convert_vard_to_varr(d = matrix(ma_table_subset[,es1_col], length(p_vec), length(var1_col)),
                                                              var = ma_table_subset[,var1_col],
                                                              p = matrix(p_vec, length(p_vec), length(var1_col)))
@@ -562,7 +566,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
                                                           sd = ma_table_subset[,se1_col],
                                                           p = matrix(p_vec, length(p_vec), length(se1_col)))
 
-          if(col_ids$method != "bb_d"){
+          if(col_ids$method != "d_bb"){
                ma_table_subset[,se2_col] <- convert_sdd_to_sdr(d = matrix(ma_table_subset[,es2_col], length(p_vec), length(se2_col)),
                                                                sd = ma_table_subset[,se2_col],
                                                                p = matrix(p_vec, length(p_vec), length(se2_col)))
@@ -576,17 +580,17 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
                                                             p = matrix(p_vec, length(p_vec), length(es2_col)))
           }
 
-          if(col_ids$method == "bb_d"){
+          if(col_ids$method == "d_bb"){
                ma_table_subset[,es3_col] <- confidence(mean = ma_table_subset[,es1_col], se = ma_table_subset[,se1_col], k = k, conf_level = conf_level, conf_method = conf_method)
                ma_table_subset[,es4_col] <- credibility(mean = ma_table_subset[,es1_col], sd = ma_table_subset[,sd1_col[3]], k = k, cred_level = cred_level, cred_method = cred_method)
           }
 
-          if(col_ids$method == "ad_d"){
+          if(col_ids$method == "d_ad"){
                ma_table_subset[,es3_col] <- .convert_d_to_r(d = ma_table_subset[,es3_col], p = matrix(p_vec, length(p_vec), length(es3_col)))
                ma_table_subset[,es4_col] <- credibility(mean = ma_table_subset[,es2_col], sd = ma_table_subset[,"sd_delta"], k = k, cred_level = cred_level, cred_method = cred_method)
           }
 
-          if(col_ids$method == "ic_d"){
+          if(col_ids$method == "d_ic"){
                ma_table_subset[,es3_col] <- confidence(mean = ma_table_subset[,es2_col], se = ma_table_subset[,se2_col], k = k, conf_level = conf_level, conf_method = conf_method)
                ma_table_subset[,es4_col] <- credibility(mean = ma_table_subset[,es2_col], sd = ma_table_subset[,sd2_col[3]], k = k, cred_level = cred_level, cred_method = cred_method)
           }
@@ -594,8 +598,19 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      ma_table[,col_ids$old_cols] <- ma_table_subset
      colnames(ma_table)[colnames(ma_table) %in% col_ids$old_cols] <- col_ids$new_cols
-
-     fix_df(ma_table)
+     .attributes$names <- col_ids$new_cols
+     
+     if(any(col_ids$method == c("r_bb", "r_ad", "r_ic"))){
+          .attributes$ma_type <- gsub(x = col_ids$method, pattern = "r_", replacement = "d_")
+     }else if(any(col_ids$method == c("d_bb", "d_ad", "d_ic"))){
+          .attributes$ma_type <- gsub(x = col_ids$method, pattern = "d_", replacement = "r_")
+     }
+     
+     ma_table <- fix_df(ma_table)
+     attributes(ma_table) <- .attributes
+     class(ma_table) <- .class
+     
+     ma_table
 }
 
 

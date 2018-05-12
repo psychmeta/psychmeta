@@ -1,58 +1,7 @@
-#' Individual-correction meta-analysis of \emph{d} values
-#'
-#' This function computes individual-correction meta-analyses of \emph{d} values.
-#'
-#' @param d Vector or column name of observed \emph{d} values.
-#' @param n1 Vector or column name of sample sizes.
-#' @param n2 Vector or column name of sample sizes.
-#' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
-#' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
-#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
-#' @param treat_as_d Logical scalar determining whether \emph{d} values are to be meta-analyzed as d values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).
-#' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
-#' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
-#' (see metafor documentation for details about the metafor methods).
-#' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rGg Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rr_g Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_rr_y Logical scalar or vector or column name determining whether each \emph{d} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-#' @param indirect_rr_g Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
-#' Superseded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_g} == \code{FALSE}, the value supplied for \code{indirect_rr_g} is disregarded).
-#' @param indirect_rr_y Logical vector or column name determining whether each \emph{d} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
-#' Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).
-#' @param rGg Vector or column name of reliability estimates for X.
-#' @param ryy Vector or column name of reliability estimates for Y.
-#' @param ryy_restricted Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
-#' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#' @param pi Scalar or vector containing the restricted-group proportions of group membership. If a vector, it must either have as many elements as there are \emph{d} values.
-#' @param pa Scalar or vector containing the unrestricted-group proportions of group membership. If a vector, it must either have as many elements as there are \emph{d} values.
-#' @param uy Vector or column name of u ratios for Y.
-#' @param uy_observed Logical vector or column name determining whether each element of \code{uy} is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
-#' @param sign_rgz Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).
-#' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).
-#' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
-#' @param moderator_type Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time,
-#' "hierarchical" means that all possible combinations and subsets of moderators are to be examined, and "all" means that simple and hierarchical moderator analyses are to be performed.
-#' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
-#' @param supplemental_ads_y List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.
-#' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
-#' @param ... Further arguments to be passed to functions called within the meta-analysis.
-#'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_d_as_r} or \code{ma_d_as_d}, \code{ma_bb}, and \code{ma_ic}.
+#' @rdname ma_d
 #' @export
-#'
-#' @references
-#' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
-#' Thousand Oaks, California: SAGE Publications, Inc. Chapter 3.
-#'
-#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-#' Accounting for indirect range restriction in organizational and psychological research}.
-#' Manuscript submitted for review.
-#'
 #' @examples
+#' ### Demonstration of ma_d_ic ###
 #' ## Example meta-analyses using simulated data:
 #' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
