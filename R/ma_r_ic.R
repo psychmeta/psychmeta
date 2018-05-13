@@ -23,7 +23,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     sign_rxz = 1, sign_ryz = 1,
                     moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
                     supplemental_ads_x = NULL, supplemental_ads_y = NULL,
-                    data = NULL, control = psychmeta_control(), ...){
+                    data = NULL, control = control_psychmeta(), ...){
      
      warn_obj1 <- record_warnings()
      call <- match.call()
@@ -32,8 +32,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      
-     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
-                                  .psychmeta_control_arg = control)
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
      error_type <- control$error_type
      conf_level <- control$conf_level
      cred_level <- control$cred_level

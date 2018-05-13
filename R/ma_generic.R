@@ -15,7 +15,7 @@
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
+#' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list object of the classes \code{psychmeta}, \code{ma_generic}, and \code{ma_bb}.
@@ -42,8 +42,8 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      
-     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
-                                  .psychmeta_control_arg = control)
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
      conf_level <- control$conf_level
      cred_level <- control$cred_level
      conf_method <- control$conf_method

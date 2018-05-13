@@ -34,7 +34,7 @@ Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML"
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
-\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+\item{control}{Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

@@ -22,7 +22,7 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rz = NULL,
   sign_rxz = 1, sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
   moderator_type = c("simple", "hierarchical", "none"),
-  supplemental_ads = NULL, data = NULL, control = psychmeta_control(),
+  supplemental_ads = NULL, data = NULL, control = control_psychmeta(),
   ...)
 
 ma_r_ad(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
@@ -35,7 +35,7 @@ ma_r_bb(r, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE",
   "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
   moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
-  "hierarchical", "none"), data = NULL, control = psychmeta_control(), ...)
+  "hierarchical", "none"), data = NULL, control = control_psychmeta(), ...)
 
 ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE",
@@ -48,7 +48,7 @@ ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
   moderator_type = c("simple", "hierarchical", "none"),
   supplemental_ads_x = NULL, supplemental_ads_y = NULL, data = NULL,
-  control = psychmeta_control(), ...)
+  control = control_psychmeta(), ...)
 }
 \arguments{
 \item{rxyi, r}{Vector or column name of observed correlations. The \code{r} argument is used with the \code{ma_r_bb} (i.e., the barebones function) function and the \code{rxyi} argument is used with \code{ma_r} and \code{ma_r_ic} (i.e., the function in which corrections are applied).}
@@ -165,7 +165,7 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
-\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+\item{control}{Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 

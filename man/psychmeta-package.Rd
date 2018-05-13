@@ -56,7 +56,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jeffrey A. Dahlke \email{jeff@psychmeta.com}
+\strong{Maintainer}: Jeffrey A. Dahlke \email{dahlk068@umn.edu}
 
 Authors:
 \itemize{

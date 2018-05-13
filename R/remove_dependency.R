@@ -202,8 +202,17 @@
           if(collapse_method == "composite"){
                if(length(intercor) > 1) {
                     if(is.null(construct_x) & is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
-                    intercor_x <- intercor[construct_x[i][1]]
-                    intercor_y <- intercor[construct_y[i][1]]
+                    
+                    intercor_x <- intercor[paste(sample_id[i][1], construct_x[i][1])]
+                    intercor_y <- intercor[paste(sample_id[i][1], construct_y[i][1])]
+                    
+                    if(is.na(intercor_x)) intercor_x <- intercor[construct_x[i][1]]
+                    if(is.na(intercor_y)) intercor_y <- intercor[construct_y[i][1]]
+                    
+                    if(is.na(intercor_x) | is.na(intercor_y))
+                         warning("Valid same-construct intercorrelations not provided for sample '", sample_id[i][1], "': '\n     Computing averages instead of composites")
+                    if(is.na(intercor_x)) intercor_x <- 1
+                    if(is.na(intercor_y)) intercor_y <- 1
                } else {
                     intercor_x <- intercor_y <- intercor
                }

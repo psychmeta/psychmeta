@@ -81,7 +81,7 @@
 #' "hierarchical" means that all possible combinations and subsets of moderators are to be examined.
 #' @param supplemental_ads For \code{ma_r} only: Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
+#' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #' 
 #' @param supplemental_ads_x,supplemental_ads_y For \code{ma_r_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.
@@ -346,7 +346,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  uy = NULL, uy_observed = TRUE,
                  sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
-                 supplemental_ads = NULL, data = NULL, control = psychmeta_control(), ...){
+                 supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
 
      ##### Get inputs #####
      call <- match.call()
@@ -358,8 +358,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
      
-     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
-                                  .psychmeta_control_arg = control)
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
      error_type <- control$error_type
      conf_level <- control$conf_level
      cred_level <- control$cred_level
@@ -515,7 +515,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(deparse(substitute(indirect_rr_y))[1] != "NULL")
                indirect_rr_y <- match_variables(call = call_full[[match("indirect_rr_y", names(call_full))]], arg = indirect_rr_y, arg_name = "indirect_rr_y", data = data)
      }
-
+          
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
                moderators <- as.data.frame(moderators)
@@ -621,6 +621,19 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(is.null(construct_x)) construct_x <- rep("X", length(rxyi))
      if(is.null(construct_y)) construct_y <- rep("Y", length(rxyi))
 
+     if(class(intercor) != "control_intercor"){
+          if(is.list(intercor)){
+               intercor <- do.call(control_intercor, args = intercor)
+          }else{
+               intercor <- control_intercor(rxyi = rxyi, sample_id = sample_id,
+                                            construct_x = construct_x, 
+                                            construct_y = construct_y, 
+                                            construct_names = unique(c(construct_x, construct_y)), 
+                                            intercor_vec = intercor, 
+                                            intercor_scalar = .5) 
+          }
+     }
+     
      if(is.matrix(correction_method)){
           .colnames <- colnames(correction_method)
           .rownames <- rownames(correction_method)
@@ -1296,7 +1309,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz, cat_moderators = cat_moderators, moderator_type = moderator_type,
                               data = data,
                               
-                              control = psychmeta_control(error_type = error_type,
+                              control = control_psychmeta(error_type = error_type,
                                                           conf_level = conf_level, 
                                                           cred_level = cred_level, 
                                                           conf_method = conf_method, 

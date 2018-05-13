@@ -23,7 +23,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                       correct_bias = TRUE,
                                       moderators = NULL, cat_moderators = TRUE, 
                                       moderator_type = c("simple", "hierarchical", "none"), 
-                                      data = NULL, control = psychmeta_control(), ...){
+                                      data = NULL, control = control_psychmeta(), ...){
 
      warn_obj1 <- record_warnings()
      call <- match.call()
@@ -32,8 +32,8 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      
-     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
-                                  .psychmeta_control_arg = control)
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
      error_type <- control$error_type
      conf_level <- control$conf_level
      cred_level <- control$cred_level

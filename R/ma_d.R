@@ -61,7 +61,7 @@
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param control Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
+#' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #' 
 #' @param supplemental_ads_y For \code{ma_d_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.
@@ -241,7 +241,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  uy = NULL, uy_observed = TRUE,
                  sign_rz = NULL, sign_rgz = 1, sign_ryz = 1,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
-                 supplemental_ads = NULL, data = NULL, control = psychmeta_control(), ...){
+                 supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
 
      ##### Get inputs #####
      call <- match.call()
@@ -252,8 +252,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
      
-     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
-                                  .psychmeta_control_arg = control)
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
      
      if(control$hs_override){
           wt_type <- "sample_size"

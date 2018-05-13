@@ -8,7 +8,7 @@ ma_d_order2(k, N = NULL, d = NULL, delta = NULL, var_d = NULL,
   var_d_c = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
   citekey = NULL, moderators = NULL, moderator_type = "simple",
   construct_x = NULL, construct_y = NULL, data = NULL,
-  control = psychmeta_control(), ...)
+  control = control_psychmeta(), ...)
 }
 \arguments{
 \item{k}{Vector or column name of meta-analyses' k values.}
@@ -39,7 +39,7 @@ ma_d_order2(k, N = NULL, d = NULL, delta = NULL, var_d = NULL,
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
-\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+\item{control}{Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

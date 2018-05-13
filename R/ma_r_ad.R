@@ -33,8 +33,8 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      
      use_ic_ads <- match.arg(use_ic_ads, choices = c("tsa", "int"))
      
-     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
-                                  .psychmeta_control_arg = control)
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
      residual_ads <- control$residual_ads
      decimals <- control$decimals
      

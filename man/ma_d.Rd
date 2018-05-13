@@ -22,7 +22,7 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
   uy_observed = TRUE, sign_rz = NULL, sign_rgz = 1, sign_ryz = 1,
   moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
   "hierarchical", "none"), supplemental_ads = NULL, data = NULL,
-  control = psychmeta_control(), ...)
+  control = control_psychmeta(), ...)
 
 ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
   correction_method = "auto", use_ic_ads = c("tsa", "int"),
@@ -35,7 +35,7 @@ ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL,
   "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
   correct_bias = FALSE, moderators = NULL, cat_moderators = TRUE,
   moderator_type = c("simple", "hierarchical", "none"), data = NULL,
-  control = psychmeta_control(), ...)
+  control = control_psychmeta(), ...)
 
 ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   citekey = NULL, treat_as_d = TRUE, wt_type = c("sample_size",
@@ -47,7 +47,7 @@ ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1, moderators = NULL,
   cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
   "none"), supplemental_ads_y = NULL, data = NULL,
-  control = psychmeta_control(), ...)
+  control = control_psychmeta(), ...)
 }
 \arguments{
 \item{d}{Vector or column name of observed \emph{d} values.}
@@ -148,7 +148,7 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
-\item{control}{Output from the \code{psychmeta_control()} function or a list of arguments controlled by the \code{psychmeta_control()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+\item{control}{Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 

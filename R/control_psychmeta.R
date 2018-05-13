@@ -48,8 +48,8 @@
 #' @export
 #' 
 #' @examples 
-#' psychmeta_control()
-psychmeta_control <- function(error_type = c("mean", "sample"),
+#' control_psychmeta()
+control_psychmeta <- function(error_type = c("mean", "sample"),
                               conf_level = .95, 
                               cred_level = .8, 
                               conf_method = c("t", "norm"), 
@@ -97,13 +97,13 @@ psychmeta_control <- function(error_type = c("mean", "sample"),
                      estimate_pa = estimate_pa)
      additional_args <- list(...)
      .psychmeta_ellipse_args <- additional_args$.psychmeta_ellipse_args
-     .psychmeta_control_arg <- additional_args$.psychmeta_control_arg
+     .control_psychmeta_arg <- additional_args$.control_psychmeta_arg
      rm(additional_args)
      
-     if(length(.psychmeta_control_arg) > 0)
-          .psychmeta_control_arg <- .psychmeta_control_arg[names(.psychmeta_control_arg) != ""]
+     if(length(.control_psychmeta_arg) > 0)
+          .control_psychmeta_arg <- .control_psychmeta_arg[names(.control_psychmeta_arg) != ""]
      if(length(.psychmeta_ellipse_args) > 0)
-          control[names(control) %in% names(.psychmeta_control_arg)] <- .psychmeta_control_arg
+          control[names(control) %in% names(.control_psychmeta_arg)] <- .control_psychmeta_arg
      
      if(length(.psychmeta_ellipse_args) > 0)
           .psychmeta_ellipse_args <- .psychmeta_ellipse_args[names(.psychmeta_ellipse_args) != ""]
@@ -129,7 +129,7 @@ psychmeta_control <- function(error_type = c("mean", "sample"),
      
      control$check_dependence <- scalar_arg_warning(control$check_dependence, arg_name = "check_dependence")
      control$collapse_method <- match.arg(control$collapse_method, c("composite", "average", "stop"))
-     if(!is.numeric(control$intercor)) stop("'intercor' must be numeric", call. = FALSE)
+     # if(!is.numeric(control$intercor)) stop("'intercor' must be numeric", call. = FALSE)
      # control$partial_intercor <- scalar_arg_warning(arg = control$partial_intercor, arg_name = "partial_intercor")
      if(!is.logical(control$partial_intercor)) stop("'partial_intercor' must be logical", call. = FALSE)
      
@@ -160,8 +160,8 @@ psychmeta_control <- function(error_type = c("mean", "sample"),
      control
 }
 
-#' @rdname psychmeta_control
+#' @rdname control_psychmeta
 #' @export
-control_psychmeta <- psychmeta_control
+psychmeta_control <- control_psychmeta
 
 

@@ -20,7 +20,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
                     uy = NULL, uy_observed = TRUE,
                     sign_rgz = 1, sign_ryz = 1,
                     moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"), 
-                    supplemental_ads_y = NULL, data = NULL, control = psychmeta_control(), ...){
+                    supplemental_ads_y = NULL, data = NULL, control = control_psychmeta(), ...){
      
      call <- match.call()
 
@@ -28,8 +28,8 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      
-     control <- psychmeta_control(.psychmeta_ellipse_args = list(...),
-                                  .psychmeta_control_arg = control)
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
      
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
