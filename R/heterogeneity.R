@@ -295,7 +295,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
 #' @param es_type Name of effect-size type.
 #'
 #' @return A list of heterogeneity statistics.
-#' @export
+#' 
 #' @importFrom stats pchisq
 #' @importFrom stats uniroot
 #'

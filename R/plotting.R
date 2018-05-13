@@ -196,7 +196,6 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @param x An escalc-class object
 #'
 #' @return A funnel plot.
-#' @export
 #'
 #' @author John Sakaluk
 #'

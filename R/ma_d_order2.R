@@ -189,10 +189,8 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
 #' @param ma_arg_list List of arguments to be used in the meta-analysis function.
 #'
 #' @return A meta-analytic table and a data frame.
-#' @export
-#'
-#' @examples
-#' ## Example TBD
+#' 
+#' @keywords internal
 .ma_d_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
 
      r <- data$d

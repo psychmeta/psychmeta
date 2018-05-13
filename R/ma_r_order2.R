@@ -214,10 +214,6 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @param ma_arg_list List of arguments to be used in the meta-analysis function.
 #'
 #' @return A meta-analytic table and a data frame.
-#' @export
-#'
-#' @examples
-#' ## Example TBD
 .ma_r_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
      
      r <- data$r
@@ -284,15 +280,13 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @param run_lean If TRUE, the meta-analysis will not generate a data object. Meant to speed up bootstrap analyses that do not require supplemental output.
 #'
 #' @return A meta-analytic table and a data frame.
-#' @export
+#'
+#' @keywords internal
 #'
 #' @references
 #' Schmidt, F. L., & Oh, I.-S. (2013).
 #' Methods for second order meta-analysis and illustrative applications.
 #' \emph{Organizational Behavior and Human Decision Processes, 121}(2), 204–218. \url{https://doi.org/10.1016/j.obhdp.2013.03.002}
-#'
-#' @examples
-#' ## Example TBD
 .ma_r_order2_bb <- function(k_vec = NULL, N_vec = NULL, r_vec = NULL, var_r_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE){
@@ -361,15 +355,13 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @param run_lean If TRUE, the meta-analysis will not generate a data object. Meant to speed up bootstrap analyses that do not require supplemental output.
 #'
 #' @return A meta-analytic table and a data frame.
-#' @export
+#' 
+#' @keywords internal
 #'
 #' @references
 #' Schmidt, F. L., & Oh, I.-S. (2013).
 #' Methods for second order meta-analysis and illustrative applications.
 #' \emph{Organizational Behavior and Human Decision Processes, 121}(2), 204–218. \url{https://doi.org/10.1016/j.obhdp.2013.03.002}
-#'
-#' @examples
-#' ## Example TBD
 .ma_r_order2_ic <- function(k_vec = NULL, N_vec = NULL, rho_vec = NULL, var_r_c_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE){
@@ -441,15 +433,13 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @param run_lean If TRUE, the meta-analysis will not generate a data object. Meant to speed up bootstrap analyses that do not require supplemental output.
 #'
 #' @return A meta-analytic table and a data frame.
-#' @export
+#' 
+#' @keywords internal
 #'
 #' @references
 #' Schmidt, F. L., & Oh, I.-S. (2013).
 #' Methods for second order meta-analysis and illustrative applications.
 #' \emph{Organizational Behavior and Human Decision Processes, 121}(2), 204–218. \url{https://doi.org/10.1016/j.obhdp.2013.03.002}
-#'
-#' @examples
-#' ## Example TBD
 .ma_r_order2_ad <- function(k_vec = NULL, N_vec = NULL, r_vec = NULL, rho_vec = NULL, var_r_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE){

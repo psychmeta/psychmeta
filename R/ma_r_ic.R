@@ -1230,7 +1230,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @param r_corrected Vector of corrected correlations.
 #'
 #' @return A vector of compound attenuation factors.
-#' @export
 #'
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
@@ -1259,7 +1258,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @param rxx_restricted Logical vector determining whether each element of rxx is an incumbent reliability (TRUE) or an applicant reliability (FALSE).
 #'
 #' @return A vector of range-restriction refinement factors.
-#' @export
 #'
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
