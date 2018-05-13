@@ -5,7 +5,7 @@
 \title{Write a summary table of meta-analytic results}
 \usage{
 metabulate(ma_obj, file, show_conf = TRUE, show_cred = TRUE,
-  show_se = FALSE)
+  show_se = FALSE, ...)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object.}
@@ -17,6 +17,8 @@ metabulate(ma_obj, file, show_conf = TRUE, show_cred = TRUE,
 \item{show_cred}{Logical scalar determining whether to show credibility intervals (\code{TRUE}; default) or not (\code{FALSE}).}
 
 \item{show_se}{Logical scalar determining whether to show standard errors (\code{TRUE}) or not (\code{FALSE}; default).}
+
+\item{...}{Additional arguments.}
 }
 \value{
 Saved rich text file containing tables of meta-analytic output.

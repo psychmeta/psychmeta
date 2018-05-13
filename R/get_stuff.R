@@ -97,8 +97,21 @@ get_metafor <- get_escalc <- function(ma_obj, analyses = "all", match = c("all",
 get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, 
                         ma_methods = c("bb", "ic", "ad"), correction_types = c("ts", "vgx", "vgy"), ...){
      
+     additional_args <- list(...)
+     
      ma_methods <- match.arg(ma_methods, c("bb", "ic", "ad"), several.ok = TRUE)
      correction_types <- match.arg(correction_types, c("ts", "vgx", "vgy"), several.ok = TRUE)
+     ma_metric <- attributes(ma_obj)$ma_metric
+     
+     if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+          ts_label <- "true_score"
+          vgx_label <- "validity_generalization_x"
+          vgy_label <- "validity_generalization_y"
+     }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+          ts_label <- "latentGroup_latentY"
+          vgx_label <- "observedGroup_latentY"
+          vgy_label <- "latentGroup_observedY"
+     }
      
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
      
@@ -117,30 +130,41 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           total_tables <- total_tables + 1
      }
      
-     
      if("ic" %in% ma_methods){
           .contents <- NULL
           if("ts" %in% correction_types){
-               out$individual_correction$true_score <- 
+               out$individual_correction[[ts_label]] <- 
                     compile_metatab(ma_obj = ma_obj, ma_method = "ic", 
                                     correction_type = "ts")   
-               .contents <- c(.contents, "true score")
+               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                    .contents <- c(.contents, "true score")
+               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                    .contents <- c(.contents, "latent group and latent Y")
+               }
                total_tables <- total_tables + 1
           }
           
           if("vgx" %in% correction_types){
-               out$individual_correction$validity_generalization_x <- 
+               out$individual_correction[[vgx_label]] <- 
                     compile_metatab(ma_obj = ma_obj, ma_method = "ic", 
                                     correction_type = "vgx")
-               .contents <- c(.contents, "validity generalization (X as predictor)")
+               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                    .contents <- c(.contents, "validity generalization (X as predictor)")
+               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                    .contents <- c(.contents, "observed group and latent Y")
+               }
                total_tables <- total_tables + 1
           }
           
           if("vgy" %in% correction_types){
-               out$individual_correction$validity_generalization_y <-
+               out$individual_correction[[vgy_label]] <-
                     compile_metatab(ma_obj = ma_obj, ma_method = "ic", 
                                     correction_type = "vgy")
-               .contents <- c(.contents, "validity generalization (Y as predictor)")
+               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                    .contents <- c(.contents, "validity generalization (Y as predictor)")
+               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                    .contents <- c(.contents, "latent group and observed Y")
+               }
                total_tables <- total_tables + 1
           }
           
@@ -152,26 +176,38 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      if("ad" %in% ma_methods){
           .contents <- NULL
           if("ts" %in% correction_types){
-               out$artifact_distribution$true_score <- 
+               out$artifact_distribution[[ts_label]] <- 
                     compile_metatab(ma_obj = ma_obj, ma_method = "ad", 
                                     correction_type = "ts")   
-               .contents <- c(.contents, "true score")
+               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                    .contents <- c(.contents, "true score")
+               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                    .contents <- c(.contents, "latent group and latent Y")
+               }
                total_tables <- total_tables + 1
           }
           
           if("vgx" %in% correction_types){
-               out$artifact_distribution$validity_generalization_x <- 
+               out$artifact_distribution[[vgx_label]] <- 
                     compile_metatab(ma_obj = ma_obj, ma_method = "ad", 
                                     correction_type = "vgx")
-               .contents <- c(.contents, "validity generalization (X as predictor)")
+               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                    .contents <- c(.contents, "validity generalization (X as predictor)")
+               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                    .contents <- c(.contents, "observed group and latent Y")
+               }
                total_tables <- total_tables + 1
           }
           
           if("vgy" %in% correction_types){
-               out$artifact_distribution$validity_generalization_y <-
+               out$artifact_distribution[[vgy_label]] <-
                     compile_metatab(ma_obj = ma_obj, ma_method = "ad", 
                                     correction_type = "vgy")
-               .contents <- c(.contents, "validity generalization (Y as predictor)")
+               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                    .contents <- c(.contents, "validity generalization (Y as predictor)")
+               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                    .contents <- c(.contents, "latent group and observed Y")
+               }
                total_tables <- total_tables + 1
           }
           
@@ -180,8 +216,9 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                                               paste0(.contents, collapse = "\n     - ")))
      }
      
-     
-     if(total_tables > 1){
+     as_list <- additional_args$as_list
+     if(is.null(as_list)) as_list <- FALSE
+     if(total_tables > 1 | as_list){
           attributes(out) <- append(attributes(out), list(contents = paste0(contents, collapse = "\n")))
           class(out) <- c("get_metatab")   
      }else{
@@ -427,7 +464,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
      
-     if(!is.null(ma_obj$pair_id)){
+     if(any(colnames(ma_obj) == "pair_id")){
           do_matrix <- length(unique(ma_obj$pair_id)) > 1
      }else{
           do_matrix <- FALSE
@@ -559,7 +596,8 @@ get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "c
 }
 
 
-compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_type = c("ts", "vgx", "vgy")){
+compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_type = c("ts", "vgx", "vgy"), ...){
+     
      ma_method <- match.arg(arg = ma_method, choices = c("bb", "ic", "ad"))
      correction_type <- match.arg(arg = correction_type, choices = c("ts", "vgx", "vgy"))
      ma_metric <- attributes(ma_obj)$ma_metric

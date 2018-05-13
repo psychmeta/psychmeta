@@ -11,7 +11,8 @@
 #' @param check_dependence Logical scalar that determines whether database should be checked for violations of independence (\code{TRUE}) or not (\code{FALSE}).
 #' @param collapse_method Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."
 #' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.
-#' @param partial_intercor For \emph{d} values only: Logical value that determines whether the values in \code{intercor} are to be treated as within-group correlations (i.e., partial correlation controlling for group membership; \code{TRUE}) or not (\code{FALSE}; default).
+#' @param partial_intercor For \emph{d} values only: Logical scalar that determines whether the values in \code{intercor} are to be treated as within-group correlations (i.e., partial correlation controlling for group membership; \code{TRUE}) or not (\code{FALSE}; default).
+#' Note that this must be a scalar and it is not possible to provide a vector argument: If the database contains a mixture of total- and partial correlations, they must be converted to a common format by either using the \code{mix_r_2group()} function to convert partial correlations to total correlations or using the \code{unmix_r_2group()} function to convert total correlations to partial correlations.
 #' @param clean_artifacts If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
 #' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
 #' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
@@ -159,9 +160,4 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
      
      control
 }
-
-#' @rdname control_psychmeta
-#' @export
-psychmeta_control <- control_psychmeta
-
 

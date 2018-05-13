@@ -111,3 +111,4 @@ control_intercor <- function(rxyi, sample_id, construct_x, construct_y, construc
      class(out) <- "control_intercor"
      out
 }
+

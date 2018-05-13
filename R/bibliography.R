@@ -46,11 +46,8 @@ generate_bib <- function(ma_obj=NULL, additional_citekeys=NULL, bib=NULL, analys
           ma_obj_filtered <- filter_ma(ma_obj=ma_obj, analyses=analyses, match=match)
 
           # Get the citekeys for requested metas
-          citekeys <- if(is.null(ma_obj_filtered$construct_pairs)) {
-               unique(c(additional_citekeys, unlist(strsplit(paste(unlist(lapply(ma_obj_filtered$barebones$escalc_list, function(y) as.character(y$citekey))), collapse=", "), ", "))))
-          } else {
-               unique(c(additional_citekeys, unlist(strsplit(paste(unlist(lapply(ma_obj_filtered$construct_pairs, function(x) lapply(x$barebones$escalc_list, function(y) as.character(y$citekey)))), collapse=", "), ", "))))
-          }
+          citekeys <- unique(c(additional_citekeys, unlist(lapply(ma_obj_filtered$escalc, function(x) 
+               as.character(x$barebones$citekey)))))
      } else citekeys <- additional_citekeys
 
      # Set BibOptions to accept entries with missing data

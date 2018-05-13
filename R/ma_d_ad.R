@@ -236,8 +236,25 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
      ma_obj$sign_rgz <- NULL
      ma_obj$sign_ryz <- NULL
      
+     ma_obj$meta_tables <- ma_list
+     if(!any(colnames(ma_obj) == "ad"))
+          ma_obj$ad <- rep(list(list(ic = NULL, ad = NULL)))
+     
+     for(i in 1:nrow(ma_obj)){
+          ma_obj$ad[[i]] <- list(ic = ma_obj$ad[[i]]$ic, 
+                                 ad = ma_obj$meta_tables[[i]]$artifact_distributions)
+          ma_obj$meta_tables[[i]]$artifact_distributions <- NULL
+          ma_obj$meta_tables[[i]] <- ma_obj$meta_tables[[i]]$meta
+          
+          class(ma_obj$meta_tables[[i]]$artifact_distribution) <- c("ma_ad_list", class(ma_obj$meta_tables[[i]]$artifact_distribution))
+     }
+     
+     if(!("ad" %in% attributes(ma_obj)$ma_methods))
+          attributes(ma_obj)$ma_methods <- c(attributes(ma_obj)$ma_methods, "ad")
+     
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 
+     ma_metric <- attributes(ma_obj)$ma_metric
      convert_metric <- ifelse(any(ma_metric == "r_as_r" | ma_metric == "d_as_r"), TRUE, FALSE)
      if(convert_metric) ma_obj <- convert_ma(ma_obj)
      
