@@ -44,7 +44,7 @@ create_ad_group(ad_type = c("tsa", "int"), rGg = NULL, n_rGg = NULL,
 Artifact distribution object (matrix of artifact-distribution means and variances) for use in artifact-distribution meta-analyses.
 }
 \description{
-This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
+This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
 Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 }
 \details{

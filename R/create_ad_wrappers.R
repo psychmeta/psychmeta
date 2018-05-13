@@ -1,6 +1,6 @@
 #' Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
 #'
-#' This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions.
+#' This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions.
 #' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
 #' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
@@ -215,7 +215,7 @@ create_ad <- function(ad_type = c("tsa", "int"),
 #' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.
 #' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
 #' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param process_ads Logical scalar determining whether artifact information should be processed into "ad_obj" class objects (\code{TRUE}; default) or reported in list form (\code{FALSE}).
+#' @param process_ads Logical scalar determining whether artifact information should be processed into artifact-distribution objects (\code{TRUE}; default) or reported in list form (\code{FALSE}).
 #' @param collapse_method Character argument that determines how to collapse multiple measures of a construct within a single study (used when \code{measure_x} and/or \code{measure_y} are supplied).
 #' Options are "composite" (default), "average," and "stop." When measure names are not supplied, multiple entries for a given construct within a given study will be averaged.
 #' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.
@@ -615,7 +615,7 @@ create_ad_array <- function(ad_list, name_vec = NULL){
 
 #' Generate an artifact distribution object for a dichotomous grouping variable for use in interactive artifact-distribution meta-analysis programs.
 #'
-#' This wrapper for \code{link{create_ad_int}} generates \code{ad_obj} class objects containing interactive artifact distributions for dichotomous group-membership variables.
+#' This wrapper for \code{link{create_ad_int}} generates artifact-distribution objects containing interactive artifact distributions for dichotomous group-membership variables.
 #' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
 #' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
@@ -665,7 +665,7 @@ create_ad_int_group <- function(rGg = NULL, wt_rGg = rep(1, length(rGg)),
 
 #' Generate an artifact distribution object for a dichotomous grouping variable for use in Taylor series artifact-distribution meta-analysis programs.
 #'
-#' This wrapper for \code{link{create_ad_tsa}} generates \code{ad_obj} class objects containing Taylor series artifact distributions for dichotomous group-membership variables.
+#' This wrapper for \code{link{create_ad_tsa}} generates artifact-distribution objects containing Taylor series artifact distributions for dichotomous group-membership variables.
 #' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
 #' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
@@ -736,7 +736,7 @@ create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
 
 #' Generate an artifact distribution object for a dichotomous grouping variable.
 #'
-#' This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
+#' This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
 #' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
 #' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
@@ -919,6 +919,7 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
           construct_pair <- c(construct_pair, construct_pair)
           construct_x <- c(construct_x, construct_y)
 
+          i <- which(construct_x == "X")
           ad_obj_list_x <- ad_obj_list_y <- by(1:length(construct_pair), construct_x, function(i){
 
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
@@ -1009,7 +1010,7 @@ create_ad_supplemental <- function(ad_type = c("tsa", "int"),
      if(!is.null(supplemental_ads)){
           supplemental_ads <-
                if(is.list(supplemental_ads)){
-                    if("ad_obj" %in% class(supplemental_ads)){
+                    if(any(c("ad_tsa", "ad_int") %in% class(supplemental_ads))){
                          list(supplemental_ads)
                     }else{
                          supplemental_ads
@@ -1018,7 +1019,7 @@ create_ad_supplemental <- function(ad_type = c("tsa", "int"),
                     list(supplemental_ads)
                }
 
-          is_adobj <- unlist(lapply(supplemental_ads, function(x) "ad_obj" %in% class(x)))
+          is_adobj <- unlist(lapply(supplemental_ads, function(x) any(c("ad_tsa", "ad_int") %in% class(x))))
           if(any(!is_adobj)){
                if(any(names(supplemental_ads)[!is_adobj] == ""))
                     warning("Some elements in 'supplemental_ads' were not named: These elements were NOT included in artifact distributions", call. = FALSE)

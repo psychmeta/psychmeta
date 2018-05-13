@@ -28,20 +28,20 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
           if(!any(attributes(ma_obj)$ma_methods == "ic")){
                if(!is.null(ad_obj_g)){
                     if(!is.list(ad_obj_g)){
-                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_g must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_g must be a list of artifact-distribution objects", call. = FALSE)
                     }else{
                          if(!any(unlist(lapply(ad_obj_g, function(x) any(class(x) == "ad_obj"))))){
-                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_g must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_g must be a list of artifact-distribution objects", call. = FALSE)
                          }
                     }
                }
 
                if(!is.null(ad_obj_y)){
                     if(!is.list(ad_obj_y)){
-                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects", call. = FALSE)
                     }else{
                          if(!any(unlist(lapply(ad_obj_y, function(x) any(class(x) == "ad_obj"))))){
-                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects", call. = FALSE)
                          }
                     }
                }
@@ -112,7 +112,7 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
                     }
                }else{
                     if(is.null(ad_obj_g_i) & is.null(ad_obj_y_i)){
-                         stop("'ad_obj_g' and 'ad_obj_y' cannot both be NULL unless 'ma_r_obj' contains individual-correction results", call. = FALSE)
+                         stop("'ad_obj_g' and 'ad_obj_y' cannot both be NULL unless 'ma_obj' contains individual-correction results", call. = FALSE)
                     }else{
                          if(is.null(ad_obj_g_i)){
                               if(any(class(ad_obj_y_i) == "tsa")){

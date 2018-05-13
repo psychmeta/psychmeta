@@ -18,7 +18,7 @@
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
-#' @return A nested tabular object of the class “psychmeta”.
+#' @return A nested tabular object of the class "ma_psychmeta".
 #'
 #' @export
 #'
@@ -145,7 +145,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                      fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
      
-     class(out) <- c("psychmeta", class(out))
+     class(out) <- c("ma_psychmeta", class(out))
      return(out)
 }
 

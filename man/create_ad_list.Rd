@@ -57,7 +57,7 @@ create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
 
 \item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
 
-\item{process_ads}{Logical scalar determining whether artifact information should be processed into "ad_obj" class objects (\code{TRUE}; default) or reported in list form (\code{FALSE}).}
+\item{process_ads}{Logical scalar determining whether artifact information should be processed into artifact-distribution objects (\code{TRUE}; default) or reported in list form (\code{FALSE}).}
 
 \item{collapse_method}{Character argument that determines how to collapse multiple measures of a construct within a single study (used when \code{measure_x} and/or \code{measure_y} are supplied).
 Options are "composite" (default), "average," and "stop." When measure names are not supplied, multiple entries for a given construct within a given study will be averaged.}

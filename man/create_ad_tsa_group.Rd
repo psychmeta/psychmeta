@@ -42,7 +42,7 @@ create_ad_tsa_group(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
 Artifact distribution object (matrix of artifact-distribution means and variances) for use in Taylor serices artifact-distribution meta-analyses.
 }
 \description{
-This wrapper for \code{link{create_ad_tsa}} generates \code{ad_obj} class objects containing Taylor series artifact distributions for dichotomous group-membership variables.
+This wrapper for \code{link{create_ad_tsa}} generates artifact-distribution objects containing Taylor series artifact distributions for dichotomous group-membership variables.
 Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 }
 \details{

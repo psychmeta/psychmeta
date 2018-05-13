@@ -77,7 +77,7 @@
 #' Only evaluated when \code{ad_obj_g} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
 #' Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.
 #'
-#' @return A nested tabular object of the class “psychmeta”.
+#' @return A nested tabular object of the class "ma_psychmeta".
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}

@@ -52,7 +52,7 @@ create_ad_int(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 Artifact distribution object (list of artifact-distribution tables) for use in interactive artifact-distribution meta-analyses.
 }
 \description{
-This function generates \code{ad_obj} class objects containing interactive artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
+This function generates artifact-distribution objects containing interactive artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
 \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 }
 \details{

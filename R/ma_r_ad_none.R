@@ -24,6 +24,7 @@
      var_r <- barebones[,"var_r"]
      var_e <- barebones[,"var_e"]
      var_res <- barebones[,"var_res"]
+     sd_res <- barebones[,"sd_res"]
      ci_xy <- barebones[,grepl(x = colnames(barebones), pattern = "CI")]
      se_r <- barebones[,"se_r"]
 
@@ -37,6 +38,10 @@
      var_pre_tp <- var_pre_xp <- var_pre_ty <- var_e
      var_res_tp <- var_res_xp <- var_res_ty <- var_res
      var_rho_tp <- var_rho_xp <- var_rho_ty <- var_res
+     
+     sd_pre_tp <- sd_pre_xp <- sd_pre_ty <- var_e^.5
+     sd_res_tp <- sd_res_xp <- sd_res_ty <- sd_res
+     sd_rho_tp <- sd_rho_xp <- sd_rho_ty <- sd_res
 
      sd_r <- var_r^.5
      sd_pre <- sd_e <- var_e^.5

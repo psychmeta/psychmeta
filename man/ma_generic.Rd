@@ -39,7 +39,7 @@ Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML"
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }
 \value{
-A nested tabular object of the class “psychmeta”.
+A nested tabular object of the class "ma_psychmeta".
 }
 \description{
 This function computes bare-bones meta-analyses of any effect size using user-supplied effect error variances.

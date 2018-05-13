@@ -60,16 +60,10 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      correct_bias <- scalar_arg_warning(arg = correct_bias, arg_name = "correct_bias")
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
-     error_type <- scalar_arg_warning(arg = error_type, arg_name = "error_type")
-     conf_method <- scalar_arg_warning(arg = conf_method, arg_name = "conf_method")
-     cred_method <- scalar_arg_warning(arg = cred_method, arg_name = "cred_method")
-     conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
-     cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
      
      sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
-     use_all_arts <- scalar_arg_warning(arg = use_all_arts, arg_name = "use_all_arts")
-     
+
      inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias, 
                     conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased)
      additional_args <- list(...)
@@ -921,7 +915,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                             neg_var_rtya = neg_var_rtya)))
      }
 
-     class(out) <- c("ma_r", class(out))
+     class(out) <- c("ma_psychmeta", class(out))
      
      return(out)
                          }

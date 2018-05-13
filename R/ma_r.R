@@ -96,7 +96,7 @@
 #' Only evaluated when \code{ad_obj_x} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
 #' Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.
 #'
-#' @return A nested tabular object of the class “psychmeta”.
+#' @return A nested tabular object of the class "ma_psychmeta".
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
 #' \item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
@@ -251,33 +251,37 @@
 #'
 #' ## And 'ma_r' can also curate artifact distributions and compute multiple
 #' ## artifact-distribution meta-analyses:
-#' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'      clean_artifacts = FALSE, impute_artifacts = FALSE,
-#'      moderators = moderator, data = data_r_meas_multi)
+#' ma_obj <- ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+#'                correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'                clean_artifacts = FALSE, impute_artifacts = FALSE,
+#'                moderators = moderator, data = data_r_meas_multi)
+#' ma_obj
+#' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #'
-#' ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'      clean_artifacts = FALSE, impute_artifacts = FALSE,
-#'      moderators = moderator, data = data_r_meas_multi)
+#' ma_obj <- ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+#'                correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'                clean_artifacts = FALSE, impute_artifacts = FALSE,
+#'                moderators = moderator, data = data_r_meas_multi)
+#' ma_obj
 #'
 #' ## Even if no studies in the database provide artifact information,
 #' ## pre-specified artifact distributions from previous meta-analyses
 #' ## can still be used! (These results should match the previous example.)
-#' ma_r(ma_method = "ad", rxyi = rxyi, n = n,
-#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'      clean_artifacts = FALSE, impute_artifacts = FALSE,
-#'      moderators = moderator, data = data_r_meas_multi,
-#'      supplemental_ads =
-#'           list(X = list(mean_qxi = 0.8927818, var_qxi = 0.0008095520, k_qxi = 40,
-#'                         mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
-#'                Y = list(mean_qxi = 0.8941266, var_qxi = 0.0009367234, k_qxi = 40,
-#'                         mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
-#'                Z = list(mean_qxi = 0.8962108, var_qxi = 0.0007840593, k_qxi = 40,
-#'                         mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha")))
+#' ma_obj <- ma_r(ma_method = "ad", rxyi = rxyi, n = n,
+#'                correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'                clean_artifacts = FALSE, impute_artifacts = FALSE,
+#'                moderators = moderator, data = data_r_meas_multi,
+#'                supplemental_ads =
+#'                     list(X = list(mean_qxi = 0.8927818, var_qxi = 0.0008095520, k_qxi = 40,
+#'                                   mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
+#'                          Y = list(mean_qxi = 0.8941266, var_qxi = 0.0009367234, k_qxi = 40,
+#'                                   mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
+#'                          Z = list(mean_qxi = 0.8962108, var_qxi = 0.0007840593, k_qxi = 40,
+#'                                   mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha")))
+#' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #'
 #'
 #' ## Artifact information may also be supplied by passing "ad_obj" class objects with the
@@ -288,13 +292,13 @@
 #'                           sample_id = sample_id,
 #'                           data = data_r_meas_multi)
 #' ## Run the artifact-distribution meta-analysis:
-#' ma_r(ma_method = "ad", rxyi = rxyi, n = n,
-#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'      clean_artifacts = FALSE, impute_artifacts = FALSE,
-#'      moderators = moderator, data = data_r_meas_multi,
-#'      supplemental_ads = ad_list)
-#'
+#' ma_obj <- ma_r(ma_method = "ad", rxyi = rxyi, n = n,
+#'                correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'                clean_artifacts = FALSE, impute_artifacts = FALSE,
+#'                moderators = moderator, data = data_r_meas_multi,
+#'                supplemental_ads = ad_list)
+#' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #'
 #' ## Artifact information from studies not included in the meta-analysis can also be used to make
 #' ## corrections. Passing artifact information with the 'supplemental_ads' argument allows for
@@ -312,13 +316,14 @@
 #' rzzi <- c(data_r_meas_multi$rxxi, data_r_meas_multi$ryyi)[z_ids]
 #' n_rzzi = c(data_r_meas_multi$n, data_r_meas_multi$n)[z_ids]
 #'
-#' ma_r(ma_method = "ad", rxyi = rxyi, n = n,
-#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name,
-#'      moderators = moderator, sample_id = sample_id, data = data_r_meas_multi,
-#'      supplemental_ads = list(X = list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi),
-#'                              Y = list(rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi),
-#'                              Z = list(rxxi = rzzi, n_rxxi = n_rzzi, wt_rxxi = n_rzzi)))
+#' ma_obj <- ma_r(ma_method = "ad", rxyi = rxyi, n = n,
+#'                correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'                construct_x = x_name, construct_y = y_name,
+#'                moderators = moderator, sample_id = sample_id, data = data_r_meas_multi,
+#'                supplemental_ads = list(X = list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi),
+#'                                        Y = list(rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi),
+#'                                        Z = list(rxxi = rzzi, n_rxxi = n_rzzi, wt_rxxi = n_rzzi)))
+#' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #'
 #' ## If 'use_all_arts' is set to TRUE, artifacts from studies without valid correlations
 #' ## will be used to inform artifact distributions. Below, correlations and artifacts
@@ -328,11 +333,12 @@
 #' dat2$rxyi <- NA
 #' dat2$sample_id <- dat2$sample_id + 40
 #' dat <- rbind(dat1, dat2)
-#' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'      construct_x = x_name, construct_y = y_name,
-#'      sample_id = sample_id, moderators = moderator,
-#'      use_all_arts = TRUE, data = dat)
+#' ma_obj <- ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+#'                correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'                construct_x = x_name, construct_y = y_name,
+#'                sample_id = sample_id, moderators = moderator,
+#'                use_all_arts = TRUE, data = dat)
+#' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  ma_method = c("bb", "ic", "ad"), 
                  ad_type = c("tsa", "int"), 
@@ -1601,7 +1607,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(attributes(out)$ma_metric == "d_as_r")
           out <- convert_ma(ma_obj = out)
      
-     class(out) <- c("psychmeta", class(out))
+     class(out) <- c("ma_psychmeta", class(out))
      
      return(out)
 }

@@ -98,7 +98,7 @@ consolidate_ads <- function(...){
      inputs_adobj <- list()
      for(i in 1:length(inputs)){
           for(j in 1:length(inputs[[i]])){
-               if("ad_obj" %in% class(inputs[[i]][[j]])){
+               if(any(c("ad_tsa", "ad_int") %in% class(inputs[[i]][[j]]))){
                     iter <- iter + 1
                     inputs_adobj[[iter]] <- attributes(inputs[[i]][[j]])[["inputs"]]
                }
@@ -106,7 +106,7 @@ consolidate_ads <- function(...){
      }
 
      .inputs <- lapply(inputs, function(l){
-          l[unlist(lapply(l, function(x) !("ad_obj" %in% class(x))))]
+          l[unlist(lapply(l, function(x) !(any(c("ad_tsa", "ad_int") %in% class(x)))))]
      })
 
      inputs <- filter_listnonnull(append(.inputs, inputs_adobj))

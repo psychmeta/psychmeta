@@ -19,7 +19,7 @@
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
-#' @return A nested tabular object of the class “psychmeta”.
+#' @return A nested tabular object of the class "ma_psychmeta".
 #' @export
 ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
@@ -173,7 +173,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
                                             neg_var_delta_ic_order2 = sum(out$individual_correction$meta_table$var_delta_bar < 0),
                                             neg_var_delta_ad_order2 = sum(out$artifact_distribution$meta_table$var_delta_bar < 0)))
 
-     class(out) <- c("psychmeta", class(out))
+     class(out) <- c("ma_psychmeta", class(out))
      
      out
 }

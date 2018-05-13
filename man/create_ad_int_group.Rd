@@ -24,7 +24,7 @@ create_ad_int_group(rGg = NULL, wt_rGg = rep(1, length(rGg)), pi = NULL,
 Artifact distribution object (list of artifact-distribution tables) for use in interactive artifact-distribution meta-analyses.
 }
 \description{
-This wrapper for \code{link{create_ad_int}} generates \code{ad_obj} class objects containing interactive artifact distributions for dichotomous group-membership variables.
+This wrapper for \code{link{create_ad_int}} generates artifact-distribution objects containing interactive artifact distributions for dichotomous group-membership variables.
 Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 }
 \details{

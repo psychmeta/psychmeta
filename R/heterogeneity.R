@@ -404,7 +404,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
                                            tau_m_squared = tau_m_squared,
                                            tau_m = tau_m_squared^.5),
                  file_drawer = file_drawer)
-     class(out) <- c("psychmeta_heterogeneity")
+     class(out) <- "ma_heterogeneity"
      out
 }
 

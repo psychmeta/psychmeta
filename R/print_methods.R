@@ -39,6 +39,8 @@ round2char <- function(x, digits = 3, na_replace = "", omit_leading_zero = FALSE
 
 
 #### Print artifact distributions ####
+#' @exportClass ad_tsa
+#' @export
 #' @method print ad_tsa
 print.ad_tsa <- function(x, ..., digits = 3){
      cat("Taylor-Series Artifact Distributions\n")
@@ -50,9 +52,9 @@ print.ad_tsa <- function(x, ..., digits = 3){
 }
 
 
-#' print method for interactive artifact distributions
+#' @exportClass ad_int_list
+#' @export
 #' @method print ad_int_list
-#' @keywords internal
 print.ad_int_list <- function(x, ..., digits = 3){
      cat("Interactive Distributions\n")
      cat("-------------------------\n")
@@ -86,9 +88,9 @@ print.ad_int_list <- function(x, ..., digits = 3){
      cat("\n")
 }
 
-#' print method for interactive artifact distributions
+#' @exportClass ad_int
+#' @export
 #' @method print ad_int
-#' @keywords internal
 print.ad_int <- function(x, ..., digits = 3){
      cat("Interactive Distributions\n")
      cat("-------------------------\n")
@@ -105,6 +107,8 @@ print.ad_int <- function(x, ..., digits = 3){
 
 
 #### Print correlation corrections ####
+#' @exportClass correct_r
+#' @export
 #' @method print correct_r
 print.correct_r <- function(x, ..., digits = 3){
      if(any(class(x) == "meas"))
@@ -140,6 +144,8 @@ print.correct_r <- function(x, ..., digits = 3){
 
 
 #### Print d value corrections ####
+#' @exportClass correct_d
+#' @export
 #' @method print correct_d
 print.correct_d <- function(x, ..., digits = 3){
      if(any(class(x) == "meas"))
@@ -174,6 +180,8 @@ print.correct_d <- function(x, ..., digits = 3){
 
 
 #### Print simulation outputs ####
+#' @exportClass simdat_psych
+#' @export
 #' @method print simdat_psych
 print.simdat_psych <- function(x, ..., digits = 3){
      cat("Data from a Simulated Study of", nrow(x$obs), "Cases\n")
@@ -203,7 +211,8 @@ print.simdat_psych <- function(x, ..., digits = 3){
 
 }
 
-
+#' @exportClass simdat_r_sample
+#' @export
 #' @method print simdat_r_sample
 print.simdat_r_sample <- function(x, ..., digits = 3){
      if(is.infinite(x$na)){
@@ -233,6 +242,8 @@ print.simdat_r_sample <- function(x, ..., digits = 3){
 }
 
 
+#' @exportClass simdat_r_database
+#' @export
 #' @method print simdat_r_database
 print.simdat_r_database <- function(x, ..., digits = 3){
      if(any(class(x) == "merged")){
@@ -291,7 +302,8 @@ print.simdat_r_database <- function(x, ..., digits = 3){
 # }
 
 
-
+#' @exportClass simdat_d_sample
+#' @export
 #' @method print simdat_d_sample
 print.simdat_d_sample <- function(x, ..., digits = 3){
      if(is.null(x$data) & is.null(x$overall_results$observed$ni1) & is.null(x$overall_results$observed$ni2)){
@@ -311,6 +323,8 @@ print.simdat_d_sample <- function(x, ..., digits = 3){
 }
 
 
+#' @exportClass simdat_d_database
+#' @export
 #' @method print simdat_d_database
 print.simdat_d_database <- function(x, ..., digits = 3){
      if(any(class(x) == "merged")){
@@ -350,7 +364,8 @@ print.simdat_d_database <- function(x, ..., digits = 3){
 
 
 
-
+#' @exportClass convert_es
+#' @export
 #' @method print convert_es
 print.convert_es <- function(x, ..., digits = 3){
      cat("Effect Sizes with Effective Sample Sizes and Confidence Intervals:\n")
@@ -359,7 +374,8 @@ print.convert_es <- function(x, ..., digits = 3){
 }
 
 
-
+#' @exportClass dmod
+#' @export
 #' @method print dmod
 print.dmod <- function(x, ..., digits = 3){
      cat("\n")
@@ -394,9 +410,10 @@ print.dmod <- function(x, ..., digits = 3){
 }
 
 
-
-#' @method print psychmeta_heterogeneity
-print.psychmeta_heterogeneity <- function(x, ..., digits = 3){
+#' @exportClass ma_heterogeneity
+#' @export
+#' @method print ma_heterogeneity
+print.ma_heterogeneity <- function(x, ..., digits = 3){
      es_type <- x$es_type
 
      cat("Heterogeneity results for", es_type, "\n")
@@ -431,6 +448,8 @@ print.psychmeta_heterogeneity <- function(x, ..., digits = 3){
 }
 
 
+#' @exportClass ma_leave1out
+#' @export
 #' @method print ma_leave1out
 print.ma_leave1out <- function(x, ..., digits = 3){
      cat("Leave-one-out meta-analysis results \n")
@@ -441,6 +460,8 @@ print.ma_leave1out <- function(x, ..., digits = 3){
 }
 
 
+#' @exportClass ma_cumulative
+#' @export
 #' @method print ma_cumulative
 print.ma_cumulative <- function(x, ..., digits = 3){
      cat("Cumulative meta-analysis results \n")
@@ -450,6 +471,8 @@ print.ma_cumulative <- function(x, ..., digits = 3){
 }
 
 
+#' @exportClass ma_bootstrap
+#' @export
 #' @method print ma_bootstrap
 print.ma_bootstrap <- function(x, ..., digits = 3){
      cat("Bootstrapped meta-analysis results \n")
@@ -460,6 +483,8 @@ print.ma_bootstrap <- function(x, ..., digits = 3){
 
 
 ####Print output of get_stuff functions ####
+#' @exportClass get_metatab
+#' @export
 #' @method print get_metatab
 print.get_metatab <- function(x, ..., digits = 3){
      cat("List of meta-analytic tables \n")
@@ -470,6 +495,8 @@ print.get_metatab <- function(x, ..., digits = 3){
      cat(attributes(x)$contents)
 }
 
+#' @exportClass get_plots
+#' @export
 #' @method print get_plots
 print.get_plots <- function(x, ..., digits = 3){
      cat("List of meta-analysis plots \n")
@@ -480,6 +507,8 @@ print.get_plots <- function(x, ..., digits = 3){
      cat("Plots available in this list are:", paste(names(x), collapse = ", "), "\n")
 }
 
+#' @exportClass get_matrix
+#' @export
 #' @method print get_matrix
 print.get_matrix <- function(x, ..., digits = 3){
      cat("List of meta-analytic matrices \n")
@@ -488,6 +517,8 @@ print.get_matrix <- function(x, ..., digits = 3){
 }
 
 
+#' @exportClass get_escalc
+#' @export
 #' @method print get_escalc
 print.get_escalc <- function(x, ..., digits = 3){
      cat("List of escalc objects \n")
@@ -495,6 +526,8 @@ print.get_escalc <- function(x, ..., digits = 3){
      cat("To view specific escalc data frames, use the '$' operator to search this list object. \n")
 }
 
+#' @exportClass get_followup
+#' @export
 #' @method print get_followup
 print.get_followup <- function(x, ..., digits = 3){
      cat("List of meta-analytic follow-up analyses \n")
@@ -505,6 +538,8 @@ print.get_followup <- function(x, ..., digits = 3){
      cat("Analyses included in this list are:", paste(names(x), collapse = ", "), "\n")
 }
 
+#' @exportClass get_heterogeneity
+#' @export
 #' @method print get_heterogeneity
 print.get_heterogeneity <- function(x, ..., digits = 3){
      cat("List of heterogeneity analyses \n")
@@ -512,6 +547,8 @@ print.get_heterogeneity <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
+#' @exportClass get_metareg
+#' @export
 #' @method print get_metareg
 print.get_metareg <- function(x, ..., digits = 3){
      cat("List of meta-regression analyses \n")
@@ -519,6 +556,8 @@ print.get_metareg <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
+#' @exportClass get_bootstrap
+#' @export
 #' @method print get_bootstrap
 print.get_bootstrap <- function(x, ..., digits = 3){
      cat("List of bootstrap meta-analyses \n")
@@ -526,6 +565,8 @@ print.get_bootstrap <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
+#' @exportClass get_leave1out
+#' @export
 #' @method print get_leave1out
 print.get_leave1out <- function(x, ..., digits = 3){
      cat("List of leave-one-out meta-analyses \n")
@@ -533,6 +574,8 @@ print.get_leave1out <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
+#' @exportClass get_cumulative
+#' @export
 #' @method print get_cumulative
 print.get_cumulative <- function(x, ..., digits = 3){
      cat("List of cumulative meta-analyses \n")
@@ -540,54 +583,39 @@ print.get_cumulative <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
-
-# print.ma_r <- function(x, ..., digits = 3, verbose = FALSE){
-#      default_print <- attributes(x)$default_print
-#      additional_args <- list(...)
-#      
-#      
-#      cat("Meta-analysis of correlations \n")
-#      if("ma_method" %in% names(additional_args)){
-#           meta_tab <- compile_metatab(ma_obj = x, ...)
-#      }else{
-#           meta_tab <- compile_metatab(ma_obj = x, ma_method = default_print, ...)
-#      }
-#      class(meta_tab) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
-#      print(meta_tab)
-#      
-#      cat("\n")
-#      cat("Summary tibble of all meta-analytic information \n")
-#      x <- ungroup(x)
-#      class(x) <- c("tbl_df", "tbl", "data.frame")
-#      print(x)
-# }
-
-
-
-print.psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
+#' @exportClass ma_psychmeta
+#' @export
+#' @method print ma_psychmeta
+print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      ma_method <- attributes(x)$ma_method
      correction_type <- attributes(x)$correction_type 
      ma_metric <- attributes(x)$ma_metric 
      
+     title_text <- "Summary tibble of psychmeta meta-analysis"
      if(ma_metric == "r_as_r"){
-          es <- "correlations"
+          title_text <- "Summary tibble of psychmeta meta-analysis of correlations"
      }else if(ma_metric == "r_as_d"){
-          es <- "d values (converted from correlations)"
+          title_text <- "Summary tibble of psychmeta meta-analysis of d values (converted from correlations)"
      }else if(ma_metric == "d_as_d"){
-          es <- "d values"
+          title_text <- "Summary tibble of psychmeta meta-analysis of d values"
      }else if(ma_metric == "d_as_r"){
-          es <- "correlations (converted from d values)"
+          title_text <- "Summary tibble of psychmeta meta-analysis of correlations (converted from d values)"
+     }else if(ma_metric == "generic"){
+          title_text <- "Summary tibble of psychmeta meta-analysis of generic effect sizes"
      }else if(ma_metric == "r_order2"){
-          es <- "second-order correlations"
+          title_text <- "Summary tibble of psychmeta second-order meta-analysis of correlations"
+     }else if(ma_metric == "d_order2"){
+          title_text <- "Summary tibble of psychmeta second-order meta-analysis of d values"
      }
 
-     cat("Summary tibble of all meta-analytic information \n")
+     cat(title_text, " \n")
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)
 }
 
-
+#' @exportClass ma_table
+#' @export
 #' @method print ma_table
 print.ma_table <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
      ma_type <- attributes(x)$ma_type
@@ -711,6 +739,8 @@ print.ma_table <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
 }
 
 
+#' @exportClass ma_ic_list
+#' @export
 #' @method print ma_ic_list
 print.ma_ic_list <- function(x, ..., digits = 3, verbose = FALSE){
      cat("Individual-correction meta-analysis results")
@@ -731,6 +761,9 @@ print.ma_ic_list <- function(x, ..., digits = 3, verbose = FALSE){
      }
 }
 
+
+#' @exportClass ma_ad_list
+#' @export
 #' @method print ma_ad_list
 print.ma_ad_list <- function(x, ..., digits = 3, verbose = FALSE){
      cat("Artifact-distribution meta-analysis results")

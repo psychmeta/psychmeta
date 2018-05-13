@@ -50,20 +50,20 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
           if(!any(attributes(ma_obj)$ma_methods == "ic")){
                if(!is.null(ad_obj_x)){
                     if(!is.list(ad_obj_x)){
-                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_x must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_x must be a list of artifact-distribution objects", call. = FALSE)
                     }else{
                          if(!any(unlist(lapply(ad_obj_x, function(x) any(class(x) == "ad_obj"))))){
-                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_x must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_x must be a list of artifact-distribution objects", call. = FALSE)
                          }
                     }
                }
                
                if(!is.null(ad_obj_y)){
                     if(!is.list(ad_obj_y)){
-                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                         stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects", call. = FALSE)
                     }else{
                          if(!any(unlist(lapply(ad_obj_y, function(x) any(class(x) == "ad_obj"))))){
-                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects of class 'ad_obj'", call. = FALSE)
+                              stop("When ma_obj contains multiple relationships but no individual-correction results, ad_obj_y must be a list of artifact-distribution objects", call. = FALSE)
                          }
                     }
                }

@@ -1,6 +1,6 @@
 #' Generate an artifact distribution object for use in interactive artifact-distribution meta-analysis programs.
 #'
-#' This function generates \code{ad_obj} class objects containing interactive artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
+#' This function generates artifact-distribution objects containing interactive artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
 #' \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
 #' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
@@ -869,7 +869,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
 #' Generate an artifact distribution object for use in interactive artifact-distribution meta-analysis programs.
 #'
-#' This function generates \code{ad_obj} class objects containing Taylor series artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
+#' This function generates artifact-distribution objects containing Taylor series artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
 #' \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
 #' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
