@@ -136,9 +136,14 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      ut_mean <- art_mean(art_vec = ut, wt_vec = wt_ut)
 
      if(!is.null(rxxa)){
-          mean_n_rxxa <- mean(n_rxxa, na.rm = TRUE)
-          var_e_rxxa <- var_error_rel(rel = rxxa_mean, n = mean_n_rxxa)
-          var_e_qxa <- var_error_q(q = qxa_mean, n = mean_n_rxxa)
+          if(!is.null(n_rxxa)){
+               mean_n_rxxa <- mean(n_rxxa, na.rm = TRUE)  
+               var_e_rxxa <- var_error_rel(rel = rxxa_mean, n = mean_n_rxxa)
+               var_e_qxa <- var_error_q(q = qxa_mean, n = mean_n_rxxa)
+          }else{
+               mean_n_rxxa <- NULL
+               var_e_rxxa <- var_e_qxa <- 0
+          }
 
           rxxa_consistency <- convert_reltype2consistency(rel_type = rxxa_type)
           if(any(rxxa_consistency)){
@@ -152,9 +157,14 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxa_var_c <- art_var(art_vec = rxxa_c^.5, wt_vec = wt_rxxa_c)
                rxxa_var_c <- art_var(art_vec = rxxa_c, wt_vec = wt_rxxa_c)
 
-               mean_n_rxxa_c <- mean(n_rxxa_c, na.rm = TRUE)
-               var_e_rxxa_c <- var_error_rel(rel = rxxa_mean_c, n = mean_n_rxxa_c)
-               var_e_qxa_c <- var_error_q(q = qxa_mean_c, n = mean_n_rxxa_c)
+               if(!is.null(n_rxxa_c)){
+                    mean_n_rxxa_c <- mean(n_rxxa_c, na.rm = TRUE)
+                    var_e_rxxa_c <- var_error_rel(rel = rxxa_mean_c, n = mean_n_rxxa_c)
+                    var_e_qxa_c <- var_error_q(q = qxa_mean_c, n = mean_n_rxxa_c)
+               }else{
+                    mean_n_rxxa_c <- NULL
+                    var_e_rxxa_c <- var_e_qxa_c <- 0
+               }
           }else{
                qxa_mean_c <- rxxa_mean_c <- qxa_var_c <- rxxa_var_c <- NULL
                rxxa_c <- wt_rxxa_c <- NULL
@@ -172,9 +182,14 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxa_var_m <- art_var(art_vec = rxxa_m^.5, wt_vec = wt_rxxa_m)
                rxxa_var_m <- art_var(art_vec = rxxa_m, wt_vec = wt_rxxa_m)
 
-               mean_n_rxxa_m <- mean(n_rxxa_m, na.rm = TRUE)
-               var_e_rxxa_m <- var_error_rel(rel = rxxa_mean_m, n = mean_n_rxxa_m)
-               var_e_qxa_m <- var_error_q(q = qxa_mean_m, n = mean_n_rxxa_m)
+               if(!is.null(n_rxxa_m)){
+                    mean_n_rxxa_m <- mean(n_rxxa_m, na.rm = TRUE)
+                    var_e_rxxa_m <- var_error_rel(rel = rxxa_mean_m, n = mean_n_rxxa_m)
+                    var_e_qxa_m <- var_error_q(q = qxa_mean_m, n = mean_n_rxxa_m)
+               }else{
+                    mean_n_rxxa_m <- NULL
+                    var_e_rxxa_m <- var_e_qxa_m <- 0
+               }
           }else{
                qxa_mean_m <- rxxa_mean_m <- qxa_var_m <- rxxa_var_m <- NULL
                rxxa_m <- wt_rxxa_m <- NULL
@@ -190,9 +205,14 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      }
 
      if(!is.null(rxxi)){
-          mean_n_rxxi <- mean(n_rxxi, na.rm = TRUE)
-          var_e_rxxi <- var_error_rel(rel = rxxi_mean, n = mean_n_rxxi)
-          var_e_qxi <- var_error_q(q = qxi_mean, n = mean_n_rxxi)
+          if(!is.null(n_rxxi)){
+               mean_n_rxxi <- mean(n_rxxi, na.rm = TRUE)
+               var_e_rxxi <- var_error_rel(rel = rxxi_mean, n = mean_n_rxxi)
+               var_e_qxi <- var_error_q(q = qxi_mean, n = mean_n_rxxi)
+          }else{
+               mean_n_rxxi <- NULL
+               var_e_rxxi <- var_e_qxi <- 0
+          }
 
           rxxi_consistency <- convert_reltype2consistency(rel_type = rxxi_type)
           if(any(rxxi_consistency)){
@@ -206,9 +226,14 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxi_var_c <- art_var(art_vec = rxxi_c^.5, wt_vec = wt_rxxi_c)
                rxxi_var_c <- art_var(art_vec = rxxi_c, wt_vec = wt_rxxi_c)
 
-               mean_n_rxxi_c <- mean(n_rxxi_c, na.rm = TRUE)
-               var_e_rxxi_c <- var_error_rel(rel = rxxi_mean_c, n = mean_n_rxxi_c)
-               var_e_qxi_c <- var_error_q(q = qxi_mean_c, n = mean_n_rxxi_c)
+               if(!is.null(n_rxxi_c)){
+                    mean_n_rxxi_c <- mean(n_rxxi_c, na.rm = TRUE)
+                    var_e_rxxi_c <- var_error_rel(rel = rxxi_mean_c, n = mean_n_rxxi_c)
+                    var_e_qxi_c <- var_error_q(q = qxi_mean_c, n = mean_n_rxxi_c)
+               }else{
+                    mean_n_rxxi_c <- NULL
+                    var_e_rxxi_c <- var_e_qxi_c <- 0
+               }
           }else{
                qxi_mean_c <- rxxi_mean_c <- qxi_var_c <- rxxi_var_c <- NULL
                rxxi_c <- wt_rxxi_c <- NULL
@@ -226,9 +251,14 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxi_var_m <- art_var(art_vec = rxxi_m^.5, wt_vec = wt_rxxi_m)
                rxxi_var_m <- art_var(art_vec = rxxi_m, wt_vec = wt_rxxi_m)
 
-               mean_n_rxxi_m <- mean(n_rxxi_m, na.rm = TRUE)
-               var_e_rxxi_m <- var_error_rel(rel = rxxi_mean_m, n = mean_n_rxxi_m)
-               var_e_qxi_m <- var_error_q(q = qxi_mean_m, n = mean_n_rxxi_m)
+               if(!is.null(n_rxxi_m)){
+                    mean_n_rxxi_m <- mean(n_rxxi_m, na.rm = TRUE)
+                    var_e_rxxi_m <- var_error_rel(rel = rxxi_mean_m, n = mean_n_rxxi_m)
+                    var_e_qxi_m <- var_error_q(q = qxi_mean_m, n = mean_n_rxxi_m)
+               }else{
+                    mean_n_rxxi_m <- NULL
+                    var_e_rxxi_m <- var_e_qxi_m <- 0
+               }
           }else{
                qxi_mean_m <- rxxi_mean_m <- qxi_var_m <- rxxi_var_m <- NULL
                rxxi_m <- wt_rxxi_m <- NULL
@@ -804,7 +834,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           if(sum(c(valid_rxxa_irr, valid_rxxa_drr, valid_rxxi_irr, valid_rxxi_drr, valid_ux, valid_ut)) == 0) ad_contents <- "NULL"
 
           attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
-
+          class(out) <- "ad_int_list"
+          
           out
      }
 
@@ -815,16 +846,21 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                            list(estimate_rxxa = FALSE, estimate_rxxi = FALSE,
                                 estimate_ux = FALSE, estimate_ut = FALSE))
 
-     out <- do.call(est_summaries, args = arglist)
-
+     ad_out <- do.call(est_summaries, args = arglist)
+     .attributes <- attributes(ad_out)
+     out <- tibble(Artifact = names(ad_out))
+     out$Distribution <- ad_out
+     
      out_raw <- do.call(est_summaries, args = arglist_raw)
 
      attributes(out) <- append(attributes(out),
-                               list(summary_raw = attributes(out_raw)$summary,
+                               list(summary = .attributes$summary, 
+                                    ad_contents = .attributes$ad_contents, 
+                                    summary_raw = attributes(out_raw)$summary,
                                     ad_contents_raw = attributes(out_raw)$ad_contents,
                                     inputs = inputs))
 
-     class(out) <- c("psychmeta", "ad_obj", "ad_int")
+     class(out) <- c("ad_int", class(out))
      out
 }
 
@@ -1964,7 +2000,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                     ad_contents_raw = attributes(out_raw)$ad_contents,
                                     inputs = inputs))
 
-     class(out) <- c("psychmeta", "ad_obj", "ad_tsa")
+     class(out) <- c("ad_tsa", "matrix")
      out
 }
 
@@ -2000,4 +2036,3 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           }
      }
 }
-

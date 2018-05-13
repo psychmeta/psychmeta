@@ -340,7 +340,7 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
                       messages = warning_out)
      }
 
-     class(out) <- c("psychmeta", "correct_r", "meas")
+     class(out) <- c("correct_r", "meas")
      return(out)
 }
 
@@ -452,7 +452,7 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
                       messages = warning_out)
      }
 
-     class(out) <- c("psychmeta", "correct_r", "uvdrr")
+     class(out) <- c("correct_r", "uvdrr")
      return(out)
 }
 
@@ -562,7 +562,7 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
                       messages = warning_out)
      }
 
-     class(out) <- c("psychmeta", "correct_r", "uvirr")
+     class(out) <- c("correct_r", "uvirr")
      return(out)
 }
 
@@ -695,7 +695,7 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
                       messages = warning_out)
      }
 
-     class(out) <- c("psychmeta", "correct_r", "bvirr")
+     class(out) <- c("correct_r", "bvirr")
      return(out)
 }
 
@@ -811,7 +811,7 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
                       messages = warning_out)
      }
 
-     class(out) <- c("psychmeta", "correct_r", "bvdrr")
+     class(out) <- c("correct_r", "bvdrr")
      return(out)
 }
 

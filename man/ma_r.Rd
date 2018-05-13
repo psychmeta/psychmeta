@@ -186,7 +186,7 @@ Use one of the following commands: \code{tsa} to use the Taylor series method or
 \item{supplemental_ads_x, supplemental_ads_y}{For \code{ma_r_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.}
 }
 \value{
-A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
+A nested tabular object of the class “psychmeta”.
 Components of output tables for bare-bones meta-analyses:
 \itemize{
 \item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
@@ -325,6 +325,12 @@ ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 ## And 'ma_r' can also curate artifact distributions and compute multiple
 ## artifact-distribution meta-analyses:
 ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+     correct_rr_x = FALSE, correct_rr_y = FALSE,
+     construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+     clean_artifacts = FALSE, impute_artifacts = FALSE,
+     moderators = moderator, data = data_r_meas_multi)
+
+ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      correct_rr_x = FALSE, correct_rr_y = FALSE,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
      clean_artifacts = FALSE, impute_artifacts = FALSE,

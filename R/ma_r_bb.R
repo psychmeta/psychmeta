@@ -159,7 +159,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                                           fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
      }
 
-     class(out) <- c("ma_psychmeta", class(out))
+     class(out) <- c("psychmeta", class(out))
      
      return(out)
 }

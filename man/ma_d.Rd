@@ -170,7 +170,7 @@ Use one of the following commands: \code{tsa} to use the Taylor series method or
 \item{supplemental_ads_y}{For \code{ma_d_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.}
 }
 \value{
-A list object of the classes \code{psychmeta}, \code{ma_d_as_r} or \code{ma_d_as_d}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
+A nested tabular object of the class “psychmeta”.
 Components of output tables for bare-bones meta-analyses:
 \itemize{
 \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}

@@ -96,7 +96,7 @@
 #' Only evaluated when \code{ad_obj_x} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
 #' Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.
 #'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
+#' @return A nested tabular object of the class “psychmeta”.
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
 #' \item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
@@ -252,6 +252,12 @@
 #' ## And 'ma_r' can also curate artifact distributions and compute multiple
 #' ## artifact-distribution meta-analyses:
 #' ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+#'      correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'      clean_artifacts = FALSE, impute_artifacts = FALSE,
+#'      moderators = moderator, data = data_r_meas_multi)
+#'
+#' ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'      correct_rr_x = FALSE, correct_rr_y = FALSE,
 #'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
 #'      clean_artifacts = FALSE, impute_artifacts = FALSE,
@@ -1251,14 +1257,14 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                ma_metric = "r_as_r"))  
           }
      }
-
+     
      if(ma_method == "ic"){
           ad_obj_list_tsa <- .create_ad_list(ad_type = "tsa", sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
                                              construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
-                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads, ...)
+                                             supplemental_ads = supplemental_ads, ...)
           ad_obj_list_int <- .create_ad_list(ad_type = "int", sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
                                              construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
-                                             pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads, ...)
+                                             supplemental_ads = supplemental_ads, ...)
 
           out <- by(1:length(construct_pair), construct_pair, function(i){
                progbar$tick()
@@ -1364,7 +1370,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(ma_method == "ad"){
           ad_obj_list <- .create_ad_list(ad_type = ad_type, sample_id = sample_id, construct_x = construct_x, construct_y = construct_y,
                                          construct_pair = construct_pair, es_data = es_data, data_x = data_x, data_y = data_y,
-                                         pairwise_ads = pairwise_ads, var_unbiased = var_unbiased, supplemental_ads = supplemental_ads, ...)
+                                         supplemental_ads = supplemental_ads, ...)
 
           i <- which(construct_pair == construct_pair[1])
           out <- by(1:length(construct_pair), construct_pair, function(i){
@@ -1595,7 +1601,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(attributes(out)$ma_metric == "d_as_r")
           out <- convert_ma(ma_obj = out)
      
-     class(out) <- c("ma_psychmeta", class(out))
+     class(out) <- c("psychmeta", class(out))
      
      return(out)
 }

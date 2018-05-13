@@ -41,8 +41,6 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
      is_r <- any(ma_metric %in% c("r_as_r", "d_as_r"))
      is_d <- any(ma_metric %in% c("r_as_d", "d_as_d"))
      is_generic <- any(ma_metric == "generic")
-     ## TODO remove master stuff
-     # is_master <- any(ma_class %in% "ma_master") 
      is_bb <- any(ma_methods %in% "bb")
      is_ic <- any(ma_methods %in% "ic")
      is_ad <- any(ma_methods %in% "ad")

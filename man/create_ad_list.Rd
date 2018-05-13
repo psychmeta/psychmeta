@@ -81,4 +81,10 @@ create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
                construct_x = x_name, construct_y = y_name,
                sample_id = sample_id,
                data = data_r_meas_multi)
+               
+create_ad_list(ad_type = "int", 
+               n = n, rxx = rxxi, ryy = ryyi,
+               construct_x = x_name, construct_y = y_name,
+               sample_id = sample_id,
+               data = data_r_meas_multi)
 }

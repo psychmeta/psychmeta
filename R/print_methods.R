@@ -51,39 +51,51 @@ print.ad_tsa <- function(x, ..., digits = 3){
 
 
 #' print method for interactive artifact distributions
+#' @method print ad_int_list
+#' @keywords internal
+print.ad_int_list <- function(x, ..., digits = 3){
+     cat("Interactive Distributions\n")
+     cat("-------------------------\n")
+     
+     cat("\n")
+     cat("qxa Artifact Distribution - Indirect Range Restriction\n")
+     print.data.frame(x[["qxa_irr"]], digits = digits)
+     
+     cat("\n")
+     cat("qxa Artifact Distribution - Direct Range Restriction\n")
+     print.data.frame(x[["qxa_drr"]], digits = digits)
+     
+     
+     cat("\n")
+     cat("qxi Artifact Distribution - Indirect Range Restriction\n")
+     print.data.frame(x[["qxi_irr"]], digits = digits)
+     
+     cat("\n")
+     cat("qxi Artifact Distribution - Direct Range Restriction\n")
+     print.data.frame(x[["qxi_drr"]], digits = digits)
+     
+     
+     cat("\n")
+     cat("ux Artifact Distribution\n")
+     print.data.frame(x[["ux"]], digits = digits)
+     
+     cat("\n")
+     cat("ut Artifact Distribution\n")
+     print.data.frame(x[["ut"]], digits = digits)
+     
+     cat("\n")
+}
+
+#' print method for interactive artifact distributions
 #' @method print ad_int
 #' @keywords internal
 print.ad_int <- function(x, ..., digits = 3){
      cat("Interactive Distributions\n")
      cat("-------------------------\n")
-
-     cat("\n")
-     cat("qxa Artifact Distribution - Indirect Range Restriction\n")
-     print.data.frame(x[["qxa_irr"]], digits = digits)
-
-     cat("\n")
-     cat("qxa Artifact Distribution - Direct Range Restriction\n")
-     print.data.frame(x[["qxa_drr"]], digits = digits)
-
-
-     cat("\n")
-     cat("qxi Artifact Distribution - Indirect Range Restriction\n")
-     print.data.frame(x[["qxi_irr"]], digits = digits)
-
-     cat("\n")
-     cat("qxi Artifact Distribution - Direct Range Restriction\n")
-     print.data.frame(x[["qxi_drr"]], digits = digits)
-
-
-     cat("\n")
-     cat("ux Artifact Distribution\n")
-     print.data.frame(x[["ux"]], digits = digits)
-
-     cat("\n")
-     cat("ut Artifact Distribution\n")
-     print.data.frame(x[["ut"]], digits = digits)
-
-     cat("\n")
+     
+     x <- ungroup(x)
+     class(x) <- c("tbl_df", "tbl", "data.frame")
+     print(x)
 }
 
 
@@ -425,7 +437,7 @@ print.ma_leave1out <- function(x, ..., digits = 3){
      cat("---------------------------------------- \n")
      print.data.frame(x$data, digits = digits)
      x$sd_plot
-     cat("See the 'plots' list for data visualizations. \n")
+     cat("\nSee the 'plots' list for data visualizations. \n")
 }
 
 
@@ -434,7 +446,7 @@ print.ma_cumulative <- function(x, ..., digits = 3){
      cat("Cumulative meta-analysis results \n")
      cat("---------------------------------------- \n")
      print.data.frame(x$data, digits = digits)
-     cat("See the 'plots' list for data visualizations. \n")
+     cat("\nSee the 'plots' list for data visualizations. \n")
 }
 
 
@@ -443,7 +455,7 @@ print.ma_bootstrap <- function(x, ..., digits = 3){
      cat("Bootstrapped meta-analysis results \n")
      cat("---------------------------------------- \n")
      print.data.frame(as.data.frame(x$boot_summary), digits = digits)
-     cat("See list item 'boot_data' for meta-analysis results from each bootstrap iteration \n")
+     cat("\nSee list item 'boot_data' for meta-analysis results from each bootstrap iteration \n")
 }
 
 
@@ -552,7 +564,7 @@ print.get_cumulative <- function(x, ..., digits = 3){
 
 
 
-print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
+print.psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      ma_method <- attributes(x)$ma_method
      correction_type <- attributes(x)$correction_type 
      ma_metric <- attributes(x)$ma_metric 

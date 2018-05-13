@@ -304,13 +304,14 @@ gather_ma_ad <- function(x){
      
      class(validity_generalization_y) <- c("ma_table", class(validity_generalization_y))
      attributes(validity_generalization_y) <- append(attributes(validity_generalization_y), list(ma_type = "r_ad"))
-          
      
-     list(method_details = c(ad_method = ad_method, measurement = meas_correction, range_restriction = range_restriction),
-          true_score = true_score,
-          validity_generalization_x = validity_generalization_x,
-          validity_generalization_y = validity_generalization_y,
-          artifact_distributions = list(ad_x = x$x$ad_obj_x, ad_y = x$x$ad_obj_y))
+     out <- list(method_details = c(ad_method = ad_method, measurement = meas_correction, range_restriction = range_restriction),
+                 true_score = true_score,
+                 validity_generalization_x = validity_generalization_x,
+                 validity_generalization_y = validity_generalization_y,
+                 artifact_distributions = list(ad_x = x$x$ad_obj_x, ad_y = x$x$ad_obj_y))
+     rm(x)
+     out
 }
 
 

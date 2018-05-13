@@ -44,7 +44,7 @@ ma_d_order2(k, N = NULL, d = NULL, delta = NULL, var_d = NULL,
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }
 \value{
-An object of the classes \code{psychmeta}, \code{ma_d_as_d}, \code{ma_order2}, and \code{ma_bb}, \code{ma_ic}, and/or \code{ma_ad}.
+A nested tabular object of the class “psychmeta”.
 }
 \description{
 This function computes second-order meta-analysis function for \emph{d} values. It supports second-order analyses of bare-bones, artifact-distribution, and individual-correction meta-analyses.

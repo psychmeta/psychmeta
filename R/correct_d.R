@@ -256,6 +256,6 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
           names(out[["correlations"]])[names(out[["correlations"]]) %in% out_names] <- new_names
      }
      names(out)[names(out) == "correlations"] <- "d_values"
-     class(out)[2] <- "correct_d"
+     class(out)[class(out) == "correct_r"] <- "correct_d"
      out
 }

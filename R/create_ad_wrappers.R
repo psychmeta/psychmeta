@@ -231,6 +231,12 @@ create_ad <- function(ad_type = c("tsa", "int"),
 #'                construct_x = x_name, construct_y = y_name,
 #'                sample_id = sample_id,
 #'                data = data_r_meas_multi)
+#'                
+#' create_ad_list(ad_type = "int", 
+#'                n = n, rxx = rxxi, ryy = ryyi,
+#'                construct_x = x_name, construct_y = y_name,
+#'                sample_id = sample_id,
+#'                data = data_r_meas_multi)
 create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                            construct_x, measure_x = NULL,
                            construct_y, measure_y = NULL,
@@ -488,6 +494,8 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
 prepare_ad_int <- function(ad_obj, residual_ads = TRUE, decimals = Inf){
      screen_ad_int(ad_obj)
 
+     ad_obj <- ad_obj[["Distribution"]]
+     
      if(is.na(decimals)) warning("decimals cannot be NA")
      if(is.null(decimals)) warning("decimals cannot be NULL")
      if(decimals < 1) warning("decimals cannot be less than 1")

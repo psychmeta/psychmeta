@@ -44,7 +44,7 @@ ma_r_order2(k, N = NULL, r = NULL, rho = NULL, var_r = NULL,
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }
 \value{
-An object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_order2}, and \code{ma_bb}, \code{ma_ic}, and/or \code{ma_ad}.
+A nested tabular object of the class “psychmeta”.
 }
 \description{
 This function computes second-order meta-analysis function for correlations. It supports second-order analyses of bare-bones, artifact-distribution, and individual-correction meta-analyses.
