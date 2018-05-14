@@ -62,7 +62,7 @@ create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
 \item{collapse_method}{Character argument that determines how to collapse multiple measures of a construct within a single study (used when \code{measure_x} and/or \code{measure_y} are supplied).
 Options are "composite" (default), "average," and "stop." When measure names are not supplied, multiple entries for a given construct within a given study will be averaged.}
 
-\item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.}
+\item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar, a named vector with element named according to the names of constructs, or output from the \code{control_intercor} function. Default scalar value is .5.}
 
 \item{supplemental_ads}{Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.}
 

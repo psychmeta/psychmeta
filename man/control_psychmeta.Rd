@@ -8,12 +8,12 @@ control_psychmeta(error_type = c("mean", "sample"), conf_level = 0.95,
   cred_level = 0.8, conf_method = c("t", "norm"), cred_method = c("t",
   "norm"), var_unbiased = TRUE, pairwise_ads = FALSE, residual_ads = TRUE,
   check_dependence = TRUE, collapse_method = c("composite", "average",
-  "stop"), intercor = 0.5, partial_intercor = FALSE,
-  clean_artifacts = TRUE, impute_artifacts = TRUE,
-  impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod",
-  "simulate_full", "wt_mean_mod", "wt_mean_full", "unwt_mean_mod",
-  "unwt_mean_full", "replace_unity", "stop"), seed = 42, decimals = 2,
-  hs_override = FALSE, use_all_arts = TRUE, estimate_pa = FALSE, ...)
+  "stop"), intercor = 0.5, clean_artifacts = TRUE,
+  impute_artifacts = TRUE, impute_method = c("bootstrap_mod",
+  "bootstrap_full", "simulate_mod", "simulate_full", "wt_mean_mod",
+  "wt_mean_full", "unwt_mean_mod", "unwt_mean_full", "replace_unity", "stop"),
+  seed = 42, decimals = 2, hs_override = FALSE, use_all_arts = TRUE,
+  estimate_pa = FALSE, ...)
 }
 \arguments{
 \item{error_type}{Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.}
@@ -36,10 +36,7 @@ control_psychmeta(error_type = c("mean", "sample"), conf_level = 0.95,
 
 \item{collapse_method}{Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."}
 
-\item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.}
-
-\item{partial_intercor}{For \emph{d} values only: Logical scalar that determines whether the values in \code{intercor} are to be treated as within-group correlations (i.e., partial correlation controlling for group membership; \code{TRUE}) or not (\code{FALSE}; default).
-Note that this must be a scalar and it is not possible to provide a vector argument: If the database contains a mixture of total- and partial correlations, they must be converted to a common format by either using the \code{mix_r_2group()} function to convert partial correlations to total correlations or using the \code{unmix_r_2group()} function to convert total correlations to partial correlations.}
+\item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar, a named vector with element named according to the names of constructs, or output from the \code{control_intercor} function. Default scalar value is .5.}
 
 \item{clean_artifacts}{If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
 in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.}

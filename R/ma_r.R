@@ -383,7 +383,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      check_dependence <- control$check_dependence
      collapse_method <- control$collapse_method
      intercor <- control$intercor
-     partial_intercor <- control$intercor
      clean_artifacts <- control$clean_artifacts
      impute_artifacts <- control$impute_artifacts
      impute_method <- control$impute_method
@@ -427,12 +426,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      n2 <- inputs$n2_d
      pi <- inputs$pi_d
      pa <- inputs$pa_d
-
-     if(!is.null(inputs$partial_intercor)){
-          partial_intercor <- inputs$partial_intercor
-     }else{
-          partial_intercor <- FALSE
-     }
 
      ma_method <- scalar_arg_warning(arg = ma_method, arg_name = "ma_method")
      ad_type <- scalar_arg_warning(arg = ad_type, arg_name = "ad_type")
@@ -637,12 +630,13 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(is.list(intercor)){
                intercor <- do.call(control_intercor, args = intercor)
           }else{
-               intercor <- control_intercor(rxyi = rxyi, sample_id = sample_id,
+               intercor <- control_intercor(rxyi = rxyi, 
+                                            n = n_adj,
+                                            sample_id = sample_id,
                                             construct_x = construct_x, 
                                             construct_y = construct_y, 
                                             construct_names = unique(c(construct_x, construct_y)), 
-                                            intercor_vec = intercor, 
-                                            intercor_scalar = .5) 
+                                            intercor_vec = intercor) 
           }
      }
      
@@ -1137,7 +1131,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                progbar$tick()
                out <- .remove_dependency(sample_id = "sample_id", citekey = "citekey", es_data = str_es_data,
                                          data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
-                                         intercor=intercor, partial_intercor = partial_intercor, construct_x = "construct_x", construct_y = "construct_y",
+                                         intercor=intercor, partial_intercor = FALSE, construct_x = "construct_x", construct_y = "construct_y",
                                          measure_x = "measure_x", measure_y = "measure_y",
                                          es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
                cbind(duplicates[i, c("analysis_id", "analysis_type", str_moderators, str_compmod_temp)][rep(1, nrow(out)),], out)
@@ -1332,7 +1326,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                           check_dependence = check_dependence, 
                                                           collapse_method = collapse_method,
                                                           intercor = intercor,
-                                                          partial_intercor = partial_intercor,
                                                           clean_artifacts = clean_artifacts, 
                                                           impute_artifacts = impute_artifacts,
                                                           impute_method = impute_method,

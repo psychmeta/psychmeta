@@ -218,7 +218,7 @@ create_ad <- function(ad_type = c("tsa", "int"),
 #' @param process_ads Logical scalar determining whether artifact information should be processed into artifact-distribution objects (\code{TRUE}; default) or reported in list form (\code{FALSE}).
 #' @param collapse_method Character argument that determines how to collapse multiple measures of a construct within a single study (used when \code{measure_x} and/or \code{measure_y} are supplied).
 #' Options are "composite" (default), "average," and "stop." When measure names are not supplied, multiple entries for a given construct within a given study will be averaged.
-#' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.
+#' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar, a named vector with element named according to the names of constructs, or output from the \code{control_intercor} function. Default scalar value is .5.
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments.
 #' @param ... Additional arguments
@@ -310,6 +310,18 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, arg_name = "uy_observed", data = data)
      }
 
+     if(class(intercor) != "control_intercor"){
+          if(is.list(intercor)){
+               intercor <- do.call(control_intercor, args = intercor)
+          }else{
+               intercor <- control_intercor(sample_id = sample_id,
+                                            construct_x = construct_x, 
+                                            construct_y = construct_y, 
+                                            construct_names = unique(c(construct_x, construct_y)), 
+                                            intercor_vec = intercor) 
+          }
+     }
+     
      full_data <- list(sample_id = sample_id, n = n,
                        construct_x = construct_x, measure_x = measure_x,
                        construct_y = construct_y, measure_y = measure_y,
@@ -332,8 +344,6 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      full_data <- rbind(data_x, data_y)
      construct_pair <- c(construct_pair, construct_pair)
 
-     i <- which(full_data$construct_x == full_data$construct_x[1])
-     j <- (1:length(i))[full_data$sample_id[i] == full_data$sample_id[i][1]]
      .ad_obj_list <- by(1:length(construct_pair), full_data$construct_x, function(i){
 
           if(!is.null(sample_id)){
@@ -356,20 +366,33 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                     if(nrow(.data) > 1){
                          if(collapse_method == "composite"){
                               if(length(intercor) > 1){
-                                   if(is.null(names(intercor)))
-                                        stop("The values in the intercor vector must be named", call. = FALSE)
-                                   if(!(as.character(.data$construct_x) %in% names(intercor)))
-                                        stop("The intercor vector is missing a value for construct ", as.character(.data$construct_x), call. = FALSE)
-                                   .intercor <- intercor[as.character(.data$construct_x)]
+                                   if(is.null(names(intercor))) stop("The values in the intercor vector must be named", call. = FALSE)
+                                   
+                                   .intercor <- intercor[paste(as.character(.data$sample_id)[1], as.character(.data$construct_x)[1])]
+                                   if(is.na(.intercor)) .intercor <- intercor[as.character(.data$construct_x)[1]]
+
                               }else{
                                    .intercor <- intercor
                               }
-                              n <- mean(.data$n)
-                              rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = length(.data$n), mean_intercor = .intercor)
-                              rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
-                              rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
-                              ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = length(.data$n), mean_ri = .intercor)
-                              ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))
+                              if(!is.na(.intercor)){
+                                   n <- mean(.data$n)
+                                   rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = length(.data$n), mean_intercor = .intercor)
+                                   rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
+                                   rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
+                                   ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = length(.data$n), mean_ri = .intercor)
+                                   ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))    
+                              }else{
+                                   warning("Valid same-construct intercorrelation not provided for construct'", as.character(.data$construct_x)[1], 
+                                           "' in sample '", .data$sample_id[1], 
+                                           "': '\n     Computing average instead of composite", call. = FALSE)
+                                   
+                                   n <- mean(.data$n)
+                                   rxx <- mean(.data$rxx)
+                                   rxx_restricted <- as.logical(mean(.data$rxx_restricted))
+                                   rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type))))
+                                   ux <- round(mean(.data$ux))
+                                   ux_observed <- as.logical(mean(.data$ux_observed))      
+                              }
                          }else{
                               n <- mean(.data$n)
                               rxx <- mean(.data$rxx)

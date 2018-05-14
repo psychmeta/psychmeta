@@ -10,9 +10,7 @@
 #' @param residual_ads Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_rho}.
 #' @param check_dependence Logical scalar that determines whether database should be checked for violations of independence (\code{TRUE}) or not (\code{FALSE}).
 #' @param collapse_method Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."
-#' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs. Default value is .5.
-#' @param partial_intercor For \emph{d} values only: Logical scalar that determines whether the values in \code{intercor} are to be treated as within-group correlations (i.e., partial correlation controlling for group membership; \code{TRUE}) or not (\code{FALSE}; default).
-#' Note that this must be a scalar and it is not possible to provide a vector argument: If the database contains a mixture of total- and partial correlations, they must be converted to a common format by either using the \code{mix_r_2group()} function to convert partial correlations to total correlations or using the \code{unmix_r_2group()} function to convert total correlations to partial correlations.
+#' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar, a named vector with element named according to the names of constructs, or output from the \code{control_intercor} function. Default scalar value is .5.
 #' @param clean_artifacts If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
 #' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
 #' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
@@ -61,7 +59,6 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                               check_dependence = TRUE, 
                               collapse_method = c("composite", "average", "stop"),
                               intercor = .5,
-                              partial_intercor = FALSE,
                               clean_artifacts = TRUE, 
                               impute_artifacts = TRUE,
                               impute_method = c("bootstrap_mod", "bootstrap_full", 
@@ -87,7 +84,7 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                      check_dependence = check_dependence, 
                      collapse_method = collapse_method,
                      intercor = intercor,
-                     partial_intercor = partial_intercor,
+                     # partial_intercor = partial_intercor,
                      clean_artifacts = clean_artifacts, 
                      impute_artifacts = impute_artifacts,
                      impute_method = impute_method,
@@ -132,7 +129,7 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
      control$collapse_method <- match.arg(control$collapse_method, c("composite", "average", "stop"))
      # if(!is.numeric(control$intercor)) stop("'intercor' must be numeric", call. = FALSE)
      # control$partial_intercor <- scalar_arg_warning(arg = control$partial_intercor, arg_name = "partial_intercor")
-     if(!is.logical(control$partial_intercor)) stop("'partial_intercor' must be logical", call. = FALSE)
+     # if(!is.logical(control$partial_intercor)) stop("'partial_intercor' must be logical", call. = FALSE)
      
      control$clean_artifacts <- scalar_arg_warning(arg = control$clean_artifacts, arg_name = "clean_artifacts")
      if(!is.logical(control$clean_artifacts)) stop("'clean_artifacts' must be logical", call. = FALSE)

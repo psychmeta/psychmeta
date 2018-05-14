@@ -209,34 +209,54 @@
                     if(is.na(intercor_x)) intercor_x <- intercor[construct_x[i][1]]
                     if(is.na(intercor_y)) intercor_y <- intercor[construct_y[i][1]]
                     
-                    if(is.na(intercor_x) | is.na(intercor_y))
-                         warning("Valid same-construct intercorrelations not provided for sample '", sample_id[i][1], "': '\n     Computing averages instead of composites")
-                    if(is.na(intercor_x)) intercor_x <- 1
-                    if(is.na(intercor_y)) intercor_y <- 1
+                    if(is.na(intercor_x) & is.na(intercor_y)){
+                         warning("Valid same-construct intercorrelations for constructs '", as.character(construct_x[i][1]), 
+                                 "' and '", as.character(construct_y[i][1]),
+                                 "' not provided for sample '", sample_id[i][1], 
+                                 "': '\n    Computing averages rather than composites", call. = FALSE)
+                    }else if(is.na(intercor_x) | is.na(intercor_y)){
+                         if(is.na(intercor_x)){
+                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_x[i][1]), 
+                                      "' not provided for sample '", sample_id[i][1], 
+                                      "': '\n     Compositing using information from construct '", as.character(construct_y[i][1]), "' only", call. = FALSE)     
+                         }else{
+                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_y[i][1]), 
+                                      "' not provided for sample '", sample_id[i][1], 
+                                      "': '\n     Compositing using information from construct '", as.character(construct_x[i][1]), "' only", call. = FALSE)     
+                         }
+                            
+                    }
+
                } else {
                     intercor_x <- intercor_y <- intercor
                }
 
                if(length(partial_intercor) > 1) {
                     if(is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
-                    intercor_y <- partial_intercor[construct_y[i][1]]
+                    partial_y <- partial_intercor[construct_y[i][1]]
+                    
+                    partial_y <- partial_y[paste(sample_id[i][1], construct_y[i][1])]
+
+                    if(is.na(partial_y)) partial_y <- partial_y[construct_y[i][1]]
                } else {
                     partial_y <- partial_intercor
-                    if(partial_y){
-                         if(!is.null(additions$.dx_internal_designation)){
-                              intercor_y <- mix_r_2group(rxy = intercor_y, dx = es_data$d, dy = es_data$d, p = es_data$pi)
-                              partial_y <- FALSE
-                         }
+               }
+               
+               if(partial_y){
+                    if(!is.null(additions$.dx_internal_designation)){
+                         intercor_y <- mix_r_2group(rxy = intercor_y, dx = es_data$d, dy = es_data$d, p = es_data$pi)
+                         partial_y <- FALSE
                     }
                }
 
-               if(is.null(measure_x) & is.null(measure_y)){
+               if(is.null(measure_x) & is.null(measure_y) & (!is.na(intercor_x) | !is.na(intercor_y))){
                     if(es_metric=="r") {
                          es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
-                                                       k_vars_x = length(es_data$rxyi[i]), mean_intercor_x = mean(c(intercor_x,intercor_y)),
+                                                       k_vars_x = length(es_data$rxyi[i]), mean_intercor_x = mean(c(intercor_x,intercor_y), na.rm = TRUE),
                                                        k_vars_y = 1, mean_intercor_y = intercor_y)
                     } else {
-                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), mean_intercor = intercor_y, partial_intercor = partial_y)
+                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), 
+                                                       mean_intercor = intercor_y, partial_intercor = partial_y)
                     }
 
                     if(ma_method != "bb"){
@@ -245,7 +265,7 @@
                          ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
                          uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
                     }
-               } else if(!is.null(measure_x) & is.null(measure_y)) {
+               } else if(!is.null(measure_x) & is.null(measure_y) & !is.na(intercor_x)) {
                     if(es_metric=="r") {
                          es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
                                                        k_vars_x = length(es_data$rxyi[i]),  mean_intercor_x = intercor_x,
@@ -268,7 +288,7 @@
                     }
 
 
-               } else if(is.null(measure_x) & !is.null(measure_y)) {
+               } else if(is.null(measure_x) & !is.null(measure_y) & !is.na(intercor_y)) {
                     if(es_metric=="r") {
                          es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
                                                        k_vars_x = 1, mean_intercor_x = intercor_x,
@@ -283,7 +303,7 @@
                          ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
                     }
 
-               } else {
+               } else if(!is.null(measure_x) & !is.null(measure_y) & !is.na(intercor_x) & !is.na(intercor_y)){
                     kx <- length(unique(measure_x[i]))
                     ky <- length(unique(measure_y[i]))
 
@@ -306,6 +326,19 @@
                               rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
                               ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
                          }
+                    }
+               }else{
+                    if(es_metric=="r"){
+                         es_comp <- wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i])
+                    }else{
+                         es_comp <- wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i])
+                    }
+                    
+                    if(ma_method != "bb"){
+                         rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
+                         ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
+                         ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
+                         uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
                     }
                }
           }

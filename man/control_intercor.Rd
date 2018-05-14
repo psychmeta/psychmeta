@@ -4,12 +4,15 @@
 \alias{control_intercor}
 \title{Control function to curate intercorrelations to be used in automatic compositing routine}
 \usage{
-control_intercor(rxyi, sample_id, construct_x, construct_y,
-  construct_names = NULL, intercor_vec = NULL, intercor_scalar = 0.5,
-  data = NULL, ...)
+control_intercor(rxyi = NULL, n = NULL, sample_id = NULL,
+  construct_x = NULL, construct_y = NULL, construct_names = NULL,
+  intercor_vec = NULL, intercor_scalar = 0.5, dx = NULL, dy = NULL,
+  p = 0.5, partial_intercor = FALSE, data = NULL, ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations.}
+
+\item{n}{Vector or column name of sample sizes.}
 
 \item{sample_id}{Vector of identification labels for samples/studies in the meta-analysis.}
 
@@ -22,6 +25,13 @@ control_intercor(rxyi, sample_id, construct_x, construct_y,
 \item{intercor_vec}{Named vector of pre-specified intercorrelations among measures of constructs in the meta-analysis.}
 
 \item{intercor_scalar}{Generic scalar intercorrelation that can stand in for unobserved or unspecified values.}
+
+\item{dx, dy}{\emph{d} values corresponding to \code{construct_x} and \code{construct_y}. These values only need to be supplied for cases in which \code{rxyi} represents a correlation between two measures of the same construct.}
+
+\item{p}{Scalar or vector containing the proportions of group membership corresponding to the \emph{d} values.}
+
+\item{partial_intercor}{For meta-analyses of \emph{d} values only: Logical scalar, vector, or column corresponding to values in \code{rxyi} that determines whether the correlations are to be treated as within-group correlations (i.e., partial correlation controlling for group membership; \code{TRUE}) or not (\code{FALSE}; default).
+Note that this only converts correlation values from the \code{rxyi} argument - any values provided in the \code{intercor_vec} or \code{intercor_scalar} arguments must be total correlations or converted to total correlations using the \code{mix_r_2group()} function prior to running \code{control_intercor}.}
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments.}
 
