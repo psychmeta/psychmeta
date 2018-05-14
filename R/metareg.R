@@ -7,7 +7,8 @@
 #' to a specific construct pair within the \code{construct_pairs} list.
 #'
 #' @param ma_obj Meta-analysis object.
-#' @param formula_list Optional list of regression formulas to evaluate.
+#' @param formula_list Optional list of regression formulas to evaluate. 
+#' NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly. 
 #' @param ... Additional arguments.
 #'
 #' @return ma_obj with meta-regression results added (see ma_obj$follow_up_analyses$metareg).
@@ -53,8 +54,12 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
           cat_moderator_matrix <- ma_obj_i$moderator_info$cat_moderator_matrix
           es_data <- ma_obj_i$moderator_info$data$barebones
 
-          moderator_names <- colnames(moderator_matrix)
           if(!is.null(moderator_matrix)){
+               moderator_names <- colnames(moderator_matrix)
+               
+               moderator_names <- gsub(x = moderator_names, pattern = " ", replacement = "_")
+               colnames(moderator_matrix) <- moderator_names
+
                if(is.null(formula_list)){
                     formula_list <- list(paste("~", paste(moderator_names, collapse = " + ")))
                     interaction_list <- list()
@@ -71,9 +76,9 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                          names(formula_list) <- "Main Effects"
                     }
                }
-
+               
                if("bb" %in% ma_methods){
-                    data_bb <- data.frame(moderator_matrix, escalc$barebones)
+                    data_bb <- bind_cols(moderator_matrix, escalc$barebones)
                     metareg_bb <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_bb))
                }else{
                     metareg_bb <- NULL
@@ -81,14 +86,14 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
                if("ic" %in% ma_methods){
                     if(es_type == "r"){
-                         data_ts <- data.frame(moderator_matrix, escalc$individual_correction$true_score)
-                         data_vgx <- data.frame(moderator_matrix, escalc$individual_correction$validity_generalization_x)
-                         data_vgy <- data.frame(moderator_matrix, escalc$individual_correction$validity_generalization_y)
+                         data_ts <- bind_cols(moderator_matrix, escalc$individual_correction$true_score)
+                         data_vgx <- bind_cols(moderator_matrix, escalc$individual_correction$validity_generalization_x)
+                         data_vgy <- bind_cols(moderator_matrix, escalc$individual_correction$validity_generalization_y)
                     }
                     if(es_type == "d"){
-                         data_ts <- data.frame(moderator_matrix, escalc$individual_correction$latentGroup_latentY)
-                         data_vgx <- data.frame(moderator_matrix, escalc$individual_correction$observedGroup_latentY)
-                         data_vgy <- data.frame(moderator_matrix, escalc$individual_correction$latentGroup_observedY)
+                         data_ts <- bind_cols(moderator_matrix, escalc$individual_correction$latentGroup_latentY)
+                         data_vgx <- bind_cols(moderator_matrix, escalc$individual_correction$observedGroup_latentY)
+                         data_vgy <- bind_cols(moderator_matrix, escalc$individual_correction$latentGroup_observedY)
                     }
 
                     metareg_ts <- lapply(formula_list, function(x) rma(yi = yi, vi = vi, mods = x, data = data_ts))

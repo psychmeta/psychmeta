@@ -314,13 +314,20 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           if(!is.null(cat_moderator_matrix)){
                cat_moderator_matrix <- as.data.frame(cat_moderator_matrix)
                colnames(cat_moderator_matrix) <- moderator_names$cat
+               moderators$cat_moderator_matrix <- cat_moderator_matrix
           }
-          if(!is.null(moderator_matrix)) colnames(moderator_matrix) <- moderator_names$all
+          if(!is.null(moderator_matrix)){
+               moderator_matrix <- as.data.frame(moderator_matrix)
+               colnames(moderator_matrix) <- moderator_names$all
+               moderators$moderator_matrix <- moderator_matrix
+          }
+          
           moderator_info <- organize_moderators(moderator_matrix = cat_moderator_matrix,
                                                 es_data = es_data,
                                                 moderator_type = moderator_type,
                                                 construct_x = construct_x, construct_y = construct_y,
-                                                construct_order = construct_order, moderator_levels = moderator_levels, moderator_names = .moderator_names)
+                                                construct_order = construct_order, moderator_levels = moderator_levels, 
+                                                moderator_names = .moderator_names)
      }
 
      data <- moderator_info$data

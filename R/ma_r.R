@@ -543,6 +543,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                moderator_levels <- NULL
           }
 
+          moderators <- as.data.frame(moderators)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
