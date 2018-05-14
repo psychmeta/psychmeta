@@ -96,7 +96,7 @@ compute_dmod(data = dat, group = "G", predictors = "X", criterion = "Y",
 # Compute point estimates of non-parametric d_mod effect sizes:
 compute_dmod(data = dat, group = "G", predictors = "X", criterion = "Y",
      referent_id = 1, focal_id_vec = 2:4,
-     conf_level = .95, rescale_cdf = TRUE, parametric = TRUE,
+     conf_level = .95, rescale_cdf = TRUE, parametric = FALSE,
      bootstrap = FALSE)
 
 # Compute unstratified bootstrapped estimates of parametric d_mod effect sizes:

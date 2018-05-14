@@ -5,7 +5,8 @@
 \alias{wt_cor}
 \title{Compute weighted covariances}
 \usage{
-wt_cov(x, y = NULL, wt = NULL, as_cor = FALSE, use = "everything")
+wt_cov(x, y = NULL, wt = NULL, as_cor = FALSE, use = c("everything",
+  "listwise", "pairwise"), unbiased = TRUE, df_type = c("count", "sum_wts"))
 
 wt_cor(x, y = NULL, wt = NULL, use = "everything")
 }
@@ -19,6 +20,10 @@ wt_cor(x, y = NULL, wt = NULL, use = "everything")
 \item{as_cor}{Logical scalar that determines whether the covariances should be standardized (TRUE) or unstandardized (FALSE).}
 
 \item{use}{Method for handling missing values. "everything" uses all values and does not account for missingness, "listwise" uses only complete cases, and "pairwise" uses pairwise deletion.}
+
+\item{unbiased}{Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).}
+
+\item{df_type}{Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases ("count"; default) or sums of weights ("sum_wts").}
 }
 \value{
 Scalar, vector, or matrix of covariances.
@@ -29,4 +34,10 @@ Compute the weighted covariance among variables in a matrix or between the varia
 \examples{
 wt_cov(x = c(1, 0, 2), y = c(1, 2, 3), wt = c(1, 2, 2), as_cor = FALSE, use = "everything")
 wt_cov(x = c(1, 0, 2), y = c(1, 2, 3), wt = c(1, 2, 2), as_cor = TRUE, use = "everything")
+wt_cov(x = cbind(c(1, 0, 2), c(1, 2, 3)), wt = c(1, 2, 2), as_cor = FALSE, use = "everything")
+wt_cov(x = cbind(c(1, 0, 2), c(1, 2, 3)), wt = c(1, 2, 2), as_cor = TRUE, use = "everything")
+wt_cov(x = cbind(c(1, 0, 2, NA), c(1, 2, 3, 3)),
+       wt = c(1, 2, 2, 1), as_cor = FALSE, use = "listwise")
+wt_cov(x = cbind(c(1, 0, 2, NA), c(1, 2, 3, 3)),
+       wt = c(1, 2, 2, 1), as_cor = TRUE, use = "listwise")
 }

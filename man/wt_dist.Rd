@@ -6,11 +6,13 @@
 \alias{wt_var}
 \title{Weighted descriptive statistics for a vector of numbers}
 \usage{
-wt_dist(x, wt = rep(1, length(x)), unbiased = TRUE)
+wt_dist(x, wt = rep(1, length(x)), unbiased = TRUE, df_type = c("count",
+  "sum_wts"))
 
 wt_mean(x, wt = rep(1, length(x)))
 
-wt_var(x, wt = rep(1, length(x)), unbiased = TRUE)
+wt_var(x, wt = rep(1, length(x)), unbiased = TRUE, df_type = c("count",
+  "sum_wts"))
 }
 \arguments{
 \item{x}{Vector of values to be analyzed.}
@@ -18,6 +20,8 @@ wt_var(x, wt = rep(1, length(x)), unbiased = TRUE)
 \item{wt}{Weights associated with the values in x.}
 
 \item{unbiased}{Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).}
+
+\item{df_type}{Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases ("count"; default) or sums of weights ("sum_wts").}
 }
 \value{
 A weighted mean and variance if weights are supplied or an unweighted mean and variance if weights are not supplied.
