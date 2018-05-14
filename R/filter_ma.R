@@ -149,81 +149,19 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
 filter_meta <- filter_ma
 
 
-#' @method filter psychmeta
-filter.psychmeta <- function(.data, ...){
-     .class <- class(.data)
-     class(.data) <- .class[.class != "psychmeta"]
-     .attributes <- attributes(.data)
-     
-     .filter <- function (.data, ...) UseMethod("filter") 
-     .data <- .filter(.data, ...)
-     .attributes$row.names <- attributes(.data)$row.names
-     class(.data) <- .class
-     attributes(.data) <- .attributes
-     .data
+namelists.ma_psychmeta <- function(ma_obj){
+     analysis_id <- ma_obj$analysis_id
+     for(i in 1:ncol(ma_obj)) ma_obj[[i]] <- setNames(ma_obj[[i]], paste0("analysis_id: ", analysis_id))
+     ma_obj
 }
-
-
-#' @method arrange psychmeta
-arrange.psychmeta <- function(.data, ...){
-     .class <- class(.data)
-     class(.data) <- .class[.class != "psychmeta"]
-     .attributes <- attributes(.data)
-     
-     .arrange <- function (.data, ...) UseMethod("filter") 
-     .data <- .arrange(.data, ...)
-     class(.data) <- .class
-     attributes(.data) <- .attributes
-     .data
-}
-
-
-#' @method arrange_all psychmeta
-arrange_all.psychmeta <- function(.tbl, .funs = list(), ...){
-     .class <- class(.tbl)
-     class(.tbl) <- .class[.class != "psychmeta"]
-     .attributes <- attributes(.tbl)
-     
-     .arrange_all <- function (.tbl, .funs = list(), ...) UseMethod("arrange_all") 
-     .tbl <- .arrange_all(.tbl, .funs = list(), ...)
-     class(.tbl) <- .class
-     attributes(.tbl) <- .attributes
-     .tbl
-}
-
-
-#' @method arrange_at psychmeta
-arrange_at.psychmeta <- function(.tbl, .vars, .funs = list(), ...){
-     .class <- class(.tbl)
-     class(.tbl) <- .class[.class != "psychmeta"]
-     .attributes <- attributes(.tbl)
-     
-     .arrange_at <- function (.tbl, .funs = list(), ...) UseMethod("arrange_at") 
-     .tbl <- .arrange_at(.tbl, .vars, .funs = list(), ...)
-     class(.tbl) <- .class
-     attributes(.tbl) <- .attributes
-     .tbl
-}
-
-
-#' @method arrange_if psychmeta
-arrange_if.psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
-     .class <- class(.tbl)
-     class(.tbl) <- .class[.class != "psychmeta"]
-     .attributes <- attributes(.tbl)
-     
-     .arrange_if <- function (.tbl, .funs = list(), ...) UseMethod("arrange_if") 
-     .tbl <- .arrange_if(.tbl, .predicate, .funs = list(), ...)
-     class(.tbl) <- .class
-     attributes(.tbl) <- .attributes
-     .tbl
-}
-
 
 
 screen_ma <- function(ma_obj){
      correct_class <- "ma_psychmeta" %in% class(ma_obj)
      correct_attributes <- all(c("ma_metric", "ma_methods") %in% names(attributes(ma_obj)))
+     
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     correct_cols <- needed_cols %in% colnames(ma_obj)
      
      if(!correct_class)
           stop("The object supplied does not have the class 'ma_psychmeta'. This can occur if:
@@ -232,8 +170,171 @@ screen_ma <- function(ma_obj){
      
      if(!correct_attributes)
           stop("The meta-analysis object is missing necessary attributes. 
-               This issue typically occurs when the object has been manipulated using unsupported methods.", call. = FALSE)
+               This issue typically occurs when the object has been manipulated using unsupported methods.", call. = FALSE)     
+     
+     if(!all(correct_cols))
+          stop("The meta-analysis object is missing critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
      
      ma_obj     
 }
+
+
+
+#' @method select ma_psychmeta
+select.ma_psychmeta <- function(.data, ...){
+     .class <- class(.data)
+     class(.data) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(.data)
+     
+     .filter <- function (.data, ...) UseMethod("select") 
+     .data <- .filter(.data, ...)
+     .attributes$names <- attributes(.data)$names
+     
+     attributes(.data) <- .attributes
+     class(.data) <- .class
+     
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     correct_cols <- needed_cols %in% colnames(.data)
+     if(!all(correct_cols))
+          warning("You have removed the following critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
+     
+     .data
+}
+
+#' @method filter ma_psychmeta
+filter.ma_psychmeta <- function(.data, ...){
+     .class <- class(.data)
+     class(.data) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(.data)
+     
+     .filter <- function (.data, ...) UseMethod("filter") 
+     .data <- .filter(.data, ...)
+     .attributes$row.names <- attributes(.data)$row.names
+     
+     attributes(.data) <- .attributes
+     class(.data) <- .class
+     
+     .data
+}
+
+
+#' @method arrange ma_psychmeta
+arrange.ma_psychmeta <- function(.data, ...){
+     .class <- class(.data)
+     class(.data) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(.data)
+     
+     .arrange <- function (.data, ...) UseMethod("filter") 
+     .data <- .arrange(.data, ...)
+     
+     attributes(.data) <- .attributes
+     class(.data) <- .class
+     .data
+}
+
+
+#' @method arrange_all ma_psychmeta
+arrange_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
+     .class <- class(.tbl)
+     class(.tbl) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(.tbl)
+     
+     .arrange_all <- function (.tbl, .funs = list(), ...) UseMethod("arrange_all") 
+     .tbl <- .arrange_all(.tbl, .funs = list(), ...)
+     
+     attributes(.tbl) <- .attributes
+     class(.tbl) <- .class
+     .tbl
+}
+
+
+#' @method arrange_at ma_psychmeta
+arrange_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
+     .class <- class(.tbl)
+     class(.tbl) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(.tbl)
+     
+     .arrange_at <- function (.tbl, .funs = list(), ...) UseMethod("arrange_at") 
+     .tbl <- .arrange_at(.tbl, .vars, .funs = list(), ...)
+    
+      attributes(.tbl) <- .attributes
+     class(.tbl) <- .class
+     .tbl
+}
+
+
+#' @method arrange_if ma_psychmeta
+arrange_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
+     .class <- class(.tbl)
+     class(.tbl) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(.tbl)
+     
+     .arrange_if <- function (.tbl, .funs = list(), ...) UseMethod("arrange_if") 
+     .tbl <- .arrange_if(.tbl, .predicate, .funs = list(), ...)
+     
+     attributes(.tbl) <- .attributes
+     class(.tbl) <- .class
+     .tbl
+}
+
+
+#' @method subset ma_psychmeta
+subset.ma_psychmeta <- function (x, subset, select, drop = FALSE, ...){
+     .class <- class(x)
+     class(x) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(x)
+     
+     .subset <- function (x, subset, select, drop = FALSE, ...) UseMethod("subset") 
+     x <- .subset(x, subset, select, drop, ...)
+     
+     .attributes$names <- attributes(x)$names
+     .attributes$row.names <- attributes(x)$row.names
+     
+     attributes(x) <- .attributes
+     class(x) <- .class
+     
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     correct_cols <- needed_cols %in% colnames(x)
+     if(!all(correct_cols))
+          warning("You have removed the following critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
+     x
+}
+
+
+#' @method group_by ma_psychmeta
+group_by.ma_psychmeta <- function (x, ..., add = FALSE){
+     .class <- class(x)
+     class(x) <- .class[.class != "ma_psychmeta"]
+
+     .group_by <- function (x, ..., add = FALSE) UseMethod("group_by") 
+     x <- .group_by(x, ..., add = add)
+     
+     class(x) <- .class
+     x
+}
+
+
+#' @method `[` ma_psychmeta
+`[.ma_psychmeta` <- function(x, i = rep(TRUE, nrow(x)), j = rep(TRUE, ncol(x)), drop = if (missing(i)) TRUE else ncol(x) == 1){
+     .class <- class(x)
+     class(x) <- .class[.class != "ma_psychmeta"]
+     .attributes <- attributes(x)
+     
+     x <- do.call(`[.data.frame`, args = list(x, i, j, drop))
+     
+     .attributes$names <- attributes(x)$names
+     .attributes$row.names <- attributes(x)$row.names
+     
+     attributes(x) <- .attributes
+     class(x) <- .class
+     
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     correct_cols <- needed_cols %in% colnames(x)
+     if(!all(correct_cols))
+          warning("You have removed the following critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
+     
+     x
+} 
+
+
 

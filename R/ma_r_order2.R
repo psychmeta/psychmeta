@@ -198,6 +198,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                                                        neg_var_r_order2 = neg_var_r_order2,
                                                                        neg_var_rho_ic_order2 = neg_var_rho_ic_order2,
                                                                        neg_var_rho_ad_order2 = neg_var_rho_ad_order2)))
+     out <- namelists.ma_psychmeta(ma_obj = out)
      
      class(out) <- c("ma_psychmeta", class(out))
      

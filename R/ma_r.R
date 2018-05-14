@@ -1602,6 +1602,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      class(out) <- c("ma_psychmeta", class(out))
      
+     out <- namelists.ma_psychmeta(ma_obj = out)
+     
      return(out)
 }
 

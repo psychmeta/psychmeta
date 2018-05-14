@@ -259,6 +259,7 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
      ma_metric <- attributes(ma_obj)$ma_metric
      convert_metric <- ifelse(any(ma_metric == "r_as_r" | ma_metric == "d_as_r"), TRUE, FALSE)
      if(convert_metric) ma_obj <- convert_ma(ma_obj)
+     ma_obj <- namelists.ma_psychmeta(ma_obj)
      
      message("Artifact-distribution meta-analyses have been added to 'ma_obj'")
 

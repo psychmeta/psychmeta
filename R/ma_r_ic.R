@@ -913,6 +913,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                             neg_var_rtpa = neg_var_rtpa,
                                                                             neg_var_rxpa = neg_var_rxpa,
                                                                             neg_var_rtya = neg_var_rtya)))
+          out <- namelists.ma_psychmeta(ma_obj = out)
      }
 
      class(out) <- c("ma_psychmeta", class(out))

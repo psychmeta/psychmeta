@@ -136,6 +136,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                                                           default_print = "bb",
                                                           warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                           fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
+          out <- namelists.ma_psychmeta(ma_obj = out)
      }
      
      class(out) <- c("ma_psychmeta", class(out))
