@@ -60,11 +60,6 @@ globalVariables(c(".", "Value",                                  ## Global varia
     }
 }
 
-.onLoad <- function(libname, pkgname){
-     psychmeta <- new.env()
-}
-
-
 
 #' Retrieve the NEWS file for the psychmeta package
 #'

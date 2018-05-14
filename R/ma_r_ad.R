@@ -31,6 +31,8 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                     sign_rxz = 1, sign_ryz = 1, 
                     control = control_psychmeta(), ...){
      
+     screen_ma(ma_obj = ma_obj)
+     
      use_ic_ads <- match.arg(use_ic_ads, choices = c("tsa", "int"))
      
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),

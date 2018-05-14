@@ -40,6 +40,8 @@
 #' }
 filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
      
+     screen_ma(ma_obj = ma_obj)
+     
      .attributes <- attributes(ma_obj)
      
      match <- match.arg(match, c("all", "any"))
@@ -217,4 +219,21 @@ arrange_if.psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
      .tbl
 }
 
+
+
+screen_ma <- function(ma_obj){
+     correct_class <- "ma_psychmeta" %in% class(ma_obj)
+     correct_attributes <- all(c("ma_metric", "ma_methods") %in% names(attributes(ma_obj)))
+     
+     if(!correct_class)
+          stop("The object supplied does not have the class 'ma_psychmeta'. This can occur if:
+               (1) the object does not represent a meta-analysis or
+               (2) the meta-analysis object has been manipulated using unsupported methods.", call. = FALSE)
+     
+     if(!correct_attributes)
+          stop("The meta-analysis object is missing necessary attributes. 
+               This issue typically occurs when the object has been manipulated using unsupported methods.", call. = FALSE)
+     
+     ma_obj     
+}
 

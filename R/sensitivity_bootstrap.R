@@ -3,6 +3,8 @@
 sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .95,
                                   boot_ci_type = c("bca", "norm","basic", "stud", "perc"), ...){
 
+     screen_ma(ma_obj = ma_obj)
+     
      boot_ci_type <- match.arg(boot_ci_type, choices = c("bca", "norm", "basic", "stud", "perc"))
      
      boot_iter <- scalar_arg_warning(arg = boot_iter, arg_name = "boot_iter")

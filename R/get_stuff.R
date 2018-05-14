@@ -97,6 +97,8 @@ get_metafor <- get_escalc <- function(ma_obj, analyses = "all", match = c("all",
 get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, 
                         ma_methods = c("bb", "ic", "ad"), correction_types = c("ts", "vgx", "vgy"), ...){
      
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     
      additional_args <- list(...)
      
      ma_methods <- match.arg(ma_methods, c("bb", "ic", "ad"), several.ok = TRUE)
@@ -112,8 +114,6 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           vgx_label <- "observedGroup_latentY"
           vgy_label <- "latentGroup_observedY"
      }
-     
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
      
      ma_methods <- ma_methods[ma_methods %in% attributes(ma_obj)$ma_methods]
      

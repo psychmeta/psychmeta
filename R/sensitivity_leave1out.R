@@ -1,6 +1,9 @@
 #' @name sensitivity
 #' @rdname sensitivity
 sensitivity_leave1out <- function(ma_obj, ...){
+     
+     screen_ma(ma_obj = ma_obj)
+     
      es_type <- NULL
      ma_methods <- attributes(ma_obj)$ma_methods
      ma_metric <- attributes(ma_obj)$ma_metric

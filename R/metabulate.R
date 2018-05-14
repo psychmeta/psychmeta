@@ -5,6 +5,9 @@
 #' @param show_conf Logical scalar determining whether to show confidence intervals (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param show_cred Logical scalar determining whether to show credibility intervals (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param show_se Logical scalar determining whether to show standard errors (\code{TRUE}) or not (\code{FALSE}; default).
+#' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
+#' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
+#' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param ... Additional arguments.
 #'
 #' @return Saved rich text file containing tables of meta-analytic output.
@@ -34,8 +37,11 @@
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 #' metabulate(ma_obj = ma_obj, file = "meta tables generic es.rtf")
 #' }
-metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se = FALSE, ...){
+metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se = FALSE, 
+                       analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
 
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
+     
      ma_metric <- attributes(ma_obj)$ma_metric
      ma_methods <- attributes(ma_obj)$ma_methods
      is_r <- any(ma_metric %in% c("r_as_r", "d_as_r"))

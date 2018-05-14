@@ -7,6 +7,7 @@
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses.
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
+#' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param style References should be formatted in what style? Can be the style ID for any \url{https://github.com/citation-style-language/styles}{CSL style} (formatted examples of styles are available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Requires an internet connection to retrieve styles. If unavailable, references will be rendered in Chicago style.)
 #' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires the \code{tinytex} package), Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
 #' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} or \code{"print"} to output directly to the R console.
@@ -32,7 +33,8 @@
 #' bib=system.file("sample_bibliography.bib", package="psychmeta"), style="apa",
 #' output_format="word", header=list())
 #' }
-generate_bib <- function(ma_obj=NULL, additional_citekeys=NULL, bib=NULL, analyses="all", match=c("all", "any"),
+generate_bib <- function(ma_obj=NULL, additional_citekeys=NULL, bib=NULL, 
+                         analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                          style="apa", output_format=c("word", "html", "pdf", "text", "Rmd", "biblatex", "citekeys"),
                          file=NULL, header=list()){
 
@@ -43,10 +45,10 @@ generate_bib <- function(ma_obj=NULL, additional_citekeys=NULL, bib=NULL, analys
 
      if(!is.null(ma_obj)) {
           # Get the requested meta-analyses
-          ma_obj_filtered <- filter_ma(ma_obj=ma_obj, analyses=analyses, match=match)
-
+          ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
+          
           # Get the citekeys for requested metas
-          citekeys <- unique(c(additional_citekeys, unlist(lapply(ma_obj_filtered$escalc, function(x) 
+          citekeys <- unique(c(additional_citekeys, unlist(lapply(ma_obj$escalc, function(x) 
                as.character(x$barebones$citekey)))))
      } else citekeys <- additional_citekeys
 
