@@ -21,7 +21,7 @@ install.packages("psychmeta")
 Development versions of `psychmeta` from [GitHub](https://github.com/jadahlke/psychmeta) reflect updates made to the package between official CRAN releases. Using the [devtools](https://cran.r-project.org/package=devtools) package, the GitHub release can be installed with the following code:
 ```r
 install.packages("devtools")
-devtools::install_github("jadahlke/psychmeta")
+devtools::install_github("psychmeta/psychmeta")
 ```
 
 ## Citing `psychmeta`
