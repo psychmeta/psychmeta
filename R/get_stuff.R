@@ -240,7 +240,8 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
      
      ad_type <- match.arg(ad_type, c("tsa", "int"))
      ma_method <- match.arg(ma_method, c("ad", "ic"))
-
+     additional_args <- list(...)
+     
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
 
      
@@ -323,16 +324,33 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
      names(ad_list_x) <- construct_pairs[,1]
      names(ad_list_y) <- construct_pairs[,2]
 
-     pairwise_ads <- attributes(ma_obj)$inputs$pairwise_ads
+     if(!is.null(additional_args$pairwise_ads)){
+          pairwise_ads <- additional_args$pairwise_ads
+     }else{
+          pairwise_ads <- attributes(ma_obj)$inputs$pairwise_ads
+     }
      if(as_ad_obj){
           if(!pairwise_ads){
                ad <- append(ad_list_x, ad_list_y)
                ad <- ad[!duplicated(names(ad))]
           }else{
-               names(ad_list_x) <- paste0("Pair ID = ", 1:length(ad_list_y), ": X = ", names(ad_list_x))
-               names(ad_list_y) <- paste0("Pair ID = ", 1:length(ad_list_y), ": Y = ", names(ad_list_y))
-               ad <- append(ad_list_x, ad_list_y)
+               
+               if(any(colnames(ma_obj) == "pair_id")){
+                    ad_list_x <- ad_list_x[!duplicated(ma_obj$pair_id)]
+                    ad_list_y <- ad_list_y[!duplicated(ma_obj$pair_id)]
+                    names(ad_list_x) <- paste0("pair_id: ", 1:length(ad_list_x), ", construct: ", names(ad_list_x))
+                    names(ad_list_y) <- paste0("pair_id: ", 1:length(ad_list_y), ", construct: ", names(ad_list_y))    
+               }else{
+                    names(ad_list_x) <- paste0("analysis_id: ", 1:length(ad_list_x), ", construct: ", names(ad_list_x))
+                    names(ad_list_y) <- paste0("analysis_id: ", 1:length(ad_list_y), ", construct: ", names(ad_list_y))
+               }
+               
+               class(ad_list_x) <- c("ad_list", class(ad_list_x))
+               class(ad_list_y) <- c("ad_list", class(ad_list_y))
+               ad <- list(ad_list_x = ad_list_x, 
+                          ad_list_y = ad_list_y)
           }
+          class(ad) <- c("ad_list", class(ad))
      }else{
           ad_x <- ad_y <- NULL
           for(i in 1:length(ad_list_x)){
@@ -551,6 +569,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                }
                out[[i]] <- r_list
           }
+          class(out) <- c("get_matrix", class(out))
      }else{
           out <- NULL
      }

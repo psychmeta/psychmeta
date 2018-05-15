@@ -511,9 +511,11 @@ print.get_plots <- function(x, ..., digits = 3){
 #' @export
 #' @method print get_matrix
 print.get_matrix <- function(x, ..., digits = 3){
-     cat("List of meta-analytic matrices \n")
+     cat("Tibble of meta-analytic matrices \n")
      cat("---------------------------------------- \n")
-     cat("To view matrices, use the '$' operator to search this list object. \n")
+     x <- ungroup(x)
+     class(x) <- c("tbl_df", "tbl", "data.frame")
+     print(x)
 }
 
 
@@ -583,6 +585,16 @@ print.get_cumulative <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
+#' @exportClass ad_list
+#' @export
+#' @method print ad_list
+print.ad_list <- function(x, ..., digits = 3){
+     cat("List of artifact distributions \n")
+     cat("---------------------------------------- \n")
+     cat("To view specific results, use the '$' operator to search this list object. \n")
+}
+
+
 #' @exportClass ma_psychmeta
 #' @export
 #' @method print ma_psychmeta
@@ -592,14 +604,10 @@ print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      ma_metric <- attributes(x)$ma_metric 
      
      title_text <- "Summary tibble of psychmeta meta-analysis"
-     if(ma_metric == "r_as_r"){
+     if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
           title_text <- "Summary tibble of psychmeta meta-analysis of correlations"
-     }else if(ma_metric == "r_as_d"){
-          title_text <- "Summary tibble of psychmeta meta-analysis of d values (converted from correlations)"
-     }else if(ma_metric == "d_as_d"){
+     }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
           title_text <- "Summary tibble of psychmeta meta-analysis of d values"
-     }else if(ma_metric == "d_as_r"){
-          title_text <- "Summary tibble of psychmeta meta-analysis of correlations (converted from d values)"
      }else if(ma_metric == "generic"){
           title_text <- "Summary tibble of psychmeta meta-analysis of generic effect sizes"
      }else if(ma_metric == "r_order2"){
@@ -609,6 +617,7 @@ print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      }
 
      cat(title_text, " \n")
+     cat("---------------------------------------------------------------------- \n")
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)

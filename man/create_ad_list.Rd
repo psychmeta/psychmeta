@@ -12,7 +12,7 @@ create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
   estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE,
   estimate_ut = TRUE, var_unbiased = TRUE, process_ads = TRUE,
   collapse_method = c("composite", "average", "stop"), intercor = 0.5,
-  supplemental_ads = NULL, data = NULL, ...)
+  pairwise_ads = FALSE, supplemental_ads = NULL, data = NULL, ...)
 }
 \arguments{
 \item{ad_type}{Type of artifact distributions to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.}
@@ -63,6 +63,8 @@ create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
 Options are "composite" (default), "average," and "stop." When measure names are not supplied, multiple entries for a given construct within a given study will be averaged.}
 
 \item{intercor}{The intercorrelation(s) among variables to be combined into a composite. Can be a scalar, a named vector with element named according to the names of constructs, or output from the \code{control_intercor} function. Default scalar value is .5.}
+
+\item{pairwise_ads}{Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).}
 
 \item{supplemental_ads}{Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.}
 

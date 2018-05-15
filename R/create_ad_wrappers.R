@@ -219,6 +219,7 @@ create_ad <- function(ad_type = c("tsa", "int"),
 #' @param collapse_method Character argument that determines how to collapse multiple measures of a construct within a single study (used when \code{measure_x} and/or \code{measure_y} are supplied).
 #' Options are "composite" (default), "average," and "stop." When measure names are not supplied, multiple entries for a given construct within a given study will be averaged.
 #' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar, a named vector with element named according to the names of constructs, or output from the \code{control_intercor} function. Default scalar value is .5.
+#' @param pairwise_ads Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments.
 #' @param ... Additional arguments
@@ -247,7 +248,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                            estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                            estimate_ux = TRUE, estimate_ut = TRUE,
                            var_unbiased = TRUE, process_ads = TRUE,
-                           collapse_method = c("composite", "average", "stop"), intercor = .5,
+                           collapse_method = c("composite", "average", "stop"), intercor = .5, pairwise_ads = FALSE,
                            supplemental_ads = NULL, data = NULL, ...){
 
      ad_type <- match.arg(ad_type, c("tsa", "int"))
@@ -341,175 +342,201 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      data_x <- full_data[,c("sample_id", "n", "construct_x", "measure_x", "rxx", "rxx_restricted", "rxx_type", "ux", "ux_observed")]
      data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "uy", "uy_observed")]
      colnames(data_y) <- colnames(data_x)
-     full_data <- rbind(data_x, data_y)
-     construct_pair <- c(construct_pair, construct_pair)
-
-     .ad_obj_list <- by(1:length(construct_pair), full_data$construct_x, function(i){
-
-          if(!is.null(sample_id)){
-               independent_arts <- by(1:length(i), full_data$sample_id[i], function(j){
-
-                    .data <- full_data[i,][j,]
-                    measure_averages <- by(.data, .data$measure_x, function(x){
-                         out <- x[1,]
-                         out$n <- mean(x$n)
-                         out$rxx <- mean(x$rxx)
-                         out$rxx_restricted <- as.logical(mean(x$rxx_restricted))
-                         out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type))))
-                         out$ux <- round(mean(x$ux))
-                         out$ux_observed <- as.logical(mean(x$ux_observed))
-                         out
-                    })
-                    .data <- NULL
-                    for(d in 1:length(measure_averages)) .data <- rbind(.data, measure_averages[[d]])
-
-                    if(nrow(.data) > 1){
-                         if(collapse_method == "composite"){
-                              if(length(intercor) > 1){
-                                   if(is.null(names(intercor))) stop("The values in the intercor vector must be named", call. = FALSE)
-                                   
-                                   .intercor <- intercor[paste(as.character(.data$sample_id)[1], as.character(.data$construct_x)[1])]
-                                   if(is.na(.intercor)) .intercor <- intercor[as.character(.data$construct_x)[1]]
-
+     
+     .create_ad_list_internal <- function(index)
+          by(1:length(construct_pair), index, function(i){
+               
+               if(!is.null(sample_id)){
+                    independent_arts <- by(1:length(i), full_data$sample_id[i], function(j){
+                         
+                         .data <- full_data[i,][j,]
+                         measure_averages <- by(.data, .data$measure_x, function(x){
+                              out <- x[1,]
+                              out$n <- mean(x$n)
+                              out$rxx <- mean(x$rxx)
+                              out$rxx_restricted <- as.logical(mean(x$rxx_restricted))
+                              out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type))))
+                              out$ux <- round(mean(x$ux))
+                              out$ux_observed <- as.logical(mean(x$ux_observed))
+                              out
+                         })
+                         .data <- NULL
+                         for(d in 1:length(measure_averages)) .data <- rbind(.data, measure_averages[[d]])
+                         
+                         if(nrow(.data) > 1){
+                              if(collapse_method == "composite"){
+                                   if(length(intercor) > 1){
+                                        if(is.null(names(intercor))) stop("The values in the intercor vector must be named", call. = FALSE)
+                                        
+                                        .intercor <- intercor[paste(as.character(.data$sample_id)[1], as.character(.data$construct_x)[1])]
+                                        if(is.na(.intercor)) .intercor <- intercor[as.character(.data$construct_x)[1]]
+                                        
+                                   }else{
+                                        .intercor <- intercor
+                                   }
+                                   if(!is.na(.intercor)){
+                                        n <- mean(.data$n)
+                                        rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = length(.data$n), mean_intercor = .intercor)
+                                        rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
+                                        rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
+                                        ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = length(.data$n), mean_ri = .intercor)
+                                        ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))    
+                                   }else{
+                                        warning("Valid same-construct intercorrelation not provided for construct'", as.character(.data$construct_x)[1], 
+                                                "' in sample '", .data$sample_id[1], 
+                                                "': '\n     Computing average instead of composite", call. = FALSE)
+                                        
+                                        n <- mean(.data$n)
+                                        rxx <- mean(.data$rxx)
+                                        rxx_restricted <- as.logical(mean(.data$rxx_restricted))
+                                        rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type))))
+                                        ux <- round(mean(.data$ux))
+                                        ux_observed <- as.logical(mean(.data$ux_observed))      
+                                   }
                               }else{
-                                   .intercor <- intercor
-                              }
-                              if(!is.na(.intercor)){
-                                   n <- mean(.data$n)
-                                   rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = length(.data$n), mean_intercor = .intercor)
-                                   rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
-                                   rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
-                                   ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = length(.data$n), mean_ri = .intercor)
-                                   ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))    
-                              }else{
-                                   warning("Valid same-construct intercorrelation not provided for construct'", as.character(.data$construct_x)[1], 
-                                           "' in sample '", .data$sample_id[1], 
-                                           "': '\n     Computing average instead of composite", call. = FALSE)
-                                   
                                    n <- mean(.data$n)
                                    rxx <- mean(.data$rxx)
                                    rxx_restricted <- as.logical(mean(.data$rxx_restricted))
                                    rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type))))
                                    ux <- round(mean(.data$ux))
-                                   ux_observed <- as.logical(mean(.data$ux_observed))      
+                                   ux_observed <- as.logical(mean(.data$ux_observed))
                               }
                          }else{
-                              n <- mean(.data$n)
-                              rxx <- mean(.data$rxx)
-                              rxx_restricted <- as.logical(mean(.data$rxx_restricted))
-                              rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type))))
-                              ux <- round(mean(.data$ux))
-                              ux_observed <- as.logical(mean(.data$ux_observed))
+                              n <- as.numeric(.data$n)
+                              rxx <- as.numeric(.data$rxx)
+                              rxx_restricted <- as.logical(.data$rxx_restricted)
+                              rxx_type <- as.character(.data$rxx_type)
+                              ux  <- as.numeric(.data$ux)
+                              ux_observed <- as.logical(.data$ux_observed)
                          }
+                         
+                         list(n = n,
+                              rxx = rxx,
+                              rxx_restricted = rxx_restricted,
+                              rxx_type = rxx_type,
+                              ux = ux,
+                              ux_observed = ux_observed)
+                    })
+                    
+                    n              <- unlist(lapply(independent_arts, function(x) x$n))
+                    rxx            <- unlist(lapply(independent_arts, function(x) x$rxx))
+                    rxx_restricted <- unlist(lapply(independent_arts, function(x) x$rxx_restricted))
+                    rxx_type       <- unlist(lapply(independent_arts, function(x) x$rxx_type))
+                    ux             <- unlist(lapply(independent_arts, function(x) x$ux))
+                    ux_observed    <- unlist(lapply(independent_arts, function(x) x$ux_observed))
+               }else{
+                    n <- full_data$n[i]
+                    rxx <- full_data$rxx[i]
+                    rxx_restricted <- full_data$rxx_restricted[i]
+                    rxx_type <- full_data$rxx_type[i]
+                    ux <- full_data$ux[i]
+                    ux_observed <- full_data$ux_observed[i]
+               }
+               
+               rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
+               n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
+               rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
+               n_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){n[rxx_restricted]}else{NULL}}else{NULL}
+               ux <-     if(!is.null(ux)){if(any(ux_observed)){ux[ux_observed]}else{NULL}}else{NULL}
+               n_ux <-   if(!is.null(ux)){if(any(ux_observed)){n[ux_observed]}else{NULL}}else{NULL}
+               ut <-     if(!is.null(ux)){if(any(!ux_observed)){ux[!ux_observed]}else{NULL}}else{NULL}
+               n_ut <-   if(!is.null(ux)){if(any(!ux_observed)){n[!ux_observed]}else{NULL}}else{NULL}
+               
+               rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
+               rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
+               
+               if(!is.null(rxxa)){
+                    rxxa_type <- rxxa_type[!is.na(rxxa)]
+                    n_rxxa <- n_rxxa[!is.na(rxxa)]
+                    rxxa <- rxxa[!is.na(rxxa)]
+               }else{
+                    rxxa_type <- n_rxxa <- rxxa <- NULL
+               }
+               
+               if(!is.null(rxxi)){
+                    rxxi_type <- rxxi_type[!is.na(rxxi)]
+                    n_rxxi <- n_rxxi[!is.na(rxxi)]
+                    rxxi <- rxxi[!is.na(rxxi)]
+               }else{
+                    rxxi_type <- n_rxxi <- rxxi <- NULL
+               }
+               
+               if(!is.null(ux)){
+                    n_ux <- n_ux[!is.na(ux)]
+                    ux <- ux[!is.na(ux)]
+               }else{
+                    n_ux <- ux <- NULL
+               }
+               
+               if(!is.null(ut)){
+                    n_ut <- n_ut[!is.na(ut)]
+                    ut <- ut[!is.na(ut)]
+               }else{
+                    n_ut <- ut <- NULL
+               }
+               
+               if(!is.null(supplemental_ads)){
+                    if(full_data$construct_x[i][1] %in% names(supplemental_ads)){
+                         .supplemental_ads <- supplemental_ads[[full_data$construct_x[i][1]]]
                     }else{
-                         n <- as.numeric(.data$n)
-                         rxx <- as.numeric(.data$rxx)
-                         rxx_restricted <- as.logical(.data$rxx_restricted)
-                         rxx_type <- as.character(.data$rxx_type)
-                         ux  <- as.numeric(.data$ux)
-                         ux_observed <- as.logical(.data$ux_observed)
+                         .supplemental_ads <- NULL
                     }
-
-                    list(n = n,
-                         rxx = rxx,
-                         rxx_restricted = rxx_restricted,
-                         rxx_type = rxx_type,
-                         ux = ux,
-                         ux_observed = ux_observed)
-               })
-
-               n              <- unlist(lapply(independent_arts, function(x) x$n))
-               rxx            <- unlist(lapply(independent_arts, function(x) x$rxx))
-               rxx_restricted <- unlist(lapply(independent_arts, function(x) x$rxx_restricted))
-               rxx_type       <- unlist(lapply(independent_arts, function(x) x$rxx_type))
-               ux             <- unlist(lapply(independent_arts, function(x) x$ux))
-               ux_observed    <- unlist(lapply(independent_arts, function(x) x$ux_observed))
-          }else{
-               n <- full_data$n[i]
-               rxx <- full_data$rxx[i]
-               rxx_restricted <- full_data$rxx_restricted[i]
-               rxx_type <- full_data$rxx_type[i]
-               ux <- full_data$ux[i]
-               ux_observed <- full_data$ux_observed[i]
-          }
-
-          rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
-          n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
-          rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
-          n_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){n[rxx_restricted]}else{NULL}}else{NULL}
-          ux <-     if(!is.null(ux)){if(any(ux_observed)){ux[ux_observed]}else{NULL}}else{NULL}
-          n_ux <-   if(!is.null(ux)){if(any(ux_observed)){n[ux_observed]}else{NULL}}else{NULL}
-          ut <-     if(!is.null(ux)){if(any(!ux_observed)){ux[!ux_observed]}else{NULL}}else{NULL}
-          n_ut <-   if(!is.null(ux)){if(any(!ux_observed)){n[!ux_observed]}else{NULL}}else{NULL}
-
-          rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
-          rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
-
-          if(!is.null(rxxa)){
-               rxxa_type <- rxxa_type[!is.na(rxxa)]
-               n_rxxa <- n_rxxa[!is.na(rxxa)]
-               rxxa <- rxxa[!is.na(rxxa)]
-          }else{
-               rxxa_type <- n_rxxa <- rxxa <- NULL
-          }
-
-          if(!is.null(rxxi)){
-               rxxi_type <- rxxi_type[!is.na(rxxi)]
-               n_rxxi <- n_rxxi[!is.na(rxxi)]
-               rxxi <- rxxi[!is.na(rxxi)]
-          }else{
-               rxxi_type <- n_rxxi <- rxxi <- NULL
-          }
-
-          if(!is.null(ux)){
-               n_ux <- n_ux[!is.na(ux)]
-               ux <- ux[!is.na(ux)]
-          }else{
-               n_ux <- ux <- NULL
-          }
-
-          if(!is.null(ut)){
-               n_ut <- n_ut[!is.na(ut)]
-               ut <- ut[!is.na(ut)]
-          }else{
-               n_ut <- ut <- NULL
-          }
-
-          if(!is.null(supplemental_ads)){
-               if(full_data$construct_x[i][1] %in% names(supplemental_ads)){
-                    .supplemental_ads <- supplemental_ads[[full_data$construct_x[i][1]]]
                }else{
                     .supplemental_ads <- NULL
                }
-          }else{
-               .supplemental_ads <- NULL
-          }
-
-          if(process_ads){
-               ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                                                 rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
-                                                                 ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                                                                 ut = ut, ni_ut = n_ut, wt_ut = n_ut,
-                                                                 estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                                 estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                 var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads))
-          }else{
-               ad_obj <- list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                              rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
-                              ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                              ut = ut, ni_ut = n_ut, wt_ut = n_ut)
-               if(!is.null(.supplemental_ads))
-                    ad_obj <- consolidate_ads(ad_obj, .supplemental_ads)
-          }
-
-          list(ad_obj = ad_obj,
-               construct = as.character(full_data$construct_x[i][1]))
-     })
-
-     ad_obj_list <- list()
-     for(i in 1:length(.ad_obj_list)) ad_obj_list[[i]] <- .ad_obj_list[[i]][[1]]
-     names(ad_obj_list) <- as.character(lapply(.ad_obj_list, function(x) x[[2]]))
-
+               
+               if(process_ads){
+                    ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
+                                                                      rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+                                                                      ux = ux, ni_ux = n_ux, wt_ux = n_ux,
+                                                                      ut = ut, ni_ut = n_ut, wt_ut = n_ut,
+                                                                      estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                                                                      estimate_ux = estimate_ux, estimate_ut = estimate_ut,
+                                                                      var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads))
+               }else{
+                    ad_obj <- list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
+                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+                                   ux = ux, ni_ux = n_ux, wt_ux = n_ux,
+                                   ut = ut, ni_ut = n_ut, wt_ut = n_ut)
+                    if(!is.null(.supplemental_ads))
+                         ad_obj <- consolidate_ads(ad_obj, .supplemental_ads)
+               }
+               
+               list(ad_obj = ad_obj,
+                    construct = as.character(full_data$construct_x[i][1]))
+          })
+     
+     if(pairwise_ads){
+          full_data <- data_x
+          .ad_obj_list_x <- .create_ad_list_internal(index = construct_pair)    
+          ad_obj_list_x <- list()
+          for(i in 1:length(.ad_obj_list_x)) ad_obj_list_x[[i]] <- .ad_obj_list_x[[i]][[1]]
+          names(ad_obj_list_x) <- as.character(lapply(.ad_obj_list_x, function(x) x[[2]]))    
+          class(ad_obj_list_x) <- c("ad_list", class(ad_obj_list_x))
+          
+          full_data <- data_y
+          .ad_obj_list_y <- .create_ad_list_internal(index = construct_pair)   
+          ad_obj_list_y <- list()
+          for(i in 1:length(.ad_obj_list_y)) ad_obj_list_y[[i]] <- .ad_obj_list_y[[i]][[1]]
+          names(ad_obj_list_y) <- as.character(lapply(.ad_obj_list_y, function(x) x[[2]]))    
+          class(ad_obj_list_y) <- c("ad_list", class(ad_obj_list_y))
+          
+          names(ad_obj_list_x) <- paste0("pair_id: ", 1:length(ad_obj_list_x), ", construct: ", names(ad_obj_list_x))
+          names(ad_obj_list_y) <- paste0("pair_id: ", 1:length(ad_obj_list_y), ", construct: ", names(ad_obj_list_y))
+          
+          ad_obj_list <- list(ad_list_x = ad_obj_list_x, 
+                              ad_list_y = ad_obj_list_y)
+     }else{
+          full_data <- rbind(data_x, data_y)
+          construct_pair <- c(construct_pair, construct_pair)
+          .ad_obj_list <- .create_ad_list_internal(index = full_data$construct_x)      
+          
+          ad_obj_list <- list()
+          for(i in 1:length(.ad_obj_list)) ad_obj_list[[i]] <- .ad_obj_list[[i]][[1]]
+          names(ad_obj_list) <- as.character(lapply(.ad_obj_list, function(x) x[[2]]))    
+     }
+     class(ad_obj_list) <- c("ad_list", class(ad_obj_list))
+     
      ad_obj_list
 }
 
