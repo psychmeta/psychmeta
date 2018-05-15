@@ -318,7 +318,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
      construct_y <- ma_obj$construct_y
 
      construct_pairs <- cbind(construct_x, construct_y)
-     if(case_sensitive) construct_pairs <- tolower(construct_pairs)
+     if(!case_sensitive) construct_pairs <- tolower(construct_pairs)
      
      names(ad_list_x) <- construct_pairs[,1]
      names(ad_list_y) <- construct_pairs[,2]
@@ -397,6 +397,7 @@ get_followup <- function(ma_obj, follow_up = c("heterogeneity", "leave1out", "cu
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
      
      follow_up <- follow_up[follow_up %in% colnames(ma_obj)]
+     class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
      .followup <- ma_obj[,follow_up]
      
      out <- apply(.followup, 2, function(x){
@@ -476,42 +477,41 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 
           constructs <- unique(c(as.character(ma_list$barebones$construct_x),
                                  as.character(ma_list$barebones$construct_y)))
-          analysis_ids <- unique(ma_list$barebones$analysis_id)
+          if(which(colnames(ma_list$barebones) == "analysis_type") + 1 == which(colnames(ma_list$barebones) == "k")){
+               moderator_combs <- rep(1, nrow(ma_obj))
+               out <- tibble(moderator_comb = 1, moderator = list(NULL))    
+          }else{
+               moderator_names <- colnames(ma_list$barebones)[(which(colnames(ma_list$barebones) == "analysis_type") + 1):(which(colnames(ma_list$barebones) == "k") - 1)]
+               moderator_combs <- apply(ma_list$barebones[,moderator_names], 1, function(x) paste0(moderator_names, ": ", x, collapse = ", "))
+               moderator_combs <- paste0("moderator_comb: ", as.numeric(factor(moderator_combs, levels = unique(moderator_combs))))
+               out <- ma_list$barebones[!duplicated(moderator_combs),moderator_names]
+               out <- bind_cols(moderator_comb = 1:nrow(out), out)    
+          }
+          
           .rmat <- reshape_vec2mat(cov = NA, var = rep(1, length(constructs)), var_names = constructs)
           .mat <- reshape_vec2mat(cov = NA, var = rep(NA, length(constructs)), var_names = constructs)
-          .rmat_list <- rep(list(.rmat), length(analysis_ids))
-          .mat_list <- rep(list(.mat), length(analysis_ids))
-          names(.rmat_list) <- names(.mat_list) <- paste("analysis id: ", analysis_ids)
-          r_list <- ma_list
+          .rmat_list <- rep(list(.rmat), length(moderator_combs))
+          .mat_list <- rep(list(.mat), length(moderator_combs))
+          names(.rmat_list) <- names(.mat_list) <- moderator_combs
 
           for(i in ma_methods){
-               if(i == "barebones"){
-                    r_list[[i]] <- .rmat_list
-               }else{
-                    corrections <- names(ma_list[[i]])
-                    for(j in corrections){
-                         r_list[[i]][[j]] <- .rmat_list
-                    }
-               }
-          }
-
-          for(a in analysis_ids){
-               for(i in ma_methods){
+               r_list <- list()
+               for(a in moderator_combs[!duplicated(moderator_combs)]){
                     if(i == "barebones"){
                          .names <- colnames(ma_list$barebones)[which(colnames(ma_list$barebones) == "k"):ncol(ma_list$barebones)]
                          .out_list <- rep(list(.mat), length(.names))
                          names(.out_list) <- .names
-
+                         
                          for(l in which(grepl(x = .names, pattern = "mean_r") |
                                         grepl(x = .names, pattern = "CI_LL_") |
                                         grepl(x = .names, pattern = "CI_UL_") |
                                         grepl(x = .names, pattern = "CV_LL_") |
                                         grepl(x = .names, pattern = "CV_UL_")))
                               .out_list[[l]] <- .rmat
-
+                         
                          for(x in constructs){
                               for(y in constructs){
-                                   .out <- dplyr::filter(ma_list$barebones, construct_x == x, construct_y == y, analysis_id == a)
+                                   .out <- dplyr::filter(ma_list$barebones, construct_x == x, construct_y == y, moderator_combs == a)
                                    if(nrow(.out) > 0){
                                         for(.name in .names){
                                              .out_list[[.name]][x,y] <- .out_list[[.name]][y,x] <- unlist(.out[,.name])
@@ -519,14 +519,14 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                    }
                               }
                          }
-                         r_list[[i]][[a]] <- .out_list
+                         r_list[[a]] <- .out_list
                     }else{
                          corrections <- names(ma_list[[i]])
                          for(j in corrections){
                               .names <- colnames(ma_list[[i]][[j]])[which(colnames(ma_list[[i]][[j]]) == "k"):ncol(ma_list[[i]][[j]])]
                               .out_list <- rep(list(.mat), length(.names))
                               names(.out_list) <- .names
-
+                              
                               for(l in which(grepl(x = .names, pattern = "mean_r") |
                                              grepl(x = .names, pattern = "mean_rho") |
                                              grepl(x = .names, pattern = "CI_LL_") |
@@ -534,10 +534,10 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                              grepl(x = .names, pattern = "CV_LL_") |
                                              grepl(x = .names, pattern = "CV_UL_")))
                                    .out_list[[l]] <- .rmat
-
+                              
                               for(x in constructs){
                                    for(y in constructs){
-                                        .out <- dplyr::filter(ma_list[[i]][[j]], construct_x == x, construct_y == y, analysis_id == a)
+                                        .out <- dplyr::filter(ma_list[[i]][[j]], construct_x == x, construct_y == y, moderator_combs == a)
                                         if(nrow(.out) > 0){
                                              for(.name in .names){
                                                   .out_list[[.name]][x,y] <- .out_list[[.name]][y,x] <- unlist(.out[,.name])
@@ -545,16 +545,16 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                         }
                                    }
                               }
-                              r_list[[i]][[a]] <- .out_list
+                              r_list[[a]][[j]] <- .out_list
                          }
                     }
                }
+               out[[i]] <- r_list
           }
-          class(r_list) <- "get_matrix"
-          r_list
      }else{
-          NULL
+          out <- NULL
      }
+     out
 }
 
 
@@ -581,6 +581,7 @@ get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "c
      }
      
      plot_types <- plot_types[plot_types %in% colnames(ma_obj)]
+     class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
      .plots <- ma_obj[,plot_types]
      
      out <- apply(.plots, 2, function(x){
@@ -601,6 +602,8 @@ compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_
      ma_method <- match.arg(arg = ma_method, choices = c("bb", "ic", "ad"))
      correction_type <- match.arg(arg = correction_type, choices = c("ts", "vgx", "vgy"))
      ma_metric <- attributes(ma_obj)$ma_metric
+     
+     class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
      
      if(!(ma_method %in% attributes(ma_obj)$ma_methods))
           ma_method <- "bb"

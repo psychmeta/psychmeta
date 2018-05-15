@@ -31,7 +31,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                     sign_rxz = 1, sign_ryz = 1, 
                     control = control_psychmeta(), ...){
      
-     screen_ma(ma_obj = ma_obj)
+     # screen_ma(ma_obj = ma_obj)
      
      use_ic_ads <- match.arg(use_ic_ads, choices = c("tsa", "int"))
      
@@ -46,7 +46,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      
      run_as_master <- any(colnames(ma_obj) == "construct_x") & any(colnames(ma_obj) == "construct_y")
      if(run_as_master)
-          run_as_master <- length(table(ma_obj[,"construct_x"])) > 1 | length(table(ma_obj[,"construct_y"])) > 1
+          run_as_master <- length(table(ma_obj[["construct_x"]])) > 1 | length(table(ma_obj[["construct_y"]])) > 1
      
      if(run_as_master){
           if(!any(attributes(ma_obj)$ma_methods == "ic")){
@@ -175,7 +175,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                    indirect_rr_y = ma_obj_i$indirect_rr_y,
                    residual_ads = residual_ads, 
                    sign_rxz = ma_obj_i$sign_rxz, 
-                   sign_ryz = ma_obj_i$sign_ryz, decimals = decimals, ...)
+                   sign_ryz = ma_obj_i$sign_ryz, decimals = decimals)#, ...)
      })
      
      ma_obj$correction_method <- NULL
@@ -204,7 +204,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      if(!("ad" %in% attributes(ma_obj)$ma_methods))
           attributes(ma_obj)$ma_methods <- c(attributes(ma_obj)$ma_methods, "ad")
      
-     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
+     attributes(ma_obj)$call_history <- base::append(attributes(ma_obj)$call_history, list(match.call()))
      ma_obj <- namelists.ma_psychmeta(ma_obj)
      
      message("Artifact-distribution meta-analyses have been added to 'ma_obj'")
@@ -300,13 +300,13 @@ gather_ma_ad <- function(x){
      barebones <- x$barebones
      
      class(true_score) <- c("ma_table", class(true_score))
-     attributes(true_score) <- append(attributes(true_score), list(ma_type = "r_ad"))
+     attributes(true_score) <- base::append(attributes(true_score), list(ma_type = "r_ad"))
      
      class(validity_generalization_x) <- c("ma_table", class(validity_generalization_x))
-     attributes(validity_generalization_x) <- append(attributes(validity_generalization_x), list(ma_type = "r_ad"))
+     attributes(validity_generalization_x) <- base::append(attributes(validity_generalization_x), list(ma_type = "r_ad"))
      
      class(validity_generalization_y) <- c("ma_table", class(validity_generalization_y))
-     attributes(validity_generalization_y) <- append(attributes(validity_generalization_y), list(ma_type = "r_ad"))
+     attributes(validity_generalization_y) <- base::append(attributes(validity_generalization_y), list(ma_type = "r_ad"))
      
      out <- list(method_details = c(ad_method = ad_method, measurement = meas_correction, range_restriction = range_restriction),
                  true_score = true_score,
@@ -721,7 +721,7 @@ gather_ma_ad <- function(x){
                ma_r_obj$meta$artifact_distribution <- list(true_score = out$true_score, 
                                                            validity_generalization_x = out$validity_generalization_x, 
                                                            validity_generalization_y = out$validity_generalization_y)
-               attributes(ma_r_obj$meta$artifact_distribution) <- append(attributes(ma_r_obj$meta$artifact_distribution), 
+               attributes(ma_r_obj$meta$artifact_distribution) <- base::append(attributes(ma_r_obj$meta$artifact_distribution), 
                                                                          list(method_details = out$method_details, inputs = inputs))
                ma_r_obj$artifact_distributions <- out$artifact_distributions
                rm(out)

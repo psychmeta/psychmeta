@@ -24,7 +24,6 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' \dontrun{
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id, citekey = NULL,
 #'                moderators = moderator, data = data_r_meas_multi,
@@ -37,16 +36,14 @@
 #' filter_ma(ma_obj, analyses=list(construct="X"), match="all")
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="any")
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
-#' }
 filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
      
      screen_ma(ma_obj = ma_obj)
      
-     .attributes <- attributes(ma_obj)
-     
      match <- match.arg(match, c("all", "any"))
      case_sensitive <- scalar_arg_warning(arg = case_sensitive, arg_name = "case_sensitive")
      
+     .attributes <- attributes(ma_obj)
      ma_method <- .attributes$ma_method
      
      if(any(colnames(ma_obj) == "group_contrast") | 
@@ -78,18 +75,17 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
 
      keep_meta <- rep(TRUE, nrow(ma_obj))
      
-     if(!is.null(construct_x) & !is.null(construct_y))
-          if(!is.null(analyses$construct)) {
-               if(is.vector(analyses$construct)) analyses$construct <- as.list(analyses$construct)
+     if(!is.null(construct_x) & !is.null(construct_y)){
+          if(!is.null(analyses[["construct"]])) {
+               if(is.vector(analyses[["construct"]])) analyses[["construct"]] <- as.list(analyses[["construct"]])
                if(match == "all"){
-                    keep_meta <- construct_x %in% analyses$construct | construct_y %in% analyses$construct
+                    keep_meta <- construct_x %in% analyses[["construct"]] | construct_y %in% analyses[["construct"]]
                }
           }
-     
-     if(!is.null(construct_x) & !is.null(construct_y))
-          if(!is.null(analyses$construct_pair)) {
+          
+          if(!is.null(analyses[["construct_pair"]])) {
                construct_pair_ids <-
-                    lapply(analyses$construct_pair, function(x){
+                    lapply(analyses[["construct_pair"]], function(x){
                          construct_x %in% x & construct_y %in% x
                     })
                if(match == "any"){
@@ -100,9 +96,10 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                          keep_meta <- keep_meta & construct_pair_ids[[i]]
                }
           } 
+     }
      
-     if(!is.null(analyses$k_min)) {
-          .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$k >= analyses$k_min))
+     if(!is.null(analyses[["k_min"]])) {
+          .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$k >= analyses[["k_min"]]))
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
           }else{
@@ -110,8 +107,8 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }
      }
      
-     if(!is.null(analyses$N_min)) {
-          .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$N >= analyses$N_min))
+     if(!is.null(analyses[["N_min"]])) {
+          .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$N >= analyses[["N_min"]]))
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
           }else{
@@ -120,7 +117,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
      }
      
      if(!is.null(analyses$analysis_id)) {
-          .keep_meta <- ma_obj$analysis_id %in% analyses$analysis_id
+          .keep_meta <- ma_obj[["analysis_id"]] %in% analyses[["analysis_id"]]
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
           }else{
@@ -129,8 +126,8 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
      }
      
      if(any(colnames(ma_obj) == "pair_id"))
-          if(!is.null(analyses$pair_id)) {
-               .keep_meta <- ma_obj$pair_id %in% analyses$pair_id
+          if(!is.null(analyses[["pair_id"]])) {
+               .keep_meta <- ma_obj[["pair_id"]] %in% analyses[["pair_id"]]
                if(match == "any"){
                     keep_meta <- keep_meta | .keep_meta
                }else{
@@ -139,8 +136,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }
 
      ma_obj <- ma_obj[keep_meta,]
-     attributes(ma_obj) <- .attributes
-     
+
      return(ma_obj)
 }
 
@@ -335,6 +331,3 @@ group_by.ma_psychmeta <- function (x, ..., add = FALSE){
      
      x
 } 
-
-
-

@@ -38,7 +38,6 @@ A \code{psychmeta} meta-analysis object with analyses matching the specified cri
 Filter \code{psychmeta} meta-analysis objects based on specified criteria.
 }
 \examples{
-\dontrun{
 ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                construct_x = x_name, construct_y = y_name, sample_id = sample_id, citekey = NULL,
                moderators = moderator, data = data_r_meas_multi,
@@ -51,5 +50,4 @@ filter_ma(ma_obj, analyses="all")
 filter_ma(ma_obj, analyses=list(construct="X"), match="all")
 filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="any")
 filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
-}
 }

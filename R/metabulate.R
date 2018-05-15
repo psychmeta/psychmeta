@@ -198,7 +198,7 @@ add_commas <- function(x, decimals = 0){
      out
 }
 
-ma_type = "ic_ts"
+
 .metabulate_es <- function(ma_obj, ma_list, ma_type = "bb", show_conf = TRUE, show_cred = TRUE, show_se = FALSE){
 
      if(ma_type == "bb") ma_tab <- ma_list$barebones
