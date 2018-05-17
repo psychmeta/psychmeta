@@ -11,8 +11,9 @@ create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
   ux_observed = TRUE, uy = NULL, uy_observed = TRUE,
   estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE,
   estimate_ut = TRUE, var_unbiased = TRUE, process_ads = TRUE,
-  collapse_method = c("composite", "average", "stop"), intercor = 0.5,
-  pairwise_ads = FALSE, supplemental_ads = NULL, data = NULL, ...)
+  collapse_method = c("composite", "average", "stop"),
+  intercor = control_intercor(), pairwise_ads = FALSE,
+  supplemental_ads = NULL, data = NULL, ...)
 }
 \arguments{
 \item{ad_type}{Type of artifact distributions to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.}

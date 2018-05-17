@@ -58,7 +58,7 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                               residual_ads = TRUE,
                               check_dependence = TRUE, 
                               collapse_method = c("composite", "average", "stop"),
-                              intercor = .5,
+                              intercor = control_intercor(),
                               clean_artifacts = TRUE, 
                               impute_artifacts = TRUE,
                               impute_method = c("bootstrap_mod", "bootstrap_full", 
@@ -84,7 +84,6 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                      check_dependence = check_dependence, 
                      collapse_method = collapse_method,
                      intercor = intercor,
-                     # partial_intercor = partial_intercor,
                      clean_artifacts = clean_artifacts, 
                      impute_artifacts = impute_artifacts,
                      impute_method = impute_method,
@@ -127,10 +126,7 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
      
      control$check_dependence <- scalar_arg_warning(control$check_dependence, arg_name = "check_dependence")
      control$collapse_method <- match.arg(control$collapse_method, c("composite", "average", "stop"))
-     # if(!is.numeric(control$intercor)) stop("'intercor' must be numeric", call. = FALSE)
-     # control$partial_intercor <- scalar_arg_warning(arg = control$partial_intercor, arg_name = "partial_intercor")
-     # if(!is.logical(control$partial_intercor)) stop("'partial_intercor' must be logical", call. = FALSE)
-     
+
      control$clean_artifacts <- scalar_arg_warning(arg = control$clean_artifacts, arg_name = "clean_artifacts")
      if(!is.logical(control$clean_artifacts)) stop("'clean_artifacts' must be logical", call. = FALSE)
      control$impute_artifacts <- scalar_arg_warning(arg = control$impute_artifacts, arg_name = "impute_artifacts")

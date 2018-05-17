@@ -248,7 +248,8 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                            estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                            estimate_ux = TRUE, estimate_ut = TRUE,
                            var_unbiased = TRUE, process_ads = TRUE,
-                           collapse_method = c("composite", "average", "stop"), intercor = .5, pairwise_ads = FALSE,
+                           collapse_method = c("composite", "average", "stop"),
+                           intercor = control_intercor(), pairwise_ads = FALSE,
                            supplemental_ads = NULL, data = NULL, ...){
 
      ad_type <- match.arg(ad_type, c("tsa", "int"))
