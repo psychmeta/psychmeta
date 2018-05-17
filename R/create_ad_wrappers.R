@@ -339,6 +339,24 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      if(any(is.na(full_data$measure_y))) full_data$measure_y[is.na(full_data$measure_y)] <- "No measure specified"
      full_data <- as.data.frame(full_data)
 
+     .create_ad_list_internal(full_data = full_data, ad_type = ad_type,
+                              intercor = intercor, collapse_method = collapse_method, 
+                              estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                              estimate_ux = estimate_ux, estimate_ut = estimate_ut,
+                              var_unbiased = var_unbiased,
+                              process_ads = process_ads, supplemental_ads = supplemental_ads, pairwise_ads = pairwise_ads)
+     
+}
+
+
+.create_ad_list_internal <- function(full_data, intercor, collapse_method, 
+                                     estimate_rxxa, estimate_rxxi,
+                                     estimate_ux, estimate_ut, var_unbiased,
+                                     process_ads, supplemental_ads, pairwise_ads = pairwise_ads, ad_type){
+     sample_id <- full_data$sample_id
+     construct_x <- full_data$construct_x
+     construct_y <- full_data$construct_y
+     
      construct_pair <- paste0("X = ", construct_x, ", Y = ", construct_y)
      data_x <- full_data[,c("sample_id", "n", "construct_x", "measure_x", "rxx", "rxx_restricted", "rxx_type", "ux", "ux_observed")]
      data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "uy", "uy_observed")]
@@ -538,7 +556,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      }
      class(ad_obj_list) <- c("ad_list", class(ad_obj_list))
      
-     ad_obj_list
+     ad_obj_list     
 }
 
 
