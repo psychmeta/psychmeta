@@ -17,7 +17,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage("This is ", paste(pkgname, "version", version))
     packageStartupMessage("Please report any bugs to: \ngithub.com/psychmeta/psychmeta/issues or issues@psychmeta.com \n")
-    packageStartupMessage("We work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \nDahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for \n   psychometric meta-analysis. Applied Psychological Measurement.")
+    packageStartupMessage("We work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \n\nDahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for \n   psychometric meta-analysis. Applied Psychological Measurement.")
 
     ## Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.
     if(try(is.character(RCurl::getURL("http://www.r-pkg.org/badges/version/psychmeta")), silent = TRUE) == TRUE){
@@ -41,18 +41,33 @@ globalVariables(c(".", "Value",                                  ## Global varia
          vcheck <- vcheck_equal | vcheck_greater
          development <- all(vcheck) & any(vcheck_greater)
          
+         get_os <- function() {
+              if (.Platform$OS.type == "windows") { 
+                   "win"
+              } else if (Sys.info()["sysname"] == "Darwin") {
+                   "mac" 
+              } else if (.Platform$OS.type == "unix") { 
+                   "unix"
+              } else {
+                   stop("Unknown OS")
+              }
+         }
+         use_symbols <- get_os() != "windows"
+         
          if(out_of_date){
-              # packageStartupMessage(paste("\n", crayon::red(cli::symbol$cross), "Oh no! It looks like your copy of psychmeta is out of date!"))
-              packageStartupMessage("\nOh no! It looks like your copy of psychmeta is out of date!")
+              version_message <- "Oh no! It looks like your copy of psychmeta is out of date!"
+              if(use_symbols) version_message <- paste0(crayon::red(cli::symbol$cross), " ", version_message)
+              packageStartupMessage(paste0("\n", version_message))
               packageStartupMessage("No worries, it's easy to obtain the latest version - just run the following command: \n")
               packageStartupMessage('                       update.packages("psychmeta")')
          }else{
               if(development){
-                   packageStartupMessage("\nKudos! Your copy of psychmeta is more recent than the current CRAN release!")    
+                   version_message <- "Kudos! Your copy of psychmeta is more recent than the current CRAN release!"
               }else{
-                   # packageStartupMessage(paste("\n", crayon::green(cli::symbol$tick), 'Yay! Your copy of psychmeta is up to date!'))
-                   packageStartupMessage("\nYay! Your copy of psychmeta is up to date!")    
+                   version_message <- "Yay! Your copy of psychmeta is up to date!"
               }
+              if(use_symbols) version_message <- paste0(crayon::green(cli::symbol$tick), " ", version_message)
+              packageStartupMessage(paste0("\n", version_message))
          }
          
          if(sys_v_num[4] > 0)
