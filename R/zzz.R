@@ -16,9 +16,10 @@ globalVariables(c(".", "Value",                                  ## Global varia
 .onAttach <- function(libname, pkgname) {
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage("This is ", paste(pkgname, "version", version))
-    packageStartupMessage("Please report any bugs to: \ngithub.com/psychmeta/psychmeta/issues or issues@psychmeta.com \n")
-    packageStartupMessage("We work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \n\nDahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for \n   psychometric meta-analysis. Applied Psychological Measurement.")
-
+    packageStartupMessage("Please report any bugs to github.com/psychmeta/psychmeta/issues or issues@psychmeta.com")
+    packageStartupMessage("\nWe work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \nDahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for \n   psychometric meta-analysis. Applied Psychological Measurement.")
+    packageStartupMessage("\nFind info about psychmeta on the web at psychmeta.com and twitter.com/psychmetaR")
+    
     ## Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.
     if(try(is.character(RCurl::getURL("http://www.r-pkg.org/badges/version/psychmeta")), silent = TRUE) == TRUE){
          pkg_badge <- xml2::read_html("http://www.r-pkg.org/badges/version/psychmeta")
@@ -71,7 +72,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
          }
          
          if(sys_v_num[4] > 0)
-              packageStartupMessage(paste0("\nNOTE: You are currently using a UNRELEASED development build of psychmeta (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
+              packageStartupMessage(paste0("NOTE: You are currently using an UNRELEASED development build of psychmeta (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
     }
 }
 
