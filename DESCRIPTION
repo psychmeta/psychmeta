@@ -21,7 +21,7 @@ VignetteBuilder: knitr
 Imports: stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
         ggplot2, dplyr, metafor, nor1mix, progress, tidyr, rtf,
         fungible, stringr , rmarkdown, RefManageR, rlang, RCurl, xml2, purrr, data.table
-Suggests: knitr
+Suggests: knitr, cli, crayon
 RoxygenNote: 6.0.1
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068
