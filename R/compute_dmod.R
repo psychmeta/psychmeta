@@ -616,7 +616,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
 #' # Compute point estimates of non-parametric d_mod effect sizes:
 #' compute_dmod(data = dat, group = "G", predictors = "X", criterion = "Y",
 #'      referent_id = 1, focal_id_vec = 2:4,
-#'      conf_level = .95, rescale_cdf = TRUE, parametric = TRUE,
+#'      conf_level = .95, rescale_cdf = TRUE, parametric = FALSE,
 #'      bootstrap = FALSE)
 #'
 #' # Compute unstratified bootstrapped estimates of parametric d_mod effect sizes:
@@ -640,12 +640,12 @@ compute_dmod <- function(data, group, predictors, criterion,
                     conf_level = conf_level, rescale_cdf = rescale_cdf, parametric = parametric,
                     bootstrap = bootstrap, boot_iter = boot_iter, stratify = stratify, empirical_ci = empirical_ci,
                     cross_validate_wts = cross_validate_wts)
-
+     
      if(!is.data.frame(data)) data <- as.data.frame(data)
      group <- match_variables(call = call[[match("group", names(call))]], arg = group, arg_name = "group", data = data)
      predictors <- match_variables(call = call[[match("predictors", names(call))]], arg = predictors, arg_name = "predictors", data = data)
      criterion <- match_variables(call = call[[match("criterion", names(call))]], arg = criterion, arg_name = "criterion", data = data)
-
+     
      if(!is.null(dim(group))){
           if(ncol(group) > 1){
                stop("Only 1 group variable may be specified in 'group'", call. = FALSE)
@@ -656,15 +656,15 @@ compute_dmod <- function(data, group, predictors, criterion,
                stop("Only 1 criterion variable may be specified in 'criterion'", call. = FALSE)
           }
      }
-
+     
      data <- data.frame(G = group, Y = unlist(criterion), predictors)
      xNames <- colnames(data)[-(1:2)]
-
+     
      groupNames <- levels(factor(data[,"G"]))
      referentId <- which(groupNames == referent_id)
      if(length(referentId) == 0)
           stop("The 'referent_id' specified does not match a level of the grouping factor")
-
+     
      if(is.null(focal_id_vec)){
           focalId <- which(groupNames != referent_id)
           focal_id_vec<- groupNames[focalId]
@@ -675,73 +675,77 @@ compute_dmod <- function(data, group, predictors, criterion,
           if(length(unlist(focalId)) < length(focal_id_vec))
                stop("'focal_id_vec' contains invalid group indices")
      }
-
+     
      if(any(referentId == unlist(focalId)))
           warning("'focal_id_vec' contains the value specified for 'referent_id'")
-
+     
      sd_vec <- unlist(by(data[,-1], INDICES = data[,"G"], function(x){
           apply(x, 2, sd, na.rm = TRUE)}))
-
+     
      if(any(is.na(sd_vec))){
           whichInvalidSd <- names(which(is.na(sd_vec)))
           whichInvalidSd <- strsplit(x = whichInvalidSd, split = "[.]")
           varVecInvalidSd <- lapply(whichInvalidSd, function(x) x[length(x)])
           groupVecInvalidSd <- lapply(whichInvalidSd, function(x) paste(x[-length(x)], sep = "."))
-
+          
           print(data.frame(Group = unlist(groupVecInvalidSd), Variable = unlist(varVecInvalidSd)))
           stop("The variables associated with the groups listed above have no non-NA cases")
      }
-
+     
      if(any(0 == sd_vec)){
           whichInvalidSd <- names(which(sd_vec == 0))
           whichInvalidSd <- strsplit(x = whichInvalidSd, split = "[.]")
           varVecInvalidSd <- lapply(whichInvalidSd, function(x) x[length(x)])
           groupVecInvalidSd <- lapply(whichInvalidSd, function(x) paste(x[-length(x)], sep = "."))
-
+          
           print(data.frame(Group = unlist(groupVecInvalidSd), Variable = unlist(varVecInvalidSd)))
           stop("The variables associated with the groups listed above have variances of zero")
      }
-
+     
      regModel <- lm(as.formula(paste("Y ~", paste(xNames, collapse = " + "))), data = data)$coeff
      xFun <- function(replace = TRUE, parametric = TRUE, showFullResult = FALSE){
-          if(stratify){
-               invalidRep <- TRUE
-               while(invalidRep){
-                    stratDat <- by(data, INDICES = data[,"G"], function(x){
-                         x[sample(1:nrow(x), nrow(x), replace = replace),]
-                    })
-                    data_i <- NULL
-                    for(i in 1:length(stratDat)) data_i <- rbind(data_i, stratDat[[i]])
-                    sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
-                         apply(x, 2, sd, na.rm = TRUE)}))
-                    invalidRep <- any(0 == sd_vec) | any(is.na(sd_vec))
-               }
+          if(replace){
+               if(stratify){
+                    invalidRep <- TRUE
+                    while(invalidRep){
+                         stratDat <- by(data, INDICES = data[,"G"], function(x){
+                              x[sample(1:nrow(x), nrow(x), replace = replace),]
+                         })
+                         data_i <- NULL
+                         for(i in 1:length(stratDat)) data_i <- rbind(data_i, stratDat[[i]])
+                         sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
+                              apply(x, 2, sd, na.rm = TRUE)}))
+                         invalidRep <- any(0 == sd_vec) | any(is.na(sd_vec))
+                    }
+               }else{
+                    invalidRep <- TRUE
+                    while(invalidRep){
+                         data_i <- data[sample(1:nrow(data), nrow(data), replace = replace),]
+                         sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
+                              apply(x, 2, sd, na.rm = TRUE)}))
+                         invalidRep <- any(length(by(data_i, INDICES = data_i[,"G"], nrow)) < length(groupNames) |
+                                                as.numeric(by(data_i, INDICES = data_i[,"G"], nrow)) < 3) |
+                              any(0 == sd_vec) | any(is.na(sd_vec))
+                    }
+               }    
           }else{
-               invalidRep <- TRUE
-               while(invalidRep){
-                    data_i <- data[sample(1:nrow(data), nrow(data), replace = replace),]
-                    sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
-                         apply(x, 2, sd, na.rm = TRUE)}))
-                    invalidRep <- any(length(by(data_i, INDICES = data_i[,"G"], nrow)) < length(groupNames) |
-                                           as.numeric(by(data_i, INDICES = data_i[,"G"], nrow)) < 3) |
-                         any(0 == sd_vec) | any(is.na(sd_vec))
-               }
+               data_i <- data
           }
-
-          if(length(predictors) > 1){
+          
+          if(ncol(data) > 3){
                if(!cross_validate_wts)
                     regModel <- lm(as.formula(paste("Y ~", paste(xNames, collapse = " + "))), data = data_i)$coeff
                data_i <- data.frame(cbind(data_i[,1:2],
-                                         X = as.numeric(apply(as.matrix(data_i[,xNames]), 1,
-                                                              function(x) regModel[-1] %*% x))))
+                                          X = as.numeric(apply(as.matrix(data_i[,xNames]), 1,
+                                                               function(x) regModel[-1] %*% x))))
           }else{
                data_i <- data.frame(cbind(data_i[,1:2], X = unlist(data_i[,3])))
           }
-
+          
           regList <- by(data_i, INDICES = data_i$G, function(x) lm(Y ~ X, data = x)$coeff)
           meanList <- by(data_i, INDICES = data_i$G, function(x) apply(x[,c("Y", "X")], 2, mean))
           sdList <- by(data_i, INDICES = data_i$G, function(x) apply(x[,c("Y", "X")], 2, sd))
-
+          
           intVec <- as.numeric(lapply(regList, function(x) x[1]))
           slopeVec <- as.numeric(lapply(regList, function(x) x[2]))
           xMeanVec <- as.numeric(lapply(meanList, function(x) x["X"]))
@@ -750,7 +754,7 @@ compute_dmod <- function(data, group, predictors, criterion,
           ySdVec <- as.numeric(lapply(sdList, function(x) x["Y"]))
           minVec <- c(by(data_i[,"X"], INDICES = data_i$G, min))
           maxVec <- c(by(data_i[,"X"], INDICES = data_i$G, max))
-
+          
           if(parametric){
                out <- compute_dmod_par(referent_int = intVec[referentId],
                                        referent_slope = slopeVec[referentId],
@@ -765,28 +769,28 @@ compute_dmod <- function(data, group, predictors, criterion,
                                        rescale_cdf = rescale_cdf)$point_estimate
           }else{
                out <- data.frame(t(apply(t(focalId), 2, function(x){
-                   x_out <-  compute_dmod_npar(referent_int = intVec[referentId],
-                                               referent_slope = slopeVec[referentId],
-                                               focal_int = intVec[x],
-                                               focal_slope = slopeVec[x],
-                                               focal_x = data_i[data_i$G == groupNames[x],"X"],
-                                               referent_sd_y = ySdVec[referentId])$point_estimate
-                   class(x_out) <- NULL
-                   unlist(x_out)
+                    x_out <-  compute_dmod_npar(referent_int = intVec[referentId],
+                                                referent_slope = slopeVec[referentId],
+                                                focal_int = intVec[x],
+                                                focal_slope = slopeVec[x],
+                                                focal_x = data_i[data_i$G == groupNames[x],"X"],
+                                                referent_sd_y = ySdVec[referentId])$point_estimate
+                    class(x_out) <- NULL
+                    unlist(x_out)
                })))
                out <- cbind(focal_group = focal_id_vec, out)
           }
           class(out) <- NULL
           as.data.frame(out)
      }
-
+     
      if(bootstrap){
           obsOut <- xFun(replace = FALSE, parametric = parametric)
-
+          
           repOut <- t(replicate(boot_iter, c(as.matrix(xFun(parametric = parametric)[,-1]))))
           bootstrap_mean <- matrix(apply(repOut, 2, mean), nrow(obsOut), ncol(obsOut) - 1, FALSE)
           bootstrap_se <- matrix(apply(repOut, 2, sd), nrow(obsOut), ncol(obsOut) - 1, FALSE)
-
+          
           if(empirical_ci){
                bootstrap_CI_LL <- matrix(apply(repOut, 2, function(x)
                     sort(x)[nrow(repOut) * (1 - conf_level) / 2]), nrow(obsOut), ncol(obsOut) - 1, FALSE)
@@ -796,20 +800,20 @@ compute_dmod <- function(data, group, predictors, criterion,
                bootstrap_CI_LL <- bootstrap_mean - qnorm((1 - (1 - conf_level) / 2)) * bootstrap_se
                bootstrap_CI_UL <- bootstrap_mean + qnorm((1 - (1 - conf_level) / 2)) * bootstrap_se
           }
-
+          
           colnames(bootstrap_mean) <- colnames(bootstrap_se) <- colnames(bootstrap_CI_LL) <- colnames(bootstrap_CI_UL) <- colnames(obsOut)[-1]
           bootstrap_mean <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_mean))
           bootstrap_se <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_se))
           bootstrap_CI_LL <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_CI_LL))
           bootstrap_CI_UL <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_CI_UL))
-
+          
           out <- list(point_estimate = obsOut, bootstrap_mean = bootstrap_mean, bootstrap_se = bootstrap_se,
                       bootstrap_CI_LL = bootstrap_CI_LL, bootstrap_CI_UL = bootstrap_CI_UL)
           names(out)[-(1:3)] <- paste(names(out)[-(1:3)], "_", conf_level * 100, sep = "")
      }else{
           out <- list(point_estimate = xFun(replace = FALSE, parametric = parametric, showFullResult = !bootstrap))
      }
-
+     
      out <- append(list(call = call, inputs = inputs), out)
 
      if(parametric){
