@@ -73,6 +73,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
          
          if(sys_v_num[4] > 0)
               packageStartupMessage(paste0("NOTE: You are currently using an UNRELEASED development build of psychmeta (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
+         packageStartupMessage("\n")
     }
 }
 
