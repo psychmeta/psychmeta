@@ -20,30 +20,27 @@
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.
-#' @param construct_x Vector of construct names for construct initially designated as X.
-#' @param construct_y Vector of construct names for construct initially designated as Y.
-#' @param measure_x Vector of names for measures associated with constructs initially designated as "X".
-#' @param measure_y Vector of names for measures associated with constructs initially designated as "Y".
+#' @param construct_x,construct_y Vector of construct names for construct initially designated as "X" or as "Y".
+#' @param measure_x,measure_y Vector of names for measures associated with constructs initially designated as "X" or as "Y".
 #' @param construct_order Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rel Optional named vector that supersedes \code{correct_rxx} and \code{correct_ryy}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for unreliability.
-#' @param correct_rxx Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
-#' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_rxx,correct_ryy Logical scalar or vector that determines whether to correct the X or Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rr Optional named vector that supersedes \code{correct_rr_x} and \code{correct_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for range restriction.
-#' @param correct_rr_x Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.
-#' @param correct_rr_y Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.
+#' @param correct_rr_x Logical scalar, logical vector, or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.
+#' @param correct_rr_y Logical scalar, logical vector, or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.
 #' @param indirect_rr Optional named vector that supersedes \code{indirect_rr_x} and \code{indirect_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.
 #' @param indirect_rr_x Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in X (\code{TRUE}) or not (\code{FALSE}).
 #' Superseded in evaluation by \code{correct_rr_x} (i.e., if \code{correct_rr_x} == \code{FALSE}, the value supplied for \code{indirect_rr_x} is disregarded).
 #' @param indirect_rr_y Logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for indirect range restriction in Y (\code{TRUE}) or not (\code{FALSE}).
 #' Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} == \code{FALSE}, the value supplied for \code{indirect_rr_y} is disregarded).
 #' @param rxx Vector or column name of reliability estimates for X.
-#' @param rxx_restricted Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param rxx_restricted Logical vector or column name determining whether each element of \code{rxx} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param ryy Vector or column name of reliability estimates for Y.
-#' @param ryy_restricted Logical vector or column name determining whether each element of ryy is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param ryy_restricted Logical vector or column name determining whether each element of code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. Acceptable reliability types are:
 #' \itemize{
 #' \item{internal_consistency}{\cr A generic designation for internal-consistency reliability estimates derived from responses to a single test administration.}
@@ -68,6 +65,7 @@
 #' \item{parallel_delayed}{\cr Parallel-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
 #' \item{alternate_delayed}{\cr Alternate-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
 #' }
+#' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param ux Vector or column name of u ratios for X.
 #' @param ux_observed Logical vector or column name determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
 #' @param uy Vector or column name of u ratios for Y.
@@ -352,8 +350,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  correct_rel = NULL, correct_rxx = TRUE, correct_ryy = TRUE,
                  correct_rr = NULL, correct_rr_x = TRUE, correct_rr_y = TRUE,
                  indirect_rr = NULL, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
-                 rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
-                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                 rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NULL,
+                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
                  ux = NULL, ux_observed = TRUE,
                  uy = NULL, uy_observed = TRUE,
                  sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
@@ -477,16 +475,22 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(deparse(substitute(rxx_type))[1] != "NULL")
                rxx_type <- match_variables(call = call_full[[match("rxx_type", names(call_full))]], arg = rxx_type, arg_name = "rxx_type", data = data)
-
+          
+          if(deparse(substitute(k_items_x))[1] != "NULL")
+               k_items_x <- match_variables(call = call_full[[match("k_items_x", names(call_full))]], arg = k_items_x, arg_name = "k_items_x", data = data)
+          
           if(deparse(substitute(ryy))[1] != "NULL")
                ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, arg_name = "ryy", data = data)
 
           if(deparse(substitute(ryy_restricted))[1] != "NULL")
                ryy_restricted <- match_variables(call = call_full[[match("ryy_restricted", names(call_full))]], arg = ryy_restricted, arg_name = "ryy_restricted", data = data)
-
+          
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
-
+          
+          if(deparse(substitute(k_items_y))[1] != "NULL")
+               k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
+          
           if(deparse(substitute(ux))[1] != "NULL")
                ux <- match_variables(call = call_full[[match("ux", names(call_full))]], arg = ux, arg_name = "ux", data = data)
 
@@ -777,6 +781,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxx_consistency <- convert_reltype2consistency(rel_type = rxx_type)
      ryy_consistency <- convert_reltype2consistency(rel_type = ryy_type)
 
+     if(is.null(k_items_x)) k_items_x <- rep(NA, length(rxyi))
+     if(is.null(k_items_y)) k_items_y <- rep(NA, length(rxyi))
+     
      if(use_all_arts & any(!valid_r)){
           .rxx_type <- rxx_type[!valid_r]
           .ryy_type <- ryy_type[!valid_r]
@@ -817,6 +824,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           .uy <- manage_arglength(x = uy, y = rxyi)[!valid_r]
           .uy_observed <- manage_arglength(x = uy_observed, y = rxyi)[!valid_r]
 
+          .k_items_x <- manage_arglength(x = k_items_x, y = rxyi)[!valid_r]
+          .k_items_y <- manage_arglength(x = k_items_y, y = rxyi)[!valid_r]
+          
           if(!is.null(sample_id)){
                sample_id <- as.character(sample_id)
 
@@ -844,7 +854,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                .rxx_type <- .rxx_type[!.valid_r_xy]
                .ux <- .ux[!.valid_r_xy]
                .ux_observed <- .ux_observed[!.valid_r_xy]
-
+               .k_items_x <- .k_items_x[!.valid_r_xy]
+               
                if(!is.null(.construct_y)) .construct_y <- .construct_y[!.valid_r_xy]
                if(!is.null(.measure_y)) .measure_y <- .measure_y[!.valid_r_xy]
                .ryy <- .ryy[!.valid_r_xy]
@@ -852,7 +863,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                .ryy_type <- .ryy_type[!.valid_r_xy]
                .uy <- .uy[!.valid_r_xy]
                .uy_observed <- .uy_observed[!.valid_r_xy]
-
+               .k_items_y <- .k_items_y[!.valid_r_xy]
+               
 
                if(is.null(.construct_x)) .construct_x[.valid_r_x] <-NA
                if(is.null(.measure_x)) .measure_x[.valid_r_x] <-NA
@@ -860,7 +872,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     .rxx_restricted[.valid_r_x] <-
                     .rxx_type[.valid_r_x] <-
                     .ux[.valid_r_x] <-
-                    .ux_observed[.valid_r_x] <- NA
+                    .ux_observed[.valid_r_x] <- 
+                    .k_items_x[.valid_r_x] <- NA
 
                if(is.null(.construct_y)) .construct_y[.valid_r_y] <- NA
                if(is.null(.measure_y)) .measure_y[.valid_r_y] <- NA
@@ -868,15 +881,16 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     .ryy_restricted[.valid_r_y] <-
                     .ryy_type[.valid_r_y] <-
                     .uy[.valid_r_y] <-
-                    .uy_observed[.valid_r_y] <- NA
+                    .uy_observed[.valid_r_y] <- 
+                    .k_items_y[.valid_r_y] <- NA
           }
 
           if(length(.n) > 0){
                .supplemental_ads <- create_ad_list(sample_id = .sample_id, n = .n,
                                                    construct_x = .construct_x, measure_x = .measure_x,
                                                    construct_y = .construct_y, measure_y = .measure_y,
-                                                   rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type,
-                                                   ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type,
+                                                   rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type, k_items_x = .k_items_x,
+                                                   ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type, k_items_y = .k_items_y, 
                                                    ux = .ux, ux_observed = .ux_observed,
                                                    uy = .uy, uy_observed = .uy_observed, process_ads = FALSE)
 
@@ -921,7 +935,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      ux_observed <- manage_arglength(x = ux_observed, y = rxyi)[valid_r]
      uy <- manage_arglength(x = uy, y = rxyi)[valid_r]
      uy_observed <- manage_arglength(x = uy_observed, y = rxyi)[valid_r]
-
+     k_items_x <- manage_arglength(x = k_items_x, y = rxyi)[valid_r]
+     k_items_y <- manage_arglength(x = k_items_y, y = rxyi)[valid_r]
+     
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
@@ -952,6 +968,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(!is.null(rxx_restricted)){data_x$rxx_restricted <- rxx_restricted}else{data_x$rxx_restricted <- TRUE}
           if(!is.null(rxx_type)){data_x$rxx_type <- rxx_type}else{data_x$rxx_type <- "alpha"}
           if(!is.null(rxx_consistency)){data_x$rxx_consistency <- rxx_consistency}else{data_x$rxx_consistency <- TRUE}
+          if(!is.null(k_items_x)){data_x$k_items_x <- k_items_x}else{data_x$k_items_x <- NA}
           if(!is.null(ux)){data_x$ux <- ux}else{data_x$ux <- NA}
           if(!is.null(ux_observed)){data_x$ux_observed <- ux_observed}else{data_x$ux_observed <- TRUE}
           if(!is.null(correct_rr_x)){data_x$correct_rr_x <- correct_rr_x}else{data_x$correct_rr_x <- FALSE}
@@ -963,6 +980,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(!is.null(ryy_restricted)){data_y$ryy_restricted <- ryy_restricted}else{data_y$ryy_restricted <- TRUE}
           if(!is.null(ryy_type)){data_y$ryy_type <- ryy_type}else{data_y$ryy_type <- "alpha"}
           if(!is.null(ryy_consistency)){data_y$ryy_consistency <- ryy_consistency}else{data_y$ryy_consistency <- TRUE}
+          if(!is.null(k_items_y)){data_y$k_items_y <- k_items_y}else{data_y$k_items_y <- NA}
           if(!is.null(uy)){data_y$uy <- uy}else{data_y$uy <- NA}
           if(!is.null(uy_observed)){data_y$uy_observed <- uy_observed}else{data_y$uy_observed <- TRUE}
           if(!is.null(correct_rr_y)){data_y$correct_rr_y <- correct_rr_y}else{data_y$correct_rr_y <- FALSE}

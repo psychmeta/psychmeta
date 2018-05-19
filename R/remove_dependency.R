@@ -342,14 +342,20 @@
                     }
                }
           }
+          
+          if(ma_method != "bb"){
+               k_items_x_comp <- wt_mean(x = data_x$k_items_x[i], wt = es_data$n[i])
+               k_items_y_comp  <- wt_mean(x = data_x$k_items_y[i], wt = es_data$n[i])
+          }
 
           if(ma_method == "bb") rxx_comp <- ux_comp <- ryy_comp <- uy_comp <-
                rxx_restricted_comp <- ryy_restricted_comp <- ux_observed_comp <- uy_observed_comp <-
-               correct_rr_x <- correct_rr_y <- indirect_rr_x <- indirect_rr_y <- NULL
+               correct_rr_x <- correct_rr_y <- indirect_rr_x <- indirect_rr_y <- 
+                    k_items_x_comp <- k_items_y_comp <- NULL
 
           n_comp <- wt_mean(x = es_data$n[i], wt = es_data$n_adj[i])
           n_adj_comp <- wt_mean(x = es_data$n_adj[i], wt = es_data$n_adj[i])
-
+          
           if(all(c("d", "n1", "n2", "pi", "pa") %in% colnames(es_data))){
                n1_comp <- wt_mean(x = es_data$n1[i], wt = es_data$n_adj[i])
                n2_comp <- wt_mean(x = es_data$n2[i], wt = es_data$n_adj[i])
@@ -368,7 +374,9 @@
                       ryy_restricted_comp = ryy_restricted_comp,
                       ux_observed_comp = ux_observed_comp,
                       uy_observed_comp = uy_observed_comp,
-
+                      k_items_x_comp = k_items_x_comp, 
+                      k_items_y_comp = k_items_y_comp, 
+                      
                       correct_rr_x = correct_rr_x[i][1],
                       correct_rr_y = correct_rr_y[i][1],
 
@@ -441,7 +449,8 @@
      data_x_list <- list(rxx = unlist(lapply(out, function(x) x$rxx_comp)),
                          rxx_type = unlist(lapply(out, function(x) x$rxx_type)),
                          rxx_consistency = unlist(lapply(out, function(x) x$rxx_consistency)),
-
+                         k_items_x = unlist(lapply(out, function(x) x$k_items_x_comp)),
+                         
                          ux = unlist(lapply(out, function(x) x$ux_comp)),
                          rxx_restricted = unlist(lapply(out, function(x) x$rxx_restricted_comp)),
                          ux_observed = unlist(lapply(out, function(x) x$ux_observed_comp)),
@@ -455,7 +464,8 @@
      data_y_list <- list(ryy = unlist(lapply(out, function(x) x$ryy_comp)),
                          ryy_type = unlist(lapply(out, function(x) x$ryy_type)),
                          ryy_consistency = unlist(lapply(out, function(x) x$ryy_consistency)),
-
+                         k_items_y = unlist(lapply(out, function(x) x$k_items_y_comp)),
+                         
                          uy = unlist(lapply(out, function(x) x$uy_comp)),
                          ryy_restricted = unlist(lapply(out, function(x) x$ryy_restricted_comp)),
                          uy_observed = unlist(lapply(out, function(x) x$uy_observed_comp)),

@@ -16,8 +16,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     correct_bias = TRUE, correct_rxx = TRUE, correct_ryy = TRUE,
                     correct_rr_x = TRUE, correct_rr_y = TRUE,
                     indirect_rr_x = TRUE, indirect_rr_y = TRUE,
-                    rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
-                    ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                    rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NULL,
+                    ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
                     ux = NULL, ux_observed = TRUE,
                     uy = NULL, uy_observed = TRUE,
                     sign_rxz = 1, sign_ryz = 1,
@@ -124,6 +124,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(deparse(substitute(rxx_type))[1] != "NULL")
                rxx_type <- match_variables(call = call_full[[match("rxx_type", names(call_full))]], arg = rxx_type, arg_name = "rxx_type", data = data)
           
+          if(deparse(substitute(k_items_x))[1] != "NULL")
+               k_items_x <- match_variables(call = call_full[[match("k_items_x", names(call_full))]], arg = k_items_x, arg_name = "k_items_x", data = data)
+          
           if(deparse(substitute(ryy))[1] != "NULL")
                ryy <- match_variables(call = call_full[[match("ryy",  names(call_full))]], arg = ryy, arg_name = "ryy", data = data)
           
@@ -132,6 +135,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
+          
+          if(deparse(substitute(k_items_y))[1] != "NULL")
+               k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
           
           if(deparse(substitute(ux))[1] != "NULL")
                ux <- match_variables(call = call_full[[match("ux",  names(call_full))]], arg = ux, arg_name = "ux", data = data)
@@ -192,7 +198,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(is.null(ryy)){correct_ryy <- FALSE}else{if(all(is.na(ryy))){correct_ryy <- FALSE}}
      if(is.null(ux)){correct_rr_x <- FALSE}else{if(all(is.na(ux))){correct_rr_x <- FALSE}}
      if(is.null(uy)){correct_rr_y <- FALSE}else{if(all(is.na(uy))){correct_rr_y <- FALSE}}
-     
+     if(is.null(k_items_x)) k_items_x <- rep(NA, length(rxyi))
+     if(is.null(k_items_y)) k_items_y <- rep(NA, length(rxyi))
      if(is.null(n_adj)) n_adj <- n
      
      valid_r <- filter_r(r_vec = rxyi, n_vec = n)
@@ -209,6 +216,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      ryy_type <- manage_arglength(x = ryy_type, y = rxyi)
      correct_rxx <- manage_arglength(x = correct_rxx, y = rxyi)
      correct_ryy <- manage_arglength(x = correct_ryy, y = rxyi)
+     k_items_x <- manage_arglength(x = k_items_x, y = rxyi)
+     k_items_y <- manage_arglength(x = k_items_y, y = rxyi)
      
      if(use_all_arts & any(!valid_r)){
           .rxx_type <- rxx_type[!valid_r]
@@ -224,11 +233,14 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           .uy <- manage_arglength(x = uy, y = rxyi)[!valid_r]
           .uy_observed <- manage_arglength(x = uy_observed, y = rxyi)[!valid_r]
           
+          .k_items_x <- manage_arglength(x = k_items_x, y = rxyi)[!valid_r]
+          .k_items_y <- manage_arglength(x = k_items_y, y = rxyi)[!valid_r]
+          
           .supplemental_ads <- create_ad_list(n = .n,
                                               construct_x = rep("X", length(.n)),
                                               construct_y = rep("Y", length(.n)),
-                                              rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type,
-                                              ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type,
+                                              rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type, k_items_x = .k_items_x,
+                                              ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type, k_items_y = .k_items_y,
                                               ux = .ux, ux_observed = .ux_observed,
                                               uy = .uy, uy_observed = .uy_observed, process_ads = FALSE)
           .supplemental_ads_x <- .supplemental_ads$X
@@ -291,10 +303,13 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
      rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
+     k_items_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){k_items_x[rxx_restricted]}else{NULL}}else{NULL}
+     k_items_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){k_items_x[!rxx_restricted]}else{NULL}}else{NULL}
      
      if(is.null(ad_x_int))
-          ad_x_int <- suppressWarnings(create_ad_supplemental(ad_type = "int", rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                                              rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+          ad_x_int <- suppressWarnings(create_ad_supplemental(ad_type = "int",
+                                                              rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
+                                                              rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
                                                               ux = .ux, ni_ux = n_ux, wt_ux = n_ux,
                                                               ut = ut, ni_ut = n_ut, wt_ut = n_ut,
                                                               var_unbiased = var_unbiased,
@@ -303,8 +318,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                               supplemental_ads = supplemental_ads_x))
      
      if(is.null(ad_x_tsa))
-          ad_x_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa", rxxa = rxxa, n_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                                              rxxi = rxxi, n_rxxi = n_rxxi, rxxi_type = rxxi_type,
+          ad_x_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa",
+                                                              rxxa = rxxa, n_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
+                                                              rxxi = rxxi, n_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
                                                               ux = .ux, ni_ux = n_ux,
                                                               ut = ut, ni_ut = n_ut,
                                                               var_unbiased = var_unbiased,
@@ -324,10 +340,13 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      ryyi_type <- if(!is.null(ryy)){if(any(ryy_restricted)){ryy_type[ryy_restricted]}else{NULL}}else{NULL}
      ryya_type <- if(!is.null(ryy)){if(any(!ryy_restricted)){ryy_type[!ryy_restricted]}else{NULL}}else{NULL}
+     k_items_ryyi <- if(!is.null(ryy)){if(any(ryy_restricted)){k_items_y[ryy_restricted]}else{NULL}}else{NULL}
+     k_items_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){k_items_y[!ryy_restricted]}else{NULL}}else{NULL}
      
      if(is.null(ad_y_int))
-          ad_y_int <- suppressWarnings(create_ad_supplemental(ad_type = "int", rxxa = ryya, n_rxxa = n_ryya, wt_rxxa = n_ryya, rxxa_type = ryya_type,
-                                                              rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi, rxxi_type = ryyi_type,
+          ad_y_int <- suppressWarnings(create_ad_supplemental(ad_type = "int", 
+                                                              rxxa = ryya, n_rxxa = n_ryya, wt_rxxa = n_ryya, rxxa_type = ryya_type, k_items_rxxa = k_items_ryya,
+                                                              rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi, rxxi_type = ryyi_type, k_items_rxxi = k_items_ryyi,
                                                               ux = .uy, ni_ux = n_uy, wt_ux = n_uy,
                                                               ut = up, ni_ut = n_up, wt_ut = n_up,
                                                               var_unbiased = var_unbiased,
@@ -336,8 +355,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                               supplemental_ads = supplemental_ads_y))
      
      if(is.null(ad_y_tsa))
-          ad_y_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa", rxxa = ryya, n_rxxa = n_ryya, rxxa_type = ryya_type,
-                                                              rxxi = ryyi, n_rxxi = n_ryyi, rxxi_type = ryyi_type,
+          ad_y_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa", 
+                                                              rxxa = ryya, n_rxxa = n_ryya, rxxa_type = ryya_type, k_items_rxxa = k_items_ryya,
+                                                              rxxi = ryyi, n_rxxi = n_ryyi, rxxi_type = ryyi_type, k_items_rxxi = k_items_ryyi,
                                                               ux = .uy, ni_ux = n_uy,
                                                               ut = up, ni_ut = n_up,
                                                               var_unbiased = var_unbiased,

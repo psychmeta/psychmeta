@@ -48,6 +48,7 @@
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
+#' @param k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param pi Scalar or vector containing the restricted-group proportions of group membership. If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param pa Scalar or vector containing the unrestricted-group proportions of group membership (default = .5). If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param uy Vector or column name of u ratios for Y.
@@ -237,7 +238,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  correct_rr = NULL, correct_rr_g = TRUE, correct_rr_y = TRUE,
                  indirect_rr = NULL, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                  rGg = NULL, pi = NULL, pa = NULL,
-                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
                  uy = NULL, uy_observed = TRUE,
                  sign_rz = NULL, sign_rgz = 1, sign_ryz = 1,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
@@ -319,7 +320,10 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, data = data)
-
+          
+          if(deparse(substitute(k_items_y))[1] != "NULL")
+               k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
+          
           if(deparse(substitute(uy))[1] != "NULL")
                uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, data = data)
 
@@ -502,7 +506,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  correct_rr = correct_rr, correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
                  indirect_rr = indirect_rr, indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
                  rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment",
-                 ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
+                 ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
                  ux = ux, ux_observed = TRUE,
                  uy = uy, uy_observed = uy_observed,
                  sign_rz = sign_rz, sign_rxz = sign_rgz, sign_ryz = sign_ryz,

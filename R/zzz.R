@@ -13,7 +13,6 @@ globalVariables(c(".", "Value",                                  ## Global varia
 
 
 ## Messages to be displayed when the user loads psychmeta:
-#' @importFrom utils installed.packages
 .onAttach <- function(libname, pkgname) {
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage("This is ", paste(pkgname, "version", version))
@@ -58,15 +57,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
          
          if(out_of_date){
               version_message <- "Oh no! It looks like your copy of psychmeta is out of date!"
-              if(use_symbols){
-                   if("cli" %in% rownames(installed.packages())){
-                        if("crayon" %in% rownames(installed.packages())){
-                             version_message <- paste0(crayon::red(cli::symbol$cross), " ", version_message)   
-                        }else{
-                             version_message <- paste0(cli::symbol$cross, " ", version_message)
-                        }
-                   }                   
-              }
+              if(use_symbols) version_message <- paste0(crayon::red(cli::symbol$cross), " ", version_message)   
               packageStartupMessage(paste0("\n", version_message))
               packageStartupMessage("No worries, it's easy to obtain the latest version - just run the following command: \n")
               packageStartupMessage('                       update.packages("psychmeta")')
@@ -76,15 +67,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
               }else{
                    version_message <- "Yay! Your copy of psychmeta is up to date!"
               }
-              if(use_symbols){
-                   if("cli" %in% rownames(installed.packages())){
-                        if("crayon" %in% rownames(installed.packages())){
-                             version_message <- paste0(crayon::green(cli::symbol$tick), " ", version_message)   
-                        }else{
-                             version_message <- paste0(cli::symbol$tick, " ", version_message)
-                        }
-                   }                   
-              }
+              if(use_symbols) version_message <- paste0(crayon::green(cli::symbol$tick), " ", version_message)   
               packageStartupMessage(paste0("\n", version_message))
          }
          

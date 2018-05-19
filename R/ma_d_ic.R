@@ -16,7 +16,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
                     correct_rr_g = FALSE, correct_rr_y = TRUE,
                     indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                     rGg = NULL, pi = NULL, pa = NULL,
-                    ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                    ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
                     uy = NULL, uy_observed = TRUE,
                     sign_rgz = 1, sign_ryz = 1,
                     moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"), 
@@ -69,7 +69,10 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
 
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
-
+          
+          if(deparse(substitute(k_items_y))[1] != "NULL")
+               k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
+          
           if(deparse(substitute(uy))[1] != "NULL")
                uy <- match_variables(call = call_full[[match("uy",  names(call_full))]], arg = uy, arg_name = "uy", data = data)
 
@@ -154,7 +157,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
                     correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
                     indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
                     rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment",
-                    ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
+                    ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
                     ux = ux, ux_observed = TRUE,
                     uy = uy, uy_observed = uy_observed,
                     sign_rxz = sign_rgz, sign_ryz = sign_ryz,

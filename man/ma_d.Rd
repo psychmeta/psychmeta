@@ -18,11 +18,12 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
   correct_ryy = TRUE, correct_rr = NULL, correct_rr_g = TRUE,
   correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_g = TRUE,
   indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", uy = NULL,
-  uy_observed = TRUE, sign_rz = NULL, sign_rgz = 1, sign_ryz = 1,
-  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
-  "hierarchical", "none"), supplemental_ads = NULL, data = NULL,
-  control = control_psychmeta(), ...)
+  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
+  uy = NULL, uy_observed = TRUE, sign_rz = NULL, sign_rgz = 1,
+  sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
+  moderator_type = c("simple", "hierarchical", "none"),
+  supplemental_ads = NULL, data = NULL, control = control_psychmeta(),
+  ...)
 
 ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
   correction_method = "auto", use_ic_ads = c("tsa", "int"),
@@ -43,10 +44,10 @@ ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   "PM"), correct_bias = TRUE, correct_rGg = FALSE, correct_ryy = TRUE,
   correct_rr_g = FALSE, correct_rr_y = TRUE, indirect_rr_g = TRUE,
   indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", uy = NULL,
-  uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1, moderators = NULL,
-  cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
-  "none"), supplemental_ads_y = NULL, data = NULL,
+  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
+  uy = NULL, uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1,
+  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
+  "hierarchical", "none"), supplemental_ads_y = NULL, data = NULL,
   control = control_psychmeta(), ...)
 }
 \arguments{
@@ -126,6 +127,8 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 \item{ryy_restricted}{Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
 \item{ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+
+\item{k_items_y}{Numeric vector identifying the number of items in each scale.}
 
 \item{uy}{Vector or column name of u ratios for Y.}
 

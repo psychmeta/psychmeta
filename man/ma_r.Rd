@@ -17,10 +17,11 @@ ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   correct_rel = NULL, correct_rxx = TRUE, correct_ryy = TRUE,
   correct_rr = NULL, correct_rr_x = TRUE, correct_rr_y = TRUE,
   indirect_rr = NULL, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
-  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
-  ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rz = NULL,
-  sign_rxz = 1, sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
+  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
+  k_items_x = NULL, ryy = NULL, ryy_restricted = TRUE,
+  ryy_type = "alpha", k_items_y = NULL, ux = NULL, ux_observed = TRUE,
+  uy = NULL, uy_observed = TRUE, sign_rz = NULL, sign_rxz = 1,
+  sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
   moderator_type = c("simple", "hierarchical", "none"),
   supplemental_ads = NULL, data = NULL, control = control_psychmeta(),
   ...)
@@ -42,13 +43,14 @@ ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
   correct_rxx = TRUE, correct_ryy = TRUE, correct_rr_x = TRUE,
   correct_rr_y = TRUE, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
-  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
-  ux_observed = TRUE, uy = NULL, uy_observed = TRUE, sign_rxz = 1,
-  sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = c("simple", "hierarchical", "none"),
-  supplemental_ads_x = NULL, supplemental_ads_y = NULL, data = NULL,
-  control = control_psychmeta(), ...)
+  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
+  k_items_x = NULL, ryy = NULL, ryy_restricted = TRUE,
+  ryy_type = "alpha", k_items_y = NULL, ux = NULL, ux_observed = TRUE,
+  uy = NULL, uy_observed = TRUE, sign_rxz = 1, sign_ryz = 1,
+  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
+  "hierarchical", "none"), supplemental_ads_x = NULL,
+  supplemental_ads_y = NULL, data = NULL, control = control_psychmeta(),
+  ...)
 }
 \arguments{
 \item{rxyi, r}{Vector or column name of observed correlations. The \code{r} argument is used with the \code{ma_r_bb} (i.e., the barebones function) function and the \code{rxyi} argument is used with \code{ma_r} and \code{ma_r_ic} (i.e., the function in which corrections are applied).}
@@ -71,13 +73,9 @@ When ma_method is "ad", select one of the following methods for correcting artif
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.}
 
-\item{construct_x}{Vector of construct names for construct initially designated as X.}
+\item{construct_x, construct_y}{Vector of construct names for construct initially designated as "X" or as "Y".}
 
-\item{construct_y}{Vector of construct names for construct initially designated as Y.}
-
-\item{measure_x}{Vector of names for measures associated with constructs initially designated as "X".}
-
-\item{measure_y}{Vector of names for measures associated with constructs initially designated as "Y".}
+\item{measure_x, measure_y}{Vector of names for measures associated with constructs initially designated as "X" or as "Y".}
 
 \item{construct_order}{Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.}
 
@@ -89,15 +87,13 @@ be used when interative artifact distributions are provided). See "Details" of \
 
 \item{correct_rel}{Optional named vector that supersedes \code{correct_rxx} and \code{correct_ryy}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
 
-\item{correct_rxx}{Logical scalar or vector that determines whether to correct the X variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
-
-\item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rxx, correct_ryy}{Logical scalar or vector that determines whether to correct the X or Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_rr}{Optional named vector that supersedes \code{correct_rr_x} and \code{correct_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for range restriction.}
 
-\item{correct_rr_x}{Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
+\item{correct_rr_x}{Logical scalar, logical vector, or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in X (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
 
-\item{correct_rr_y}{Logical scalar, logical vector or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
+\item{correct_rr_y}{Logical scalar, logical vector, or column name determining whether each correlation in \code{rxyi} should be corrected for range restriction in Y (\code{TRUE}) or not (\code{FALSE}). If using artifact distribution methods, this must be a scalar value.}
 
 \item{indirect_rr}{Optional named vector that supersedes \code{indirect_rr_x} and \code{indirect_rr_y}. Names should correspond to construct names in \code{construct_x} and \code{construct_y} to determine which constructs should be corrected for indirect range restriction.}
 
@@ -109,7 +105,7 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{rxx}{Vector or column name of reliability estimates for X.}
 
-\item{rxx_restricted}{Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
+\item{rxx_restricted}{Logical vector or column name determining whether each element of \code{rxx} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
 \item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. Acceptable reliability types are:
 \itemize{
@@ -136,9 +132,11 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 \item{alternate_delayed}{\cr Alternate-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
 }}
 
+\item{k_items_x, k_items_y}{Numeric vector identifying the number of items in each scale.}
+
 \item{ryy}{Vector or column name of reliability estimates for Y.}
 
-\item{ryy_restricted}{Logical vector or column name determining whether each element of ryy is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
+\item{ryy_restricted}{Logical vector or column name determining whether each element of code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
 \item{ux}{Vector or column name of u ratios for X.}
 

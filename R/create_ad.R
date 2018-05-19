@@ -1,46 +1,12 @@
-#' Generate an artifact distribution object for use in interactive artifact-distribution meta-analysis programs.
-#'
-#' This function generates artifact-distribution objects containing interactive artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
-#' \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' All artifact distributions are optional; null artifact distributions will be given an artifact value of 1 and a weight of 1 as placeholders.
-#'
-#' @param rxxi Vector of incumbent reliability estimates.
-#' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
-#' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi}.
-#' @param rxxi_type,rxxa_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#' @param rxxa Vector of applicant reliability estimates.
-#' @param n_rxxa Vector of sample sizes associated with the elements of \code{rxxa}.
-#' @param wt_rxxa Vector of weights associated with the elements of \code{rxxa}.
-#' @param ux Vector of observed-score u ratios.
-#' @param ni_ux Vector of incumbent sample sizes associated with the elements of \code{ux}.
-#' @param wt_ux Vector of weights associated with the elements of \code{ux}.
-#' @param ut Vector of true-score u ratios.
-#' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
-#' @param wt_ut Vector of weights associated with the elements of \code{ut}.
-#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.
-#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.
-#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.
-#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (list of artifact-distribution tables) for use in interactive artifact-distribution meta-analyses.
+#' @rdname create_ad
 #' @export
-#'
-#' @keywords internal
-#'
-#' @examples
-#' create_ad_int(rxxa = c(.9, .8), n_rxxa = c(50, 150),
-#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
-#'               ux = c(.9, .8), ni_ux = c(50, 150),
-#'               ut = c(.8, .7), ni_ut = c(50, 150))
 create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           rxxi_type = rep("alpha", length(rxxi)),
+                          k_items_rxxi = rep(NA, length(rxxi)),
                           rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa,
                           rxxa_type = rep("alpha", length(rxxa)),
-
+                          k_items_rxxa = rep(NA, length(rxxa)),
+                          
                           ux = NULL, ni_ux = NULL, wt_ux = ni_ux,
                           ut = NULL, ni_ut = NULL, wt_ut = ni_ut,
 
@@ -48,8 +14,10 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           ...){
 
-     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
-                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
+     ## TODO: Add standard-error estimates for different types of reliability statistics
+     
+     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi, 
+                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa, 
                     ux = ux, ni_ux = ni_ux, wt_ux = wt_ux,
                     ut = ut, ni_ut = ni_ut, wt_ut = wt_ut,
                     ...)
@@ -867,154 +835,15 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
 
 
-#' Generate an artifact distribution object for use in interactive artifact-distribution meta-analysis programs.
-#'
-#' This function generates artifact-distribution objects containing Taylor series artifact distributions. Use this to create objects that can be supplied to the \code{ma_r_ad} and
-#' \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' All artifact distributions are optional; null distributions will be given a mean of 1 and variance of 0 if not information is supplied.
-#'
-#' For u ratios, error variances can be computed for independent samples (i.e., settings in which the unrestricted standard deviation comes from an external study) or
-#' dependent samples (i.e., settings in which the range-restricted standard deviation comes from a sample that represents a subset of the applicant sample that provided the
-#' unrestricted standard deviation). The former circumstance is presumed to be more common, so error variances are computed for independent samples by default.
-#'
-#' @param rxxi Vector of incumbent reliability estimates.
-#' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
-#' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).
-#' @param rxxi_type,rxxa_type,qxi_dist_type,rxxi_dist_type,qxa_dist_type,rxxa_dist_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#' @param mean_qxi Vector that can be used to supply the means of externally computed distributions of incumbent square-root reliabilities.
-#' @param var_qxi Vector that can be used to supply the variances of externally computed distributions of incumbent square-root reliabilities.
-#' @param k_qxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent square-root reliabilities.
-#' @param mean_n_qxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent square-root reliabilities.
-#'
-#' @param mean_rxxi Vector that can be used to supply the means of externally computed distributions of incumbent reliabilities.
-#' @param var_rxxi Vector that can be used to supply the variances of externally computed distributions of incumbent reliabilities.
-#' @param k_rxxi Vector that can be used to supply the number of studies included in externally computed distributions of incumbent reliabilities.
-#' @param mean_n_rxxi Vector that can be used to supply the mean sample sizes of externally computed distributions of incumbent reliabilities.
-#'
-#' @param rxxa Vector of applicant reliability estimates.
-#' @param n_rxxa Vector of sample sizes associated with the elements of \code{rxxa}.
-#' @param wt_rxxa Vector of weights associated with the elements of \code{rxxa} (by default, sample sizes will be used as weights).
-#' @param mean_qxa Vector that can be used to supply the means of externally computed distributions of applicant square-root reliabilities.
-#' @param var_qxa Vector that can be used to supply the variances of externally computed distributions of applicant square-root reliabilities.
-#' @param k_qxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant square-root reliabilities.
-#' @param mean_n_qxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant square-root reliabilities.
-#'
-#' @param mean_rxxa Vector that can be used to supply the means of externally computed distributions of applicant reliabilities.
-#' @param var_rxxa Vector that can be used to supply the variances of externally computed distributions of applicant reliabilities.
-#' @param k_rxxa Vector that can be used to supply the number of studies included in externally computed distributions of applicant reliabilities.
-#' @param mean_n_rxxa Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant reliabilities.
-#'
-#' @param ux Vector of observed-score u ratios.
-#' @param ni_ux Vector of incumbent sample sizes associated with the elements of \code{ux}.
-#' @param wt_ux Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).
-#' @param na_ux Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ux values. \code{NULL} by default.
-#' Only used when ni_ux is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ux}.
-#' @param dep_sds_ux_obs Logical scalar or vector determining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param mean_ux Vector that can be used to supply the means of externally computed distributions of observed-score u ratios.
-#' @param var_ux Vector that can be used to supply the variances of externally computed distributions of observed-score u ratios.
-#' @param k_ux Vector that can be used to supply the number of studies included in externally computed distributions of observed-score u ratios.
-#' @param mean_ni_ux Vector that can be used to supply the mean incumbent sample sizes of externally computed distributions of observed-score u ratios.
-#' @param mean_na_ux Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.
-#' @param dep_sds_ux_spec Logical scalar or vector determining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param ut Vector of true-score u ratios.
-#' @param ni_ut Vector of incumbent sample sizes associated with the elements of \code{ut}.
-#' @param wt_ut Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).
-#' @param na_ut Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ut values. \code{NULL} by default.
-#' Only used when ni_ut is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ut}.
-#' @param dep_sds_ut_obs Logical scalar or vector determining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param mean_ut Vector that can be used to supply the means of externally computed distributions of true-score u ratios.
-#' @param var_ut Vector that can be used to supply the variances of externally computed distributions of true-score u ratios.
-#' @param k_ut Vector that can be used to supply the number of studies included in externally computed distributions of true-score u ratios.
-#' @param mean_ni_ut Vector that can be used to supply the mean sample sizes for of externally computed distributions of true-score u ratios.
-#' @param mean_na_ut Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of true-score u ratios.
-#' @param dep_sds_ut_spec Logical scalar or vector determining whether externally computed ut distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).
-#'
-#' @param estimate_rxxa Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.
-#' @param estimate_rxxi Logical argument to estimate rxxi values from other artifacts (\code{TRUE}) or to only used supplied rxxi values (\code{FALSE}). \code{TRUE} by default.
-#' @param estimate_ux Logical argument to estimate ux values from other artifacts (\code{TRUE}) or to only used supplied ux values (\code{FALSE}). \code{TRUE} by default.
-#' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
-#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use in Taylor serices artifact-distribution meta-analyses.
+#' @rdname create_ad
 #' @export
-#'
-#' @keywords internal
-#'
-#' @examples
-#' ## Example computed using observed values only
-#' create_ad_tsa(rxxa = c(.9, .8), n_rxxa = c(50, 150),
-#'               rxxi = c(.8, .7), n_rxxi = c(50, 150),
-#'               ux = c(.9, .8), ni_ux = c(50, 150))
-#'
-#' ## Example computed using all possible input arguments (arbitrary values):
-#' rxxa <- rxxi <- ux <- ut <- c(.7, .8)
-#' n_rxxa <- n_rxxi <- ni_ux <- ni_ut <- c(50, 100)
-#' na_ux <- na_ut <- c(200, 200)
-#' mean_qxa <- mean_qxi <- mean_ux <- mean_ut <- mean_rxxi <- mean_rxxa <- c(.7, .8)
-#' var_qxa <- var_qxi <- var_ux <- var_ut <- var_rxxi <- var_rxxa <- c(.1, .05)
-#' k_qxa <- k_qxi <- k_ux <- k_ut <- k_rxxa <- k_rxxi <- 2
-#' mean_n_qxa <- mean_n_qxi <- mean_ni_ux <- mean_ni_ut <- mean_n_rxxa <- mean_n_rxxi <- c(100, 100)
-#' dep_sds_ux_obs <- dep_sds_ux_spec <- dep_sds_ut_obs <- dep_sds_ut_spec <- FALSE
-#' mean_na_ux <- mean_na_ut <- c(200, 200)
-#'
-#' wt_rxxa <- n_rxxa
-#' wt_rxxi <- n_rxxi
-#' wt_ux <- ni_ux
-#' wt_ut <- ni_ut
-#'
-#' estimate_rxxa <- TRUE
-#' estimate_rxxi <- TRUE
-#' estimate_ux <- TRUE
-#' estimate_ut <- TRUE
-#' var_unbiased <- TRUE
-#'
-#' rxxi_type = rep("alpha", length(rxxi))
-#' rxxa_type = rep("alpha", length(rxxa))
-#' qxi_dist_type = rep("alpha", length(mean_qxi))
-#' qxa_dist_type = rep("alpha", length(mean_qxa))
-#' rxxi_dist_type = rep("alpha", length(mean_rxxi))
-#' rxxa_dist_type = rep("alpha", length(mean_rxxa))
-#'
-#' create_ad_tsa(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa,
-#'               mean_qxa = mean_qxa, var_qxa = var_qxa,
-#'               k_qxa = k_qxa, mean_n_qxa = mean_n_qxa,
-#'               mean_rxxa = mean_rxxa, var_rxxa = var_rxxa,
-#'               k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa,
-#'
-#'               rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi,
-#'               mean_qxi = mean_qxi, var_qxi = var_qxi,
-#'               k_qxi = k_qxi, mean_n_qxi = mean_n_qxi,
-#'               mean_rxxi = mean_rxxi, var_rxxi = var_rxxi,
-#'               k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi,
-#'
-#'               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
-#'               dep_sds_ux_obs = dep_sds_ux_obs,
-#'               mean_ux = mean_ux, var_ux = var_ux, k_ux =
-#'               k_ux, mean_ni_ux = mean_ni_ux,
-#'               mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
-#'
-#'               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut,
-#'               dep_sds_ut_obs = dep_sds_ut_obs,
-#'               mean_ut = mean_ut, var_ut = var_ut,
-#'               k_ut = k_ut, mean_ni_ut = mean_ni_ut,
-#'               mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
-#'
-#'               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-#'               estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
-create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
-                          mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)),
-                          mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
+create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)), 
+                          mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)), mean_k_items_qxi = rep(NA, length(mean_qxi)), 
+                          mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_k_items_rxxi = rep(NA, length(mean_rxxi)), 
 
-                          rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
-                          mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)),
-                          mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)),
+                          rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)), 
+                          mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)), mean_k_items_qxa = rep(NA, length(mean_qxa)), 
+                          mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)), mean_k_items_rxxa = rep(NA, length(mean_rxxa)), 
 
                           ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
                           mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = NA, dep_sds_ux_spec = FALSE,
@@ -1026,13 +855,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           var_unbiased = TRUE, ...){
 
-     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
-                    mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type,
-                    mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type,
+     ## TODO: Add standard-error estimates for different types of reliability statistics
+     
+     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
+                    mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type, mean_k_items_qxi = mean_k_items_qxi,
+                    mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type, mean_k_items_rxxi = mean_k_items_rxxi,
 
-                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
-                    mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa, qxa_dist_type = qxa_dist_type,
-                    mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa, rxxa_dist_type = rxxa_dist_type,
+                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
+                    mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa, qxa_dist_type = qxa_dist_type, mean_k_items_qxa = mean_k_items_qxa,
+                    mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa, rxxa_dist_type = rxxa_dist_type, mean_k_items_rxxa = mean_k_items_rxxa,
 
                     ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
                     mean_ux = mean_ux, var_ux = var_ux, k_ux = k_ux, mean_ni_ux = mean_ni_ux, mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
@@ -1051,9 +882,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
      Ni_ut <- mean_ni_ut * k_ut
      Na_ut <- mean_na_ut * k_ut
 
-     art_summary <- function(art_vec, wt_vec, ni_vec, na_vec = NULL, dependent_sds = FALSE,
-                             mean_art_1 = NULL, var_art_1 = NULL, k_art_1 = NULL, mean_ni_art_1 = NULL, mean_na_art_1 = NA, dependent_sds_art_1 = FALSE,
-                             mean_art_2 = NULL, var_art_2 = NULL, k_art_2 = NULL, mean_n_art_2 = NULL, art = "q", var_unbiased){
+     art_summary <- function(art_vec, wt_vec, ni_vec, na_vec = NULL, k_items = NULL, dependent_sds = FALSE,
+                             mean_art_1 = NULL, var_art_1 = NULL, k_art_1 = NULL, mean_ni_art_1 = NULL, mean_na_art_1 = NA, dependent_sds_art_1 = FALSE, mean_k_items_art_1 = NULL, 
+                             mean_art_2 = NULL, var_art_2 = NULL, k_art_2 = NULL, mean_n_art_2 = NULL, mean_k_items_art_2 = NULL, art = "q", var_unbiased){
           if(!is.null(art_vec)){
                if(is.null(wt_vec)) wt_vec <- rep(1, length(art_vec))
                if(art == "q" | art == "rel") valid_art <- filter_rel(rel_vec = art_vec, wt_vec = wt_vec)

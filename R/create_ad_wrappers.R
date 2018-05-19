@@ -1,5 +1,6 @@
-#' Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
+#' @title Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
 #'
+#' @description 
 #' This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions.
 #' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
@@ -15,7 +16,8 @@
 #' @param n_rxxi Vector of sample sizes associated with the elements of \code{rxxi}.
 #' @param wt_rxxi Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).
 #' @param rxxi_type,rxxa_type,qxi_dist_type,rxxi_dist_type,qxa_dist_type,rxxa_dist_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#'
+#' @param k_items_rxxi,mean_k_items_qxi,mean_k_items_rxxi,k_items_rxxa,mean_k_items_qxa,mean_k_items_rxxa Numeric vector of the number of items in each scale (or mean number of items, for pre-specified distributions). 
+#'  
 #' @param rxxa Vector of applicant reliability estimates.
 #' @param n_rxxa Vector of sample sizes associated with the elements of \code{rxxa}.
 #' @param wt_rxxa Vector of weights associated with the elements of \code{rxxa} (by default, sample sizes will be used as weights).
@@ -206,6 +208,7 @@ create_ad <- function(ad_type = c("tsa", "int"),
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of ryy is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. Acceptable reliability types are:
+#' @param k_items_x,k_items_y Numeric vector or colum name indicating the number of items in each scale. 
 #' @param ux Vector or column name of u ratios for X.
 #' @param ux_observed Logical vector or column name determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).
 #' @param uy Vector or column name of u ratios for Y.
@@ -241,8 +244,8 @@ create_ad <- function(ad_type = c("tsa", "int"),
 create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                            construct_x, measure_x = NULL,
                            construct_y, measure_y = NULL,
-                           rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
-                           ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                           rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NULL,
+                           ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
                            ux = NULL, ux_observed = TRUE,
                            uy = NULL, uy_observed = TRUE,
                            estimate_rxxa = TRUE, estimate_rxxi = TRUE,
@@ -289,7 +292,10 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
 
           if(deparse(substitute(rxx_type))[1] != "NULL")
                rxx_type <- match_variables(call = call_full[[match("rxx_type", names(call_full))]], arg = rxx_type, arg_name = "rxx_type", data = data)
-
+          
+          if(deparse(substitute(k_items_x))[1] != "NULL")
+               k_items_x <- match_variables(call = call_full[[match("k_items_x", names(call_full))]], arg = k_items_x, arg_name = "k_items_x", data = data)
+          
           if(deparse(substitute(ryy))[1] != "NULL")
                ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, arg_name = "ryy", data = data)
 
@@ -298,7 +304,10 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
 
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
-
+          
+          if(deparse(substitute(k_items_y))[1] != "NULL")
+               k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
+          
           if(deparse(substitute(ux))[1] != "NULL")
                ux <- match_variables(call = call_full[[match("ux", names(call_full))]], arg = ux, arg_name = "ux", data = data)
 
@@ -371,12 +380,13 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                          .data <- full_data[i,][j,]
                          measure_averages <- by(.data, .data$measure_x, function(x){
                               out <- x[1,]
-                              out$n <- mean(x$n)
-                              out$rxx <- mean(x$rxx)
-                              out$rxx_restricted <- as.logical(mean(x$rxx_restricted))
-                              out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type))))
-                              out$ux <- round(mean(x$ux))
-                              out$ux_observed <- as.logical(mean(x$ux_observed))
+                              out$n <- mean(x$n, na.rm = TRUE)
+                              out$rxx <- mean(x$rxx, na.rm = TRUE)
+                              out$rxx_restricted <- as.logical(mean(x$rxx_restricted, na.rm = TRUE))
+                              out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type), na.rm = TRUE)))
+                              out$k_items_x <- mean(x$k_items_x, na.rm = TRUE)
+                              out$ux <- mean(x$ux, na.rm = TRUE)
+                              out$ux_observed <- as.logical(mean(x$ux_observed), na.rm = TRUE)
                               out
                          })
                          .data <- NULL
@@ -394,10 +404,11 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                                         .intercor <- intercor
                                    }
                                    if(!is.na(.intercor)){
-                                        n <- mean(.data$n)
+                                        n <- mean(.data$n, na.rm = TRUE)
                                         rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = length(.data$n), mean_intercor = .intercor)
                                         rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
                                         rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
+                                        k_items_x <- wt_mean(x = .data$k_items_x, wt = .data$n)
                                         ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = length(.data$n), mean_ri = .intercor)
                                         ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))    
                                    }else{
@@ -405,26 +416,29 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                                                 "' in sample '", .data$sample_id[1], 
                                                 "': '\n     Computing average instead of composite", call. = FALSE)
                                         
-                                        n <- mean(.data$n)
-                                        rxx <- mean(.data$rxx)
-                                        rxx_restricted <- as.logical(mean(.data$rxx_restricted))
-                                        rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type))))
-                                        ux <- round(mean(.data$ux))
-                                        ux_observed <- as.logical(mean(.data$ux_observed))      
+                                        n <- mean(.data$n, na.rm = TRUE)
+                                        rxx <- mean(.data$rxx, na.rm = TRUE)
+                                        rxx_restricted <- as.logical(mean(.data$rxx_restricted, na.rm = TRUE))
+                                        rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
+                                        k_items_x <- mean(.data$k_items_x, na.rm = TRUE)
+                                        ux <- mean(.data$ux, na.rm = TRUE)
+                                        ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))      
                                    }
                               }else{
-                                   n <- mean(.data$n)
-                                   rxx <- mean(.data$rxx)
-                                   rxx_restricted <- as.logical(mean(.data$rxx_restricted))
-                                   rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type))))
-                                   ux <- round(mean(.data$ux))
-                                   ux_observed <- as.logical(mean(.data$ux_observed))
+                                   n <- mean(.data$n, na.rm = TRUE)
+                                   rxx <- mean(.data$rxx, na.rm = TRUE)
+                                   rxx_restricted <- as.logical(mean(.data$rxx_restricted, na.rm = TRUE))
+                                   rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
+                                   k_items_x <- mean(.data$k_items_x, na.rm = TRUE)
+                                   ux <- mean(.data$ux, na.rm = TRUE)
+                                   ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))
                               }
                          }else{
                               n <- as.numeric(.data$n)
                               rxx <- as.numeric(.data$rxx)
                               rxx_restricted <- as.logical(.data$rxx_restricted)
                               rxx_type <- as.character(.data$rxx_type)
+                              k_items_x <- suppressWarnings(as.numeric(.data$k_items_x))
                               ux  <- as.numeric(.data$ux)
                               ux_observed <- as.logical(.data$ux_observed)
                          }
@@ -433,6 +447,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                               rxx = rxx,
                               rxx_restricted = rxx_restricted,
                               rxx_type = rxx_type,
+                              k_items_x = k_items_x,
                               ux = ux,
                               ux_observed = ux_observed)
                     })
@@ -441,6 +456,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                     rxx            <- unlist(lapply(independent_arts, function(x) x$rxx))
                     rxx_restricted <- unlist(lapply(independent_arts, function(x) x$rxx_restricted))
                     rxx_type       <- unlist(lapply(independent_arts, function(x) x$rxx_type))
+                    k_items_x      <- unlist(lapply(independent_arts, function(x) x$k_items_x))
                     ux             <- unlist(lapply(independent_arts, function(x) x$ux))
                     ux_observed    <- unlist(lapply(independent_arts, function(x) x$ux_observed))
                }else{
@@ -448,6 +464,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                     rxx <- full_data$rxx[i]
                     rxx_restricted <- full_data$rxx_restricted[i]
                     rxx_type <- full_data$rxx_type[i]
+                    k_items_x <- full_data$k_items_x[i]
                     ux <- full_data$ux[i]
                     ux_observed <- full_data$ux_observed[i]
                }
@@ -463,21 +480,25 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                
                rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
                rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
+               k_items_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){k_items_x[rxx_restricted]}else{NULL}}else{NULL}
+               k_items_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){k_items_x[!rxx_restricted]}else{NULL}}else{NULL}
                
                if(!is.null(rxxa)){
                     rxxa_type <- rxxa_type[!is.na(rxxa)]
                     n_rxxa <- n_rxxa[!is.na(rxxa)]
+                    k_items_rxxa <- k_items_rxxa[!is.na(rxxa)]
                     rxxa <- rxxa[!is.na(rxxa)]
                }else{
-                    rxxa_type <- n_rxxa <- rxxa <- NULL
+                    k_items_rxxa <- rxxa_type <- n_rxxa <- rxxa <- NULL
                }
                
                if(!is.null(rxxi)){
                     rxxi_type <- rxxi_type[!is.na(rxxi)]
                     n_rxxi <- n_rxxi[!is.na(rxxi)]
+                    k_items_rxxi <- k_items_rxxi[!is.na(rxxa)]
                     rxxi <- rxxi[!is.na(rxxi)]
                }else{
-                    rxxi_type <- n_rxxi <- rxxi <- NULL
+                    k_items_rxxi <- rxxi_type <- n_rxxi <- rxxi <- NULL
                }
                
                if(!is.null(ux)){
@@ -505,16 +526,17 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                }
                
                if(process_ads){
-                    ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                                                      rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+                    ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type,
+                                                                      rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
+                                                                      rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
                                                                       ux = ux, ni_ux = n_ux, wt_ux = n_ux,
                                                                       ut = ut, ni_ut = n_ut, wt_ut = n_ut,
                                                                       estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                                       estimate_ux = estimate_ux, estimate_ut = estimate_ut,
                                                                       var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads))
                }else{
-                    ad_obj <- list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+                    ad_obj <- list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
+                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
                                    ux = ux, ni_ux = n_ux, wt_ux = n_ux,
                                    ut = ut, ni_ut = n_ut, wt_ut = n_ut)
                     if(!is.null(.supplemental_ads))
@@ -906,12 +928,14 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
                rxx <- data$rxx[i][unique_x[i] & unique_y[i]]
                rxx_restricted <- data$rxx_restricted[i][unique_x[i] & unique_y[i]]
                rxx_type <- data$rxx_type[i][unique_x[i] & unique_y[i]]
+               k_items_x <- data$k_items_x[i][unique_x[i] & unique_y[i]]
                ux <- data$ux[i][unique_x[i] & unique_y[i]]
                ux_observed <- data$ux_observed[i][unique_x[i] & unique_y[i]]
 
                ryy <- data$ryy[i][unique_x[i] & unique_y[i]]
                ryy_restricted <- data$ryy_restricted[i][unique_x[i] & unique_y[i]]
                ryy_type <- data$ryy_type[i][unique_x[i] & unique_y[i]]
+               k_items_y <- data$k_items_y[i][unique_x[i] & unique_y[i]]
                uy <- data$uy[i][unique_x[i] & unique_x[i]]
                uy_observed <- data$uy_observed[i][unique_x[i] & unique_y[i]]
 
@@ -926,7 +950,9 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
 
                rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
                rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
-
+               k_items_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){k_items_x[rxx_restricted]}else{NULL}}else{NULL}
+               k_items_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){k_items_x[!rxx_restricted]}else{NULL}}else{NULL}
+               
 
                ryya <-   if(!is.null(ryy)){if(any(!ryy_restricted)){ryy[!ryy_restricted]}else{NULL}}else{NULL}
                n_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){n[!ryy_restricted]}else{NULL}}else{NULL}
@@ -939,6 +965,8 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
 
                ryyi_type <- if(!is.null(ryy)){if(any(ryy_restricted)){ryy_type[ryy_restricted]}else{NULL}}else{NULL}
                ryya_type <- if(!is.null(ryy)){if(any(!ryy_restricted)){ryy_type[!ryy_restricted]}else{NULL}}else{NULL}
+               k_items_ryyi <- if(!is.null(ryy)){if(any(ryy_restricted)){k_items_y[ryy_restricted]}else{NULL}}else{NULL}
+               k_items_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){k_items_y[!ryy_restricted]}else{NULL}}else{NULL}
 
                if(!is.null(supplemental_ads)){
                     if(construct_x[i][1] %in% names(supplemental_ads)){
@@ -957,16 +985,18 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
                }
 
 
-               ad_obj_x <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+               ad_obj_x <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, 
+                                                                   rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, k_items_rxxa = k_items_rxxa, rxxa_type = rxxa_type,
+                                                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, k_items_rxxi = k_items_rxxi, rxxi_type = rxxi_type,
                                                                    ux = ux, ni_ux = n_ux, wt_ux = n_ux,
                                                                    ut = ut, ni_ut = n_ut, wt_ut = n_ut,
                                                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                                    estimate_ux = estimate_ux, estimate_ut = estimate_ut,
                                                                    var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads_x))
 
-               ad_obj_y <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = ryya, n_rxxa = n_ryya, wt_rxxa = n_ryya, rxxa_type = ryya_type,
-                                                                   rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi, rxxi_type = ryyi_type,
+               ad_obj_y <- suppressWarnings(create_ad_supplemental(ad_type = ad_type,
+                                                                   rxxa = ryya, n_rxxa = n_ryya, wt_rxxa = n_ryya, k_items_rxxa = k_items_ryyi, rxxa_type = ryya_type,
+                                                                   rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi, k_items_rxxi = k_items_ryya, rxxi_type = ryyi_type,
                                                                    ux = uy, ni_ux = n_uy, wt_ux = n_uy,
                                                                    ut = up, ni_ut = n_up, wt_ut = n_up,
                                                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
@@ -988,7 +1018,6 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
           construct_pair <- c(construct_pair, construct_pair)
           construct_x <- c(construct_x, construct_y)
 
-          i <- which(construct_x == "X")
           ad_obj_list_x <- ad_obj_list_y <- by(1:length(construct_pair), construct_x, function(i){
 
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
@@ -998,6 +1027,7 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
 
                rxx <- data_x$rxx[i][unique_x[i]]
                rxx_restricted <- data_x$rxx_restricted[i][unique_x[i]]
+               k_items_x <- data$k_items_x[i][unique_x[i]]
                rxx_type <- data_x$rxx_type[i][unique_x[i]]
                ux <- data_x$ux[i][unique_x[i]]
                ux_observed <- data_x$ux_observed[i][unique_x[i]]
@@ -1013,6 +1043,8 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
 
                rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
                rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
+               k_items_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){k_items_x[rxx_restricted]}else{NULL}}else{NULL}
+               k_items_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){k_items_x[!rxx_restricted]}else{NULL}}else{NULL}
 
                if(!is.null(supplemental_ads)){
                     if(construct_x[i][1] %in% names(supplemental_ads)){
@@ -1024,8 +1056,9 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
                     .supplemental_ads_x <- NULL
                }
 
-               ad_obj_x <- suppressWarnings(create_ad_supplemental(ad_type = ad_type, rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type,
-                                                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type,
+               ad_obj_x <- suppressWarnings(create_ad_supplemental(ad_type = ad_type,
+                                                                   rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, k_items_rxxa = k_items_rxxa, rxxa_type = rxxa_type,
+                                                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, k_items_rxxi = k_items_rxxi, rxxi_type = rxxi_type,
                                                                    ux = ux, ni_ux = n_ux, wt_ux = n_ux,
                                                                    ut = ut, ni_ut = n_ut, wt_ut = n_ut,
                                                                    estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
@@ -1060,8 +1093,8 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
 
 
 create_ad_supplemental <- function(ad_type = c("tsa", "int"),
-                                   rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
-                                   rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
+                                   rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
+                                   rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)),
                                    ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux,
                                    ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut,
 
@@ -1071,8 +1104,8 @@ create_ad_supplemental <- function(ad_type = c("tsa", "int"),
 
      ad_type <- match.arg(ad_type, c("tsa", "int"))
 
-     art_distributions <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
-                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
+     art_distributions <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, k_items_rxxi = k_items_rxxi, rxxi_type = rxxi_type,
+                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, k_items_rxxa = k_items_rxxa, rxxa_type = rxxa_type,
                                ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
                                ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut)
 
