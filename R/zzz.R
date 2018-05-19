@@ -13,6 +13,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
 
 
 ## Messages to be displayed when the user loads psychmeta:
+#' @importFrom utils installed.packages
 .onAttach <- function(libname, pkgname) {
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage("This is ", paste(pkgname, "version", version))
