@@ -305,9 +305,23 @@ group_by.ma_psychmeta <- function (x, ..., add = FALSE){
      .group_by <- function (x, ..., add = FALSE) UseMethod("group_by") 
      x <- .group_by(x, ..., add = add)
      
-     class(x) <- .class
+     class(x) <- c("ma_psychmeta", class(x))
      x
 }
+
+
+#' @method ungroup ma_psychmeta
+ungroup.ma_psychmeta <- function (x, ...){
+     .class <- class(x)
+     class(x) <- .class[.class != "ma_psychmeta"]
+     
+     .ungroup <- function (x, ...) UseMethod("ungroup") 
+     x <- .ungroup(x, ...)
+     
+     class(x) <- c("ma_psychmeta", class(x))
+     x
+}
+
 
 
 #' @method `[` ma_psychmeta
@@ -331,3 +345,6 @@ group_by.ma_psychmeta <- function (x, ..., add = FALSE){
      
      x
 } 
+
+
+
