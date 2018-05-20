@@ -384,7 +384,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                               out$rxx <- mean(x$rxx, na.rm = TRUE)
                               out$rxx_restricted <- as.logical(mean(x$rxx_restricted, na.rm = TRUE))
                               out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type), na.rm = TRUE)))
-                              out$k_items_x <- mean(x$k_items_x, na.rm = TRUE)
+                              out$k_items_x <- suppressWarnings(mean(x$k_items_x, na.rm = TRUE))
                               out$ux <- mean(x$ux, na.rm = TRUE)
                               out$ux_observed <- as.logical(mean(x$ux_observed), na.rm = TRUE)
                               out
@@ -420,7 +420,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                                         rxx <- mean(.data$rxx, na.rm = TRUE)
                                         rxx_restricted <- as.logical(mean(.data$rxx_restricted, na.rm = TRUE))
                                         rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
-                                        k_items_x <- mean(.data$k_items_x, na.rm = TRUE)
+                                        k_items_x <- suppressWarnings(mean(.data$k_items_x, na.rm = TRUE))
                                         ux <- mean(.data$ux, na.rm = TRUE)
                                         ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))      
                                    }
@@ -429,7 +429,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                                    rxx <- mean(.data$rxx, na.rm = TRUE)
                                    rxx_restricted <- as.logical(mean(.data$rxx_restricted, na.rm = TRUE))
                                    rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
-                                   k_items_x <- mean(.data$k_items_x, na.rm = TRUE)
+                                   k_items_x <- suppressWarnings(mean(.data$k_items_x, na.rm = TRUE))
                                    ux <- mean(.data$ux, na.rm = TRUE)
                                    ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))
                               }

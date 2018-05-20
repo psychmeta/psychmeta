@@ -53,7 +53,7 @@ globalVariables(c(".", "Value",                                  ## Global varia
                    stop("Unknown OS")
               }
          }
-         use_symbols <- get_os() != "windows"
+         use_symbols <- get_os() == "mac"
          
          if(out_of_date){
               version_message <- "Oh no! It looks like your copy of psychmeta is out of date!"
