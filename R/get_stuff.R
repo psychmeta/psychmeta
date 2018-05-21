@@ -1,7 +1,7 @@
 #' @name get_stuff
 #' @rdname get_stuff
 #'
-#' @title Estimation of applicant and incumbent reliabilities and of true- and observed-score u ratios
+#' @title Extract results from a psychmeta meta-analysis object
 #'
 #' @description
 #' Functions to estimate the values of artifacts from other artifacts. These functions allow for reliability estimates to be corrected/attenuated for range restriction and allow
