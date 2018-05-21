@@ -13,7 +13,7 @@
 \alias{get_metareg}
 \alias{get_matrix}
 \alias{get_plots}
-\title{Estimation of applicant and incumbent reliabilities and of true- and observed-score u ratios}
+\title{Extract results from a psychmeta meta-analysis object}
 \usage{
 get_metafor(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
