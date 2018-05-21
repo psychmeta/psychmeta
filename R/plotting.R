@@ -16,7 +16,7 @@
 #'
 #' @return A list of funnel plots.
 #' @export
-#' 
+#'
 #' @author Based on code by John Sakaluk
 #'
 #' @examples
@@ -35,16 +35,16 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
      escalc_list <- get_escalc(ma_obj = ma_obj_filtered)
      if(show_filtered) ma_obj <- ma_obj_filtered
-     
+
      ma_methods <- attributes(ma_obj)$ma_methods
-     
+
      if("bb" %in% ma_methods){
           barebones <- map(escalc_list, function(x) x$barebones)
           barebones <- lapply(barebones, function(x) .plot_funnel(x))
      }else{
           barebones <- NULL
      }
-     
+
      is.data.frame(escalc_list$`analysis_id: 1`$barebones)
      is.data.frame(escalc_list$`analysis_id: 1`$individual_correction)
      out <- map(escalc_list, function(x){
@@ -59,18 +59,18 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                               }else{
                                    NULL
                               }
-                         })    
+                         })
                     }else{
                          NULL
                     }
                }
           })
      })
-     
+
      names(out) <- paste0("analysis id: ", ma_obj$analysis_id)
-     
+
      ma_obj$funnel <- out
-     
+
      message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
 
      ma_obj
@@ -103,7 +103,7 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #'
 #' @return A list of forest plots.
 #' @export
-#' 
+#'
 #' @author Based on code by John Sakaluk
 #'
 #' @importFrom stringr str_split
@@ -126,7 +126,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 
      ma_metric <- attributes(ma_obj)$ma_metric
      ma_methods <- attributes(ma_obj)$ma_methods
-     
+
      if(any(c("r_as_r", "d_as_r") %in% ma_metric)){
           ts <- "true_score"
           vgx <- "validity_generalization_x"
@@ -136,44 +136,44 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           vgx <- "observedGroup_latentY"
           vgy <- "latentGroup_observedY"
      }
-     
+
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
      if(show_filtered) ma_obj <- ma_obj_filtered
-     
+
      pair_id <- as.list(unique(ma_obj_filtered$pair_id))
      names(pair_id) <- unlist(pair_id)
-     
+
      i <- 1
      out <- lapply(pair_id, function(i){
           x <- filter(ma_obj_filtered, pair_id == i)
-          
+
           barebones <- .plot_forest(ma_obj = x, ma_method = "bb",
                                     ma_facetname = ma_facetname, facet_levels = facet_levels,
                                     conf_level = conf_level, conf_method = conf_method,
                                     x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab)
-          
-          
+
+
           if("ic" %in% ma_methods){
                individual_correction <- list(.plot_forest(ma_obj = x, ma_method = "ic", correction_type = "ts",
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
                                                           x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
-                                             
+
                                              .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgx",
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
                                                           x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
-                                             
+
                                              .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgy",
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
                                                           x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab))
-               
+
                names(individual_correction) <- c(ts, vgx, vgy)
           }else{
                individual_correction <- NULL
           }
-          
+
           list(barebones = barebones,
                individual_correction = individual_correction)
      })
@@ -181,7 +181,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      .out <- rep(list(NULL), nrow(ma_obj))
      .out[ma_obj$analysis_type == "Overall"] <- out
      names(.out) <- paste0("analysis id: ", ma_obj$analysis_id)
-     
+
      ma_obj$forest <- .out
 
      message("Forest plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
@@ -282,8 +282,8 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      mat <- get_metatab(ma_obj, ma_methods = .ma_method, correction_types = .correction_type)
      ma_methods <- attributes(ma_obj)$ma_methods
      ma_metric <- attributes(ma_obj)$ma_metric
-     
-     .mat <- as_tibble(select(as.data.frame(mat), analysis_type:k))
+
+     .mat <- as_tibble(select(as.data.frame(mat), .data$analysis_type:.data$k))
      .mat <- .mat[,-c(1, ncol(.mat))]
      if(ncol(.mat) > 1) stop("Forest plots currently only support unmoderated or single-moderator meta-analysis")
 
@@ -293,7 +293,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      }else{
           setting <- paste("Analysis ID:", mat$analysis_id)
      }
-     
+
      if(any(c("r_as_r", "d_as_r") %in% ma_metric)){
           if(is.null(x_limits)) x_limits <- c(-1, 1)
           if(is.null(x_breaks)) x_breaks <- seq(-1, 1, .5)
@@ -318,10 +318,10 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           }
      }
 
-     
+
      conf_out <- confidence(mean = unlist(mat[,mean_es]),
-                            sd = unlist(mat[,sd_es]), 
-                            k = unlist(mat[,"k"]), 
+                            sd = unlist(mat[,sd_es]),
+                            k = unlist(mat[,"k"]),
                             conf_level = conf_level, conf_method = conf_method)
      colnames(conf_out) <- c("lowerci", "upperci")
      mat <- data.frame(tester = "Summary",
@@ -330,7 +330,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                        yi = unlist(mat[,mean_es]))
      colnames(mat) <- c("tester", "setting", "cite", "yi")
      mat <- cbind(mat, conf_out)
-     
+
      dat <- NULL
      for(i in 1:length(escalc_list)){
           if(.ma_method == "bb"){
@@ -382,9 +382,9 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           }
      }
 
-     ggplot(plot_dat, aes(y = cite, x = yi, xmin = lowerci, xmax = upperci, shape = tester)) +
+     ggplot(plot_dat, aes(y = .data$cite, x = .data$yi, xmin = .data$lowerci, xmax = .data$upperci, shape = .data$tester)) +
           geom_point(color = 'black') +
-          geom_point(data=subset(dat, tester=='Summary'), color='black', shape=18, size=4) +
+          geom_point(data=subset(dat, .data$tester=='Summary'), color='black', shape=18, size=4) +
           geom_errorbarh(height=.1) +
           .scale_x_continuous +
           ylab(y_lab) +

@@ -200,12 +200,12 @@ filter_u <- function(u_vec, wt_vec){
 #'                             rxxi = c(.8, .7), wt_rxxi = c(50, 150),
 #'                             ux = c(.9, .8), wt_ux = c(50, 150),
 #'                             ut = c(.8, .7), wt_ut = c(50, 150))
-#' 
+#'
 #' ad_obj_tsa <- create_ad_tsa(rxxa = c(.9, .8), n_rxxa = c(50, 150),
 #'                             rxxi = c(.8, .7), n_rxxi = c(50, 150),
 #'                             ux = c(.9, .8), ni_ux = c(50, 150),
 #'                             ut = c(.8, .7), ni_ut = c(50, 150))
-#' 
+#'
 #' screen_ad_int(x = ad_obj_int)
 #' screen_ad_int(x = ad_obj_tsa)
 #' screen_ad_int(x = data.frame(Value = 1, Weight = 1))
@@ -224,7 +224,7 @@ screen_ad_int <- function(x){
      if(is.data.frame(x)){
           if(!("Distribution" %in% colnames(x)))
                stop("x is not an interactive artifact distribution object", call. = FALSE)
-          
+
           nomenclature <- (grepl(x = ad_contents, pattern = "Null") |
                                 grepl(x = ad_contents, pattern = "qxi_irr") | grepl(x = ad_contents, pattern = "qxi_drr") |
                                 grepl(x = ad_contents, pattern = "qxa_irr") | grepl(x = ad_contents, pattern = "qxa_drr") |
@@ -235,7 +235,7 @@ screen_ad_int <- function(x){
                                    "rxxi_irr", "rxxi_drr", "rxxa_irr", "rxxa_drr", "ux", "ut"))
 
           if(nomenclature){
-               
+
                if(all(lapply(x$Distribution, class) == "data.frame")){
                     if(all(lapply(x$Distribution, ncol) == 2)){
                          if(!all(unlist(lapply(x$Distribution, function(x) all(colnames(x) == c("Value", "Weight")))))){
@@ -543,7 +543,7 @@ clean_warning <- function(warn_obj1, warn_obj2){
           warn_obj$Frequency2[is.na(warn_obj$Frequency2)] <- 0
           warn_obj$difference <- warn_obj$Frequency2 - warn_obj$Frequency1
           if(any(warn_obj$difference > 0)){
-               warn_obj <- filter(warn_obj, difference > 0)
+               warn_obj <- filter(warn_obj, .data$difference > 0)
                warn_obj$Frequency1 <- warn_obj$difference <- NULL
                colnames(warn_obj)[2] <- "Frequency"
           }else{

@@ -273,10 +273,10 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
 #' @param ... Further arguments.
 #'
 #' @return A list of meta-analytic results.
-#' 
+#'
 #' @importFrom tidyr nest
-#' @importFrom rlang .data  
-#' @importFrom purrr map 
+#' @importFrom rlang .data
+#' @importFrom purrr map
 #'
 #' @keywords internal
 ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
@@ -321,12 +321,12 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                colnames(moderator_matrix) <- moderator_names$all
                moderators$moderator_matrix <- moderator_matrix
           }
-          
+
           moderator_info <- organize_moderators(moderator_matrix = cat_moderator_matrix,
                                                 es_data = es_data,
                                                 moderator_type = moderator_type,
                                                 construct_x = construct_x, construct_y = construct_y,
-                                                construct_order = construct_order, moderator_levels = moderator_levels, 
+                                                construct_order = construct_order, moderator_levels = moderator_levels,
                                                 moderator_names = .moderator_names)
      }
 
@@ -336,31 +336,31 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           moderator_matrix <- cat_moderator_matrix <- NULL
      }
 
-     moderator_tab <- data %>% 
-          group_by(analysis_id) %>% do(.data[1,analysis_id_variables])
-     results_df <- suppressWarnings(data %>% 
-                                         group_by(analysis_id) %>%
-                                         nest() %>% 
-                                         mutate(ma_out = map(data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
+     moderator_tab <- data %>%
+          group_by(.data$analysis_id) %>% do(.data[1,analysis_id_variables])
+     results_df <- suppressWarnings(data %>%
+                                         group_by(.data$analysis_id) %>%
+                                         nest() %>%
+                                         mutate(ma_out = map(.data$data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
      results_df <- suppressMessages(suppressWarnings(full_join(moderator_tab, results_df)))
      results_df$analysis_id <- results_df$data <- NULL
-     
+
      results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
      results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
      results_df$moderator_info <- rep(list(NULL), nrow(results_df))
      results_df$moderator_info[[1]] <- append(moderators, list(data = results_df$escalc[[1]]))
-     
-     results_df$ma_out <- NULL          
-     
+
+     results_df$ma_out <- NULL
+
      if(es_type == "r" & ma_type == "ic"){
           for(i in 1:nrow(results_df)){
                method_details <- table(results_df$escalc[[i]]$individual_correction$true_score$correction_type)
                method_details <- data.frame(Correction = names(method_details), Frequency = as.numeric(method_details))
-               
-               attributes(results_df$meta_tables[[i]]$individual_correction) <- append(attributes(results_df$meta_tables[[i]]$individual_correction), 
+
+               attributes(results_df$meta_tables[[i]]$individual_correction) <- append(attributes(results_df$meta_tables[[i]]$individual_correction),
                                                                                        list(method_details = method_details))
           }
      }
-     
+
      ungroup(results_df)
 }

@@ -3,7 +3,7 @@
 #' Takes a meta-analysis class object of \emph{d} values or correlations (classes \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, and \code{d_as_r}; second-order meta-analyses are currently not supported) as an input and uses conversion formulas and Taylor series approximations to convert effect sizes and variance estimates, respectively.
 #'
 #' @param ma_obj A meta-analysis object of class \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, or \code{d_as_r}
-#' @param ... Additional arguments. 
+#' @param ... Additional arguments.
 #'
 #' @return A meta-analysis converted to the \emph{d} value metric (if ma_obj was a meta-analysis in the correlation metric) or converted to the correlation metric (if ma_obj was a meta-analysis in the \emph{d} value metric).
 #' @export
@@ -28,47 +28,46 @@ convert_ma <- function(ma_obj, ...){
 
      additional_args <- list(...)
      .attributes <- attributes(ma_obj)
-     
+
      if(is.null(additional_args$ma_metric)){
           ma_metric <- attributes(ma_obj)$ma_metric
      }else{
           ma_metric <- additional_args$ma_metric
      }
-     
+
      if(is.null(additional_args$ma_methods)){
           ma_methods <- attributes(ma_obj)$ma_methods
      }else{
           ma_methods <- additional_args$ma_methods
      }
-     
-     ma_obj_i <- ma_obj[1,]
-     ma_obj <- ma_obj %>% group_by(analysis_id) %>% 
+
+     ma_obj <- ma_obj %>% group_by(.data$analysis_id) %>%
           do(.convert_ma(ma_obj_i = .data, ma_obj = ma_obj, ma_metric = ma_metric, ma_methods = ma_methods))
-     
+
      if(ma_metric == "r_as_r") .ma_metric <- "r_as_d"
      if(ma_metric == "d_as_r") .ma_metric <- "d_as_d"
-     
+
      if(ma_metric == "r_as_d") .ma_metric <- "r_as_r"
      if(ma_metric == "d_as_d") .ma_metric <- "d_as_r"
-     
+
      if("construct_x" %in% colnames(ma_obj)){
           colnames(ma_obj)[colnames(ma_obj) == "construct_x"] <- "group_contrast"
      }else{
-          if("group_contrast" %in% colnames(ma_obj)) 
+          if("group_contrast" %in% colnames(ma_obj))
                colnames(ma_obj)[colnames(ma_obj) == "group_contrast"] <- "construct_x"
      }
-     
+
      .attributes$names <- attributes(ma_obj)$names
      attributes(ma_obj) <- .attributes
      attributes(ma_obj)$ma_metric <- .ma_metric
-     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, 
+     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history,
                                                list(match.call()))
-     
+
      ma_obj
 }
 
 .convert_ma <- function(ma_obj_i, ma_obj, ma_methods, ma_metric){
-     
+
      k <- ma_obj_i$meta_tables[[1]]$barebones$k
      att <- attributes(ma_obj)
      conf_level <- att$inputs$conf_level
@@ -76,7 +75,7 @@ convert_ma <- function(ma_obj, ...){
      conf_method <- att$inputs$conf_method
      cred_method <- att$inputs$cred_method
      error_type <- att$inputs$error_type
-     
+
      if(is.null(ma_obj_i$escalc[[1]]$barebones$pi)){
           pi_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
           pi_vec <- rep(.5, length(k))
@@ -84,7 +83,7 @@ convert_ma <- function(ma_obj, ...){
           pi_list <- ma_obj_i$escalc[[1]]$barebones$pi
           pi_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pi, wt = ma_obj_i$escalc[[1]]$barebones$weight)
      }
-     
+
      if(is.null(ma_obj_i$escalc[[1]]$barebones$pa)){
           pa_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
           pa_vec <- rep(.5, length(k))
@@ -92,7 +91,7 @@ convert_ma <- function(ma_obj, ...){
           pa_list <- ma_obj_i$escalc[[1]]$barebones$pa
           pa_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pa, wt = ma_obj_i$escalc[[1]]$barebones$weight)
      }
-     
+
      if(is.null(ma_obj_i$escalc[[1]]$barebones$pa_ad)){
           pa_ad_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
           pa_ad_vec <- rep(.5, length(k))
@@ -100,13 +99,13 @@ convert_ma <- function(ma_obj, ...){
           pa_ad_list <- ma_obj_i$escalc[[1]]$barebones$pa_ad
           pa_ad_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pa_ad, wt = ma_obj_i$escalc[[1]]$barebones$weight)
      }
-     
+
      correction_names_r <- c("true_score", "validity_generalization_x", "validity_generalization_y")
      correction_names_d <- c("latentGroup_latentY", "observedGroup_latentY", "latentGroup_observedY")
-     
+
      if(any(ma_metric == "r_as_r") | any(ma_metric == "d_as_r")){
           if(any(ma_methods == "bb")){
-               
+
                if(error_type == "mean"){
                     mean_r <- ma_obj_i$meta_tables[[1]]$barebones$mean_r
 
@@ -117,67 +116,67 @@ convert_ma <- function(ma_obj, ...){
                                                                               var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }
-               
+
                ma_obj_i$meta_tables[[1]]$barebones <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$barebones, p_vec = pi_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
           }
-          
+
           if(any(ma_methods == "ad")){
                ma_obj_i$meta_tables[[1]]$artifact_distribution$true_score <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$true_score,
                                                                                               p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
                ma_obj_i$meta_tables[[1]]$artifact_distribution$validity_generalization_x <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$validity_generalization_x,
                                                                                                              p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-               ma_obj_i$meta_tables[[1]]$artifact_distribution$validity_generalization_y <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$validity_generalization_y, 
+               ma_obj_i$meta_tables[[1]]$artifact_distribution$validity_generalization_y <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$validity_generalization_y,
                                                                                                              p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
           }
-          
+
           if(any(ma_methods == "ic")){
                mean_rtpa <- ma_obj_i$meta_tables[[1]]$individual_correction$true_score$mean_rho
                mean_rxpa <- ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_x$mean_rho
                mean_rtya <- ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_y$mean_rho
-               
+
                if(error_type == "mean"){
                     ## Deal with true-score data
                     ma_obj_i$escalc[[1]]$individual_correction$true_score$vi <- convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$true_score$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$true_score$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi, p = pa_list)
-                    
+
                     ## Deal with vgx data
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi <- convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi, p = pa_list)
-                    
+
                     ## Deal with vgy data
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi <- convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi, p = pa_list)
                }else{
                     ## Deal with true-score data
-                    ma_obj_i$escalc[[1]]$individual_correction$true_score$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi, 
+                    ma_obj_i$escalc[[1]]$individual_correction$true_score$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi,
                                                                                                      var = ma_obj_i$escalc[[1]]$individual_correction$true_score$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$true_score$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi, p = pa_list)
-                    
+
                     ## Deal with vgx data
-                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi, 
+                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi,
                                                                                                                     var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi, p = pa_list)
-                    
+
                     ## Deal with vgy data
-                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi, 
+                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi,
                                                                                                                     var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi, p = pa_list)
                }
-               
+
                ## Convert meta-analytic tables
-               ma_obj_i$meta_tables[[1]]$individual_correction$true_score <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$true_score, 
+               ma_obj_i$meta_tables[[1]]$individual_correction$true_score <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$true_score,
                                                                                               p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-               ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_x <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_x, 
+               ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_x <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_x,
                                                                                                              p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-               ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_y <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_y, 
+               ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_y <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$validity_generalization_y,
                                                                                                              p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
           }
      }
-     
-     
+
+
      if(any(ma_metric == "d_as_d") | any(ma_metric == "r_as_d")){
           if(any(ma_methods == "bb")){
-               
+
                if(error_type == "mean"){
                     mean_d <- ma_obj_i$meta_tables[[1]]$barebones$mean_d
 
@@ -190,30 +189,30 @@ convert_ma <- function(ma_obj, ...){
                }
                ma_obj_i$meta_tables[[1]]$barebones <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$barebones, p_vec = pi_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
           }
-          
+
           if(any(ma_methods == "ad")){
-               ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_latentY, 
+               ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_latentY,
                                                                                                        p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-               ma_obj_i$meta_tables[[1]]$artifact_distribution$observedGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$observedGroup_latentY, 
+               ma_obj_i$meta_tables[[1]]$artifact_distribution$observedGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$observedGroup_latentY,
                                                                                                          p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
-               ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_observedY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_observedY, 
+               ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_observedY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$artifact_distribution$latentGroup_observedY,
                                                                                                          p_vec = pa_ad_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
           }
-          
+
           if(any(ma_methods == "ic")){
                mean_dtpa <- ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_latentY$mean_delta
                mean_dxpa <- ma_obj_i$meta_tables[[1]]$individual_correction$observedGroup_latentY$mean_delta
                mean_dtya <- ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_observedY$mean_delta
-               
+
                if(error_type == "mean"){
                     ## Deal with true-score data
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi <- convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi, p = pa_list)
-                    
+
                     ## Deal with vgx data
                     ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi <- convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi, p = pa_list)
-                    
+
                     ## Deal with vgy data
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi <- convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi, p = pa_list)
@@ -222,29 +221,29 @@ convert_ma <- function(ma_obj, ...){
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi,
                                                                                                               var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi, p = pa_list)
-                    
+
                     ## Deal with vgx data
                     ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi,
                                                                                                                 var = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi, p = pa_list)
-                    
+
                     ## Deal with vgy data
-                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi, 
+                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi,
                                                                                                                 var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi, p = pa_list)
                }
-               
+
                ## Convert meta-analytic tables
-               ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_latentY, 
+               ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_latentY,
                                                                                                        p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
                ma_obj_i$meta_tables[[1]]$individual_correction$observedGroup_latentY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$observedGroup_latentY,
                                                                                                    p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
                ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_observedY <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$individual_correction$latentGroup_observedY,
                                                                                                    p_vec = pa_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
           }
-          
+
      }
-     
+
      ## Re-define class of converted object
      if(any(ma_metric == "r_as_r") | any(ma_metric == "d_as_r")){
 
@@ -255,39 +254,39 @@ convert_ma <- function(ma_obj, ...){
                names(ma_obj_i$meta_tables[[1]]$individual_correction)[names_ic == correction_names_r[1]] <- correction_names_d[1]
                names(ma_obj_i$meta_tables[[1]]$individual_correction)[names_ic == correction_names_r[2]] <- correction_names_d[2]
                names(ma_obj_i$meta_tables[[1]]$individual_correction)[names_ic == correction_names_r[3]] <- correction_names_d[3]
-               
+
                names(ma_obj_i$escalc[[1]]$individual_correction)[names_ic == correction_names_r[1]] <- correction_names_d[1]
                names(ma_obj_i$escalc[[1]]$individual_correction)[names_ic == correction_names_r[2]] <- correction_names_d[2]
                names(ma_obj_i$escalc[[1]]$individual_correction)[names_ic == correction_names_r[3]] <- correction_names_d[3]
           }
-          
+
           if(!is.null(names_ad)){
                names(ma_obj_i$meta_tables[[1]]$artifact_distribution)[names_ad == correction_names_r[1]] <- correction_names_d[1]
                names(ma_obj_i$meta_tables[[1]]$artifact_distribution)[names_ad == correction_names_r[2]] <- correction_names_d[2]
                names(ma_obj_i$meta_tables[[1]]$artifact_distribution)[names_ad == correction_names_r[3]] <- correction_names_d[3]
           }
-          
+
      }else{
 
           names_ic <- names(ma_obj_i$meta_tables[[1]]$individual_correction)
           names_ad <- names(ma_obj_i$meta_tables[[1]]$artifact_distribution)
-          
+
           if(!is.null(names_ic)){
                names(ma_obj_i$meta_tables[[1]]$individual_correction)[names_ic == correction_names_d[1]] <- correction_names_r[1]
                names(ma_obj_i$meta_tables[[1]]$individual_correction)[names_ic == correction_names_d[2]] <- correction_names_r[2]
                names(ma_obj_i$meta_tables[[1]]$individual_correction)[names_ic == correction_names_d[3]] <- correction_names_r[3]
-               
+
                names(ma_obj_i$escalc[[1]]$individual_correction)[names_ic == correction_names_d[1]] <- correction_names_r[1]
                names(ma_obj_i$escalc[[1]]$individual_correction)[names_ic == correction_names_d[2]] <- correction_names_r[2]
                names(ma_obj_i$escalc[[1]]$individual_correction)[names_ic == correction_names_d[3]] <- correction_names_r[3]
           }
-          
+
           if(!is.null(names_ad)){
                names(ma_obj_i$meta_tables[[1]]$artifact_distribution)[names_ad == correction_names_d[1]] <- correction_names_r[1]
                names(ma_obj_i$meta_tables[[1]]$artifact_distribution)[names_ad == correction_names_d[2]] <- correction_names_r[2]
                names(ma_obj_i$meta_tables[[1]]$artifact_distribution)[names_ad == correction_names_d[3]] <- correction_names_r[3]
           }
-          
+
      }
 
      ma_obj_i
@@ -489,7 +488,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      .attributes <- attributes(ma_table)
      .class <- class(ma_table)
-     
+
      col_ids <- .identify_ma_cols(col_names = colnames(ma_table))
 
      ma_table_subset <- ma_table[,col_ids$old_cols]
@@ -599,17 +598,17 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
      ma_table[,col_ids$old_cols] <- ma_table_subset
      colnames(ma_table)[colnames(ma_table) %in% col_ids$old_cols] <- col_ids$new_cols
      .attributes$names <- col_ids$new_cols
-     
+
      if(any(col_ids$method == c("r_bb", "r_ad", "r_ic"))){
           .attributes$ma_type <- gsub(x = col_ids$method, pattern = "r_", replacement = "d_")
      }else if(any(col_ids$method == c("d_bb", "d_ad", "d_ic"))){
           .attributes$ma_type <- gsub(x = col_ids$method, pattern = "d_", replacement = "r_")
      }
-     
+
      ma_table <- fix_df(ma_table)
      attributes(ma_table) <- .attributes
      class(ma_table) <- .class
-     
+
      ma_table
 }
 

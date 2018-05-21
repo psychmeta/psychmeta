@@ -6,7 +6,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa,
                           rxxa_type = rep("alpha", length(rxxa)),
                           k_items_rxxa = rep(NA, length(rxxa)),
-                          
+
                           ux = NULL, ni_ux = NULL, wt_ux = ni_ux,
                           ut = NULL, ni_ut = NULL, wt_ut = ni_ut,
 
@@ -15,9 +15,9 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           ...){
 
      ## TODO: Add standard-error estimates for different types of reliability statistics
-     
-     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi, 
-                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa, 
+
+     inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
+                    rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
                     ux = ux, ni_ux = ni_ux, wt_ux = wt_ux,
                     ut = ut, ni_ut = ni_ut, wt_ut = wt_ut,
                     ...)
@@ -105,7 +105,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
      if(!is.null(rxxa)){
           if(!is.null(n_rxxa)){
-               mean_n_rxxa <- mean(n_rxxa, na.rm = TRUE)  
+               mean_n_rxxa <- mean(n_rxxa, na.rm = TRUE)
                var_e_rxxa <- var_error_rel(rel = rxxa_mean, n = mean_n_rxxa)
                var_e_qxa <- var_error_q(q = qxa_mean, n = mean_n_rxxa)
           }else{
@@ -803,7 +803,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
           attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
           class(out) <- "ad_int_list"
-          
+
           out
      }
 
@@ -818,12 +818,12 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      .attributes <- attributes(ad_out)
      out <- tibble(Artifact = names(ad_out))
      out$Distribution <- ad_out
-     
+
      out_raw <- do.call(est_summaries, args = arglist_raw)
 
      attributes(out) <- append(attributes(out),
-                               list(summary = .attributes$summary, 
-                                    ad_contents = .attributes$ad_contents, 
+                               list(summary = .attributes$summary,
+                                    ad_contents = .attributes$ad_contents,
                                     summary_raw = attributes(out_raw)$summary,
                                     ad_contents_raw = attributes(out_raw)$ad_contents,
                                     inputs = inputs))
@@ -837,13 +837,13 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
 #' @rdname create_ad
 #' @export
-create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)), 
-                          mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)), mean_k_items_qxi = rep(NA, length(mean_qxi)), 
-                          mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_k_items_rxxi = rep(NA, length(mean_rxxi)), 
+create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
+                          mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)), mean_k_items_qxi = rep(NA, length(mean_qxi)),
+                          mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_k_items_rxxi = rep(NA, length(mean_rxxi)),
 
-                          rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)), 
-                          mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)), mean_k_items_qxa = rep(NA, length(mean_qxa)), 
-                          mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)), mean_k_items_rxxa = rep(NA, length(mean_rxxa)), 
+                          rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)),
+                          mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)), mean_k_items_qxa = rep(NA, length(mean_qxa)),
+                          mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)), mean_k_items_rxxa = rep(NA, length(mean_rxxa)),
 
                           ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
                           mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = NA, dep_sds_ux_spec = FALSE,
@@ -856,7 +856,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                           var_unbiased = TRUE, ...){
 
      ## TODO: Add standard-error estimates for different types of reliability statistics
-     
+
      inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
                     mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type, mean_k_items_qxi = mean_k_items_qxi,
                     mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type, mean_k_items_rxxi = mean_k_items_rxxi,
@@ -883,7 +883,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
      Na_ut <- mean_na_ut * k_ut
 
      art_summary <- function(art_vec, wt_vec, ni_vec, na_vec = NULL, k_items = NULL, dependent_sds = FALSE,
-                             mean_art_1 = NULL, var_art_1 = NULL, k_art_1 = NULL, mean_ni_art_1 = NULL, mean_na_art_1 = NA, dependent_sds_art_1 = FALSE, mean_k_items_art_1 = NULL, 
+                             mean_art_1 = NULL, var_art_1 = NULL, k_art_1 = NULL, mean_ni_art_1 = NULL, mean_na_art_1 = NA, dependent_sds_art_1 = FALSE, mean_k_items_art_1 = NULL,
                              mean_art_2 = NULL, var_art_2 = NULL, k_art_2 = NULL, mean_n_art_2 = NULL, mean_k_items_art_2 = NULL, art = "q", var_unbiased){
           if(!is.null(art_vec)){
                if(is.null(wt_vec)) wt_vec <- rep(1, length(art_vec))
@@ -1860,7 +1860,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           }else{
                if(length(art_vec) != length(wt_vec)) stop("Lengths of art_vec and wt_vec differ")
                art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec)
-               art_tab <- as.data.frame(ungroup(art_tab %>% group_by(Value) %>% do(data.frame(Value = .$Value[1], Weight = sum(.$Weight)))))
+               art_tab <- as.data.frame(ungroup(art_tab %>% group_by(.data$Value) %>% do(data.frame(Value = .data$Value[1], Weight = sum(.data$Weight)))))
                art_tab <- art_tab[!is.na(art_tab[,1]),]
                art_tab[,"Weight"] <- art_tab[,"Weight"] / sum(art_tab[,"Weight"])
                art_tab

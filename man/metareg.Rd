@@ -9,7 +9,7 @@ metareg(ma_obj, formula_list = NULL, ...)
 \arguments{
 \item{ma_obj}{Meta-analysis object.}
 
-\item{formula_list}{Optional list of regression formulas to evaluate. 
+\item{formula_list}{Optional list of regression formulas to evaluate.
 NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly.}
 
 \item{...}{Additional arguments.}
