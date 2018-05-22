@@ -1,14 +1,12 @@
 #' @rdname ma_d
 #' @export
 #' @examples
-#' \dontrun{
 #' ### Demonstration of ma_d_ic ###
 #' ## Example meta-analyses using simulated data:
 #' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 #' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-#' }
 ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     treat_as_d = TRUE, 
                     wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 

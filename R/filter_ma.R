@@ -29,8 +29,6 @@
 #'                moderators = moderator, data = data_r_meas_multi,
 #'                impute_artifacts = FALSE, clean_artifacts = FALSE)
 #' ma_obj <- ma_r_ad(ma_obj, correct_rr_x = FALSE, correct_rr_y = FALSE)
-#' ma_obj <- heterogeneity(ma_obj)
-#' ma_obj <- sensitivity(ma_obj, bootstrap = FALSE)
 #'
 #' filter_ma(ma_obj, analyses="all")
 #' filter_ma(ma_obj, analyses=list(construct="X"), match="all")
