@@ -81,7 +81,7 @@
 
 #' @rdname get_stuff
 #' @export
-get_metafor <- get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
+get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
 
@@ -91,6 +91,10 @@ get_metafor <- get_escalc <- function(ma_obj, analyses = "all", match = c("all",
      class(out) <- "get_escalc"
      out
 }
+
+#' @rdname get_stuff
+#' @export
+get_metafor <- get_escalc
 
 #' @rdname get_stuff
 #' @export
