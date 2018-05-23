@@ -58,12 +58,12 @@ This function helps researchers to examine the stability/fragility of their meta
 \examples{
 ## Run a meta-analysis using simulated UVIRR data:
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
-correct_rr_y = FALSE, data = data_r_uvirr)
+                  correct_rr_y = FALSE, data = data_r_uvirr)
 ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
 
 ## Pass the meta-analysis object to the sensitivity() function:
-ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10, cumulative = TRUE,
-boot_ci_type = "norm", sort_method = "inv_var")
+ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10,
+                      boot_ci_type = "norm", sort_method = "inv_var")
 
 ## Examine the tables and plots produced for the IC meta-analysis:
 ma_obj$bootstrap[[1]]$barebones

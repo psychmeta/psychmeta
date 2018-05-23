@@ -97,6 +97,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      if(length(sign_ryz) == 1) sign_ryz <- rep(sign_ryz, nrow(ma_obj))
      ma_obj$sign_ryz <- sign_ryz
           
+     ma_obj_i <- ma_obj[1,]
      ma_list <- apply(ma_obj, 1, function(ma_obj_i){
           if(is.null(ad_obj_x) | is.null(ad_obj_y)){
                if(any(attributes(ma_obj_i)$ma_methods == "ic")){
@@ -175,7 +176,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                    indirect_rr_y = ma_obj_i$indirect_rr_y,
                    residual_ads = residual_ads, 
                    sign_rxz = ma_obj_i$sign_rxz, 
-                   sign_ryz = ma_obj_i$sign_ryz, decimals = decimals)#, ...)
+                   sign_ryz = ma_obj_i$sign_ryz, decimals = decimals, ...)
      })
      
      ma_obj$correction_method <- NULL
@@ -697,7 +698,7 @@ gather_ma_ad <- function(x){
           }
           
           flip_xy <- ifelse(correct_rr_y & !correct_rr_x, TRUE, FALSE)
-          x <- list(barebones = ma_r_obj$meta$barebones, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
+          x <- list(barebones = as.data.frame(ma_r_obj$meta$barebones), ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
                     correct_rxx = correct_rxx, correct_ryy = correct_ryy, residual_ads = residual_ads,
                     indirect_rr_x = indirect_rr_x, indirect_rr_y = indirect_rr_y,
                     sign_rxz = sign_rxz, sign_ryz = sign_ryz, cred_level = ma_r_obj$inputs$cred_level,
@@ -710,6 +711,7 @@ gather_ma_ad <- function(x){
           .ma_r_ad_internal <- function(x) UseMethod(generic = "ma_r_ad", object = x)
           
           raw_out <- .ma_r_ad_internal(x = x)
+          
           if(datadump){
                raw_out
           }else{
@@ -726,9 +728,7 @@ gather_ma_ad <- function(x){
                ma_r_obj$artifact_distributions <- out$artifact_distributions
                rm(out)
                
-               new_class <- class(ma_r_obj)
-               
-               return(ma_r_obj)
+               ma_r_obj
           }
      }
      
@@ -742,7 +742,7 @@ gather_ma_ad <- function(x){
      
      out_bb <- .ma_r_bb(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)$meta$barebones
      ma_ad_dump <- ma_arg_list$ma_ad_dump
-     ma_ad_dump$barebones <- out_bb
+     ma_ad_dump$barebones <- as.data.frame(out_bb)
      
      .ma_r_ad_internal <- function(x) UseMethod(generic = "ma_r_ad", object = x)
      out <- gather_ma_ad(.ma_r_ad_internal(x = ma_ad_dump))

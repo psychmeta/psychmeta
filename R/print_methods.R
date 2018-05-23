@@ -603,6 +603,10 @@ print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      correction_type <- attributes(x)$correction_type 
      ma_metric <- attributes(x)$ma_metric 
      
+     additional_args <- list(...)
+     suppress_title <- additional_args$suppress_title
+     if(is.null(suppress_title)) suppress_title <- FALSE
+     
      title_text <- "Summary tibble of psychmeta meta-analysis"
      if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
           title_text <- "Summary tibble of psychmeta meta-analysis of correlations"
@@ -616,8 +620,10 @@ print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
           title_text <- "Summary tibble of psychmeta second-order meta-analysis of d values"
      }
 
-     cat(title_text, " \n")
-     cat("---------------------------------------------------------------------- \n")
+     if(!suppress_title){
+          cat(title_text, " \n")
+          cat("---------------------------------------------------------------------- \n")    
+     }
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)
@@ -744,7 +750,10 @@ print.ma_table <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
      
      if(!suppress_title)
           cat("Meta-analysis table \n")
-     print.data.frame(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
+     
+     x <- ungroup(x)
+     class(x) <- class(x)[class(x) != "ma_table"]
+     print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
 }
 
 

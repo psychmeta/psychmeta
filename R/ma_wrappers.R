@@ -336,12 +336,14 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           moderator_matrix <- cat_moderator_matrix <- NULL
      }
 
-     moderator_tab <- data %>%
+     moderator_tab <- data %>% 
           group_by(.data$analysis_id) %>% do(.data[1,analysis_id_variables])
-     results_df <- suppressWarnings(data %>%
+     
+     results_df <- suppressWarnings(data %>% 
                                          group_by(.data$analysis_id) %>%
-                                         nest() %>%
-                                         mutate(ma_out = map(.data$data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
+                                         nest() %>% 
+                                         mutate(ma_out = map(data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
+
      results_df <- suppressMessages(suppressWarnings(full_join(moderator_tab, results_df)))
      results_df$analysis_id <- results_df$data <- NULL
 

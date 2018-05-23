@@ -113,6 +113,12 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           ts_label <- "latentGroup_latentY"
           vgx_label <- "observedGroup_latentY"
           vgy_label <- "latentGroup_observedY"
+     }else if(ma_metric == "r_order2"){
+          ts_label <- vgx_label <- vgy_label <- NULL
+     }else if(ma_metric == "d_order2"){
+          ts_label <- vgx_label <- vgy_label <- NULL
+     }else if(ma_metric == "generic"){
+          ts_label <- vgx_label <- vgy_label <- NULL
      }
 
      ma_methods <- ma_methods[ma_methods %in% attributes(ma_obj)$ma_methods]
@@ -132,88 +138,108 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 
      if("ic" %in% ma_methods){
           .contents <- NULL
-          if("ts" %in% correction_types){
-               out$individual_correction[[ts_label]] <-
+          
+          if(ma_metric %in% c("r_order2", "d_order2")){
+               out$individual_correction <-
                     compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                     correction_type = "ts")
-               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                    .contents <- c(.contents, "true score")
-               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                    .contents <- c(.contents, "latent group and latent Y")
-               }
                total_tables <- total_tables + 1
-          }
-
-          if("vgx" %in% correction_types){
-               out$individual_correction[[vgx_label]] <-
-                    compile_metatab(ma_obj = ma_obj, ma_method = "ic",
-                                    correction_type = "vgx")
-               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                    .contents <- c(.contents, "validity generalization (X as predictor)")
-               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                    .contents <- c(.contents, "observed group and latent Y")
+               
+               contents <- c(contents, "- individual correction \n")
+          }else{
+               if("ts" %in% correction_types){
+                    out$individual_correction[[ts_label]] <-
+                         compile_metatab(ma_obj = ma_obj, ma_method = "ic",
+                                         correction_type = "ts")
+                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                         .contents <- c(.contents, "true score")
+                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                         .contents <- c(.contents, "latent group and latent Y")
+                    }
+                    total_tables <- total_tables + 1
                }
-               total_tables <- total_tables + 1
-          }
-
-          if("vgy" %in% correction_types){
-               out$individual_correction[[vgy_label]] <-
-                    compile_metatab(ma_obj = ma_obj, ma_method = "ic",
-                                    correction_type = "vgy")
-               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                    .contents <- c(.contents, "validity generalization (Y as predictor)")
-               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                    .contents <- c(.contents, "latent group and observed Y")
+               
+               if("vgx" %in% correction_types){
+                    out$individual_correction[[vgx_label]] <-
+                         compile_metatab(ma_obj = ma_obj, ma_method = "ic",
+                                         correction_type = "vgx")
+                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                         .contents <- c(.contents, "validity generalization (X as predictor)")
+                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                         .contents <- c(.contents, "observed group and latent Y")
+                    }
+                    total_tables <- total_tables + 1
                }
-               total_tables <- total_tables + 1
+               
+               if("vgy" %in% correction_types){
+                    out$individual_correction[[vgy_label]] <-
+                         compile_metatab(ma_obj = ma_obj, ma_method = "ic",
+                                         correction_type = "vgy")
+                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                         .contents <- c(.contents, "validity generalization (Y as predictor)")
+                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                         .contents <- c(.contents, "latent group and observed Y")
+                    }
+                    total_tables <- total_tables + 1
+               }    
+               
+               if(!is.null(.contents))
+                    contents <- c(contents, paste0("- individual correction \n     - ",
+                                                   paste0(.contents, collapse = "\n     - ")))
           }
-
-          if(!is.null(.contents))
-               contents <- c(contents, paste0("- individual correction \n     - ",
-                                              paste0(.contents, collapse = "\n     - ")))
      }
 
      if("ad" %in% ma_methods){
           .contents <- NULL
-          if("ts" %in% correction_types){
-               out$artifact_distribution[[ts_label]] <-
+          
+          if(ma_metric %in% c("r_order2", "d_order2")){
+               out$artifact_distribution <-
                     compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                     correction_type = "ts")
-               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                    .contents <- c(.contents, "true score")
-               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                    .contents <- c(.contents, "latent group and latent Y")
-               }
                total_tables <- total_tables + 1
-          }
-
-          if("vgx" %in% correction_types){
-               out$artifact_distribution[[vgx_label]] <-
-                    compile_metatab(ma_obj = ma_obj, ma_method = "ad",
-                                    correction_type = "vgx")
-               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                    .contents <- c(.contents, "validity generalization (X as predictor)")
-               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                    .contents <- c(.contents, "observed group and latent Y")
+               
+               contents <- c(contents, "- artifact distribution \n")
+          }else{
+               if("ts" %in% correction_types){
+                    out$artifact_distribution[[ts_label]] <-
+                         compile_metatab(ma_obj = ma_obj, ma_method = "ad",
+                                         correction_type = "ts")
+                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                         .contents <- c(.contents, "true score")
+                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                         .contents <- c(.contents, "latent group and latent Y")
+                    }
+                    total_tables <- total_tables + 1
                }
-               total_tables <- total_tables + 1
-          }
-
-          if("vgy" %in% correction_types){
-               out$artifact_distribution[[vgy_label]] <-
-                    compile_metatab(ma_obj = ma_obj, ma_method = "ad",
-                                    correction_type = "vgy")
-               if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                    .contents <- c(.contents, "validity generalization (Y as predictor)")
-               }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                    .contents <- c(.contents, "latent group and observed Y")
+               
+               if("vgx" %in% correction_types){
+                    out$artifact_distribution[[vgx_label]] <-
+                         compile_metatab(ma_obj = ma_obj, ma_method = "ad",
+                                         correction_type = "vgx")
+                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                         .contents <- c(.contents, "validity generalization (X as predictor)")
+                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                         .contents <- c(.contents, "observed group and latent Y")
+                    }
+                    total_tables <- total_tables + 1
                }
-               total_tables <- total_tables + 1
+               
+               if("vgy" %in% correction_types){
+                    out$artifact_distribution[[vgy_label]] <-
+                         compile_metatab(ma_obj = ma_obj, ma_method = "ad",
+                                         correction_type = "vgy")
+                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
+                         .contents <- c(.contents, "validity generalization (Y as predictor)")
+                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
+                         .contents <- c(.contents, "latent group and observed Y")
+                    }
+                    total_tables <- total_tables + 1
+               }
+               
+               if(!is.null(.contents))
+                    contents <- c(contents, paste0("- artifact distribution \n     - ",
+                                                   paste0(.contents, collapse = "\n     - ")))
           }
-
-          if(!is.null(.contents))
-               contents <- c(contents, paste0("- artifact distribution \n     - ",
-                                              paste0(.contents, collapse = "\n     - ")))
      }
 
      as_list <- additional_args$as_list
@@ -673,6 +699,8 @@ compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_
           }
 
      }
+     
+     out <- as_tibble(out)
      attributes(out) <- append(attributes(out), list(ma_type = ma_type,
                                                      ma_method = ma_method,
                                                      correction_type = correction_type,

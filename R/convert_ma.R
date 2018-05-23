@@ -488,6 +488,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      .attributes <- attributes(ma_table)
      .class <- class(ma_table)
+     ma_table <- as.data.frame(ma_table)
 
      col_ids <- .identify_ma_cols(col_names = colnames(ma_table))
 

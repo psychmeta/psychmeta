@@ -6,9 +6,10 @@
 \usage{
 control_psychmeta(error_type = c("mean", "sample"), conf_level = 0.95,
   cred_level = 0.8, conf_method = c("t", "norm"), cred_method = c("t",
-  "norm"), var_unbiased = TRUE, pairwise_ads = FALSE, residual_ads = TRUE,
-  check_dependence = TRUE, collapse_method = c("composite", "average",
-  "stop"), intercor = control_intercor(), clean_artifacts = TRUE,
+  "norm"), var_unbiased = TRUE, pairwise_ads = FALSE,
+  moderated_ads = FALSE, residual_ads = TRUE, check_dependence = TRUE,
+  collapse_method = c("composite", "average", "stop"),
+  intercor = control_intercor(), clean_artifacts = TRUE,
   impute_artifacts = TRUE, impute_method = c("bootstrap_mod",
   "bootstrap_full", "simulate_mod", "simulate_full", "wt_mean_mod",
   "wt_mean_full", "unwt_mean_mod", "unwt_mean_full", "replace_unity", "stop"),
@@ -29,6 +30,8 @@ control_psychmeta(error_type = c("mean", "sample"), conf_level = 0.95,
 \item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
 
 \item{pairwise_ads}{Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).}
+
+\item{moderated_ads}{Logical value that determines whether to compute artifact distributions separately for each moderator combination (\code{TRUE}) or for overall analyses only (\code{FALSE}, default).}
 
 \item{residual_ads}{Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_rho}.}
 

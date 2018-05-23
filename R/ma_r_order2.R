@@ -188,11 +188,21 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      neg_var_rho_ic_order2 <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$var_rho_bar < 0)), na.rm = TRUE)
      neg_var_rho_ad_order2 <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$var_rho_bar < 0)), na.rm = TRUE)
      
+     default_print <- 
+          if(do_ic){
+               "ic"
+          }else if(do_ad){
+               "ad"
+          }else if(do_bb){
+               "bb"
+          }
+
      out <- bind_cols(analysis_id = 1:nrow(out), out)
      attributes(out) <- append(attributes(out), list(call_history = list(call), 
                                                      inputs = inputs, 
                                                      ma_methods = c("bb", "ic", "ad")[c(do_bb, do_ic, do_ad)],
-                                                     ma_metric = "r_order2",
+                                                     ma_metric = "r_order2", 
+                                                     default_print = default_print,
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                      fyi = record_fyis(es_metric = "r_order2",
                                                                        neg_var_r_order2 = neg_var_r_order2,
@@ -411,7 +421,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
 
      class(meta) <- c("ma_table", class(meta))
-     attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic_order2"))
+     attributes(meta) <- append(attributes(meta), 
+                                list(ma_type = "r_ic_order2"))
      
      list(meta = meta,
           escalc = dat)

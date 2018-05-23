@@ -965,7 +965,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      rxyi <- data$rxyi
      n <- data$n
-     n_adj <- data$n_ad
+     n_adj <- data$n_adj
      if(!is.null(ma_arg_list$es_d)){
           es_d <- ma_arg_list$es_d
      }else{
@@ -982,7 +982,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           var_e_xy_vec <- convert_vard_to_varr(d = out$escalc$barebones[,"d"], var = out$escalc$barebones[,"var_e_raw"], p = data$pi)
           out$escalc$barebones$vi <- convert_vard_to_varr(d = out$escalc$barebones$yi, var = out$escalc$barebones$vi, p = data$pi)
           out$escalc$barebones$yi <- convert_es.q_d_to_r(d = out$escalc$barebones$yi, p = data$pi)
-          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = data$n_adj), conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = data$n_adj), 
+                                                 conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
      }else{
           out <- .ma_r_bb(data = data, ma_arg_list = ma_arg_list)
           var_e_xy_vec <- out$escalc$barebones[,"var_e_raw"]
@@ -996,7 +997,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      a_vec <- data$a
      correction_type <- data$correction_type
      sample_id <- data$sample_id
-     citekey <- data$citekey
+     if(any(colnames(data) == "citekey")){
+          citekey <- data$citekey
+     }else{
+          citekey <- NULL
+     }
 
      if(is.null(n_adj)){
           n_adj <- n

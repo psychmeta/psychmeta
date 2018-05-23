@@ -7,6 +7,7 @@
 #' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
 #' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
 #' @param pairwise_ads Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).
+#' @param moderated_ads Logical value that determines whether to compute artifact distributions separately for each moderator combination (\code{TRUE}) or for overall analyses only (\code{FALSE}, default).
 #' @param residual_ads Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_rho}.
 #' @param check_dependence Logical scalar that determines whether database should be checked for violations of independence (\code{TRUE}) or not (\code{FALSE}).
 #' @param collapse_method Character argument that determines how to collapse dependent studies. Options are "composite" (default), "average," and "stop."
@@ -55,6 +56,7 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                               cred_method = c("t", "norm"), 
                               var_unbiased = TRUE,
                               pairwise_ads = FALSE,
+                              moderated_ads = FALSE,
                               residual_ads = TRUE,
                               check_dependence = TRUE, 
                               collapse_method = c("composite", "average", "stop"),
@@ -80,6 +82,7 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                      cred_method = cred_method, 
                      var_unbiased = var_unbiased,
                      pairwise_ads = pairwise_ads,
+                     moderated_ads = moderated_ads,
                      residual_ads = residual_ads,
                      check_dependence = check_dependence, 
                      collapse_method = collapse_method,
@@ -92,20 +95,28 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                      hs_override = hs_override,
                      use_all_arts = use_all_arts, 
                      estimate_pa = estimate_pa)
+     
      additional_args <- list(...)
      .psychmeta_ellipse_args <- additional_args$.psychmeta_ellipse_args
      .control_psychmeta_arg <- additional_args$.control_psychmeta_arg
      rm(additional_args)
      
+     
      if(length(.control_psychmeta_arg) > 0)
           .control_psychmeta_arg <- .control_psychmeta_arg[names(.control_psychmeta_arg) != ""]
-     if(length(.psychmeta_ellipse_args) > 0)
-          control[names(control) %in% names(.control_psychmeta_arg)] <- .control_psychmeta_arg
+     if(length(.control_psychmeta_arg) > 0)
+          .control_psychmeta_arg <- .control_psychmeta_arg[names(.control_psychmeta_arg) %in% names(control)]
+     if(length(.control_psychmeta_arg) > 0)
+          for(i in names(.control_psychmeta_arg)) control[[i]] <- .control_psychmeta_arg[[i]]
+     
      
      if(length(.psychmeta_ellipse_args) > 0)
           .psychmeta_ellipse_args <- .psychmeta_ellipse_args[names(.psychmeta_ellipse_args) != ""]
      if(length(.psychmeta_ellipse_args) > 0)
-          control[names(control) %in% names(.psychmeta_ellipse_args)] <- .psychmeta_ellipse_args
+          .psychmeta_ellipse_args <- .psychmeta_ellipse_args[names(.psychmeta_ellipse_args) %in% names(control)]
+     if(length(.psychmeta_ellipse_args) > 0)
+          for(i in names(.psychmeta_ellipse_args)) control[[i]] <- .psychmeta_ellipse_args[[i]]
+     
      
      control$error_type <- match.arg(control$error_type, c("mean", "sample"))
      
@@ -119,8 +130,13 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
      
      control$var_unbiased <- scalar_arg_warning(arg = control$var_unbiased, arg_name = "var_unbiased")
      if(!is.logical(control$var_unbiased)) stop("'var_unbiased' must be logical", call. = FALSE)
-     control$pairwise_ads <- scalar_arg_warning(arg = control$pairwise_ad, arg_name = "pairwise_ad")
+     
+     control$pairwise_ads <- scalar_arg_warning(arg = control$pairwise_ads, arg_name = "pairwise_ads")
      if(!is.logical(control$pairwise_ads)) stop("'pairwise_ads' must be logical", call. = FALSE)
+     
+     control$moderated_ads <- scalar_arg_warning(arg = control$moderated_ads, arg_name = "moderated_ads")
+     if(!is.logical(control$moderated_ads)) stop("'moderated_ads' must be logical", call. = FALSE)
+     
      control$residual_ads <- scalar_arg_warning(arg = control$residual_ads, arg_name = "residual_ads")
      if(!is.logical(control$residual_ads)) stop("'residual_ads' must be logical", call. = FALSE)
      

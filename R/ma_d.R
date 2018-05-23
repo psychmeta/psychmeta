@@ -500,6 +500,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      out <- ma_r(ma_method = ma_method, ad_type = ad_type, correction_method = correction_method, citekey = citekey,
                  rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
                  construct_x = group_id, construct_y = construct_y,
+                 construct_order = c(group_order, construct_order), 
                  measure_x = NULL, measure_y = measure_y,
                  wt_type = wt_type, correct_bias = correct_bias,
                  correct_rel = correct_rel, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
