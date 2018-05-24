@@ -345,7 +345,7 @@
           
           if(ma_method != "bb"){
                k_items_x_comp <- wt_mean(x = data_x$k_items_x[i], wt = es_data$n[i])
-               k_items_y_comp  <- wt_mean(x = data_x$k_items_y[i], wt = es_data$n[i])
+               k_items_y_comp  <- wt_mean(x = data_y$k_items_y[i], wt = es_data$n[i])
           }
 
           if(ma_method == "bb") rxx_comp <- ux_comp <- ryy_comp <- uy_comp <-

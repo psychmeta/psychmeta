@@ -561,7 +561,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                impute_method <- gsub(x = impute_method, pattern = "_mod", replacement = "_full")
           }
      }
-
+     
      if(is.null(n_adj)) n_adj <- n
 
      ##### Data checking #####
@@ -945,7 +945,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
-     if(!is.null(moderators)) moderators <- as.data.frame(moderators)[valid_r,]
+     if(!is.null(moderators)) moderators <- data.frame(as_tibble(moderators)[valid_r,])
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
      ##### Organize database #####
@@ -1002,7 +1002,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                        data_x = data_x, data_y = data_y, moderators = moderators,
                                        use_as_x = use_as_x, use_as_y = use_as_y,
                                        construct_order = construct_order, cat_moderators = cat_moderators)
-
+     
      es_data <- cleaned_data$es_data
      sample_id <- cleaned_data$sample_id
      citekey <- cleaned_data$citekey
@@ -1026,6 +1026,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                             categorical_moderators = categorical_moderators, impute_method = impute_method)
      data_x <- impute_out$data_x
      data_y <- impute_out$data_y
+     rm(impute_out)
      
      study_construct_pair <- paste(sample_id, construct_x, construct_y)
      dups_exist <- any(duplicated(study_construct_pair))
@@ -1049,10 +1050,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }else{
                str_compmod <- str_compmod_temp <- NULL
           }
-
+          
           full_data_mod <- organize_moderators(moderator_matrix = categorical_moderators, es_data = full_data,
                                                construct_x = NULL, construct_y = NULL,
                                                moderator_type = moderator_type)
+          
           analysis_id_variables <- full_data_mod$id_variables
           full_data_mod <- full_data_mod$data
 
@@ -1060,7 +1062,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           duplicate_samples <- duplicated(sample_id_mod) | duplicated(sample_id_mod, fromLast=TRUE)
 
           duplicates <- full_data_mod[duplicate_samples,]
-
+          
           str_es_data    <- colnames(es_data)
           str_data_x     <- colnames(data_x)
           str_data_y     <- colnames(data_y)
@@ -1085,7 +1087,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                }
 
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
-                                      total = length(duplicates$analysis_id), clear = FALSE, width = options()$width)
+                                      total = length(unique(duplicates$analysis_id)), clear = FALSE, width = options()$width)
           collapsed_data_list <- by(1:length(duplicates$analysis_id), duplicates$analysis_id, function(i){
                progbar$tick()
                out <- .remove_dependency(sample_id = "sample_id", citekey = "citekey", es_data = str_es_data,
@@ -1093,9 +1095,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                          intercor=intercor, partial_intercor = FALSE, construct_x = "construct_x", construct_y = "construct_y",
                                          measure_x = "measure_x", measure_y = "measure_y",
                                          es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
-               cbind(duplicates[i, c("analysis_id", "analysis_type", str_moderators, str_compmod_temp)][rep(1, nrow(out)),], out)
+               cbind(duplicates[i, c("analysis_id", "analysis_type", str_moderators, str_compmod_temp)], out)
           })
-
+          
           collapsed_data <- NULL
           for(i in 1:length(collapsed_data_list)) collapsed_data <- rbind(collapsed_data, collapsed_data_list[[i]])
           colnames(collapsed_data)[colnames(collapsed_data) == "es"] <- "rxyi"
@@ -1193,6 +1195,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                             data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y), 
                                             control_only = TRUE, ...)
           
+          i <- which(construct_pair == construct_pair[1])
           out <- by(1:length(construct_pair), construct_pair, function(i){
                progbar$tick()
 
@@ -1236,7 +1239,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               ux = "ux", ux_observed = "ux_observed",
                               uy = "uy", uy_observed = "uy_observed",
                               sign_rxz = "sign_rxz", sign_ryz = "sign_ryz",
-                              moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz, cat_moderators = cat_moderators, moderator_type = moderator_type,
+                              moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz,
+                              # moderators = moderators, 
+                              cat_moderators = cat_moderators, moderator_type = moderator_type,
                               data = data,
                               
                               control = control_psychmeta(error_type = error_type,

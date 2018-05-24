@@ -25,8 +25,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     supplemental_ads_x = NULL, supplemental_ads_y = NULL,
                     data = NULL, control = control_psychmeta(), ...){
 
-     warn_obj1 <- record_warnings()
      call <- match.call()
+     warn_obj1 <- record_warnings()
 
      wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample",
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
@@ -286,7 +286,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
-     if(!is.null(moderators)) moderators <- data.frame(moderators)[valid_r,]
+     if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators)[valid_r,])
      if(!is.null(sample_id)) sample_id <- sample_id[valid_r]
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
