@@ -41,6 +41,12 @@ convert_ma <- function(ma_obj, ...){
           ma_methods <- additional_args$ma_methods
      }
 
+     if(!is.null(additional_args$record_call)){
+          record_call <- additional_args$record_call
+     }else{
+          record_call <- TRUE
+     }
+     
      ma_obj <- ma_obj %>% group_by(.data$analysis_id) %>%
           do(.convert_ma(ma_obj_i = .data, ma_obj = ma_obj, ma_metric = ma_metric, ma_methods = ma_methods))
 
@@ -60,8 +66,9 @@ convert_ma <- function(ma_obj, ...){
      .attributes$names <- attributes(ma_obj)$names
      attributes(ma_obj) <- .attributes
      attributes(ma_obj)$ma_metric <- .ma_metric
-     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history,
-                                               list(match.call()))
+     if(record_call)
+          attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history,
+                                                    list(match.call()))
 
      ma_obj
 }

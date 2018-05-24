@@ -1,3 +1,164 @@
+join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
+     
+     .attributes <- attributes(ma_obj)
+     
+     match_names <- colnames(ma_obj)[1:(which(colnames(ma_obj) == "meta_tables") - 1)]
+     match_names <- match_names[match_names != "analysis_id"]
+     match_names <- match_names[match_names != "pair_id"]
+     match_names <- match_names[match_names != "analysis_type"]
+     
+     if(!is.null(ad_obj_x)){
+          ad_obj_x <- select_(ad_obj_x, .dots = colnames(ad_obj_x)[colnames(ad_obj_x) != "analysis_type"])
+          if(!("construct_x" %in% colnames(ad_obj_x)) & "construct_y" %in% colnames(ad_obj_x))
+               ad_obj_x <- rename_(ad_obj_x, construct_x = "construct_y")
+          if(!("ad_x" %in% colnames(ad_obj_x)) & "ad_y" %in% colnames(ad_obj_x))
+               ad_obj_x <- rename_(ad_obj_x, ad_x = "ad_y")
+          
+          match_names_x <- match_names[match_names %in% colnames(ad_obj_x)]
+          if(length(match_names_x) > 0){
+               ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_x, by = match_names_x))      
+          }else{
+               if(nrow(ad_obj_x) == 1) ma_obj <- bind_cols(ma_obj, ad_obj_x)
+          }
+     }
+     
+     if(!is.null(ad_obj_y)){
+          ad_obj_y <- select_(ad_obj_y, .dots = colnames(ad_obj_y)[colnames(ad_obj_y) != "analysis_type"])
+          if(!("construct_y" %in% colnames(ad_obj_y)) & "construct_x" %in% colnames(ad_obj_y))
+               ad_obj_y <- rename_(ad_obj_y, construct_y = "construct_x")
+          if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
+               ad_obj_y <- rename_(ad_obj_y, ad_y = "ad_x")
+          
+          match_names_y <- match_names[match_names %in% colnames(ad_obj_y)]
+          if(length(match_names_y) > 0){
+               ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_y, by = match_names_y))   
+          }else{
+               if(nrow(ad_obj_y) == 1) ma_obj <- bind_cols(ma_obj, ad_obj_y)
+          }
+     }
+     
+     .attributes$names <- attributes(ma_obj)$names
+     attributes(ma_obj) <- .attributes
+     
+     ma_obj   
+}
+
+
+reshape_ad2tibble <- function(ma_obj, ad_obj){
+     
+     constructs <- NULL
+     if("construct_x" %in% colnames(ma_obj)) constructs <- as.character(ma_obj$construct_x)
+     if("construct_y" %in% colnames(ma_obj)) constructs <- as.character(ma_obj$construct_y)
+     constructs <- unique(constructs)
+     
+     if(is.null(ad_obj)){
+          out <- NULL
+     }else if("ad_tibble" %in% class(ad_obj)){
+          out <- ad_obj
+     }else if(all(c("tbl_df", "tbl", "data.frame") %in% class(ad_obj))){
+          if(any(c("ad_x", "ad_x") %in% colnames(ad_obj))){
+               out <- ad_obj
+          }else{
+               stop()
+          }
+          
+     }else if(any(c("ad_int", "ad_tsa") %in% class(ad_obj))){
+          
+          if(is.null(constructs)){
+               out <- ma_obj
+               class(out) <- class(out)[!(class(out) %in% "ma_psychmeta")]
+               out <- out[,1:(which(colnames(ma_obj) == "meta_tables") - 1)]
+               out$ad_x <- rep(list(ad_obj), nrow(out))     
+               out$analysis_id <- NULL
+          }else{
+               out <- tibble(construct_x = constructs, 
+                             analysis_type = rep("Overall", length(constructs)), 
+                             ad_x = rep(list(ad_obj), length(constructs)))    
+          }
+          
+     }else if("list" %in% class(ad_obj)){
+          if(any(names(ad_obj) == "")){
+               if(all(names(ad_obj) == "")){
+                    stop("If artifact distributions are supplied as a list, the elements of the list must be named", call. = FALSE)
+               }else{
+                    warning("Some elements of the artifact-distribution list were not named", call. = FALSE)
+                    ad_obj <- ad_obj[names(ad_obj) != ""]    
+               }
+          }
+          
+          is_ad <- unlist(map(ad_obj, function(x){
+               any(c("ad_int", "ad_tsa") %in% class(x))
+          }))
+          
+          if(any(!is_ad)){
+               if(all(!is_ad)){
+                    stop("The elements of the artifact-distribution list must be artifact-distribution objects", call. = FALSE)
+               }else{
+                    warning("Some elements of the artifact-distribution list were not artifact-distribution objects", call. = FALSE)
+                    ad_obj <- ad_obj[is_ad]    
+               }
+          }
+          
+          if(is.null(constructs))
+               stop("ma_obj does not contain construct names: \nArtifact distributions must be supplied as tibbles or individual artifact-distribution objects", call. = FALSE)
+          
+          out <- tibble(construct_x = constructs, 
+                        analysis_type = rep("Overall", length(constructs)))
+          
+          .out <- tibble(construct_x = names(ad_obj), 
+                         analysis_type = rep("Overall", length(ad_obj)), 
+                         ad_x = ad_obj)
+          
+          out <- suppressMessages(suppressWarnings(left_join(out, .out)))
+          rm(.out)
+          
+     }else{
+          stop("Usable artifact-distribution format not found", call. = FALSE)
+     }
+     out
+}
+
+
+manage_ad_objs <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
+     ad_obj_x <- reshape_ad2tibble(ma_obj = ma_obj, ad_obj = ad_obj_x)
+     ad_obj_y <- reshape_ad2tibble(ma_obj = ma_obj, ad_obj = ad_obj_y)
+     
+     ma_obj <- join_maobj_adobj(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y)
+     
+     if(all(c("ad_x", "ad_y") %in% colnames(ma_obj))){
+          ad_list <- apply(ma_obj, 1, function(x){
+               null_entry_x <- is.null(x$ad_x)
+               null_entry_y <- is.null(x$ad_y)
+               if(null_entry_x | null_entry_y){
+                    if(null_entry_x & null_entry_y){
+                         x$ad_x <- x$ad_y <- create_ad_tsa()
+                    }else if(null_entry_x){
+                         if("ad_tsa" %in% class(x$ad_y)){
+                              x$ad_x <- create_ad_tsa()
+                         }else{
+                              x$ad_x <- create_ad_int()
+                         }
+                    }else if(null_entry_y){
+                         if("ad_tsa" %in% class(x$ad_x)){
+                              x$ad_y <- create_ad_tsa()
+                         }else{
+                              x$ad_y <- create_ad_int()
+                         }
+                    }
+               }
+               list(ad_x = x$ad_x, ad_y = x$ad_y)
+          })
+          
+          ma_obj$ad_x <- map(ad_list, function(x) x$ad_x)
+          ma_obj$ad_y <- map(ad_list, function(x) x$ad_y)
+          
+     }
+     
+     ma_obj
+}
+
+
+
 mock_ad <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
                     rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
                     ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux, length(mean_ux)),

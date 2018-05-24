@@ -306,9 +306,9 @@ estimate_u <- function(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL, r
      }
 
      out <- rep(NA, max(unlist(lapply(list(u_sr, u_sd, u_rxx), length))))
-     if(!is.null(u_sd)) out[!is.na(u_sd)] <- out[!is.na(u_sd)] + u_sd[!is.na(u_sd)]
-     if(!is.null(u_rxx)) out[!is.na(u_rxx)] <- out[!is.na(u_rxx)] + u_rxx[!is.na(u_rxx)]
      if(!is.null(u_sd) & !is.null(u_rxx)) out[!is.na(u_sd) & !is.na(u_rxx)] <- out[!is.na(u_sd) & !is.na(u_rxx)] / 2
+     if(!is.null(u_sd)) out[!is.na(u_sd) & is.na(out)] <- u_sd[!is.na(u_sd) & is.na(out)]
+     if(!is.null(u_rxx)) out[!is.na(u_rxx) & is.na(out)] <- u_rxx[!is.na(u_rxx) & is.na(out)]
      if(!is.null(u_sr)) out[is.na(out)] <- u_sr[is.na(out)]
 
      out

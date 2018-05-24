@@ -320,7 +320,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                                                      fyi = NULL)) 
      # out <- namelists.ma_psychmeta(ma_obj = out)
      out
-     # class(out) <- c("ma_psychmeta", class(out))
+     class(out) <- c("ad_tibble", class(out))
      
      return(out)
 }
@@ -355,28 +355,6 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      
 }
 
-
-join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
-     ad_obj_x <- select_(ad_obj_x, .dots = colnames(ad_obj_x)[colnames(ad_obj_x) != "analysis_type"])
-     
-     match_names <- colnames(ma_obj)[1:(which(colnames(ma_obj) == "meta_tables") - 1)]
-     match_names <- match_names[match_names != "analysis_id"]
-     match_names <- match_names[match_names != "pair_id"]
-     match_names <- match_names[match_names != "analysis_type"]
-     match_names_x <- match_names[match_names %in% colnames(ad_obj_x)]
-     
-     .ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_x, by = match_names_x))
-     if(!is.null(ad_obj_y)){
-          ad_obj_y <- select_(ad_obj_y, .dots = colnames(ad_obj_y)[colnames(ad_obj_y) != "analysis_type"])
-          if(!("construct_y" %in% colnames(ad_obj_y))){
-               ad_obj_y <- rename_(ad_obj_y, construct_y = "construct_x", ad_y = "ad_x")
-               match_names_y <- match_names[match_names %in% colnames(ad_obj_y)]
-               .ma_obj <- suppressWarnings(left_join(.ma_obj, ad_obj_y, by = match_names_y))
-          }
-     }
-     
-     .ma_obj   
-}
 
 
 .create_ad_list_internal <- function(full_data, intercor, collapse_method, check_dependence,
