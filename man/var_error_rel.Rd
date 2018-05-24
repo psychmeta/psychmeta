@@ -4,12 +4,17 @@
 \alias{var_error_rel}
 \title{Estimate the error variance of reliability estimates}
 \usage{
-var_error_rel(rel, n)
+var_error_rel(rel, n, rel_type = "alpha", k_items = NULL)
 }
 \arguments{
 \item{rel}{Vector of reliability estimates.}
 
 \item{n}{Vector of sample sizes.}
+
+\item{rel_type}{Character vector indicating the type(s) of reliabilities being analyzed. See documentation for \code{ma_r} for a full list of acceptable reliability types. 
+NOTE: Currently, only alpha has its own dedicated error-variance estimate; the error variance of other reliability types is estimated using the generic definition of reliability as the squared correlation between observed scores and true scores.}
+
+\item{k_items}{Optional numeric vector indicating the number of items in each scale for which reliabilities are being analyzed.}
 }
 \value{
 A vector of sampling-error variances.
@@ -21,12 +26,19 @@ Estimate the error variance of reliability estimates
 The sampling variance of a reliability coefficient is:
 
 \deqn{var_{e}=\frac{4r_{XX}(1-r_{XX})^{2}}{n-1}}{var_e = 4 * rxx * (1 - rxx)^2 / (n - 1)}
+
+For the equation to estimate the variance of coefficient alpha, see Duhachek and Iacobucci (2004).
 }
 \examples{
 var_error_rel(rel = .8, n = 100)
+var_error_rel(rel = .8, n = 100, rel_type = "alpha", k_items = 10)
 }
 \references{
 Dahlke, J. A., & Wiernik, B. M. (2017).
 \emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
 Unpublished manuscript.
+
+Duhachek, A., & Iacobucci, D. (2004).
+Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
+\emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
 }
