@@ -4,14 +4,19 @@
 \alias{var_error_r_bvirr}
 \title{Taylor series approximation of the sampling variance of correlations corrected using the Case V correction for indirect range restriction}
 \usage{
-var_error_r_bvirr(rxyi, var_e = NULL, ni, na = NA, ux, uy, qx,
-  qx_restricted = TRUE, qy, qy_restricted = TRUE, mean_rxyi = NULL,
-  mean_ux = NULL, mean_uy = NULL, mean_qxa = NULL, mean_qya = NULL,
-  var_rxyi = NULL, var_ux = NULL, var_uy = NULL, var_qxa = NULL,
-  var_qya = NULL, cor_rxyi_ux = 0, cor_rxyi_uy = 0, cor_rxyi_qxa = 0,
-  cor_rxyi_qya = 0, cor_ux_uy = 0, cor_ux_qxa = 0, cor_ux_qya = 0,
-  cor_uy_qxa = 0, cor_uy_qya = 0, cor_qxa_qya = 0, sign_rxz = 1,
-  sign_ryz = 1, r_deriv_only = FALSE)
+var_error_r_bvirr(rxyi, var_e = NULL, ni, na = NA, ux = rep(1,
+  length(rxyi)), ux_observed = rep(TRUE, length(rxyi)), uy = rep(1,
+  length(rxyi)), uy_observed = rep(TRUE, length(rxyi)), qx = rep(1,
+  length(rxyi)), qx_restricted = rep(TRUE, length(rxyi)),
+  qx_type = rep("alpha", length(rxyi)), k_items_x = rep(NA, length(rxyi)),
+  qy = rep(1, length(rxyi)), qy_restricted = rep(TRUE, length(rxyi)),
+  qy_type = rep("alpha", length(rxyi)), k_items_y = rep(NA, length(rxyi)),
+  mean_rxyi = NULL, mean_ux = NULL, mean_uy = NULL, mean_qxa = NULL,
+  mean_qya = NULL, var_rxyi = NULL, var_ux = NULL, var_uy = NULL,
+  var_qxa = NULL, var_qya = NULL, cor_rxyi_ux = 0, cor_rxyi_uy = 0,
+  cor_rxyi_qxa = 0, cor_rxyi_qya = 0, cor_ux_uy = 0, cor_ux_qxa = 0,
+  cor_ux_qya = 0, cor_uy_qxa = 0, cor_uy_qya = 0, cor_qxa_qya = 0,
+  sign_rxz = 1, sign_ryz = 1, r_deriv_only = FALSE)
 }
 \arguments{
 \item{rxyi}{Vector of observed correlations.}
@@ -24,11 +29,19 @@ var_error_r_bvirr(rxyi, var_e = NULL, ni, na = NA, ux, uy, qx,
 
 \item{ux}{Vector of observed-score u ratios for X.}
 
+\item{ux_observed}{Logical vector in which each entry specifies whether the corresponding ux value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.}
+
 \item{uy}{Vector of observed-score u ratios for Y.}
+
+\item{uy_observed}{Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.}
 
 \item{qx}{Vector of square roots of reliability estimates for X.}
 
 \item{qx_restricted}{Logical vector determining whether each element of qx is derived from an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
+
+\item{qx_type, qy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+
+\item{k_items_x, k_items_y}{Numeric vector identifying the number of items in each scale.}
 
 \item{qy}{Vector of square roots of reliability estimates for X.}
 

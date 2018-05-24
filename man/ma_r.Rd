@@ -450,9 +450,15 @@ ma_r_bb(r = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014)
 ## a noticeable difference for small studies like the textbook example:
 ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
 ### Demonstration of ma_r_ic ###
-## Simulated example satisfying the assumptions of the Case IV range-
-## restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
+## Simulated example satisfying the assumptions of the Case IV 
+## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
 ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
+
+## Simulated example satisfying the assumptions of the Case V 
+## range-restriction correction
+ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
+        rxx_type = "parallel", ryy_type = "parallel", 
+        ux = ux, uy = uy, data = data_r_bvirr)
 
 ## Published example from Gonzalez-Mule et al. (2014)
 ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,

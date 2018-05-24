@@ -7,8 +7,8 @@
 correct_d(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y",
   "bvdrr", "bvirr"), d, ryy = 1, uy = 1, rGg = 1, pi = NULL,
   pa = NULL, uy_observed = TRUE, ryy_restricted = TRUE,
-  ryy_type = "alpha", sign_rgz = 1, sign_ryz = 1, n1 = NULL, n2 = NA,
-  conf_level = 0.95, correct_bias = FALSE)
+  ryy_type = "alpha", k_items_y = NA, sign_rgz = 1, sign_ryz = 1,
+  n1 = NULL, n2 = NA, conf_level = 0.95, correct_bias = FALSE)
 }
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"}
@@ -30,6 +30,8 @@ correct_d(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y",
 \item{ryy_restricted}{Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.}
 
 \item{ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+
+\item{k_items_y}{Numeric vector identifying the number of items in each scale.}
 
 \item{sign_rgz}{Vector of signs of the relationships between grouping variables and the selection mechanism.}
 

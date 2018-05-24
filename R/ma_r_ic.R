@@ -2,10 +2,16 @@
 #' @export
 #' @examples
 #' ### Demonstration of ma_r_ic ###
-#' ## Simulated example satisfying the assumptions of the Case IV range-
-#' ## restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
+#' ## Simulated example satisfying the assumptions of the Case IV 
+#' ## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
 #' ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
-#'
+#' 
+#' ## Simulated example satisfying the assumptions of the Case V 
+#' ## range-restriction correction
+#' ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
+#'         rxx_type = "parallel", ryy_type = "parallel", 
+#'         ux = ux, uy = uy, data = data_r_bvirr)
+#' 
 #' ## Published example from Gonzalez-Mule et al. (2014)
 #' ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
 #'         rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
@@ -800,7 +806,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                      ux = ux_vec[do_bvirr],
                                                                      uy = uy_vec[do_bvirr],
                                                                      qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
+                                                                     qx_type = rxx_type[do_bvirr], k_items_x = k_items_x[do_bvirr],
                                                                      qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
+                                                                     qy_type = ryy_type[do_bvirr], k_items_y = k_items_y[do_bvirr],
                                                                      mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
                                                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz))
 
@@ -811,6 +819,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                      uy = uy_vec[do_bvirr],
                                                                      qx = 1, qx_restricted = FALSE,
                                                                      qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
+                                                                     qy_type = ryy_type[do_bvirr], k_items_y = k_items_y[do_bvirr],
                                                                      mean_rxyi = mean_rxyi, mean_qxa = 1, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
                                                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz))
 
@@ -820,6 +829,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                      ux = ux_vec[do_bvirr],
                                                                      uy = uy_vec[do_bvirr],
                                                                      qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
+                                                                     qx_type = rxx_type[do_bvirr], k_items_x = k_items_x[do_bvirr],
                                                                      qy = 1, qy_restricted = FALSE,
                                                                      mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = 1, mean_ux = mean_ux, mean_uy = mean_uy,
                                                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz))

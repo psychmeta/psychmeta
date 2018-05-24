@@ -7,9 +7,9 @@
 correct_r(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y",
   "bvdrr", "bvirr"), rxyi, ux = 1, uy = 1, rxx = 1, ryy = 1,
   ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE,
-  rxx_type = "alpha", ryy_restricted = TRUE, ryy_type = "alpha",
-  sign_rxz = 1, sign_ryz = 1, n = NULL, conf_level = 0.95,
-  correct_bias = FALSE)
+  rxx_type = "alpha", k_items_x = NA, ryy_restricted = TRUE,
+  ryy_type = "alpha", k_items_y = NA, sign_rxz = 1, sign_ryz = 1,
+  n = NULL, conf_level = 0.95, correct_bias = FALSE)
 }
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"}
@@ -31,6 +31,8 @@ correct_r(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y",
 \item{rxx_restricted}{Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.}
 
 \item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+
+\item{k_items_x, k_items_y}{Numeric vector identifying the number of items in each scale.}
 
 \item{ryy_restricted}{Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.}
 
