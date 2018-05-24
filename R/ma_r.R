@@ -1020,80 +1020,13 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(!is.null(cleaned_data$citekey)) es_data <- cbind(citekey = cleaned_data$citekey, es_data)
      if(!is.null(cleaned_data$sample_id)) es_data <- cbind(sample_id = cleaned_data$sample_id, es_data)
 
-     if(ma_method != "bb" & !is.null(sample_id)){
-          if(impute_artifacts & ma_method == "ic"){
-               cat(" Cleaning and imputing reliability information \n")
-               rel_imputed <- impute_artifact_2col(logic_vec_x = data_x$rxx_restricted,
-                                                   logic_vec_y = data_y$ryy_restricted,
-                                                   sample_id = sample_id, n_vec = n,
-                                                   construct_x = construct_x,
-                                                   construct_y = construct_y,
-                                                   measure_x = measure_x,
-                                                   measure_y = measure_y,
-                                                   art_vec_x = data_x$rxx,
-                                                   art_vec_y = data_y$ryy,
-                                                   cat_moderator_matrix = categorical_moderators,
-                                                   impute_method = impute_method, art_type = "reliability")
-
-               cat(" Cleaning and imputing range-restriction information \n")
-               u_imputed <- impute_artifact_2col(logic_vec_x = data_x$ux_observed,
-                                                 logic_vec_y = data_y$uy_observed,
-                                                 sample_id = sample_id, n_vec = n,
-                                                 construct_x = construct_x,
-                                                 construct_y = construct_y,
-                                                 measure_x = measure_x,
-                                                 measure_y = measure_y,
-                                                 art_vec_x = data_x$ux,
-                                                 art_vec_y = data_y$uy,
-                                                 cat_moderator_matrix = categorical_moderators,
-                                                 impute_method = impute_method, art_type = "u ratio")
-
-               data_x$rxx <- rel_imputed$art_vec_x
-               data_y$ryy <- rel_imputed$art_vec_y
-               data_x$rxx_restricted <- rel_imputed$logic_vec_x
-               data_y$ryy_restricted <- rel_imputed$logic_vec_y
-
-               data_x$ux <- u_imputed$art_vec_x
-               data_y$uy <- u_imputed$art_vec_y
-               data_x$ux_observed <- u_imputed$logic_vec_x
-               data_y$uy_observed <- u_imputed$logic_vec_y
-          }else{
-               if(clean_artifacts){
-                    cat(" Cleaning reliability information \n")
-                    rel_reconciled <- reconcile_artifacts(logic_vec_x = data_x$rxx_restricted,
-                                                          logic_vec_y = data_y$ryy_restricted,
-                                                          sample_id = sample_id,
-                                                          art_vec_x = data_x$rxx,
-                                                          art_vec_y = data_y$ryy,
-                                                          construct_x = construct_x,
-                                                          construct_y = construct_y,
-                                                          measure_x = measure_x,
-                                                          measure_y = measure_y)
-
-                    cat(" Cleaning range-restriction information \n")
-                    u_reconciled <- reconcile_artifacts(logic_vec_x = data_x$ux_observed,
-                                                        logic_vec_y = data_y$uy_observed,
-                                                        sample_id = sample_id,
-                                                        art_vec_x = data_x$ux,
-                                                        art_vec_y = data_y$uy,
-                                                        construct_x = construct_x,
-                                                        construct_y = construct_y,
-                                                        measure_x = measure_x,
-                                                        measure_y = measure_y)
-
-                    data_x$rxx <- rel_reconciled$art_vec_x
-                    data_y$ryy <- rel_reconciled$art_vec_y
-                    data_x$rxx_restricted <- rel_reconciled$logic_vec_x
-                    data_y$ryy_restricted <- rel_reconciled$logic_vec_y
-
-                    data_x$ux <- u_reconciled$art_vec_x
-                    data_y$uy <- u_reconciled$art_vec_y
-                    data_x$ux_observed <- u_reconciled$logic_vec_x
-                    data_y$uy_observed <- u_reconciled$logic_vec_y
-               }
-          }
-     }
-
+     impute_out <- impute_artifacts_wrapper(impute_artifacts = impute_artifacts, clean_artifacts = clean_artifacts, 
+                                            ma_method = ma_method, sample_id = sample_id, data_x = data_x, data_y = data_y, n = n,
+                                            construct_x = construct_x, construct_y = construct_y, measure_x = measure_x, measure_y = measure_y, 
+                                            categorical_moderators = categorical_moderators, impute_method = impute_method)
+     data_x <- impute_out$data_x
+     data_y <- impute_out$data_y
+     
      study_construct_pair <- paste(sample_id, construct_x, construct_y)
      dups_exist <- any(duplicated(study_construct_pair))
 

@@ -506,7 +506,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  correct_rel = correct_rel, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
                  correct_rr = correct_rr, correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
                  indirect_rr = indirect_rr, indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
-                 rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment",
+                 rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment", k_items_x = NA,
                  ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
                  ux = ux, ux_observed = TRUE,
                  uy = uy, uy_observed = uy_observed,
