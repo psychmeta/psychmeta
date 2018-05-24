@@ -112,7 +112,7 @@ print.summary.ma_psychmeta <- function(object, ..., ma_methods = NULL, correctio
                stop("Supplied 'ma_methods' not represented in the summary object")
           }
      }else{
-          ma_methods <- object$ma_methods
+          ma_methods <- (c("ad", "ic", "bb")[c("ad", "ic", "bb") %in% object$ma_methods])[1]
      }    
      
      if(any(c("ic", "ad") %in% ma_methods))
