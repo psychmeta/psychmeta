@@ -1,5 +1,4 @@
-#' @name summary.psychmeta
-#' @rdname summary.psychmeta
+#' @name summary
 #' 
 #' @title Summary methods for \pkg{psychmeta}
 #' 
@@ -10,13 +9,10 @@
 #' @param ... Additional arguments. 
 #' 
 #' @return Summary object.
-#' @export
-summary.psychmeta <- function(...){
-     UseMethod("summary")
-}
+NULL
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ma_psychmeta
@@ -118,7 +114,7 @@ summary.ma_psychmeta <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary lm_mat
@@ -127,7 +123,7 @@ summary.lm_mat <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ad_tsa
@@ -136,7 +132,7 @@ summary.ad_tsa <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ad_int_list
@@ -144,7 +140,7 @@ summary.ad_int_list <- function(object, ...){
      object
 }
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ad_int
@@ -153,7 +149,7 @@ summary.ad_int <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary correct_r
@@ -162,7 +158,7 @@ summary.correct_r <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary correct_d
@@ -171,7 +167,7 @@ summary.correct_d <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary simdat_psych
@@ -180,7 +176,7 @@ summary.simdat_psych <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary simdat_r_sample
@@ -189,7 +185,7 @@ summary.simdat_r_sample <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary simdat_r_database
@@ -198,7 +194,7 @@ summary.simdat_r_database <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary simdat_d_sample
@@ -207,7 +203,7 @@ summary.simdat_d_sample <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary simdat_d_database
@@ -216,7 +212,7 @@ summary.simdat_d_database <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary convert_es
@@ -225,7 +221,7 @@ summary.convert_es <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary dmod
@@ -234,14 +230,14 @@ summary.dmod <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @method summary ma_heterogeneity
 summary.ma_heterogeneity <- function(object, ...){
      object
 }
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @method summary ma_leave1out
 summary.ma_leave1out <- function(object, ...){
@@ -249,7 +245,7 @@ summary.ma_leave1out <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ma_cumulative
@@ -258,7 +254,7 @@ summary.ma_cumulative <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @method summary ma_bootstrap
 summary.ma_bootstrap <- function(object, ...){
@@ -267,14 +263,14 @@ summary.ma_bootstrap <- function(object, ...){
 
 
 ####summary output of get_stuff functions ####
-#' @rdname summary.psychmeta
+
 #' @export
 #' @method summary get_metatab
 summary.get_metatab <- function(object, ...){
      object
 }
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @method summary get_plots
 summary.get_plots <- function(object, ...){
@@ -282,7 +278,7 @@ summary.get_plots <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @method summary get_matrix
 summary.get_matrix <- function(object, ...){
@@ -290,7 +286,7 @@ summary.get_matrix <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary get_escalc
@@ -299,7 +295,7 @@ summary.get_escalc <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary get_followup
@@ -307,7 +303,7 @@ summary.get_followup <- function(object, ...){
      object
 }
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary get_heterogeneity
@@ -315,7 +311,7 @@ summary.get_heterogeneity <- function(object, ...){
      object
 }
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary get_metareg
@@ -323,7 +319,7 @@ summary.get_metareg <- function(object, ...){
      object
 }
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary get_bootstrap
@@ -332,7 +328,7 @@ summary.get_bootstrap <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @method summary get_leave1out
 summary.get_leave1out <- function(object, ...){
@@ -340,7 +336,7 @@ summary.get_leave1out <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary get_cumulative
@@ -348,7 +344,7 @@ summary.get_cumulative <- function(object, ...){
      object
 }
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ad_list
@@ -357,7 +353,7 @@ summary.ad_list <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ma_table
@@ -366,7 +362,7 @@ summary.ma_table <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ma_ic_list
@@ -375,7 +371,7 @@ summary.ma_ic_list <- function(object, ...){
 }
 
 
-#' @rdname summary.psychmeta
+
 #' @export
 #' @keywords internal
 #' @method summary ma_ad_list

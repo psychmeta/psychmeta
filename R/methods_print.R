@@ -1,5 +1,4 @@
-#' @name print.psychmeta
-#' @rdname print.psychmeta
+#' @name print
 #' 
 #' @title Print methods for \pkg{psychmeta}
 #' 
@@ -14,15 +13,10 @@
 #' @param verbose Logical scalar that determines whether printed object should contain verbose information (e.g., non-standard columns of meta-analytic output; \code{TRUE}) or not (\code{FALSE}).
 #' @param symbolic.cor For \code{lm_mat} output: logical. If TRUE, print the correlations in a symbolic form (see symnum) rather than as numbers.
 #' @param signif.stars For \code{lm_mat} output: logical. If TRUE, ‘significance stars’ are printed for each coefficient.
-#' 
-#' @return Printed object.
-#' @export
-print.psychmeta <- function(...){
-     UseMethod("print")
-}
+NULL
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass lm_mat
@@ -36,7 +30,7 @@ print.lm_mat <- function(x, ..., digits = max(3L, getOption("digits") - 3L)){
 .print.summary.lm_mat <- stats:::print.summary.lm
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass summary.lm_mat
@@ -55,7 +49,7 @@ print.summary.lm_mat <- function(x, digits = max(3L, getOption("digits") - 3L), 
 
 
 #### Print artifact distributions ####
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ad_tsa
@@ -70,7 +64,7 @@ print.ad_tsa <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ad_int_list
@@ -108,7 +102,7 @@ print.ad_int_list <- function(x, ..., digits = 3){
      cat("\n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ad_int
@@ -129,7 +123,7 @@ print.ad_int <- function(x, ..., digits = 3){
 
 
 #### Print correlation corrections ####
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass correct_r
@@ -168,7 +162,7 @@ print.correct_r <- function(x, ..., digits = 3){
 
 
 #### Print d value corrections ####
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass correct_d
@@ -206,7 +200,7 @@ print.correct_d <- function(x, ..., digits = 3){
 
 
 #### Print simulation outputs ####
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass simdat_psych
@@ -226,7 +220,7 @@ print.simdat_psych <- function(x, ..., digits = 3){
 
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass simdat_r_sample
@@ -259,7 +253,7 @@ print.simdat_r_sample <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass simdat_r_database
@@ -296,7 +290,7 @@ print.simdat_r_database <- function(x, ..., digits = 3){
 
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass simdat_d_sample
@@ -318,7 +312,7 @@ print.simdat_d_sample <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass simdat_d_database
@@ -351,7 +345,7 @@ print.simdat_d_database <- function(x, ..., digits = 3){
 
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass convert_es
@@ -363,7 +357,7 @@ print.convert_es <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass dmod
@@ -401,7 +395,7 @@ print.dmod <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ma_heterogeneity
@@ -441,7 +435,7 @@ print.ma_heterogeneity <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ma_leave1out
@@ -455,7 +449,7 @@ print.ma_leave1out <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ma_cumulative
@@ -468,7 +462,7 @@ print.ma_cumulative <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ma_bootstrap
@@ -482,7 +476,7 @@ print.ma_bootstrap <- function(x, ..., digits = 3){
 
 
 ####Print output of get_stuff functions ####
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_metatab
@@ -496,7 +490,7 @@ print.get_metatab <- function(x, ..., digits = 3){
      cat(attributes(x)$contents)
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_plots
@@ -510,7 +504,7 @@ print.get_plots <- function(x, ..., digits = 3){
      cat("Plots available in this list are:", paste(names(x), collapse = ", "), "\n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_matrix
@@ -523,7 +517,7 @@ print.get_matrix <- function(x, ..., digits = 3){
      print(x)
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_escalc
@@ -534,7 +528,7 @@ print.get_escalc <- function(x, ..., digits = 3){
      cat("To view specific escalc data frames, use the '$' operator to search this list object. \n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_followup
@@ -548,7 +542,7 @@ print.get_followup <- function(x, ..., digits = 3){
      cat("Analyses included in this list are:", paste(names(x), collapse = ", "), "\n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_heterogeneity
@@ -559,7 +553,7 @@ print.get_heterogeneity <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_metareg
@@ -570,7 +564,7 @@ print.get_metareg <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_bootstrap
@@ -581,7 +575,7 @@ print.get_bootstrap <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_leave1out
@@ -592,7 +586,7 @@ print.get_leave1out <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass get_cumulative
@@ -603,7 +597,7 @@ print.get_cumulative <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 }
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ad_list
@@ -615,12 +609,12 @@ print.ad_list <- function(x, ..., digits = 3){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ma_psychmeta
 #' @method print ma_psychmeta
-print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
+print.ma_psychmeta <- function(x, ..., digits = 3){
      ma_method <- attributes(x)$ma_method
      correction_type <- attributes(x)$correction_type 
      ma_metric <- attributes(x)$ma_metric 
@@ -651,9 +645,8 @@ print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      print(x)
 }
 
-#' @rdname print.psychmeta
+
 #' @export
-#' @keywords internal
 #' @exportClass ma_table
 #' @method print ma_table
 print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
@@ -781,12 +774,12 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ma_ic_list
 #' @method print ma_ic_list
-print.ma_ic_list <- function(x, ..., digits = 3, verbose = FALSE){
+print.ma_ic_list <- function(x, ..., digits = 3){
      cat("Individual-correction meta-analysis results")
      if(any(names(x) == "true_score")){
           cat("\nFully corrected \n")
@@ -806,12 +799,12 @@ print.ma_ic_list <- function(x, ..., digits = 3, verbose = FALSE){
 }
 
 
-#' @rdname print.psychmeta
+
 #' @export
 #' @keywords internal
 #' @exportClass ma_ad_list
 #' @method print ma_ad_list
-print.ma_ad_list <- function(x, ..., digits = 3, verbose = FALSE){
+print.ma_ad_list <- function(x, ..., digits = 3){
      cat("Artifact-distribution meta-analysis results")
      if(any(names(x) == "true_score")){
           cat("\nFully corrected \n")
@@ -832,9 +825,8 @@ print.ma_ad_list <- function(x, ..., digits = 3, verbose = FALSE){
 
 
 
-#' @rdname print.psychmeta
+
 #' @export
-#' @keywords internal
 #' @exportClass summary.ma_psychmeta
 #' @method print summary.ma_psychmeta
 print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_types = "ts", verbose = FALSE){

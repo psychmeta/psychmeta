@@ -1,5 +1,4 @@
-#' @name predict.psychmeta
-#' @rdname predict.psychmeta
+#' @name predict
 #' 
 #' @title Prediction method for objects of classes deriving from "lm_mat"
 #'
@@ -15,13 +14,9 @@
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return An set of predicted values
-#' @export
-predict.psychmeta <- function(...){
-     UseMethod("predict")
-}
+NULL
 
 
-#' @rdname predict.psychmeta
 #' @export
 #' @keywords internal
 #' @method predict lm_mat
@@ -32,7 +27,6 @@ predict.lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
                             interval = interval, level = level, ...)
 }
 
-#' @rdname predict.psychmeta
 #' @export
 #' @keywords internal
 #' @method predict summary.lm_mat

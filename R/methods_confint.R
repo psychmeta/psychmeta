@@ -1,24 +1,18 @@
-#' @name confint.psychmeta
-#' @rdname confint.psychmeta
+#' @name confint
 #' 
 #' @title Confidence interval method for objects of classes deriving from "lm_mat"
 #'
 #' @description
-#' Confidence interval method for objects of classes deriving from "lm_mat"
+#' Confidence interval method for objects of classes deriving from "lm_mat."
+#' Returns lower and upper bounds of confidence intervals for regression coefficients.
 #' 
 #' @param object Matrix regression object.
 #' @param parm a specification of which parameters are to be given confidence intervals, either a vector of numbers or a vector of names. If missing, all parameters are considered.
 #' @param level Confidence level
 #' @param ... further arguments passed to or from other methods.
-#'
-#' @return Lower and upper bounds of confidence intervals for regression coefficients.
-#' @export
-confint.psychmeta <- function(...){
-     UseMethod("confint")
-}
+NULL
 
 
-#' @rdname confint.psychmeta
 #' @export
 #' @keywords internal
 #' @method confint lm_mat
@@ -27,7 +21,6 @@ confint.lm_mat <- function(object, parm, level = 0.95, ...){
 }
 
 
-#' @rdname confint.psychmeta
 #' @export
 #' @keywords internal
 #' @method confint summary.lm_mat
