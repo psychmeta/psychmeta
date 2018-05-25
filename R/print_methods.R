@@ -241,7 +241,7 @@ print.simdat_r_database <- function(x, ..., digits = 3){
      if(any(class(x) == "wide")){
           cat("Simulated Correlation Database of", nrow(x[["statistics"]]), "Studies", merged, "\n")
      }else{
-          construct_pairs <- paste(x[["statistics"]][,"x_name"], x[["statistics"]][,"y_name"])
+          construct_pairs <- paste(unlist(x[["statistics"]][,"x_name"]), unlist(x[["statistics"]][,"y_name"]))
           cat("Simulated Correlation Database of", sum(construct_pairs == construct_pairs[1]), "Studies", merged, "\n")
      }
      cat("----------------------------------------------------------\n")
@@ -293,7 +293,7 @@ print.simdat_d_database <- function(x, ..., digits = 3){
      }else{
           merged <- NULL
      }
-     cat("Simulated d Value Database of", nrow(x[["statistics"]]), "Studies", merged, " \n")
+     cat("Simulated d Value Database of", length(unique(unlist(x[["statistics"]][,"sample_id"]))), "Studies", merged, " \n")
      cat("----------------------------------------------------------\n")
      cat("\n")
 
