@@ -38,6 +38,8 @@
 \alias{print.summary.ma_psychmeta}
 \title{Print methods for \pkg{psychmeta}}
 \usage{
+print.psychmeta(...)
+
 \method{print}{lm_mat}(x, ..., digits = max(3L, getOption("digits") - 3L))
 
 \method{print}{summary.lm_mat}(x, digits = max(3L, getOption("digits") - 3L),
@@ -110,9 +112,9 @@
   correction_types = "ts", verbose = FALSE)
 }
 \arguments{
-\item{x}{Object to be printed (object is used to select a method).}
-
 \item{...}{Additional arguments.}
+
+\item{x}{Object to be printed (object is used to select a method).}
 
 \item{digits}{Number of digits to which results should be rounded.}
 

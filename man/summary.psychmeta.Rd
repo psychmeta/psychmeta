@@ -36,6 +36,8 @@
 \alias{summary.ma_ad_list}
 \title{Summary methods for \pkg{psychmeta}}
 \usage{
+summary.psychmeta(...)
+
 \method{summary}{ma_psychmeta}(object, ...)
 
 \method{summary}{lm_mat}(object, ...)
@@ -101,9 +103,9 @@
 \method{summary}{ma_ad_list}(object, ...)
 }
 \arguments{
-\item{object}{Object to be printed (object is used to select a method).}
-
 \item{...}{Additional arguments.}
+
+\item{object}{Object to be printed (object is used to select a method).}
 }
 \value{
 Summary object.

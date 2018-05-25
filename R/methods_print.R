@@ -17,7 +17,9 @@
 #' 
 #' @return Printed object.
 #' @export
-NULL
+print.psychmeta <- function(...){
+     UseMethod("print")
+}
 
 
 #' @rdname print.psychmeta

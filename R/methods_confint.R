@@ -1,5 +1,5 @@
-#' @name confint
-#' @rdname confint
+#' @name confint.psychmeta
+#' @rdname confint.psychmeta
 #' 
 #' @title Confidence interval method for objects of classes deriving from "lm_mat"
 #'
@@ -13,10 +13,12 @@
 #'
 #' @return Lower and upper bounds of confidence intervals for regression coefficients.
 #' @export
-NULL
+confint.psychmeta <- function(...){
+     UseMethod("confint")
+}
 
 
-#' @rdname confint
+#' @rdname confint.psychmeta
 #' @export
 #' @keywords internal
 #' @method confint lm_mat
@@ -25,7 +27,7 @@ confint.lm_mat <- function(object, parm, level = 0.95, ...){
 }
 
 
-#' @rdname confint
+#' @rdname confint.psychmeta
 #' @export
 #' @keywords internal
 #' @method confint summary.lm_mat

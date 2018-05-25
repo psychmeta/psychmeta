@@ -11,7 +11,9 @@
 #' 
 #' @return Summary object.
 #' @export
-NULL
+summary.psychmeta <- function(...){
+     UseMethod("summary")
+}
 
 
 #' @rdname summary.psychmeta
