@@ -362,6 +362,8 @@ ad_list <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
                           construct_x = x_name, construct_y = y_name,
                           sample_id = sample_id,
                           data = data_r_meas_multi)
+ad_list <- setNames(ad_list$ad_x, ad_list$construct_x)
+
 ## Run the artifact-distribution meta-analysis:
 ma_obj <- ma_r(ma_method = "ad", rxyi = rxyi, n = n,
                correct_rr_x = FALSE, correct_rr_y = FALSE,
@@ -370,6 +372,7 @@ ma_obj <- ma_r(ma_method = "ad", rxyi = rxyi, n = n,
                moderators = moderator, data = data_r_meas_multi,
                supplemental_ads = ad_list)
 ma_obj$meta_tables[[1]]$artifact_distribution$true_score
+
 
 ## Artifact information from studies not included in the meta-analysis can also be used to make
 ## corrections. Passing artifact information with the 'supplemental_ads' argument allows for
@@ -447,9 +450,15 @@ ma_r_bb(r = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014)
 ## a noticeable difference for small studies like the textbook example:
 ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
 ### Demonstration of ma_r_ic ###
-## Simulated example satisfying the assumptions of the Case IV range-
-## restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
+## Simulated example satisfying the assumptions of the Case IV 
+## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
 ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
+
+## Simulated example satisfying the assumptions of the Case V 
+## range-restriction correction
+ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
+        rxx_type = "parallel", ryy_type = "parallel", 
+        ux = ux, uy = uy, data = data_r_bvirr)
 
 ## Published example from Gonzalez-Mule et al. (2014)
 ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,

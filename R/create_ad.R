@@ -106,8 +106,12 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      if(!is.null(rxxa)){
           if(!is.null(n_rxxa)){
                mean_n_rxxa <- mean(n_rxxa, na.rm = TRUE)
-               var_e_rxxa <- var_error_rel(rel = rxxa_mean, n = mean_n_rxxa)
-               var_e_qxa <- var_error_q(q = qxa_mean, n = mean_n_rxxa)
+               
+               var_e_rxxa <- var_error_rel(rel = rxxa_mean, n = n_rxxa, rel_type = rxxa_type, k_items = k_items_rxxa)
+               var_e_rxxa <- wt_mean(x = var_e_rxxa, wt = n_rxxa)
+               
+               var_e_qxa <- var_error_q(q = qxa_mean, n = n_rxxa, rel_type = rxxa_type, k_items = k_items_rxxa)
+               var_e_qxa <- wt_mean(x = var_e_qxa, wt = n_rxxa)
           }else{
                mean_n_rxxa <- NULL
                var_e_rxxa <- var_e_qxa <- 0
@@ -127,8 +131,15 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
                if(!is.null(n_rxxa_c)){
                     mean_n_rxxa_c <- mean(n_rxxa_c, na.rm = TRUE)
-                    var_e_rxxa_c <- var_error_rel(rel = rxxa_mean_c, n = mean_n_rxxa_c)
-                    var_e_qxa_c <- var_error_q(q = qxa_mean_c, n = mean_n_rxxa_c)
+                    
+                    rxxa_type_c <- .replace_null(x = rxxa_type[rxxa_consistency])
+                    k_items_rxxa_c <- .replace_null(x = k_items_rxxa[rxxa_consistency])
+                    
+                    var_e_rxxa_c <- var_error_rel(rel = rxxa_mean_c, n = n_rxxa_c, rel_type = rxxa_type_c, k_items = k_items_rxxa_c)
+                    var_e_rxxa_c <- wt_mean(x = var_e_rxxa_c, wt = n_rxxa_c)
+                    
+                    var_e_qxa_c <- var_error_q(q = qxa_mean_c, n = n_rxxa_c, rel_type = rxxa_type_c, k_items = k_items_rxxa_c)
+                    var_e_qxa_c <- wt_mean(x = var_e_qxa_c, wt = n_rxxa_c)
                }else{
                     mean_n_rxxa_c <- NULL
                     var_e_rxxa_c <- var_e_qxa_c <- 0
@@ -152,8 +163,15 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
                if(!is.null(n_rxxa_m)){
                     mean_n_rxxa_m <- mean(n_rxxa_m, na.rm = TRUE)
-                    var_e_rxxa_m <- var_error_rel(rel = rxxa_mean_m, n = mean_n_rxxa_m)
-                    var_e_qxa_m <- var_error_q(q = qxa_mean_m, n = mean_n_rxxa_m)
+                    
+                    rxxa_type_m <- .replace_null(x = rxxa_type[!rxxa_consistency])
+                    k_items_rxxa_m <- .replace_null(x = k_items_rxxa[!rxxa_consistency])
+                    
+                    var_e_rxxa_m <- var_error_rel(rel = rxxa_mean_m, n = n_rxxa_m, rel_type = rxxa_type_m, k_items = k_items_rxxa_m)
+                    var_e_rxxa_m <- wt_mean(x = var_e_rxxa_m, wt = n_rxxa_m)
+                    
+                    var_e_qxa_m <- var_error_q(q = qxa_mean_m, n = n_rxxa_m, rel_type = rxxa_type_m, k_items = k_items_rxxa_m)
+                    var_e_qxa_m <- wt_mean(x = var_e_qxa_m, wt = n_rxxa_m)
                }else{
                     mean_n_rxxa_m <- NULL
                     var_e_rxxa_m <- var_e_qxa_m <- 0
@@ -175,8 +193,12 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      if(!is.null(rxxi)){
           if(!is.null(n_rxxi)){
                mean_n_rxxi <- mean(n_rxxi, na.rm = TRUE)
-               var_e_rxxi <- var_error_rel(rel = rxxi_mean, n = mean_n_rxxi)
-               var_e_qxi <- var_error_q(q = qxi_mean, n = mean_n_rxxi)
+               
+               var_e_rxxi <- var_error_rel(rel = rxxi_mean, n = n_rxxi, rel_type = rxxi_type, k_items = k_items_rxxi)
+               var_e_rxxi <- wt_mean(x = var_e_rxxi, wt = n_rxxi)
+               
+               var_e_qxi <- var_error_q(q = qxi_mean, n = n_rxxi, rel_type = rxxi_type, k_items = k_items_rxxi)
+               var_e_qxi <- wt_mean(x = var_e_qxi, wt = n_rxxi)
           }else{
                mean_n_rxxi <- NULL
                var_e_rxxi <- var_e_qxi <- 0
@@ -196,8 +218,15 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
                if(!is.null(n_rxxi_c)){
                     mean_n_rxxi_c <- mean(n_rxxi_c, na.rm = TRUE)
-                    var_e_rxxi_c <- var_error_rel(rel = rxxi_mean_c, n = mean_n_rxxi_c)
-                    var_e_qxi_c <- var_error_q(q = qxi_mean_c, n = mean_n_rxxi_c)
+                    
+                    rxxi_type_c <- .replace_null(x = rxxi_type[rxxi_consistency])
+                    k_items_rxxi_c <- .replace_null(x = k_items_rxxi[rxxi_consistency])
+                    
+                    var_e_rxxi_c <- var_error_rel(rel = rxxi_mean_c, n = n_rxxi_c, rel_type = rxxi_type_c, k_items = k_items_rxxi_c)
+                    var_e_rxxi_c <- wt_mean(x = var_e_rxxi_c, wt = n_rxxi_c)
+                    
+                    var_e_qxi_c <- var_error_q(q = qxi_mean_c, n = n_rxxi_c, rel_type = rxxi_type_c, k_items = k_items_rxxi_c)
+                    var_e_qxi_c <- wt_mean(x = var_e_qxi_c, wt = n_rxxi_c)
                }else{
                     mean_n_rxxi_c <- NULL
                     var_e_rxxi_c <- var_e_qxi_c <- 0
@@ -221,8 +250,15 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
                if(!is.null(n_rxxi_m)){
                     mean_n_rxxi_m <- mean(n_rxxi_m, na.rm = TRUE)
-                    var_e_rxxi_m <- var_error_rel(rel = rxxi_mean_m, n = mean_n_rxxi_m)
-                    var_e_qxi_m <- var_error_q(q = qxi_mean_m, n = mean_n_rxxi_m)
+                    
+                    rxxi_type_m <- .replace_null(x = rxxi_type[!rxxi_consistency])
+                    k_items_rxxi_m <- .replace_null(x = k_items_rxxi[!rxxi_consistency])
+                    
+                    var_e_rxxi_m <- var_error_rel(rel = rxxi_mean_m, n = n_rxxi_m, rel_type = rxxi_type_m, k_items = k_items_rxxi_m)
+                    var_e_rxxi_m <- wt_mean(x = var_e_rxxi_m, wt = n_rxxi_m)
+                    
+                    var_e_qxi_m <- var_error_q(q = qxi_mean_m, n = n_rxxi_m, rel_type = rxxi_type_m, k_items = k_items_rxxi_m)
+                    var_e_qxi_m <- wt_mean(x = var_e_qxi_m, wt = n_rxxi_m)
                }else{
                     mean_n_rxxi_m <- NULL
                     var_e_rxxi_m <- var_e_qxi_m <- 0
@@ -835,6 +871,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
 
 
+
+
 #' @rdname create_ad
 #' @export
 create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
@@ -881,10 +919,10 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
      Na_ux <- mean_na_ux * k_ux
      Ni_ut <- mean_ni_ut * k_ut
      Na_ut <- mean_na_ut * k_ut
-
-     art_summary <- function(art_vec, wt_vec, ni_vec, na_vec = NULL, k_items = NULL, dependent_sds = FALSE,
-                             mean_art_1 = NULL, var_art_1 = NULL, k_art_1 = NULL, mean_ni_art_1 = NULL, mean_na_art_1 = NA, dependent_sds_art_1 = FALSE, mean_k_items_art_1 = NULL,
-                             mean_art_2 = NULL, var_art_2 = NULL, k_art_2 = NULL, mean_n_art_2 = NULL, mean_k_items_art_2 = NULL, art = "q", var_unbiased){
+     
+     art_summary <- function(art_vec, wt_vec, ni_vec, na_vec = NULL, k_items = NULL, art_type = NULL, dependent_sds = FALSE,
+                             mean_art_1 = NULL, var_art_1 = NULL, k_art_1 = NULL, mean_ni_art_1 = NULL, mean_na_art_1 = NA, dependent_sds_art_1 = FALSE, dist_type_1 = NULL, mean_k_items_art_1 = NULL,
+                             mean_art_2 = NULL, var_art_2 = NULL, k_art_2 = NULL, mean_n_art_2 = NULL, dist_type_2 = NULL, mean_k_items_art_2 = NULL, art = "q", var_unbiased){
           if(!is.null(art_vec)){
                if(is.null(wt_vec)) wt_vec <- rep(1, length(art_vec))
                if(art == "q" | art == "rel") valid_art <- filter_rel(rel_vec = art_vec, wt_vec = wt_vec)
@@ -906,16 +944,36 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(is.null(ni_vec)){
                     art_desc_obs <- cbind(art_desc_obs, var_res = as.numeric(art_desc_obs[,"var"]), total_n = 1, n_wt = 0)
                }else{
-                    if(art == "q") var_res <- as.numeric(art_desc_obs[,"var"] - var_error_q(q = art_desc_obs[,"mean"], n = mean(ni_vec)))
-                    if(art == "rel") var_res <- as.numeric(art_desc_obs[,"var"] - var_error_rel(rel = art_desc_obs[,"mean"], n = mean(ni_vec)))
+                    if(art == "q"){
+                         var_e <- var_error_q(q = art_desc_obs[,"mean"], n = ni_vec, rel_type = art_type, k_items = k_items)
+                         if(length(var_e) == 0){
+                              var_e <- 0
+                         }else{
+                              var_e <- wt_mean(x = var_e, wt = ni_vec)
+                         }
+                         var_res <- as.numeric(art_desc_obs[,"var"] - var_e)
+                    }
+                    if(art == "rel"){
+                         var_e <- var_error_rel(rel = art_desc_obs[,"mean"], n = ni_vec, rel_type = art_type, k_items = k_items)
+                         if(length(var_e) == 0){
+                              var_e <- 0
+                         }else{
+                              var_e <- wt_mean(x = var_e, wt = ni_vec)
+                         }
+                         var_res <- as.numeric(art_desc_obs[,"var"] - var_e)
+                    }
                     if(art == "u"){
                          if(!is.null(na_vec)){
-                              var_e_u <- var_error_u(u = art_desc_obs[,"mean"], n_i = ni_vec, n_a = na_vec, dependent_sds = dependent_sds)
-                              var_e_u <- wt_mean(x = var_e_u, wt = ni_vec)
+                              var_e <- var_error_u(u = art_desc_obs[,"mean"], n_i = ni_vec, n_a = na_vec, dependent_sds = dependent_sds)
+                              if(length(var_e) == 0){
+                                   var_e <- 0
+                              }else{
+                                   var_e <- wt_mean(x = var_e, wt = ni_vec)
+                              }
                          }else{
-                              var_e_u <- var_error_u(u = art_desc_obs[,"mean"], n_i = mean(ni_vec))
+                              var_e <- var_error_u(u = art_desc_obs[,"mean"], n_i = mean(ni_vec))
                          }
-                         var_res <- as.numeric(art_desc_obs[,"var"] - var_e_u)
+                         var_res <- as.numeric(art_desc_obs[,"var"] - var_e)
                     }
 
                     art_desc_obs <- cbind(art_desc_obs, var_res = var_res, total_n = sum(ni_vec), n_wt = 1)
@@ -934,8 +992,10 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(!is.null(mean_ni_art_1)){
                     valid_n <- !is.na(mean_ni_art_1)
                     var_res <- as.numeric(art_desc_spec_1[,"var"])
-                    if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_q(q = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n]))
-                    if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_rel(rel = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n]))
+                    if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_q(q = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n], 
+                                                                                                               rel_type = dist_type_1, k_items = mean_k_items_art_1))
+                    if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_rel(rel = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n], 
+                                                                                                                   rel_type = dist_type_1, k_items = mean_k_items_art_1))
                     if(art == "u") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_u(u = art_desc_spec_1[valid_n,"mean"], n_i = mean_ni_art_1[valid_n],
                                                                                                                n_a = mean_na_art_1, dependent_sds = dependent_sds_art_1))
                     if(!is.null(k_art_1)){
@@ -959,8 +1019,10 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(!is.null(mean_n_art_2)){
                     valid_n <- !is.na(mean_n_art_2)
                     var_res <- as.numeric(art_desc_spec_2[,"var"])
-                    if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_rel(rel = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n]))
-                    if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_q(q = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n]))
+                    if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_rel(rel = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n], 
+                                                                                                                 rel_type = dist_type_2, k_items = mean_k_items_art_2))
+                    if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_q(q = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n], 
+                                                                                                                 rel_type = dist_type_2, k_items = mean_k_items_art_2))
 
                     if(!is.null(k_art_2)){
                          art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = var_res, total_n = k_art_2 * mean_n_art_2, n_wt = as.numeric(valid_n))
@@ -1036,20 +1098,28 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                rxxi_c <- rxxi[rxxi_consistency]
                n_rxxi_c <- n_rxxi[rxxi_consistency]
                wt_rxxi_c <- wt_rxxi[rxxi_consistency]
+               rxxi_type_c <- rxxi_type[rxxi_consistency]
+               k_items_rxxi_c <- k_items_rxxi[rxxi_consistency]
           }else{
                rxxi_c <- n_rxxi_c <- wt_rxxi_c <- NULL
+               rxxi_type_c <- k_items_rxxi_c <- NULL
           }
 
           if(any(!rxxi_consistency)){
                rxxi_m <- rxxi[!rxxi_consistency]
                n_rxxi_m <- n_rxxi[!rxxi_consistency]
                wt_rxxi_m <- wt_rxxi[!rxxi_consistency]
+               rxxi_type_m <- rxxi_type[!rxxi_consistency]
+               k_items_rxxi_m <- k_items_rxxi[!rxxi_consistency]
           }else{
                rxxi_m <- n_rxxi_m <- wt_rxxi_m <- NULL
+               rxxi_type_m <- k_items_rxxi_m <- NULL
           }
      }else{
           rxxi_c <- n_rxxi_c <- wt_rxxi_c <- NULL
           rxxi_m <- n_rxxi_m <- wt_rxxi_m <- NULL
+          rxxi_type_c <- k_items_rxxi_c <- NULL
+          rxxi_type_m <- k_items_rxxi_m <- NULL
      }
      if(!is.null(mean_qxi)){
           qxi_dist_consistency <- convert_reltype2consistency(rel_type = qxi_dist_type)
@@ -1058,8 +1128,11 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_qxi_c <- var_qxi[qxi_dist_consistency]
                k_qxi_c <- k_qxi[qxi_dist_consistency]
                mean_n_qxi_c <- mean_n_qxi[qxi_dist_consistency]
+               qxi_dist_type_c <- qxi_dist_type[qxi_dist_consistency]
+               mean_k_items_qxi_c <- mean_k_items_qxi[qxi_dist_consistency]
           }else{
                mean_qxi_c <- var_qxi_c <- k_qxi_c <- mean_n_qxi_c <- NULL
+               qxi_dist_type_c <- mean_k_items_qxi_c <- NULL
           }
 
           if(any(!qxi_dist_consistency)){
@@ -1067,12 +1140,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_qxi_m <- var_qxi[!qxi_dist_consistency]
                k_qxi_m <- k_qxi[!qxi_dist_consistency]
                mean_n_qxi_m <- mean_n_qxi[!qxi_dist_consistency]
+               qxi_dist_type_m <- qxi_dist_type[!qxi_dist_consistency]
+               mean_k_items_qxi_m <- mean_k_items_qxi[!qxi_dist_consistency]
           }else{
                mean_qxi_m <- var_qxi_m <- k_qxi_m <- mean_n_qxi_m <- NULL
+               qxi_dist_type_m <- mean_k_items_qxi_m <- NULL
           }
      }else{
           mean_qxi_c <- var_qxi_c <- k_qxi_c <- mean_n_qxi_c <- NULL
           mean_qxi_m <- var_qxi_m <- k_qxi_m <- mean_n_qxi_m <- NULL
+          qxi_dist_type_c <- mean_k_items_qxi_c <- NULL
+          qxi_dist_type_m <- mean_k_items_qxi_m <- NULL
      }
      if(!is.null(mean_rxxi)){
           rxxi_dist_consistency <- convert_reltype2consistency(rel_type = rxxi_dist_type)
@@ -1081,8 +1159,11 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_rxxi_c <- var_rxxi[rxxi_dist_consistency]
                k_rxxi_c <- k_rxxi[rxxi_dist_consistency]
                mean_n_rxxi_c <- mean_n_rxxi[rxxi_dist_consistency]
+               rxxi_dist_type_c <- rxxi_dist_type[rxxi_dist_consistency]
+               mean_k_items_rxxi_c <- mean_k_items_rxxi[rxxi_dist_consistency]
           }else{
                mean_rxxi_c <- var_rxxi_c <- k_rxxi_c <- mean_n_rxxi_c <- NULL
+               rxxi_dist_type_c <- mean_k_items_rxxi_c <- NULL
           }
 
           if(any(!rxxi_dist_consistency)){
@@ -1090,12 +1171,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_rxxi_m <- var_rxxi[!rxxi_dist_consistency]
                k_rxxi_m <- k_rxxi[!rxxi_dist_consistency]
                mean_n_rxxi_m <- mean_n_rxxi[!rxxi_dist_consistency]
+               rxxi_dist_type_m <- rxxi_dist_type[!rxxi_dist_consistency]
+               mean_k_items_rxxi_m <- mean_k_items_rxxi[!rxxi_dist_consistency]
           }else{
                mean_rxxi_m <- var_rxxi_m <- k_rxxi_m <- mean_n_rxxi_m <- NULL
+               rxxi_dist_type_m <- mean_k_items_rxxi_m <- NULL
           }
      }else{
           mean_rxxi_c <- var_rxxi_c <- k_rxxi_c <- mean_n_rxxi_c <- NULL
           mean_rxxi_m <- var_rxxi_m <- k_rxxi_m <- mean_n_rxxi_m <- NULL
+          rxxi_dist_type_c <- mean_k_items_rxxi_c <- NULL
+          rxxi_dist_type_m <- mean_k_items_rxxi_m <- NULL
      }
 
 
@@ -1105,20 +1191,28 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                rxxa_c <- rxxa[rxxa_consistency]
                n_rxxa_c <- n_rxxa[rxxa_consistency]
                wt_rxxa_c <- wt_rxxa[rxxa_consistency]
+               rxxa_type_c <- rxxa_type[rxxa_consistency]
+               k_items_rxxa_c <- k_items_rxxa[rxxa_consistency]
           }else{
                rxxa_c <- n_rxxa_c <- wt_rxxa_c <- NULL
+               rxxa_type_c <- k_items_rxxa_c <- NULL
           }
 
           if(any(!rxxa_consistency)){
                rxxa_m <- rxxa[!rxxa_consistency]
                n_rxxa_m <- n_rxxa[!rxxa_consistency]
                wt_rxxa_m <- wt_rxxa[!rxxa_consistency]
+               rxxa_type_m <- rxxa_type[!rxxa_consistency]
+               k_items_rxxa_m <- k_items_rxxa[!rxxa_consistency]
           }else{
                rxxa_m <- n_rxxa_m <- wt_rxxa_m <- NULL
+               rxxa_type_m <- k_items_rxxa_m <- NULL
           }
      }else{
           rxxa_c <- n_rxxa_c <- wt_rxxa_c <- NULL
           rxxa_m <- n_rxxa_m <- wt_rxxa_m <- NULL
+          rxxa_type_c <- k_items_rxxa_c <- NULL
+          rxxa_type_m <- k_items_rxxa_m <- NULL
      }
      if(!is.null(mean_qxa)){
           qxa_dist_consistency <- convert_reltype2consistency(rel_type = qxa_dist_type)
@@ -1127,8 +1221,11 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_qxa_c <- var_qxa[qxa_dist_consistency]
                k_qxa_c <- k_qxa[qxa_dist_consistency]
                mean_n_qxa_c <- mean_n_qxa[qxa_dist_consistency]
+               qxa_dist_type_c <- qxa_dist_type[qxa_dist_consistency]
+               mean_k_items_qxa_c <- mean_k_items_qxa[qxa_dist_consistency]
           }else{
                mean_qxa_c <- var_qxa_c <- k_qxa_c <- mean_n_qxa_c <- NULL
+               qxa_dist_type_c <- mean_k_items_qxa_c <- NULL
           }
 
           if(any(!qxa_dist_consistency)){
@@ -1136,12 +1233,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_qxa_m <- var_qxa[!qxa_dist_consistency]
                k_qxa_m <- k_qxa[!qxa_dist_consistency]
                mean_n_qxa_m <- mean_n_qxa[!qxa_dist_consistency]
+               qxa_dist_type_m <- qxa_dist_type[!qxa_dist_consistency]
+               mean_k_items_qxa_m <- mean_k_items_qxa[!qxa_dist_consistency]
           }else{
                mean_qxa_m <- var_qxa_m <- k_qxa_m <- mean_n_qxa_m <- NULL
+               qxa_dist_type_m <- mean_k_items_qxa_m <- NULL
           }
      }else{
           mean_qxa_c <- var_qxa_c <- k_qxa_c <- mean_n_qxa_c <- NULL
           mean_qxa_m <- var_qxa_m <- k_qxa_m <- mean_n_qxa_m <- NULL
+          qxa_dist_type_c <- mean_k_items_qxa_c <- NULL
+          qxa_dist_type_m <- mean_k_items_qxa_m <- NULL
      }
      if(!is.null(mean_rxxa)){
           rxxa_dist_consistency <- convert_reltype2consistency(rel_type = rxxa_dist_type)
@@ -1150,8 +1252,11 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_rxxa_c <- var_rxxa[rxxa_dist_consistency]
                k_rxxa_c <- k_rxxa[rxxa_dist_consistency]
                mean_n_rxxa_c <- mean_n_rxxa[rxxa_dist_consistency]
+               rxxa_dist_type_c <- rxxa_dist_type[rxxa_dist_consistency]
+               mean_k_items_rxxa_c <- mean_k_items_rxxa[rxxa_dist_consistency]
           }else{
                mean_rxxa_c <- var_rxxa_c <- k_rxxa_c <- mean_n_rxxa_c <- NULL
+               rxxa_dist_type_c <- mean_k_items_rxxa_c <- NULL
           }
 
           if(any(!rxxa_dist_consistency)){
@@ -1159,12 +1264,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                var_rxxa_m <- var_rxxa[!rxxa_dist_consistency]
                k_rxxa_m <- k_rxxa[!rxxa_dist_consistency]
                mean_n_rxxa_m <- mean_n_rxxa[!rxxa_dist_consistency]
+               rxxa_dist_type_m <- rxxa_dist_type[!rxxa_dist_consistency]
+               mean_k_items_rxxa_m <- mean_k_items_rxxa[!rxxa_dist_consistency]
           }else{
                mean_rxxa_m <- var_rxxa_m <- k_rxxa_m <- mean_n_rxxa_m <- NULL
+               rxxa_dist_type_m <- mean_k_items_rxxa_m <- NULL
           }
      }else{
           mean_rxxa_c <- var_rxxa_c <- k_rxxa_c <- mean_n_rxxa_c <- NULL
           mean_rxxa_m <- var_rxxa_m <- k_rxxa_m <- mean_n_rxxa_m <- NULL
+          rxxa_dist_type_c <- mean_k_items_rxxa_c <- NULL
+          rxxa_dist_type_m <- mean_k_items_rxxa_m <- NULL
      }
 
      .replace_null <- function(x){
@@ -1223,54 +1333,65 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
      k_rxxa_m <- .replace_null(x = k_rxxa_m)
      mean_n_rxxa_m <- .replace_null(x = mean_n_rxxa_m)
 
-
      ## All reliability indices
-     qxa_desc <- art_summary(art_vec = rxxa, wt_vec = wt_rxxa, ni_vec = n_rxxa,
-                             mean_art_1 = mean_qxa, var_art_1 = var_qxa, k_art_1 = k_qxa, mean_ni_art_1 = mean_n_qxa,
-                             mean_art_2 = mean_rxxa, var_art_2 = var_rxxa, k_art_2 = k_rxxa, mean_n_art_2 = mean_n_rxxa, art = "q", var_unbiased = var_unbiased)
-     qxi_desc <- art_summary(art_vec = rxxi, wt_vec = wt_rxxi, ni_vec = n_rxxi,
-                             mean_art_1 = mean_qxi, var_art_1 = var_qxi, k_art_1 = k_qxi, mean_ni_art_1 = mean_n_qxi,
-                             mean_art_2 = mean_rxxi, var_art_2 = var_rxxi, k_art_2 = k_rxxi, mean_n_art_2 = mean_n_rxxi, art = "q", var_unbiased = var_unbiased)
-
+     qxa_desc <- art_summary(art_vec = rxxa, wt_vec = wt_rxxa, ni_vec = n_rxxa, art_type = rxxa_type, k_items = k_items_rxxa, 
+                             mean_art_1 = mean_qxa, var_art_1 = var_qxa, k_art_1 = k_qxa, mean_ni_art_1 = mean_n_qxa, dist_type_1 = qxa_dist_type, mean_k_items_art_1 = mean_k_items_qxa, 
+                             mean_art_2 = mean_rxxa, var_art_2 = var_rxxa, k_art_2 = k_rxxa, mean_n_art_2 = mean_n_rxxa, dist_type_2 = rxxa_dist_type, mean_k_items_art_2 = mean_k_items_rxxa, 
+                             art = "q", var_unbiased = var_unbiased)
+     qxi_desc <- art_summary(art_vec = rxxi, wt_vec = wt_rxxi, ni_vec = n_rxxi, art_type = rxxi_type, k_items = k_items_rxxi, 
+                             mean_art_1 = mean_qxi, var_art_1 = var_qxi, k_art_1 = k_qxi, mean_ni_art_1 = mean_n_qxi, dist_type_1 = qxi_dist_type, mean_k_items_art_1 = mean_k_items_qxi, 
+                             mean_art_2 = mean_rxxi, var_art_2 = var_rxxi, k_art_2 = k_rxxi, mean_n_art_2 = mean_n_rxxi, dist_type_2 = rxxi_dist_type, mean_k_items_art_2 = mean_k_items_rxxi,  
+                             art = "q", var_unbiased = var_unbiased)
+     
      ## All reliability coefficients
-     rxxa_desc <- art_summary(art_vec = rxxa, wt_vec = wt_rxxa, ni_vec = n_rxxa,
-                              mean_art_1 = mean_rxxa, var_art_1 = var_rxxa, k_art_1 = k_rxxa, mean_ni_art_1 = mean_n_rxxa,
-                              mean_art_2 = mean_qxa, var_art_2 = var_qxa, k_art_2 = k_qxa, mean_n_art_2 = mean_n_qxa, art = "rel", var_unbiased = var_unbiased)
-     rxxi_desc <- art_summary(art_vec = rxxi, wt_vec = wt_rxxi, ni_vec = n_rxxi,
-                              mean_art_1 = mean_rxxi, var_art_1 = var_rxxi, k_art_1 = k_rxxi, mean_ni_art_1 = mean_n_rxxi,
-                              mean_art_2 = mean_qxi, var_art_2 = var_qxi, k_art_2 = k_qxi, mean_n_art_2 = mean_n_qxi, art = "rel", var_unbiased = var_unbiased)
-
+     rxxa_desc <- art_summary(art_vec = rxxa, wt_vec = wt_rxxa, ni_vec = n_rxxa, art_type = rxxa_type, k_items = k_items_rxxa, 
+                              mean_art_1 = mean_rxxa, var_art_1 = var_rxxa, k_art_1 = k_rxxa, mean_ni_art_1 = mean_n_rxxa, dist_type_1 = rxxa_dist_type, mean_k_items_art_1 = mean_k_items_rxxa, 
+                              mean_art_2 = mean_qxa, var_art_2 = var_qxa, k_art_2 = k_qxa, mean_n_art_2 = mean_n_qxa, dist_type_2 = qxa_dist_type, mean_k_items_art_2 = mean_k_items_qxa, 
+                              art = "rel", var_unbiased = var_unbiased)
+     rxxi_desc <- art_summary(art_vec = rxxi, wt_vec = wt_rxxi, ni_vec = n_rxxi, art_type = rxxi_type, k_items = k_items_rxxi, 
+                              mean_art_1 = mean_rxxi, var_art_1 = var_rxxi, k_art_1 = k_rxxi, mean_ni_art_1 = mean_n_rxxi, dist_type_1 = rxxi_dist_type, mean_k_items_art_1 = mean_k_items_rxxi, 
+                              mean_art_2 = mean_qxi, var_art_2 = var_qxi, k_art_2 = k_qxi, mean_n_art_2 = mean_n_qxi, dist_type_2 = qxi_dist_type, mean_k_items_art_2 = mean_k_items_qxi, 
+                              art = "rel", var_unbiased = var_unbiased)
+     
      ## Consistency estimates of reliability indices
-     qxa_desc_c <- art_summary(art_vec = rxxa_c, wt_vec = wt_rxxa_c, ni_vec = n_rxxa_c,
-                               mean_art_1 = mean_qxa_c, var_art_1 = var_qxa_c, k_art_1 = k_qxa_c, mean_ni_art_1 = mean_n_qxa_c,
-                               mean_art_2 = mean_rxxa_c, var_art_2 = var_rxxa_c, k_art_2 = k_rxxa_c, mean_n_art_2 = mean_n_rxxa_c, art = "q", var_unbiased = var_unbiased)
-     qxi_desc_c <- art_summary(art_vec = rxxi_c, wt_vec = wt_rxxi_c, ni_vec = n_rxxi_c,
-                               mean_art_1 = mean_qxi_c, var_art_1 = var_qxi_c, k_art_1 = k_qxi_c, mean_ni_art_1 = mean_n_qxi_c,
-                               mean_art_2 = mean_rxxi_c, var_art_2 = var_rxxi_c, k_art_2 = k_rxxi_c, mean_n_art_2 = mean_n_rxxi_c, art = "q", var_unbiased = var_unbiased)
+     qxa_desc_c <- art_summary(art_vec = rxxa_c, wt_vec = wt_rxxa_c, ni_vec = n_rxxa_c, art_type = rxxa_type_c, k_items = k_items_rxxa_c, 
+                               mean_art_1 = mean_qxa_c, var_art_1 = var_qxa_c, k_art_1 = k_qxa_c, mean_ni_art_1 = mean_n_qxa_c, dist_type_1 = qxa_dist_type_c, mean_k_items_art_1 = mean_k_items_qxa_c,
+                               mean_art_2 = mean_rxxa_c, var_art_2 = var_rxxa_c, k_art_2 = k_rxxa_c, mean_n_art_2 = mean_n_rxxa_c, dist_type_2 = rxxa_dist_type_c, mean_k_items_art_2 = mean_k_items_rxxa_c, 
+                               art = "q", var_unbiased = var_unbiased)
+     qxi_desc_c <- art_summary(art_vec = rxxi_c, wt_vec = wt_rxxi_c, ni_vec = n_rxxi_c, art_type = rxxi_type_c, k_items = k_items_rxxi_c, 
+                               mean_art_1 = mean_qxi_c, var_art_1 = var_qxi_c, k_art_1 = k_qxi_c, mean_ni_art_1 = mean_n_qxi_c, dist_type_1 = qxi_dist_type_c, mean_k_items_art_1 = mean_k_items_qxi_c,
+                               mean_art_2 = mean_rxxi_c, var_art_2 = var_rxxi_c, k_art_2 = k_rxxi_c, mean_n_art_2 = mean_n_rxxi_c, dist_type_2 = rxxi_dist_type_c, mean_k_items_art_2 = mean_k_items_rxxi_c, 
+                               art = "q", var_unbiased = var_unbiased)
 
      ## Multi-administration estimates of reliability indices
-     qxa_desc_m <- art_summary(art_vec = rxxa_m, wt_vec = wt_rxxa_m, ni_vec = n_rxxa_m,
-                               mean_art_1 = mean_qxa_m, var_art_1 = var_qxa_m, k_art_1 = k_qxa_m, mean_ni_art_1 = mean_n_qxa_m,
-                               mean_art_2 = mean_rxxa_m, var_art_2 = var_rxxa_m, k_art_2 = k_rxxa_m, mean_n_art_2 = mean_n_rxxa_m, art = "q", var_unbiased = var_unbiased)
-     qxi_desc_m <- art_summary(art_vec = rxxi_m, wt_vec = wt_rxxi_m, ni_vec = n_rxxi_m,
-                               mean_art_1 = mean_qxi_m, var_art_1 = var_qxi_m, k_art_1 = k_qxi_m, mean_ni_art_1 = mean_n_qxi_m,
-                               mean_art_2 = mean_rxxi_m, var_art_2 = var_rxxi_m, k_art_2 = k_rxxi_m, mean_n_art_2 = mean_n_rxxi_m, art = "q", var_unbiased = var_unbiased)
+     qxa_desc_m <- art_summary(art_vec = rxxa_m, wt_vec = wt_rxxa_m, ni_vec = n_rxxa_m, art_type = rxxa_type_m, k_items = k_items_rxxa_m, 
+                               mean_art_1 = mean_qxa_m, var_art_1 = var_qxa_m, k_art_1 = k_qxa_m, mean_ni_art_1 = mean_n_qxa_m, dist_type_1 = qxa_dist_type_m, mean_k_items_art_1 = mean_k_items_qxa_m,
+                               mean_art_2 = mean_rxxa_m, var_art_2 = var_rxxa_m, k_art_2 = k_rxxa_m, mean_n_art_2 = mean_n_rxxa_m, dist_type_2 = rxxa_dist_type_m, mean_k_items_art_2 = mean_k_items_rxxa_m, 
+                               art = "q", var_unbiased = var_unbiased)
+     qxi_desc_m <- art_summary(art_vec = rxxi_m, wt_vec = wt_rxxi_m, ni_vec = n_rxxi_m, art_type = rxxi_type_m, k_items = k_items_rxxi_m, 
+                               mean_art_1 = mean_qxi_m, var_art_1 = var_qxi_m, k_art_1 = k_qxi_m, mean_ni_art_1 = mean_n_qxi_m, dist_type_1 = qxi_dist_type_m, mean_k_items_art_1 = mean_k_items_qxi_m,
+                               mean_art_2 = mean_rxxi_m, var_art_2 = var_rxxi_m, k_art_2 = k_rxxi_m, mean_n_art_2 = mean_n_rxxi_m, dist_type_2 = rxxi_dist_type_m, mean_k_items_art_2 = mean_k_items_rxxi_m, 
+                               art = "q", var_unbiased = var_unbiased)
 
      ## Consistency estimates of reliability coefficients
-     rxxa_desc_c <- art_summary(art_vec = rxxa_c, wt_vec = wt_rxxa_c, ni_vec = n_rxxa_c,
-                                mean_art_1 = mean_rxxa_c, var_art_1 = var_rxxa_c, k_art_1 = k_rxxa_c, mean_ni_art_1 = mean_n_rxxa_c,
-                                mean_art_2 = mean_qxa_c, var_art_2 = var_qxa_c, k_art_2 = k_qxa_c, mean_n_art_2 = mean_n_qxa_c, art = "rel", var_unbiased = var_unbiased)
-     rxxi_desc_c <- art_summary(art_vec = rxxi_c, wt_vec = wt_rxxi_c, ni_vec = n_rxxi_c,
-                                mean_art_1 = mean_rxxi_c, var_art_1 = var_rxxi_c, k_art_1 = k_rxxi_c, mean_ni_art_1 = mean_n_rxxi_c,
-                                mean_art_2 = mean_qxi_c, var_art_2 = var_qxi_c, k_art_2 = k_qxi_c, mean_n_art_2 = mean_n_qxi_c, art = "rel", var_unbiased = var_unbiased)
+     rxxa_desc_c <- art_summary(art_vec = rxxa_c, wt_vec = wt_rxxa_c, ni_vec = n_rxxa_c, art_type = rxxa_type_c, k_items = k_items_rxxa_c, 
+                                mean_art_1 = mean_rxxa_c, var_art_1 = var_rxxa_c, k_art_1 = k_rxxa_c, mean_ni_art_1 = mean_n_rxxa_c, dist_type_1 = rxxa_dist_type_c, mean_k_items_art_1 = mean_k_items_rxxa_c,
+                                mean_art_2 = mean_qxa_c, var_art_2 = var_qxa_c, k_art_2 = k_qxa_c, mean_n_art_2 = mean_n_qxa_c, dist_type_2 = qxa_dist_type_c, mean_k_items_art_2 = mean_k_items_qxa_c, 
+                                art = "rel", var_unbiased = var_unbiased)
+     rxxi_desc_c <- art_summary(art_vec = rxxi_c, wt_vec = wt_rxxi_c, ni_vec = n_rxxi_c, art_type = rxxi_type_c, k_items = k_items_rxxi_c, 
+                                mean_art_1 = mean_rxxi_c, var_art_1 = var_rxxi_c, k_art_1 = k_rxxi_c, mean_ni_art_1 = mean_n_rxxi_c, dist_type_1 = rxxi_dist_type_c, mean_k_items_art_1 = mean_k_items_rxxi_c,
+                                mean_art_2 = mean_qxi_c, var_art_2 = var_qxi_c, k_art_2 = k_qxi_c, mean_n_art_2 = mean_n_qxi_c, dist_type_2 = qxi_dist_type_c, mean_k_items_art_2 = mean_k_items_qxi_c, 
+                                art = "rel", var_unbiased = var_unbiased)
 
      ## Multi-administration estimates of reliability coefficients
-     rxxa_desc_m <- art_summary(art_vec = rxxa_m, wt_vec = wt_rxxa_m, ni_vec = n_rxxa_m,
-                                mean_art_1 = mean_rxxa_m, var_art_1 = var_rxxa_m, k_art_1 = k_rxxa_m, mean_ni_art_1 = mean_n_rxxa_m,
-                                mean_art_2 = mean_qxa_m, var_art_2 = var_qxa_m, k_art_2 = k_qxa_m, mean_n_art_2 = mean_n_qxa_m, art = "rel", var_unbiased = var_unbiased)
-     rxxi_desc_m <- art_summary(art_vec = rxxi_m, wt_vec = wt_rxxi_m, ni_vec = n_rxxi_m,
-                                mean_art_1 = mean_rxxi_m, var_art_1 = var_rxxi_m, k_art_1 = k_rxxi_m, mean_ni_art_1 = mean_n_rxxi_m,
-                                mean_art_2 = mean_qxi_m, var_art_2 = var_qxi_m, k_art_2 = k_qxi_m, mean_n_art_2 = mean_n_qxi_m, art = "rel", var_unbiased = var_unbiased)
+     rxxa_desc_m <- art_summary(art_vec = rxxa_m, wt_vec = wt_rxxa_m, ni_vec = n_rxxa_m, art_type = rxxa_type_m, k_items = k_items_rxxa_m, 
+                                mean_art_1 = mean_rxxa_m, var_art_1 = var_rxxa_m, k_art_1 = k_rxxa_m, mean_ni_art_1 = mean_n_rxxa_m, dist_type_1 = rxxa_dist_type_m, mean_k_items_art_1 = mean_k_items_rxxa_m,
+                                mean_art_2 = mean_qxa_m, var_art_2 = var_qxa_m, k_art_2 = k_qxa_m, mean_n_art_2 = mean_n_qxa_m, dist_type_2 = qxa_dist_type_m, mean_k_items_art_2 = mean_k_items_qxa_m, 
+                                art = "rel", var_unbiased = var_unbiased)
+     rxxi_desc_m <- art_summary(art_vec = rxxi_m, wt_vec = wt_rxxi_m, ni_vec = n_rxxi_m, art_type = rxxi_type_m, k_items = k_items_rxxi_m, 
+                                mean_art_1 = mean_rxxi_m, var_art_1 = var_rxxi_m, k_art_1 = k_rxxi_m, mean_ni_art_1 = mean_n_rxxi_m, dist_type_1 = rxxi_dist_type_m, mean_k_items_art_1 = mean_k_items_rxxi_m,
+                                mean_art_2 = mean_qxi_m, var_art_2 = var_qxi_m, k_art_2 = k_qxi_m, mean_n_art_2 = mean_n_qxi_m, dist_type_2 = qxi_dist_type_m, mean_k_items_art_2 = mean_k_items_qxi_m, 
+                                art = "rel", var_unbiased = var_unbiased)
 
      ## u ratios
      ux_desc <- art_summary(art_vec = ux, wt_vec = wt_ux, ni_vec = ni_ux, na_vec = na_ux, dependent_sds = dep_sds_ux_obs,

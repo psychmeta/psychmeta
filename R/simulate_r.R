@@ -1212,8 +1212,9 @@ simulate_r_database <- function(k, n_params, rho_params,
      }
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = dat_stats,
-                 parameters = dat_params)
+                 statistics = as_tibble(dat_stats),
+                 parameters = as_tibble(dat_params))
+     
      class(out) <- c("simdat_r_database", format)
      out
 }
@@ -1826,6 +1827,9 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
      if(!any(class(data_obj) == "sparsified"))
           class(data_obj) <- c(class(data_obj), "sparsified")
 
+     data_obj$statistics <- as_tibble(data_obj$statistics)
+     data_obj$parameters <- as_tibble(data_obj$parameters)
+     
      data_obj
 }
 
@@ -1892,6 +1896,9 @@ merge_simdat_r <- function(...){
      if(!any(class(data_obj) == "merged"))
           class(data_obj) <- c(class(data_obj), "merged")
 
+     data_obj$statistics <- as_tibble(data_obj$statistics)
+     data_obj$parameters <- as_tibble(data_obj$parameters)
+     
      data_obj
 }
 

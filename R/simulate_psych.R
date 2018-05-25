@@ -125,7 +125,9 @@ simulate_psych <- function(n, rho_mat,
           error <- error[,keep_id]
      }
 
-     out <- list(observed = obs, true = true, error = error)
+     out <- list(observed = as_tibble(obs), 
+                 true = as_tibble(true),
+                 error = as_tibble(error))
      class(out) <- "simdat_psych"
      out
 }

@@ -2,10 +2,16 @@
 #' @export
 #' @examples
 #' ### Demonstration of ma_r_ic ###
-#' ## Simulated example satisfying the assumptions of the Case IV range-
-#' ## restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
+#' ## Simulated example satisfying the assumptions of the Case IV 
+#' ## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
 #' ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
-#'
+#' 
+#' ## Simulated example satisfying the assumptions of the Case V 
+#' ## range-restriction correction
+#' ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
+#'         rxx_type = "parallel", ryy_type = "parallel", 
+#'         ux = ux, uy = uy, data = data_r_bvirr)
+#' 
 #' ## Published example from Gonzalez-Mule et al. (2014)
 #' ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
 #'         rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
@@ -25,8 +31,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     supplemental_ads_x = NULL, supplemental_ads_y = NULL,
                     data = NULL, control = control_psychmeta(), ...){
 
-     warn_obj1 <- record_warnings()
      call <- match.call()
+     warn_obj1 <- record_warnings()
 
      wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample",
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
@@ -286,7 +292,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
-     if(!is.null(moderators)) moderators <- data.frame(moderators)[valid_r,]
+     if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators)[valid_r,])
      if(!is.null(sample_id)) sample_id <- sample_id[valid_r]
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
@@ -316,7 +322,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                               estimate_ux = estimate_ux, estimate_ut = estimate_ut,
                                                               supplemental_ads = supplemental_ads_x))
-
+     
      if(is.null(ad_x_tsa))
           ad_x_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa",
                                                               rxxa = rxxa, n_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
@@ -327,7 +333,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                               estimate_ux = estimate_ux, estimate_ut = estimate_ut,
                                                               supplemental_ads = supplemental_ads_x))
-
+     
+     
      ## Construct artifact distribution for Y
      ryya <-   if(!is.null(ryy)){if(any(!ryy_restricted)){ryy[!ryy_restricted]}else{NULL}}else{NULL}
      n_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){n[!ryy_restricted]}else{NULL}}else{NULL}
@@ -800,7 +807,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                      ux = ux_vec[do_bvirr],
                                                                      uy = uy_vec[do_bvirr],
                                                                      qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
+                                                                     qx_type = rxx_type[do_bvirr], k_items_x = k_items_x[do_bvirr],
                                                                      qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
+                                                                     qy_type = ryy_type[do_bvirr], k_items_y = k_items_y[do_bvirr],
                                                                      mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
                                                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz))
 
@@ -811,6 +820,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                      uy = uy_vec[do_bvirr],
                                                                      qx = 1, qx_restricted = FALSE,
                                                                      qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
+                                                                     qy_type = ryy_type[do_bvirr], k_items_y = k_items_y[do_bvirr],
                                                                      mean_rxyi = mean_rxyi, mean_qxa = 1, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
                                                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz))
 
@@ -820,6 +830,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                      ux = ux_vec[do_bvirr],
                                                                      uy = uy_vec[do_bvirr],
                                                                      qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
+                                                                     qx_type = rxx_type[do_bvirr], k_items_x = k_items_x[do_bvirr],
                                                                      qy = 1, qy_restricted = FALSE,
                                                                      mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = 1, mean_ux = mean_ux, mean_uy = mean_uy,
                                                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz))
@@ -965,7 +976,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      rxyi <- data$rxyi
      n <- data$n
-     n_adj <- data$n_ad
+     n_adj <- data$n_adj
      if(!is.null(ma_arg_list$es_d)){
           es_d <- ma_arg_list$es_d
      }else{
@@ -982,7 +993,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           var_e_xy_vec <- convert_vard_to_varr(d = out$escalc$barebones[,"d"], var = out$escalc$barebones[,"var_e_raw"], p = data$pi)
           out$escalc$barebones$vi <- convert_vard_to_varr(d = out$escalc$barebones$yi, var = out$escalc$barebones$vi, p = data$pi)
           out$escalc$barebones$yi <- convert_es.q_d_to_r(d = out$escalc$barebones$yi, p = data$pi)
-          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = data$n_adj), conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = data$n_adj), 
+                                                 conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
      }else{
           out <- .ma_r_bb(data = data, ma_arg_list = ma_arg_list)
           var_e_xy_vec <- out$escalc$barebones[,"var_e_raw"]
@@ -996,7 +1008,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      a_vec <- data$a
      correction_type <- data$correction_type
      sample_id <- data$sample_id
-     citekey <- data$citekey
+     if(any(colnames(data) == "citekey")){
+          citekey <- data$citekey
+     }else{
+          citekey <- NULL
+     }
 
      if(is.null(n_adj)){
           n_adj <- n

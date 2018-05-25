@@ -186,28 +186,15 @@ print.correct_d <- function(x, ..., digits = 3){
 print.simdat_psych <- function(x, ..., digits = 3){
      cat("Data from a Simulated Study of", nrow(x$obs), "Cases\n")
      cat("--------------------------\n")
-     cat("\n")
-
-     cat("Overview of simulated data:\n")
-     if(nrow(x$obs) > 5){
-          cat("\nPreview of observed scores (first 5 rows):\n")
-          print.data.frame(x$observed[1:5,], digits = digits)
-
-          cat("\nPreview of true scores (first 5 rows):\n")
-          print.data.frame(x$true[1:5,], digits = digits)
-
-          cat("\nPreview of error scores (first 5 rows):\n")
-          print.data.frame(x$error[1:5,], digits = digits)
-     }else{
-          cat("\nObserved scores:\n")
-          print.data.frame(x$observed, digits = digits)
-
-          cat("\nTrue scores:\n")
-          print.data.frame(x$true, digits = digits)
-
-          cat("\nError scores:\n")
-          print.data.frame(x$error, digits = digits)
-     }
+     
+     cat("\nObserved scores:\n")
+     print(x$observed, digits = digits)
+     
+     cat("\nTrue scores:\n")
+     print(x$true, digits = digits)
+     
+     cat("\nError scores:\n")
+     print(x$error, digits = digits)
 
 }
 
@@ -254,7 +241,7 @@ print.simdat_r_database <- function(x, ..., digits = 3){
      if(any(class(x) == "wide")){
           cat("Simulated Correlation Database of", nrow(x[["statistics"]]), "Studies", merged, "\n")
      }else{
-          construct_pairs <- paste(x[["statistics"]][,"x_name"], x[["statistics"]][,"y_name"])
+          construct_pairs <- paste(unlist(x[["statistics"]][,"x_name"]), unlist(x[["statistics"]][,"y_name"]))
           cat("Simulated Correlation Database of", sum(construct_pairs == construct_pairs[1]), "Studies", merged, "\n")
      }
      cat("----------------------------------------------------------\n")
@@ -265,41 +252,16 @@ print.simdat_r_database <- function(x, ..., digits = 3){
      cat("\n")
 
      cat("Overview of simulated statistics (i.e., results with sampling error):\n")
-     cat("\n")
-     if(nrow(x[["statistics"]]) > 10){
-          cat("Preview of statistic database (first 10 rows):\n")
-          print.data.frame(x[["statistics"]][1:10,], digits = digits)
-     }else{
-          cat("Statistic database:\n")
-          print.data.frame(x[["statistics"]], digits = digits)
-     }
+     print(x[["statistics"]])
+     
      cat("\n")
 
      cat("Overview of simulated parameters (i.e., results without sampling error):\n")
-     cat("\n")
-     if(nrow(x[["parameters"]]) > 10){
-          cat("Preview of parameter database (first 10 rows):\n")
-          print.data.frame(x[["parameters"]][1:10,], digits = digits)
-     }else{
-          cat("Parameter database:\n")
-          print.data.frame(x[["parameters"]], digits = digits)
-     }
+     print(x[["parameters"]])
+     
 }
 
 
-
-# #' @method print simdat_r_summary
-# print.simdat_r_summary <- function(x, ..., digits = 3){
-#      cat("Descriptive Statistics for Database of", nrow(x$data_obj[["statistics"]]), "Simulated Studies:\n")
-#      cat("-----------------------------------------------------------------\n")
-# 
-#      cat("Summary of simulated statistics weighted by incumbent sample sizes:\n")
-#      print.data.frame(x[["statistics"]][["descriptives_ni_wt"]], digits = digits)
-# 
-#      cat("\n")
-#      cat("Summary of simulated parameters weighted by incumbent sample sizes:\n")
-#      print.data.frame(x[["parameters"]][["descriptives_ni_wt"]], digits = digits)
-# }
 
 
 #' @exportClass simdat_d_sample
@@ -318,8 +280,7 @@ print.simdat_d_sample <- function(x, ..., digits = 3){
      cat("Simulated ", x$proportions$na[nrow(x$proportions)], " applicant cases and selected ", x$proportions$ni[nrow(x$proportions)], " incumbent cases for an overall selection ratio of ", round(x$proportions$sr[nrow(x$proportions)], 3) * 100, "%.\n", sep = "")
      cat("\n")
 
-
-     print.data.frame(x$overall_results$observed, digits = digits)
+     print(x$overall_results$observed, digits = digits)
 }
 
 
@@ -332,7 +293,7 @@ print.simdat_d_database <- function(x, ..., digits = 3){
      }else{
           merged <- NULL
      }
-     cat("Simulated d Value Database of", nrow(x[["statistics"]]), "Studies", merged, " \n")
+     cat("Simulated d Value Database of", length(unique(unlist(x[["statistics"]][,"sample_id"]))), "Studies", merged, " \n")
      cat("----------------------------------------------------------\n")
      cat("\n")
 
@@ -342,24 +303,14 @@ print.simdat_d_database <- function(x, ..., digits = 3){
 
      cat("Overview of simulated statistics (i.e., results with sampling error):\n")
      cat("\n")
-     if(nrow(x[["statistics"]]) > 10){
-          cat("Preview of statistic database (first 10 rows):\n")
-          print.data.frame(x[["statistics"]][1:10,], digits = digits)
-     }else{
-          cat("Statistic database:\n")
-          print.data.frame(x[["statistics"]], digits = digits)
-     }
+     print(x[["statistics"]], digits = digits)
+     
      cat("\n")
 
      cat("Overview of simulated parameters (i.e., results without sampling error):\n")
      cat("\n")
-     if(nrow(x[["parameters"]]) > 10){
-          cat("Preview of parameter database (first 10 rows):\n")
-          print.data.frame(x[["parameters"]][1:10,], digits = digits)
-     }else{
-          cat("Parameter database:\n")
-          print.data.frame(x[["parameters"]], digits = digits)
-     }
+     print(x[["parameters"]], digits = digits)
+     
 }
 
 
@@ -603,6 +554,10 @@ print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
      correction_type <- attributes(x)$correction_type 
      ma_metric <- attributes(x)$ma_metric 
      
+     additional_args <- list(...)
+     suppress_title <- additional_args$suppress_title
+     if(is.null(suppress_title)) suppress_title <- FALSE
+     
      title_text <- "Summary tibble of psychmeta meta-analysis"
      if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
           title_text <- "Summary tibble of psychmeta meta-analysis of correlations"
@@ -616,8 +571,10 @@ print.ma_psychmeta <- function(x, ..., digits = 3, verbose = FALSE){
           title_text <- "Summary tibble of psychmeta second-order meta-analysis of d values"
      }
 
-     cat(title_text, " \n")
-     cat("---------------------------------------------------------------------- \n")
+     if(!suppress_title){
+          cat(title_text, " \n")
+          cat("---------------------------------------------------------------------- \n")    
+     }
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)
@@ -744,7 +701,10 @@ print.ma_table <- function(x, ..., digits = 3, ma_type, verbose = FALSE){
      
      if(!suppress_title)
           cat("Meta-analysis table \n")
-     print.data.frame(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
+     
+     x <- ungroup(x)
+     class(x) <- class(x)[class(x) != "ma_table"]
+     print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
 }
 
 

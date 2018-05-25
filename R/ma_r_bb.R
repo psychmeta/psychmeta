@@ -193,7 +193,11 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
           }
      }
      sample_id <- data$sample_id
-     citekey <- data$citekey
+     if("citekey" %in% colnames(data)){
+          citekey <- data$citekey
+     }else{
+          citekey <- NULL
+     }
      n <- data$n
      n_adj <- data$n_adj
 
@@ -254,8 +258,8 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                    var_e_raw = var_e_vec,
                                    weight = wt_vec,
                                    residual = r - mean_r_xy)
-          escalc_obj$pi <- data$pi
-          escalc_obj$pa <- data$pa
+          if("pi" %in% colnames(data)) escalc_obj$pi <- data$pi
+          if("pa" %in% colnames(data)) escalc_obj$pa <- data$pa
           if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
           if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj)
           class(escalc_obj) <- c("escalc", "data.frame")

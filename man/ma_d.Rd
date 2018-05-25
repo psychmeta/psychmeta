@@ -317,14 +317,12 @@ ma_d_bb(d = d, n1 = n1, n2 = n2,
         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 ma_d_bb(d = d, n1 = n1, n2 = n2,
         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-\dontrun{
 ### Demonstration of ma_d_ic ###
 ## Example meta-analyses using simulated data:
 ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-}
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
