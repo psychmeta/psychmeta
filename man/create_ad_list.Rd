@@ -6,8 +6,8 @@
 \usage{
 create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
   measure_x = NULL, construct_y, measure_y = NULL, rxx = NULL,
-  rxx_restricted = TRUE, rxx_type = "alpha", ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", ux = NULL,
+  rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA, ryy = NULL,
+  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA, ux = NULL,
   ux_observed = TRUE, uy = NULL, uy_observed = TRUE,
   estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE,
   estimate_ut = TRUE, moderators = NULL, cat_moderators = TRUE,
@@ -35,6 +35,8 @@ create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL, construct_x,
 \item{rxx_restricted}{Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
 \item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. See documentation of \code{ma_r()} for a full list of acceptable values.}
+
+\item{k_items_x, k_items_y}{Numeric vector identifying the number of items in each scale.}
 
 \item{ryy}{Vector or column name of reliability estimates for Y.}
 

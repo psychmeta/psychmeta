@@ -25,6 +25,7 @@
 #' @param ... Additional arguments
 #' 
 #' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. See documentation of \code{ma_r()} for a full list of acceptable values. 
+#' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
 #' @param moderator_type Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time, and
@@ -74,8 +75,8 @@
 create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                            construct_x, measure_x = NULL,
                            construct_y, measure_y = NULL,
-                           rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
-                           ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                           rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
+                           ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                            ux = NULL, ux_observed = TRUE,
                            uy = NULL, uy_observed = TRUE,
                            estimate_rxxa = TRUE, estimate_rxxi = TRUE,
@@ -143,6 +144,9 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           if(deparse(substitute(rxx_type))[1] != "NULL")
                rxx_type <- match_variables(call = call_full[[match("rxx_type", names(call_full))]], arg = rxx_type, arg_name = "rxx_type", data = data)
           
+          if(deparse(substitute(k_items_x))[1] != "NULL")
+               k_items_x <- match_variables(call = call_full[[match("k_items_x", names(call_full))]], arg = k_items_x, arg_name = "k_items_x", data = data)
+          
           if(deparse(substitute(ryy))[1] != "NULL")
                ryy <- match_variables(call = call_full[[match("ryy", names(call_full))]], arg = ryy, arg_name = "ryy", data = data)
           
@@ -151,6 +155,9 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
+
+          if(deparse(substitute(k_items_y))[1] != "NULL")
+               k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
           
           if(deparse(substitute(ux))[1] != "NULL")
                ux <- match_variables(call = call_full[[match("ux", names(call_full))]], arg = ux, arg_name = "ux", data = data)
@@ -167,7 +174,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
-     
+
      if(!moderated_ads) moderators <- NULL
      
      if(!is.null(moderators)){
@@ -216,8 +223,8 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      full_data <- list(sample_id = sample_id, n = n,
                        construct_x = construct_x, measure_x = measure_x,
                        construct_y = construct_y, measure_y = measure_y,
-                       rxx = rxx, rxx_restricted = rxx_restricted, rxx_type = rxx_type,
-                       ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
+                       rxx = rxx, rxx_restricted = rxx_restricted, rxx_type = rxx_type, k_items_x = k_items_x,
+                       ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y, 
                        ux = ux, ux_observed = ux_observed,
                        uy = uy, uy_observed = uy_observed)
      
@@ -368,8 +375,8 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      construct_y <- full_data$construct_y
      
      construct_pair <- paste0("X = ", construct_x, ", Y = ", construct_y)
-     data_x <- full_data[,c("sample_id", "n", "construct_x", "measure_x", "rxx", "rxx_restricted", "rxx_type", "ux", "ux_observed")]
-     data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "uy", "uy_observed")]
+     data_x <- full_data[,c("sample_id", "n", "construct_x", "measure_x", "rxx", "rxx_restricted", "rxx_type", "k_items_x", "ux", "ux_observed")]
+     data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "k_items_y", "uy", "uy_observed")]
      colnames(data_y) <- colnames(data_x)
      
      ..create_ad_list_internal <- function(index)
@@ -496,7 +503,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                if(!is.null(rxxi)){
                     rxxi_type <- rxxi_type[!is.na(rxxi)]
                     n_rxxi <- n_rxxi[!is.na(rxxi)]
-                    k_items_rxxi <- k_items_rxxi[!is.na(rxxa)]
+                    k_items_rxxi <- k_items_rxxi[!is.na(rxxi)]
                     rxxi <- rxxi[!is.na(rxxi)]
                }else{
                     k_items_rxxi <- rxxi_type <- n_rxxi <- rxxi <- NULL

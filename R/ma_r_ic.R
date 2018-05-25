@@ -322,7 +322,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                               estimate_ux = estimate_ux, estimate_ut = estimate_ut,
                                                               supplemental_ads = supplemental_ads_x))
-
+     
      if(is.null(ad_x_tsa))
           ad_x_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa",
                                                               rxxa = rxxa, n_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
@@ -333,7 +333,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                                               estimate_ux = estimate_ux, estimate_ut = estimate_ut,
                                                               supplemental_ads = supplemental_ads_x))
-
+     
+     
      ## Construct artifact distribution for Y
      ryya <-   if(!is.null(ryy)){if(any(!ryy_restricted)){ryy[!ryy_restricted]}else{NULL}}else{NULL}
      n_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){n[!ryy_restricted]}else{NULL}}else{NULL}
