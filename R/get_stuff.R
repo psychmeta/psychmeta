@@ -105,6 +105,11 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      correction_types <- match.arg(correction_types, c("ts", "vgx", "vgy"), several.ok = TRUE)
      ma_metric <- attributes(ma_obj)$ma_metric
 
+     invalid_methods <- ma_methods[!(ma_methods %in% attributes(ma_obj)$ma_methods)]
+     ma_methods <- ma_methods[ma_methods %in% attributes(ma_obj)$ma_methods]
+     if(length(ma_methods) == 0)
+          stop("Results for the following method(s) were not available in the supplied object: ", paste(invalid_methods, collapse = ", "), call. = FALSE)
+     
      if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
           ts_label <- "true_score"
           vgx_label <- "validity_generalization_x"
@@ -145,17 +150,14 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                                     correction_type = "ts")
                total_tables <- total_tables + 1
                
-               contents <- c(contents, "- individual correction \n")
+               contents <- c(contents, "- individual_correction \n")
           }else{
                if("ts" %in% correction_types){
                     out$individual_correction[[ts_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                          correction_type = "ts")
-                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                         .contents <- c(.contents, "true score")
-                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                         .contents <- c(.contents, "latent group and latent Y")
-                    }
+                    .contents <- c(.contents, ts_label)
+                    
                     total_tables <- total_tables + 1
                }
                
@@ -163,11 +165,8 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                     out$individual_correction[[vgx_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                          correction_type = "vgx")
-                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                         .contents <- c(.contents, "validity generalization (X as predictor)")
-                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                         .contents <- c(.contents, "observed group and latent Y")
-                    }
+                    .contents <- c(.contents, vgx_label)
+                    
                     total_tables <- total_tables + 1
                }
                
@@ -175,16 +174,13 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                     out$individual_correction[[vgy_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                          correction_type = "vgy")
-                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                         .contents <- c(.contents, "validity generalization (Y as predictor)")
-                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                         .contents <- c(.contents, "latent group and observed Y")
-                    }
+                    .contents <- c(.contents, vgy_label)
+                    
                     total_tables <- total_tables + 1
                }    
                
                if(!is.null(.contents))
-                    contents <- c(contents, paste0("- individual correction \n     - ",
+                    contents <- c(contents, paste0("- individual_correction \n     - ",
                                                    paste0(.contents, collapse = "\n     - ")))
           }
      }
@@ -204,11 +200,8 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                     out$artifact_distribution[[ts_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                          correction_type = "ts")
-                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                         .contents <- c(.contents, "true score")
-                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                         .contents <- c(.contents, "latent group and latent Y")
-                    }
+                    .contents <- c(.contents, ts_label)
+                    
                     total_tables <- total_tables + 1
                }
                
@@ -216,11 +209,8 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                     out$artifact_distribution[[vgx_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                          correction_type = "vgx")
-                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                         .contents <- c(.contents, "validity generalization (X as predictor)")
-                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                         .contents <- c(.contents, "observed group and latent Y")
-                    }
+                    .contents <- c(.contents, vgx_label)
+                    
                     total_tables <- total_tables + 1
                }
                
@@ -228,16 +218,13 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                     out$artifact_distribution[[vgy_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                          correction_type = "vgy")
-                    if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
-                         .contents <- c(.contents, "validity generalization (Y as predictor)")
-                    }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
-                         .contents <- c(.contents, "latent group and observed Y")
-                    }
+                    .contents <- c(.contents, vgy_label)
+                    
                     total_tables <- total_tables + 1
                }
                
                if(!is.null(.contents))
-                    contents <- c(contents, paste0("- artifact distribution \n     - ",
+                    contents <- c(contents, paste0("- artifact_distribution \n     - ",
                                                    paste0(.contents, collapse = "\n     - ")))
           }
      }
