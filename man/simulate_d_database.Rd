@@ -77,7 +77,6 @@ with the values to be sampled.
 }
 }
 \examples{
-\dontrun{
 ## Define sample sizes, means, and other parameters for each of two groups:
 n_params <- list(c(mean = 200, sd = 20),
                  c(mean = 100, sd = 20))
@@ -97,6 +96,5 @@ simulate_d_database(k = 5, n_params = n_params, rho_params = rho_params,
                     k_items = c(4, 4),
                     group_names = NULL, var_names = c("y1", "y2"),
                     show_applicant = TRUE, keep_vars = c("y1", "y2"), decimals = 2)
-}
 }
 \keyword{datagen}
