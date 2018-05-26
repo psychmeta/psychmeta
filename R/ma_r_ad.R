@@ -22,6 +22,95 @@
 #' ## Compute artifact-distribution meta-analysis, correcting for univariate direct range restriction
 #' ma_r_ad(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y, correction_method = "uvdrr",
 #'         correct_rr_y = FALSE, indirect_rr_x = FALSE)
+#'         
+#'         
+#'         
+#' # The results of ma_r() can also be corrected using artifact distributions
+#' ma_obj <- ma_r(ma_method = "bb", rxyi = rxyi, n = n,
+#'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'                moderators = moderator, data = data_r_meas_multi)
+#' 
+#' 
+#' # The create_ad_list function can be used to generate batches of artifact-distribution objects.
+#' # Here is an example in which one distribution is created per construct.
+#' ad_tibble <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
+#'                             construct_x = x_name, construct_y = y_name,
+#'                             sample_id = sample_id,
+#'                             data = data_r_meas_multi)
+#' # Passing that collection of distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
+#' ma_obj_tibble <- ma_r_ad(ma_obj = ma_obj, 
+#'                          ad_obj_x = ad_tibble, ad_obj_y = ad_tibble)
+#' summary(ma_obj_tibble)
+#' ma_obj_tibble$meta_tables[[1]]$artifact_distribution$true_score
+#' 
+#' 
+#' # The same outcomes as the previous example can be achieved by passing a named list of
+#' # artifact information, with each element bearing the name of a construct:
+#' ad_list <- setNames(ad_tibble$ad_x, ad_tibble$construct_x)
+#' ma_obj_list <- ma_r_ad(ma_obj = ma_obj, 
+#'                        ad_obj_x = ad_list, ad_obj_y = ad_list)
+#' summary(ma_obj_list)
+#' ma_obj_list$meta_tables[[1]]$artifact_distribution$true_score
+#' 
+#' 
+#' # It is also possible to construct artifact distributions in a pairwise fashion. 
+#' # For example, if correlations between X and Y and between X and Z are being analyzed,
+#' # X will get a different distribution for its relationships with Y than with Z.
+#' # These pairwise distributions are based only on artifact data from specific construct pairs.
+#' ad_tibble_pair <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
+#'                                  construct_x = x_name, construct_y = y_name,
+#'                                  sample_id = sample_id,
+#'                                  control = control_psychmeta(pairwise_ads = TRUE),
+#'                                  data = data_r_meas_multi)
+#' # Passing these pairwise distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
+#' ma_obj_pair <- ma_r_ad(ma_obj = ma_obj, 
+#'                        ad_obj_x = ad_tibble_pair, ad_obj_y = ad_tibble_pair)
+#' summary(ma_obj_pair)
+#' ma_obj_pair$meta_tables[[1]]$artifact_distribution$true_score
+#' 
+#' 
+#' # Sometimes moderators have important influcnces on artifact distributions as well as
+#' # distributions of effect sizes. When this occurs, moderated artifact distributions 
+#' # can be created to make more appropriate corrections. 
+#' ad_tibble_mod <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
+#'                                 construct_x = x_name, construct_y = y_name,
+#'                                 sample_id = sample_id,
+#'                                 control = control_psychmeta(moderated_ads = TRUE),
+#'                                 moderators = moderator,
+#'                                 data = data_r_meas_multi)
+#' # Passing these moderated distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
+#' ma_obj_mod <- ma_r_ad(ma_obj = ma_obj, 
+#'                       ad_obj_x = ad_tibble_mod, ad_obj_y = ad_tibble_mod)
+#' summary(ma_obj_mod)
+#' ma_obj_mod$meta_tables[[1]]$artifact_distribution$true_score
+#' 
+#' 
+#' # It is also possible to create pairwise moderated artifact distributions.
+#' ad_tibble_pairmod <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
+#'                                     construct_x = x_name, construct_y = y_name,
+#'                                     sample_id = sample_id,
+#'                                     control = control_psychmeta(moderated_ads = TRUE,
+#'                                                                 pairwise_ads = TRUE),
+#'                                     moderators = moderator,
+#'                                     data = data_r_meas_multi)
+#' # Passing these pairwise moderated distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
+#' ma_obj_pairmod <- ma_r_ad(ma_obj = ma_obj, 
+#'                           ad_obj_x = ad_tibble_pairmod, ad_obj_y = ad_tibble_pairmod)
+#' summary(ma_obj_pairmod)
+#' ma_obj_pairmod$meta_tables[[1]]$artifact_distribution$true_score
+#' 
+#' 
+#' # For even more control over which artifact distributions are used in corrections, you can supply
+#' # un-named list of distributions in which the order of distributions corresponds to the order of
+#' # meta-analyses in ma_obj. It is important for the elements to be un-named, as the absence of names 
+#' # and the length of the list are the two ways in which ma_r_ad() validates the lists.
+#' ad_list_pairmod_x <- ad_tibble_pairmod$ad_x
+#' ad_list_pairmod_y <- ad_tibble_pairmod$ad_y
+#' # Passing these lists of distributions to ma_r_ad() corrects 'ma_obj' for artifacts:
+#' ma_obj_pairmodlist <- ma_r_ad(ma_obj = ma_obj,
+#'                               ad_obj_x = ad_list_pairmod_x, ad_obj_y = ad_list_pairmod_y)
+#' summary(ma_obj_pairmodlist)
+#' ma_obj_pairmodlist$meta_tables[[1]]$artifact_distribution$true_score
 ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL, 
                     correction_method = "auto", 
                     use_ic_ads = c("tsa", "int"),
@@ -76,11 +165,47 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      if(!any(colnames(ma_obj) == "ad"))
           ma_obj$ad <- rep(list(list(ic = NULL, ad = NULL)), nrow(ma_obj))
      
-     ma_obj_i <- ma_obj[1,]
+     if(is.list(ad_obj_x)){
+          if(length(ad_obj_x) == nrow(ma_obj) & is.null(names(ad_obj_x))){
+               ma_obj$ad_x <- ad_obj_x
+               ad_obj_x <- NULL
+          }
+     }
+     
+     if(is.list(ad_obj_y)){
+          if(length(ad_obj_y) == nrow(ma_obj) & is.null(names(ad_obj_y))){
+               ma_obj$ad_y <- ad_obj_y
+               ad_obj_y <- NULL
+          }
+     }
+     
+     ma_obj <- manage_ad_objs(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y)
+     
+     null_adx <- is.null(ad_obj_x) & !("ad_x" %in% colnames(ma_obj))
+     null_ady <- is.null(ad_obj_y) & !("ad_y" %in% colnames(ma_obj))
+     
+     if(null_adx | null_ady){
+          if(any(attributes(ma_obj)$ma_methods == "ic")){
+               if(use_ic_ads != "tsa" & use_ic_ads != "int")
+                    stop("The only acceptable values for 'use_ic_ads' are 'tsa' and 'int'")
+               
+               if(use_ic_ads == "tsa"){
+                    if(null_adx) ma_obj$ad_x <- map(ma_obj$ad, function(x){x$ic$ad_x_tsa})
+                    if(null_ady) ma_obj$ad_y <- map(ma_obj$ad, function(x){x$ic$ad_y_tsa})
+               }
+               if(use_ic_ads == "int"){
+                    if(null_adx) ma_obj$ad_x <- map(ma_obj$ad, function(x){x$ic$ad_x_int})
+                    if(null_ady) ma_obj$ad_y <- map(ma_obj$ad, function(x){x$ic$ad_y_int})
+               }
+          }else{
+               if(null_adx & null_ady){
+                    stop("'ad_obj_x' and 'ad_obj_y' cannot both be NULL unless 'ma_obj' contains individual-correction results", call. = FALSE)
+               }
+          }
+     }
+     
      ma_list <- map(as.list(1:nrow(ma_obj)), function(i){
           ma_obj_i <- ma_obj[i,]
-          
-          ma_obj_i <- manage_ad_objs(ma_obj = ma_obj_i, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y)
           
           if("ad_x" %in% colnames(ma_obj_i)){
                ad_obj_x_i <- ma_obj_i$ad_x[[1]]
@@ -93,7 +218,6 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
           }else{
                ad_obj_y_i <- NULL
           }
-          ma_obj_i$ad_x <- ma_obj_i$ad_y <- NULL
           
           if(is.null(ad_obj_x_i) | is.null(ad_obj_y_i)){
                if(any(attributes(ma_obj)$ma_methods == "ic")){
@@ -229,7 +353,9 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                     ma_obj_i$escalc[[1]]$barebones$pa_ad <- convert_pq_to_p(pq = pqa)
                }    
           }else{
-               ma_obj_i$escalc[[1]]$barebones$pa_ad <- ma_obj_i$escalc[[1]]$barebones$pi
+               if("pi" %in% colnames(ma_obj_i$escalc[[1]]$barebones)){
+                    ma_obj_i$escalc[[1]]$barebones$pa_ad <- ma_obj_i$escalc[[1]]$barebones$pi
+               }
           }
           
           ma_obj_i
@@ -248,6 +374,8 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      ma_obj$indirect_rr_y <- NULL
      ma_obj$sign_rxz <- NULL
      ma_obj$sign_ryz <- NULL
+     if("ad_x" %in% colnames(ma_obj)) ma_obj$ad_x <- NULL
+     if("ad_y" %in% colnames(ma_obj)) ma_obj$ad_y <- NULL
      
      if(!("ad" %in% attributes(ma_obj)$ma_methods))
           attributes(ma_obj)$ma_methods <- c(attributes(ma_obj)$ma_methods, "ad")

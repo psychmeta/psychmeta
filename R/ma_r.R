@@ -238,14 +238,17 @@
 #'
 #' @examples
 #' ## The 'ma_r' function can compute multi-construct bare-bones meta-analyses:
-#' ma_r(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+#' ma_obj <- ma_r(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
 #'      moderators = moderator, data = data_r_meas_multi)
+#' summary(ma_obj)
 #'
 #' ## It can also perform multiple individual-correction meta-analyses:
-#' ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-#'      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'      moderators = moderator, data = data_r_meas_multi)
+#' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+#'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
+#'                moderators = moderator, data = data_r_meas_multi)
+#' summary(ma_obj)
+#' ma_obj$meta_tables[[1]]$individual_correction$true_score
 #'
 #' ## And 'ma_r' can also curate artifact distributions and compute multiple
 #' ## artifact-distribution meta-analyses:
@@ -254,7 +257,7 @@
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
 #'                clean_artifacts = FALSE, impute_artifacts = FALSE,
 #'                moderators = moderator, data = data_r_meas_multi)
-#' ma_obj
+#' summary(ma_obj)
 #' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #'
 #' ## Even if no studies in the database provide artifact information,
@@ -272,8 +275,8 @@
 #'                                   mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
 #'                          Z = list(mean_qxi = 0.8962108, var_qxi = 0.0007840593, k_qxi = 40,
 #'                                   mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha")))
+#' summary(ma_obj)
 #' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
-#'
 #'
 #' ## Artifact information may also be supplied by passing "ad_obj" class objects with the
 #' ## "supplemental_ads" argument.
@@ -291,6 +294,7 @@
 #'                clean_artifacts = FALSE, impute_artifacts = FALSE,
 #'                moderators = moderator, data = data_r_meas_multi,
 #'                supplemental_ads = ad_list)
+#' summary(ma_obj)
 #' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #' 
 #'
@@ -317,6 +321,7 @@
 #'                supplemental_ads = list(X = list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi),
 #'                                        Y = list(rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi),
 #'                                        Z = list(rxxi = rzzi, n_rxxi = n_rzzi, wt_rxxi = n_rzzi)))
+#' summary(ma_obj)
 #' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #'
 #' ## If 'use_all_arts' is set to TRUE, artifacts from studies without valid correlations
@@ -332,6 +337,7 @@
 #'                construct_x = x_name, construct_y = y_name,
 #'                sample_id = sample_id, moderators = moderator,
 #'                use_all_arts = TRUE, data = dat)
+#' summary(ma_obj)
 #' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  ma_method = c("bb", "ic", "ad"), 

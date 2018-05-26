@@ -53,6 +53,16 @@ reshape_suppad2tibble <- function(supplemental_ads){
           out <- NULL
      }else if("ad_tibble" %in% class(supplemental_ads)){
           out <- supplemental_ads
+          
+     }else if(all(c("tbl_df", "tbl", "data.frame") %in% class(supplemental_ads))){
+          
+          if(all(c("construct_x", "ad_x") %in% colnames(supplemental_ads)) | 
+             all(c("construct_y", "ad_y") %in% colnames(supplemental_ads))){
+               out <- supplemental_ads
+          }else{
+               stop("The artifact-distribution object supplied does not contain appropriately named columns. \nManually generated artifact tibbles must contain columns 'ad_x' and 'construct_x' AND/OR 'ad_y' and 'construct_y'", call. = FALSE)
+          }
+          
      }else if("list" %in% class(supplemental_ads)){
           
           if(any(names(supplemental_ads) == "")){
@@ -268,7 +278,7 @@ reshape_ad2tibble <- function(ma_obj, ad_obj){
      
      constructs <- NULL
      if("construct_x" %in% colnames(ma_obj)) constructs <- as.character(ma_obj$construct_x)
-     if("construct_y" %in% colnames(ma_obj)) constructs <- as.character(ma_obj$construct_y)
+     if("construct_y" %in% colnames(ma_obj)) constructs <- c(constructs, as.character(ma_obj$construct_y))
      constructs <- unique(constructs)
      
      if(is.null(ad_obj)){
@@ -276,10 +286,12 @@ reshape_ad2tibble <- function(ma_obj, ad_obj){
      }else if("ad_tibble" %in% class(ad_obj)){
           out <- ad_obj
      }else if(all(c("tbl_df", "tbl", "data.frame") %in% class(ad_obj))){
-          if(any(c("ad_x", "ad_x") %in% colnames(ad_obj))){
+          
+          if(all(c("construct_x", "ad_x") %in% colnames(ad_obj)) | 
+             all(c("construct_y", "ad_y") %in% colnames(ad_obj))){
                out <- ad_obj
           }else{
-               stop()
+               stop("The artifact-distribution object supplied does not contain appropriately named columns. \nManually generated artifact tibbles must contain columns 'ad_x' and 'construct_x' AND/OR 'ad_y' and 'construct_y'", call. = FALSE)
           }
           
      }else if(any(c("ad_int", "ad_tsa") %in% class(ad_obj))){
