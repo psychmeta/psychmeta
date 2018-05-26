@@ -257,13 +257,6 @@
 #' ma_obj
 #' ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 #'
-#' ma_obj <- ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-#'                correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'                clean_artifacts = FALSE, impute_artifacts = FALSE,
-#'                moderators = moderator, data = data_r_meas_multi)
-#' ma_obj
-#'
 #' ## Even if no studies in the database provide artifact information,
 #' ## pre-specified artifact distributions from previous meta-analyses
 #' ## can still be used! (These results should match the previous example.)
@@ -788,6 +781,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(is.null(k_items_x)) k_items_x <- rep(NA, length(rxyi))
      if(is.null(k_items_y)) k_items_y <- rep(NA, length(rxyi))
      
+     # Set harvested_ads to NULL in anticipation of there being no information
+     harvested_ads <- NULL
      if(use_all_arts & any(!valid_r)){
           .rxx_type <- rxx_type[!valid_r]
           .ryy_type <- ryy_type[!valid_r]
@@ -888,18 +883,29 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     .uy_observed[.valid_r_y] <- 
                     .k_items_y[.valid_r_y] <- NA
           }
+          
+          if(!is.null(moderators)){
+               .moderators <- data.frame(as_tibble(moderators)[!valid_r,][.valid_r_xy,])
+          }else{
+               .moderators <- NULL
+          }
 
           if(length(.n) > 0){
-               .supplemental_ads <- create_ad_list(sample_id = .sample_id, n = .n,
-                                                   construct_x = .construct_x, measure_x = .measure_x,
-                                                   construct_y = .construct_y, measure_y = .measure_y,
-                                                   rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type, k_items_x = .k_items_x,
-                                                   ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type, k_items_y = .k_items_y, 
-                                                   ux = .ux, ux_observed = .ux_observed,
-                                                   uy = .uy, uy_observed = .uy_observed, process_ads = FALSE)
-               .supplemental_ads <- setNames(.supplemental_ads$ad_x, .supplemental_ads$construct_x)
-               supplemental_ads <- consolidate_ads_list(ad_lists = list(.supplemental_ads, supplemental_ads))
-               supplemental_ads <- filter_listnonnull(supplemental_ads)
+               harvested_ads <- create_ad_list(sample_id = .sample_id, n = .n,
+                                               construct_x = .construct_x, measure_x = .measure_x,
+                                               construct_y = .construct_y, measure_y = .measure_y,
+                                               rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type, k_items_x = .k_items_x,
+                                               ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type, k_items_y = .k_items_y, 
+                                               ux = .ux, ux_observed = .ux_observed,
+                                               uy = .uy, uy_observed = .uy_observed, 
+                                               moderators = .moderators, cat_moderators = cat_moderators, moderator_type = moderator_type, 
+                                               control = control_psychmeta(var_unbiased = var_unbiased,
+                                                                           pairwise_ads = pairwise_ads,
+                                                                           moderated_ads = moderated_ads, 
+                                                                           check_dependence = check_dependence, 
+                                                                           collapse_method = collapse_method, 
+                                                                           intercor = intercor),
+                                               process_ads = FALSE)
           }
      }
 
@@ -1157,6 +1163,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                            total = n_pairs, clear = FALSE, width = options()$width)
      
      if(ma_method == "ic"){
+          .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- complete_moderators
+          if(!is.null(.psychmeta_reserved_internal_mod_aabbccddxxyyzz))
+               colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
+          
           ad_obj_list_tsa <- create_ad_list(ad_type = "tsa",
                                             n = "n", sample_id = "sample_id",
                                             construct_x = "construct_x", construct_y = "construct_y", 
@@ -1168,13 +1178,17 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                         pairwise_ads = pairwise_ads,
                                                                         moderated_ads = moderated_ads, 
                                                                         check_dependence = FALSE),
-                                            moderators = moderators,
+                                            moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz,
                                             cat_moderators = cat_moderators,
                                             moderator_type = moderator_type,
                                             construct_order = construct_order,
-                                            supplemental_ads = supplemental_ads,
                                             data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y), 
-                                            control_only = TRUE, ...)
+                                            control_only = TRUE, process_ads = FALSE, ...)
+          
+          ad_obj_list_tsa <- join_adobjs(ad_type = "tsa",
+                                         primary_ads = ad_obj_list_tsa, 
+                                         harvested_ads = harvested_ads, 
+                                         supplemental_ads = supplemental_ads)
           
           ad_obj_list_int <- create_ad_list(ad_type = "int",
                                             n = "n", sample_id = "sample_id",
@@ -1187,15 +1201,18 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                         pairwise_ads = pairwise_ads,
                                                                         moderated_ads = moderated_ads, 
                                                                         check_dependence = FALSE),
-                                            moderators = moderators,
+                                            moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz,
                                             cat_moderators = cat_moderators,
                                             moderator_type = moderator_type,
                                             construct_order = construct_order,
-                                            supplemental_ads = supplemental_ads,
                                             data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y), 
-                                            control_only = TRUE, ...)
+                                            control_only = TRUE, process_ads = FALSE, ...)
           
-          i <- which(construct_pair == construct_pair[1])
+          ad_obj_list_int <- join_adobjs(ad_type = "int", 
+                                         primary_ads = ad_obj_list_int, 
+                                         harvested_ads = harvested_ads, 
+                                         supplemental_ads = supplemental_ads)
+          
           out <- by(1:length(construct_pair), construct_pair, function(i){
                progbar$tick()
 
@@ -1219,7 +1236,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                }else{
                     complete_moderators_i <- NULL
                }
-               .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- complete_moderators_i
 
                if(!is.null(construct_x)) data <- data.frame(data, construct_x = construct_x[i])
                if(!is.null(construct_y)) data <- data.frame(data, construct_y = construct_y[i])
@@ -1227,8 +1243,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                ad_x_tsa <- ad_y_tsa <- create_ad_tsa()
                ad_x_int <- ad_y_int <- create_ad_tsa()
                
-               colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
-
+               .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- complete_moderators_i
+               if(!is.null(.psychmeta_reserved_internal_mod_aabbccddxxyyzz))
+                    colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
+               
                out <- ma_r_ic(rxyi = "rxyi", n = "n", n_adj = "n_adj", sample_id = "sample_id", citekey = "citekey",
                               wt_type = wt_type, 
                               correct_bias = correct_bias, correct_rxx = "correct_rxx", correct_ryy = "correct_ryy",
@@ -1240,7 +1258,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               uy = "uy", uy_observed = "uy_observed",
                               sign_rxz = "sign_rxz", sign_ryz = "sign_ryz",
                               moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz,
-                              # moderators = moderators, 
                               cat_moderators = cat_moderators, moderator_type = moderator_type,
                               data = data,
                               
@@ -1443,6 +1460,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           class(out) <- c("ma_psychmeta", class(out))
           
           if(ma_method == "ad"){
+               .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- complete_moderators
+               if(!is.null(complete_moderators))
+                    colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
+               
                ad_obj_list <- create_ad_list(ad_type = ad_type,
                                              n = "n", sample_id = "sample_id",
                                              construct_x = "construct_x", construct_y = "construct_y", 
@@ -1454,13 +1475,17 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                          pairwise_ads = pairwise_ads,
                                                                          moderated_ads = moderated_ads, 
                                                                          check_dependence = FALSE),
-                                             moderators = moderators,
+                                             moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz,
                                              cat_moderators = cat_moderators,
                                              moderator_type = moderator_type,
                                              construct_order = construct_order,
-                                             supplemental_ads = supplemental_ads,
                                              data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y), 
-                                             control_only = TRUE, ...)
+                                             control_only = TRUE, process_ads = FALSE, ...)
+               
+               ad_obj_list <- join_adobjs(ad_type = ad_type, 
+                                          primary_ads = ad_obj_list, 
+                                          harvested_ads = harvested_ads, 
+                                          supplemental_ads = supplemental_ads)
                
                out <- ma_r_ad(ma_obj = out, 
                               ad_obj_x = ad_obj_list, 

@@ -171,7 +171,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           if(deparse(substitute(uy_observed))[1] != "NULL")
                uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, arg_name = "uy_observed", data = data)
           
-          if(deparse(substitute(moderators))[1] != "NULL")
+          if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators))[1] != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
 

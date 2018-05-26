@@ -118,7 +118,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
                          .match_by <- .match_by[.match_by %in% colnames(ad_list[[i]])]
                          
                          if(length(.match_by) > 0)
-                              out <- left_join(out, ad_list[[i]], by = .match_by)
+                              out <- suppressWarnings(left_join(out, ad_list[[i]], by = .match_by))
                     }
                
                out    
@@ -225,6 +225,9 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
           if(!("ad_x" %in% colnames(ad_obj_x)) & "ad_y" %in% colnames(ad_obj_x))
                ad_obj_x <- rename_(ad_obj_x, ad_x = "ad_y")
           
+          if("ad_y" %in% colnames(ad_obj_x))
+               ad_obj_x$ad_y <- NULL
+          
           match_names_x <- match_names[match_names %in% colnames(ad_obj_x)]
           if(length(match_names_x) > 0){
                ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_x, by = match_names_x))      
@@ -239,6 +242,10 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
                ad_obj_y <- rename_(ad_obj_y, construct_y = "construct_x")
           if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
                ad_obj_y <- rename_(ad_obj_y, ad_y = "ad_x")
+          
+          
+          if("ad_x" %in% colnames(ad_obj_y))
+               ad_obj_y$ad_x <- NULL
           
           match_names_y <- match_names[match_names %in% colnames(ad_obj_y)]
           if(length(match_names_y) > 0){
