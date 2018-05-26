@@ -165,7 +165,7 @@ screen_ma <- function(ma_obj){
      correct_class <- "ma_psychmeta" %in% class(ma_obj)
      correct_attributes <- all(c("ma_metric", "ma_methods") %in% names(attributes(ma_obj)))
      
-     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc")
      correct_cols <- needed_cols %in% colnames(ma_obj)
      
      if(!correct_class)

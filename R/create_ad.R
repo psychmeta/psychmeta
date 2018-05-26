@@ -3,23 +3,180 @@
 create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                           rxxi_type = rep("alpha", length(rxxi)),
                           k_items_rxxi = rep(NA, length(rxxi)),
+                          
                           rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa,
                           rxxa_type = rep("alpha", length(rxxa)),
                           k_items_rxxa = rep(NA, length(rxxa)),
 
-                          ux = NULL, ni_ux = NULL, wt_ux = ni_ux,
-                          ut = NULL, ni_ut = NULL, wt_ut = ni_ut,
+                          ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = FALSE,
+                          
+                          ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = FALSE,
 
                           estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           ...){
 
-     ## TODO: Add standard-error estimates for different types of reliability statistics
-
+     if(length(rxxi) > 0){
+          
+          if(length(n_rxxi) == 0){
+               n_rxxi <- rep(NA, length(rxxi))
+               if(length(wt_rxxi) == 0){
+                    wt_rxxi <- rep(1, length(rxxi))
+               }else{
+                    if(length(wt_rxxi) != length(rxxi))
+                         stop("When wt_rxxi is not NULL, the lengths of rxxi and wt_rxxi must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(n_rxxi) != length(rxxi))
+                    stop("When n_rxxi is not NULL, the lengths of rxxi and n_rxxi must be equal", call. = FALSE)
+               if(length(wt_rxxi) == 0)
+                    wt_rxxi <- n_rxxi
+          }
+          
+          if(length(rxxi_type) == 0){
+               rxxi_type <- rep("alpha", length(rxxi))
+               k_items_rxxi <- rep(NA, length(rxxi))
+          }else{
+               if(length(rxxi_type) == 1)
+                    rxxi_type <- rep(rxxi_type, length(rxxi))
+               
+               if(length(rxxi_type) != length(rxxi))
+                    stop("When rxxi_type is not length 1, the lengths of rxxi and rxxi_type must be equal", call. = FALSE)
+          }
+          
+          if(length(k_items_rxxi) == 0){
+               k_items_rxxi <- rep(NA, length(rxxi))
+          }else{
+               if(length(k_items_rxxi) == 1)
+                    k_items_rxxi <- rep(k_items_rxxi, length(rxxi))
+               
+               if(length(k_items_rxxi) != length(rxxi))
+                    stop("When k_items_rxxi is not length 1, the lengths of rxxi and k_items_rxxi must be equal", call. = FALSE)
+          }
+     }else{
+          n_rxxi <- wt_rxxi <- rxxi_type <- k_items_rxxi <- NULL
+     }
+     
+     
+     if(length(rxxa) > 0){
+          
+          if(length(n_rxxa) == 0){
+               n_rxxa <- rep(NA, length(rxxa))
+               if(length(wt_rxxa) == 0){
+                    wt_rxxa <- rep(1, length(rxxa))
+               }else{
+                    if(length(wt_rxxa) != length(rxxa))
+                         stop("When wt_rxxa is not NULL, the lengths of rxxa and wt_rxxa must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(n_rxxa) != length(rxxa))
+                    stop("When n_rxxa is not NULL, the lengths of rxxa and n_rxxa must be equal", call. = FALSE)
+               if(length(wt_rxxa) == 0)
+                    wt_rxxa <- n_rxxa
+          }
+          
+          if(length(rxxa_type) == 0){
+               rxxa_type <- rep("alpha", length(rxxa))
+               k_items_rxxa <- rep(NA, length(rxxa))
+          }else{
+               if(length(rxxa_type) == 1)
+                    rxxa_type <- rep(rxxa_type, length(rxxa))
+               
+               if(length(rxxa_type) != length(rxxa))
+                    stop("When rxxa_type is not length 1, the lengths of rxxa and rxxa_type must be equal", call. = FALSE)
+          }
+          
+          if(length(k_items_rxxa) == 0){
+               k_items_rxxa <- rep(NA, length(rxxa))
+          }else{
+               if(length(k_items_rxxa) == 1)
+                    k_items_rxxa <- rep(k_items_rxxa, length(rxxa))
+               
+               if(length(k_items_rxxa) != length(rxxa))
+                    stop("When k_items_rxxa is not length 1, the lengths of rxxa and k_items_rxxa must be equal", call. = FALSE)
+          }
+     }else{
+          n_rxxa <- wt_rxxa <- rxxa_type <- k_items_rxxa <- NULL
+     }
+     
+     if(length(ux) > 0){
+          
+          if(length(ni_ux) == 0){
+               ni_ux <- rep(NA, length(ux))
+               if(length(wt_ux) == 0){
+                    wt_ux <- rep(1, length(ux))
+               }else{
+                    if(length(wt_ux) != length(ux))
+                         stop("When wt_ux is not NULL, the lengths of ux and wt_ux must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(ni_ux) != length(ux))
+                    stop("When ni_ux is not NULL, the lengths of ux and ni_ux must be equal", call. = FALSE)
+               if(length(wt_ux) == 0)
+                    wt_ux <- ni_ux
+          }
+          
+          if(length(na_ux) == 0){
+               na_ux <- rep(NA, length(ux))
+          }else{
+               if(length(na_ux) != length(ux))
+                    stop("When na_ux is not NULL, the lengths of ux and na_ux must be equal", call. = FALSE)
+          }
+          
+          if(length(dep_sds_ux_obs) == 0){
+               dep_sds_ux_obs <- rep(FALSE, length(ux))
+          }else{
+               if(length(dep_sds_ux_obs) == 1)
+                    dep_sds_ux_obs <- rep(dep_sds_ux_obs, length(ux))
+               
+               if(length(dep_sds_ux_obs) != length(ux))
+                    stop("When dep_sds_ux_obs is not length 1, the lengths of ux and dep_sds_ux_obs must be equal", call. = FALSE)
+          }
+     }else{
+          ni_ux <- wt_ux <- na_ux <- dep_sds_ux_obs <- NULL
+     }
+     
+     if(length(ut) > 0){
+          
+          if(length(ni_ut) == 0){
+               ni_ut <- rep(NA, length(ut))
+               if(length(wt_ut) == 0){
+                    wt_ut <- rep(1, length(ut))
+               }else{
+                    if(length(wt_ut) != length(ut))
+                         stop("When wt_ut is not NULL, the lengths of ut and wt_ut must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(ni_ut) != length(ut))
+                    stop("When ni_ut is not NULL, the lengths of ut and ni_ut must be equal", call. = FALSE)
+               if(length(wt_ut) == 0)
+                    wt_ut <- ni_ut
+          }
+          
+          if(length(na_ut) == 0){
+               na_ut <- rep(NA, length(ut))
+          }else{
+               if(length(na_ut) != length(ut))
+                    stop("When na_ut is not NULL, the lengths of ut and na_ut must be equal", call. = FALSE)
+          }
+          
+          if(length(dep_sds_ut_obs) == 0){
+               dep_sds_ut_obs <- rep(FALSE, length(ut))
+          }else{
+               if(length(dep_sds_ut_obs) == 1)
+                    dep_sds_ut_obs <- rep(dep_sds_ut_obs, length(ut))
+               
+               if(length(dep_sds_ut_obs) != length(ut))
+                    stop("When dep_sds_ut_obs is not length 1, the lengths of ut and dep_sds_ut_obs must be equal", call. = FALSE)
+          }
+     }else{
+          ni_ut <- wt_ut <- na_ut <- dep_sds_ut_obs <- NULL
+     }
+     
      inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
                     rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
-                    ux = ux, ni_ux = ni_ux, wt_ux = wt_ux,
-                    ut = ut, ni_ut = ni_ut, wt_ut = wt_ut,
+                    ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
+                    ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
                     ...)
 
      if(is.null(wt_rxxi)) wt_rxxi <- rep(1, length(rxxi))
@@ -68,17 +225,21 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      if(!is.null(ux)){
           filtered_ux <- filter_u(u_vec = ux, wt_vec = wt_ux)
           if(!is.null(ni_ux)) ni_ux <- ni_ux[filtered_ux]
+          if(!is.null(na_ux)) na_ux <- na_ux[filtered_ux]
+          if(!is.null(dep_sds_ux_obs)) dep_sds_ux_obs <- dep_sds_ux_obs[filtered_ux]
           ux <- ux[filtered_ux]
           wt_ux <- wt_ux[filtered_ux]
-          if(length(ux) == 0) ux <- ni_ux <- wt_ux <- NULL
+          if(length(ux) == 0) ux <- ni_ux <- na_ux <- wt_ux <- dep_sds_ux_obs <- NULL
      }
 
      if(!is.null(ut)){
           filtered_ut <- filter_u(u_vec = ut, wt_vec = wt_ut)
           if(!is.null(ni_ut)) ni_ut <- ni_ut[filtered_ut]
+          if(!is.null(na_ut)) na_ut <- na_ut[filtered_ut]
+          if(!is.null(dep_sds_ut_obs)) dep_sds_ut_obs <- dep_sds_ut_obs[filtered_ut]
           ut <- ut[filtered_ut]
           wt_ut <- wt_ut[filtered_ut]
-          if(length(ut) == 0) ut <- ni_ut <- wt_ut <- NULL
+          if(length(ut) == 0) ut <- ni_ut <- na_ut <- wt_ut <- dep_sds_ut_obs <- NULL
      }
 
      .replace_null <- function(x){
@@ -278,16 +439,28 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      }
 
      if(!is.null(ni_ux)){
+          if(is.null(na_ux)) na_ux <- rep(NA, length(ni_ux))
+          if(is.null(dep_sds_ux_obs)) dep_sds_ux_obs <- rep(FALSE, length(dep_sds_ux_obs))
+          
           mean_ni_ux <- mean(ni_ux, na.rm = TRUE)
           var_e_ux <- var_error_u(u = ux_mean, n_i = mean_ni_ux)
+          
+          var_e_ux <- var_error_u(u = ux_mean, n_i = ni_ux, n_a = na_ux, dependent_sds = dep_sds_ux_obs)
+          var_e_ux <- wt_mean(x = var_e_ux, wt = ni_ux)
      }else{
           mean_ni_ux <- NULL
           var_e_ux <- NA
      }
 
      if(!is.null(ni_ut)){
+          if(is.null(na_ut)) na_ut <- rep(NA, length(ni_ut))
+          if(is.null(dep_sds_ut_obs)) dep_sds_ut_obs <- rep(FALSE, length(dep_sds_ut_obs))
+          
           mean_ni_ut <- mean(ni_ut, na.rm = TRUE)
           var_e_ut <- var_error_u(u = ut_mean, n_i = mean_ni_ut)
+          
+          var_e_ut <- var_error_u(u = ut_mean, n_i = ni_ut, n_a = na_ut, dependent_sds = dep_sds_ut_obs)
+          var_e_ut <- wt_mean(x = var_e_ut, wt = ni_ut)
      }else{
           mean_ni_ut <- NULL
           var_e_ut <- NA
@@ -751,16 +924,16 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                      length(rxxi), length(rxxi), length(rxxa), length(rxxa),
                      length(.ux), length(.ut))
 
-          N_vec <- c(sum(n_rxxi), sum(n_rxxi), sum(n_rxxa), sum(n_rxxa),
-                     sum(n_rxxi), sum(n_rxxi), sum(n_rxxa), sum(n_rxxa),
-                     sum(ni_ux), sum(ni_ut))
+          N_vec <- c(sum(n_rxxi, na.rm = TRUE), sum(n_rxxi, na.rm = TRUE), sum(n_rxxa, na.rm = TRUE), sum(n_rxxa, na.rm = TRUE),
+                     sum(n_rxxi, na.rm = TRUE), sum(n_rxxi, na.rm = TRUE), sum(n_rxxa, na.rm = TRUE), sum(n_rxxa, na.rm = TRUE),
+                     sum(ni_ux, na.rm = TRUE), sum(ni_ut, na.rm = TRUE))
 
           if(estimate_rxxa){
                k_vec <- k_vec + c(0, 0, length(rxxi), length(rxxi),
                                   0, 0, length(rxxi), length(rxxi),
                                   0, 0)
-               N_vec <- N_vec + c(0, 0, sum(n_rxxi), sum(n_rxxi),
-                                  0, 0, sum(n_rxxi), sum(n_rxxi),
+               N_vec <- N_vec + c(0, 0, sum(n_rxxi, na.rm = TRUE), sum(n_rxxi, na.rm = TRUE),
+                                  0, 0, sum(n_rxxi, na.rm = TRUE), sum(n_rxxi, na.rm = TRUE),
                                   0, 0)
           }
 
@@ -768,8 +941,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                k_vec <- k_vec + c(length(rxxa), length(rxxa), 0, 0,
                                   length(rxxa), length(rxxa), 0, 0,
                                   0, 0)
-               N_vec <- N_vec + c(sum(n_rxxa), sum(n_rxxa), 0, 0,
-                                  sum(n_rxxa), sum(n_rxxa), 0, 0,
+               N_vec <- N_vec + c(sum(n_rxxa, na.rm = TRUE), sum(n_rxxa, na.rm = TRUE), 0, 0,
+                                  sum(n_rxxa, na.rm = TRUE), sum(n_rxxa, na.rm = TRUE), 0, 0,
                                   0, 0)
           }
 
@@ -777,14 +950,14 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                k_vec <- k_vec + c(rep(0, 8),
                                   length(.ut), 0)
                N_vec <- N_vec + c(rep(0, 8),
-                                  sum(ni_ut), 0)
+                                  sum(ni_ut, na.rm = TRUE), 0)
           }
 
           if(estimate_ut){
                k_vec <- k_vec + c(rep(0, 8),
                                   0, length(.ux))
                N_vec <- N_vec + c(rep(0, 8),
-                                  0, sum(ni_ux))
+                                  0, sum(ni_ux, na.rm = TRUE))
           }
 
           mean_vec <- c(mean_qxi_irr, mean_qxi_drr,
@@ -816,6 +989,9 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                                sd = var_vec^.5, sd_e = vare_vec^.5, sd_res = var_res_vec^.5,
                                rel_coef = rel_vec, rel_index = sqrt(rel_vec))
           rownames(summary_mat) <- name_vec
+          summary_mat <- summary_mat[c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
+                                       "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
+                                       "ux", "ut"),]
           summary_mat[is.na(summary_mat[,"mean"]),] <- NA
 
           out <- list(qxa_irr = .create_ad_int(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr),
@@ -892,9 +1068,164 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                           estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                           estimate_ux = TRUE, estimate_ut = TRUE,
                           var_unbiased = TRUE, ...){
-
-     ## TODO: Add standard-error estimates for different types of reliability statistics
-
+     
+     if(length(rxxi) > 0){
+          
+          if(length(n_rxxi) == 0){
+               n_rxxi <- rep(NA, length(rxxi))
+               if(length(wt_rxxi) == 0){
+                    wt_rxxi <- rep(1, length(rxxi))
+               }else{
+                    if(length(wt_rxxi) != length(rxxi))
+                         stop("When wt_rxxi is not NULL, the lengths of rxxi and wt_rxxi must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(n_rxxi) != length(rxxi))
+                    stop("When n_rxxi is not NULL, the lengths of rxxi and n_rxxi must be equal", call. = FALSE)
+               if(length(wt_rxxi) == 0)
+                    wt_rxxi <- n_rxxi
+          }
+          
+          if(length(rxxi_type) == 0){
+               rxxi_type <- rep("alpha", length(rxxi))
+               k_items_rxxi <- rep(NA, length(rxxi))
+          }else{
+               if(length(rxxi_type) == 1)
+                    rxxi_type <- rep(rxxi_type, length(rxxi))
+               
+               if(length(rxxi_type) != length(rxxi))
+                    stop("When rxxi_type is not length 1, the lengths of rxxi and rxxi_type must be equal", call. = FALSE)
+          }
+          
+          if(length(k_items_rxxi) == 0){
+               k_items_rxxi <- rep(NA, length(rxxi))
+          }else{
+               if(length(k_items_rxxi) == 1)
+                    k_items_rxxi <- rep(k_items_rxxi, length(rxxi))
+               
+               if(length(k_items_rxxi) != length(rxxi))
+                    stop("When k_items_rxxi is not length 1, the lengths of rxxi and k_items_rxxi must be equal", call. = FALSE)
+          }
+     }else{
+          n_rxxi <- wt_rxxi <- rxxi_type <- k_items_rxxi <- NULL
+     }
+     
+     
+     if(length(rxxa) > 0){
+          
+          if(length(n_rxxa) == 0){
+               n_rxxa <- rep(NA, length(rxxa))
+               if(length(wt_rxxa) == 0){
+                    wt_rxxa <- rep(1, length(rxxa))
+               }else{
+                    if(length(wt_rxxa) != length(rxxa))
+                         stop("When wt_rxxa is not NULL, the lengths of rxxa and wt_rxxa must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(n_rxxa) != length(rxxa))
+                    stop("When n_rxxa is not NULL, the lengths of rxxa and n_rxxa must be equal", call. = FALSE)
+               if(length(wt_rxxa) == 0)
+                    wt_rxxa <- n_rxxa
+          }
+          
+          if(length(rxxa_type) == 0){
+               rxxa_type <- rep("alpha", length(rxxa))
+               k_items_rxxa <- rep(NA, length(rxxa))
+          }else{
+               if(length(rxxa_type) == 1)
+                    rxxa_type <- rep(rxxa_type, length(rxxa))
+               
+               if(length(rxxa_type) != length(rxxa))
+                    stop("When rxxa_type is not length 1, the lengths of rxxa and rxxa_type must be equal", call. = FALSE)
+          }
+          
+          if(length(k_items_rxxa) == 0){
+               k_items_rxxa <- rep(NA, length(rxxa))
+          }else{
+               if(length(k_items_rxxa) == 1)
+                    k_items_rxxa <- rep(k_items_rxxa, length(rxxa))
+               
+               if(length(k_items_rxxa) != length(rxxa))
+                    stop("When k_items_rxxa is not length 1, the lengths of rxxa and k_items_rxxa must be equal", call. = FALSE)
+          }
+     }else{
+          n_rxxa <- wt_rxxa <- rxxa_type <- k_items_rxxa <- NULL
+     }
+     
+     if(length(ux) > 0){
+          
+          if(length(ni_ux) == 0){
+               ni_ux <- rep(NA, length(ux))
+               if(length(wt_ux) == 0){
+                    wt_ux <- rep(1, length(ux))
+               }else{
+                    if(length(wt_ux) != length(ux))
+                         stop("When wt_ux is not NULL, the lengths of ux and wt_ux must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(ni_ux) != length(ux))
+                    stop("When ni_ux is not NULL, the lengths of ux and ni_ux must be equal", call. = FALSE)
+               if(length(wt_ux) == 0)
+                    wt_ux <- ni_ux
+          }
+          
+          if(length(na_ux) == 0){
+               na_ux <- rep(NA, length(ux))
+          }else{
+               if(length(na_ux) != length(ux))
+                    stop("When na_ux is not NULL, the lengths of ux and na_ux must be equal", call. = FALSE)
+          }
+          
+          if(length(dep_sds_ux_obs) == 0){
+               dep_sds_ux_obs <- rep(FALSE, length(ux))
+          }else{
+               if(length(dep_sds_ux_obs) == 1)
+                    dep_sds_ux_obs <- rep(dep_sds_ux_obs, length(ux))
+               
+               if(length(dep_sds_ux_obs) != length(ux))
+                    stop("When dep_sds_ux_obs is not length 1, the lengths of ux and dep_sds_ux_obs must be equal", call. = FALSE)
+          }
+     }else{
+          ni_ux <- wt_ux <- na_ux <- dep_sds_ux_obs <- NULL
+     }
+     
+     if(length(ut) > 0){
+          
+          if(length(ni_ut) == 0){
+               ni_ut <- rep(NA, length(ut))
+               if(length(wt_ut) == 0){
+                    wt_ut <- rep(1, length(ut))
+               }else{
+                    if(length(wt_ut) != length(ut))
+                         stop("When wt_ut is not NULL, the lengths of ut and wt_ut must be equal", call. = FALSE)
+               }
+          }else{
+               if(length(ni_ut) != length(ut))
+                    stop("When ni_ut is not NULL, the lengths of ut and ni_ut must be equal", call. = FALSE)
+               if(length(wt_ut) == 0)
+                    wt_ut <- ni_ut
+          }
+          
+          if(length(na_ut) == 0){
+               na_ut <- rep(NA, length(ut))
+          }else{
+               if(length(na_ut) != length(ut))
+                    stop("When na_ut is not NULL, the lengths of ut and na_ut must be equal", call. = FALSE)
+          }
+          
+          if(length(dep_sds_ut_obs) == 0){
+               dep_sds_ut_obs <- rep(FALSE, length(ut))
+          }else{
+               if(length(dep_sds_ut_obs) == 1)
+                    dep_sds_ut_obs <- rep(dep_sds_ut_obs, length(ut))
+               
+               if(length(dep_sds_ut_obs) != length(ut))
+                    stop("When dep_sds_ut_obs is not length 1, the lengths of ut and dep_sds_ut_obs must be equal", call. = FALSE)
+          }
+     }else{
+          ni_ut <- wt_ut <- na_ut <- dep_sds_ut_obs <- NULL
+     }
+     
      inputs <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
                     mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type, mean_k_items_qxi = mean_k_items_qxi,
                     mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type, mean_k_items_rxxi = mean_k_items_rxxi,
@@ -930,9 +1261,13 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                valid_art <- valid_art & !is.na(wt_vec)
 
                if(!is.null(ni_vec)){
-                    valid_art <- valid_art & !is.na(ni_vec) & !is.infinite(ni_vec) & ni_vec > 0
-                    ni_vec <- ni_vec[valid_art]
+                    if(any(!is.na(ni_vec))){
+                         ni_vec <- ni_vec[valid_art]
+                    }else{
+                         ni_vec <- NULL
+                    }
                }
+               
                if(!is.null(na_vec)) na_vec <- na_vec[valid_art]
                art_vec <- art_vec[valid_art]
                wt_vec <- wt_vec[valid_art]
@@ -971,12 +1306,12 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                    var_e <- wt_mean(x = var_e, wt = ni_vec)
                               }
                          }else{
-                              var_e <- var_error_u(u = art_desc_obs[,"mean"], n_i = mean(ni_vec))
+                              var_e <- var_error_u(u = art_desc_obs[,"mean"], n_i = mean(ni_vec, na.rm = TRUE))
                          }
                          var_res <- as.numeric(art_desc_obs[,"var"] - var_e)
                     }
 
-                    art_desc_obs <- cbind(art_desc_obs, var_res = var_res, total_n = sum(ni_vec), n_wt = 1)
+                    art_desc_obs <- cbind(art_desc_obs, var_res = var_res, total_n = sum(ni_vec, na.rm = TRUE), n_wt = 1)
                     art_desc_obs[,"var_res"] <- ifelse(art_desc_obs[,"var_res"] < 0, 0, as.numeric(art_desc_obs[,"var_res"]))
                }
           }else{
@@ -1878,9 +2213,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                          length(rxxa[.valid_rxxa]), length(rxxa[.valid_rxxa]), length(rxxi[.valid_rxxi]), length(rxxi[.valid_rxxi]),
                                          length(ux[.valid_ux]), length(ut[.valid_ut])),
 
-                               N_obs = c(sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
-                                         sum(n_rxxa[.valid_rxxa]), sum(n_rxxa[.valid_rxxa]), sum(n_rxxi[.valid_rxxi]), sum(n_rxxi[.valid_rxxi]),
-                                         sum(ni_ux[.valid_ux]), sum(ni_ut[.valid_ut])),
+                               N_obs = c(sum(n_rxxa[.valid_rxxa], na.rm = TRUE), sum(n_rxxa[.valid_rxxa], na.rm = TRUE), sum(n_rxxi[.valid_rxxi], na.rm = TRUE), sum(n_rxxi[.valid_rxxi], na.rm = TRUE),
+                                         sum(n_rxxa[.valid_rxxa], na.rm = TRUE), sum(n_rxxa[.valid_rxxa], na.rm = TRUE), sum(n_rxxi[.valid_rxxi], na.rm = TRUE), sum(n_rxxi[.valid_rxxi], na.rm = TRUE),
+                                         sum(ni_ux[.valid_ux], na.rm = TRUE), sum(ni_ut[.valid_ut], na.rm = TRUE)),
 
                                p_dists = c(length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
                                            length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),

@@ -50,16 +50,16 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
           escalc <- ma_obj_i$escalc
 
-          moderator_matrix <- ma_obj_i$moderator_info$moderator_matrix
-          cat_moderator_matrix <- ma_obj_i$moderator_info$cat_moderator_matrix
-          es_data <- ma_obj_i$moderator_info$data$barebones
+          moderator_matrix <- escalc$moderator_info$moderator_matrix
+          cat_moderator_matrix <- escalc$moderator_info$cat_moderator_matrix
 
           if(!is.null(moderator_matrix)){
                moderator_names <- colnames(moderator_matrix)
-
                moderator_names <- gsub(x = moderator_names, pattern = " ", replacement = "_")
                colnames(moderator_matrix) <- moderator_names
-
+               
+               moderator_names <- moderator_names[moderator_names != "original_order"]
+               
                if(is.null(formula_list)){
                     formula_list <- list(paste("~", paste(moderator_names, collapse = " + ")))
                     interaction_list <- list()
@@ -78,7 +78,7 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                }
 
                if("bb" %in% ma_methods){
-                    data_bb <- bind_cols(moderator_matrix, escalc$barebones)
+                    data_bb <- full_join(moderator_matrix, escalc$barebones, by = "original_order")
                     metareg_bb <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_bb))
                }else{
                     metareg_bb <- NULL
@@ -86,14 +86,14 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
                if("ic" %in% ma_methods){
                     if(es_type == "r"){
-                         data_ts <- bind_cols(moderator_matrix, escalc$individual_correction$true_score)
-                         data_vgx <- bind_cols(moderator_matrix, escalc$individual_correction$validity_generalization_x)
-                         data_vgy <- bind_cols(moderator_matrix, escalc$individual_correction$validity_generalization_y)
+                         data_ts <- full_join(moderator_matrix, escalc$individual_correction$true_score, by = "original_order")
+                         data_vgx <- full_join(moderator_matrix, escalc$individual_correction$validity_generalization_x, by = "original_order")
+                         data_vgy <- full_join(moderator_matrix, escalc$individual_correction$validity_generalization_y, by = "original_order")
                     }
                     if(es_type == "d"){
-                         data_ts <- bind_cols(moderator_matrix, escalc$individual_correction$latentGroup_latentY)
-                         data_vgx <- bind_cols(moderator_matrix, escalc$individual_correction$observedGroup_latentY)
-                         data_vgy <- bind_cols(moderator_matrix, escalc$individual_correction$latentGroup_observedY)
+                         data_ts <- full_join(moderator_matrix, escalc$individual_correction$latentGroup_latentY, by = "original_order")
+                         data_vgx <- full_join(moderator_matrix, escalc$individual_correction$observedGroup_latentY, by = "original_order")
+                         data_vgy <- full_join(moderator_matrix, escalc$individual_correction$latentGroup_observedY, by = "original_order")
                     }
 
                     metareg_ts  <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_ts))

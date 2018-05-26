@@ -10,8 +10,9 @@ create_ad_int(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
   rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA,
   length(rxxi)), rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa,
   rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA,
-  length(rxxa)), ux = NULL, ni_ux = NULL, wt_ux = ni_ux, ut = NULL,
-  ni_ut = NULL, wt_ut = ni_ut, estimate_rxxa = TRUE,
+  length(rxxa)), ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux,
+  dep_sds_ux_obs = FALSE, ut = NULL, ni_ut = NULL, na_ut = NULL,
+  wt_ut = ni_ut, dep_sds_ut_obs = FALSE, estimate_rxxa = TRUE,
   estimate_rxxi = TRUE, estimate_ux = TRUE, estimate_ut = TRUE, ...)
 
 create_ad_tsa(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
@@ -79,13 +80,23 @@ create_ad(ad_type = c("tsa", "int"), rxxi = NULL, n_rxxi = NULL,
 
 \item{ni_ux}{Vector of incumbent sample sizes associated with the elements of \code{ux}.}
 
+\item{na_ux}{Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ux values. \code{NULL} by default.
+Only used when ni_ux is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ux}.}
+
 \item{wt_ux}{Vector of weights associated with the elements of \code{ux} (by default, sample sizes will be used as weights).}
+
+\item{dep_sds_ux_obs}{Logical scalar or vector determining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{ut}{Vector of true-score u ratios.}
 
 \item{ni_ut}{Vector of incumbent sample sizes associated with the elements of \code{ut}.}
 
+\item{na_ut}{Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ut values. \code{NULL} by default.
+Only used when ni_ut is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ut}.}
+
 \item{wt_ut}{Vector of weights associated with the elements of \code{ut} (by default, sample sizes will be used as weights).}
+
+\item{dep_sds_ut_obs}{Logical scalar or vector determining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{estimate_rxxa}{Logical argument to estimate rxxa values from other artifacts (\code{TRUE}) or to only used supplied rxxa values (\code{FALSE}). \code{TRUE} by default.}
 
@@ -129,11 +140,6 @@ create_ad(ad_type = c("tsa", "int"), rxxi = NULL, n_rxxi = NULL,
 
 \item{mean_n_rxxa}{Vector that can be used to supply the mean sample sizes of externally computed distributions of applicant reliabilities.}
 
-\item{na_ux}{Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ux values. \code{NULL} by default.
-Only used when ni_ux is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ux}.}
-
-\item{dep_sds_ux_obs}{Logical scalar or vector determining whether supplied ux values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
-
 \item{mean_ux}{Vector that can be used to supply the means of externally computed distributions of observed-score u ratios.}
 
 \item{var_ux}{Vector that can be used to supply the variances of externally computed distributions of observed-score u ratios.}
@@ -145,11 +151,6 @@ Only used when ni_ux is not NULL. If supplied, must be either a scalar or the sa
 \item{mean_na_ux}{Vector or scalar that can be used to supply the mean applicant sample size(s) of externally computed distributions of observed-score u ratios.}
 
 \item{dep_sds_ux_spec}{Logical scalar or vector determining whether externally computed ux distributions were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
-
-\item{na_ut}{Vector of applicant sample sizes that can be used in estimating the sampling error of supplied ut values. \code{NULL} by default.
-Only used when ni_ut is not NULL. If supplied, must be either a scalar or the same length as \code{ni_ut}.}
-
-\item{dep_sds_ut_obs}{Logical scalar or vector determining whether supplied ut values were computed using dependent samples (\code{TRUE}) or independent samples (\code{FALSE}).}
 
 \item{mean_ut}{Vector that can be used to supply the means of externally computed distributions of true-score u ratios.}
 

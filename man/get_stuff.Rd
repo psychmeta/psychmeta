@@ -15,8 +15,8 @@
 \alias{get_plots}
 \title{Extract results from a psychmeta meta-analysis object}
 \usage{
-get_metafor(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_metafor(ma_obj, moderators = FALSE, analyses = "all", match = c("all",
+  "any"), case_sensitive = TRUE, ...)
 
 get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ma_methods = c("bb", "ic", "ad"),
@@ -54,6 +54,8 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
+
+\item{moderators}{Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).}
 
 \item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
 \itemize{

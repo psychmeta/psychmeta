@@ -159,6 +159,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
                          .ad_supplemental <- attributes(.ad_supplemental)$inputs
                     
                     .ad_info <- consolidate_ads(.ad_primary, .ad_harvested, .ad_supplemental)
+                    lapply(.ad_info, length)
                     
                     if(ad_type == "tsa"){
                          out <- do.call(create_ad_tsa, .ad_info)
@@ -219,11 +220,12 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
      match_names <- match_names[match_names != "analysis_type"]
      
      if(!is.null(ad_obj_x)){
-          ad_obj_x <- select_(ad_obj_x, .dots = colnames(ad_obj_x)[colnames(ad_obj_x) != "analysis_type"])
+
+          ad_obj_x <- ad_obj_x %>% select(colnames(ad_obj_x)[colnames(ad_obj_x) != "analysis_type"])
           if(!("construct_x" %in% colnames(ad_obj_x)) & "construct_y" %in% colnames(ad_obj_x))
-               ad_obj_x <- rename_(ad_obj_x, construct_x = "construct_y")
+               ad_obj_x <- ad_obj_x %>% rename(construct_x = "construct_y")
           if(!("ad_x" %in% colnames(ad_obj_x)) & "ad_y" %in% colnames(ad_obj_x))
-               ad_obj_x <- rename_(ad_obj_x, ad_x = "ad_y")
+               ad_obj_x <- ad_obj_x %>% rename(ad_x = "ad_y")
           
           if("ad_y" %in% colnames(ad_obj_x))
                ad_obj_x$ad_y <- NULL
@@ -237,12 +239,12 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
      }
      
      if(!is.null(ad_obj_y)){
-          ad_obj_y <- select_(ad_obj_y, .dots = colnames(ad_obj_y)[colnames(ad_obj_y) != "analysis_type"])
-          if(!("construct_y" %in% colnames(ad_obj_y)) & "construct_x" %in% colnames(ad_obj_y))
-               ad_obj_y <- rename_(ad_obj_y, construct_y = "construct_x")
-          if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
-               ad_obj_y <- rename_(ad_obj_y, ad_y = "ad_x")
           
+          ad_obj_y <- ad_obj_y %>% select(colnames(ad_obj_y)[colnames(ad_obj_y) != "analysis_type"])
+          if(!("construct_y" %in% colnames(ad_obj_y)) & "construct_x" %in% colnames(ad_obj_y))
+               ad_obj_y <- ad_obj_y %>% rename(construct_y = "construct_x")
+          if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
+               ad_obj_y <- ad_obj_y %>% rename(ad_y = "ad_x")
           
           if("ad_x" %in% colnames(ad_obj_y))
                ad_obj_y$ad_x <- NULL

@@ -35,7 +35,7 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
      escalc_list <- get_escalc(ma_obj = ma_obj_filtered)
      if(show_filtered) ma_obj <- ma_obj_filtered
-
+     
      ma_methods <- attributes(ma_obj)$ma_methods
 
      if("bb" %in% ma_methods){
@@ -45,8 +45,6 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           barebones <- NULL
      }
 
-     is.data.frame(escalc_list$`analysis_id: 1`$barebones)
-     is.data.frame(escalc_list$`analysis_id: 1`$individual_correction)
      out <- map(escalc_list, function(x){
           map(x, function(.x){
                if(is.data.frame(.x)){
