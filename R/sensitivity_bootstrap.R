@@ -217,7 +217,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                                                                                boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
                          
                          class(boot_list$barebones) <- class(boot_list$true_score) <- class(boot_list$validity_generalization_x) <-
-                              class(boot_list$validity_generalization_y) <- c("psychmeta", "ma_bootstrap")
+                              class(boot_list$validity_generalization_y) <- "ma_bootstrap"
                          
                          out_list$barebones <- boot_list$barebones
                          out_list$individual_correction$true_score <- boot_list$true_score
@@ -237,7 +237,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                                                                                boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list))
                          
                          class(boot_list$barebones) <- class(boot_list$true_score) <- class(boot_list$validity_generalization_x) <-
-                              class(boot_list$validity_generalization_y) <- c("psychmeta", "ma_bootstrap")
+                              class(boot_list$validity_generalization_y) <- "ma_bootstrap"
                          
                          out_list$barebones <- boot_list$barebones
                          out_list$artifact_distribution$true_score <- boot_list$true_score
@@ -260,7 +260,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                          out_list$barebones <- .ma_bootstrap(data = es_data, ma_fun_boot = .ma_d_bb_boot, boot_iter = boot_iter,
                                                                             boot_conf_level = boot_conf_level, boot_ci_type = boot_ci_type, ma_arg_list = ma_arg_list)
                     
-                    class(out_list$barebones) <- c("psychmeta", "ma_bootstrap")
+                    class(out_list$barebones) <- "ma_bootstrap"
                }
                
                if(d_metric){

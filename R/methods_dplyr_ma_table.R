@@ -1,11 +1,13 @@
+#' @export
+#' @keywords internal
 #' @method select ma_table
 select.ma_table <- function(.data, ...){
      .class <- class(.data)
      class(.data) <- .class[.class != "ma_table"]
      .attributes <- attributes(.data)
      
-     .filter <- function (.data, ...) UseMethod("select") 
-     .data <- .filter(.data, ...)
+     .select <- function (.data, ...) UseMethod("select") 
+     .data <- .select(.data, ...)
      .attributes$names <- attributes(.data)$names
      
      attributes(.data) <- .attributes
@@ -14,6 +16,8 @@ select.ma_table <- function(.data, ...){
      .data
 }
 
+#' @export
+#' @keywords internal
 #' @method filter ma_table
 filter.ma_table <- function(.data, ...){
      .class <- class(.data)
@@ -31,13 +35,15 @@ filter.ma_table <- function(.data, ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange ma_table
 arrange.ma_table <- function(.data, ...){
      .class <- class(.data)
      class(.data) <- .class[.class != "ma_table"]
      .attributes <- attributes(.data)
      
-     .arrange <- function (.data, ...) UseMethod("filter") 
+     .arrange <- function (.data, ...) UseMethod("arrange") 
      .data <- .arrange(.data, ...)
      
      attributes(.data) <- .attributes
@@ -46,6 +52,8 @@ arrange.ma_table <- function(.data, ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange_all ma_table
 arrange_all.ma_table <- function(.tbl, .funs = list(), ...){
      .class <- class(.tbl)
@@ -61,6 +69,8 @@ arrange_all.ma_table <- function(.tbl, .funs = list(), ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange_at ma_table
 arrange_at.ma_table <- function(.tbl, .vars, .funs = list(), ...){
      .class <- class(.tbl)
@@ -76,6 +86,8 @@ arrange_at.ma_table <- function(.tbl, .vars, .funs = list(), ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange_if ma_table
 arrange_if.ma_table <- function(.tbl, .predicate, .funs = list(), ...){
      .class <- class(.tbl)
@@ -91,6 +103,8 @@ arrange_if.ma_table <- function(.tbl, .predicate, .funs = list(), ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method subset ma_table
 subset.ma_table <- function (x, subset, select, drop = FALSE, ...){
      .class <- class(x)
@@ -110,19 +124,23 @@ subset.ma_table <- function (x, subset, select, drop = FALSE, ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method group_by ma_table
-group_by.ma_table <- function (x, ..., add = FALSE){
-     .class <- class(x)
-     class(x) <- .class[.class != "ma_table"]
+group_by.ma_table <- function (.data, ..., add = FALSE){
+     .class <- class(.data)
+     class(.data) <- .class[.class != "ma_table"]
      
-     .group_by <- function (x, ..., add = FALSE) UseMethod("group_by") 
-     x <- .group_by(x, ..., add = add)
+     .group_by <- function (.data, ..., add = FALSE) UseMethod("group_by") 
+     .data <- .group_by(.data, ..., add = add)
      
-     class(x) <- c("ma_table", class(x))
-     x
+     class(.data) <- c("ma_table", class(.data))
+     .data
 }
 
 
+#' @export
+#' @keywords internal
 #' @method ungroup ma_table
 ungroup.ma_table <- function (x, ...){
      .class <- class(x)
@@ -137,7 +155,9 @@ ungroup.ma_table <- function (x, ...){
 
 
 
-#' @method `[` ma_table
+#' @export
+#' @keywords internal
+#' @method [ ma_table
 `[.ma_table` <- function(x, i = rep(TRUE, nrow(x)), j = rep(TRUE, ncol(x)), drop = if (missing(i)) TRUE else ncol(x) == 1){
      .class <- class(x)
      class(x) <- .class[.class != "ma_table"]

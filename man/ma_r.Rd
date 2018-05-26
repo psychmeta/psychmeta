@@ -330,13 +330,6 @@ ma_obj <- ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi
 ma_obj
 ma_obj$meta_tables[[1]]$artifact_distribution$true_score
 
-ma_obj <- ma_r(ma_method = "ad", ad_type = "int", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
-               correct_rr_x = FALSE, correct_rr_y = FALSE,
-               construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-               clean_artifacts = FALSE, impute_artifacts = FALSE,
-               moderators = moderator, data = data_r_meas_multi)
-ma_obj
-
 ## Even if no studies in the database provide artifact information,
 ## pre-specified artifact distributions from previous meta-analyses
 ## can still be used! (These results should match the previous example.)

@@ -1,11 +1,13 @@
+#' @export
+#' @keywords internal
 #' @method select ma_psychmeta
 select.ma_psychmeta <- function(.data, ...){
      .class <- class(.data)
      class(.data) <- .class[.class != "ma_psychmeta"]
      .attributes <- attributes(.data)
      
-     .filter <- function (.data, ...) UseMethod("select") 
-     .data <- .filter(.data, ...)
+     .select <- function (.data, ...) UseMethod("select") 
+     .data <- .select(.data, ...)
      .attributes$names <- attributes(.data)$names
      
      attributes(.data) <- .attributes
@@ -19,6 +21,8 @@ select.ma_psychmeta <- function(.data, ...){
      .data
 }
 
+#' @export
+#' @keywords internal
 #' @method filter ma_psychmeta
 filter.ma_psychmeta <- function(.data, ...){
      .class <- class(.data)
@@ -36,13 +40,15 @@ filter.ma_psychmeta <- function(.data, ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange ma_psychmeta
 arrange.ma_psychmeta <- function(.data, ...){
      .class <- class(.data)
      class(.data) <- .class[.class != "ma_psychmeta"]
      .attributes <- attributes(.data)
      
-     .arrange <- function (.data, ...) UseMethod("filter") 
+     .arrange <- function (.data, ...) UseMethod("arrange") 
      .data <- .arrange(.data, ...)
      
      attributes(.data) <- .attributes
@@ -51,6 +57,8 @@ arrange.ma_psychmeta <- function(.data, ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange_all ma_psychmeta
 arrange_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
      .class <- class(.tbl)
@@ -66,6 +74,8 @@ arrange_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange_at ma_psychmeta
 arrange_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
      .class <- class(.tbl)
@@ -81,6 +91,8 @@ arrange_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method arrange_if ma_psychmeta
 arrange_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
      .class <- class(.tbl)
@@ -96,6 +108,8 @@ arrange_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method subset ma_psychmeta
 subset.ma_psychmeta <- function (x, subset, select, drop = FALSE, ...){
      .class <- class(x)
@@ -119,19 +133,24 @@ subset.ma_psychmeta <- function (x, subset, select, drop = FALSE, ...){
 }
 
 
+#' @export
+#' @keywords internal
 #' @method group_by ma_psychmeta
-group_by.ma_psychmeta <- function (x, ..., add = FALSE){
-     .class <- class(x)
-     class(x) <- .class[.class != "ma_psychmeta"]
+group_by.ma_psychmeta <- function (.data, ..., add = FALSE){
+     .class <- class(.data)
+     class(.data) <- .class[.class != "ma_psychmeta"]
      
-     .group_by <- function (x, ..., add = FALSE) UseMethod("group_by") 
-     x <- .group_by(x, ..., add = add)
+     .group_by <- function (.data, ..., add = FALSE) UseMethod("group_by") 
+     .data <- .group_by(.data, ..., add = add)
      
-     class(x) <- c("ma_psychmeta", class(x))
-     x
+     class(.data) <- c("ma_psychmeta", class(.data))
+     .data
 }
 
 
+
+#' @export
+#' @keywords internal
 #' @method ungroup ma_psychmeta
 ungroup.ma_psychmeta <- function (x, ...){
      .class <- class(x)
@@ -146,7 +165,9 @@ ungroup.ma_psychmeta <- function (x, ...){
 
 
 
-#' @method `[` ma_psychmeta
+#' @export
+#' @keywords internal
+#' @method [ ma_psychmeta
 `[.ma_psychmeta` <- function(x, i = rep(TRUE, nrow(x)), j = rep(TRUE, ncol(x)), drop = if (missing(i)) TRUE else ncol(x) == 1){
      .class <- class(x)
      class(x) <- .class[.class != "ma_psychmeta"]

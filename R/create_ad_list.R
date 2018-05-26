@@ -73,8 +73,8 @@
 #'                control = control_psychmeta(pairwise_ads = TRUE,
 #'                                            moderated_ads = TRUE))
 create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
-                           construct_x, measure_x = NULL,
-                           construct_y, measure_y = NULL,
+                           construct_x = NULL, measure_x = NULL,
+                           construct_y = NULL, measure_y = NULL,
                            rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
                            ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                            ux = NULL, ux_observed = TRUE,
@@ -171,11 +171,16 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           if(deparse(substitute(uy_observed))[1] != "NULL")
                uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, arg_name = "uy_observed", data = data)
           
-          if(deparse(substitute(moderators))[1] != "NULL")
+          if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators))[1] != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
 
      if(!moderated_ads) moderators <- NULL
+     
+     null_construct_x <- is.null(construct_x)
+     null_construct_y <- is.null(construct_y)
+     if(null_construct_x) construct_x <- "X"
+     if(null_construct_y) construct_y <- "Y"
      
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
@@ -325,8 +330,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      attributes(out) <- append(attributes(out), list(call_history = list(call), 
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                      fyi = NULL)) 
-     # out <- namelists.ma_psychmeta(ma_obj = out)
-     out
+     
      class(out) <- c("ad_tibble", class(out))
      
      return(out)

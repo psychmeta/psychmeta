@@ -256,7 +256,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                                     plots = vgx_plots)
                     out_vgy <- list(data = vgy_table, 
                                     plots = vgy_plots)
-                    class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
+                    class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- "ma_leave1out"
                     
                     out_list$barebones <- out_bb
                     out_list$individual_correction$true_score <- out_ts
@@ -317,7 +317,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                                     plots = vgx_plots)
                     out_vgy <- list(data = vgy_table, 
                                     plots = vgy_plots)
-                    class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- c("psychmeta", "ma_leave1out")
+                    class(out_bb) <- class(out_ts) <- class(out_vgx) <- class(out_vgy) <- "ma_leave1out"
                     
                     out_list$barebones <- out_bb
                     out_list$artifact_distribution$true_score <- out_ts
@@ -366,7 +366,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                     
                     out_bb <- list(data = bb_table, 
                                    plots = bb_plots)
-                    class(out_bb) <- c("psychmeta", "ma_leave1out")
+                    class(out_bb) <- "ma_leave1out"
                     out_list$barebones <- out_bb
                }
           }

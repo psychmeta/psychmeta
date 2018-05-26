@@ -1,3 +1,214 @@
+organize_ads <- function(ad_obj, ad_suffix = NULL){
+     
+     if(is.null(ad_obj)){
+          ad_obj_x <- ad_obj_y <- NULL
+     }else{
+          if("ad_x" %in% colnames(ad_obj)){
+               if(!("ad_y" %in% colnames(ad_obj))){
+                    ad_obj_x <- ad_obj_y <- ad_obj
+                    
+                    colnames(ad_obj_x)[colnames(ad_obj_x) == "ad_x"] <- paste0("ad_x", ad_suffix)
+                    colnames(ad_obj_y)[colnames(ad_obj_y) == "ad_x"] <- paste0("ad_y", ad_suffix)
+                    
+                    if("construct_x" %in% colnames(ad_obj))
+                         ad_obj_y <- rename(ad_obj_y, construct_y = "construct_x")
+                    
+                    ad_obj <- NULL
+               }else{
+                    colnames(ad_obj)[colnames(ad_obj) == "ad_x"] <- paste0("ad_x", ad_suffix)
+                    
+                    ad_obj_x <- ad_obj_y <- NULL
+               }
+          }
+          
+          if(!is.null(ad_obj))
+               if("ad_y" %in% colnames(ad_obj)){
+                    if(!(paste0("ad_x", ad_suffix) %in% colnames(ad_obj))){
+                         ad_obj_x <- ad_obj_y <- ad_obj
+                         
+                         colnames(ad_obj_x)[colnames(ad_obj_x) == "ad_y"] <- paste0("ad_x", ad_suffix)
+                         colnames(ad_obj_y)[colnames(ad_obj_y) == "ad_y"] <- paste0("ad_y", ad_suffix)
+                         
+                         if("construct_y" %in% colnames(ad_obj))
+                              ad_obj_x <- rename(ad_obj_x, construct_y = "construct_x")
+                         
+                         ad_obj <- NULL
+                    }else{
+                         colnames(ad_obj)[colnames(ad_obj) == "ad_y"] <- paste0("ad_y", ad_suffix)
+                         
+                         ad_obj_x <- ad_obj_y <- NULL
+                    }
+               }    
+     }
+     
+     list(ad_obj = ad_obj, 
+          ad_obj_x = ad_obj_x, 
+          ad_obj_y = ad_obj_y)
+}
+
+
+reshape_suppad2tibble <- function(supplemental_ads){
+     
+     if(is.null(supplemental_ads)){
+          out <- NULL
+     }else if("ad_tibble" %in% class(supplemental_ads)){
+          out <- supplemental_ads
+     }else if("list" %in% class(supplemental_ads)){
+          
+          if(any(names(supplemental_ads) == "")){
+               if(all(names(supplemental_ads) == "")){
+                    stop("If artifact distributions are supplied as a list, the elements of the list must be named", call. = FALSE)
+               }else{
+                    warning("Some elements of the artifact-distribution list were not named", call. = FALSE)
+                    supplemental_ads <- supplemental_ads[names(supplemental_ads) != ""]    
+               }
+          }
+          
+          constructs <- names(supplemental_ads)
+          
+          out <- tibble(construct_x = constructs, 
+                        analysis_type = rep("Overall", length(constructs)))
+          
+          out <- tibble(construct_x = names(supplemental_ads), 
+                        analysis_type = rep("Overall", length(supplemental_ads)), 
+                        ad_x = supplemental_ads)
+          
+          class(out) <- c("ad_tibble", class(out))
+     }else{
+          out <- NULL
+     }
+     
+     out
+}
+
+
+join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested_ads = NULL, supplemental_ads = NULL){
+     
+     ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
+     
+     primary_ads <- organize_ads(ad_obj = primary_ads, ad_suffix = "_primary")
+     harvested_ads <- organize_ads(ad_obj = harvested_ads, ad_suffix = "_harvested")
+     supplemental_ads <- organize_ads(reshape_suppad2tibble(supplemental_ads), ad_suffix = "_supplemental")
+     
+     .join_adobjs <- function(..., exclude_from_matching = NULL){
+          exclude_from_matching <- c("analysis_type", "analysis_id", "pair_id", exclude_from_matching)
+          
+          .ad_list <- list(...)
+          ad_list <- list()
+          for(i in 1:length(.ad_list)) ad_list <- append(ad_list, .ad_list[[i]])
+          null_entry <- unlist(map(ad_list, is.null))    
+          
+          if(all(null_entry)){
+               NULL
+          }else{
+               ad_list[null_entry] <- NULL
+               ad_list <- map(ad_list, function(x){
+                    if("analysis_type" %in% colnames(x)) x$analysis_type <- NULL
+                    x
+               })
+               match_by <- unique(unlist(map(ad_list, colnames)))
+               match_by <- match_by[!(match_by %in% exclude_from_matching)]
+               
+               out <- ad_list[[1]]
+               if(length(ad_list) > 1 & !("data.frame" %in% ad_list))
+                    for(i in 2:length(ad_list)){
+                         .match_by <- unique(c(colnames(out), colnames(ad_list[[i]])))
+                         .match_by <- .match_by[.match_by %in% match_by]
+                         .match_by <- .match_by[.match_by %in% colnames(out)]
+                         .match_by <- .match_by[.match_by %in% colnames(ad_list[[i]])]
+                         
+                         if(length(.match_by) > 0)
+                              out <- suppressWarnings(left_join(out, ad_list[[i]], by = .match_by))
+                    }
+               
+               out    
+          }
+     }
+     
+     exclude_from_matching <- c(paste0("ad_x", c("_primary", "_harvested", "_supplemental")), 
+                                paste0("ad_y", c("_primary", "_harvested", "_supplemental")))
+     
+     ad_obj <- .join_adobjs(primary_ads, harvested_ads, supplemental_ads, exclude_from_matching = exclude_from_matching)
+     
+     if(is.null(ad_obj)){
+          ad_obj
+     }else{
+          if(any(c("ad_x_primary", "ad_x_harvested", "ad_x_supplemental") %in% colnames(ad_obj)))
+               ad_obj$ad_x <- map(as.list(1:nrow(ad_obj)), function(i){
+                    x <- ad_obj[i,]
+                    
+                    if("ad_x_primary" %in% colnames(x)){
+                         .ad_primary <- x$ad_x_primary[[1]]
+                    }else{
+                         .ad_primary <- NULL
+                    }
+                    
+                    if("ad_x_harvested" %in% colnames(x)){
+                         .ad_harvested <- x$ad_x_harvested[[1]]
+                    }else{
+                         .ad_harvested <- NULL
+                    }
+                    
+                    if("ad_x_supplemental" %in% colnames(x)){
+                         .ad_supplemental <- x$ad_x_supplemental[[1]]
+                    }else{
+                         .ad_supplemental <- NULL
+                    }
+                    
+                    if(any(c("ad_tsa", "ad_int") %in% class(.ad_supplemental)))
+                         .ad_supplemental <- attributes(.ad_supplemental)$inputs
+                    
+                    .ad_info <- consolidate_ads(.ad_primary, .ad_harvested, .ad_supplemental)
+                    
+                    if(ad_type == "tsa"){
+                         out <- do.call(create_ad_tsa, .ad_info)
+                    }else{
+                         out <- do.call(create_ad_int, .ad_info)
+                    }
+                    out
+               })
+          
+          if(any(c("ad_y_primary", "ad_y_harvested", "ad_y_supplemental") %in% colnames(ad_obj)))
+               ad_obj$ad_y <- map(as.list(1:nrow(ad_obj)), function(i){
+                    x <- ad_obj[i,]
+                    
+                    if("ad_y_primary" %in% colnames(x)){
+                         .ad_primary <- x$ad_y_primary[[1]]
+                    }else{
+                         .ad_primary <- NULL
+                    }
+                    
+                    if("ad_y_harvested" %in% colnames(x)){
+                         .ad_harvested <- x$ad_y_harvested[[1]]
+                    }else{
+                         .ad_harvested <- NULL
+                    }
+                    
+                    if("ad_y_supplemental" %in% colnames(x)){
+                         .ad_supplemental <- x$ad_y_supplemental[[1]]
+                    }else{
+                         .ad_supplemental <- NULL
+                    }
+                    
+                    if(any(c("ad_tsa", "ad_int") %in% class(.ad_supplemental)))
+                         .ad_supplemental <- attributes(.ad_supplemental)$inputs
+                    
+                    .ad_info <- consolidate_ads(.ad_primary, .ad_harvested, .ad_supplemental)
+                    
+                    if(ad_type == "tsa"){
+                         out <- do.call(create_ad_tsa, .ad_info)
+                    }else{
+                         out <- do.call(create_ad_int, .ad_info)
+                    }
+                    out
+               })
+          
+          ad_obj <- ad_obj[,!(colnames(ad_obj) %in% exclude_from_matching)] 
+     }
+     
+     ad_obj
+}
+
 join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
      
      .attributes <- attributes(ma_obj)
@@ -14,6 +225,9 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
           if(!("ad_x" %in% colnames(ad_obj_x)) & "ad_y" %in% colnames(ad_obj_x))
                ad_obj_x <- rename_(ad_obj_x, ad_x = "ad_y")
           
+          if("ad_y" %in% colnames(ad_obj_x))
+               ad_obj_x$ad_y <- NULL
+          
           match_names_x <- match_names[match_names %in% colnames(ad_obj_x)]
           if(length(match_names_x) > 0){
                ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_x, by = match_names_x))      
@@ -28,6 +242,10 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
                ad_obj_y <- rename_(ad_obj_y, construct_y = "construct_x")
           if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
                ad_obj_y <- rename_(ad_obj_y, ad_y = "ad_x")
+          
+          
+          if("ad_x" %in% colnames(ad_obj_y))
+               ad_obj_y$ad_x <- NULL
           
           match_names_y <- match_names[match_names %in% colnames(ad_obj_y)]
           if(length(match_names_y) > 0){

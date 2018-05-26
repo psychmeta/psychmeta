@@ -68,8 +68,3 @@ psychmeta_news <- function(){
      news(package = "psychmeta")
 }
 
-
-create_call <- function(...){
-     match.call()
-}
-
