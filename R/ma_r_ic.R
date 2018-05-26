@@ -318,12 +318,12 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           ad_obj_list_tsa <- join_adobjs(ad_type = "tsa", 
                                          primary_ads = ad_obj_list, 
                                          harvested_ads = harvested_ads, 
-                                         supplemental_ads = list(X = supplemental_ads_x, Y = supplemental_ads_y))
+                                         supplemental_ads_x = supplemental_ads_x, supplemental_ads_y = supplemental_ads_y)
           
           ad_obj_list_int <- join_adobjs(ad_type = "int", 
                                          primary_ads = ad_obj_list, 
                                          harvested_ads = harvested_ads, 
-                                         supplemental_ads = list(X = supplemental_ads_x, Y = supplemental_ads_y))
+                                         supplemental_ads_x = supplemental_ads_x, supplemental_ads_y = supplemental_ads_y)
      }
 
      if(is.null(rxx)) rxx <- rep(1, length(rxyi))

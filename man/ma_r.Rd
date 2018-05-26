@@ -418,14 +418,14 @@ ma_obj <- ma_r_bb(r = rxyi, n = n, correct_bias = FALSE,
                            conf_method = "norm", cred_method = "norm", data = data_r_mcdaniel_1994)
 
 ## Construct artifact distribution for X
-ad_obj_x <- create_ad_tsa(mean_rxxi = data_r_mcdaniel_1994$Mrxxi[1],
-                          var_rxxi = data_r_mcdaniel_1994$SDrxxi[1]^.5,
-                          ux = data_r_mcdaniel_1994$ux,
-                          wt_ux = data_r_mcdaniel_1994$`ux frequency`)
+ad_obj_x <- create_ad(ad_type = "tsa", mean_rxxi = data_r_mcdaniel_1994$Mrxxi[1],
+                      var_rxxi = data_r_mcdaniel_1994$SDrxxi[1]^.5,
+                      ux = data_r_mcdaniel_1994$ux,
+                      wt_ux = data_r_mcdaniel_1994$`ux frequency`)
 
 ## Construct artifact distribution for Y
-ad_obj_y <- create_ad_tsa(rxxi = data_r_mcdaniel_1994$ryyi,
-                          wt_rxxi = data_r_mcdaniel_1994$`ryyi frequency`)
+ad_obj_y <- create_ad(ad_type = "tsa", rxxi = data_r_mcdaniel_1994$ryyi,
+                      wt_rxxi = data_r_mcdaniel_1994$`ryyi frequency`)
 
 ## Compute artifact-distribution meta-analysis, correcting for measurement error only
 ma_r_ad(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y, correction_method = "meas")

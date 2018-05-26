@@ -1,4 +1,7 @@
-#' Create a list of artifact distributions by construct
+#' @title Create a tibble of artifact distributions by construct
+#' 
+#' @description 
+#' Create a tibble of artifact distributions by construct
 #'
 #' @param ad_type Type of artifact distributions to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
 #' @param n Vector or column name of sample sizes.
@@ -32,59 +35,59 @@
 #' "hierarchical" means that all possible combinations and subsets of moderators are to be examined.
 #' @param construct_order Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.
 #'
-#' @return A list of artifact distributions
+#' @return A tibble of artifact distributions
 #' @export
-#'
+#' 
 #' @examples
 #' ## Examples to create Taylor series artifact distributions:
 #' # Overall artifact distributions (not pairwise, not moderated)
-#' create_ad_list(ad_type = "tsa",
-#'                n = n, rxx = rxxi, ryy = ryyi,
-#'                construct_x = x_name, construct_y = y_name,
-#'                sample_id = sample_id, moderators = moderator,
-#'                data = data_r_meas_multi,
-#'                control = control_psychmeta(pairwise_ads = FALSE,
-#'                                            moderated_ads = FALSE))
+#' create_ad_tibble(ad_type = "tsa",
+#'                  n = n, rxx = rxxi, ryy = ryyi,
+#'                  construct_x = x_name, construct_y = y_name,
+#'                  sample_id = sample_id, moderators = moderator,
+#'                  data = data_r_meas_multi,
+#'                  control = control_psychmeta(pairwise_ads = FALSE,
+#'                                              moderated_ads = FALSE))
 #' 
 #' # Overall artifact distributions by moderator combination
-#' create_ad_list(ad_type = "tsa",
-#'                n = n, rxx = rxxi, ryy = ryyi,
-#'                construct_x = x_name, construct_y = y_name,
-#'                sample_id = sample_id, moderators = moderator,
-#'                data = data_r_meas_multi,
-#'                control = control_psychmeta(pairwise_ads = FALSE,
-#'                                            moderated_ads = TRUE))
+#' create_ad_tibble(ad_type = "tsa",
+#'                  n = n, rxx = rxxi, ryy = ryyi,
+#'                  construct_x = x_name, construct_y = y_name,
+#'                  sample_id = sample_id, moderators = moderator,
+#'                  data = data_r_meas_multi,
+#'                  control = control_psychmeta(pairwise_ads = FALSE,
+#'                                              moderated_ads = TRUE))
 #' 
 #' # Pairwise artifact distributions (not moderated)
-#' create_ad_list(ad_type = "tsa",
-#'                n = n, rxx = rxxi, ryy = ryyi,
-#'                construct_x = x_name, construct_y = y_name,
-#'                sample_id = sample_id, moderators = moderator,
-#'                data = data_r_meas_multi,
-#'                control = control_psychmeta(pairwise_ads = TRUE,
-#'                                            moderated_ads = FALSE))
+#' create_ad_tibble(ad_type = "tsa",
+#'                  n = n, rxx = rxxi, ryy = ryyi,
+#'                  construct_x = x_name, construct_y = y_name,
+#'                  sample_id = sample_id, moderators = moderator,
+#'                  data = data_r_meas_multi,
+#'                  control = control_psychmeta(pairwise_ads = TRUE,
+#'                                                moderated_ads = FALSE))
 #' 
 #' # Pairwise artifact distributions by moderator combination
-#' create_ad_list(ad_type = "tsa",
-#'                n = n, rxx = rxxi, ryy = ryyi,
-#'                construct_x = x_name, construct_y = y_name,
-#'                sample_id = sample_id, moderators = moderator,
-#'                data = data_r_meas_multi,
-#'                control = control_psychmeta(pairwise_ads = TRUE,
-#'                                            moderated_ads = TRUE))
-create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
-                           construct_x = NULL, measure_x = NULL,
-                           construct_y = NULL, measure_y = NULL,
-                           rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
-                           ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
-                           ux = NULL, ux_observed = TRUE,
-                           uy = NULL, uy_observed = TRUE,
-                           estimate_rxxa = TRUE, estimate_rxxi = TRUE,
-                           estimate_ux = TRUE, estimate_ut = TRUE,
-                           moderators = NULL, cat_moderators = TRUE, 
-                           moderator_type = c("simple", "hierarchical", "none"),
-                           construct_order = NULL,
-                           supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
+#' create_ad_tibble(ad_type = "tsa",
+#'                  n = n, rxx = rxxi, ryy = ryyi,
+#'                  construct_x = x_name, construct_y = y_name,
+#'                  sample_id = sample_id, moderators = moderator,
+#'                  data = data_r_meas_multi,
+#'                  control = control_psychmeta(pairwise_ads = TRUE,
+#'                                              moderated_ads = TRUE))
+create_ad_tibble <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
+                                               construct_x = NULL, measure_x = NULL,
+                                               construct_y = NULL, measure_y = NULL,
+                                               rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
+                                               ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
+                                               ux = NULL, ux_observed = TRUE,
+                                               uy = NULL, uy_observed = TRUE,
+                                               estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+                                               estimate_ux = TRUE, estimate_ut = TRUE,
+                                               moderators = NULL, cat_moderators = TRUE, 
+                                               moderator_type = c("simple", "hierarchical", "none"),
+                                               construct_order = NULL,
+                                               supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
      
      call <- match.call()
      warn_obj1 <- record_warnings()
@@ -109,7 +112,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      process_ads <- list(...)$process_ads
      if(is.null(process_ads)) process_ads <- TRUE
      
-     formal_args <- formals(create_ad_list)
+     formal_args <- formals(create_ad_tibble)
      formal_args[["..."]] <- NULL
      for(i in names(formal_args)) if(i %in% names(call)) formal_args[[i]] <- NULL
      call_full <- as.call(append(as.list(call), formal_args))
@@ -240,6 +243,7 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      if(any(is.na(full_data$measure_x))) full_data$measure_x[is.na(full_data$measure_x)] <- "No measure specified"
      if(any(is.na(full_data$measure_y))) full_data$measure_y[is.na(full_data$measure_y)] <- "No measure specified"
      full_data <- as.data.frame(full_data)
+     if(is.null(sample_id)) full_data$sample_id <- 1:nrow(full_data)
      
      additional_args <- NULL
      additional_args <- list(...)
@@ -268,7 +272,6 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
                construct_y <- unlist(lapply(str_split(string = names(dat$meta_tables[[1]][[2]]), pattern = ", construct: "), function(x) x[2]))
                
                out <- NULL
-               i <- 1
                for(i in 1:length(construct_x)){
                     .dat <- dat 
                     
@@ -337,6 +340,11 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
 }
 
 
+#' @rdname create_ad_tibble
+#' @export
+create_ad_list <- create_ad_tibble
+
+
 #' Internal function for computing meta-analyses of artifacts
 #'
 #' @param data Data frame of bare-bones information.
@@ -365,7 +373,6 @@ create_ad_list <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           escalc = NULL)
      
 }
-
 
 
 .create_ad_list_internal <- function(full_data, intercor, collapse_method, check_dependence,

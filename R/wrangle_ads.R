@@ -47,7 +47,7 @@ organize_ads <- function(ad_obj, ad_suffix = NULL){
 }
 
 
-reshape_suppad2tibble <- function(supplemental_ads){
+reshape_suppad2tibble <- function(supplemental_ads, as_individual_pair = FALSE, construct_name = "X"){
      
      if(is.null(supplemental_ads)){
           out <- NULL
@@ -88,16 +88,34 @@ reshape_suppad2tibble <- function(supplemental_ads){
           out <- NULL
      }
      
+     if((is.null(out) | "list" %in% class(supplemental_ads)) & as_individual_pair){
+          out <- tibble(construct_x = construct_name, 
+                        analysis_type = "Overall", 
+                        ad_x = list(supplemental_ads))
+          
+          class(out) <- c("ad_tibble", class(out))
+     }
+     
      out
 }
 
 
-join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested_ads = NULL, supplemental_ads = NULL){
+join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested_ads = NULL, 
+                        supplemental_ads = NULL, supplemental_ads_x = NULL, supplemental_ads_y = NULL){
      
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
      
      primary_ads <- organize_ads(ad_obj = primary_ads, ad_suffix = "_primary")
      harvested_ads <- organize_ads(ad_obj = harvested_ads, ad_suffix = "_harvested")
+     if(!is.null(supplemental_ads)){
+          supplemental_ads_x <- organize_ads(NULL, ad_suffix = "_supplemental")
+          supplemental_ads_y <- organize_ads(NULL, ad_suffix = "_supplemental") 
+     }else{
+          supplemental_ads_x <- organize_ads(reshape_suppad2tibble(supplemental_ads_x, as_individual_pair = TRUE, construct_name = "X"), ad_suffix = "_supplemental")
+          supplemental_ads_y <- organize_ads(reshape_suppad2tibble(supplemental_ads_y, as_individual_pair = TRUE, construct_name = "Y"), ad_suffix = "_supplemental")
+          supplemental_ads_x$ad_obj_y <- NULL
+          supplemental_ads_y$ad_obj_x <- NULL
+     }
      supplemental_ads <- organize_ads(reshape_suppad2tibble(supplemental_ads), ad_suffix = "_supplemental")
      
      .join_adobjs <- function(..., exclude_from_matching = NULL){
@@ -138,7 +156,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
      exclude_from_matching <- c(paste0("ad_x", c("_primary", "_harvested", "_supplemental")), 
                                 paste0("ad_y", c("_primary", "_harvested", "_supplemental")))
      
-     ad_obj <- .join_adobjs(primary_ads, harvested_ads, supplemental_ads, exclude_from_matching = exclude_from_matching)
+     ad_obj <- .join_adobjs(primary_ads, harvested_ads, supplemental_ads, supplemental_ads_x, supplemental_ads_y, exclude_from_matching = exclude_from_matching)
      
      if(is.null(ad_obj)){
           ad_obj
