@@ -543,25 +543,16 @@ create_ad_list <- create_ad_tibble
                }else{
                     .supplemental_ads <- NULL
                }
-               
-               if(process_ads){
-                    ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type,
-                                                                      rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
-                                                                      rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
-                                                                      ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                                                                      ut = ut, ni_ut = n_ut, wt_ut = n_ut,
-                                                                      estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                                      estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                      var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads))
-               }else{
-                    ad_obj <- list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
-                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
-                                   ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                                   ut = ut, ni_ut = n_ut, wt_ut = n_ut)
-                    if(!is.null(.supplemental_ads))
-                         ad_obj <- consolidate_ads(ad_obj, .supplemental_ads)
-               }
-               
+             
+               ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type,
+                                                                 rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
+                                                                 rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
+                                                                 ux = ux, ni_ux = n_ux, wt_ux = n_ux,
+                                                                 ut = ut, ni_ut = n_ut, wt_ut = n_ut,
+                                                                 estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                                                                 estimate_ux = estimate_ux, estimate_ut = estimate_ut,
+                                                                 var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads, process_ads = process_ads))
+                              
                list(ad_obj = ad_obj,
                     construct = as.character(full_data$construct_x[i][1]))
           })

@@ -568,7 +568,7 @@ create_ad_supplemental <- function(ad_type = c("tsa", "int"),
                out <- suppressWarnings(do.call(what = create_ad_int, args = art_distributions))
           }
      }else{
-          out <- art_distributions
+          out <- suppressWarnings(do.call(what = create_ad_unprocessed, args = art_distributions))
      }
 
      out

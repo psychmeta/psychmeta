@@ -270,10 +270,6 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           var_res <- sd_res <- NA
           se_d <- sd_e
           ci <- confidence(mean = mean_d, sd = sd_e, k = 1, conf_level = conf_level, conf_method = "norm")
-
-          # se_d <- NA
-          # ci <- cbind(NA, NA)
-          # colnames(ci) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
      }else{
           se_d <- sd_d / sqrt(k)
           ci <- confidence(mean = mean_d, sd = var_d^.5, k = k, conf_level = conf_level, conf_method = conf_method)

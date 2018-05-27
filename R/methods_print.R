@@ -635,9 +635,29 @@ print.ma_psychmeta <- function(x, ..., digits = 3){
      }else if(ma_metric == "d_order2"){
           title_text <- "Summary tibble of psychmeta second-order meta-analysis of d values"
      }
-
+     
      if(!suppress_title){
           cat(title_text, " \n")
+          cat("---------------------------------------------------------------------- \n")    
+     }
+     x <- ungroup(x)
+     class(x) <- c("tbl_df", "tbl", "data.frame")
+     print(x)
+}
+
+
+#' @export
+#' @keywords internal
+#' @exportClass ad_tibble
+#' @method print ad_tibble
+print.ad_tibble <- function(x, ..., digits = 3){
+
+     additional_args <- list(...)
+     suppress_title <- additional_args$suppress_title
+     if(is.null(suppress_title)) suppress_title <- FALSE
+    
+     if(!suppress_title){
+          cat("Tibble of artifact distributions \n")
           cat("---------------------------------------------------------------------- \n")    
      }
      x <- ungroup(x)

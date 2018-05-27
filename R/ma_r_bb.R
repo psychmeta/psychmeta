@@ -266,10 +266,6 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
           var_res <- sd_res <- NA
           se_r <- sd_e
           ci <- confidence(mean = mean_r_xy, sd = sd_e, k = 1, conf_level = conf_level, conf_method = "norm")
-
-          # se_r <- NA
-          # ci <- cbind(NA, NA)
-          # colnames(ci) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
      }else{
           se_r <- sd_r / sqrt(k)
           ci <- confidence(mean = mean_r_xy, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)
