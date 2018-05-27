@@ -8,6 +8,7 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
                     indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                     sign_rgz = 1, sign_ryz = 1, control = control_psychmeta(), ...){
 
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      use_ic_ads <- match.arg(use_ic_ads, choices = c("tsa", "int"))
@@ -34,6 +35,7 @@ ma_d_ad <- function(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
      convert_metric <- any(ma_metric == "r_as_r" | ma_metric == "d_as_r")
      if(convert_metric) ma_obj <- convert_ma(ma_obj, record_call = FALSE)
      ma_obj <- namelists.ma_psychmeta(ma_obj)
+     if(flag_summary) ma_obj <- summary(ma_obj)
      
      ma_obj
 

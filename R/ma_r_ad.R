@@ -120,6 +120,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                     sign_rxz = 1, sign_ryz = 1, 
                     control = control_psychmeta(), ...){
      
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      use_ic_ads <- match.arg(use_ic_ads, choices = c("tsa", "int"))
@@ -383,6 +384,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      attributes(ma_obj)$call_history <- base::append(attributes(ma_obj)$call_history, list(match.call()))
      ma_obj <- namelists.ma_psychmeta(ma_obj)
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      if(!suppress_message)
           message("Artifact-distribution meta-analyses have been added to 'ma_obj'")
      

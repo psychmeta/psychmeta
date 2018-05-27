@@ -32,6 +32,7 @@
 #' ma_obj$metareg[[1]]$individual_correction$true_score$`Main Effects`
 metareg <- function(ma_obj, formula_list = NULL, ...){
 
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      es_type <- NULL
@@ -127,6 +128,7 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
      names(.out_list) <- paste0("analysis id: ", ma_obj$analysis_id)
 
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Meta-regressions have been added to 'ma_obj' - use get_metareg() to retrieve them.")
 
      ma_obj

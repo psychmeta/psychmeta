@@ -2,6 +2,7 @@
 #' @rdname sensitivity
 sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_var"), ...){
      
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      sort_method <- match.arg(sort_method, choices = c("weight", "n", "inv_var"))
@@ -384,6 +385,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
      
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Cumulative meta-analyses have been added to 'ma_obj' - use get_cumulative() to retrieve them.")
      
      ma_obj

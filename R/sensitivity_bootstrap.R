@@ -3,6 +3,7 @@
 sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .95,
                                   boot_ci_type = c("bca", "norm","basic", "stud", "perc"), ...){
 
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      boot_ci_type <- match.arg(boot_ci_type, choices = c("bca", "norm", "basic", "stud", "perc"))
@@ -282,6 +283,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
      
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Bootstrapped meta-analyses have been added to 'ma_obj' - use get_bootstrap() to retrieve them.")
 
      ma_obj

@@ -65,6 +65,7 @@
 #' ma_obj$heterogeneity[[1]]$artifact_distribution$true_score
 heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      es_failsafe <- scalar_arg_warning(arg = es_failsafe, arg_name = "es_failsafe")
@@ -277,8 +278,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Heterogeneity analyses have been added to 'ma_obj' - use get_heterogeneity() to retrieve them.")
-
+     
      ma_obj
 }
 

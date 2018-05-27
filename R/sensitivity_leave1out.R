@@ -2,6 +2,7 @@
 #' @rdname sensitivity
 sensitivity_leave1out <- function(ma_obj, ...){
      
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      es_type <- NULL
@@ -382,6 +383,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
      
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("leave-1-out meta-analyses have been added to 'ma_obj' - use get_leave1out() to retrieve them.")
      
      ma_obj

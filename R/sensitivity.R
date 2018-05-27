@@ -53,6 +53,9 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
                         boot_iter = 1000, boot_conf_level = .95, 
                         boot_ci_type = c("bca", "norm", "basic", "stud", "perc"), ...){
 
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
+     
      cat(" **** Computing sensitivity analyses **** \n")
      bootstrap <- scalar_arg_warning(arg = bootstrap, arg_name = "bootstrap")
      leave1out <- scalar_arg_warning(arg = leave1out, arg_name = "leave1out")
@@ -63,6 +66,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      if(cumulative) ma_obj <- sensitivity_cumulative(ma_obj = ma_obj, sort_method = sort_method, record_call = FALSE, ...)
 
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
+     if(flag_summary) ma_obj <- summary(ma_obj)
      
      ma_obj
 }

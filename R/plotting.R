@@ -29,6 +29,7 @@
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
      
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
@@ -70,6 +71,7 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      for(i in names(out)) .out[[i]] <- out[[i]]
      ma_obj$funnel <- .out
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
      
      ma_obj
@@ -120,6 +122,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                         conf_level = .95, conf_method = "t",
                         x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference"){
      
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      ma_metric <- attributes(ma_obj)$ma_metric
@@ -230,8 +233,9 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_obj$forest <- out
      rm(out_pair, out_analysis)
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Forest plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
-     
+
      ma_obj
 }
 
