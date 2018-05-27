@@ -16,7 +16,7 @@ Changes in Version 2.0.0 (2018-05-27)
 
 - "print" methods have been updated for a variety of object classes. 
 
-- Bug fixes and stability improvements have been made to follow-up analyses, plotting functions, and convert_ma(). 
+- Bug fixes and stability improvements have been made to follow-up analyses, plotting functions, convert_ma(), and dMod(). 
 
 
 Changes in Version 1.0.3 (2018-05-08)
