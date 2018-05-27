@@ -162,6 +162,10 @@ namelists.ma_psychmeta <- function(ma_obj){
 
 
 screen_ma <- function(ma_obj){
+     
+     if("summary.ma_psychmeta" %in% class(ma_obj))
+          ma_obj <- ma_obj$ma_obj
+     
      correct_class <- "ma_psychmeta" %in% class(ma_obj)
      correct_attributes <- all(c("ma_metric", "ma_methods") %in% names(attributes(ma_obj)))
      

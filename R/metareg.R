@@ -32,8 +32,8 @@
 #' ma_obj$metareg[[1]]$individual_correction$true_score$`Main Effects`
 metareg <- function(ma_obj, formula_list = NULL, ...){
 
-     screen_ma(ma_obj = ma_obj)
-
+     ma_obj <- screen_ma(ma_obj = ma_obj)
+     
      es_type <- NULL
      ma_methods <- attributes(ma_obj)$ma_methods
      ma_metric <- attributes(ma_obj)$ma_metric

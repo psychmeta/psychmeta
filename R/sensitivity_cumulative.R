@@ -2,7 +2,7 @@
 #' @rdname sensitivity
 sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_var"), ...){
      
-     screen_ma(ma_obj = ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      sort_method <- match.arg(sort_method, choices = c("weight", "n", "inv_var"))
      

@@ -65,7 +65,7 @@
 #' ma_obj$heterogeneity[[1]]$artifact_distribution$true_score
 heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      
-     screen_ma(ma_obj = ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      es_failsafe <- scalar_arg_warning(arg = es_failsafe, arg_name = "es_failsafe")
      conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
