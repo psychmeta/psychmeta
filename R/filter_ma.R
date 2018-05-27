@@ -1,5 +1,6 @@
-#' Filter meta-analyses
-#'
+#' @title  Filter meta-analyses
+#' 
+#' @description 
 #' Filter \code{psychmeta} meta-analysis objects based on specified criteria.
 #'
 #' @param ma_obj A psychmeta meta-analysis object.

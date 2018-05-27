@@ -8,7 +8,8 @@
 #'
 #' @param ma_obj Meta-analysis object.
 #' @param formula_list Optional list of regression formulas to evaluate.
-#' NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly.
+#' NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly. 
+#' The function will remove spaces in the data, you only have to account for this in \code{formula_list} when you supply your own formula(s). 
 #' @param ... Additional arguments.
 #'
 #' @return ma_obj with meta-regression results added (see ma_obj$follow_up_analyses$metareg).
@@ -30,6 +31,23 @@
 #' ## Examine the meta-regression results for the bare-bones and corrected data:
 #' ma_obj$metareg[[1]]$barebones$`Main Effects`
 #' ma_obj$metareg[[1]]$individual_correction$true_score$`Main Effects`
+#' 
+#' 
+#' ## Meta-analyze simulated d-value data
+#' dat <- data_d_meas_multi
+#' ## Simulate a random moderator
+#' set.seed(100)
+#' dat$moderator <- sample(1:2, nrow(dat), replace = TRUE)
+#' ma_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
+#'                construct_y = construct, sample_id = sample_id,
+#'                moderators = moderator, data = dat)
+#'
+#' ## Pass the meta-analysis object to the meta-regression function:
+#' ma_obj <- metareg(ma_obj)
+#'
+#' ## Examine the meta-regression results for the bare-bones and corrected data:
+#' ma_obj$metareg[[1]]$barebones$`Main Effects`
+#' ma_obj$metareg[[1]]$individual_correction$latentGroup_latentY$`Main Effects`
 metareg <- function(ma_obj, formula_list = NULL, ...){
 
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
@@ -104,10 +122,18 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                     metareg_ts <- metareg_vgx <- metareg_vgy <- NULL
                }
 
-               out <- list(barebones = metareg_bb,
-                           individual_correction = list(true_score = metareg_ts,
-                                                        validity_generalization_x = metareg_vgx,
-                                                        validity_generalization_y = metareg_vgy))
+               if(es_type == "d"){
+                    out <- list(barebones = metareg_bb,
+                                individual_correction = list(latentGroup_latentY = metareg_ts,
+                                                             observedGroup_latentY = metareg_vgx,
+                                                             latentGroup_observedY = metareg_vgy))
+               }else{
+                    out <- list(barebones = metareg_bb,
+                                individual_correction = list(true_score = metareg_ts,
+                                                             validity_generalization_x = metareg_vgx,
+                                                             validity_generalization_y = metareg_vgy))
+               }
+
           }else{
                out <- list(NULL)
           }
@@ -124,8 +150,8 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
      .out_list <- rep(list(NULL), nrow(ma_obj))
      .out_list[ma_obj$analysis_type == "Overall"] <- out_list
-     ma_obj$metareg <- .out_list
      names(.out_list) <- paste0("analysis id: ", ma_obj$analysis_id)
+     ma_obj$metareg <- .out_list
 
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      if(flag_summary) ma_obj <- summary(ma_obj)

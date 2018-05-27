@@ -1,12 +1,5 @@
 #' @rdname ma_d
 #' @export
-#' @examples
-#' ### Demonstration of ma_d_ic ###
-#' ## Example meta-analyses using simulated data:
-#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
-#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
 ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     treat_as_d = TRUE, 
                     wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
@@ -166,6 +159,8 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
 
                     ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
                     es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa)
+     
+     if(treat_as_d) attributes(out)$ma_metric <- "d_as_r"
      
      attributes(out)$call_history <- append(list(call), attributes(out)$call_history)
      out <- convert_ma(ma_obj = out)

@@ -238,7 +238,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
      ad_obj
 }
 
-join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
+join_maobj_adobj <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL){
      
      .attributes <- attributes(ma_obj)
      

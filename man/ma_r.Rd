@@ -310,6 +310,7 @@ the "uvdrr" procedure to appropriately correct for univariate range restriction.
 }
 
 \examples{
+\dontrun{
 ## The 'ma_r' function can compute multi-construct bare-bones meta-analyses:
 ma_obj <- ma_r(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
@@ -412,6 +413,45 @@ ma_obj <- ma_r(ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                use_all_arts = TRUE, data = dat)
 summary(ma_obj)
 ma_obj$meta_tables[[1]]$artifact_distribution$true_score
+
+
+
+### Demonstration of ma_r_bb ###
+## Example analysis using data from Gonzalez-Mule et al. (2014):
+
+## Not correcting for bias and using normal distributions to compute uncertainty intervals
+## allows for exact replication of the results reported in the text:
+ma_r_bb(r = rxyi, n = n, correct_bias = FALSE, conf_method = "norm", cred_method = "norm",
+               data = data_r_gonzalezmule_2014)
+
+## Using hs_override = TRUE allows one to easily implement the traditional Hunter-Schmidt method:
+ma_r_bb(r = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014)
+
+## With hs_override = FALSE, the program defaults will compute unbiased variances and use
+## t-distributions to estimate confidence and credibility intervals - these settings make
+## a noticeable difference for small studies like the textbook example:
+ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
+
+
+
+### Demonstration of ma_r_ic ###
+## Simulated example satisfying the assumptions of the Case IV 
+## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
+ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
+
+## Simulated example satisfying the assumptions of the Case V 
+## range-restriction correction
+ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
+        rxx_type = "parallel", ryy_type = "parallel", 
+        ux = ux, uy = uy, data = data_r_bvirr)
+
+## Published example from Gonzalez-Mule et al. (2014)
+ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
+        rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
+        moderators = c("Rating source", "Published", "Type", "Complexity"))
+        
+        
+
 ### Demonstration of ma_r_ad ###
 ## Compute barebones meta-analysis
 ma_obj <- ma_r_bb(r = rxyi, n = n, correct_bias = FALSE,
@@ -435,12 +475,10 @@ ma_r_ad(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y, correction_me
         correct_rr_y = FALSE, indirect_rr_x = FALSE)
         
         
-        
 # The results of ma_r() can also be corrected using artifact distributions
 ma_obj <- ma_r(ma_method = "bb", rxyi = rxyi, n = n,
                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
                moderators = moderator, data = data_r_meas_multi)
-
 
 # The create_ad_list function can be used to generate batches of artifact-distribution objects.
 # Here is an example in which one distribution is created per construct.
@@ -522,36 +560,7 @@ ma_obj_pairmodlist <- ma_r_ad(ma_obj = ma_obj,
                               ad_obj_x = ad_list_pairmod_x, ad_obj_y = ad_list_pairmod_y)
 summary(ma_obj_pairmodlist)
 ma_obj_pairmodlist$meta_tables[[1]]$artifact_distribution$true_score
-### Demonstration of ma_r_bb ###
-## Example analysis using data from Gonzalez-Mule et al. (2014):
-
-## Not correcting for bias and using normal distributions to compute uncertainty intervals
-## allows for exact replication of the results reported in the text:
-ma_r_bb(r = rxyi, n = n, correct_bias = FALSE, conf_method = "norm", cred_method = "norm",
-               data = data_r_gonzalezmule_2014)
-
-## Using hs_override = TRUE allows one to easily implement the traditional Hunter-Schmidt method:
-ma_r_bb(r = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014)
-
-## With hs_override = FALSE, the program defaults will compute unbiased variances and use
-## t-distributions to estimate confidence and credibility intervals - these settings make
-## a noticeable difference for small studies like the textbook example:
-ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
-### Demonstration of ma_r_ic ###
-## Simulated example satisfying the assumptions of the Case IV 
-## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
-ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
-
-## Simulated example satisfying the assumptions of the Case V 
-## range-restriction correction
-ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
-        rxx_type = "parallel", ryy_type = "parallel", 
-        ux = ux, uy = uy, data = data_r_bvirr)
-
-## Published example from Gonzalez-Mule et al. (2014)
-ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
-        rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
-        moderators = c("Rating source", "Published", "Type", "Complexity"))
+}
 }
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).

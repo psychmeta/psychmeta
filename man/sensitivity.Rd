@@ -56,7 +56,8 @@ Wrapper function to compute bootstrap analyses, leave-one-out analyses, and cumu
 This function helps researchers to examine the stability/fragility of their meta-analytic results with bootstrapping and leave-one-out analyses, as well as detect initial evidence of publication bias with cumulative meta-analyses.
 }
 \examples{
-## Run a meta-analysis using simulated UVIRR data:
+\dontrun{
+## Run a meta-analysis using simulated correlation data:
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
                   correct_rr_y = FALSE, data = data_r_uvirr)
 ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
@@ -75,4 +76,26 @@ ma_obj$cumulative[[1]]$individual_correction$true_score
 ma_obj$bootstrap[[1]]$artifact_distribution$true_score
 ma_obj$leave1out[[1]]$artifact_distribution$true_score
 ma_obj$cumulative[[1]]$artifact_distribution$true_score
+
+
+## Run a meta-analysis using simulated d-value data:
+ma_obj <- ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi,
+                  data = filter(data_d_meas_multi, construct == "Y"))
+ma_obj <- ma_d_ad(ma_obj)
+                  
+## Pass the meta-analysis object to the sensitivity() function:
+ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10,
+                      boot_ci_type = "norm", sort_method = "inv_var")
+
+## Examine the tables and plots produced for the IC meta-analysis:
+ma_obj$bootstrap[[1]]$barebones
+ma_obj$bootstrap[[1]]$individual_correction$latentGroup_latentY
+ma_obj$leave1out[[1]]$individual_correction$latentGroup_latentY
+ma_obj$cumulative[[1]]$individual_correction$latentGroup_latentY
+
+## Examine the tables and plots produced for the AD meta-analysis:
+ma_obj$bootstrap[[1]]$artifact_distribution$latentGroup_latentY
+ma_obj$leave1out[[1]]$artifact_distribution$latentGroup_latentY
+ma_obj$cumulative[[1]]$artifact_distribution$latentGroup_latentY
+}
 }
