@@ -20,16 +20,13 @@
 #' @author Based on code by John Sakaluk
 #'
 #' @examples
-#' \dontrun{
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'                moderators = moderator, data = data_r_meas_multi,
-#'                clean_artifacts = FALSE, impute_artifacts = FALSE)
+#'                moderators = moderator, data = data_r_meas_multi)
+#' plot_funnel(ma_obj = ma_obj)
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1))
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 2))
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
-#' plot_funnel(ma_obj = ma_obj$construct_pairs[[1]])
-#' }
 plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
 
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
@@ -65,10 +62,12 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           })
      })
 
-     names(out) <- paste0("analysis id: ", ma_obj$analysis_id)
-
-     ma_obj$funnel <- out
-
+     names(out) <- paste0("analysis id: ", ma_obj_filtered$analysis_id)
+     .out <- rep(list(NULL), nrow(ma_obj))
+     names(.out) <- paste0("analysis id: ", ma_obj$analysis_id)
+     for(i in names(out)) .out[[i]] <- out[[i]]
+     ma_obj$funnel <- .out
+     
      message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
 
      ma_obj
@@ -107,16 +106,13 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @importFrom stringr str_split
 #'
 #' @examples
-#' \dontrun{
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'                moderators = moderator, data = data_r_meas_multi,
-#'                clean_artifacts = FALSE, impute_artifacts = FALSE)
+#'                moderators = moderator, data = data_r_meas_multi)
+#' plot_forest(ma_obj = ma_obj)
 #' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1))
 #' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 2))
 #' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1), show_filtered = TRUE)
-#' plot_forest(ma_obj = ma_obj$construct_pairs[[1]])
-#' }
 plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE,
                         ma_facetname = "Summary", facet_levels = NULL,
                         conf_level = .95, conf_method = "t",
@@ -316,6 +312,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      }
 
 
+     mat <- as.data.frame(mat)
      conf_out <- confidence(mean = unlist(mat[,mean_es]),
                             sd = unlist(mat[,sd_es]),
                             k = unlist(mat[,"k"]),
@@ -378,10 +375,10 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                .scale_x_continuous <- scale_x_continuous(limits = x_limits, breaks = x_breaks, name = x_lab)
           }
      }
-
-     ggplot(plot_dat, aes(y = .data$cite, x = .data$yi, xmin = .data$lowerci, xmax = .data$upperci, shape = .data$tester)) +
+     
+     ggplot(plot_dat, aes_(y = ~cite, x = ~yi, xmin = ~lowerci, xmax = ~upperci, shape = ~tester)) +
           geom_point(color = 'black') +
-          geom_point(data=subset(dat, .data$tester=='Summary'), color='black', shape=18, size=4) +
+          geom_point(data=dat %>% filter(.data$tester=='Summary'), color='black', shape=18, size=4) +
           geom_errorbarh(height=.1) +
           .scale_x_continuous +
           ylab(y_lab) +
