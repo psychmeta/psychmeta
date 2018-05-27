@@ -12,7 +12,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
      if(any(ma_metric == "r_as_r" | ma_metric == "r_as_d")) es_type <- "r"
      if(any(ma_metric == "d_as_d" | ma_metric == "d_as_r")) es_type <- "d"
      
-     if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)
+     if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations, d values, or generic effect sizes", call. = FALSE)
      
      d_metric <- ifelse(any((ma_metric == "d_as_d" & (any(ma_methods == "ic") | any(ma_methods == "ad"))) | ma_metric == "r_as_d"), TRUE, FALSE)
      if(d_metric){

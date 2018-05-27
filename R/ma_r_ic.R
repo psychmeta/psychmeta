@@ -51,7 +51,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      hs_override <- control$hs_override
      use_all_arts <- control$use_all_arts
      estimate_pa <- control$estimate_pa
-
+     
+     control$pairwise_ads <- TRUE
+     
      if(hs_override){
           wt_type <- "sample_size"
           error_type <- "mean"
@@ -76,12 +78,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      as_worker <- additional_args$as_worker
      if(is.null(as_worker)) as_worker <- FALSE
-
-     ad_x_tsa <- additional_args$ad_x_tsa
-     ad_y_tsa <- additional_args$ad_y_tsa
-     ad_x_int <- additional_args$ad_x_int
-     ad_y_int <- additional_args$ad_y_int
-
+     
      inputs <- append(inputs, additional_args)
      presorted_data <- additional_args$presorted_data
      if(!is.null(additional_args$es_d)){
@@ -225,10 +222,24 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      k_items_x <- manage_arglength(x = k_items_x, y = rxyi)
      k_items_y <- manage_arglength(x = k_items_y, y = rxyi)
 
-     if(use_all_arts & any(!valid_r)){
+     harvested_ads <- NULL
+     if(!as_worker & use_all_arts & any(!valid_r)){
           .rxx_type <- rxx_type[!valid_r]
           .ryy_type <- ryy_type[!valid_r]
 
+          if(!is.null(sample_id)){
+               .sample_id <- sample_id[!valid_r]
+          }else{
+               .sample_id <- NULL
+          }
+          
+          if(!is.null(moderators)){
+               if(!is.null(moderators)) colnames(moderators) <- moderator_names$all
+               .moderators <- as.data.frame(as_tibble(moderators)[!valid_r,])
+          }else{
+               .moderators <- NULL
+          }
+          
           .n <- n[!valid_r]
           .rxx <- manage_arglength(x = rxx, y = rxyi)[!valid_r]
           .rxx_restricted <- manage_arglength(x = rxx_restricted, y = rxyi)[!valid_r]
@@ -242,27 +253,16 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           .k_items_x <- manage_arglength(x = k_items_x, y = rxyi)[!valid_r]
           .k_items_y <- manage_arglength(x = k_items_y, y = rxyi)[!valid_r]
 
-          .supplemental_ads <- create_ad_list(n = .n,
+          harvested_ads <- create_ad_list(n = .n,
+                                              sample_id = .sample_id,
                                               construct_x = rep("X", length(.n)),
                                               construct_y = rep("Y", length(.n)),
                                               rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type, k_items_x = .k_items_x,
                                               ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type, k_items_y = .k_items_y,
                                               ux = .ux, ux_observed = .ux_observed,
-                                              uy = .uy, uy_observed = .uy_observed, process_ads = FALSE)
-          .supplemental_ads_x <- .supplemental_ads$X
-          .supplemental_ads_y <- .supplemental_ads$Y
-
-          if(is.null(supplemental_ads_x)){
-               supplemental_ads_x <- .supplemental_ads_x
-          }else{
-               supplemental_ads_x <- consolidate_ads(supplemental_ads_x, .supplemental_ads_x)
-          }
-
-          if(is.null(supplemental_ads_y)){
-               supplemental_ads_y <- .supplemental_ads_y
-          }else{
-               supplemental_ads_y <- consolidate_ads(supplemental_ads_y, .supplemental_ads_y)
-          }
+                                              uy = .uy, uy_observed = .uy_observed, 
+                                              moderators = .moderators, cat_moderators = cat_moderators, moderator_type = moderator_type,
+                                              control = control, process_ads = FALSE)
      }
 
      estimate_rxxa <- additional_args$estimate_rxxa
@@ -296,81 +296,35 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(!is.null(sample_id)) sample_id <- sample_id[valid_r]
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
-
-     ## Construct artifact distribution for X
-     rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
-     n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
-     rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
-     n_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){n[rxx_restricted]}else{NULL}}else{NULL}
-     .ux <-    if(!is.null(ux)){if(any(ux_observed)){ux[ux_observed]}else{NULL}}else{NULL}
-     n_ux <-   if(!is.null(ux)){if(any(ux_observed)){n[ux_observed]}else{NULL}}else{NULL}
-     ut <-     if(!is.null(ux)){if(any(!ux_observed)){ux[!ux_observed]}else{NULL}}else{NULL}
-     n_ut <-   if(!is.null(ux)){if(any(!ux_observed)){n[!ux_observed]}else{NULL}}else{NULL}
-
-     rxxi_type <- if(!is.null(rxx)){if(any(rxx_restricted)){rxx_type[rxx_restricted]}else{NULL}}else{NULL}
-     rxxa_type <- if(!is.null(rxx)){if(any(!rxx_restricted)){rxx_type[!rxx_restricted]}else{NULL}}else{NULL}
-     k_items_rxxi <- if(!is.null(rxx)){if(any(rxx_restricted)){k_items_x[rxx_restricted]}else{NULL}}else{NULL}
-     k_items_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){k_items_x[!rxx_restricted]}else{NULL}}else{NULL}
-
-     if(is.null(ad_x_int))
-          ad_x_int <- suppressWarnings(create_ad_supplemental(ad_type = "int",
-                                                              rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
-                                                              rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
-                                                              ux = .ux, ni_ux = n_ux, wt_ux = n_ux,
-                                                              ut = ut, ni_ut = n_ut, wt_ut = n_ut,
-                                                              var_unbiased = var_unbiased,
-                                                              estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                              estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                              supplemental_ads = supplemental_ads_x))
      
-     if(is.null(ad_x_tsa))
-          ad_x_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa",
-                                                              rxxa = rxxa, n_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
-                                                              rxxi = rxxi, n_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
-                                                              ux = .ux, ni_ux = n_ux,
-                                                              ut = ut, ni_ut = n_ut,
-                                                              var_unbiased = var_unbiased,
-                                                              estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                              estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                              supplemental_ads = supplemental_ads_x))
-     
-     
-     ## Construct artifact distribution for Y
-     ryya <-   if(!is.null(ryy)){if(any(!ryy_restricted)){ryy[!ryy_restricted]}else{NULL}}else{NULL}
-     n_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){n[!ryy_restricted]}else{NULL}}else{NULL}
-     ryyi <-   if(!is.null(ryy)){if(any(ryy_restricted)){ryy[ryy_restricted]}else{NULL}}else{NULL}
-     n_ryyi <- if(!is.null(ryy)){if(any(ryy_restricted)){n[ryy_restricted]}else{NULL}}else{NULL}
-     .uy <-    if(!is.null(uy)){if(any(uy_observed)){uy[uy_observed]}else{NULL}}else{NULL}
-     n_uy <-   if(!is.null(uy)){if(any(uy_observed)){n[uy_observed]}else{NULL}}else{NULL}
-     up <-     if(!is.null(uy)){if(any(!uy_observed)){uy[!uy_observed]}else{NULL}}else{NULL}
-     n_up <-   if(!is.null(uy)){if(any(!uy_observed)){n[!uy_observed]}else{NULL}}else{NULL}
-
-     ryyi_type <- if(!is.null(ryy)){if(any(ryy_restricted)){ryy_type[ryy_restricted]}else{NULL}}else{NULL}
-     ryya_type <- if(!is.null(ryy)){if(any(!ryy_restricted)){ryy_type[!ryy_restricted]}else{NULL}}else{NULL}
-     k_items_ryyi <- if(!is.null(ryy)){if(any(ryy_restricted)){k_items_y[ryy_restricted]}else{NULL}}else{NULL}
-     k_items_ryya <- if(!is.null(ryy)){if(any(!ryy_restricted)){k_items_y[!ryy_restricted]}else{NULL}}else{NULL}
-
-     if(is.null(ad_y_int))
-          ad_y_int <- suppressWarnings(create_ad_supplemental(ad_type = "int",
-                                                              rxxa = ryya, n_rxxa = n_ryya, wt_rxxa = n_ryya, rxxa_type = ryya_type, k_items_rxxa = k_items_ryya,
-                                                              rxxi = ryyi, n_rxxi = n_ryyi, wt_rxxi = n_ryyi, rxxi_type = ryyi_type, k_items_rxxi = k_items_ryyi,
-                                                              ux = .uy, ni_ux = n_uy, wt_ux = n_uy,
-                                                              ut = up, ni_ut = n_up, wt_ut = n_up,
-                                                              var_unbiased = var_unbiased,
-                                                              estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                              estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                              supplemental_ads = supplemental_ads_y))
-
-     if(is.null(ad_y_tsa))
-          ad_y_tsa <- suppressWarnings(create_ad_supplemental(ad_type = "tsa",
-                                                              rxxa = ryya, n_rxxa = n_ryya, rxxa_type = ryya_type, k_items_rxxa = k_items_ryya,
-                                                              rxxi = ryyi, n_rxxi = n_ryyi, rxxi_type = ryyi_type, k_items_rxxi = k_items_ryyi,
-                                                              ux = .uy, ni_ux = n_uy,
-                                                              ut = up, ni_ut = n_up,
-                                                              var_unbiased = var_unbiased,
-                                                              estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                              estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                              supplemental_ads = supplemental_ads_y))
+     if(!is.null(moderators)) colnames(moderators) <- moderator_names$all
+     if(!as_worker){
+          if(is.null(sample_id)){
+               .sample_id <- as.character(1:length(n))
+          }else{
+               .sample_id <- sample_id
+          }
+          ad_obj_list <- create_ad_list(n = n,
+                                        sample_id = .sample_id,
+                                        construct_x = rep("X", length(n)),
+                                        construct_y = rep("Y", length(n)),
+                                        rxx = rxx, rxx_restricted = rxx_restricted, rxx_type = rxx_type, k_items_x = k_items_x,
+                                        ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
+                                        ux = ux, ux_observed = ux_observed,
+                                        uy = uy, uy_observed = uy_observed, 
+                                        moderators = moderators, cat_moderators = cat_moderators, moderator_type = moderator_type,
+                                        control = control, process_ads = FALSE)
+          
+          ad_obj_list_tsa <- join_adobjs(ad_type = "tsa", 
+                                         primary_ads = ad_obj_list, 
+                                         harvested_ads = harvested_ads, 
+                                         supplemental_ads_x = supplemental_ads_x, supplemental_ads_y = supplemental_ads_y)
+          
+          ad_obj_list_int <- join_adobjs(ad_type = "int", 
+                                         primary_ads = ad_obj_list, 
+                                         harvested_ads = harvested_ads, 
+                                         supplemental_ads_x = supplemental_ads_x, supplemental_ads_y = supplemental_ads_y)
+     }
 
      if(is.null(rxx)) rxx <- rep(1, length(rxyi))
      if(is.null(ryy)) ryy <- rep(1, length(rxyi))
@@ -922,17 +876,32 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                        presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
 
-     ad_list <- list(ad = NULL,
-                     ic = list(ad_x_int = ad_x_int, ad_x_tsa = ad_x_tsa, ad_y_int = ad_y_int, ad_y_tsa = ad_y_tsa))
-     out$ad <- rep(list(ad_list), nrow(out))
-
      neg_var_res <- sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)
      neg_var_rtpa <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$true_score$var_rho < 0)), na.rm = TRUE)
      neg_var_rxpa <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$validity_generalization_x$var_rho < 0)), na.rm = TRUE)
      neg_var_rtya <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$validity_generalization_y$var_rho < 0)), na.rm = TRUE)
 
      if(!as_worker){
-          out <- bind_cols(analysis_id = 1:nrow(out), out)
+          out <- bind_cols(analysis_id = 1:nrow(out),
+                           construct_x = rep("X", nrow(out)),
+                           construct_y = rep("Y", nrow(out)), 
+                           out)
+          
+          out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa)
+          out <- out %>% rename(ad_x_tsa = "ad_x", ad_y_tsa = "ad_y")
+          out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_int)
+          out <- out %>% rename(ad_x_int = "ad_x", ad_y_int = "ad_y")
+          out$ad <- apply(out, 1, function(x){
+               list(ic = list(ad_x_int = x$ad_x_int, 
+                              ad_x_tsa = x$ad_x_tsa, 
+                              
+                              ad_y_int = x$ad_y_int, 
+                              ad_y_tsa = x$ad_y_tsa), 
+                    ad = NULL)
+          })
+          
+          out <- out %>% select(colnames(out)[!(colnames(out) %in% c("construct_x", "construct_y", "ad_x_int", "ad_x_tsa", "ad_y_int", "ad_y_tsa"))])
+          
           attributes(out) <- append(attributes(out), list(call_history = list(call),
                                                           inputs = inputs,
                                                           ma_methods = c("bb", "ic"),
@@ -1049,10 +1018,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                var_rho_tp_a <- sd_rho_tp_a <- NA
                se_rtpa <- sd_e_tp_a
                ci_tp_a <- confidence(mean = mean_rtpa, sd = var_e_tp_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
-
-               # se_rtpa <- NA
-               # ci_tp_a <- cbind(NA, NA)
-               # colnames(ci_tp_a) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
           }else{
                se_rtpa <- sd_rtpa / sqrt(k)
                ci_tp_a <- confidence(mean = mean_rtpa, sd = var_rtpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -1126,10 +1091,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                var_rho_xp_a <- sd_rho_xp_a <- NA
                se_rxpa <- sd_e_xp_a
                ci_xp_a <- confidence(mean = mean_rxpa, sd = var_e_xp_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
-
-               # se_rxpa <- NA
-               # ci_xp_a <- cbind(NA, NA)
-               # colnames(ci_xp_a) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
           }else{
                se_rxpa <- sd_rxpa / sqrt(k)
                ci_xp_a <- confidence(mean = mean_rxpa, sd = var_rxpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -1202,10 +1163,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                var_rho_ty_a <- sd_rho_ty_a <- NA
                se_rtya <- sd_e_ty_a
                ci_ty_a <- confidence(mean = mean_rtya, sd = var_e_ty_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
-
-               # se_rtya <- NA
-               # ci_ty_a <- cbind(NA, NA)
-               # colnames(ci_ty_a) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
           }else{
                se_rtya <- sd_rtya / sqrt(k)
                ci_ty_a <- confidence(mean = mean_rtya, sd = var_rtya^.5, k = k, conf_level = conf_level, conf_method = conf_method)

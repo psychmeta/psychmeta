@@ -295,8 +295,6 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
 
           es_colname <- colnames(es_data)[colnames(es_data) %in% c("d", "r", "rxyi")]
 
-          # moderator_matrix <- data.frame(as_tibble(moderator_matrix)[presorted_data$analysis_id == 1,])
-          
           moderators <- clean_moderators(moderator_matrix = moderator_matrix,
                                          cat_moderators = cat_moderators,
                                          es_vec = es_data[presorted_data$analysis_id == 1,es_colname])
@@ -354,9 +352,30 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
 
      results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
      results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
-     results_df$moderator_info <- rep(list(NULL), nrow(results_df))
-     results_df$moderator_info[[1]] <- append(moderators, list(data = results_df$escalc[[1]]))
+     
+     if(!is.null(moderators$moderator_matrix))
+          moderators$moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$moderator_matrix), moderators$moderator_matrix)
+     if(!is.null(moderators$cat_moderator_matrix))
+          moderators$cat_moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$cat_moderator_matrix), moderators$cat_moderator_matrix)
+     
+     results_df$escalc <- map(results_df$escalc, function(x1){
+          map(x1, function(x2){
+               if(length(x2) == 0){
+                    NULL
+               }else{
+                    if(is.data.frame(x2)){
+                         bind_cols(original_order = 1:nrow(x2), x2)
+                    }else{
+                         map(x2, function(x3){
+                              bind_cols(original_order = 1:nrow(x3), x3)
+                         })  
+                    }
+               }
+          })
+     })
 
+     results_df$escalc[[1]] <- append(results_df$escalc[[1]], list(moderator_info = moderators))
+     
      results_df$ma_out <- NULL
 
      if(es_type == "r" & ma_type == "ic"){

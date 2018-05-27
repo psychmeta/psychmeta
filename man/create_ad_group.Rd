@@ -46,15 +46,20 @@ Artifact distribution object (matrix of artifact-distribution means and variance
 \description{
 This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
 Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-}
-\details{
+
 Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
 }
 \examples{
 ## Example artifact distribution for a dichotomous grouping variable:
 create_ad_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
-                    mean_rGg = .9, var_rGg = .05,
-                    k_rGg = 5, mean_n_rGg = 100,
-                    pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = 300,
-                    var_unbiased = TRUE)
+                mean_rGg = .9, var_rGg = .05,
+                k_rGg = 5, mean_n_rGg = 100,
+                pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
+                var_unbiased = TRUE)
+                
+create_ad_group(ad_type = "int", rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
+                mean_rGg = .9, var_rGg = .05,
+                k_rGg = 5, mean_n_rGg = 100,
+                pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
+                var_unbiased = TRUE)
 }

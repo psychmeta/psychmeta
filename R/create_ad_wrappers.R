@@ -1,4 +1,4 @@
-#' @title Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
+#' Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.
 #'
 #' @description 
 #' This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions.
@@ -76,7 +76,7 @@
 #' @param estimate_ut Logical argument to estimate ut values from other artifacts (\code{TRUE}) or to only used supplied ut values (\code{FALSE}). \code{TRUE} by default.
 #' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
 #' @param ... Further arguments.
-#'
+#' 
 #' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use artifact-distribution meta-analyses.
 #' @export
 #'
@@ -139,17 +139,17 @@
 #'               estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
 #'               estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased)
 create_ad <- function(ad_type = c("tsa", "int"),
-                      rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
-                      rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
+                      rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
+                      rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)),
                       ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux, length(mean_ux)),
                       ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
 
-                      mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)),
-                      mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
-
-                      mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)),
-                      mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)),
-
+                      mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)), mean_k_items_qxi = rep(NA, length(mean_qxi)),
+                      mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_k_items_rxxi = rep(NA, length(mean_rxxi)),
+                      
+                      mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)), mean_k_items_qxa = rep(NA, length(mean_qxa)),
+                      mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)), mean_k_items_rxxa = rep(NA, length(mean_rxxa)),
+                      
                       mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL,
                       mean_na_ux = rep(NA, length(mean_ux)), dep_sds_ux_spec = rep(FALSE, length(mean_ux)),
 
@@ -184,9 +184,9 @@ create_ad <- function(ad_type = c("tsa", "int"),
           out <- create_ad_int(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
                                rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
 
-                               ux = ux, ni_ux = ni_ux, wt_ux = wt_ux,
-                               ut = ut, ni_ut = ni_ut, wt_ut = wt_ut,
-
+                               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
+                               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
+                               
                                estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                                estimate_ux = estimate_ux, estimate_ut = estimate_ut)
      }
@@ -326,9 +326,12 @@ create_ad_array <- function(ad_list, name_vec = NULL){
 #' All artifact distributions are optional; null distributions will be given an artifact value of 1 and a weight of 1 as placeholders.
 #'
 #' @param rGg Vector of correlations between observed-group status and latent-group status.
+#' @param n_rGg Vector of sample sizes associated with the elements of rGg.
 #' @param wt_rGg Vector of weights associated with the elements in rxxi.
 #' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
 #' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
+#' @param n_pi Vector of sample sizes associated with the elements in \code{pi}.
+#' @param n_pa Vector of sample sizes associated with the elements in \code{pa}.
 #' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
 #' @param ... Further arguments.
 #'
@@ -340,8 +343,8 @@ create_ad_array <- function(ad_list, name_vec = NULL){
 #' @examples
 #' create_ad_int_group(rGg = c(.9, .8), wt_rGg = c(50, 150),
 #'                     pi = c(.9, .8), pa = c(.5, .5), wt_p = c(50, 150))
-create_ad_int_group <- function(rGg = NULL, wt_rGg = rep(1, length(rGg)),
-                                pi = NULL, pa = NULL, wt_p = rep(1, length(pi)),
+create_ad_int_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
+                                pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
                                 ...){
 
      if(!is.null(pi))
@@ -363,7 +366,8 @@ create_ad_int_group <- function(rGg = NULL, wt_rGg = rep(1, length(rGg)),
           ux <- NULL
      }
 
-     create_ad_int(rxxi = rxxi, wt_rxxi = wt_rGg, rxxi_type = "group_treatment", ux = ux, wt_ux = wt_p)
+     create_ad_int(rxxi = rxxi, wt_rxxi = wt_rGg, rxxi_type = "group_treatment",
+                   ux = ux, wt_ux = wt_p, ni_ux = n_pi, na_ux = n_pa)
 }
 
 
@@ -403,7 +407,7 @@ create_ad_int_group <- function(rGg = NULL, wt_rGg = rep(1, length(rGg)),
 #' create_ad_tsa_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
 #'                     mean_rGg = .9, var_rGg = .05,
 #'                     k_rGg = 5, mean_n_rGg = 100,
-#'                     pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = 300,
+#'                     pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
 #'                     var_unbiased = TRUE)
 create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
                                 mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
@@ -438,8 +442,11 @@ create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
 
 
 
-#' Generate an artifact distribution object for a dichotomous grouping variable.
+#' @name create_ad_group
+#' 
+#' @title Generate an artifact distribution object for a dichotomous grouping variable.
 #'
+#' @description 
 #' This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
 #' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 #'
@@ -471,10 +478,16 @@ create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
 #' @examples
 #' ## Example artifact distribution for a dichotomous grouping variable:
 #' create_ad_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
-#'                     mean_rGg = .9, var_rGg = .05,
-#'                     k_rGg = 5, mean_n_rGg = 100,
-#'                     pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = 300,
-#'                     var_unbiased = TRUE)
+#'                 mean_rGg = .9, var_rGg = .05,
+#'                 k_rGg = 5, mean_n_rGg = 100,
+#'                 pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
+#'                 var_unbiased = TRUE)
+#'                 
+#' create_ad_group(ad_type = "int", rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
+#'                 mean_rGg = .9, var_rGg = .05,
+#'                 k_rGg = 5, mean_n_rGg = 100,
+#'                 pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
+#'                 var_unbiased = TRUE)
 create_ad_group <- function(ad_type = c("tsa", "int"),
                             rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
                             pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
@@ -494,7 +507,8 @@ create_ad_group <- function(ad_type = c("tsa", "int"),
                                      pi = pi, pa = pa, n_pi = n_pi, n_pa = n_pa, wt_p = wt_p,
                                      var_unbiased = var_unbiased)
      }else{
-          out <- create_ad_int_group(rGg = rGg, wt_rGg = wt_rGg, pi = pi, pa = pa, wt_p = wt_p)
+          out <- create_ad_int_group(rGg = rGg,n_rGg = n_rGg, wt_rGg = wt_rGg,
+                                     pi = pi, pa = pa, n_pi = n_pi, n_pa = n_pa, wt_p = wt_p)
      }
      out
 }

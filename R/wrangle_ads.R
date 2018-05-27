@@ -47,12 +47,22 @@ organize_ads <- function(ad_obj, ad_suffix = NULL){
 }
 
 
-reshape_suppad2tibble <- function(supplemental_ads){
+reshape_suppad2tibble <- function(supplemental_ads, as_individual_pair = FALSE, construct_name = "X"){
      
      if(is.null(supplemental_ads)){
           out <- NULL
      }else if("ad_tibble" %in% class(supplemental_ads)){
           out <- supplemental_ads
+          
+     }else if(all(c("tbl_df", "tbl", "data.frame") %in% class(supplemental_ads))){
+          
+          if(all(c("construct_x", "ad_x") %in% colnames(supplemental_ads)) | 
+             all(c("construct_y", "ad_y") %in% colnames(supplemental_ads))){
+               out <- supplemental_ads
+          }else{
+               stop("The artifact-distribution object supplied does not contain appropriately named columns. \nManually generated artifact tibbles must contain columns 'ad_x' and 'construct_x' AND/OR 'ad_y' and 'construct_y'", call. = FALSE)
+          }
+          
      }else if("list" %in% class(supplemental_ads)){
           
           if(any(names(supplemental_ads) == "")){
@@ -78,16 +88,34 @@ reshape_suppad2tibble <- function(supplemental_ads){
           out <- NULL
      }
      
+     if((is.null(out) | "list" %in% class(supplemental_ads)) & as_individual_pair){
+          out <- tibble(construct_x = construct_name, 
+                        analysis_type = "Overall", 
+                        ad_x = list(supplemental_ads))
+          
+          class(out) <- c("ad_tibble", class(out))
+     }
+     
      out
 }
 
 
-join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested_ads = NULL, supplemental_ads = NULL){
+join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested_ads = NULL, 
+                        supplemental_ads = NULL, supplemental_ads_x = NULL, supplemental_ads_y = NULL){
      
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
      
      primary_ads <- organize_ads(ad_obj = primary_ads, ad_suffix = "_primary")
      harvested_ads <- organize_ads(ad_obj = harvested_ads, ad_suffix = "_harvested")
+     if(!is.null(supplemental_ads)){
+          supplemental_ads_x <- organize_ads(NULL, ad_suffix = "_supplemental")
+          supplemental_ads_y <- organize_ads(NULL, ad_suffix = "_supplemental") 
+     }else{
+          supplemental_ads_x <- organize_ads(reshape_suppad2tibble(supplemental_ads_x, as_individual_pair = TRUE, construct_name = "X"), ad_suffix = "_supplemental")
+          supplemental_ads_y <- organize_ads(reshape_suppad2tibble(supplemental_ads_y, as_individual_pair = TRUE, construct_name = "Y"), ad_suffix = "_supplemental")
+          supplemental_ads_x$ad_obj_y <- NULL
+          supplemental_ads_y$ad_obj_x <- NULL
+     }
      supplemental_ads <- organize_ads(reshape_suppad2tibble(supplemental_ads), ad_suffix = "_supplemental")
      
      .join_adobjs <- function(..., exclude_from_matching = NULL){
@@ -128,7 +156,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
      exclude_from_matching <- c(paste0("ad_x", c("_primary", "_harvested", "_supplemental")), 
                                 paste0("ad_y", c("_primary", "_harvested", "_supplemental")))
      
-     ad_obj <- .join_adobjs(primary_ads, harvested_ads, supplemental_ads, exclude_from_matching = exclude_from_matching)
+     ad_obj <- .join_adobjs(primary_ads, harvested_ads, supplemental_ads, supplemental_ads_x, supplemental_ads_y, exclude_from_matching = exclude_from_matching)
      
      if(is.null(ad_obj)){
           ad_obj
@@ -159,6 +187,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
                          .ad_supplemental <- attributes(.ad_supplemental)$inputs
                     
                     .ad_info <- consolidate_ads(.ad_primary, .ad_harvested, .ad_supplemental)
+                    lapply(.ad_info, length)
                     
                     if(ad_type == "tsa"){
                          out <- do.call(create_ad_tsa, .ad_info)
@@ -219,11 +248,12 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
      match_names <- match_names[match_names != "analysis_type"]
      
      if(!is.null(ad_obj_x)){
-          ad_obj_x <- select_(ad_obj_x, .dots = colnames(ad_obj_x)[colnames(ad_obj_x) != "analysis_type"])
+
+          ad_obj_x <- ad_obj_x %>% select(colnames(ad_obj_x)[colnames(ad_obj_x) != "analysis_type"])
           if(!("construct_x" %in% colnames(ad_obj_x)) & "construct_y" %in% colnames(ad_obj_x))
-               ad_obj_x <- rename_(ad_obj_x, construct_x = "construct_y")
+               ad_obj_x <- ad_obj_x %>% rename(construct_x = "construct_y")
           if(!("ad_x" %in% colnames(ad_obj_x)) & "ad_y" %in% colnames(ad_obj_x))
-               ad_obj_x <- rename_(ad_obj_x, ad_x = "ad_y")
+               ad_obj_x <- ad_obj_x %>% rename(ad_x = "ad_y")
           
           if("ad_y" %in% colnames(ad_obj_x))
                ad_obj_x$ad_y <- NULL
@@ -237,12 +267,12 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
      }
      
      if(!is.null(ad_obj_y)){
-          ad_obj_y <- select_(ad_obj_y, .dots = colnames(ad_obj_y)[colnames(ad_obj_y) != "analysis_type"])
-          if(!("construct_y" %in% colnames(ad_obj_y)) & "construct_x" %in% colnames(ad_obj_y))
-               ad_obj_y <- rename_(ad_obj_y, construct_y = "construct_x")
-          if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
-               ad_obj_y <- rename_(ad_obj_y, ad_y = "ad_x")
           
+          ad_obj_y <- ad_obj_y %>% select(colnames(ad_obj_y)[colnames(ad_obj_y) != "analysis_type"])
+          if(!("construct_y" %in% colnames(ad_obj_y)) & "construct_x" %in% colnames(ad_obj_y))
+               ad_obj_y <- ad_obj_y %>% rename(construct_y = "construct_x")
+          if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
+               ad_obj_y <- ad_obj_y %>% rename(ad_y = "ad_x")
           
           if("ad_x" %in% colnames(ad_obj_y))
                ad_obj_y$ad_x <- NULL
@@ -266,7 +296,7 @@ reshape_ad2tibble <- function(ma_obj, ad_obj){
      
      constructs <- NULL
      if("construct_x" %in% colnames(ma_obj)) constructs <- as.character(ma_obj$construct_x)
-     if("construct_y" %in% colnames(ma_obj)) constructs <- as.character(ma_obj$construct_y)
+     if("construct_y" %in% colnames(ma_obj)) constructs <- c(constructs, as.character(ma_obj$construct_y))
      constructs <- unique(constructs)
      
      if(is.null(ad_obj)){
@@ -274,10 +304,12 @@ reshape_ad2tibble <- function(ma_obj, ad_obj){
      }else if("ad_tibble" %in% class(ad_obj)){
           out <- ad_obj
      }else if(all(c("tbl_df", "tbl", "data.frame") %in% class(ad_obj))){
-          if(any(c("ad_x", "ad_x") %in% colnames(ad_obj))){
+          
+          if(all(c("construct_x", "ad_x") %in% colnames(ad_obj)) | 
+             all(c("construct_y", "ad_y") %in% colnames(ad_obj))){
                out <- ad_obj
           }else{
-               stop()
+               stop("The artifact-distribution object supplied does not contain appropriately named columns. \nManually generated artifact tibbles must contain columns 'ad_x' and 'construct_x' AND/OR 'ad_y' and 'construct_y'", call. = FALSE)
           }
           
      }else if(any(c("ad_int", "ad_tsa") %in% class(ad_obj))){

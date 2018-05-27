@@ -4,17 +4,23 @@
 \alias{create_ad_int_group}
 \title{Generate an artifact distribution object for a dichotomous grouping variable for use in interactive artifact-distribution meta-analysis programs.}
 \usage{
-create_ad_int_group(rGg = NULL, wt_rGg = rep(1, length(rGg)), pi = NULL,
-  pa = NULL, wt_p = rep(1, length(pi)), ...)
+create_ad_int_group(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg, pi = NULL,
+  pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi, ...)
 }
 \arguments{
 \item{rGg}{Vector of correlations between observed-group status and latent-group status.}
+
+\item{n_rGg}{Vector of sample sizes associated with the elements of rGg.}
 
 \item{wt_rGg}{Vector of weights associated with the elements in rxxi.}
 
 \item{pi}{Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).}
 
 \item{pa}{Vector of applicant/population proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).}
+
+\item{n_pi}{Vector of sample sizes associated with the elements in \code{pi}.}
+
+\item{n_pa}{Vector of sample sizes associated with the elements in \code{pa}.}
 
 \item{wt_p}{Vector of weights associated with the collective element pairs in \code{pi} and pa.}
 

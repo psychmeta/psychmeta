@@ -539,8 +539,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 #' @importFrom huxtable add_colnames()
 #'
 #' @keywords internal
-#'
-.metabulate <- function(ma_summary, show_conf = show_conf = TRUE, show_cred = TRUE,
+.metabulate <- function(ma_summary, show_conf = TRUE, show_cred = TRUE,
                         show_se = FALSE, output_format = output_format,
                         ma_type = NULL, es_type = NULL, symbol_es = "ES",
                         digits = 2L, leading0 = "figure", neg.sign = "\u2212",

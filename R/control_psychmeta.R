@@ -16,7 +16,6 @@
 #' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
 #' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
 #' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.
-#' @param seed Seed value to use for imputing artifacts. Default value is 42.
 #' @param impute_method Method to use for imputing artifacts. Choices are:
 #' \itemize{
 #' \item{bootstrap_mod}{\cr Select random values from the most specific moderator categories available (default).}
@@ -32,6 +31,9 @@
 #' \item{stop}{\cr Stop evaluations when missing artifacts are encountered.}
 #' }
 #' If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".
+#' @param seed Seed value to use for imputing artifacts in a reproducible way. Default value is 42.
+#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
+#' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param decimals Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).
 #' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
 #' \code{error_type} (will set to "mean"),
@@ -39,9 +41,8 @@
 #' \code{conf_method} (will set to "norm"),
 #' \code{cred_method} (will set to "norm"), 
 #' \code{var_unbiased} (will set to \code{FALSE}), 
+#' \code{residual_ads} (will be set to \code{FALSE}),
 #' and \code{use_all_arts} (will set to \code{FALSE}).
-#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
-#' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list of control arguments in the package environment. 
@@ -69,10 +70,10 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                                                 "unwt_mean_mod", "unwt_mean_full", 
                                                 "replace_unity", "stop"),
                               seed = 42,
-                              decimals = 2, 
-                              hs_override = FALSE,
                               use_all_arts = TRUE, 
                               estimate_pa = FALSE,
+                              decimals = 2, 
+                              hs_override = FALSE,
                               ...){
      
      control <- list(error_type = error_type,
@@ -91,10 +92,10 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                      impute_artifacts = impute_artifacts,
                      impute_method = impute_method,
                      seed = seed,
-                     decimals = decimals,
-                     hs_override = hs_override,
                      use_all_arts = use_all_arts, 
-                     estimate_pa = estimate_pa)
+                     estimate_pa = estimate_pa,
+                     decimals = decimals,
+                     hs_override = hs_override)
      
      additional_args <- list(...)
      .psychmeta_ellipse_args <- additional_args$.psychmeta_ellipse_args

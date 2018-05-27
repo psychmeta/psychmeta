@@ -13,7 +13,7 @@ select.ma_psychmeta <- function(.data, ...){
      attributes(.data) <- .attributes
      class(.data) <- .class
      
-     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc")
      correct_cols <- needed_cols %in% colnames(.data)
      if(!all(correct_cols))
           warning("You have removed the following critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
@@ -125,7 +125,7 @@ subset.ma_psychmeta <- function (x, subset, select, drop = FALSE, ...){
      attributes(x) <- .attributes
      class(x) <- .class
      
-     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc")
      correct_cols <- needed_cols %in% colnames(x)
      if(!all(correct_cols))
           warning("You have removed the following critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
@@ -181,7 +181,7 @@ ungroup.ma_psychmeta <- function (x, ...){
      attributes(x) <- .attributes
      class(x) <- .class
      
-     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc", "moderator_info")
+     needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc")
      correct_cols <- needed_cols %in% colnames(x)
      if(!all(correct_cols))
           warning("You have removed the following critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
