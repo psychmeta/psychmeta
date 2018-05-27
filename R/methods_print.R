@@ -849,7 +849,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
      if(any(c("ic", "ad") %in% ma_methods))
           if(!is.null(correction_types)){
                if(!all(correction_types %in% c("ts", "vgx", "vgy"))){
-                    stop("Supplied 'correction_types' not represented in the summary x")
+                    stop("Supplied 'correction_types' not represented in the summary object", call. = FALSE)
                }
           }else{
                correction_types <- "ts"
@@ -876,7 +876,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
      }
      
      if("ic" %in% ma_methods){
-          if(length(correction_types_ic) == 0){
+          if(length(unlist(correction_labels)) == 0){
                if(ma_metric %in% c("r_order2", "d_order2")){
                     cat("\nSecond-order individual-correction meta-analysis results \n")
                }else{
@@ -920,7 +920,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
      
      if("ad" %in% ma_methods){
           
-          if(length(correction_types_ic) == 0){
+          if(length(unlist(correction_labels)) == 0){
                if(ma_metric %in% c("r_order2", "d_order2")){
                     cat("\nSecond-order artifact-distribution meta-analysis results \n")
                }else{

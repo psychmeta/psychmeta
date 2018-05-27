@@ -64,7 +64,7 @@ summary.ma_psychmeta <- function(object, ...){
           correction_types_ic <- correction_types_ad <- NULL
      }
 
-     if("ic" %in% ma_methods){
+     if("ic" %in% ma_methods & any(c("r_as_r", "r_as_d", "d_as_r", "d_as_d") %in% ma_metric)){
           if(length(correction_types_ic) > 0){
                method_details_ic <- bind_rows(apply(object, 1, function(x){
                     cbind(analysis_id = x$analysis_id, attributes(x$meta_tables$individual_correction)$method_details)
@@ -77,7 +77,7 @@ summary.ma_psychmeta <- function(object, ...){
      }
 
 
-     if("ad" %in% ma_methods){
+     if("ad" %in% ma_methods & any(c("r_as_r", "r_as_d", "d_as_r", "d_as_d") %in% ma_metric)){
           if(length(correction_types_ic) > 0){
                method_details_ad <- bind_rows(apply(object, 1, function(x){
                     cbind(analysis_id = x$analysis_id, data.frame(t(attributes(x$meta_tables$artifact_distribution)$method_details)))

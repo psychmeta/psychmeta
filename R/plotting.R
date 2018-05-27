@@ -141,7 +141,6 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      pair_id <- as.list(unique(ma_obj_filtered$pair_id))
      names(pair_id) <- unlist(pair_id)
 
-     i <- 1
      out <- lapply(pair_id, function(i){
           x <- filter(ma_obj_filtered, pair_id == i)
 

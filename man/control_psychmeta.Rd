@@ -13,8 +13,8 @@ control_psychmeta(error_type = c("mean", "sample"), conf_level = 0.95,
   impute_artifacts = TRUE, impute_method = c("bootstrap_mod",
   "bootstrap_full", "simulate_mod", "simulate_full", "wt_mean_mod",
   "wt_mean_full", "unwt_mean_mod", "unwt_mean_full", "replace_unity", "stop"),
-  seed = 42, decimals = 2, hs_override = FALSE, use_all_arts = TRUE,
-  estimate_pa = FALSE, ...)
+  seed = 42, use_all_arts = TRUE, estimate_pa = FALSE, decimals = 2,
+  hs_override = FALSE, ...)
 }
 \arguments{
 \item{error_type}{Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.}
@@ -63,7 +63,11 @@ When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} s
 }
 If an imputation method ending in "mod" is selected but no moderators are provided, the "mod" suffix will internally be replaced with "full".}
 
-\item{seed}{Seed value to use for imputing artifacts. Default value is 42.}
+\item{seed}{Seed value to use for imputing artifacts in a reproducible way. Default value is 42.}
+
+\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
+
+\item{estimate_pa}{Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).}
 
 \item{decimals}{Number of decimal places to which interactive artifact distributions should be rounded (default is 2 decimal places).}
 
@@ -73,11 +77,8 @@ If an imputation method ending in "mod" is selected but no moderators are provid
 \code{conf_method} (will set to "norm"),
 \code{cred_method} (will set to "norm"), 
 \code{var_unbiased} (will set to \code{FALSE}), 
+\code{residual_ads} (will be set to \code{FALSE}),
 and \code{use_all_arts} (will set to \code{FALSE}).}
-
-\item{use_all_arts}{Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).}
-
-\item{estimate_pa}{Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

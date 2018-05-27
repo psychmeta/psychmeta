@@ -631,6 +631,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(all(!valid_r)) stop("No valid construct combinations provided", call. = FALSE)
      }
 
+     
+     if(length(construct_x) == 1) construct_x <- rep(construct_x, length(rxyi))
+     if(length(construct_y) == 1) construct_y <- rep(construct_y, length(rxyi))
+     
      if(is.null(construct_x)) construct_x <- rep("X", length(rxyi))
      if(is.null(construct_y)) construct_y <- rep("Y", length(rxyi))
 
@@ -1278,7 +1282,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
          
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
           
-          out <- as_tibble(rbindlist(out))
+          out <- as_tibble(data.table::rbindlist(out))
           
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa)
           out <- out %>% rename(ad_x_tsa = "ad_x", ad_y_tsa = "ad_y")
@@ -1293,7 +1297,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               ad_y_tsa = x$ad_y_tsa), 
                     ad = NULL)
           })
-          out <- select_(out, .dots = colnames(out)[!(colnames(out) %in% c("ad_x_int", "ad_x_tsa", "ad_y_int", "ad_y_tsa"))])
+          out <- out %>% select(colnames(out)[!(colnames(out) %in% c("ad_x_int", "ad_x_tsa", "ad_y_int", "ad_y_tsa"))])
           
           if(es_d & treat_as_d){
                attributes(out) <- append(attributes(out), list(call_history = list(call),

@@ -24,8 +24,8 @@
 ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
                         construct_x = NULL, construct_y = NULL, data = NULL, control = control_psychmeta(), ...){
-     warn_obj1 <- record_warnings()
      call <- match.call()
+     warn_obj1 <- record_warnings()
      ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
 
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
@@ -158,101 +158,41 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
      if("ad" %in% ma_type & !do_ad)
           stop("For artifact-distribution, the following data arguments must be supplied: ", paste(ad_req, collapse = ", "), call. = FALSE)
 
-     out <- ma_wrapper(es_data = dat, es_type = "d", ma_type = "d_order2", ma_fun = .ma_d_order2,
+     out <- ma_wrapper(es_data = dat, es_type = "d", ma_type = "d_order2", ma_fun = .ma_r_order2,
                        moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = TRUE,
                        construct_x = construct_x, construct_y = construct_y,
 
-                       ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad)),
+                       ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad, ma_metric = "d")),
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
 
-     out <- append(list(call = call, inputs = inputs), out)
-
-     out$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                          fyi = record_fyis(es_metric = "d_order2",
-                                            neg_var_d_order2 = sum(out$barebones$meta_table$var_d_bar < 0),
-                                            neg_var_delta_ic_order2 = sum(out$individual_correction$meta_table$var_delta_bar < 0),
-                                            neg_var_delta_ad_order2 = sum(out$artifact_distribution$meta_table$var_delta_bar < 0)))
+     neg_var_r_order2 <- sum(unlist(map(out$meta_tables, function(x) x$barebones$var_d_bar < 0)), na.rm = TRUE)
+     neg_var_rho_ic_order2 <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$var_delta_bar < 0)), na.rm = TRUE)
+     neg_var_rho_ad_order2 <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$var_delta_bar < 0)), na.rm = TRUE)
+     
+     default_print <- 
+          if(do_ic){
+               "ic"
+          }else if(do_ad){
+               "ad"
+          }else if(do_bb){
+               "bb"
+          }
+     
+     out <- bind_cols(analysis_id = 1:nrow(out), out)
+     attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                     inputs = inputs, 
+                                                     ma_methods = c("bb", "ic", "ad")[c(do_bb, do_ic, do_ad)],
+                                                     ma_metric = "d_order2", 
+                                                     default_print = default_print,
+                                                     warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
+                                                     fyi = record_fyis(es_metric = "d_order2",
+                                                                       neg_var_r_order2 = neg_var_r_order2,
+                                                                       neg_var_rho_ic_order2 = neg_var_rho_ic_order2,
+                                                                       neg_var_rho_ad_order2 = neg_var_rho_ad_order2)))
      out <- namelists.ma_psychmeta(ma_obj = out)
      
      class(out) <- c("ma_psychmeta", class(out))
      
      out
 }
-
-
-
-#' Internal function for computing individual-correction meta-analyses of correlations
-#'
-#' @param data Data frame of individual-correction information.
-#' @param type Type of correlation to be meta-analyzed: "ts" for true score, "vgx" for validity generalization with "X" as the predictor,
-#' "vgy" for for validity generalization with "X" as the predictor, and "all" for the complete set of results.
-#' @param run_lean If TRUE, the meta-analysis will not generate a data object. Meant to speed up bootstrap analyses that do not require supplemental output.
-#' @param ma_arg_list List of arguments to be used in the meta-analysis function.
-#'
-#' @return A meta-analytic table and a data frame.
-#' 
-#' @keywords internal
-.ma_d_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
-
-     r <- data$d
-     rho <- data$delta
-     var_r <- data$var_d
-     var_r_c <- data$var_d_c
-     k <- data$k
-     N <- data$N
-
-     conf_level <- ma_arg_list$conf_level
-     cred_level <- ma_arg_list$cred_level
-     cred_method <- ma_arg_list$cred_method
-     conf_method <- ma_arg_list$conf_method
-     var_unbiased <- ma_arg_list$var_unbiased
-
-     do_bb <- ma_arg_list$do_bb
-     do_ic <- ma_arg_list$do_ic
-     do_ad <- ma_arg_list$do_ad
-
-     if((type == "all" | type == "bb") & do_bb){
-          out_bb <- .ma_r_order2_bb(k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
-                                    conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
-          colnames(out_bb$meta)[ncol(out_bb$meta)] <- "cor(d, error)"
-          colnames(out_bb$meta) <- gsub(x = colnames(out_bb$meta), pattern = "_r", replacement = "_d")
-          colnames(out_bb$meta) <- gsub(x = colnames(out_bb$meta), pattern = "_bar_des", replacement = "_bar_res")
-          attributes(out_bb$meta)$ma_type <- "d_bb_order2"
-     }else{
-          out_bb <- NULL
-     }
-
-     if((type == "all" | type == "ic") & do_ic){
-          out_ic <- .ma_r_order2_ic(k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
-                                    conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
-          colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "rho", replacement = "delta")
-          colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "_r", replacement = "_d")
-          colnames(out_ic$meta) <- gsub(x = colnames(out_ic$meta), pattern = "_bar_des", replacement = "_bar_res")
-          attributes(out_ic$meta)$ma_type <- "d_ic_order2"
-     }else{
-          out_ic <- NULL
-     }
-
-     if((type == "all" | type == "ad") & do_ad){
-          out_ad <- .ma_r_order2_ad(k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
-                                    conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased, run_lean = run_lean)
-          colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "rho", replacement = "delta")
-          colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "_r", replacement = "_d")
-          colnames(out_ad$meta) <- gsub(x = colnames(out_ad$meta), pattern = "_bar_des", replacement = "_bar_res")
-          attributes(out_ad$meta)$ma_type <- "d_ad_order2"
-     }else{
-          out_ad <- NULL
-     }
-
-     list(meta = list(barebones = out_bb$meta, 
-                      individual_correction = out_ic$meta, 
-                      artifact_distribution = out_ad$meta),
-          escalc = list(barebones = out_bb$escalc, 
-                        individual_correction = out_ic$escalc, 
-                        artifact_distribution = out_ad$escalc))
-}
-
 

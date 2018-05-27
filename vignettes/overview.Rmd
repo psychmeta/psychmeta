@@ -196,7 +196,8 @@ correct_r_split(r = c(.3, .5), pi = .2, n = 100)
 
 # Computing meta-analyses
 
-## `ma_r()` is the general-purpose meta-analysis function for correlations.
+## `ma_r()` is the general-purpose meta-analysis function for correlations
+The arguments to this function are:
 ```{r, eval=FALSE}
 ma_r(
 #### Commonly used arguments: ####
@@ -268,7 +269,80 @@ ma_r(
      indirect_rr = NULL,
 # If analyzing multiple relationships, how does each construct correlate with
 # the selection mechanism?
-     sign_rz = NULL
+     sign_rz = NULL,
+
+# Additional methological parameters can be modified using the "control" argument. 
+     control =  control_psychmeta()
+)
+```
+
+\pagebreak
+
+In addition to the arguments used with `ma_r()` directly, the `control` argument allows users to modify methological parameters of their analyses and interact with some of the more specialized features of **`psychmeta`**'s meta-analysis functions. The `control` argument in meta-analysis functions accepts the output of the `control_psychmeta()` function.
+```{r, eval=FALSE}
+control_psychmeta(
+     # Should the mean or the sample-specific effect sizes be used to estimate error variance?
+     error_type = c("mean", "sample"),
+     # What proportion of the distribution of means should be included in confidence intervals?
+     conf_level = .95, 
+     # What proportion of the residual distribution of observations should be included in credibility intervals?
+     cred_level = .8, 
+     # How should confidence and credibility intervals be computed? With the t or normal distribution?
+     conf_method = c("t", "norm"), 
+     cred_method = c("t", "norm"), 
+     # Should weighted variance estimates be computed as unbiased (i.e., multiplied by k / [k-1])?
+     var_unbiased = TRUE,
+     # Should overall artifaction distributions be computed for each construct (pairwise_ads == FALSE) or should 
+     # artifact distributions be computed separately for each construct pair (pairwise_ads == TRUE)?
+     pairwise_ads = FALSE,
+     # Should artifact distributions be computed by collapsing across moderator 
+     # levels (moderated_ads == FALSE) or should artifact distributions be computed 
+     # separately for each moderator combination (moderated_ads == TRUE)?
+     moderated_ads = FALSE,
+     # Should artifact-distribution corrections be computed using artifact distributions 
+     # that have had sampling error removed (residual_ads == TRUE) or should the observed 
+     # distributions be used (residual_ads == TRUE)?
+     residual_ads = TRUE,
+     # Should dependent observations (i.e., multiple observations of the same relationship in a single sample) be 
+     # consolidated so that there is just one independent observation per sample? 
+     check_dependence = TRUE, 
+     # If check_dependence is TRUE, how should dependency be resolved? Options are to compute a composite 
+     # effect size (default), compute the average of the effect sizes, or to stop with an error message. 
+     collapse_method = c("composite", "average", "stop"),
+     # The intercor argument uses the control_intercor() function to control how the intercorrelations 
+     # among variables are handled with collapse_method == "composite"
+     intercor = control_intercor(),
+     # Should artifact information be cleaned to resolve discrepancies among values recorded for multiple   
+     # relationsips involving a given construct in a given sample? 
+     clean_artifacts = TRUE, 
+     # Should missing artifact information be imputed? (For use with individual-correction method only)
+     impute_artifacts = TRUE,
+     # If impute_artifacts is TRUE, how should imputation be performed? See the documentation for the 
+     # control_psychmeta() function for descriptions of the available options. 
+     impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod", "simulate_full", 
+                       "wt_mean_mod", "wt_mean_full", "unwt_mean_mod", "unwt_mean_full", 
+                       "replace_unity", "stop"),
+     # What seed value should be set for the imputation process? (This makes the imputation reproducible)
+     seed = 42,
+     # Should artifact information from observations not included in meta-analyses be harvested from "data"
+     # and included in artifact distributions?
+     use_all_arts = TRUE, 
+     # For meta-analyses of d values, should the proportionality of membership in the unrestricted sample
+     # be estimated from the range-restricted proportions and the range-restriction correction factor?
+     estimate_pa = FALSE,
+     # To what number of decimal places should interactive artifact distributions be rounded prior to use? 
+     # Rounding reduces the computational burden of creating multi-dimensional arrays of artifact information. 
+     decimals = 2,
+     # Should the "Hunter-Schmidt" override settings be used? When TRUE, this will override settings for:
+     # - wt_type will set to "sample_size"
+     # - error_type will set to "mean"
+     # - correct_bias will set to TRUE
+     # - conf_method will set to "norm"
+     # - cred_method will set to "norm" 
+     # - var_unbiased will set to FALSE
+     # - residual_ads will be set to FALSE
+     # - use_all_arts will set to FALSE
+     hs_override = FALSE
 )
 ```
 
@@ -296,7 +370,6 @@ ma_r(rxyi = "rxyi", n = "n",
 ma_r(rxyi = rxyi, n = n,
      data = data_r_meas_multi)
 ```
-
 
 ### Moderator analyses
 Moderator analyses are easy—just identify a column or matrix of moderator information.
@@ -391,6 +464,47 @@ ma_r(rxyi = rxyi, n = n, sample_id = sample_id,
 ma_r(rxyi = rxyi, n = n, sample_id = sample_id,
      collapse_method = "average",
      data = data_r_meas_multi)
+```
+
+
+# Navigating meta-analysis output objects
+
+The results of **`psychmeta`**'s meta-analysis functions take the form of nested tibbles. A tibble is a type of tabular array that is a modernized version on the data frame (if you're new to tibbles, a vignette on the topic is available from the **`tibble`** package's [CRAN documentation](https://CRAN.R-project.org/package=tibble)). The "nesting" of results means that the some cells of the tibble contain complex objects, such as data frames and lists (i.e., objects that have their own indexing structures, hence the nesting). This nested structure allows a lot of information to be organized in a very concise way so that an overview of even a very complicated meta-analysis can fit in your console window. 
+
+As an example, below are some results computed using the `data_r_gonzalezmule_2014` data set included with **`psychmeta`**, which is an updated version of the database reported by Gonzalez-Mulé, Mount, and Oh [-@gonzalez-mule_meta-analysis_2014] in their meta-analysis of the relationship between general mental ability (GMA) and organizational citizenship behaviors (i.e., prosocial behaviors exhibited in the workplace; OCBs). Gonzalez-Mulé et al. explored a number of moderators, but for this analysis we have chosen to use only two: `Rating source` (OCBs rated by self vs. supervisor) and `Type` (the target of the OCBs; OCB-I = targeted toward individuals, OCB-O = targeted toward the organization, OCB-CH = targeted toward change). To demonstrate the structure of meta-analysis objects, we have chosen to run this example using hierarchical moderator analyses (i.e., `moderator_type = "hierarchical"`), which means we will be able to see the main effects of each moderator as well as the results from individual combinations of the levels of the moderators.  
+
+**Note**: This table of results is larger than can fit in most HTML viewers. Use the arrow buttons in the header to scroll horizonally through the content and use the page numbers in the lower-right corner of the object to scroll vertically. 
+```{r, eval=TRUE, echo=TRUE}
+(gonzalezmule <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, 
+                     construct_x = "GMA",
+                     construct_y = "OCB",
+                     rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
+                     moderators = c("Rating source", "Type", "Published"), 
+                     moderator_type = "hierarchical",
+                     control = control_psychmeta(hs_override = TRUE),
+                     data = data_r_gonzalezmule_2014))
+```
+
+From this tibble, we see that there are a total of 13 meta-analyses (each row of the tibble is a distinct analysis representing a unique set of construct pairings and/or combinations of moderator levels) and these meta-analyses are indexed by a unique number in the `analysis_id` column. We also see that the `pair_id` column indexes the individual construct pairs (in this example, there is only one contstruct pair: GMA and OCB), with the names of the constructs displayed in the `construct_x` and `construct_y` columns. 
+
+In terms of moderator analyses, the `analysis_type` column tells us how moderator information was treated in each meta-analysis. Analyses labeled as "Overall" represent meta-analyses of all information, with all observations collapsed across moderator levels (when moderator levels are collapsed, it is indicated by "All Levels" in the columns bearing the moderator names). Analyses labeled as "Simple Moderator" represent meta-analyses of a particular level of a single moderator, collapsing across all of the other moderators (the moderator levels used in these analyses are indicated in the columns bearing the moderator names). Finally, analyses labled as "Fully Hierarchical Moderator" represent intersections of the categories of the moderators. Note that this database is smaller than what would be needed to do a good hierarchical moderator analysis and we have run this analysis for purposes of illustration only. When hierarchical moderator analyses are run with more than two moderators, results will also be diplayed for "Partial Hierarchical Moderator" analyses, which means that the results represent intersections among only a subset of the moderators while levels of the other moderators are collapsed. 
+
+To the right of the moderator columns are columns that contain data and results from the meta-analyses. The `meta_tables` column contains the meta-analysis tables for each analysis, the `escalc` column contains the data from each meta-analysis (these data are in the format of "escalc" class objects that can be used with the **metafor** package's functions), and the `ad` column contains artifact distributions from psychometric meta-analyses (each cell contains artifact distributions from individual-correction analyses, if present, and from artifact-distribution analyses, if present).
+
+To see a summary view of the statistical results of the meta-analysis, use the `summary()` function. 
+```{r, eval=FALSE}
+summary(gonzalezmule)
+```
+
+To retrieve tables from all meta-analyses in the object, you can use the `get_metatab()` function (this information is also included in the output object from the `summary()` function). For example, below is the true-score correlation table from our meta-analysis of Gonzalez-Mulé et al.'s (2014) data. This table communicates the bare-bones and fully corrected results for all of the relationships in the meta-analysis object.
+```{r, eval=TRUE}
+metatab_list <- get_metatab(gonzalezmule)
+metatab_list$individual_correction$true_score
+```
+
+Of course, it is also possible to directly pull the results of a particular analysis out of the meta-analysis object, but the tables retrived with this method will not contain the `analysis_id`, `pair_id`, contstruct, or moderator information included in the tables from `get_metatab()`.
+```{r, eval=TRUE}
+gonzalezmule$meta_tables$`analysis_id: 1`$individual_correction$true_score
 ```
 
 # Follow-up analyses

@@ -6,7 +6,7 @@ library(psychmeta)
 #  install.packages("psychmeta")
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  devtools::install_github("jadahlke/psychmeta")
+#  devtools::install_github("psychmeta/psychmeta")
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  library(psychmeta)
@@ -127,8 +127,8 @@ convert_es(es = c(.4, .3, .25),
 #       construct_x = NULL, construct_y = NULL,
 #       measure_x = NULL, measure_y = NULL,
 #  
-#  # Weighting and variance-estimation parameters.
-#       wt_type = "sample_size", error_type = "mean",
+#  # Weighting method
+#       wt_type = "sample_size",
 #  
 #  # Correct for small-sample bias?
 #       correct_bias = TRUE,
@@ -157,41 +157,16 @@ convert_es(es = c(.4, .3, .25),
 #  # What type of moderator analysis do you want (simple vs. hierarchical)?
 #       moderator_type = "simple",
 #  
-#  #### Specialized and methodological arguments: ####
 #  # If correcting for bivariate indirect RR, how do constructs correlate
 #  # with selection mechanisms? (only need to specify the +1 or -1 sign of the relationships)
 #       sign_rxz = 1, sign_ryz = 1,
 #  
-#  # How would you like to estimate uncertainty intervals?
-#       conf_level = 0.95, cred_level = 0.8,
-#       conf_method = "t", cred_method = "t",
-#  
-#  # Should unbiased variances be used?
-#       var_unbiased = TRUE,
-#  
-#  # How would you like to use your artifact distributions?
-#       pairwise_ads = FALSE, residual_ads = TRUE,
-#  
-#  # How would you like to deal with dependent effect sizes?
-#       check_dependence = TRUE,
-#       collapse_method = "composite", intercor = 0.5,
-#  
-#  # Would you like to clean/impute artifacts?
-#       clean_artifacts = TRUE, impute_artifacts = TRUE,
-#       impute_method = "bootstrap_mod",
-#  
-#  # Do you have any artifacts to use that are not associated with a valid effect size?
-#       use_all_arts = FALSE, supplemental_ads = NULL,
-#  
-#  # Would you like to do a meta-analysis as reported in "Methods of Meta-Analysis?"
-#       hs_override = FALSE,
+#  # Do you have any artifact distributions to include that are not in your database?
+#       supplemental_ads = NULL,
 #  
 #  #### Other arguments to know about: ####
 #  # Specify the order in which constructs should be displayed in output.
 #       construct_order = NULL,
-#  # Specify the number of decimal places to which interactive artifact distributions
-#  # should be rounded (for computational efficiency).
-#       decimals = 2,
 #  # If analyzing multiple relationships, how should each constructs's measurement
 #  # error be handled?
 #       correct_rel = NULL,
@@ -203,7 +178,76 @@ convert_es(es = c(.4, .3, .25),
 #       indirect_rr = NULL,
 #  # If analyzing multiple relationships, how does each construct correlate with
 #  # the selection mechanism?
-#       sign_rz = NULL
+#       sign_rz = NULL,
+#  
+#  # Additional methological parameters can be modified using the "control" argument.
+#       control =  control_psychmeta()
+#  )
+
+## ---- eval=FALSE---------------------------------------------------------
+#  control_psychmeta(
+#       # Should the mean or the sample-specific effect sizes be used to estimate error variance?
+#       error_type = c("mean", "sample"),
+#       # What proportion of the distribution of means should be included in confidence intervals?
+#       conf_level = .95,
+#       # What proportion of the residual distribution of observations should be included in credibility intervals?
+#       cred_level = .8,
+#       # How should confidence and credibility intervals be computed? With the t or normal distribution?
+#       conf_method = c("t", "norm"),
+#       cred_method = c("t", "norm"),
+#       # Should weighted variance estimates be computed as unbiased (i.e., multiplied by k / [k-1])?
+#       var_unbiased = TRUE,
+#       # Should overall artifaction distributions be computed for each construct (pairwise_ads == FALSE) or should
+#       # artifact distributions be computed separately for each construct pair (pairwise_ads == TRUE)?
+#       pairwise_ads = FALSE,
+#       # Should artifact distributions be computed by collapsing across moderator
+#       # levels (moderated_ads == FALSE) or should artifact distributions be computed
+#       # separately for each moderator combination (moderated_ads == TRUE)?
+#       moderated_ads = FALSE,
+#       # Should artifact-distribution corrections be computed using artifact distributions
+#       # that have had sampling error removed (residual_ads == TRUE) or should the observed
+#       # distributions be used (residual_ads == TRUE)?
+#       residual_ads = TRUE,
+#       # Should dependent observations (i.e., multiple observations of the same relationship in a single sample) be
+#       # consolidated so that there is just one independent observation per sample?
+#       check_dependence = TRUE,
+#       # If check_dependence is TRUE, how should dependency be resolved? Options are to compute a composite
+#       # effect size (default), compute the average of the effect sizes, or to stop with an error message.
+#       collapse_method = c("composite", "average", "stop"),
+#       # The intercor argument uses the control_intercor() function to control how the intercorrelations
+#       # among variables are handled with collapse_method == "composite"
+#       intercor = control_intercor(),
+#       # Should artifact information be cleaned to resolve discrepancies among values recorded for multiple
+#       # relationsips involving a given construct in a given sample?
+#       clean_artifacts = TRUE,
+#       # Should missing artifact information be imputed? (For use with individual-correction method only)
+#       impute_artifacts = TRUE,
+#       # If impute_artifacts is TRUE, how should imputation be performed? See the documentation for the
+#       # control_psychmeta() function for descriptions of the available options.
+#       impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod", "simulate_full",
+#                         "wt_mean_mod", "wt_mean_full", "unwt_mean_mod", "unwt_mean_full",
+#                         "replace_unity", "stop"),
+#       # What seed value should be set for the imputation process? (This makes the imputation reproducible)
+#       seed = 42,
+#       # Should artifact information from observations not included in meta-analyses be harvested from "data"
+#       # and included in artifact distributions?
+#       use_all_arts = TRUE,
+#       # For meta-analyses of d values, should the proportionality of membership in the unrestricted sample
+#       # be estimated from the range-restricted proportions and the range-restriction correction factor?
+#       estimate_pa = FALSE,
+#       # To what number of decimal places should interactive artifact distributions be rounded prior to use?
+#       # Rounding reduces the computational burden of creating multi-dimensional arrays of artifact information.
+#       decimals = 2,
+#       # Should the "Hunter-Schmidt" override settings be used? When TRUE, this will override settings for:
+#       # - wt_type will set to "sample_size"
+#       # - error_type will set to "mean"
+#       # - correct_bias will set to TRUE
+#       # - conf_method will set to "norm"
+#       # - cred_method will set to "norm"
+#       # - var_unbiased will set to FALSE
+#       # - residual_ads will be set to FALSE
+#       # - use_all_arts will set to FALSE
+#       hs_override = FALSE
 #  )
 
 ## ---- eval=FALSE---------------------------------------------------------
@@ -277,6 +321,26 @@ convert_es(es = c(.4, .3, .25),
 #       collapse_method = "average",
 #       data = data_r_meas_multi)
 
+## ---- eval=TRUE, echo=TRUE-----------------------------------------------
+(gonzalezmule <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, 
+                     construct_x = "GMA",
+                     construct_y = "OCB",
+                     rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
+                     moderators = c("Rating source", "Type", "Published"), 
+                     moderator_type = "hierarchical",
+                     control = control_psychmeta(hs_override = TRUE),
+                     data = data_r_gonzalezmule_2014))
+
+## ---- eval=FALSE---------------------------------------------------------
+#  summary(gonzalezmule)
+
+## ---- eval=TRUE----------------------------------------------------------
+metatab_list <- get_metatab(gonzalezmule)
+metatab_list$individual_correction$true_score
+
+## ---- eval=TRUE----------------------------------------------------------
+gonzalezmule$meta_tables$`analysis_id: 1`$individual_correction$true_score
+
 ## ---- eval=FALSE---------------------------------------------------------
 #  ma_obj <- sensitivity(ma_obj,
 #                        leave1out = TRUE,
@@ -298,7 +362,7 @@ convert_es(es = c(.4, .3, .25),
 #                    data = data_r_gonzalezmule_2014)
 #  
 #  ma_obj_gm <- metareg(ma_obj_gm)
-#  get_metareg(ma_obj_gm)$individual_correction$true_score
+#  get_metareg(ma_obj = ma_obj_gm)[[1]]$individual_correction$true_score
 #  
 #  ma_obj_mc <- ma_r(ma_method = "ic",
 #                    rxyi = r, n = N,
@@ -307,7 +371,7 @@ convert_es(es = c(.4, .3, .25),
 #                    data = data_r_mcleod_2007)
 #  
 #  ma_obj_mc <- metareg(ma_obj_mc, formula_list = list("Parent*Age" = yi ~ Parent*Age))
-#  get_metareg(ma_obj_mc)$individual_correction$true_score
+#  get_metareg(ma_obj_mc)[[1]]$individual_correction$true_score
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  ma_obj_gm <- ma_r(ma_method = "ic",
@@ -338,30 +402,27 @@ convert_es(es = c(.4, .3, .25),
 #  ma_obj
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  filter_ma(ma_obj, analyses = list(construct = "X") )
+#  filter_ma(ma_obj, analyses = list(construct = "Y") )
 #  filter_ma(ma_obj, analyses = list(construct_pair = list(c("X", "Z"))) )
-
-## ---- eval=FALSE---------------------------------------------------------
-#  print(ma_obj, verbose = TRUE, digits = 2)
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  # Heterogeneity statistics
 #  ma_obj <- heterogeneity(ma_obj)
 #  out_heterogeneity <- get_heterogeneity(ma_obj)
-#  out_heterogeneity$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
+#  out_heterogeneity$`analysis id: 1`$barebones
 #  
 #  # Sensitivity analyses
 #  ma_obj <- sensitivity(ma_obj, bootstrap = FALSE)
 #  out_leave1out <- get_leave1out(ma_obj)
-#  out_leave1out$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
+#  out_leave1out$`analysis id: 1`$barebones
 #  
 #  out_cumulative <- get_cumulative(ma_obj)
-#  out_cumulative$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
+#  out_cumulative$`analysis id: 1`$barebones
 #  
 #  # Meta-regression analyses
 #  ma_obj <- metareg(ma_obj)
 #  out_metareg <- get_metareg(ma_obj)
-#  out_metareg$metareg$barebones$`Pair ID = 1: X = X, Y = Y`$`Main Effects`
+#  out_metareg$`analysis id: 1`$barebones
 #  
 #  # A summary of artifact distributions
 #  get_ad(ma_obj, ma_method = "ic")
@@ -377,27 +438,26 @@ convert_es(es = c(.4, .3, .25),
 #  
 #  # Extract plots for viewing
 #  out_plots <- get_plots(ma_obj)
-#  out_plots$funnel$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
-#  out_plots$forest$barebones$`Pair ID = 1: X = X, Y = Y`
+#  out_plots$funnel$`analysis id: 1`$barebones
+#  out_plots$forest$`analysis id: 1`$barebones
 #  
 #  # The sensitivity_cumulative() and sensitivity_leave1out() functions also produce plots.
-#  out_plots$leave1out$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
-#  out_plots$cumulative$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
+#  out_plots$leave1out$`analysis id: 1`$barebones$plots
+#  out_plots$cumulative$`analysis id: 1`$barebones$plots
 
 ## ---- eval=TRUE, echo=FALSE, results = "hide", fig.keep="high"-----------
 ma_obj_print <- ma_r(ma_method = "ic", sample_id = sample_id,
-               rxyi = rxyi, n = n,
-               construct_x = x_name,
-               construct_y = y_name,
-               rxx = rxxi,
-               ryy = ryyi,
-               moderators = moderator,
-               clean_artifacts = FALSE,
-               impute_artifacts = FALSE,
-               data = data_r_meas_multi)
+                     rxyi = rxyi, n = n,
+                     construct_x = x_name,
+                     construct_y = y_name,
+                     rxx = rxxi,
+                     ryy = ryyi,
+                     moderators = moderator,
+                     clean_artifacts = FALSE,
+                     impute_artifacts = FALSE,
+                     data = data_r_meas_multi)
 ma_obj_print <- plot_funnel(ma_obj = ma_obj_print)
-out_plots_print <- get_plots(ma_obj_print)
-out_plots_print$funnel$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
+ma_obj_print$funnel$`analysis id: 1`$barebones
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  ma_obj <- ma_r(ma_method = "ic",
@@ -742,9 +802,9 @@ out_plots_print$funnel$barebones$`Pair ID = 1: X = X, Y = Y`$`Analysis ID = 1`
 #  anova(lm_mat_out1, lm_mat_out2)
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  mat_list <- get_matrix(ma_obj = ma_obj)
-#  R <- mat_list$individual_correction$true_score$mean_rho
-#  n <- mat_list$individual_correction$true_score$N[1,3]
+#  mat_array <- get_matrix(ma_obj = ma_obj)
+#  R <- mat_array$individual_correction$`moderator_comb: 1`$true_score$mean_rho
+#  n <- mat_array$individual_correction$`moderator_comb: 1`$true_score$N[1,3]
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  lm_x <- lm_mat(formula = Y ~ X, cov_mat = R, n = n)

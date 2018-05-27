@@ -44,8 +44,8 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
      if(any(ma_metric == "generic")) es_type <- "es"
      if(any(ma_metric == "r_as_r" | ma_metric == "d_as_r")) es_type <- "r"
      if(any(ma_metric == "d_as_d" | ma_metric == "r_as_d")) es_type <- "d"
-     if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations or d values", call. = FALSE)
-
+     if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations, d values, or generic effect sizes", call. = FALSE)
+     
      out_list <- apply(ma_obj[ma_obj$analysis_type == "Overall",], 1, function(ma_obj_i){
 
           escalc <- ma_obj_i$escalc
