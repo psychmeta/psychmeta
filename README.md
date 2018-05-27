@@ -1,4 +1,6 @@
-<span style="float:left;padding-right:20px;padding-bottom:20px">![psychmeta logo](/icon/psychmeta_icon_hexbin.png?raw=TRUE)</span>psychmeta: Psychometric Meta-Analysis Toolkit
+<img width="200" src="https://github.com/psychmeta/psychmeta/blob/project/new-table/icon/psychmeta_icon_twitter.png?raw=TRUE" alt="psychmeta logo" align="left">
+
+psychmeta: Psychometric Meta-Analysis Toolkit
 ======================================
 
 [![CRAN Version](http://www.r-pkg.org/badges/version/psychmeta)](https://cran.r-project.org/package=psychmeta "CRAN version")
