@@ -35,19 +35,25 @@
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="any")
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
 filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
-     
+
+     # Check if ma_obj is a sumamry object
+     if("summary.ma_psychmeta" %in% class(ma_obj)) {
+             flag_summary <- TRUE
+             ma_obj <- ma_obj$ma_obj
+     } else flag_summary <- FALSE
+
      screen_ma(ma_obj = ma_obj)
-     
+
      match <- match.arg(match, c("all", "any"))
      case_sensitive <- scalar_arg_warning(arg = case_sensitive, arg_name = "case_sensitive")
-     
+
      .attributes <- attributes(ma_obj)
      ma_method <- .attributes$ma_method
-     
-     if(any(colnames(ma_obj) == "group_contrast") | 
-        any(colnames(ma_obj) == "construct_x") | 
+
+     if(any(colnames(ma_obj) == "group_contrast") |
+        any(colnames(ma_obj) == "construct_x") |
         any(colnames(ma_obj) == "construct_y")){
-          
+
           if(any(colnames(ma_obj) == "group_contrast") | any(colnames(ma_obj) == "construct_x")){
                if(any(colnames(ma_obj) == "group_contrast")){
                     construct_x <- ma_obj$group_contrast
@@ -57,13 +63,13 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }else{
                construct_x <- NULL
           }
-          
+
           if(any(colnames(ma_obj) == "construct_y")){
                construct_y <- ma_obj$construct_y
           }else{
                construct_y <- NULL
           }
-          
+
           if(!case_sensitive){
                if(!is.null(construct_x))
                     construct_x <- tolower(construct_x)
@@ -74,7 +80,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           construct_x <- NULL
           construct_y <- NULL
      }
-     
+
      if(mode(analyses) != "list") {
           if(analyses == "all" ) {
                construct_ids <- NULL
@@ -83,7 +89,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
      }
 
      keep_meta <- rep(TRUE, nrow(ma_obj))
-     
+
      if(!is.null(construct_x) & !is.null(construct_y)){
           if(!is.null(analyses[["construct"]])) {
                if(is.vector(analyses[["construct"]])) analyses[["construct"]] <- as.list(analyses[["construct"]])
@@ -91,7 +97,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                     keep_meta <- construct_x %in% analyses[["construct"]] | construct_y %in% analyses[["construct"]]
                }
           }
-          
+
           if(!is.null(analyses[["construct_pair"]])) {
                construct_pair_ids <-
                     lapply(analyses[["construct_pair"]], function(x){
@@ -104,9 +110,9 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                     for(i in 1:length(construct_pair_ids))
                          keep_meta <- keep_meta & construct_pair_ids[[i]]
                }
-          } 
+          }
      }
-     
+
      if(!is.null(analyses[["k_min"]])) {
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$k >= analyses[["k_min"]]))
           if(match == "any"){
@@ -115,7 +121,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                keep_meta <- keep_meta & .keep_meta
           }
      }
-     
+
      if(!is.null(analyses[["N_min"]])) {
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$N >= analyses[["N_min"]]))
           if(match == "any"){
@@ -124,7 +130,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                keep_meta <- keep_meta & .keep_meta
           }
      }
-     
+
      if(!is.null(analyses$analysis_id)) {
           .keep_meta <- ma_obj[["analysis_id"]] %in% analyses[["analysis_id"]]
           if(match == "any"){
@@ -133,7 +139,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                keep_meta <- keep_meta & .keep_meta
           }
      }
-     
+
      if(any(colnames(ma_obj) == "pair_id"))
           if(!is.null(analyses[["pair_id"]])) {
                .keep_meta <- ma_obj[["pair_id"]] %in% analyses[["pair_id"]]
@@ -145,6 +151,8 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }
 
      ma_obj <- ma_obj[keep_meta,]
+
+     if(flag_summary == TRUE) ma_obj <- summary(ma_obj)
 
      return(ma_obj)
 }
@@ -164,23 +172,23 @@ namelists.ma_psychmeta <- function(ma_obj){
 screen_ma <- function(ma_obj){
      correct_class <- "ma_psychmeta" %in% class(ma_obj)
      correct_attributes <- all(c("ma_metric", "ma_methods") %in% names(attributes(ma_obj)))
-     
+
      needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc")
      correct_cols <- needed_cols %in% colnames(ma_obj)
-     
+
      if(!correct_class)
           stop("The object supplied does not have the class 'ma_psychmeta'. This can occur if:
                (1) the object does not represent a meta-analysis or
                (2) the meta-analysis object has been manipulated using unsupported methods.", call. = FALSE)
-     
+
      if(!correct_attributes)
-          stop("The meta-analysis object is missing necessary attributes. 
-               This issue typically occurs when the object has been manipulated using unsupported methods.", call. = FALSE)     
-     
+          stop("The meta-analysis object is missing necessary attributes.
+               This issue typically occurs when the object has been manipulated using unsupported methods.", call. = FALSE)
+
      if(!all(correct_cols))
           stop("The meta-analysis object is missing critical columns: ", paste(needed_cols[!correct_cols], collapse = ", "), call. = FALSE)
-     
-     ma_obj     
+
+     ma_obj
 }
 
 

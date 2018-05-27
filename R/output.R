@@ -119,7 +119,7 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 
 #' Write a summary table of meta-analytic results
 #'
-#' @param ma_obj Meta-analysis object.
+#' @param ma_obj A psychmeta meta-analysis object.
 #' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} or \code{"print"} to output directly to the R console.
 #' @param show_conf Logical scalar determining whether to show confidence intervals (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param show_cred Logical scalar determining whether to show credibility intervals (\code{TRUE}; default) or not (\code{FALSE}).
@@ -195,6 +195,9 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
                             match = match,
                             case_sensitive = case_sensitive)
 
+        # Get summary.ma_psychmeta object
+        if(!"summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- summary(ma_obj)
+
         ma_metric <- attributes(ma_obj)$ma_metric
         ma_methods <- attributes(ma_obj)$ma_methods
         es_type <- case_when(
@@ -214,7 +217,9 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
                      paste(rep(ma_method[ma_method != "bb"], each = length(correction_type)),
                            correction_type, sep = "_"))
 
-        ma_summary <- summary(ma_obj, ma_method = ma_method, correction_type = correction_type)
+        if(!"summary.ma_psychmeta" %in% class(ma_obj)) {
+                ma_summary <- get_metatab(ma_obj)
+        } else ma_summary <- ma_obj$ma_tables
 
         # Generate formatted tables (includes generation of captions)
         ma_tables <- .metabulate(ma_summary = ma_summary, show_conf = show_conf,
@@ -234,7 +239,7 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
         if(!is.null(bib)) .generate_bib(ma_obj, bib, additional_citekeys)
 
         # Render the output
-        .psychmeta_render(file = file, output_format = output_format, tables = ma_tables,
+        .psychmeta_render(file = file, output_format = output_format, ma_tables = ma_tables,
                           ma_type = ma_type, es_type = es_type,
                           bib = bib, citations = citations, citekeys = citekeys,
                           title.bib = title.bib,
@@ -288,6 +293,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                          file=NULL, title.bib = NULL, save_build_files = FALSE, header=list()){
 
         output_format <- match.arg(tolower(output_format))
+
+        if("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
 
         # Get the requested meta-analyses
         ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
@@ -382,7 +389,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         }
 }
 
-.psychmeta_render <- function(file, output_format, tables = NULL, ma_type = NULL, es_type = NULL,
+.psychmeta_render <- function(file, output_format, ma_tables = NULL, ma_type = NULL, es_type = NULL,
                               bib = NULL, citations = NULL, citekeys = NULL, title.bib = NULL,
                               save_build_files = FALSE, header = list()){
 
@@ -393,11 +400,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                 switch(output_format,
 
-                       text = {if(!is.null(tables)) print(tables) # TODO: Fix table rendering once I can experiment
+                       text = {if(!is.null(ma_tables)) print(ma_tables) # TODO: Fix table rendering once I can experiment
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
-                                       cat(rep("\n", 2*as.numeric(is.null(tables))),
+                                       cat(rep("\n", 2*as.numeric(is.null(ma_tables))),
                                            title.bib, "\n",
                                            rep("=", nchar(title.bib)), "\n\n"
                                            )
@@ -421,12 +428,12 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                bib_file)
                                }
 
-                               if(!is.null(tables)) print(tables) # TODO: Fix table rendering once I can experiment
+                               if(!is.null(ma_tables)) print(ma_tables) # TODO: Fix table rendering once I can experiment
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
 
-                                       cat(rep("\n", 2*as.numeric(is.null(tables))),
+                                       cat(rep("\n", 2*as.numeric(is.null(ma_tables))),
                                            title.bib,
                                            "\n\n---\n"
                                            )
@@ -441,11 +448,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 switch(output_format,
 
                        text = {sink(file =)
-                               if(!is.null(tables)) print(tables) # TODO: Fix table rendering once I can experiment
+                               if(!is.null(ma_tables)) print(ma_tables) # TODO: Fix table rendering once I can experiment
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
-                                       cat(rep("\n", 2*as.numeric(is.null(tables))),
+                                       cat(rep("\n", 2*as.numeric(is.null(ma_tables))),
                                            title.bib, "\n",
                                            rep("=", nchar(title.bib)), "\n\n"
                                        )
@@ -458,7 +465,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                        # else =
                               {# Fill in critical header slots and write .bib file if necessary
                                 if(is.null(header$title)) {
-                                        if(is.null(tables)) {
+                                        if(is.null(ma_tables)) {
                                                 if(is.null(title.bib)) {
                                                         header$title <- "Sources Contributing to Meta-Analyses"
                                                 } else {
@@ -511,7 +518,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                header <- paste(names(header), header, sep=": ", collapse="\n")
                                document <- sprintf("---\n%s\n---\n\n%s%s%s",
                                                    header,
-                                                   if(!is.null(tables)) "print(tables)\ncat('\n\n')", # TODO: Fix table rendering once I can experiment)
+                                                   if(!is.null(ma_tables)) "print(ma_tables)\ncat('\n\n')", # TODO: Fix table rendering once I can experiment)
                                                    if(!is.null(title.bib)) "paste0(title.bib, '\n\n')",
                                                    if(!is.null(bib)) "sprintf('---\nnocite: |\n  %s', citations)"
                                )
@@ -558,6 +565,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         # -- Insert caption (necessary?)
         # -- Insert table
         # -- Insert newline
+
+
 
 
 
