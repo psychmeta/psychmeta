@@ -1,6 +1,22 @@
 Changes in Version 2.0.0 (2018-05-27)
 =====================================
-- Major overhauls to the formatting of meta-analysis objects. The 
+- Major overhauls to the format of meta-analysis objects. The outputs of meta-analysis functions are now nested tibbles rather than nested lists. This provides users with a clearer overview of the structure of the object, streamlines the manipulation of results objects (e.g., selecting columns, filtering, and arranging), and makes the objects more flexible in terms of performing follow up analyses and performing artifact-distribution corrections. 
+
+- The class structure of meta-analysis objects has been simplified. There is now only one class for meta-analyses ("ma_psychmeta").
+
+- "summary” methods have been added for classes exported from psychmeta. 
+
+- The overview vignette has been updated to provide instruction on how to navigate the output objects from meta-analyses. 
+
+- Data management has been streamlined within the ma_r() and ma_d() functions to permit more efficient cleaning and imputation of artifact information.  
+
+- To complement the new structure of meta-analysis objects, the create_ad_list function now produces tibbles of artifact distributions and the function has been aliased as create_ad_tibbles. This function can now create artifact distributions for construct pairs and/or specific moderator combinations. 
+
+- The behavior of the supplemental_ads argument to meta-analyses has been expanded to allow artifact information to be supplied as individual artifact distributions, lists of artifact distributions, or tibbles of artifact distributions. 
+
+- "print" methods have been updated for a variety of object classes. 
+
+- Bug fixes and stability improvements have been made to follow-up analyses, plotting functions, and convert_ma(). 
 
 
 Changes in Version 1.0.3 (2018-05-08)
