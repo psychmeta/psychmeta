@@ -77,8 +77,8 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           construct_y <- NULL
      }
      
-     if(mode(analyses) != "list") {
-          if(analyses == "all" ) {
+     if(mode(analyses) != "list"){
+          if(analyses == "all" ){
                construct_ids <- NULL
                analyses <- list()
           }else stop("'analyses' must be either 'all' or a list. See help(filter_meta).")
@@ -94,7 +94,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                }
           }
           
-          if(!is.null(analyses[["construct_pair"]])) {
+          if(!is.null(analyses[["construct_pair"]])){
                construct_pair_ids <-
                     lapply(analyses[["construct_pair"]], function(x){
                          construct_x %in% x & construct_y %in% x
@@ -109,7 +109,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           } 
      }
      
-     if(!is.null(analyses[["k_min"]])) {
+     if(!is.null(analyses[["k_min"]])){
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$k >= analyses[["k_min"]]))
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
@@ -118,7 +118,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }
      }
      
-     if(!is.null(analyses[["N_min"]])) {
+     if(!is.null(analyses[["N_min"]])){
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$N >= analyses[["N_min"]]))
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
@@ -127,7 +127,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }
      }
      
-     if(!is.null(analyses$analysis_id)) {
+     if(!is.null(analyses$analysis_id)){
           .keep_meta <- ma_obj[["analysis_id"]] %in% analyses[["analysis_id"]]
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta

@@ -340,7 +340,7 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           moderator_matrix <- cat_moderator_matrix <- NULL
      }
 
-     moderator_tab <- data %>% 
+     moderator_tab <- data %>%
           group_by(.data$analysis_id) %>% do(.data[1,analysis_id_variables])
      
      results_df <- suppressWarnings(data %>% 

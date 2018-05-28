@@ -270,7 +270,7 @@
                     intercor_x <- intercor_y <- intercor
                }
 
-               if(length(partial_intercor) > 1) {
+               if(length(partial_intercor) > 1){
                     if(is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
                     partial_y <- partial_intercor[construct_y[i][1]]
                     

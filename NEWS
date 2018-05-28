@@ -8,7 +8,7 @@ Changes in Version 2.0.0 (2018-05-27)
 
 - “summary” methods have been added for classes exported from psychmeta. 
 
-- The overview vignette has been updated to provide instruction on how to navigate the output objects from meta-analyses. 
+- The overview vignette has been updated to provide instructions on how to navigate the output objects from meta-analyses. 
 
 - The class structure of meta-analysis objects has been simplified. There is now only one class for meta-analyses ("ma_psychmeta").
 
