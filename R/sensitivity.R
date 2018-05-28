@@ -13,7 +13,8 @@
 #' @param sort_method Method to sort samples in the cumulative meta-analysis. Options are "weight" to sort by weight (default), "n" to sort by sample size, and "inv_var" to sort by inverse variance.
 #' @param boot_iter Number of bootstrap iterations to be computed.
 #' @param boot_conf_level Width of confidence intervals to be constructed for all bootstrapped statistics.
-#' @param boot_ci_type Type of bootstrapped confidence interval (see "type" options for boot::boot.ci for possible arguments). Default is "bca".
+#' @param boot_ci_type Type of bootstrapped confidence interval. Options are "bca", "norm", "basic", "stud", and "perc" (these are "type" options from the boot::boot.ci function). Default is "bca".
+#' Note: If you have too few iterations, the "bca" method will not work and you will need to either increase the iterations or choose a different method. 
 #' @param ... Additional arguments.
 #'
 #' @importFrom tibble add_column
@@ -28,29 +29,56 @@
 #' @export
 #'
 #' @examples
-#' ## Run a meta-analysis using simulated UVIRR data:
+#' \dontrun{
+#' ## Run a meta-analysis using simulated correlation data:
 #' ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
-#' correct_rr_y = FALSE, data = data_r_uvirr)
+#'                   correct_rr_y = FALSE, data = data_r_uvirr)
 #' ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
 #'
 #' ## Pass the meta-analysis object to the sensitivity() function:
-#' ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10, cumulative = TRUE,
-#' boot_ci_type = "norm", sort_method = "inv_var")
+#' ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10,
+#'                       boot_ci_type = "norm", sort_method = "inv_var")
 #'
 #' ## Examine the tables and plots produced for the IC meta-analysis:
-#' ma_obj$follow_up_analyses$bootstrap$barebones$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$bootstrap$individual_correction$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$leave1out$individual_correction$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$cumulative$individual_correction$true_score$`Analysis ID = 1`
-#'
+#' ma_obj$bootstrap[[1]]$barebones
+#' ma_obj$bootstrap[[1]]$individual_correction$true_score
+#' ma_obj$leave1out[[1]]$individual_correction$true_score
+#' ma_obj$cumulative[[1]]$individual_correction$true_score
+#' 
 #' ## Examine the tables and plots produced for the AD meta-analysis:
-#' ma_obj$follow_up_analyses$bootstrap$artifact_distribution$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$leave1out$artifact_distribution$true_score$`Analysis ID = 1`
-#' ma_obj$follow_up_analyses$cumulative$artifact_distribution$true_score$`Analysis ID = 1`
+#' ma_obj$bootstrap[[1]]$artifact_distribution$true_score
+#' ma_obj$leave1out[[1]]$artifact_distribution$true_score
+#' ma_obj$cumulative[[1]]$artifact_distribution$true_score
+#' 
+#' 
+#' ## Run a meta-analysis using simulated d-value data:
+#' ma_obj <- ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi,
+#'                   data = filter(data_d_meas_multi, construct == "Y"))
+#' ma_obj <- ma_d_ad(ma_obj)
+#'                   
+#' ## Pass the meta-analysis object to the sensitivity() function:
+#' ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10,
+#'                       boot_ci_type = "norm", sort_method = "inv_var")
+#'
+#' ## Examine the tables and plots produced for the IC meta-analysis:
+#' ma_obj$bootstrap[[1]]$barebones
+#' ma_obj$bootstrap[[1]]$individual_correction$latentGroup_latentY
+#' ma_obj$leave1out[[1]]$individual_correction$latentGroup_latentY
+#' ma_obj$cumulative[[1]]$individual_correction$latentGroup_latentY
+#' 
+#' ## Examine the tables and plots produced for the AD meta-analysis:
+#' ma_obj$bootstrap[[1]]$artifact_distribution$latentGroup_latentY
+#' ma_obj$leave1out[[1]]$artifact_distribution$latentGroup_latentY
+#' ma_obj$cumulative[[1]]$artifact_distribution$latentGroup_latentY
+#' }
 sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative = TRUE,
-                        sort_method = "weight",
-                        boot_iter = 1000, boot_conf_level = .95, boot_ci_type = "bca", ...){
+                        sort_method = c("weight", "n", "inv_var"),
+                        boot_iter = 1000, boot_conf_level = .95, 
+                        boot_ci_type = c("bca", "norm", "basic", "stud", "perc"), ...){
 
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
+     
      cat(" **** Computing sensitivity analyses **** \n")
      bootstrap <- scalar_arg_warning(arg = bootstrap, arg_name = "bootstrap")
      leave1out <- scalar_arg_warning(arg = leave1out, arg_name = "leave1out")
@@ -60,8 +88,9 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      if(leave1out) ma_obj <- sensitivity_leave1out(ma_obj = ma_obj, record_call = FALSE, ...)
      if(cumulative) ma_obj <- sensitivity_cumulative(ma_obj = ma_obj, sort_method = sort_method, record_call = FALSE, ...)
 
-     ma_obj$call_history <- append(ma_obj$call_history, list(match.call()))
-
+     attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
+     if(flag_summary) ma_obj <- summary(ma_obj)
+     
      ma_obj
 }
 

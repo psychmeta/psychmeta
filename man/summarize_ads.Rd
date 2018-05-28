@@ -18,23 +18,14 @@ Summarize artifact information from meta-analyses into table format
 \examples{
 \dontrun{
 ## Artifact distributions from "ma_r" with individual corrections
-ma_obj_ic_master <- ma_r(ma_method = "ic", rxyi = "rxyi", n = "n",
-                         rxx = "rxxi", ryy = "ryyi",
-                         pairwise_ads = TRUE,
-                         correct_rr_x = FALSE, correct_rr_y = FALSE,
-                         construct_x = "x_name", construct_y = "y_name",
-                         sample_id = "sample_id", moderators = "moderator",
-                         data = data_r_meas_multi)
-summarize_ads(ma_obj = ma_obj_ic_master)
-
-
-## Artifact distributions from a single individual-correction meta-analysis of correlations
-ma_obj_ic <- ma_obj_ic_master$construct_pairs$`Pair ID = 1: X = X, Y = Y`
-summarize_ads(ma_obj = ma_obj_ic)
-
-## Artifact distributions from a single artifact-distribution correction meta-analysis
-summarize_ads(ma_obj = ma_r_ad(ma_obj_ic, correct_rr_x = FALSE, correct_rr_y = FALSE))
-
+ma_obj_ic_pairwise <- ma_r(ma_method = "ic", rxyi = "rxyi", n = "n",
+                           rxx = "rxxi", ryy = "ryyi",
+                           pairwise_ads = TRUE,
+                           correct_rr_x = FALSE, correct_rr_y = FALSE,
+                           construct_x = "x_name", construct_y = "y_name",
+                           sample_id = "sample_id", moderators = "moderator",
+                           data = data_r_meas_multi)
+summarize_ads(ma_obj = ma_obj_ic_pairwise)
 
 ## Artifact distributions from "ma_r" with artifact-distribution corrections (pairwise ADs)
 ma_obj_ad_pairwise <- ma_r(ma_method = "ad", rxyi = "rxyi", n = "n",
@@ -55,20 +46,6 @@ ma_obj_ad_nonpairwise <- ma_r(ma_method = "ad", rxyi = "rxyi", n = "n",
                               sample_id = "sample_id", moderators = "moderator",
                               data = data_r_meas_multi)
 summarize_ads(ma_obj = ma_obj_ad_nonpairwise)
-
-
-## Artifact distributions from "ma_d" with individual-correction meta-analysis
-ma_d_ic <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
-                construct_y = construct, data = data_d_meas_multi)
-summarize_ads(ma_obj = ma_d_ic)
-summarize_ads(ma_obj = ma_d_ic$construct_pairs$`Pair ID = 1: X = group1-group2, Y = Y`)
-
-## Artifact distributions from "ma_d" with artifact-distribution meta-analysis
-ma_d_ad <- ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
-                ryy = ryyi, correct_rr_y = FALSE,
-                construct_y = construct, data = data_d_meas_multi)
-summarize_ads(ma_obj = ma_d_ad)
-summarize_ads(ma_obj = ma_d_ad$construct_pairs$`Pair ID = 1: X = group1-group2, Y = Y`)
 }
 }
 \keyword{internal}

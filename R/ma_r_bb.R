@@ -1,68 +1,30 @@
-#' Bare-bones meta-analysis of correlations
-#'
-#' This function computes bare-bones meta-analyses of correlations.
-#'
-#' @param r Vector or column name of observed correlations.
-#' @param n Vector or column name of sample sizes.
-#' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
-#' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
-#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
-#' When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.
-#' @param wt_type Type of weight to use in the meta-analysis: native options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
-#' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
-#' (see metafor documentation for details about the metafor methods).
-#' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
-#' @param correct_bias Logical argument that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param moderators Matrix of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
-#' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
-#' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
-#' @param hs_override When TRUE, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-#' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
-#' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param ... Further arguments to be passed to functions called within the meta-analysis.
-#'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_r_as_r}, and \code{ma_bb}.
-#'
+#' @rdname ma_r
 #' @export
-#' @import metafor
-#' @importFrom boot boot
-#' @importFrom boot boot.ci
-#' @importFrom stats as.formula
-#'
 #' @aliases ma_r_barebones
-#'
-#' @references
-#' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 3.
-#'
-#' @examples
-#' ## Example analysis using data from Gonzalez-Mule et al. (2014):
-#'
-#' ## Not correcting for bias and using normal distributions to compute uncertainty intervals
-#' ## allows for exact replication of the results reported in the text:
-#' ma_r_bb(r = rxyi, n = n, correct_bias = FALSE, conf_method = "norm", cred_method = "norm",
-#'                data = data_r_gonzalezmule_2014)
-#'
-#' ## Using hs_override = TRUE allows one to easily implement the traditional Hunter-Schmidt method:
-#' ma_r_bb(r = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014)
-#'
-#' ## With hs_override = FALSE, the program defaults will compute unbiased variances and use
-#' ## t-distributions to estimate confidence and credibility intervals - these settings make
-#' ## a noticeable difference for small studies like the textbook example:
-#' ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
 ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                                      wt_type = "sample_size", error_type = "mean", correct_bias = TRUE,
-                                      conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-                                      moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
+                                      wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                                  "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
+                                      correct_bias = TRUE,
+                                      moderators = NULL, cat_moderators = TRUE, 
+                                      moderator_type = c("simple", "hierarchical", "none"), 
+                                      data = NULL, control = control_psychmeta(), ...){
 
      warn_obj1 <- record_warnings()
      call <- match.call()
+
+     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
+     
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
+     error_type <- control$error_type
+     conf_level <- control$conf_level
+     cred_level <- control$cred_level
+     conf_method <- control$conf_method
+     cred_method <- control$cred_method
+     var_unbiased <- control$var_unbiased
+     hs_override <- control$hs_override
 
      if(hs_override){
           wt_type <- "sample_size"
@@ -75,11 +37,6 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      correct_bias <- scalar_arg_warning(arg = correct_bias, arg_name = "correct_bias")
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
-     error_type <- scalar_arg_warning(arg = error_type, arg_name = "error_type")
-     conf_method <- scalar_arg_warning(arg = conf_method, arg_name = "conf_method")
-     cred_method <- scalar_arg_warning(arg = cred_method, arg_name = "cred_method")
-     conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
-     cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
 
      formal_args <- formals(ma_r_bb)
      formal_args[["..."]] <- NULL
@@ -135,10 +92,12 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      }
 
      additional_args <- list(...)
-
-     inputs <- list(wt_type = wt_type, error_type = error_type,
-                    correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method,
-                    var_unbiased = var_unbiased, cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
+     
+     as_worker <- additional_args$as_worker
+     if(is.null(as_worker)) as_worker <- FALSE
+     
+     inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias, 
+                    conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased)
 
      if(is.null(n_adj)){
           n_adj <- n
@@ -172,13 +131,21 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                           conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
                        presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
-     out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
-     out <- append(list(call_history = list(call)), out)
 
-     out$barebones$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                                    fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0, na.rm = TRUE)))
+     if(!as_worker){
+          out <- bind_cols(analysis_id = 1:nrow(out), out)
+          attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                          inputs = inputs, 
+                                                          ma_methods = "bb",
+                                                          ma_metric = "r_as_r", 
+                                                          default_print = "bb",
+                                                          warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
+                                                          fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
+          out <- namelists.ma_psychmeta(ma_obj = out)
+     }
 
-     class(out) <- c("psychmeta", "ma_r_as_r", "ma_bb")
+     class(out) <- c("ma_psychmeta", class(out))
+     
      return(out)
 }
 
@@ -210,7 +177,11 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
           }
      }
      sample_id <- data$sample_id
-     citekey <- data$citekey
+     if("citekey" %in% colnames(data)){
+          citekey <- data$citekey
+     }else{
+          citekey <- NULL
+     }
      n <- data$n
      n_adj <- data$n_adj
 
@@ -271,8 +242,8 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                    var_e_raw = var_e_vec,
                                    weight = wt_vec,
                                    residual = r - mean_r_xy)
-          escalc_obj$pi <- data$pi
-          escalc_obj$pa <- data$pa
+          if("pi" %in% colnames(data)) escalc_obj$pi <- data$pi
+          if("pa" %in% colnames(data)) escalc_obj$pa <- data$pa
           if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
           if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj)
           class(escalc_obj) <- c("escalc", "data.frame")
@@ -295,10 +266,6 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
           var_res <- sd_res <- NA
           se_r <- sd_e
           ci <- confidence(mean = mean_r_xy, sd = sd_e, k = 1, conf_level = conf_level, conf_method = "norm")
-
-          # se_r <- NA
-          # ci <- cbind(NA, NA)
-          # colnames(ci) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
      }else{
           se_r <- sd_r / sqrt(k)
           ci <- confidence(mean = mean_r_xy, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -307,18 +274,27 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      ci <- setNames(c(ci), colnames(ci))
      cv <- setNames(c(cv), colnames(cv))
 
-     list(barebones = list(meta = data.frame(t(c(k = k,
-                                                 N = N,
-                                                 mean_r = mean_r_xy,
-                                                 var_r = var_r,
-                                                 var_e = var_e,
-                                                 var_res = var_res,
-                                                 sd_r = sd_r,
-                                                 se_r = se_r,
-                                                 sd_e = sd_e,
-                                                 sd_res = sd_res,
-                                                 ci, cv))),
-                           data = escalc_obj))
+     barebones <- data.frame(t(c(k = k,
+                                 N = N,
+                                 mean_r = mean_r_xy,
+                                 var_r = var_r,
+                                 var_e = var_e,
+                                 var_res = var_res,
+                                 sd_r = sd_r,
+                                 se_r = se_r,
+                                 sd_e = sd_e,
+                                 sd_res = sd_res,
+                                 ci, cv)))
+     
+     class(barebones) <- c("ma_table", class(barebones))
+     attributes(barebones) <- append(attributes(barebones), list(ma_type = "r_bb"))
+     
+     list(meta = list(barebones = barebones,
+                      individual_correction = NULL, 
+                      artifact_distribution = NULL), 
+          escalc = list(barebones = escalc_obj,
+                        individual_correction = NULL, 
+                        artifact_distribution = NULL))
 }
 
 
@@ -334,7 +310,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
 .ma_r_bb_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_bb(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)
-     unlist(out$barebones$meta)
+     unlist(out$meta$barebones)
 }
 
 

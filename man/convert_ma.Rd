@@ -5,18 +5,20 @@
 \alias{convert_meta}
 \title{Function to convert meta-analysis of correlations to d values or vice-versa}
 \usage{
-convert_ma(ma_obj)
+convert_ma(ma_obj, ...)
 
-convert_meta(ma_obj)
+convert_meta(ma_obj, ...)
 }
 \arguments{
-\item{ma_obj}{A meta-analysis object of class \code{ma_r_as_r}, \code{ma_d_as_d}, \code{ma_r_as_d}, or \code{ma_d_as_r}}
+\item{ma_obj}{A meta-analysis object of class \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, or \code{d_as_r}}
+
+\item{...}{Additional arguments.}
 }
 \value{
 A meta-analysis converted to the \emph{d} value metric (if ma_obj was a meta-analysis in the correlation metric) or converted to the correlation metric (if ma_obj was a meta-analysis in the \emph{d} value metric).
 }
 \description{
-Takes a meta-analysis class object of \emph{d} values or correlations (classes \code{ma_r_as_r}, \code{ma_d_as_d}, \code{ma_r_as_d}, and \code{ma_d_as_r}; second-order meta-analyses are currently not supported) as an input and uses conversion formulas and Taylor series approximations to convert effect sizes and variance estimates, respectively.
+Takes a meta-analysis class object of \emph{d} values or correlations (classes \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, and \code{d_as_r}; second-order meta-analyses are currently not supported) as an input and uses conversion formulas and Taylor series approximations to convert effect sizes and variance estimates, respectively.
 }
 \details{
 The formula used to convert correlations to \emph{d} values is:

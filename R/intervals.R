@@ -18,7 +18,7 @@
 #' @examples
 #' confidence(mean = c(.3, .5), se = c(.15, .2), df = c(100, 200), conf_level = .95, conf_method = "t")
 #' confidence(mean = c(.3, .5), se = c(.15, .2), conf_level = .95, conf_method = "norm")
-confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method = "t", ...){
+confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method = c("t", "norm"), ...){
      conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
      conf_method <- scalar_arg_warning(arg = conf_method, arg_name = "conf_method")
      conf_method <- match.arg(arg = conf_method, c("t", "norm"))
@@ -83,7 +83,7 @@ confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method
 #' credibility(mean = .3, sd = .15, cred_level = .8)
 #' credibility(mean = .3, sd = .15, cred_level = .8, k = 10)
 #' credibility(mean = c(.3, .5), sd = c(.15, .2), cred_level = .8, k = 10)
-credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = "t"){
+credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = c("t", "norm")){
      cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
      cred_method <- scalar_arg_warning(arg = cred_method, arg_name = "cred_method")
      cred_method <- match.arg(arg = cred_method, c("t", "norm"))
@@ -124,7 +124,7 @@ credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = "t"){
 confidence_r <- function(r, n, conf_level=.95) {
     z <- convert_es.q_r_to_Fisherz(r)
     if (n < 4) se <- 1 else se <- 1/sqrt(n - 3)
-    CI.z <- confidence(mean = z, se=se, conf_level=conf_level)
+    CI.z <- confidence(mean = z, se=se, conf_level=conf_level, conf_method = "norm")
     return(convert_es.q_Fisherz_to_r(CI.z))
 }
 

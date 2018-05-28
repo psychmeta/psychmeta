@@ -5,7 +5,7 @@
 \title{Construct a confidence interval}
 \usage{
 confidence(mean, se = NULL, df = NULL, conf_level = 0.95,
-  conf_method = "t", ...)
+  conf_method = c("t", "norm"), ...)
 }
 \arguments{
 \item{mean}{Mean effect size (if used in a meta-analysis) or observed effect size (if used on individual statistics).}

@@ -13,17 +13,18 @@
 \alias{get_metareg}
 \alias{get_matrix}
 \alias{get_plots}
-\title{Estimation of applicant and incumbent reliabilities and of true- and observed-score u ratios}
+\title{Extract results from a psychmeta meta-analysis object}
 \usage{
-get_metafor(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_metafor(ma_obj, moderators = FALSE, analyses = "all", match = c("all",
+  "any"), case_sensitive = TRUE, ...)
 
 get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+  case_sensitive = TRUE, ma_methods = c("bb", "ic", "ad"),
+  correction_types = c("ts", "vgx", "vgy"), ...)
 
 get_ad(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, as_ad_obj = FALSE, inputs_only = TRUE,
-  ma_method = c("ad", "ic"), ad_type = c("tsa", "int"), ...)
+  ma_methods = c("ad", "ic"), ad_types = c("tsa", "int"), ...)
 
 get_followup(ma_obj, follow_up = c("heterogeneity", "leave1out", "cumulative",
   "bootstrap", "metareg"), analyses = "all", match = c("all", "any"),
@@ -54,13 +55,15 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
 
+\item{moderators}{Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).}
+
 \item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
 \itemize{
 \item{construct:}{ A list or vector of construct names to search for.}
 \item{construct_pair:}{ A list of vectors of construct pairs to search for. \cr
 (e.g., \code{list(c("X", "Y"), c("X", "Z"))}).}
-\item{pair_id:}{ A list or vector of numeric construct Pair IDs.}
-\item{analysis_id:}{ A list or vector of analysis IDs (combinations of moderator levels).}
+\item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
+\item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
 \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
 \item{N_minv}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 }}
@@ -71,13 +74,15 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 
 \item{...}{Additional arguments.}
 
+\item{ma_methods}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
+
+\item{correction_types}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
+
 \item{as_ad_obj}{Logical scalar that determines whether artifact information should be returned as artifact-distribution objects (\code{TRUE}) or a summary table of artifact-distribution descriptive statistics (\code{FALSE}; default).}
 
 \item{inputs_only}{Used only if \code{as_ad_obj = TRUE}: Logical scalar that determines whether artifact information should be returned as summaries of the raw input values (\code{TRUE}; default) or artifact values that have been cross-corrected for range restriction and measurement error (\code{FALSE}).}
 
-\item{ma_method}{Character scalar indicating whether artifact distributions should be retrieved from artifact-distribution meta-analyses ("ad"; default) or from individual-correction meta-analyses ("ic").}
-
-\item{ad_type}{Used only if \code{ma_method} = "ic": Character scalar indicating whether Taylor-series approximation artifact distributions ("tsa") or interactive artifact distributions ("int") should be retrieved.}
+\item{ad_types}{Used only if \code{ma_method} = "ic": Character value(s) indicating whether Taylor-series approximation artifact distributions ("tsa") and/or interactive artifact distributions ("int") should be retrieved.}
 
 \item{follow_up}{Vector of follow-up analysis names (options are: "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg").}
 
@@ -87,8 +92,8 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 Selected set of results.
 }
 \description{
-Functions to estimate the values of artifacts from other artifacts. These functions allow for reliability estimates to be corrected/attenuated for range restriction and allow
-u ratios to be converted between observed-score and true-score metrics. Some functions also allow for the extrapolation of an artifact from other available information.
+Functions to extract specific results from a meta-analysis tibble. 
+This family of functions harvests information from meta-analysis objects and returns it as lists or tibbles that are easily navigable. 
 
 Available functions include:
 \itemize{
@@ -103,6 +108,7 @@ Available functions include:
 \item{\code{get_bootstrap}}{\cr Retrieve list of bootstrap meta-analyses (special case of \code{get_followup}).}
 \item{\code{get_metareg}}{\cr Retrieve list of meta-regression analyses (special case of \code{get_followup}).}
 \item{\code{get_heterogeneity}}{\cr Retrieve list of heterogeneity analyses (special case of \code{get_followup}).}
+\item{\code{get_matrix}}{\cr Retrieve a tibble of matrices summarizing the relationships among constructs (only applicable to meta-analyses with multiple constructs).}
 }
 }
 \examples{
@@ -117,15 +123,19 @@ ma_obj <- ma_r_ad(ma_obj, correct_rr_x = FALSE, correct_rr_y = FALSE)
 
 ## Run additional analyses:
 ma_obj <- heterogeneity(ma_obj)
-ma_obj <- sensitivity(ma_obj, bootstrap = FALSE)
+ma_obj <- sensitivity(ma_obj, boot_iter = 10, boot_ci_type = "norm")
 ma_obj <- metareg(ma_obj)
 ma_obj <- plot_funnel(ma_obj)
 ma_obj <- plot_forest(ma_obj)
+
+## View summary:
+summary(ma_obj)
 
 ## Extract selected analyses:
 get_metatab(ma_obj)
 get_matrix(ma_obj)
 get_escalc(ma_obj)
+get_bootstrap(ma_obj)
 get_cumulative(ma_obj)
 get_leave1out(ma_obj)
 get_heterogeneity(ma_obj)

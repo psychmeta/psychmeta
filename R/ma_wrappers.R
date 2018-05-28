@@ -26,27 +26,27 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                stop("The moderator-level label 'All Levels' in moderator_matrix is reserved for internal usage; please use a different moderator-level label", call. = FALSE)
           }
           if(!is.null(colnames(moderator_matrix))){
-               if(any(colnames(moderator_matrix) %in% "Analysis_ID")){
-                    stop("The column name 'Analysis_ID' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
+               if(any(colnames(moderator_matrix) %in% "analysis_id")){
+                    stop("The column name 'analysis_id' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
                }
-               if(any(colnames(moderator_matrix) %in% "Construct_X")){
-                    stop("The column name 'Construct_X' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
+               if(any(colnames(moderator_matrix) %in% "construct_x")){
+                    stop("The column name 'construct_x' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
                }
-               if(any(colnames(moderator_matrix) %in% "Construct_Y")){
-                    stop("The column name 'Construct_Y' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
+               if(any(colnames(moderator_matrix) %in% "construct_y")){
+                    stop("The column name 'construct_y' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
                }
           }
      }
 
      if(!is.null(construct_x) | !is.null(construct_y)){
-          construct_mat_initial <- data.frame(cbind(Construct_X = construct_x, Construct_Y = construct_y))
+          construct_mat_initial <- data.frame(cbind(construct_x = construct_x, construct_y = construct_y))
      }else{
           construct_mat_initial <- NULL
      }
 
      if(!is.null(construct_order)){
-          if(!is.null(construct_x)) construct_dat[,"Construct_X"] <- factor(construct_dat[,"Construct_X"], levels = construct_order)
-          if(!is.null(construct_y)) construct_dat[,"Construct_Y"] <- factor(construct_dat[,"Construct_Y"], levels = construct_order)
+          if(!is.null(construct_x)) construct_dat[,"construct_x"] <- factor(construct_dat[,"construct_x"], levels = construct_order)
+          if(!is.null(construct_y)) construct_dat[,"construct_y"] <- factor(construct_dat[,"construct_y"], levels = construct_order)
      }
 
      ## Build the temporary data matrix
@@ -103,7 +103,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
 
      organize_moderators_null <- function(moderator_matrix, es_data){
           if(is.null(moderator_matrix)){
-               cbind(Analysis_Type = "Overall", es_data)
+               cbind(analysis_type = "Overall", es_data)
           }else{
                moderator_vars <- colnames(moderator_matrix)
                if(is.null(moderator_vars)){
@@ -118,7 +118,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
 
                colnames(moderator_matrix_new) <- moderator_vars
                moderator_matrix_new <- as_tibble(moderator_matrix_new)
-               cbind(Analysis_Type = "Overall", cbind(moderator_matrix_new, es_data))
+               cbind(analysis_type = "Overall", cbind(moderator_matrix_new, es_data))
           }
      }
 
@@ -144,7 +144,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
           moderator_matrix_new <- as_tibble(moderator_matrix_new)
 
           colnames(moderator_matrix_new) <- moderator_vars
-          cbind(Analysis_Type = "Simple Moderator", cbind(moderator_matrix_new, es_data_new))
+          cbind(analysis_type = "Simple Moderator", cbind(moderator_matrix_new, es_data_new))
      }
 
      organize_moderators_full_hierarchical <- function(moderator_matrix, es_data){
@@ -160,7 +160,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
           if(ncol(moderator_matrix) > 1){
                moderator_matrix <- as_tibble(moderator_matrix)
 
-               cbind(Analysis_Type = "Fully Hierarchical Moderator", cbind(moderator_matrix, es_data))
+               cbind(analysis_type = "Fully Hierarchical Moderator", cbind(moderator_matrix, es_data))
           }else{
                NULL
           }
@@ -199,7 +199,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                }
                moderator_matrix_new <- as_tibble(moderator_matrix_new)
 
-               cbind(Analysis_Type = "Partial Hierarchical Moderator", cbind(moderator_matrix_new, es_data_new))
+               cbind(analysis_type = "Partial Hierarchical Moderator", cbind(moderator_matrix_new, es_data_new))
           }else{
                NULL
           }
@@ -225,7 +225,6 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      moderator_vars <- colnames(moderator_data)[1:(ncol(moderator_data) - ncol(es_data))]
 
 
-
      if(!is.null(construct_mat_initial)){
           construct_mat <- NULL
           for(i in 1:(nrow(moderator_data) / nrow(es_data))) construct_mat <- rbind(construct_mat, construct_mat_initial)
@@ -246,11 +245,14 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      analysis_names <- x[!duplicated(x)]
      for(i in 1:length(analysis_names)) x[x == analysis_names[i]] <- i
 
-     if(!is.null(moderator_names)) moderator_vars <- colnames(moderator_data)[colnames(moderator_data) %in% .moderator_names] <- moderator_names
-     moderator_data <- cbind(Analysis_ID = as.numeric(x), moderator_data)
+     if(!is.null(moderator_names)){
+          moderator_vars <- colnames(moderator_data)[colnames(moderator_data) %in% .moderator_names] <- moderator_names
+          moderator_vars <- c("analysis_type", moderator_vars)
+     }
+     moderator_data <- cbind(analysis_id = as.numeric(x), moderator_data)
 
      list(data = moderator_data,
-          id_variables = c("Analysis_ID", construct_vars, moderator_vars))
+          id_variables = c("analysis_id", construct_vars, moderator_vars))
 }
 
 
@@ -272,6 +274,10 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
 #'
 #' @return A list of meta-analytic results.
 #'
+#' @importFrom tidyr nest
+#' @importFrom rlang .data
+#' @importFrom purrr map
+#'
 #' @keywords internal
 ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                        moderator_matrix = NULL, moderator_type = "all", cat_moderators = TRUE,
@@ -287,9 +293,12 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
      if(!is.null(presorted_data)){
           moderator_info <- list(data = cbind(presorted_data, es_data), id_variables = id_variables)
 
+          es_colname <- colnames(es_data)[colnames(es_data) %in% c("d", "r", "rxyi")]
+
           moderators <- clean_moderators(moderator_matrix = moderator_matrix,
                                          cat_moderators = cat_moderators,
-                                         es_vec = es_data[presorted_data$Analysis_ID == 1,1])
+                                         es_vec = es_data[presorted_data$analysis_id == 1,es_colname])
+          
           moderator_matrix <- moderators$moderator_matrix
           cat_moderator_matrix <- moderators$cat_moderator_matrix
      }else{
@@ -305,141 +314,80 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           }else{
                .moderator_names <- NULL
           }
-          if(!is.null(cat_moderator_matrix)) cat_moderator_matrix <- as.data.frame(cat_moderator_matrix)
+          if(!is.null(cat_moderator_matrix)){
+               cat_moderator_matrix <- as.data.frame(cat_moderator_matrix)
+               colnames(cat_moderator_matrix) <- moderator_names$cat
+               moderators$cat_moderator_matrix <- cat_moderator_matrix
+          }
+          if(!is.null(moderator_matrix)){
+               moderator_matrix <- as.data.frame(moderator_matrix)
+               colnames(moderator_matrix) <- moderator_names$all
+               moderators$moderator_matrix <- moderator_matrix
+          }
+
           moderator_info <- organize_moderators(moderator_matrix = cat_moderator_matrix,
                                                 es_data = es_data,
                                                 moderator_type = moderator_type,
                                                 construct_x = construct_x, construct_y = construct_y,
-                                                construct_order = construct_order, moderator_levels = moderator_levels, moderator_names = .moderator_names)
+                                                construct_order = construct_order, moderator_levels = moderator_levels,
+                                                moderator_names = .moderator_names)
      }
 
      data <- moderator_info$data
+     
      analysis_id_variables <- moderator_info$id_variables
      if(moderator_type == "none"){
           moderator_matrix <- cat_moderator_matrix <- NULL
      }
 
-     result_list <- by(data, data$Analysis_ID, function(x){
-          rownames(x) <- 1:nrow(x)
+     moderator_tab <- data %>%
+          group_by(.data$analysis_id) %>% do(.data[1,analysis_id_variables])
+     
+     results_df <- suppressWarnings(data %>% 
+                                         group_by(.data$analysis_id) %>%
+                                         nest() %>% 
+                                         mutate(ma_out = map(data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
 
-          results <- ma_fun(data = x, ma_arg_list = ma_arg_list)
+     results_df <- suppressMessages(suppressWarnings(full_join(moderator_tab, results_df)))
+     results_df$analysis_id <- results_df$data <- NULL
 
-          if(ma_type == "bb" | ma_type == "ic")
-               results$barebones$meta <- cbind(x[1,analysis_id_variables], results$barebones$meta)
-
-          if(ma_type == "ic"){
-               results$individual_correction$true_score$meta <- cbind(x[1,analysis_id_variables], results$individual_correction$true_score$meta)
-               results$individual_correction$validity_generalization_x$meta <- cbind(x[1,analysis_id_variables], results$individual_correction$validity_generalization_x$meta)
-               results$individual_correction$validity_generalization_y$meta <- cbind(x[1,analysis_id_variables], results$individual_correction$validity_generalization_y$meta)
-
-               correction_summary <- table(x$correction_type)
-               results$individual_correction$correction_summary <- correction_summary <- data.frame(Correction = names(correction_summary), Frequency = as.numeric(correction_summary))
-          }else{
-               results <- append(results, list(artifact_distribution = NULL,
-                                               individual_correction = NULL))
-          }
-
-          if(ma_type == "bb" & es_type == "r"){
-               if(any(colnames(x) == "pi")) results$barebones$data$pi <- x$pi
-               if(any(colnames(x) == "pa")) results$barebones$data$pa <- x$pa
-          }
-
-          if(ma_type == "r_order2" | ma_type == "d_order2"){
-               if(!is.null(results$barebones))
-                    results$barebones$meta <- cbind(x[1,analysis_id_variables], results$barebones$meta)
-
-               if(!is.null(results$individual_correction))
-                    results$individual_correction$meta <- cbind(x[1,analysis_id_variables], results$individual_correction$meta)
-
-               if(!is.null(results$artifact_distribution))
-                    results$artifact_distribution$meta <- cbind(x[1,analysis_id_variables], results$artifact_distribution$meta)
-          }
-
-          results
+     results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
+     results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
+     
+     if(!is.null(moderators$moderator_matrix))
+          moderators$moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$moderator_matrix), moderators$moderator_matrix)
+     if(!is.null(moderators$cat_moderator_matrix))
+          moderators$cat_moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$cat_moderator_matrix), moderators$cat_moderator_matrix)
+     
+     results_df$escalc <- map(results_df$escalc, function(x1){
+          map(x1, function(x2){
+               if(length(x2) == 0){
+                    NULL
+               }else{
+                    if(is.data.frame(x2)){
+                         bind_cols(original_order = 1:nrow(x2), x2)
+                    }else{
+                         map(x2, function(x3){
+                              bind_cols(original_order = 1:nrow(x3), x3)
+                         })  
+                    }
+               }
+          })
      })
-     names(result_list) <- paste("Analysis ID =", names(result_list))
 
-     if(ma_type == "bb"){
-          meta_table_bb <- NULL
-          for(i in 1:length(result_list)){
-               meta_table_bb <- rbind(meta_table_bb, result_list[[i]]$barebones$meta)
-               result_list[[i]]$barebones <- result_list[[i]]$barebones$data
-          }
-     }
+     results_df$escalc[[1]] <- append(results_df$escalc[[1]], list(moderator_info = moderators))
+     
+     results_df$ma_out <- NULL
 
      if(es_type == "r" & ma_type == "ic"){
-          meta_table_bb <- meta_table_ts <- meta_table_vgx <- meta_table_vgy <- NULL
-          for(i in 1:length(result_list)){
-               meta_table_bb <- rbind(meta_table_bb, result_list[[i]]$barebones$meta)
-               meta_table_ts <- rbind(meta_table_ts, result_list[[i]]$individual_correction$true_score$meta)
-               meta_table_vgx <- rbind(meta_table_vgx, result_list[[i]]$individual_correction$validity_generalization_x$meta)
-               meta_table_vgy <- rbind(meta_table_vgy, result_list[[i]]$individual_correction$validity_generalization_y$meta)
+          for(i in 1:nrow(results_df)){
+               method_details <- table(results_df$escalc[[i]]$individual_correction$true_score$correction_type)
+               method_details <- data.frame(Correction = names(method_details), Frequency = as.numeric(method_details))
 
-               result_list[[i]]$barebones <- result_list[[i]]$barebones$data
-               result_list[[i]]$individual_correction$true_score <- result_list[[i]]$individual_correction$true_score$data
-               result_list[[i]]$individual_correction$validity_generalization_x <- result_list[[i]]$individual_correction$validity_generalization_x$data
-               result_list[[i]]$individual_correction$validity_generalization_y <- result_list[[i]]$individual_correction$validity_generalization_y$data
+               attributes(results_df$meta_tables[[i]]$individual_correction) <- append(attributes(results_df$meta_tables[[i]]$individual_correction),
+                                                                                       list(method_details = method_details))
           }
      }
 
-     if(ma_type == "r_order2" | ma_type == "d_order2"){
-          valid_bb <- !is.null(result_list[[1]]$barebones$meta)
-          valid_ic <- !is.null(result_list[[1]]$individual_correction$meta)
-          valid_ad <- !is.null(result_list[[1]]$artifact_distribution$meta)
-
-          out <- list(barebones = NULL,
-                      individual_correction = NULL,
-                      artifact_distribution = NULL)
-
-          if(valid_bb){
-               meta_table_bb <- NULL
-               for(i in 1:length(result_list)){
-                    meta_table_bb <- rbind(meta_table_bb, result_list[[i]]$barebones$meta)
-                    result_list[[i]]$barebones <- result_list[[i]]$barebones$data
-               }
-               out$barebones <- list(meta_table = meta_table_bb,
-                                     data_list = lapply(result_list, function(x) x[["barebones"]]))
-          }
-          if(valid_ic){
-               meta_table_ic <- NULL
-               for(i in 1:length(result_list)){
-                    meta_table_ic <- rbind(meta_table_ic, result_list[[i]]$individual_correction$meta)
-                    result_list[[i]]$individual_correction <- result_list[[i]]$individual_correction$data
-               }
-               out$individual_correction = list(meta_table = meta_table_ic,
-                                                data_list = lapply(result_list, function(x) x[["individual_correction"]]))
-          }
-          if(valid_ad){
-               meta_table_ad <- NULL
-               for(i in 1:length(result_list)){
-                    meta_table_ad <- rbind(meta_table_ad, result_list[[i]]$artifact_distribution$meta)
-                    result_list[[i]]$artifact_distribution <- result_list[[i]]$artifact_distribution$data
-               }
-               out$artifact_distribution = list(meta_table = meta_table_ad,
-                                                data_list = lapply(result_list, function(x) x[["artifact_distribution"]]))
-          }
-     }
-
-     if(ma_type == "bb" | ma_type == "ic")
-          out <- list(barebones = list(meta_table = meta_table_bb,
-                                       escalc_list = lapply(result_list, function(x) x[["barebones"]])))
-
-     if(es_type == "r")
-          if(ma_type == "ic"){
-               out$individual_correction <- append(out$individual_correction,
-                                                   list(correction_summary = lapply(result_list, function(x) x[["individual_correction"]][["correction_summary"]]),
-                                                        true_score = list(meta_table = meta_table_ts,
-                                                                          escalc_list = lapply(result_list, function(x) x[["individual_correction"]][["true_score"]])),
-                                                        validity_generalization_x = list(meta_table = meta_table_vgx,
-                                                                                         escalc_list = lapply(result_list, function(x) x[["individual_correction"]][["validity_generalization_x"]])),
-                                                        validity_generalization_y = list(meta_table = meta_table_vgy,
-                                                                                         escalc_list = lapply(result_list, function(x) x[["individual_correction"]][["validity_generalization_y"]]))))
-          }else{
-               out <- append(out, list(individual_correction = NULL))
-          }
-
-     if(ma_type != "r_order2" & ma_type != "d_order2")
-          out <- append(out, list(artifact_distribution = NULL, moderator_info = moderators))
-
-     out
+     ungroup(results_df)
 }

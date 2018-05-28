@@ -9,11 +9,15 @@
 #' @param ni Vector of incumbent sample sizes (necessary when variances of correlations/artifacts are not supplied).
 #' @param na Optional vector of applicant sample sizes (for estimating error variance of u ratios and applicant reliabilities).
 #' @param ux Vector of observed-score u ratios for X.
+#' @param ux_observed Logical vector in which each entry specifies whether the corresponding ux value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param uy Vector of observed-score u ratios for Y.
+#' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param qx Vector of square roots of reliability estimates for X.
 #' @param qx_restricted Logical vector determining whether each element of qx is derived from an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param qy  Vector of square roots of reliability estimates for X.
 #' @param qy_restricted Logical vector determining whether each element of qy is derived from an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
+#' @param qx_type,qy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
+#' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param mean_rxyi Mean observed correlation.
 #' @param mean_ux Mean observed-score u ratio for X (for use in estimating sampling errors in the context of a meta-analysis).
 #' @param mean_uy Mean observed-score u ratio for Y (for use in estimating sampling errors in the context of a meta-analysis).
@@ -70,9 +74,15 @@
 #'                 qy = .9, qy_restricted = TRUE,
 #'                 sign_rxz = 1, sign_ryz = 1)
 var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
-                              ux, uy,
-                              qx, qx_restricted = TRUE,
-                              qy, qy_restricted = TRUE,
+                              ux = rep(1, length(rxyi)), ux_observed = rep(TRUE, length(rxyi)), 
+                              uy = rep(1, length(rxyi)), uy_observed = rep(TRUE, length(rxyi)),
+                              
+                              qx = rep(1, length(rxyi)), qx_restricted = rep(TRUE, length(rxyi)),
+                              qx_type = rep("alpha", length(rxyi)), k_items_x = rep(NA, length(rxyi)),
+                              
+                              qy = rep(1, length(rxyi)), qy_restricted = rep(TRUE, length(rxyi)), 
+                              qy_type = rep("alpha", length(rxyi)), k_items_y = rep(NA, length(rxyi)),
+                              
                               mean_rxyi = NULL, mean_ux = NULL, mean_uy = NULL, mean_qxa = NULL, mean_qya = NULL,
                               var_rxyi = NULL, var_ux = NULL, var_uy = NULL, var_qxa = NULL, var_qya = NULL,
                               cor_rxyi_ux = 0, cor_rxyi_uy = 0, cor_rxyi_qxa = 0, cor_rxyi_qya = 0,
@@ -82,6 +92,11 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
      if(length(qx) == 1 & length(rxyi) > 1) qx <- rep(qx, length(rxyi))
      if(length(qy) == 1 & length(rxyi) > 1) qy <- rep(qy, length(rxyi))
 
+     if(any(!ux_observed))
+          ux[!ux_observed] <- estimate_ux(ut = ux[!ux_observed], rxx = qx[!ux_observed]^2, rxx_restricted = qx_restricted[!ux_observed])
+     if(any(!uy_observed))
+          uy[!uy_observed] <- estimate_ux(ut = uy[!uy_observed], rxx = qy[!uy_observed]^2, rxx_restricted = qy_restricted[!uy_observed])
+     
      ## If necessary, estimate the distributions of qxa and/or qya
      qxa <- qx
      qya <- qy
@@ -115,10 +130,10 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
                var_e_ux <- var_ux
           }else{
                if(is.null(mean_ux)){
-                    var_e_ux <- var_error_u(u = ux, n_i = ni, n_a = na)
+                    var_e_ux <- var_error_u(u = ux, ni = ni, na = na)
                     mean_ux <- ux[qx_restricted]
                }else{
-                    var_e_ux <- var_error_u(u = mean_ux, n_i = ni, n_a = na)
+                    var_e_ux <- var_error_u(u = mean_ux, ni = ni, na = na)
                }
           }
 
@@ -126,10 +141,10 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
                var_e_uy <- var_uy
           }else{
                if(is.null(mean_uy)){
-                    var_e_uy <- var_error_u(u = uy, n_i = ni, n_a = na)
+                    var_e_uy <- var_error_u(u = uy, ni = ni, na = na)
                     mean_uy <- uy[qy_restricted]
                }else{
-                    var_e_uy <- var_error_u(u = mean_uy, n_i = ni, n_a = na)
+                    var_e_uy <- var_error_u(u = mean_uy, ni = ni, na = na)
                }
           }
 
@@ -139,9 +154,9 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
                if(is.null(mean_qxa)) mean_qxa <- wt_mean(x = qxa, wt = ni)
                mean_qxi <- estimate_rxxi(rxxa = mean_qxa^2, ux = mean_ux)^.5
 
-               var_e_qxa <- var_error_q(q = mean_qxa, n = ni)
-               var_e_qxa[!is.na(na)] <- var_error_q(q = mean_qxa, n = na[!is.na(na)])
-               var_e_qxa[qx_restricted] <- var_error_q(q = mean_qxi, n = ni[qx_restricted])
+               var_e_qxa <- var_error_q(q = mean_qxa, n = ni, rel_type = qx_type, k_items = k_items_x)
+               var_e_qxa[!is.na(na)] <- var_error_q(q = mean_qxa, n = na[!is.na(na)], rel_type = qx_type[!is.na(na)], k_items = k_items_x[!is.na(na)])
+               var_e_qxa[qx_restricted] <- var_error_q(q = mean_qxi, n = ni[qx_restricted], rel_type = qx_type[qx_restricted], k_items = k_items_x[qx_restricted])
                var_e_qxa[qx_restricted] <- estimate_var_qxa_ux(qxi = mean_qxi, var_qxi = var_e_qxa[qx_restricted], ux = ux[qx_restricted], indirect_rr = TRUE)
           }
 
@@ -151,9 +166,9 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
                if(is.null(mean_qya)) mean_qya <- wt_mean(x = qya, wt = ni)
                mean_qyi <- estimate_rxxi(rxxa = mean_qya^2, ux = mean_uy)^.5
 
-               var_e_qya <- var_error_q(q = mean_qya, n = ni)
-               var_e_qya[!is.na(na)] <- var_error_q(q = mean_qya, n = na[!is.na(na)])
-               var_e_qya[qx_restricted] <- var_error_q(q = mean_qyi, n = ni[qx_restricted])
+               var_e_qya <- var_error_q(q = mean_qya, n = ni, rel_type = qy_type, k_items = k_items_y)
+               var_e_qya[!is.na(na)] <- var_error_q(q = mean_qya, n = na[!is.na(na)], rel_type = qy_type, k_items = k_items_y)
+               var_e_qya[qy_restricted] <- var_error_q(q = mean_qyi, n = ni[qy_restricted], rel_type = qy_type[qy_restricted], k_items = k_items_y[qy_restricted])
                var_e_qya[qy_restricted] <- estimate_var_qxa_ux(qxi = mean_qyi, var_qxi = var_e_qya[qy_restricted], ux = ux[qy_restricted], indirect_rr = TRUE)
           }
 

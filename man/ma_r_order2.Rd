@@ -7,9 +7,8 @@
 ma_r_order2(k, N = NULL, r = NULL, rho = NULL, var_r = NULL,
   var_r_c = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
   citekey = NULL, moderators = NULL, moderator_type = "simple",
-  construct_x = NULL, construct_y = NULL, conf_level = 0.95,
-  cred_level = 0.8, conf_method = "t", cred_method = "t",
-  var_unbiased = TRUE, hs_override = FALSE, data = NULL)
+  construct_x = NULL, construct_y = NULL, data = NULL,
+  control = control_psychmeta(), ...)
 }
 \arguments{
 \item{k}{Vector or column name of meta-analyses' k values.}
@@ -38,49 +37,38 @@ ma_r_order2(k, N = NULL, r = NULL, rho = NULL, var_r = NULL,
 
 \item{construct_y}{Vector or column name of construct names for Y.}
 
-\item{conf_level}{Confidence level to define the width of the confidence interval (default = .95).}
-
-\item{cred_level}{Credibility level to define the width of the credibility interval (default = .80).}
-
-\item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{cred_method}{Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
-
-\item{var_unbiased}{Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).}
-
-\item{hs_override}{When \code{TRUE}, this will override settings for \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).}
-
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
+
+\item{control}{Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+
+\item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }
 \value{
-An object of the classes \code{psychmeta}, \code{ma_r_as_r}, \code{ma_order2}, and \code{ma_bb}, \code{ma_ic}, and/or \code{ma_ad}.
+A nested tabular object of the class "ma_psychmeta".
 }
 \description{
 This function computes second-order meta-analysis function for correlations. It supports second-order analyses of bare-bones, artifact-distribution, and individual-correction meta-analyses.
 }
 \examples{
 ## Analysis of the validity of conscientiousness as a predictor of job performance in East Asia
-ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, ma_type = "ad",
-            sample_id = NULL, moderators = NULL,
-            construct_x = NULL, construct_y = NULL,
-            conf_level = .95, cred_level = .8,
-            cred_method = "t", var_unbiased = TRUE,
-            data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
+out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+                   var_r_c = NULL, ma_type = c("bb", "ad"),
+                   sample_id = NULL, moderators = NULL,
+                   construct_x = NULL, construct_y = NULL,
+                   data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
+out$meta_tables[[1]]
 
 ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
-ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, ma_type = "ad",
-            sample_id = NULL, moderators = NULL, construct_x = Predictor,
-            conf_level = .95, cred_level = .8,
-            cred_method = "t", var_unbiased = TRUE,
-            data = data_r_oh_2009)
+out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+                   var_r_c = NULL, ma_type = c("bb", "ad"),
+                   sample_id = NULL, moderators = NULL, construct_x = Predictor,
+                   data = data_r_oh_2009)
+out$meta_tables[[1]]
 
 ## Analysis of the average validity of the Big Five traits as predictors of
 ## job performance by Eastern Asian country
-ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
-            var_r_c = NULL, ma_type = "ad",
-            sample_id = NULL, moderators = "Country",
-            conf_level = .95, cred_level = .8, cred_method = "t",
-            var_unbiased = TRUE, data = data_r_oh_2009)
+out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
+                   var_r_c = NULL, ma_type = c("bb", "ad"),
+                   sample_id = NULL, moderators = "Country", data = data_r_oh_2009)
+out$meta_tables[[1]]
 }

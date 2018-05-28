@@ -35,13 +35,23 @@ ma_obj with heterogeneity statistics added. Included statistics include:
 This function computes a variety of supplemental statistics for meta-analyses. The statistics here are included for interested users. It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default \code{ma_obj} output (Wiernik et al., 2017).
 }
 \examples{
+## Correlations
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
- correct_rr_y = FALSE, data = data_r_uvirr)
- ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
+                  correct_rr_y = FALSE, data = data_r_uvirr)
+ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
 ma_obj <- heterogeneity(ma_obj = ma_obj)
-ma_obj$follow_up_analyses$heterogeneity$barebones$`Analysis ID = 1`
-ma_obj$follow_up_analyses$heterogeneity$individual_correction$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$heterogeneity$artifact_distribution$true_score$`Analysis ID = 1`
+ma_obj$heterogeneity[[1]]$barebones
+ma_obj$heterogeneity[[1]]$individual_correction$true_score
+ma_obj$heterogeneity[[1]]$artifact_distribution$true_score
+
+## d values
+ma_obj <- ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi,
+                  data = data_d_meas_multi)
+ma_obj <- ma_d_ad(ma_obj)
+ma_obj <- heterogeneity(ma_obj = ma_obj)
+ma_obj$heterogeneity[[1]]$barebones
+ma_obj$heterogeneity[[1]]$individual_correction$latentGroup_latentY
+ma_obj$heterogeneity[[1]]$artifact_distribution$latentGroup_latentY
 }
 \references{
 Becker, B. J. (2005).

@@ -22,7 +22,10 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                                           show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }
 
-     class(out) <- c("psychmeta", "simulate_d", "data.frame")
+     out$overall_results$observed <- as_tibble(out$overall_results$observed)
+     out$overall_results$true <- as_tibble(out$overall_results$true)
+     out$overall_results$error <- as_tibble(out$overall_results$error)
+     
      out
 }
 
@@ -414,7 +417,7 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                  data = list(observed = data.frame(obs_a, selected = select_vec),
                              true = data.frame(true_a, selected = select_vec),
                              error = data.frame(error_a, selected = select_vec)))
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- "simdat_d_sample"
      out
 }
 
@@ -717,7 +720,7 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                  S_complete_a = sa,
                  S_complete_i = si,
                  data = NULL)
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- "simdat_d_sample"
      out
 }
 
@@ -1023,8 +1026,105 @@ simulate_d_database_noalpha <- function(k, n_params, rho_params,
      dat_params[,-c(1:which(colnames(dat_stats) == "y_name"))] <- round(dat_params[,-c(1:which(colnames(dat_stats) == "y_name"))], decimals)
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = dat_stats,
-                 parameters = dat_params)
-     class(out) <- c("psychmeta", "simdat_d", "long")
+                 statistics = as_tibble(dat_stats),
+                 parameters = as_tibble(dat_params))
+     class(out) <- "simdat_d_database"
      out
+}
+
+
+sparsify_simdat_d_noalpha <- function(data_obj, prop_missing, sparify_arts = c("rel", "u"), study_wise = TRUE){
+     sparify_arts <- match.arg(sparify_arts, c("rel", "u"), several.ok  = TRUE)
+     
+     if(!any(class(data_obj) == "simdat_d"))
+          stop("'data_obj' must be of class 'simdat_d'", call. = FALSE)
+     
+     call <- match.call()
+     
+     name_vec <- colnames(data_obj$statistics)
+     
+     sparify_rel <- any(sparify_arts == "rel")
+     sparify_u <- any(sparify_arts == "u")
+     
+     k <- length(levels(factor(data_obj$statistics$sample_id)))
+     
+     show_applicant <- any(grepl(x = name_vec, pattern = "ryya")) & any(grepl(x = name_vec, pattern = "na"))
+     sample_id <- unique(data_obj$statistics$sample_id)
+     
+     if(study_wise){
+          if(show_applicant){
+               art_logic_stat <- c(rep(sparify_u, 6), rep(sparify_rel, 18))
+               art_logic_param <- c(rep(sparify_u, 3), rep(sparify_rel, 18))
+               art_names_stat <- c("uy_local", "uy1_local", "uy2_local",
+                                   "uy_external", "uy1_external", "uy2_external",
+                                   "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
+                                   "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
+                                   "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
+                                   "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
+                                   "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2",
+                                   "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2")[art_logic_stat]
+               art_names_param <- c("uy", "uy1", "uy2",
+                                    "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
+                                    "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
+                                    "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
+                                    "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
+                                    "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2",
+                                    "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2")[art_logic_param]
+          }else{
+               art_logic_stat <- c(rep(sparify_u, 6), rep(sparify_rel, 9))
+               art_logic_param <- c(rep(sparify_u, 3), rep(sparify_rel, 9))
+               art_names_stat <- c("uy_local", "uy1_local", "uy2_local",
+                                   "uy_external", "uy1_external", "uy2_external",
+                                   "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
+                                   "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
+                                   "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")[art_logic_stat]
+               art_names_param <- c("uy", "uy1", "uy2",
+                                    "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
+                                    "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
+                                    "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")[art_logic_stat]
+          }
+          
+          art_names_stat <- art_names_stat[art_names_stat %in% colnames(data_obj$statistics)]
+          art_names_param <- art_names_param[art_names_param %in% colnames(data_obj$parameters)]
+          
+          delete_id <- sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
+          delete_id <- data_obj$statistics$sample_id %in% delete_id
+          data_obj$statistics[delete_id,art_names_stat] <- NA
+          data_obj$parameters[delete_id,art_names_param] <- NA
+     }else{
+          art_names <- c("u", "r")[c(sparify_u, sparify_rel)]
+          for(i in art_names){
+               delete_id <- data_obj$statistics$sample_id %in% sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
+               if(i == "u"){
+                    art_i_stat <- c("uy_local", "uy1_local", "uy2_local",
+                                    "uy_external", "uy1_external", "uy2_external")
+                    art_i_param <- c("uy", "uy1", "uy2")
+               }else{
+                    if(show_applicant){
+                         art_i_param <- art_i_stat <- c("parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
+                                                        "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
+                                                        "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
+                                                        "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
+                                                        "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2",
+                                                        "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2")
+                    }else{
+                         art_i_param <- art_i_stat <- c("parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
+                                                        "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
+                                                        "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")
+                    }
+               }
+               
+               art_i_stat <- art_i_stat[art_i_stat %in% colnames(data_obj$statistics)]
+               art_i_param <- art_i_param[art_i_param %in% colnames(data_obj$parameters)]
+               
+               for(ij in art_i_stat) data_obj$statistics[delete_id,ij] <- NA
+               for(ij in art_i_param) data_obj$parameters[delete_id,ij] <- NA
+          }
+     }
+     
+     data_obj$call_history <- append(data_obj$call_history, list(call))
+     if(!any(class(data_obj) == "sparsified"))
+          class(data_obj) <- c(class(data_obj), "sparsified")
+     
+     data_obj
 }

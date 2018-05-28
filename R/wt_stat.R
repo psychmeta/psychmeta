@@ -6,6 +6,7 @@
 #' @param x Vector of values to be analyzed.
 #' @param wt Weights associated with the values in x.
 #' @param unbiased Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).
+#' @param df_type Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases ("count"; default) or sums of weights ("sum_wts").
 #'
 #' @return A weighted mean and variance if weights are supplied or an unweighted mean and variance if weights are not supplied.
 #' @export
@@ -23,7 +24,8 @@
 #'
 #' @examples
 #' wt_dist(x = c(.1, .3, .5), wt = c(100, 200, 300))
-wt_dist <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
+wt_dist <- function(x, wt = rep(1, length(x)), unbiased = TRUE, df_type = c("count", "sum_wts")){
+     df_type <- match.arg(arg = df_type, choices = c("count", "sum_wts"))
      if(length(x) != length(wt)) stop("Lengths of x and wt differ")
      x[is.na(wt)] <- NA
      wt[is.na(x)] <- NA
@@ -33,7 +35,11 @@ wt_dist <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
           if(length(x) == 1){
                var_x <- 0
           }else{
-               var_x <- var_x * length(x) / (length(x) - 1)
+               if(df_type == "count"){
+                    var_x <- var_x * length(x) / (length(x) - 1)
+               }else if(df_type == "sum_wts"){
+                    var_x <- var_x * sum(wt, na.rm = TRUE) / (sum(wt, na.rm = TRUE) - 1)
+               }
           }
      }
      c(mean = mean_x, var = var_x)
@@ -55,7 +61,8 @@ wt_mean <- function(x, wt = rep(1, length(x))){
 #' @export
 #' @examples
 #' wt_var(x = c(.1, .3, .5), wt = c(100, 200, 300))
-wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
+wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE, df_type = c("count", "sum_wts")){
+     df_type <- match.arg(arg = df_type, choices = c("count", "sum_wts"))
      if(length(x) != length(wt)) stop("Lengths of x and wt differ")
      x[is.na(wt)] <- NA
      wt[is.na(x)] <- NA
@@ -65,7 +72,11 @@ wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
           if(length(x) == 1){
                var_x <- 0
           }else{
-               var_x <- var_x * length(x) / (length(x) - 1)
+               if(df_type == "count"){
+                    var_x <- var_x * length(x) / (length(x) - 1)
+               }else if(df_type == "sum_wts"){
+                    var_x <- var_x * sum(wt, na.rm = TRUE) / (sum(wt, na.rm = TRUE) - 1)
+               }
           }
      }
      var_x
@@ -83,6 +94,8 @@ wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
 #' @param wt Vector of weights
 #' @param as_cor Logical scalar that determines whether the covariances should be standardized (TRUE) or unstandardized (FALSE).
 #' @param use Method for handling missing values. "everything" uses all values and does not account for missingness, "listwise" uses only complete cases, and "pairwise" uses pairwise deletion.
+#' @param unbiased Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).
+#' @param df_type Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases ("count"; default) or sums of weights ("sum_wts").
 #'
 #' @return Scalar, vector, or matrix of covariances.
 #' @export
@@ -90,9 +103,19 @@ wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE){
 #' @examples
 #' wt_cov(x = c(1, 0, 2), y = c(1, 2, 3), wt = c(1, 2, 2), as_cor = FALSE, use = "everything")
 #' wt_cov(x = c(1, 0, 2), y = c(1, 2, 3), wt = c(1, 2, 2), as_cor = TRUE, use = "everything")
-wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE, use = "everything"){
-     match.arg(arg = use, choices = c("everything", "listwise", "pairwise"))
-
+#' wt_cov(x = cbind(c(1, 0, 2), c(1, 2, 3)), wt = c(1, 2, 2), as_cor = FALSE, use = "everything")
+#' wt_cov(x = cbind(c(1, 0, 2), c(1, 2, 3)), wt = c(1, 2, 2), as_cor = TRUE, use = "everything")
+#' wt_cov(x = cbind(c(1, 0, 2, NA), c(1, 2, 3, 3)),
+#'        wt = c(1, 2, 2, 1), as_cor = FALSE, use = "listwise")
+#' wt_cov(x = cbind(c(1, 0, 2, NA), c(1, 2, 3, 3)),
+#'        wt = c(1, 2, 2, 1), as_cor = TRUE, use = "listwise")
+wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE, 
+                   use = c("everything", "listwise", "pairwise"),
+                   unbiased = TRUE, df_type = c("count", "sum_wts")){
+     
+     use <- match.arg(arg = use, choices = c("everything", "listwise", "pairwise"))
+     df_type <- match.arg(arg = df_type, choices = c("count", "sum_wts"))
+     
      if(is.null(x)){
           if(is.null(y)){
                stop("x and y cannot both be NULL")
@@ -106,9 +129,9 @@ wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE, use = "everything"){
      if(is.null(wt)) wt <- rep(1, nrow(x))
 
      if(use != "everything"){
-          if(use == "complete"){
+          if(use == "listwise"){
                use_x <- apply(!is.na(x), 1, all) & !is.na(wt)
-               x[!use_x,] <- NA
+               x[!use_x,] <- wt[!use_x] <- NA
           }else{
                use_x <- TRUE
           }
@@ -126,7 +149,7 @@ wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE, use = "everything"){
      if(as_cor){
           D <- diag(ncol(x))
           if(use != "everything"){
-               diag(D) <- apply(x, 2, function(x) wt_var(x = x, wt = wt, unbiased = FALSE))^.5
+               diag(D) <- apply(x, 2, function(x) wt_var(x = x, wt = wt, unbiased = unbiased))^.5
           }else{
                diag(D) <- 1 / ((wt %*% x^2) / sum(wt))^.5
           }
@@ -156,7 +179,7 @@ wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE, use = "everything"){
           if(as_cor) {
                D <- diag(ncol(y))
                if(use != "everything"){
-                    diag(D) <- apply(y, 2, function(x) wt_var(x = x, wt = wt, unbiased = FALSE)^.5)
+                    diag(D) <- apply(y, 2, function(x) wt_var(x = x, wt = wt, unbiased = unbiased)^.5)
                }else{
                     diag(D) <- 1 / ((wt %*% y^2) / sum(wt))^.5
                }
@@ -168,14 +191,28 @@ wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE, use = "everything"){
           out <- t(y) %*% (x * drop(wt)) / sum(wt)
      }else{
           out <- matrix(NA, nrow = ncol(y), ncol = ncol(x))
-          for(i in 1:nrow(out))
-               for(j in 1:ncol(out))
+          for(i in 1:nrow(out)){
+               for(j in 1:ncol(out)){
                     out[i,j] <- wt_mean(x = y[,i] * x[,j], wt = wt)
+                  
+                    if(as_cor){
+                         out[i,j] <- out[i,j] / sqrt(wt_var(x = x[,j], wt = wt, unbiased = unbiased) *
+                                                          wt_var(x = y[,i], wt = wt, unbiased = unbiased))
+                    }
+               }  
+          }
      }
 
-     if(!as_cor){
-          n <- t(!is.na(y)) %*% !is.na(x)
-          listwise <- out * n/(n-1)
+     if(!as_cor & unbiased){
+          if(df_type == "count"){
+               n <- t(!is.na(y)) %*% !is.na(x)
+          }else if(df_type == "sum_wts"){
+               wt_mat_x <- matrix(1, nrow = nrow(x), ncol = ncol(x))
+               wt_mat_y <- matrix(wt, nrow = nrow(x), ncol = ncol(x))
+               wt_mat_x[is.na(wt_mat_x)] <- wt_mat_y[is.na(wt_mat_y)] <- 0    
+               n <- t(wt_mat_y) %*% wt_mat_x
+          }
+          out <- out * n/(n-1)
      }
      if(length(out) == 1){
           c(out)

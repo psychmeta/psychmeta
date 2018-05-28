@@ -226,7 +226,7 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
                       descriptives = list(observed = desc_mat_obs))
      }
 
-     class(out) <- c("psychmeta", "simulate_r")
+     class(out) <- "simdat_r_sample"
      out
 }
 
@@ -404,7 +404,7 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
                                      error = desc_mat_error)
      )
 
-     class(out) <- c("psychmeta", "simulate_r")
+     class(out) <- "simdat_r_sample"
      out
 }
 
@@ -663,9 +663,9 @@ simulate_r_database_noalpha <- function(k, n_params, rho_params,
      }
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = dat_stats,
-                 parameters = dat_params)
-     class(out) <- c("psychmeta", "simdat_r", format)
+                 statistics = as_tibble(dat_stats),
+                 parameters = as_tibble(dat_params))
+     class(out) <- c("simdat_r_database", format)
      out
 }
 

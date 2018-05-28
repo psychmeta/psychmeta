@@ -4,20 +4,24 @@
 \alias{create_ad}
 \title{Generate an artifact distribution object for use in artifact-distribution meta-analysis programs.}
 \usage{
-create_ad(ad_type = "tsa", rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
-  rxxi_type = rep("alpha", length(rxxi)), rxxa = NULL, n_rxxa = NULL,
-  wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), ux = NULL,
-  ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux,
-  length(mean_ux)), ut = NULL, ni_ut = NULL, na_ut = NULL,
-  wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
-  mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL,
-  qxi_dist_type = rep("alpha", length(mean_qxi)), mean_rxxi = NULL,
-  var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL,
-  rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_qxa = NULL,
+create_ad(ad_type = c("tsa", "int"), rxxi = NULL, n_rxxi = NULL,
+  wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
+  k_items_rxxi = rep(NA, length(rxxi)), rxxa = NULL, n_rxxa = NULL,
+  wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
+  k_items_rxxa = rep(NA, length(rxxa)), ux = NULL, ni_ux = NULL,
+  na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux, length(mean_ux)),
+  ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut,
+  dep_sds_ut_obs = rep(ut, length(mean_ux)), mean_qxi = NULL,
+  var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL,
+  qxi_dist_type = rep("alpha", length(mean_qxi)), mean_k_items_qxi = rep(NA,
+  length(mean_qxi)), mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL,
+  mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
+  mean_k_items_rxxi = rep(NA, length(mean_rxxi)), mean_qxa = NULL,
   var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL,
-  qxa_dist_type = rep("alpha", length(mean_qxa)), mean_rxxa = NULL,
-  var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL,
-  rxxa_dist_type = rep("alpha", length(mean_rxxa)), mean_ux = NULL,
+  qxa_dist_type = rep("alpha", length(mean_qxa)), mean_k_items_qxa = rep(NA,
+  length(mean_qxa)), mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL,
+  mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)),
+  mean_k_items_rxxa = rep(NA, length(mean_rxxa)), mean_ux = NULL,
   var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL, mean_na_ux = rep(NA,
   length(mean_ux)), dep_sds_ux_spec = rep(FALSE, length(mean_ux)),
   mean_ut = NULL, var_ut = NULL, k_ut = NULL, mean_ni_ut = NULL,
@@ -35,6 +39,8 @@ create_ad(ad_type = "tsa", rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 \item{wt_rxxi}{Vector of weights associated with the elements of \code{rxxi} (by default, sample sizes will be used as weights).}
 
 \item{rxxi_type, rxxa_type, qxi_dist_type, rxxi_dist_type, qxa_dist_type, rxxa_dist_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+
+\item{k_items_rxxi, mean_k_items_qxi, mean_k_items_rxxi, k_items_rxxa, mean_k_items_qxa, mean_k_items_rxxa}{Numeric vector of the number of items in each scale (or mean number of items, for pre-specified distributions).}
 
 \item{rxxa}{Vector of applicant reliability estimates.}
 
@@ -136,10 +142,9 @@ Only used when ni_ut is not NULL. If supplied, must be either a scalar or the sa
 Artifact distribution object (matrix of artifact-distribution means and variances) for use artifact-distribution meta-analyses.
 }
 \description{
-This function generates \code{ad_obj} class objects containing either interactive or Taylor series artifact distributions.
-Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-}
-\details{
+This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions.
+Use this to create objects that can be supplied to the \code{\link{ma_r_ad}} and \code{\link{ma_r_ad}} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
+
 Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
 
 For u ratios, error variances can be computed for independent samples (i.e., settings in which the unrestricted standard deviation comes from an external study) or

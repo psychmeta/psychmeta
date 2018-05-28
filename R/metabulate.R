@@ -5,6 +5,10 @@
 #' @param show_conf Logical scalar determining whether to show confidence intervals (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param show_cred Logical scalar determining whether to show credibility intervals (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param show_se Logical scalar determining whether to show standard errors (\code{TRUE}) or not (\code{FALSE}; default).
+#' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
+#' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
+#' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
+#' @param ... Additional arguments.
 #'
 #' @return Saved rich text file containing tables of meta-analytic output.
 #' @export
@@ -33,16 +37,19 @@
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 #' metabulate(ma_obj = ma_obj, file = "meta tables generic es.rtf")
 #' }
-metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se = FALSE){
+metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se = FALSE, 
+                       analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
 
-     ma_class <- class(ma_obj)
-     is_r <- any(ma_class %in% c("ma_r_as_r", "ma_d_as_r"))
-     is_d <- any(ma_class %in% c("ma_r_as_d", "ma_d_as_d"))
-     is_generic <- any(ma_class == "ma_generic")
-     is_master <- any(ma_class %in% "ma_master")
-     is_bb <- any(ma_class %in% "ma_bb")
-     is_ic <- any(ma_class %in% "ma_ic")
-     is_ad <- any(ma_class %in% "ma_ad")
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
+     
+     ma_metric <- attributes(ma_obj)$ma_metric
+     ma_methods <- attributes(ma_obj)$ma_methods
+     is_r <- any(ma_metric %in% c("r_as_r", "d_as_r"))
+     is_d <- any(ma_metric %in% c("r_as_d", "d_as_d"))
+     is_generic <- any(ma_metric == "generic")
+     is_bb <- any(ma_methods %in% "bb")
+     is_ic <- any(ma_methods %in% "ic")
+     is_ad <- any(ma_methods %in% "ad")
 
      if(is_r){
           es_type <- "r"
@@ -52,15 +59,24 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
           es_type <- "generic"
      }
 
-     ma_tab_bb     <- .metabulate_es(ma_obj = ma_obj, show_conf = show_conf, show_cred = show_cred, show_se = show_se, ma_type = "bb")
+     ma_list <- get_metatab(ma_obj, as_list = TRUE)
 
-     ma_tab_ic_ts  <- .metabulate_es(ma_obj = ma_obj, show_conf = show_conf, show_cred = show_cred, show_se = show_se, ma_type = "ic_ts")
-     ma_tab_ic_vgx <- .metabulate_es(ma_obj = ma_obj, show_conf = show_conf, show_cred = show_cred, show_se = show_se, ma_type = "ic_vgx")
-     ma_tab_ic_vgy <- .metabulate_es(ma_obj = ma_obj, show_conf = show_conf, show_cred = show_cred, show_se = show_se, ma_type = "ic_vgy")
+     ma_tab_bb     <- .metabulate_es(ma_obj = ma_obj, ma_list = ma_list, show_conf = show_conf,
+                                     show_cred = show_cred, show_se = show_se, ma_type = "bb")
 
-     ma_tab_ad_ts  <- .metabulate_es(ma_obj = ma_obj, show_conf = show_conf, show_cred = show_cred, show_se = show_se, ma_type = "ad_ts")
-     ma_tab_ad_vgx <- .metabulate_es(ma_obj = ma_obj, show_conf = show_conf, show_cred = show_cred, show_se = show_se, ma_type = "ad_vgx")
-     ma_tab_ad_vgy <- .metabulate_es(ma_obj = ma_obj, show_conf = show_conf, show_cred = show_cred, show_se = show_se, ma_type = "ad_vgy")
+     ma_tab_ic_ts  <- .metabulate_es(ma_obj = ma_obj, ma_list = ma_list, show_conf = show_conf, 
+                                     show_cred = show_cred, show_se = show_se, ma_type = "ic_ts")
+     ma_tab_ic_vgx <- .metabulate_es(ma_obj = ma_obj, ma_list = ma_list, show_conf = show_conf, 
+                                     show_cred = show_cred, show_se = show_se, ma_type = "ic_vgx")
+     ma_tab_ic_vgy <- .metabulate_es(ma_obj = ma_obj, ma_list = ma_list, show_conf = show_conf, 
+                                     show_cred = show_cred, show_se = show_se, ma_type = "ic_vgy")
+
+     ma_tab_ad_ts  <- .metabulate_es(ma_obj = ma_obj, ma_list = ma_list, show_conf = show_conf,
+                                     show_cred = show_cred, show_se = show_se, ma_type = "ad_ts")
+     ma_tab_ad_vgx <- .metabulate_es(ma_obj = ma_obj, ma_list = ma_list, show_conf = show_conf,
+                                     show_cred = show_cred, show_se = show_se, ma_type = "ad_vgx")
+     ma_tab_ad_vgy <- .metabulate_es(ma_obj = ma_obj, ma_list = ma_list, show_conf = show_conf, 
+                                     show_cred = show_cred, show_se = show_se, ma_type = "ad_vgy")
 
 
      .addTable <- function(ma_tab){
@@ -183,111 +199,54 @@ add_commas <- function(x, decimals = 0){
 }
 
 
-.metabulate_es <- function(ma_obj, ma_type = "bb", show_conf = TRUE, show_cred = TRUE, show_se = FALSE){
+.metabulate_es <- function(ma_obj, ma_list, ma_type = "bb", show_conf = TRUE, show_cred = TRUE, show_se = FALSE){
 
-     if(ma_type == "bb"){
-          if(any(class(ma_obj) %in% "ma_master")){
-               ma_tab <- ma_obj$grand_tables$barebones
-          }else{
-               ma_tab <- ma_obj$barebones$meta_table
-          }
-     }
+     if(ma_type == "bb") ma_tab <- ma_list$barebones
 
-     is_r <- any(class(ma_obj) %in% "ma_r_as_r") | any(class(ma_obj) %in% "ma_d_as_r")
-     is_d <- any(class(ma_obj) %in% "ma_r_as_d") | any(class(ma_obj) %in% "ma_d_as_d")
+     ma_metric <- attributes(ma_obj)$ma_metric
+     is_r <- any(ma_metric %in% c("r_as_r", "d_as_r"))
+     is_d <- any(ma_metric %in% c("r_as_d", "d_as_d"))
 
      if(is_r){
-          if(ma_type == "ic_ts"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$individual_correction$true_score
-               }else{
-                    ma_tab <- ma_obj$individual_correction$true_score$meta_table
-               }
-          }
-          if(ma_type == "ic_vgx"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$individual_correction$validity_generalization_x
-               }else{
-                    ma_tab <- ma_obj$individual_correction$validity_generalization_x$meta_table
-               }
-          }
-          if(ma_type == "ic_vgy"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$individual_correction$validity_generalization_y
-               }else{
-                    ma_tab <- ma_obj$individual_correction$validity_generalization_y$meta_table
-               }
-          }
+          if(ma_type == "ic_ts") 
+               ma_tab <- ma_list$individual_correction$true_score
+               
+          if(ma_type == "ic_vgx")
+                    ma_tab <- ma_list$individual_correction$validity_generalization_x
+
+          if(ma_type == "ic_vgy")
+                    ma_tab <- ma_list$individual_correction$validity_generalization_y
 
 
-          if(ma_type == "ad_ts"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$artifact_distribution$true_score
-               }else{
-                    ma_tab <- ma_obj$artifact_distribution$true_score
-               }
-          }
-          if(ma_type == "ad_vgx"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$artifact_distribution$validity_generalization_x
-               }else{
-                    ma_tab <- ma_obj$artifact_distribution$validity_generalization_x
-               }
-          }
-          if(ma_type == "ad_vgy"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$artifact_distribution$validity_generalization_y
-               }else{
-                    ma_tab <- ma_obj$artifact_distribution$validity_generalization_y
-               }
-          }
+          if(ma_type == "ad_ts")
+               ma_tab <- ma_list$artifact_distribution$true_score
+          
+          if(ma_type == "ad_vgx")
+               ma_tab <- ma_list$artifact_distribution$validity_generalization_x
+          
+          if(ma_type == "ad_vgy")
+               ma_tab <- ma_list$artifact_distribution$validity_generalization_y
      }
 
      if(is_d){
-          if(ma_type == "ic_ts"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$individual_correction$latentGroup_latentY
-               }else{
-                    ma_tab <- ma_obj$individual_correction$latentGroup_latentY$meta_table
-               }
-          }
-          if(ma_type == "ic_vgx"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$individual_correction$observedGroup_latentY
-               }else{
-                    ma_tab <- ma_obj$individual_correction$observedGroup_latentY$meta_table
-               }
-          }
-          if(ma_type == "ic_vgy"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$individual_correction$latentGroup_observedY
-               }else{
-                    ma_tab <- ma_obj$individual_correction$latentGroup_observedY$meta_table
-               }
-          }
-
-
-          if(ma_type == "ad_ts"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$artifact_distribution$latentGroup_latentY
-               }else{
-                    ma_tab <- ma_obj$artifact_distribution$latentGroup_latentY
-               }
-          }
-          if(ma_type == "ad_vgx"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$artifact_distribution$observedGroup_latentY
-               }else{
-                    ma_tab <- ma_obj$artifact_distribution$observedGroup_latentY
-               }
-          }
-          if(ma_type == "ad_vgy"){
-               if(any(class(ma_obj) %in% "ma_master")){
-                    ma_tab <- ma_obj$grand_tables$artifact_distribution$latentGroup_observedY
-               }else{
-                    ma_tab <- ma_obj$artifact_distribution$latentGroup_observedY
-               }
-          }
+          if(ma_type == "ic_ts")
+               ma_tab <- ma_list$individual_correction$latentGroup_latentY
+          
+          if(ma_type == "ic_vgx")
+               ma_tab <- ma_list$individual_correction$observedGroup_latentY
+          
+          if(ma_type == "ic_vgy")
+               ma_tab <- ma_list$individual_correction$latentGroup_observedY
+          
+          
+          if(ma_type == "ad_ts")
+               ma_tab <- ma_list$artifact_distribution$latentGroup_latentY
+          
+          if(ma_type == "ad_vgx")
+               ma_tab <- ma_list$artifact_distribution$observedGroup_latentY
+          
+          if(ma_type == "ad_vgy")
+               ma_tab <- ma_list$artifact_distribution$latentGroup_observedY
      }
 
      if(!is_r & !is_d){
@@ -302,6 +261,8 @@ add_commas <- function(x, decimals = 0){
 
 
      if(!is.null(ma_tab)){
+          ma_tab <- as.data.frame(ma_tab)
+          
           ma_tab[,c("k", "N")] <- round2char(x = ma_tab[,c("k", "N")], digits = 0)
           if(is_r){
                ma_tab[,which(colnames(ma_tab) == "mean_r"):ncol(ma_tab)] <- round2char(x = ma_tab[,which(colnames(ma_tab) == "mean_r"):ncol(ma_tab)])
@@ -329,10 +290,10 @@ add_commas <- function(x, decimals = 0){
                ma_tab$se_es <- NULL
           }
 
-          ma_tab$Analysis_ID <- ma_tab$Analysis_Type <- NULL
+          ma_tab$analysis_id <- ma_tab$analysis_type <- NULL
 
-          if(any(class(ma_obj) %in% "ma_master")){
-               ma_tab_list <- by(ma_tab, ma_tab$Pair_ID, function(x) x)
+          if(!is.null(ma_tab$pair_id)){
+               ma_tab_list <- by(ma_tab, ma_tab$pair_id, function(x) x)
           }else{
                ma_tab_list <- list(ma_tab)
           }
@@ -351,7 +312,7 @@ add_commas <- function(x, decimals = 0){
                     ma_tab <- rbind(ma_tab, ma_tab_list[[i]], "")
                }
           }
-          ma_tab$Pair_ID <- NULL
+          ma_tab$pair_id <- NULL
           rownames(ma_tab) <- 1:nrow(ma_tab)
 
           name_vec <- colnames(ma_tab)
@@ -360,9 +321,9 @@ add_commas <- function(x, decimals = 0){
           ci_width <- gsub(name_vec[ci_cols[1]], pattern = "CI_LL_", replacement = "")
           cv_width <- gsub(name_vec[cv_cols[1]], pattern = "CV_LL_", replacement = "")
 
-          colnames(ma_tab)[name_vec == "Group_Contrast"]    <- "Group Contrast"
-          colnames(ma_tab)[name_vec == "Construct_X"]       <- "Construct X"
-          colnames(ma_tab)[name_vec == "Construct_Y"]       <- "Construct Y"
+          colnames(ma_tab)[name_vec == "group_contrast"]    <- "Group Contrast"
+          colnames(ma_tab)[name_vec == "construct_x"]       <- "Construct X"
+          colnames(ma_tab)[name_vec == "construct_y"]       <- "Construct Y"
           colnames(ma_tab)[name_vec == "k"]                 <- "{\\i k}"
           colnames(ma_tab)[name_vec == "N"]                 <- "{\\i N}"
 

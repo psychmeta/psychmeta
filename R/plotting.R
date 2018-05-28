@@ -17,68 +17,71 @@
 #' @return A list of funnel plots.
 #' @export
 #'
+#' @author Based on code by John Sakaluk
+#'
 #' @examples
+#' ## Correlations
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'                moderators = moderator, data = data_r_meas_multi,
-#'                clean_artifacts = FALSE, impute_artifacts = FALSE)
-#' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1))
+#'                moderators = moderator, data = data_r_meas_multi)
+#' plot_funnel(ma_obj = ma_obj)
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 2))
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
-#' plot_funnel(ma_obj = ma_obj$construct_pairs[[1]])
+#' 
+#' ## d values
+#' ma_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
+#'                construct_y = construct, sample_id = sample_id,
+#'                data = data_d_meas_multi)
+#' plot_funnel(ma_obj = ma_obj)
+#' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 2))
+#' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
-
+     
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
+     
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
-     escalc_list <- get_escalc(ma_obj = ma_obj_filtered, leave_as_master = TRUE)
+     escalc_list <- get_escalc(ma_obj = ma_obj_filtered)
      if(show_filtered) ma_obj <- ma_obj_filtered
-
-     if("barebones" %in% names(escalc_list)){
-
-          if("ma_master" %in% class(ma_obj_filtered)){
-               barebones <- lapply(escalc_list$barebones, function(pair_list) lapply(pair_list, .plot_funnel))
-
-               if(!is.null(escalc_list$individual_correction)){
-                    individual_correction <- lapply(escalc_list$individual_correction, function(pair_list)
-                         lapply(pair_list, function(ic_list) lapply(ic_list, .plot_funnel)))
-               }else{
-                    individual_correction <- NULL
-               }
-          }else{
-               barebones <- lapply(escalc_list$barebones, .plot_funnel)
-
-               if(!is.null(escalc_list$individual_correction)){
-                    individual_correction <- lapply(escalc_list$individual_correction, function(pair_list)
-                         lapply(pair_list, .plot_funnel))
-               }else{
-                    individual_correction <- NULL
-               }
-          }
-
+     
+     ma_methods <- attributes(ma_obj)$ma_methods
+     
+     if("bb" %in% ma_methods){
+          barebones <- map(escalc_list, function(x) x$barebones)
+          barebones <- lapply(barebones, function(x) .plot_funnel(x))
      }else{
-          barebones <- lapply(escalc_list, .plot_funnel)
-          individual_correction <- NULL
+          barebones <- NULL
      }
-
-     out <- list(barebones = barebones,
-                 individual_correction = individual_correction)
-
-     if("ma_master" %in% class(ma_obj)){
-          construct_pairs <- names(ma_obj_filtered$construct_pairs)
-          for(i in construct_pairs){
-               if(is.null(ma_obj$construct_pairs[[i]]$plots))
-                    ma_obj$construct_pairs[[i]]$plots <- list()
-               ma_obj$construct_pairs[[i]]$plots$funnel <- list(barebones = out$barebones[[i]],
-                                                                individual_correction = out$individual_correction[[i]])
-          }
-          if(length(ma_obj$construct_pairs) == 1) ma_obj <- ma_obj$construct_pairs[[1]]
-     }else{
-          if(is.null(ma_obj$plots))
-               ma_obj$plots <- list()
-          ma_obj$plots$funnel <- out
-     }
-
+     
+     out <- map(escalc_list, function(x){
+          map(x, function(.x){
+               if(is.data.frame(.x)){
+                    .plot_funnel(.x)
+               }else{
+                    if(!is.null(.x)){
+                         map(.x, function(.x1){
+                              if(is.data.frame(.x1)){
+                                   .plot_funnel(.x1)
+                              }else{
+                                   NULL
+                              }
+                         })
+                    }else{
+                         NULL
+                    }
+               }
+          })
+     })
+     
+     names(out) <- paste0("analysis id: ", ma_obj_filtered$analysis_id)
+     .out <- rep(list(NULL), nrow(ma_obj))
+     names(.out) <- paste0("analysis id: ", ma_obj$analysis_id)
+     for(i in names(out)) .out[[i]] <- out[[i]]
+     ma_obj$funnel <- .out
+     
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
-
+     
      ma_obj
 }
 
@@ -110,23 +113,37 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @return A list of forest plots.
 #' @export
 #'
+#' @author Based on code by John Sakaluk
+#'
 #' @importFrom stringr str_split
 #'
 #' @examples
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-#'                moderators = moderator, data = data_r_meas_multi,
-#'                clean_artifacts = FALSE, impute_artifacts = FALSE)
-#' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1))
+#'                moderators = moderator, data = data_r_meas_multi)
+#' plot_forest(ma_obj = ma_obj)
 #' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 2))
 #' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1), show_filtered = TRUE)
-#' plot_forest(ma_obj = ma_obj$construct_pairs[[1]])
+#' 
+#' ## d values
+#' ma_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
+#'                construct_y = construct, sample_id = sample_id,
+#'                data = data_d_meas_multi)
+#' plot_forest(ma_obj = ma_obj)
+#' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 2))
+#' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE,
                         ma_facetname = "Summary", facet_levels = NULL,
                         conf_level = .95, conf_method = "t",
                         x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference"){
-
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj))){
+     
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
+     
+     ma_metric <- attributes(ma_obj)$ma_metric
+     ma_methods <- attributes(ma_obj)$ma_methods
+     
+     if(any(c("r_as_r", "d_as_r") %in% ma_metric)){
           ts <- "true_score"
           vgx <- "validity_generalization_x"
           vgy <- "validity_generalization_y"
@@ -135,62 +152,103 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           vgx <- "observedGroup_latentY"
           vgy <- "latentGroup_observedY"
      }
-
+     
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
      if(show_filtered) ma_obj <- ma_obj_filtered
-     if("ma_master" %in% class(ma_obj)){
-          ma_list <- ma_obj_filtered$construct_pairs
-          .ma_list <- ma_obj$construct_pairs
+     
+     analysis_id <- as.list(ma_obj_filtered$analysis_id)
+     names(analysis_id) <- unlist(analysis_id)
+     
+     pair_id <- table(ma_obj_filtered$pair_id)
+     pair_id <- as.list(as.numeric(names(pair_id))[pair_id > 1])
+     if(length(pair_id) > 0){
+          names(pair_id) <- unlist(pair_id)
+          out_pair <- lapply(pair_id, function(i){
+               x <- filter(ma_obj_filtered, pair_id == i)
+               
+               barebones <- .plot_forest(ma_obj = x, ma_method = "bb",
+                                         ma_facetname = ma_facetname, facet_levels = facet_levels,
+                                         conf_level = conf_level, conf_method = conf_method,
+                                         x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab)
+               
+               
+               if("ic" %in% ma_methods){
+                    individual_correction <- list(.plot_forest(ma_obj = x, ma_method = "ic", correction_type = "ts",
+                                                               ma_facetname = ma_facetname, facet_levels = facet_levels,
+                                                               conf_level = conf_level, conf_method = conf_method,
+                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
+                                                  
+                                                  .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgx",
+                                                               ma_facetname = ma_facetname, facet_levels = facet_levels,
+                                                               conf_level = conf_level, conf_method = conf_method,
+                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
+                                                  
+                                                  .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgy",
+                                                               ma_facetname = ma_facetname, facet_levels = facet_levels,
+                                                               conf_level = conf_level, conf_method = conf_method,
+                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab))
+                    
+                    names(individual_correction) <- c(ts, vgx, vgy)
+               }else{
+                    individual_correction <- NULL
+               }
+               
+               list(barebones = barebones,
+                    individual_correction = individual_correction)
+          })
+          names(out_pair) <- paste0("analysis id: ", 
+                                    ma_obj_filtered$analysis_id[ma_obj_filtered$analysis_type == "Overall" & 
+                                                                     ma_obj_filtered$pair_id %in% unlist(pair_id)])
      }else{
-          ma_list <- list(`Pair ID = 1: X = X, Y = Y` = ma_obj_filtered)
-          .ma_list <- list(`Pair ID = 1: X = X, Y = Y` = ma_obj)
+          out_pair <- NULL
      }
-     pair_id <- as.list(names(ma_list))
-     names(pair_id) <- names(ma_list)
-
-     ma_list <- lapply(pair_id, function(x){
-
-          barebones <- .plot_forest(ma_obj = ma_list[[x]], ma_method = "bb",
+     
+     out_analysis <- lapply(analysis_id, function(i){
+          x <- filter(ma_obj_filtered, analysis_id == i)
+          
+          barebones <- .plot_forest(ma_obj = x, ma_method = "bb",
                                     ma_facetname = ma_facetname, facet_levels = facet_levels,
                                     conf_level = conf_level, conf_method = conf_method,
                                     x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab)
-
-          if(!is.null(ma_list[[x]]$individual_correction)){
-               individual_correction <- list(.plot_forest(ma_obj = ma_list[[x]], ma_method = "ic", correction_type = "ts",
+          
+          
+          if("ic" %in% ma_methods){
+               individual_correction <- list(.plot_forest(ma_obj = x, ma_method = "ic", correction_type = "ts",
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
                                                           x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
-
-                                             .plot_forest(ma_obj = ma_list[[x]], ma_method = "ic", correction_type = "vgx",
+                                             
+                                             .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgx",
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
                                                           x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
-
-                                             .plot_forest(ma_obj = ma_list[[x]], ma_method = "ic", correction_type = "vgy",
+                                             
+                                             .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgy",
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
                                                           x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab))
-
+               
                names(individual_correction) <- c(ts, vgx, vgy)
           }else{
                individual_correction <- NULL
           }
-
-          if(is.null(.ma_list[[x]]$plots)){
-               .ma_list[[x]]$plots <- list()
-          }
-          .ma_list[[x]]$plots$forest <- list(barebones = barebones,
-                                            individual_correction = individual_correction)
-          .ma_list[[x]]
+          
+          list(barebones = barebones,
+               individual_correction = individual_correction)
      })
-
-     if("ma_master" %in% class(ma_obj)){
-          ma_obj$construct_pairs <- ma_list
-          if(length(ma_obj$construct_pairs) == 1) ma_obj <- ma_obj$construct_pairs[[1]]
-     }else{
-          ma_obj <- ma_list[[1]]
+     
+     out <- rep(list(NULL), nrow(ma_obj))
+     names(out) <- names(out_analysis) <- paste0("analysis id: ", ma_obj_filtered$analysis_id)
+     
+     for(i in names(out)){
+          out[[i]] <- list(moderated = out_pair[[i]], 
+                           unmoderated = out_analysis[[i]])
      }
-
+     
+     ma_obj$forest <- out
+     rm(out_pair, out_analysis)
+     
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Forest plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
 
      ma_obj
@@ -203,7 +261,6 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @param x An escalc-class object
 #'
 #' @return A funnel plot.
-#' @export
 #'
 #' @author John Sakaluk
 #'
@@ -211,7 +268,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 .plot_funnel <- function(x){
      #Extract se and yi from metafor object and store in dat
      dat = data.frame(yi = x$yi, se = sqrt(x$vi))
-
+     
      mean_es <- wt_mean(x = x$yi, wt = x$weight)
      #Seq from 0-max se, and define 90-99%CIs for null; store in dfCI
      se.seq=seq(0, max(dat$se), 0.001)
@@ -223,7 +280,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ul99 = mean_es + (qnorm(1 - (.01/2))*se.seq)
      null = rep(mean_es , length(se.seq))
      dfCI = data.frame(ll90, ul90, ll95, ul95, ll99, ul99, se.seq, null)
-
+     
      #Make contour-enhanced funnel plot
      ce.fp = ggplot(data = dat, aes_(x = substitute(se)))+#Map se to x
           #Add data-points to the scatterplot
@@ -253,7 +310,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           coord_flip()+
           #Apply APA-format theme
           theme_apa
-
+     
      ce.fp
      return(ce.fp)
 }
@@ -265,11 +322,15 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                          ma_facetname = "Summary", facet_levels = NULL,
                          conf_level = .95, conf_method = "t",
                          x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference", ...){
+     .ma_method <- ma_method
      ma_method[ma_method == "bb"] <- "barebones"
      ma_method[ma_method == "ic"] <- "individual_correction"
      ma_method[ma_method == "ad"] <- "artifact_distribution"
-
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj))){
+     
+     .attributes <- attributes(ma_obj)
+     
+     .correction_type <- correction_type
+     if(any(c("r_as_r", "d_as_r") %in% .attributes$ma_metric)){
           correction_type[correction_type == "ts"] <- "true_score"
           correction_type[correction_type == "vgx"] <- "validity_generalization_x"
           correction_type[correction_type == "vgy"] <- "validity_generalization_y"
@@ -278,44 +339,27 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           correction_type[correction_type == "vgx"] <- "observedGroup_latentY"
           correction_type[correction_type == "vgy"] <- "latentGroup_observedY"
      }
-
+     
      if(ma_method == "artifact_distribution") stop("Forest plots are not currently supported for artifact distribution meta-analyses")
-
-     if("ma_master" %in% class(ma_obj)){
-          ma_list <- ma_obj$construct_pairs
-     }else{
-          ma_list <- list(`Pair ID = 1: X = X, Y = Y` = ma_obj)
-     }
-
-     escalc_list <- list()
-     for(i in 1:length(ma_list)){
-          if(ma_method == "barebones"){
-               .escalc_list <- ma_list[[i]][[ma_method]]$escalc_list
-          }else{
-               .escalc_list <- ma_list[[i]][[ma_method]][[correction_type]]$escalc_list
-          }
-          names(.escalc_list) <- paste(names(ma_list)[i], names(.escalc_list), sep = ", ")
-          escalc_list <- append(escalc_list, .escalc_list)
-     }
-     names(escalc_list) <- 1:length(escalc_list)
-
-     if(ma_method == "barebones"){
-          mat <- ma_list[[1]][[ma_method]]$meta_table
-     }else{
-          mat <- ma_list[[1]][[ma_method]][[correction_type]]$meta_table
-     }
-     .mat <- as_tibble(select(mat, Analysis_ID:k))
+     
+     escalc_list <- get_escalc(ma_obj = ma_obj)
+     
+     mat <- get_metatab(ma_obj, ma_methods = .ma_method, correction_types = .correction_type)
+     ma_methods <- attributes(ma_obj)$ma_methods
+     ma_metric <- attributes(ma_obj)$ma_metric
+     
+     .mat <- as_tibble(select(as.data.frame(mat), .data$analysis_type:.data$k))
      .mat <- .mat[,-c(1, ncol(.mat))]
      if(ncol(.mat) > 1) stop("Forest plots currently only support unmoderated or single-moderator meta-analysis")
-
+     
      if(ncol(.mat) == 1){
           setting <- as.character(unlist(.mat[,1]))
           setting[setting == "All Levels"] <- "Overall"
      }else{
-          setting <- paste("Analysis ID =", mat$Analysis_ID)
+          setting <- paste("Analysis ID:", mat$analysis_id)
      }
-
-     if(any(c("ma_r_as_r", "ma_d_as_r") %in% class(ma_obj))){
+     
+     if(any(c("r_as_r", "d_as_r") %in% ma_metric)){
           if(is.null(x_limits)) x_limits <- c(-1, 1)
           if(is.null(x_breaks)) x_breaks <- seq(-1, 1, .5)
           if(ma_method == "barebones"){
@@ -338,19 +382,28 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                if(is.null(x_lab)) x_lab <- expression(Corrected~~Standardized~~Mean~~Difference~~(italic(d)))
           }
      }
-
-     conf_out <- confidence(mean = mat[,mean_es], sd = mat[,sd_es], k = mat[,"k"], conf_level = conf_level, conf_method = conf_method)
+     
+     
+     mat <- as.data.frame(mat)
+     conf_out <- confidence(mean = unlist(mat[,mean_es]),
+                            sd = unlist(mat[,sd_es]),
+                            k = unlist(mat[,"k"]),
+                            conf_level = conf_level, conf_method = conf_method)
      colnames(conf_out) <- c("lowerci", "upperci")
      mat <- data.frame(tester = "Summary",
                        setting = ma_facetname,
                        cite = setting,
-                       yi = as.numeric(mat[,mean_es]))
+                       yi = unlist(mat[,mean_es]))
      colnames(mat) <- c("tester", "setting", "cite", "yi")
      mat <- cbind(mat, conf_out)
-
+     
      dat <- NULL
      for(i in 1:length(escalc_list)){
-          .dat <- escalc_list[[i]]
+          if(.ma_method == "bb"){
+               .dat <- escalc_list[[i]]$barebones
+          }else{
+               .dat <- escalc_list[[i]]$individual_correction[[correction_type]]
+          }
           .dat$setting <- setting[i]
           dat <- rbind(dat, .dat)
      }
@@ -359,7 +412,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      conf_out <- confidence(mean = dat$yi, se = dat$vi^.5, df = dat$n - 2, conf_level = conf_level, conf_method = conf_method)
      colnames(conf_out) <- c("lowerci", "upperci")
      dat <- cbind(dat, conf_out)
-
+     
      if(!is.null(facet_levels)){
           if(all(as.character(dat$setting) %in% as.character(facet_levels))){
                stop("If facet_levels is not NULL, it must contain the names of moderator levels")
@@ -370,21 +423,27 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           dat$setting <- factor(dat$setting)
           dat$cite <- factor(dat$cite)
      }
-
+     
      if(length(escalc_list) > 1){
           dat <- filter(dat, setting != "Overall")
           .facet_grid <- facet_grid(setting~., scales= 'free', space='free')
      }else{
           .facet_grid <- NULL
      }
+     
+     if(nrow(mat) == 1){
+          mat$cite <- "Overall"
+          mat$cite <- as.factor(mat$cite)
+     }
      plot_dat <- rbind(data.frame(dat[,colnames(mat)]), mat)
      plot_dat$setting <- factor(plot_dat$setting, levels = c(levels(dat$setting), ma_facetname))
-
+     if(nrow(mat) == 1) plot_dat$cite <- factor(plot_dat$cite, levels = c(levels(mat$cite), levels(dat$cite)))
+     
      if(!is.null(x_limits)){
           plot_dat$upperci[dat$upperci > max(x_limits)] <- max(x_limits)
           plot_dat$lowerci[dat$lowerci < min(x_limits)] <- min(x_limits)
      }
-
+     
      if(is.null(x_limits)){
           .scale_x_continuous <- scale_x_continuous(limits = NULL, name = x_lab)
      }else{
@@ -394,10 +453,10 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                .scale_x_continuous <- scale_x_continuous(limits = x_limits, breaks = x_breaks, name = x_lab)
           }
      }
-
-     ggplot(plot_dat, aes(y = cite, x = yi, xmin = lowerci, xmax = upperci, shape = tester)) +
+     
+     ggplot(plot_dat, aes_(y = ~cite, x = ~yi, xmin = ~lowerci, xmax = ~upperci, shape = ~tester)) +
           geom_point(color = 'black') +
-          geom_point(data=subset(dat, tester=='Summary'), color='black', shape=18, size=4) +
+          geom_point(data=dat %>% filter(.data$tester=='Summary'), color='black', shape=18, size=4) +
           geom_errorbarh(height=.1) +
           .scale_x_continuous +
           ylab(y_lab) +

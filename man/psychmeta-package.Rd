@@ -60,15 +60,16 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Brenton M. Wiernik \email{psychmeta@wiernik.org}
+  \item Brenton M. Wiernik \email{brenton@psychmeta.com}
 }
 
 Other contributors:
 \itemize{
-  \item Michael T. Brannick [contributor]
-  \item Jack Kostal [contributor]
-  \item Sean Potter [contributor]
-  \item Yuejia (Mandy) Teng [contributor]
+  \item Michael T. Brannick (Testing) [contributor]
+  \item Jack Kostal (Code for reshape_mat2dat function) [contributor]
+  \item Sean Potter (Testing; Code for cumulative and leave1out plots) [contributor]
+  \item John Sakaluk (Code for funnel and forest plots) [contributor]
+  \item Yuejia (Mandy) Teng (Testing) [contributor]
 }
 
 }

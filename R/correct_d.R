@@ -76,6 +76,7 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
 #' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
+#' @param k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param rGg Vector of reliabilities for the group variable (i.e., the correlations between observed group membership and latent group membership).
 #' @param pi Proportion of cases in one of the groups in the observed data (not necessary if \code{n1} and \code{n2} reflect this proportionality).
 #' @param pa Proportion of cases in one of the groups in the population.
@@ -163,7 +164,7 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"),
                       d, ryy = 1, uy = 1,
                       rGg = 1, pi = NULL, pa = NULL,
-                      uy_observed = TRUE, ryy_restricted = TRUE, ryy_type = "alpha",
+                      uy_observed = TRUE, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                       sign_rgz = 1, sign_ryz = 1,
                       n1 = NULL, n2 = NA, conf_level = .95, correct_bias = FALSE){
      correction <- match.arg(correction)
@@ -226,7 +227,7 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
                       rxx = rxx, ryy = ryy,
                       ux_observed = TRUE, uy_observed = uy_observed,
                       rxx_restricted = TRUE, rxx_type = "group_treatment",
-                      ryy_restricted = ryy_restricted, ryy_type = ryy_type,
+                      ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
                       sign_rxz = sign_rgz, sign_ryz = sign_ryz,
                       n = n, conf_level = conf_level, correct_bias = correct_bias)
 
@@ -256,6 +257,6 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
           names(out[["correlations"]])[names(out[["correlations"]]) %in% out_names] <- new_names
      }
      names(out)[names(out) == "correlations"] <- "d_values"
-     class(out)[2] <- "correct_d"
+     class(out)[class(out) == "correct_r"] <- "correct_d"
      out
 }

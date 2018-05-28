@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_r.R
 \name{merge_simdat_r}
 \alias{merge_simdat_r}
-\title{Merge multiple "simdat_r" class objects}
+\title{Merge multiple "simdat_r_database" class objects}
 \usage{
 merge_simdat_r(...)
 }
@@ -10,7 +10,7 @@ merge_simdat_r(...)
 \item{...}{Collection of objects created by the "simulate_r_database" function. Simply enter the database objects as \code{merge_simdat_r}(data_obj1, data_obj2, data_obj_3).}
 }
 \value{
-A merged database of class \code{simdat_r}
+A merged database of class \code{simdat_r_database}
 }
 \description{
 This function allows for multiple simulated databases from \code{\link{simulate_r_database}} to be merged together into a single database. Merged databases will be assigned moderator variable codes.

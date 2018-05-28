@@ -1,10 +1,10 @@
-#' Master framework for meta-analysis of \emph{d} values
+#' Meta-analysis of \emph{d} values
 #'
-#' This is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
-#' When artifact-distribution meta-analyses are performed, this function will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
-#' This function is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
-#' The automatic compositing features are employed when \code{sample_id}s and/or construct names are provided.
-#' When multiple meta-analyses are computed within this program, the result of this function takes on the class \code{ma_master}, which means that it is a list of meta-analyses. Follow-up analyses (e.g., sensitivity, heterogeneity, meta-regression) performed on \code{ma_master} objects will analyze data from all meta-analyses recorded in the object.
+#' The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for \emph{d} values, respectively. 
+#' The \code{ma_d} function is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
+#' When artifact-distribution meta-analyses are performed, \code{ma_d} will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
+#' \code{ma_d} is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
+#' The automatic compositing features in \code{ma_d} are employed when \code{sample_id}s and/or construct names are provided.
 #'
 #' @param d Vector or column name of observed \emph{d} values.
 #' @param n1 Vector or column name of sample sizes.
@@ -12,7 +12,7 @@
 #' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
 #' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
-#' @param treat_as_d Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).
+#' @param treat_as_r Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{FALSE}; default) or whether they should be meta-analyzed as correlations and have the final results converted to the \emph{d} metric (\code{TRUE}).
 #' @param ma_method Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
 #' @param ad_type For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".
 #' @param correction_method Character scalar or a matrix with \code{group_id} levels as row names and \code{construct_y} levels as column names.
@@ -32,7 +32,6 @@
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
-#' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rel Optional named vector that supersedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.
 #' @param correct_rGg Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
@@ -49,6 +48,7 @@
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
+#' @param k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param pi Scalar or vector containing the restricted-group proportions of group membership. If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param pa Scalar or vector containing the unrestricted-group proportions of group membership (default = .5). If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param uy Vector or column name of u ratios for Y.
@@ -56,49 +56,36 @@
 #' @param sign_rz Optional named vector that supersedes \code{sign_rgz} and \code{sign_ryz}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine the sign of each construct's relationship with the selection mechanism.
 #' @param sign_rgz Sign of the relationship between X and the selection mechanism (for use with bvirr corrections only).
 #' @param sign_ryz Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param cred_level Credibility level to define the width of the credibility interval (default = .80).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param moderator_type Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time,
 #' "hierarchical" means that all possible combinations and subsets of moderators are to be examined, and "all" means that simple and hierarchical moderator analyses are to be performed.
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
-#' @param pairwise_ads Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).
-#' @param residual_ads Logical argument that determines whether to use residualized variances (\code{TRUE}) or observed variances (\code{FALSE}) of artifact distributions to estimate \code{sd_delta}.
-#' @param check_dependence Logical scalar that determines whether database should be checked for violations of independence (\code{TRUE}) or not (\code{FALSE}).
-#' @param collapse_method Character argument that determines how to collapase dependent studies. Options are "composite" (default), "average," and "stop."
-#' @param intercor The intercorrelation(s) among variables to be combined into a composite. Can be a scalar or a named vector with element named according to the names of constructs.
-#' @param partial_intercor Logical value that determines whether to compute artifact distributions in a construct-pair-wise fashion (\code{TRUE}) or separately by construct (\code{FALSE}, default).
-#' @param clean_artifacts If \code{TRUE}, multiple instances of the same construct (or construct-measure pair, if measure is provided) in the database are compared and reconciled with each other
-#' in the case that any of the matching entries within a study have different artifact values. When impute_method is anything other than "stop", this method is always implemented to prevent discrepancies among imputed values.
-#' @param impute_artifacts If \code{TRUE}, artifact imputation will be performed (see \code{impute_method} for imputation procedures). Default is \code{FALSE} for artifact-distribution meta-analyses and \code{TRUE} otherwise.
-#' When imputation is performed, \code{clean_artifacts} is treated as \code{TRUE} so as to resolve all discrepancies among artifact entries before and after imputation.
-#' @param impute_method Method to use for imputing artifacts. See the documentation for \code{\link{ma_r}} for a list of available imputation methods.
-#' @param seed Seed value to use for imputing artifacts. Default value is 42.
-#' @param decimals Number of decimal places to which results should be rounded (default is to perform no rounding).
-#' @param hs_override When \code{TRUE}, this will override settings for \code{wt_type} (will set to "sample_size"), 
-#' \code{error_type} (will set to "mean"),
-#' \code{correct_bias} (will set to \code{TRUE}), 
-#' \code{conf_method} (will set to "norm"),
-#' \code{cred_method} (will set to "norm"), 
-#' \code{var_unbiased} (will set to \code{FALSE}), 
-#' and \code{use_all_arts} (will set to \code{FALSE}).
-#' @param use_all_arts Logical scalar that determines whether artifact values from studies without valid effect sizes should be used in artifact distributions (\code{TRUE}; default) or not (\code{FALSE}).
-#' @param estimate_pa Logical scalar that determines whether the unrestricted subgroup proportions associated with univariate-range-restricted effect sizes should be estimated by rescaling the range-restricted subgroup proportions as a function of the range-restriction correction (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param supplemental_ads Named list (named according to the constructs included in the meta-analysis) of supplemental artifact distribution information from studies not included in the meta-analysis. This is a list of lists, where the elements of a list associated with a construct are named like the arguments of the \code{create_ad()} function.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
+#' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
+#' 
+#' @param supplemental_ads_y For \code{ma_d_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.
+#' @param ma_obj For \code{ma_d_ad} only: Meta-analysis object of correlations or \emph{d} values (regardless of input metric, output metric will be \emph{d}).
+#' @param ad_obj_g For \code{ma_d_ad} only: Artifact-distribution object for the grouping variable (output of the \code{link{create_ad}} or \code{link{create_ad_group}} functions).
+#' If ma_obj is of the class \code{ma_master} (i.e., the output of \code{\link{ma_r}} or \code{\link{ma_d}}), the object supplied for
+#' \code{ad_obj_g} must be a named list of artifact distributions with names.
+#' corresponding to the "X" constructs in the meta-analyses contained within \code{ma_obj}.
+#' @param ad_obj_y For \code{ma_d_ad} only: AArtifact-distribution object for the Y variable (output of the \code{create_ad} function).
+#' If ma_obj is of the class \code{ma_master}, the object supplied for \code{ad_obj_y} must be a named list of artifact distributions with names
+#' corresponding to the "Y" constructs in the meta-analyses contained within \code{ma_obj}.
+#' @param use_ic_ads For \code{ma_d_ad} only: Determines whether artifact distributions should be extracted from the individual correction results in \code{ma_obj}.
+#' Only evaluated when \code{ad_obj_g} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
+#' Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.
 #'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_d_as_r} or \code{ma_d_as_d}, \code{ma_bb} (and \code{ma_ic} or \code{ma_ad}, as appropriate).
+#' @return A nested tabular object of the class "ma_psychmeta".
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
 #' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -117,11 +104,11 @@
 #'
 #' Components of output tables for individual-correction meta-analyses:
 #' \itemize{
-#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{pair_id}}{\cr Unique identification number for each construct-contrast pairing.}
+#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -148,11 +135,11 @@
 #'
 #' Components of output tables for artifact-distribution meta-analyses:
 #' \itemize{
-#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{Group_Contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{Construct_Y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{Analysis_ID}}{\cr Unique identification number for each moderator analysis within a construct-contrast pairing.}
-#' \item{\code{Analysis_Type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{pair_id}}{\cr Unique identification number for each construct-contrast pairing.}
+#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
+#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
 #' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
 #' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
 #' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
@@ -187,16 +174,46 @@
 #'
 #' @export
 #'
+#' @details
+#' The options for \code{correction_method} are:
+#' \itemize{
+#' \item{"auto"}{\cr Automatic selection of the most appropriate correction procedure, based on the available artifacts and the logical arguments provided to the function. (default)}
+#' \item{"meas"}{\cr Correction for measurement error only.}
+#' \item{"uvdrr"}{\cr Correction for univariate direct range restriction (i.e., Case II). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+#' \item{"uvirr"}{\cr Correction for univariate indirect range restriction (i.e., Case IV). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+#' \item{"bvdrr"}{\cr Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
+#' \item{"bvirr"}{\cr Correction for bivariate indirect range restriction (i.e., Case V).}
+#' \item{"rbOrig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. We recommend using "uvdrr" instead.}
+#' \item{"rbAdj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' \item{"rb1Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. We recommend using "uvdrr" instead.}
+#' \item{"rb1Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' \item{"rb2Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. We recommend using "uvdrr" instead.}
+#' \item{"rb2Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' }
+#'
+#' @section Note:
+#' The difference between "rb" methods with the "orig" and "adj" suffixes is that the original does not account for the impact of range restriction on criterion reliabilities, whereas
+#' the adjusted procedure attempts to estimate the applicant reliability information for the criterion. The "rb" procedures are included for posterity: We strongly recommend using
+#' the "uvdrr" procedure to appropriately correct for univariate range restriction.
+#'
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 3.
+#' \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
+#' Thousand Oaks, California: SAGE Publications, Inc. Chapter 4.
+#'
+#' Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
+#' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
+#' \emph{Journal of Applied Psychology, 79}(3), 425.
 #'
 #' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
 #' Accounting for indirect range restriction in organizational and psychological research}.
 #' Manuscript submitted for review.
 #'
+#' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
+#' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
+#'
 #' @examples
+#' ### Demonstration of ma_d ###
 #' ## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:
 #' ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 #'
@@ -209,30 +226,54 @@
 #' ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
 #'      ryy = ryyi, correct_rr_y = FALSE,
 #'      construct_y = construct, data = data_d_meas_multi)
-ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                 treat_as_d = TRUE, ma_method = "bb", ad_type = "tsa", correction_method = "auto",
+#'      
+#'      
+#' ### Demonstration of ma_d_bb ###
+#' ## Example meta-analyses using simulated data:
+#' ma_d_bb(d = d, n1 = n1, n2 = n2,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
+#' ma_d_bb(d = d, n1 = n1, n2 = n2,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
+#'         
+#'         
+#' ### Demonstration of ma_d_ic ###
+#' ## Example meta-analyses using simulated data:
+#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
+#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
+ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_r = FALSE, 
+                 ma_method = c("bb", "ic", "ad"), 
+                 ad_type = c("tsa", "int"), 
+                 correction_method = "auto",
                  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
                  construct_y = NULL, measure_y = NULL, construct_order = NULL,
-                 wt_type = "inv_var_mean", error_type = "mean",
+                 wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                             "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
                  correct_bias = TRUE,
                  correct_rel = NULL, correct_rGg = FALSE, correct_ryy = TRUE,
                  correct_rr = NULL, correct_rr_g = TRUE, correct_rr_y = TRUE,
                  indirect_rr = NULL, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
                  rGg = NULL, pi = NULL, pa = NULL,
-                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+                 ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
                  uy = NULL, uy_observed = TRUE,
                  sign_rz = NULL, sign_rgz = 1, sign_ryz = 1,
-                 conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-                 moderators = NULL, cat_moderators = TRUE, moderator_type = "simple",
-                 pairwise_ads = FALSE, residual_ads = TRUE,
-                 check_dependence = TRUE, collapse_method = "composite", intercor = .5, partial_intercor = FALSE,
-                 clean_artifacts = TRUE, impute_artifacts = ifelse(ma_method == "ad", FALSE, TRUE), impute_method = "bootstrap_mod", seed = 42,
-                 decimals = 2, hs_override = FALSE, use_all_arts = TRUE, estimate_pa = FALSE, supplemental_ads = NULL, data = NULL, ...){
+                 moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
+                 supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
 
      ##### Get inputs #####
      call <- match.call()
      
-     if(hs_override){
+     ma_method <- match.arg(ma_method, choices = c("bb", "ic", "ad"))
+     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
+     ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
+     
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
+     
+     if(control$hs_override){
           wt_type <- "sample_size"
           error_type <- "mean"
           correct_bias <- TRUE
@@ -240,12 +281,10 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
           var_unbiased <- FALSE
           residual_ads <- FALSE
      }
-     
-     inputs <- list(wt_type = wt_type, error_type = error_type,
-                    correct_bias = correct_bias, correct_rGg = correct_rGg, correct_ryy = correct_ryy,
-                    conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, var_unbiased = var_unbiased,
-                    cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
 
+     treat_as_d <- list(...)$treat_as_d
+     if(is.null(treat_as_d)) treat_as_d <- !treat_as_r
+     
      cat(" **** Running ma_d: Meta-analysis of d values **** \n")
 
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
@@ -256,11 +295,6 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
-     error_type <- scalar_arg_warning(arg = error_type, arg_name = "error_type")
-     use_all_arts <- scalar_arg_warning(arg = use_all_arts, arg_name = "use_all_arts")
-
-     conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
-     cred_level <- interval_warning(interval = cred_level, interval_name = "cred_level", default = .8)
 
      formal_args <- formals(ma_d)
      formal_args[["..."]] <- NULL
@@ -306,7 +340,10 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, data = data)
-
+          
+          if(deparse(substitute(k_items_y))[1] != "NULL")
+               k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
+          
           if(deparse(substitute(uy))[1] != "NULL")
                uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, data = data)
 
@@ -483,38 +520,28 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      out <- ma_r(ma_method = ma_method, ad_type = ad_type, correction_method = correction_method, citekey = citekey,
                  rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
                  construct_x = group_id, construct_y = construct_y,
+                 construct_order = c(group_order, construct_order), 
                  measure_x = NULL, measure_y = measure_y,
-                 # construct_order = c(group_order, construct_order),
-                 wt_type = wt_type, error_type = error_type, correct_bias = correct_bias,
+                 wt_type = wt_type, correct_bias = correct_bias,
                  correct_rel = correct_rel, correct_rxx = correct_rGg, correct_ryy = correct_ryy,
                  correct_rr = correct_rr, correct_rr_x = correct_rr_g, correct_rr_y = correct_rr_y,
                  indirect_rr = indirect_rr, indirect_rr_x = indirect_rr_g, indirect_rr_y = indirect_rr_y,
-                 rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment",
-                 ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type,
+                 rxx = rxxi, rxx_restricted = TRUE, rxx_type = "group_treatment", k_items_x = NA,
+                 ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
                  ux = ux, ux_observed = TRUE,
                  uy = uy, uy_observed = uy_observed,
                  sign_rz = sign_rz, sign_rxz = sign_rgz, sign_ryz = sign_ryz,
-                 conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased,
                  moderators = moderators, cat_moderators = cat_moderators, moderator_type = moderator_type,
-                 pairwise_ads = pairwise_ads, residual_ads = residual_ads,
-                 check_dependence = check_dependence, collapse_method = collapse_method, intercor = intercor,
-                 clean_artifacts = clean_artifacts, impute_artifacts = impute_artifacts, impute_method = impute_method, seed = seed,
-                 decimals = decimals, use_all_arts = use_all_arts, supplemental_ads = supplemental_ads, data = NULL,
+                 supplemental_ads = supplemental_ads, data = NULL, control = control,
 
                  ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
                  use_as_x = group_order, use_as_y = construct_order,
-                 es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa,
-                 partial_intercor = partial_intercor, estimate_pa = estimate_pa)
+                 es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa)
 
-     out$call_history <- append(list(call), out$call_history)
-     if(ma_method != "bb"){
-          if(treat_as_d){
-               class(out)[2] <- "ma_d_as_r"
-          }else{
-               class(out)[2] <- "ma_r_as_r"
-          }
-          out <- convert_ma(ma_obj = out)
-     }
+     attributes(out)$call_history <- list(call)
 
+     if(attributes(out)$ma_metric %in% c("d_as_r", "r_as_r"))
+          out <- convert_ma(ma_obj = out, record_call = FALSE)
+     
      return(out)
 }

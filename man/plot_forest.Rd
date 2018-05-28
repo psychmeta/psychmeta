@@ -53,10 +53,19 @@ Create forest plots
 \examples{
 ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
-               moderators = moderator, data = data_r_meas_multi,
-               clean_artifacts = FALSE, impute_artifacts = FALSE)
-plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1))
+               moderators = moderator, data = data_r_meas_multi)
+plot_forest(ma_obj = ma_obj)
 plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 2))
 plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1), show_filtered = TRUE)
-plot_forest(ma_obj = ma_obj$construct_pairs[[1]])
+
+## d values
+ma_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
+               construct_y = construct, sample_id = sample_id,
+               data = data_d_meas_multi)
+plot_forest(ma_obj = ma_obj)
+plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 2))
+plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
+}
+\author{
+Based on code by John Sakaluk
 }

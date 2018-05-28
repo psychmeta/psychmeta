@@ -1,56 +1,31 @@
-#' Bare-bones meta-analysis of \emph{d} values
-#'
-#' This function computes bare-bones meta-analyses of \emph{d} values.
-#'
-#' @param d Vector of \emph{d} values.
-#' @param n1 Vector or column name of primary sample sizes (if subgroup sample sizes are not known, these values are total sample sizes; if subgroup sample sizes are known, these values are sample sizes for the first of the two groups).
-#' @param n2 Optional: Vector or column name of secondary sample sizes. If subgroup sample sizes are known, these values are sample sizes for the second of the two groups. \code{NULL} by default.
-#' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
-#' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
-#' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
-#' When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.
-#' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
-#' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
-#' (see metafor documentation for details about the metafor methods).
-#' @param error_type Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.
-#' @param correct_bias Logical argument that determines whether to correct effect sizes and error variances for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
-#' @param conf_level Width of confidence interval. Set to .95 by default.
-#' @param cred_level Width of credibility interval. Set to .80 by default.
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param cred_method Distribution to be used to compute the width of credibility intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
-#' @param var_unbiased Logical scalar determining whether variances should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param moderators Matrix of moderator variables or column names of \code{data} to be used in the meta-analysis (can be a vector in the case of one moderator).
-#' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
-#' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
-#' @param hs_override When TRUE, this will override settings for \code{wt_type} (will set to "sample_size"), \code{error_type} (will set to "mean"),
-#' \code{correct_bias} (will set to \code{TRUE}), \code{conf_method} (will set to "norm"), \code{cred_method} (will set to "norm"), and \code{var_unbiased} (will set to \code{FALSE}).
-#' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
-#' @param ... Further arguments to be passed to functions called within the meta-analysis.
-#'
-#' @return A list object of the classes \code{psychmeta}, \code{ma_d_as_d}, and \code{ma_bb}.
+#' @rdname ma_d
 #' @export
 #' @import dplyr
-#'
 #' @aliases ma_d_barebones
-#'
-#' @references
-#' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 7.
-#'
-#' @examples
-#' ## Example meta-analyses using simulated data:
-#' ma_d_bb(d = d, n1 = n1, n2 = n2,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
-#' ma_d_bb(d = d, n1 = n1, n2 = n2,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
 ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL, citekey = NULL,
-                                      wt_type = "sample_size", error_type = "mean", correct_bias = FALSE,
-                                      conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t", var_unbiased = TRUE,
-                                      moderators = NULL, cat_moderators = TRUE, moderator_type = "simple", hs_override = FALSE, data = NULL, ...){
+                                      wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                                  "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
+                                      correct_bias = FALSE,
+                                      moderators = NULL, cat_moderators = TRUE, 
+                                      moderator_type = c("simple", "hierarchical", "none"), 
+                                      data = NULL, control = control_psychmeta(), ...){
      warn_obj1 <- record_warnings()
      call <- match.call()
 
+     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
+     
+     control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
+                                  .control_psychmeta_arg = control)
+     error_type <- control$error_type
+     conf_level <- control$conf_level
+     cred_level <- control$cred_level
+     conf_method <- control$conf_method
+     cred_method <- control$cred_method
+     var_unbiased <- control$var_unbiased
+     hs_override <- control$hs_override
+     
      if(hs_override){
           wt_type <- "sample_size"
           error_type <- "mean"
@@ -124,9 +99,12 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 
      additional_args <- list(...)
 
-     inputs <- list(wt_type = wt_type, error_type = error_type,
-                    correct_bias = correct_bias, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method,
-                    var_unbiased = var_unbiased, moderators = moderators, cat_moderators = cat_moderators, moderator_type = moderator_type, data = data)
+     as_worker <- additional_args$as_worker
+     if(is.null(as_worker)) as_worker <- FALSE
+     
+     inputs <- list(wt_type = wt_type, error_type = error_type, correct_bias = correct_bias, 
+                    conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, 
+                    var_unbiased = var_unbiased)
 
      es_data <- data.frame(d = d, n1 = n1, n2 = n2)
      es_data$n_adj <- n_adj
@@ -142,13 +120,20 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                        presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
 
-     out$barebones <- append(list(call = call, inputs = inputs), out$barebones)
-     out <- append(list(call_history = list(call)), out)
-
-     out$barebones$messages <- list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                                    fyi = record_fyis(neg_var_res = sum(out$barebones$meta_table$var_res < 0, na.rm = TRUE)))
-
-     class(out) <- c("psychmeta", "ma_d_as_d", "ma_bb")
+     if(!as_worker){
+          out <- bind_cols(analysis_id = 1:nrow(out), out)
+          attributes(out) <- append(attributes(out), list(call_history = list(call), 
+                                                          inputs = inputs, 
+                                                          ma_methods = "bb",
+                                                          ma_metric = "d_as_d", 
+                                                          default_print = "bb",
+                                                          warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
+                                                          fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
+          out <- namelists.ma_psychmeta(ma_obj = out)
+     }
+     
+     class(out) <- c("ma_psychmeta", class(out))
+     
      return(out)
 }
 
@@ -285,10 +270,6 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           var_res <- sd_res <- NA
           se_d <- sd_e
           ci <- confidence(mean = mean_d, sd = sd_e, k = 1, conf_level = conf_level, conf_method = "norm")
-
-          # se_d <- NA
-          # ci <- cbind(NA, NA)
-          # colnames(ci) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
      }else{
           se_d <- sd_d / sqrt(k)
           ci <- confidence(mean = mean_d, sd = var_d^.5, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -297,19 +278,29 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      ci <- setNames(c(ci), colnames(ci))
      cv <- setNames(c(cv), colnames(cv))
 
+     barebones <- as.data.frame(t(c(k = k,
+                                    N = N,
+                                    mean_d = mean_d,
+                                    var_d = var_d,
+                                    var_e = var_e,
+                                    var_res = var_res,
+                                    sd_d = var_d^.5,
+                                    se_d = se_d,
+                                    sd_e = var_e^.5,
+                                    sd_res = sd_res,
+                                    ci, cv)))
+     
+     class(barebones) <- c("ma_table", class(barebones))
+     attributes(barebones) <- append(attributes(barebones), list(ma_type = "d_bb"))
+     
      ## Compile results
-     list(barebones = list(meta = as.data.frame(t(c(k = k,
-                                                    N = N,
-                                                    mean_d = mean_d,
-                                                    var_d = var_d,
-                                                    var_e = var_e,
-                                                    var_res = var_res,
-                                                    sd_d = var_d^.5,
-                                                    se_d = se_d,
-                                                    sd_e = var_e^.5,
-                                                    sd_res = sd_res,
-                                                    ci, cv))),
-                           data = escalc_obj))
+     list(meta = list(barebones = barebones, 
+                      individual_correction = NULL, 
+                      artifact_distribution = NULL),
+          escalc = list(barebones = escalc_obj, 
+                        individual_correction = NULL, 
+                        artifact_distribution = NULL))
+                      
 }
 
 
@@ -325,7 +316,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 .ma_d_bb_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_d_bb(data = data, ma_arg_list = ma_arg_list, run_lean = TRUE)
-     unlist(out$barebones$meta)
+     unlist(out$meta$barebones)
 }
 
 

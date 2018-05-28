@@ -91,7 +91,11 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
                                           show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }
 
-     class(out) <- c("psychmeta", "simulate_d", "data.frame")
+     out$overall_results$observed <- as_tibble(out$overall_results$observed)
+     out$overall_results$true <- as_tibble(out$overall_results$true)
+     out$overall_results$error <- as_tibble(out$overall_results$error)
+     
+     class(out) <- "simdat_d_sample"
      out
 }
 
@@ -726,7 +730,7 @@ append_dmat <- function(di_mat, da_mat,
                  data = list(observed = data.frame(obs_a, selected = select_vec),
                              true = data.frame(true_a, selected = select_vec),
                              error = data.frame(error_a, selected = select_vec)))
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- c("simdat_d_sample")
      out
 }
 
@@ -1083,7 +1087,7 @@ append_dmat <- function(di_mat, da_mat,
                  S_complete_a = sa,
                  S_complete_i = si,
                  data = NULL)
-     class(out) <- c("psychmeta", "simulate_d")
+     class(out) <- c("simdat_d_sample")
      out
 }
 
@@ -1141,7 +1145,6 @@ append_dmat <- function(di_mat, da_mat,
 #' @importFrom progress progress_bar
 #'
 #' @examples
-#' \dontrun{
 #' ## Define sample sizes, means, and other parameters for each of two groups:
 #' n_params <- list(c(mean = 200, sd = 20),
 #'                  c(mean = 100, sd = 20))
@@ -1161,7 +1164,6 @@ append_dmat <- function(di_mat, da_mat,
 #'                     k_items = c(4, 4),
 #'                     group_names = NULL, var_names = c("y1", "y2"),
 #'                     show_applicant = TRUE, keep_vars = c("y1", "y2"), decimals = 2)
-#' }
 simulate_d_database <- function(k, n_params, rho_params,
                                 mu_params = NULL, sigma_params = 1,
                                 rel_params = 1, sr_params = 1, k_items_params = 1,
@@ -1475,9 +1477,9 @@ simulate_d_database <- function(k, n_params, rho_params,
      dat_params[,numeric_vars_params] <- round(as.matrix(dat_params[,numeric_vars_params]), decimals)
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = dat_stats,
-                 parameters = dat_params)
-     class(out) <- c("psychmeta", "simdat_d", "long")
+                 statistics = as_tibble(dat_stats),
+                 parameters = as_tibble(dat_params))
+     class(out) <- "simdat_d_database"
      out
 }
 
@@ -1486,13 +1488,13 @@ simulate_d_database <- function(k, n_params, rho_params,
 
 
 
-#' Create sparse artifact information in a "simdat_d" class object
+#' Create sparse artifact information in a "simdat_d_database" class object
 #'
 #' This function can be used to randomly delete artifact from databases produced by the \code{\link{simulate_d_database}} function.
 #' Deletion of artifacts can be performed in either a study-wise fashion for complete missingness within randomly selected studies or element-wise missingness for completely random deletion of artifacts in the database.
 #' Deletion can be applied to reliability estimates and/or u ratios.
 #'
-#' @param data_obj Object created by the "simdat_d" function.
+#' @param data_obj Object created by the "simdat_d_database" function.
 #' @param prop_missing Proportion of studies in from which artifact information should be deleted.
 #' @param sparify_arts Vector of codes for the artifacts to be sparsified: "rel" for reliabilities, "u" for u ratios, or c("rel", "u") for both.
 #' @param study_wise Logical scalar argument determining whether artifact deletion should occur for all variables in a study (\code{TRUE}) or randomly across variables within studies (\code{FALSE}).
@@ -1502,8 +1504,8 @@ simulate_d_database <- function(k, n_params, rho_params,
 sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u"), study_wise = TRUE){
      sparify_arts <- match.arg(sparify_arts, c("rel", "u"), several.ok  = TRUE)
 
-     if(!any(class(data_obj) == "simdat_d"))
-          stop("'data_obj' must be of class 'simdat_d'", call. = FALSE)
+     if(!any(class(data_obj) == "simdat_d_database"))
+          stop("'data_obj' must be of class 'simdat_d_database'", call. = FALSE)
 
      call <- match.call()
 
@@ -1519,35 +1521,63 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
 
      if(study_wise){
           if(show_applicant){
+               art_logic_stat <- c(rep(sparify_u, 6), rep(sparify_rel, 36))
+               art_logic_param <- c(rep(sparify_u, 3), rep(sparify_rel, 36))
+               art_names_stat <- c("uy_local", "uy1_local", "uy2_local",
+                                   "uy_external", "uy1_external", "uy2_external",
+                                   
+                                   "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
+                                   "parallel_ryya_pooled", "parallel_ryya1_pooled", "parallel_ryya2_pooled",
+                                   "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
+                                   "raw_alpha_ya_pooled", "raw_alpha_ya1_pooled", "raw_alpha_ya2_pooled",
+                                   "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
+                                   "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled", 
+                                   
+                                   "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
+                                   "parallel_ryya_total", "parallel_ryya1_total", "parallel_ryya2_total",
+                                   "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
+                                   "raw_alpha_ya_total", "raw_alpha_ya1_total", "raw_alpha_ya2_total",
+                                   "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total",
+                                   "std_alpha_ya_total", "std_alpha_ya1_total", "std_alpha_ya2")[art_logic_stat]
+               
+               art_names_param <- c("uy", "uy1", "uy2",
+                                    
+                                    "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
+                                    "parallel_ryya_pooled", "parallel_ryya1_pooled", "parallel_ryya2_pooled",
+                                    "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
+                                    "raw_alpha_ya_pooled", "raw_alpha_ya1_pooled", "raw_alpha_ya2_pooled",
+                                    "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
+                                    "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled", 
+                                    
+                                    "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
+                                    "parallel_ryya_total", "parallel_ryya1_total", "parallel_ryya2_total",
+                                    "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
+                                    "raw_alpha_ya_total", "raw_alpha_ya1_total", "raw_alpha_ya2_total",
+                                    "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total",
+                                    "std_alpha_ya_total", "std_alpha_ya1_total", "std_alpha_ya2")[art_logic_param]
+          }else{
                art_logic_stat <- c(rep(sparify_u, 6), rep(sparify_rel, 18))
                art_logic_param <- c(rep(sparify_u, 3), rep(sparify_rel, 18))
                art_names_stat <- c("uy_local", "uy1_local", "uy2_local",
                                    "uy_external", "uy1_external", "uy2_external",
-                                   "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
-                                   "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
-                                   "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
-                                   "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
-                                   "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2",
-                                   "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2")[art_logic_stat]
+                                   
+                                   "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
+                                   "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
+                                   "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled", 
+                                   
+                                   "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
+                                   "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
+                                   "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total")[art_logic_stat]
+               
                art_names_param <- c("uy", "uy1", "uy2",
-                                    "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
-                                    "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
-                                    "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
-                                    "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
-                                    "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2",
-                                    "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2")[art_logic_param]
-          }else{
-               art_logic_stat <- c(rep(sparify_u, 6), rep(sparify_rel, 9))
-               art_logic_param <- c(rep(sparify_u, 3), rep(sparify_rel, 9))
-               art_names_stat <- c("uy_local", "uy1_local", "uy2_local",
-                                   "uy_external", "uy1_external", "uy2_external",
-                                   "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
-                                   "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
-                                   "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")[art_logic_stat]
-               art_names_param <- c("uy", "uy1", "uy2",
-                                    "parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
-                                    "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
-                                    "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")[art_logic_stat]
+                                    
+                                    "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
+                                    "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
+                                    "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled", 
+                                    
+                                    "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
+                                    "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
+                                    "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total")[art_logic_stat]
           }
 
           art_names_stat <- art_names_stat[art_names_stat %in% colnames(data_obj$statistics)]
@@ -1567,16 +1597,27 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                     art_i_param <- c("uy", "uy1", "uy2")
                }else{
                     if(show_applicant){
-                         art_i_param <- art_i_stat <- c("parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
-                                                        "parallel_ryya", "parallel_ryya1", "parallel_ryya2",
-                                                        "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
-                                                        "raw_alpha_ya", "raw_alpha_ya1", "raw_alpha_ya2",
-                                                        "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2",
-                                                        "std_alpha_ya", "std_alpha_ya1", "std_alpha_ya2")
+                         art_i_param <- art_i_stat <- c("parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
+                                                        "parallel_ryya_pooled", "parallel_ryya1_pooled", "parallel_ryya2_pooled",
+                                                        "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
+                                                        "raw_alpha_ya_pooled", "raw_alpha_ya1_pooled", "raw_alpha_ya2_pooled",
+                                                        "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
+                                                        "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled", 
+                                                        
+                                                        "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
+                                                        "parallel_ryya_total", "parallel_ryya1_total", "parallel_ryya2_total",
+                                                        "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
+                                                        "raw_alpha_ya_total", "raw_alpha_ya1_total", "raw_alpha_ya2_total",
+                                                        "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total",
+                                                        "std_alpha_ya_total", "std_alpha_ya1_total", "std_alpha_ya2")
                     }else{
-                         art_i_param <- art_i_stat <- c("parallel_ryyi", "parallel_ryyi1", "parallel_ryyi2",
-                                                        "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
-                                                        "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")
+                         art_i_param <- art_i_stat <- c("parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
+                                                        "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
+                                                        "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled", 
+                                                        
+                                                        "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
+                                                        "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
+                                                        "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total")
                     }
                }
 
@@ -1592,12 +1633,15 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
      if(!any(class(data_obj) == "sparsified"))
           class(data_obj) <- c(class(data_obj), "sparsified")
 
+     data_obj$statistics <- as_tibble(data_obj$statistics)
+     data_obj$parameters <- as_tibble(data_obj$parameters)
+     
      data_obj
 }
 
 
 
-#' Merge multiple "simdat_d" class objects
+#' Merge multiple "simdat_d_database" class objects
 #'
 #' This function allows for multiple simulated databases from \code{\link{simulate_d_database}} to be merged together into a single database. Merged databases will be assigned moderator variable codes.
 #'
@@ -1610,17 +1654,21 @@ merge_simdat_d <- function(...){
 
      data_list <- list(...)
 
-     if(!all(unlist(lapply(data_list, function(x) any(class(x) == "simdat_d")))))
-          stop("All elements in 'data_list' must be of class 'simdat_d'", call. = FALSE)
+     if(!all(unlist(lapply(data_list, function(x) any(class(x) == "simdat_d_database")))))
+          stop("All elements in 'data_list' must be of class 'simdat_d_database'", call. = FALSE)
 
      data_obj <- data_list[[1]]
 
      for(i in 1:length(data_list)){
           if(i == 1){
                data_obj$statistics <- cbind(i, data_list[[i]]$statistics)
+               data_obj$parameters <- cbind(i, data_list[[i]]$parameters)
           }else{
                data_list[[i]]$statistics$sample_id <- data_list[[i]]$statistics$sample_id + data_obj$statistics$sample_id[length(data_obj$statistics$sample_id)]
                data_obj$statistics <- rbind(data_obj$statistics, cbind(i, data_list[[i]]$statistics))
+               
+               data_list[[i]]$parameters$sample_id <- data_list[[i]]$parameters$sample_id + data_obj$parameters$sample_id[length(data_obj$parameters$sample_id)]
+               data_obj$parameters <- rbind(data_obj$parameters, cbind(i, data_list[[i]]$parameters))
           }
      }
 
@@ -1635,6 +1683,9 @@ merge_simdat_d <- function(...){
      if(!any(class(data_obj) == "merged"))
           class(data_obj) <- c(class(data_obj), "merged")
 
+     data_obj$statistics <- as_tibble(data_obj$statistics)
+     data_obj$parameters <- as_tibble(data_obj$parameters)
+     
      data_obj
 }
 

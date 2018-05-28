@@ -2,13 +2,13 @@
 % Please edit documentation in R/simulate_r.R
 \name{sparsify_simdat_r}
 \alias{sparsify_simdat_r}
-\title{Create sparse artifact information in a "simdat_r" class object}
+\title{Create sparse artifact information in a "simdat_r_database" class object}
 \usage{
 sparsify_simdat_r(data_obj, prop_missing, sparify_arts = c("rel", "u"),
   study_wise = TRUE)
 }
 \arguments{
-\item{data_obj}{Object created by the "simdat_r" function.}
+\item{data_obj}{Object created by the "simdat_r_database" function.}
 
 \item{prop_missing}{Proportion of studies in from which artifact information should be deleted.}
 

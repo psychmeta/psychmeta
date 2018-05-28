@@ -12,13 +12,14 @@
 \title{Sensitivity analyses for meta-analyses}
 \usage{
 sensitivity(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative = TRUE,
-  sort_method = "weight", boot_iter = 1000, boot_conf_level = 0.95,
-  boot_ci_type = "bca", ...)
+  sort_method = c("weight", "n", "inv_var"), boot_iter = 1000,
+  boot_conf_level = 0.95, boot_ci_type = c("bca", "norm", "basic", "stud",
+  "perc"), ...)
 
 sensitivity_bootstrap(ma_obj, boot_iter = 1000, boot_conf_level = 0.95,
-  boot_ci_type = "bca", ...)
+  boot_ci_type = c("bca", "norm", "basic", "stud", "perc"), ...)
 
-sensitivity_cumulative(ma_obj, sort_method = "weight", ...)
+sensitivity_cumulative(ma_obj, sort_method = c("weight", "n", "inv_var"), ...)
 
 sensitivity_leave1out(ma_obj, ...)
 }
@@ -37,7 +38,8 @@ sensitivity_leave1out(ma_obj, ...)
 
 \item{boot_conf_level}{Width of confidence intervals to be constructed for all bootstrapped statistics.}
 
-\item{boot_ci_type}{Type of bootstrapped confidence interval (see "type" options for boot::boot.ci for possible arguments). Default is "bca".}
+\item{boot_ci_type}{Type of bootstrapped confidence interval. Options are "bca", "norm", "basic", "stud", and "perc" (these are "type" options from the boot::boot.ci function). Default is "bca".
+Note: If you have too few iterations, the "bca" method will not work and you will need to either increase the iterations or choose a different method.}
 
 \item{...}{Additional arguments.}
 }
@@ -54,23 +56,46 @@ Wrapper function to compute bootstrap analyses, leave-one-out analyses, and cumu
 This function helps researchers to examine the stability/fragility of their meta-analytic results with bootstrapping and leave-one-out analyses, as well as detect initial evidence of publication bias with cumulative meta-analyses.
 }
 \examples{
-## Run a meta-analysis using simulated UVIRR data:
+\dontrun{
+## Run a meta-analysis using simulated correlation data:
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
-correct_rr_y = FALSE, data = data_r_uvirr)
+                  correct_rr_y = FALSE, data = data_r_uvirr)
 ma_obj <- ma_r_ad(ma_obj, correct_rr_y = FALSE)
 
 ## Pass the meta-analysis object to the sensitivity() function:
-ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10, cumulative = TRUE,
-boot_ci_type = "norm", sort_method = "inv_var")
+ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10,
+                      boot_ci_type = "norm", sort_method = "inv_var")
 
 ## Examine the tables and plots produced for the IC meta-analysis:
-ma_obj$follow_up_analyses$bootstrap$barebones$`Analysis ID = 1`
-ma_obj$follow_up_analyses$bootstrap$individual_correction$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$leave1out$individual_correction$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$cumulative$individual_correction$true_score$`Analysis ID = 1`
+ma_obj$bootstrap[[1]]$barebones
+ma_obj$bootstrap[[1]]$individual_correction$true_score
+ma_obj$leave1out[[1]]$individual_correction$true_score
+ma_obj$cumulative[[1]]$individual_correction$true_score
 
 ## Examine the tables and plots produced for the AD meta-analysis:
-ma_obj$follow_up_analyses$bootstrap$artifact_distribution$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$leave1out$artifact_distribution$true_score$`Analysis ID = 1`
-ma_obj$follow_up_analyses$cumulative$artifact_distribution$true_score$`Analysis ID = 1`
+ma_obj$bootstrap[[1]]$artifact_distribution$true_score
+ma_obj$leave1out[[1]]$artifact_distribution$true_score
+ma_obj$cumulative[[1]]$artifact_distribution$true_score
+
+
+## Run a meta-analysis using simulated d-value data:
+ma_obj <- ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi,
+                  data = filter(data_d_meas_multi, construct == "Y"))
+ma_obj <- ma_d_ad(ma_obj)
+                  
+## Pass the meta-analysis object to the sensitivity() function:
+ma_obj <- sensitivity(ma_obj = ma_obj, boot_iter = 10,
+                      boot_ci_type = "norm", sort_method = "inv_var")
+
+## Examine the tables and plots produced for the IC meta-analysis:
+ma_obj$bootstrap[[1]]$barebones
+ma_obj$bootstrap[[1]]$individual_correction$latentGroup_latentY
+ma_obj$leave1out[[1]]$individual_correction$latentGroup_latentY
+ma_obj$cumulative[[1]]$individual_correction$latentGroup_latentY
+
+## Examine the tables and plots produced for the AD meta-analysis:
+ma_obj$bootstrap[[1]]$artifact_distribution$latentGroup_latentY
+ma_obj$leave1out[[1]]$artifact_distribution$latentGroup_latentY
+ma_obj$cumulative[[1]]$artifact_distribution$latentGroup_latentY
+}
 }

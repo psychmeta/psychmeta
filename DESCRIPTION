@@ -1,33 +1,27 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 1.0.3
-Date: 2018-05-08
+Version: 2.0.0
+Date: 2018-05-28
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "dahlk068@umn.edu"),
-              person("Brenton M.", "Wiernik", role = "aut", email = "psychmeta@wiernik.org"),
-              person("Michael T.", "Brannick", role = "ctb"),
-              person("Jack", "Kostal", role = "ctb"),
-              person("Sean", "Potter", role = "ctb"),
-              person("Yuejia (Mandy)", "Teng", role = "ctb"))
-Maintainer: Jeffrey A. Dahlke <dahlk068@umn.edu>
+              person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
+              person("Michael T.", "Brannick", role = "ctb", comment = "Testing"),
+              person("Jack", "Kostal", role = "ctb", comment = "Code for reshape_mat2dat function"),
+              person("Sean", "Potter", role = "ctb", comment = "Testing; Code for cumulative and leave1out plots"),
+              person("John", "Sakaluk", role = "ctb", comment = "Code for funnel and forest plots"),
+              person("Yuejia (Mandy)", "Teng", role = "ctb", comment = "Testing"))
 BugReports: https://github.com/jadahlke/psychmeta/issues
 Description: Tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and d values. Includes tools for converting effect sizes, computing sporadic artifact corrections, reshaping meta-analytic databases, computing multivariate corrections for range variation, and more. Bugs can be reported to <https://github.com/jadahlke/psychmeta/issues> or <issues@psychmeta.com>.
 License: GPL (>= 3)
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.4.0), dplyr
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
 Imports: stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
-        ggplot2, dplyr, metafor, nor1mix, progress, tidyr, rtf,
-        fungible, stringr , rmarkdown, RefManageR, rlang, RCurl, xml2
+        ggplot2, metafor, nor1mix, progress, tidyr, rtf,
+        fungible, stringr , rmarkdown, RefManageR, rlang, RCurl, xml2, purrr, data.table, cli, crayon
 Suggests: knitr
 RoxygenNote: 6.0.1
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068
-Author: Jeffrey A. Dahlke [aut, cre],
-  Brenton M. Wiernik [aut],
-  Michael T. Brannick [ctb],
-  Jack Kostal [ctb],
-  Sean Potter [ctb],
-  Yuejia (Mandy) Teng [ctb]

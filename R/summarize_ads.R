@@ -12,23 +12,14 @@
 #' @examples
 #' \dontrun{
 #' ## Artifact distributions from "ma_r" with individual corrections
-#' ma_obj_ic_master <- ma_r(ma_method = "ic", rxyi = "rxyi", n = "n",
-#'                          rxx = "rxxi", ryy = "ryyi",
-#'                          pairwise_ads = TRUE,
-#'                          correct_rr_x = FALSE, correct_rr_y = FALSE,
-#'                          construct_x = "x_name", construct_y = "y_name",
-#'                          sample_id = "sample_id", moderators = "moderator",
-#'                          data = data_r_meas_multi)
-#' summarize_ads(ma_obj = ma_obj_ic_master)
-#'
-#'
-#' ## Artifact distributions from a single individual-correction meta-analysis of correlations
-#' ma_obj_ic <- ma_obj_ic_master$construct_pairs$`Pair ID = 1: X = X, Y = Y`
-#' summarize_ads(ma_obj = ma_obj_ic)
-#'
-#' ## Artifact distributions from a single artifact-distribution correction meta-analysis
-#' summarize_ads(ma_obj = ma_r_ad(ma_obj_ic, correct_rr_x = FALSE, correct_rr_y = FALSE))
-#'
+#' ma_obj_ic_pairwise <- ma_r(ma_method = "ic", rxyi = "rxyi", n = "n",
+#'                            rxx = "rxxi", ryy = "ryyi",
+#'                            pairwise_ads = TRUE,
+#'                            correct_rr_x = FALSE, correct_rr_y = FALSE,
+#'                            construct_x = "x_name", construct_y = "y_name",
+#'                            sample_id = "sample_id", moderators = "moderator",
+#'                            data = data_r_meas_multi)
+#' summarize_ads(ma_obj = ma_obj_ic_pairwise)
 #'
 #' ## Artifact distributions from "ma_r" with artifact-distribution corrections (pairwise ADs)
 #' ma_obj_ad_pairwise <- ma_r(ma_method = "ad", rxyi = "rxyi", n = "n",
@@ -49,73 +40,74 @@
 #'                               sample_id = "sample_id", moderators = "moderator",
 #'                               data = data_r_meas_multi)
 #' summarize_ads(ma_obj = ma_obj_ad_nonpairwise)
-#'
-#'
-#' ## Artifact distributions from "ma_d" with individual-correction meta-analysis
-#' ma_d_ic <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
-#'                 construct_y = construct, data = data_d_meas_multi)
-#' summarize_ads(ma_obj = ma_d_ic)
-#' summarize_ads(ma_obj = ma_d_ic$construct_pairs$`Pair ID = 1: X = group1-group2, Y = Y`)
-#'
-#' ## Artifact distributions from "ma_d" with artifact-distribution meta-analysis
-#' ma_d_ad <- ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
-#'                 ryy = ryyi, correct_rr_y = FALSE,
-#'                 construct_y = construct, data = data_d_meas_multi)
-#' summarize_ads(ma_obj = ma_d_ad)
-#' summarize_ads(ma_obj = ma_d_ad$construct_pairs$`Pair ID = 1: X = group1-group2, Y = Y`)
 #' }
 summarize_ads <- function(ma_obj){
-     is_r <- any(class(ma_obj) %in% "ma_r_as_r") | any(class(ma_obj) %in% "ma_d_as_r")
-     is_d <- any(class(ma_obj) %in% "ma_r_as_d") | any(class(ma_obj) %in% "ma_d_as_d")
+     ma_metric <- attributes(ma_obj)$ma_metric
+     ma_methods <- attributes(ma_obj)$ma_methods
+     is_r <- any(ma_metric %in% c("r_as_r", "d_as_r"))
+     is_d <- any(ma_metric %in% c("r_as_d", "d_as_d"))
 
-     if((is_r | is_d) & (any(class(ma_obj) == "ma_ic") | any(class(ma_obj) == "ma_ad"))){
-          if(any(class(ma_obj) == "ma_master")){
-               pairwise_ads <- ma_obj$inputs$pairwise_ads[1]
-               if(any(class(ma_obj) == "ma_ad")){
-                    if(is_r) ma_tab <- ma_obj$grand_tables$artifact_distribution$true_score
-                    if(is_d) ma_tab <- ma_obj$grand_tables$artifact_distribution$latentGroup_latentY
-                    ad_x <- lapply(ma_obj$construct_pairs, function(x) attributes(x$artifact_distribution$artifact_distributions$ad_x)[["summary"]])
-                    ad_y <- lapply(ma_obj$construct_pairs, function(x) attributes(x$artifact_distribution$artifact_distributions$ad_y)[["summary"]])
-               }else{
-                    if(is_r) ma_tab <- ma_obj$grand_tables$individual_correction$true_score
-                    if(is_d) ma_tab <- ma_obj$grand_tables$individual_correction$latentGroup_latentY
-                    ad_x <- lapply(ma_obj$construct_pairs, function(x) attributes(x$individual_correction$artifact_distributions$ad_x_tsa)[["summary"]])
-                    ad_y <- lapply(ma_obj$construct_pairs, function(x) attributes(x$individual_correction$artifact_distributions$ad_y_tsa)[["summary"]])
-               }
-               construct_vec <- unlist(ma_tab[!duplicated(ma_tab[,"Pair_ID"]),2:3])
-               ad_list <- append(ad_x, ad_y)
-               if(pairwise_ads){
-                    var_names <- as.character(construct_vec)
-                    pair_names <- names(ad_list)
-                    names(ad_list) <- paste0(pair_names, "; ", construct_vec)
-                    construct_pair <- apply(ma_tab[!duplicated(ma_tab[,"Pair_ID"]),2:3], 1, paste, collapse = " & ")
-                    construct_pair <- c(rbind(construct_pair, construct_pair))
-                    ad_list <- ad_list[paste0(sort(pair_names), "; ", c(t(ma_tab[!duplicated(ma_tab[,"Pair_ID"]),2:3])))]
-               }else{
-                    dups <- duplicated(construct_vec)
-                    ad_list[dups] <- NULL
-                    names(ad_list) <- construct_vec[!dups]
-                    construct_pair <- NULL
-                    var_names <- names(ad_list)
-               }
+     if((is_r | is_d) & (any(ma_methods == "ic") | any(ma_methods == "ad"))){
+          
+          pairwise_ads <- attributes(ma_obj)$inputs$pairwise_ads[1]
+          if(any(ma_methods == "ad")){
+               ad_x <- lapply(ma_obj$ad, function(x) attributes(x$ad$ad_x)[["summary"]])
+               ad_y <- lapply(ma_obj$ad, function(x) attributes(x$ad$ad_y)[["summary"]])
           }else{
-               pairwise_ads <- FALSE
-               construct_pair <- NULL
-               if(any(class(ma_obj) == "ma_ad")){
-                    ad_list <- list(X = attributes(ma_obj$artifact_distribution$artifact_distributions$ad_x)[["summary"]],
-                                    Y = attributes(ma_obj$artifact_distribution$artifact_distributions$ad_y)[["summary"]])
-               }else{
-                    ad_list <- list(X = attributes(ma_obj$individual_correction$artifact_distributions$ad_x_tsa)[["summary"]],
-                                    Y = attributes(ma_obj$individual_correction$artifact_distributions$ad_y_tsa)[["summary"]])
-               }
-               var_names <- as.character(names(ad_list))
+               ad_x <- lapply(ma_obj$ad, function(x) attributes(x$ic$ad_x_tsa)[["summary"]])
+               ad_y <- lapply(ma_obj$ad, function(x) attributes(x$ic$ad_y_tsa)[["summary"]])
           }
-
+          
+          if("pair_id" %in% colnames(ma_obj)){
+               pair_id <- ma_obj$pair_id
+          }else{
+               pair_id <- NULL
+          }
+          
+          if("construct_x" %in% colnames(ma_obj)){
+               construct_x <- ma_obj$construct_x
+          }else{
+               construct_x <- NULL
+          }
+          
+          if("construct_y" %in% colnames(ma_obj)){
+               construct_y <- ma_obj$construct_y
+          }else if("group_contrast" %in% colnames(ma_obj)){
+               construct_y <- ma_obj$construct_y
+          }else{
+               construct_y <- NULL
+          }
+          
+          names(ad_x) <- construct_x
+          names(ad_y) <- construct_y
+          
+          ad_list <- append(ad_x, ad_y)
+          if(pairwise_ads){
+               pair_names <- paste0("Pair ID = ", pair_id)
+               construct_vec <- c(paste0("X = ", construct_x),
+                                  paste0("Y = ", construct_y))
+               
+               names(ad_list) <- paste0(c(pair_names, pair_names), ": ", construct_vec)
+               construct_pair <- paste0(paste0("X = ", c(construct_x, construct_x), 
+                                               "; Y = ", c(construct_y, construct_y)))
+               var_names <- c(construct_x, construct_y)
+          }else{
+               construct_vec <- c(construct_x, construct_y)
+               
+               dups <- duplicated(construct_vec)
+               ad_list[dups] <- NULL
+               names(ad_list) <- construct_vec[!dups]
+               construct_pair <- NULL
+               var_names <- names(ad_list)
+          }
+          
+          
           ad_mat <- NULL
+          if(pairwise_ads) .construct_pair <- paste0(c(pair_names, pair_names), ": ", construct_pair)
           for(i in 1:length(ad_list)){
                ad_list[[i]] <- ad_list[[i]][,c("k_total", "N_total", "mean", "sd", "sd_res")]
                ad_list[[i]] <- data.frame(Variable = var_names[i], Artifact = rownames(ad_list[[i]]), ad_list[[i]])
-               if(pairwise_ads) ad_list[[i]] <- data.frame(Construct_Pair = construct_pair[i], ad_list[[i]])
+               if(pairwise_ads) ad_list[[i]] <- data.frame(Construct_Pair = .construct_pair[i], ad_list[[i]])
                ad_mat <- rbind(ad_mat, ad_list[[i]])
           }
 

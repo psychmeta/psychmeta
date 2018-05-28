@@ -37,8 +37,8 @@ var_error_r <- function(r, n, correct_bias = TRUE){
 #' Estimate the error variance of u ratios
 #'
 #' @param u Vector of u ratios.
-#' @param n_i Vector of incumbent-group sample sizes.
-#' @param n_a Vector of applicant-group sample sizes.
+#' @param ni Vector of incumbent-group sample sizes.
+#' @param na Vector of applicant-group sample sizes.
 #' @param dependent_sds Logical vector identifying whether each u ratio is based on standard deviations from independent samples (FALSE) or based on
 #' standard deviations from an applicant sample and an incumbent sample that is a subset of that applicant sample (TRUE).
 #'
@@ -64,16 +64,16 @@ var_error_r <- function(r, n, correct_bias = TRUE){
 #' where \emph{u} is the u ratio, \eqn{n_{i}}{ni} is the incumbent sample size, and \eqn{n_{a}}{na} is the applicant sample size.
 #'
 #' @examples
-#' var_error_u(u = .8, n_i = 100, n_a = 200)
-#' var_error_u(u = .8, n_i = 100, n_a = NA)
-var_error_u <- function(u, n_i, n_a = NA, dependent_sds = FALSE){
+#' var_error_u(u = .8, ni = 100, na = 200)
+#' var_error_u(u = .8, ni = 100, na = NA)
+var_error_u <- function(u, ni, na = NA, dependent_sds = FALSE){
      if(is.data.frame(u)) u <- as.matrix(u)
-     if(is.data.frame(n_i)) n_i <- as.matrix(n_i)
-     if(is.data.frame(n_a)) n_a <- as.matrix(n_a)
+     if(is.data.frame(ni)) ni <- as.matrix(ni)
+     if(is.data.frame(na)) na <- as.matrix(na)
 
-     n_term <- 1 / (n_i - 1)
-     n_term[!dependent_sds & !is.na(n_a)] <- n_term[!dependent_sds & !is.na(n_a)] + 1 / (n_a[!dependent_sds & !is.na(n_a)] - 1)
-     n_term[dependent_sds & !is.na(n_a)] <- n_term[dependent_sds & !is.na(n_a)] - 1 / (n_a[dependent_sds & !is.na(n_a)] - 1)
+     n_term <- 1 / (ni - 1)
+     n_term[!dependent_sds & !is.na(na)] <- n_term[!dependent_sds & !is.na(na)] + 1 / (na[!dependent_sds & !is.na(na)] - 1)
+     n_term[dependent_sds & !is.na(na)] <- n_term[dependent_sds & !is.na(na)] - 1 / (na[dependent_sds & !is.na(na)] - 1)
      var_e <- .5 * u^2 * n_term
 
      if(!is.null(dim(var_e)))
@@ -88,6 +88,9 @@ var_error_u <- function(u, n_i, n_a = NA, dependent_sds = FALSE){
 #'
 #' @param rel Vector of reliability estimates.
 #' @param n Vector of sample sizes.
+#' @param rel_type Character vector indicating the type(s) of reliabilities being analyzed. See documentation for \code{ma_r} for a full list of acceptable reliability types. 
+#' NOTE: Currently, only alpha has its own dedicated error-variance estimate; the error variance of other reliability types is estimated using the generic definition of reliability as the squared correlation between observed scores and true scores. 
+#' @param k_items Optional numeric vector indicating the number of items in each scale for which reliabilities are being analyzed.
 #'
 #' @return A vector of sampling-error variances.
 #' @export
@@ -102,10 +105,43 @@ var_error_u <- function(u, n_i, n_a = NA, dependent_sds = FALSE){
 #'
 #' \deqn{var_{e}=\frac{4r_{XX}(1-r_{XX})^{2}}{n-1}}{var_e = 4 * rxx * (1 - rxx)^2 / (n - 1)}
 #'
+#' For the equation to estimate the variance of coefficient alpha, see Duhachek and Iacobucci (2004). 
+#'
+#' @references
+#' Duhachek, A., & Iacobucci, D. (2004).
+#' Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
+#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
+#'
 #' @examples
 #' var_error_rel(rel = .8, n = 100)
-var_error_rel <- function(rel, n){
-     estimate_rel_dist(mean_q = rel^.5, var_q = var_error_r(r = rel^.5, n = n, correct_bias = FALSE))[,"var"]
+#' var_error_rel(rel = .8, n = 100, rel_type = "alpha", k_items = 10)
+var_error_rel <- function(rel, n, rel_type = "alpha", k_items = NULL){
+     
+     if(length(rel) == 0 | length(n) == 0){
+          out <- NULL
+     }else{
+          if(is.null(k_items)) k_items <- rep(NA, max(c(length(rel), length(n))))
+          
+          dat <- suppressWarnings(as.data.frame(list(rel = rel, n = n, k_items = k_items, rel_type = rel_type)))
+          rel <- dat$rel
+          n <- dat$n
+          k_items <- dat$k_items
+          rel_type <- as.character(dat$rel_type)
+          out <- rep(NA, nrow(dat))
+          
+          logic <- !is.na(rel) & !is.na(n)
+          out[logic] <- estimate_rel_dist(mean_q = rel[logic]^.5, 
+                                          var_q = var_error_r(r = rel[logic]^.5,
+                                                              n = n[logic], 
+                                                              correct_bias = FALSE))[,"var"]
+          
+          logic <- !is.na(rel) & !is.na(n) & rel_type == "alpha" & !is.na(k_items)
+          out[logic] <- var_error_alpha(alpha = rel[logic], 
+                                        k_items = k_items[logic],
+                                        n_cases = n[logic])
+     }
+     
+     out
 }
 
 
@@ -113,6 +149,9 @@ var_error_rel <- function(rel, n){
 #'
 #' @param q Vector of square roots of reliability estimates.
 #' @param n Vector of sample sizes.
+#' @param rel_type Character vector indicating the type(s) of reliabilities being analyzed. See documentation for \code{ma_r} for a full list of acceptable reliability types. 
+#' NOTE: Currently, only alpha has its own dedicated error-variance estimate; the error variance of other reliability types is estimated using the generic definition of reliability as the squared correlation between observed scores and true scores. 
+#' @param k_items Optional numeric vector indicating the number of items in each scale for which reliabilities are being analyzed.
 #'
 #' @return A vector of sampling-error variances.
 #' @export
@@ -126,11 +165,42 @@ var_error_rel <- function(rel, n){
 #' The sampling variance of the square root of a reliability coefficient is:
 #'
 #' \deqn{var_{e}=\frac{(1-q_{X}^{2})^{2}}{n-1}}{var_e = (1 - qx^2)^2 / (n - 1)}
+#' 
+#' For the equation to estimate the variance of coefficient alpha, see Duhachek and Iacobucci (2004). 
+#'
+#' @references
+#' Duhachek, A., & Iacobucci, D. (2004).
+#' Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
+#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
 #'
 #' @examples
 #' var_error_q(q = .8, n = 100)
-var_error_q <- function(q, n){
-     var_error_r(r = q, n = n, correct_bias = FALSE)
+#' var_error_q(q = .8, n = 100, rel_type = "alpha", k_items = 10)
+var_error_q <- function(q, n, rel_type = "alpha", k_items = NULL){
+     
+     if(length(q) == 0 | length(n) == 0){
+          out <- NULL
+     }else{
+          if(is.null(k_items)) k_items <- rep(NA, max(c(length(q), length(n))))
+          
+          dat <- suppressWarnings(as.data.frame(list(q = q, n = n, k_items = k_items, rel_type = rel_type)))
+          q <- dat$q
+          n <- dat$n
+          k_items <- dat$k_items
+          rel_type <- as.character(dat$rel_type)
+          out <- rep(NA, nrow(dat))
+          
+          logic <- !is.na(q) & !is.na(n)
+          out[logic] <- var_error_r(r = q[logic], n = n[logic], correct_bias = FALSE)
+          
+          logic <- !is.na(q) & !is.na(n) & rel_type == "alpha" & !is.na(k_items)
+          out[logic] <- estimate_q_dist(mean_rel = q[logic]^2, 
+                                        var_rel = var_error_alpha(alpha = q[logic]^2, 
+                                                                  k_items = k_items[logic],
+                                                                  n_cases = n[logic]))[,"var"]     
+     }
+     
+     out
 }
 
 

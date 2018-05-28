@@ -241,7 +241,7 @@ compute_dmod_npar <- function(referent_int, referent_slope,
      out <- list(call = call, inputs = inputs,
                  point_estimate = out)
 
-     class(out) <- c("psychmeta", "dmod", "npar")
+     class(out) <- c("dmod", "npar")
      out
 }
 
@@ -522,7 +522,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
 
      out <- list(call = call, inputs = inputs, point_estimate = outSummary)
 
-     class(out) <- c("psychmeta", "dmod", "par")
+     class(out) <- c("dmod", "par")
 
      out
 }
@@ -616,7 +616,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
 #' # Compute point estimates of non-parametric d_mod effect sizes:
 #' compute_dmod(data = dat, group = "G", predictors = "X", criterion = "Y",
 #'      referent_id = 1, focal_id_vec = 2:4,
-#'      conf_level = .95, rescale_cdf = TRUE, parametric = TRUE,
+#'      conf_level = .95, rescale_cdf = TRUE, parametric = FALSE,
 #'      bootstrap = FALSE)
 #'
 #' # Compute unstratified bootstrapped estimates of parametric d_mod effect sizes:
@@ -704,31 +704,35 @@ compute_dmod <- function(data, group, predictors, criterion,
 
      regModel <- lm(as.formula(paste("Y ~", paste(xNames, collapse = " + "))), data = data)$coeff
      xFun <- function(replace = TRUE, parametric = TRUE, showFullResult = FALSE){
-          if(stratify){
-               invalidRep <- TRUE
-               while(invalidRep){
-                    stratDat <- by(data, INDICES = data[,"G"], function(x){
-                         x[sample(1:nrow(x), nrow(x), replace = replace),]
-                    })
-                    data_i <- NULL
-                    for(i in 1:length(stratDat)) data_i <- rbind(data_i, stratDat[[i]])
-                    sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
-                         apply(x, 2, sd, na.rm = TRUE)}))
-                    invalidRep <- any(0 == sd_vec) | any(is.na(sd_vec))
-               }
+          if(replace){
+               if(stratify){
+                    invalidRep <- TRUE
+                    while(invalidRep){
+                         stratDat <- by(data, INDICES = data[,"G"], function(x){
+                              x[sample(1:nrow(x), nrow(x), replace = replace),]
+                         })
+                         data_i <- NULL
+                         for(i in 1:length(stratDat)) data_i <- rbind(data_i, stratDat[[i]])
+                         sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
+                              apply(x, 2, sd, na.rm = TRUE)}))
+                         invalidRep <- any(0 == sd_vec) | any(is.na(sd_vec))
+                    }
+               }else{
+                    invalidRep <- TRUE
+                    while(invalidRep){
+                         data_i <- data[sample(1:nrow(data), nrow(data), replace = replace),]
+                         sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
+                              apply(x, 2, sd, na.rm = TRUE)}))
+                         invalidRep <- any(length(by(data_i, INDICES = data_i[,"G"], nrow)) < length(groupNames) |
+                                                as.numeric(by(data_i, INDICES = data_i[,"G"], nrow)) < 3) |
+                              any(0 == sd_vec) | any(is.na(sd_vec))
+                    }
+               }    
           }else{
-               invalidRep <- TRUE
-               while(invalidRep){
-                    data_i <- data[sample(1:nrow(data), nrow(data), replace = replace),]
-                    sd_vec <- unlist(by(data_i[,-1], INDICES = data_i[,"G"], function(x){
-                         apply(x, 2, sd, na.rm = TRUE)}))
-                    invalidRep <- any(length(by(data_i, INDICES = data_i[,"G"], nrow)) < length(groupNames) |
-                                           as.numeric(by(data_i, INDICES = data_i[,"G"], nrow)) < 3) |
-                         any(0 == sd_vec) | any(is.na(sd_vec))
-               }
+               data_i <- data
           }
 
-          if(length(predictors) > 1){
+          if(ncol(data) > 3){
                if(!cross_validate_wts)
                     regModel <- lm(as.formula(paste("Y ~", paste(xNames, collapse = " + "))), data = data_i)$coeff
                data_i <- data.frame(cbind(data_i[,1:2],
@@ -813,9 +817,9 @@ compute_dmod <- function(data, group, predictors, criterion,
      out <- append(list(call = call, inputs = inputs), out)
 
      if(parametric){
-          class(out) <- c("psychmeta", "dmod", "par")
+          class(out) <- c("dmod", "par")
      }else{
-          class(out) <- c("psychmeta", "dmod", "npar")
+          class(out) <- c("dmod", "npar")
      }
      out
 }

@@ -5,9 +5,9 @@
 \title{Generate a list of references included in meta-analyses}
 \usage{
 generate_bib(ma_obj = NULL, additional_citekeys = NULL, bib = NULL,
-  analyses = "all", match = c("all", "any"), style = "apa",
-  output_format = c("word", "html", "pdf", "text", "Rmd", "biblatex",
-  "citekeys"), file = NULL, header = list())
+  analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
+  style = "apa", output_format = c("word", "html", "pdf", "text", "Rmd",
+  "biblatex", "citekeys"), file = NULL, header = list())
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object with \code{citekeys} supplied.}
@@ -19,6 +19,8 @@ generate_bib(ma_obj = NULL, additional_citekeys = NULL, bib = NULL,
 \item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
 
 \item{match}{Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.}
+
+\item{case_sensitive}{Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).}
 
 \item{style}{References should be formatted in what style? Can be the style ID for any \url{https://github.com/citation-style-language/styles}{CSL style} (formatted examples of styles are available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Requires an internet connection to retrieve styles. If unavailable, references will be rendered in Chicago style.)}
 

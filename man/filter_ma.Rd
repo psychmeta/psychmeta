@@ -19,8 +19,8 @@ filter_meta(ma_obj, analyses = "all", match = c("all", "any"),
 \item{construct:}{ A list or vector of construct names to search for.}
 \item{construct_pair:}{ A list of vectors of construct pairs to search for. \cr
 (e.g., \code{list(c("X", "Y"), c("X", "Z"))}).}
-\item{pair_id:}{ A list or vector of numeric construct Pair IDs.}
-\item{analysis_id:}{ A list or vector of analysis IDs (combinations of moderator levels).}
+\item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
+\item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
 \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
 \item{N_minv}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 }}
@@ -38,20 +38,14 @@ A \code{psychmeta} meta-analysis object with analyses matching the specified cri
 Filter \code{psychmeta} meta-analysis objects based on specified criteria.
 }
 \examples{
-\dontrun{
 ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                construct_x = x_name, construct_y = y_name, sample_id = sample_id, citekey = NULL,
                moderators = moderator, data = data_r_meas_multi,
                impute_artifacts = FALSE, clean_artifacts = FALSE)
 ma_obj <- ma_r_ad(ma_obj, correct_rr_x = FALSE, correct_rr_y = FALSE)
-ma_obj <- heterogeneity(ma_obj)
-ma_obj <- sensitivity(ma_obj, bootstrap = FALSE)
 
 filter_ma(ma_obj, analyses="all")
-filter_ma(ma_obj, analyses=list(construct="x"), match="all")
-filter_ma(ma_obj, analyses=list(construct="x", k_min=21), match="any")
-filter_ma(ma_obj, analyses=list(construct="x", k_min=21), match="all")
-filter_ma(ma_obj = ma_obj$construct_pairs[[1]],
-          analyses=list(construct="x", k_min=21), match="all")
-}
+filter_ma(ma_obj, analyses=list(construct="X"), match="all")
+filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="any")
+filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
 }
