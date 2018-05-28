@@ -2,7 +2,8 @@
 #' @rdname sensitivity
 sensitivity_leave1out <- function(ma_obj, ...){
      
-     screen_ma(ma_obj = ma_obj)
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      es_type <- NULL
      ma_methods <- attributes(ma_obj)$ma_methods
@@ -16,7 +17,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
      
      d_metric <- ifelse(any((ma_metric == "d_as_d" & (any(ma_methods == "ic") | any(ma_methods == "ad"))) | ma_metric == "r_as_d"), TRUE, FALSE)
      if(d_metric){
-          ma_obj <- convert_ma(ma_obj)
+          ma_obj <- convert_ma(ma_obj, record_call = FALSE)
           convert_back <- TRUE
      }else{
           convert_back <- FALSE
@@ -117,7 +118,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                            individual_correction = NULL,
                            artifact_distribution = NULL)
           
-          if(!is.null(escalc$barebones$pi)){
+          if("pi" %in% colnames(escalc$barebones)){
                p <- wt_mean(x = escalc$barebones$pi, wt = escalc$barebones$n_adj)
           }else{
                p <- .5
@@ -378,10 +379,11 @@ sensitivity_leave1out <- function(ma_obj, ...){
      
      ma_obj$leave1out <- out_list
      
-     if(convert_back) ma_obj <- convert_ma(ma_obj)
+     if(convert_back) ma_obj <- convert_ma(ma_obj, record_call = FALSE)
      
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("leave-1-out meta-analyses have been added to 'ma_obj' - use get_leave1out() to retrieve them.")
      
      ma_obj

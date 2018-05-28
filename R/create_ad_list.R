@@ -27,7 +27,7 @@
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Additional arguments
 #' 
-#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. See documentation of \code{ma_r()} for a full list of acceptable values. 
+#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. See documentation of \code{\link{ma_r}} for a full list of acceptable values. 
 #' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).
@@ -75,26 +75,27 @@
 #'                  data = data_r_meas_multi,
 #'                  control = control_psychmeta(pairwise_ads = TRUE,
 #'                                              moderated_ads = TRUE))
-create_ad_tibble <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
-                                               construct_x = NULL, measure_x = NULL,
-                                               construct_y = NULL, measure_y = NULL,
-                                               rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
-                                               ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
-                                               ux = NULL, ux_observed = TRUE,
-                                               uy = NULL, uy_observed = TRUE,
-                                               estimate_rxxa = TRUE, estimate_rxxi = TRUE,
-                                               estimate_ux = TRUE, estimate_ut = TRUE,
-                                               moderators = NULL, cat_moderators = TRUE, 
-                                               moderator_type = c("simple", "hierarchical", "none"),
-                                               construct_order = NULL,
-                                               supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
+create_ad_tibble <- function(ad_type = c("tsa", "int"), 
+                             n = NULL, sample_id = NULL,
+                             construct_x = NULL, measure_x = NULL,
+                             construct_y = NULL, measure_y = NULL,
+                             rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
+                             ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
+                             ux = NULL, ux_observed = TRUE,
+                             uy = NULL, uy_observed = TRUE,
+                             estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+                             estimate_ux = TRUE, estimate_ut = TRUE,
+                             moderators = NULL, cat_moderators = TRUE, 
+                             moderator_type = c("simple", "hierarchical", "none"),
+                             construct_order = NULL,
+                             supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
      
      call <- match.call()
      warn_obj1 <- record_warnings()
      
      ad_type <- match.arg(ad_type, c("tsa", "int"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
-
+     
      control_only <- list(...)$control_only
      if(is.null(control_only)) control_only <- FALSE
      
@@ -158,7 +159,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, arg_name = "ryy_type", data = data)
-
+          
           if(deparse(substitute(k_items_y))[1] != "NULL")
                k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
           
@@ -177,7 +178,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
           if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators))[1] != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
-
+     
      if(!moderated_ads) moderators <- NULL
      
      null_construct_x <- is.null(construct_x)
@@ -239,7 +240,8 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      if(is.null(measure_x)) full_data$measure_x <- "No measure specified"
      if(is.null(measure_y)) full_data$measure_y <- "No measure specified"
      
-     for(i in names(full_data)) if(is.null(full_data[[i]])) full_data[[i]] <- rep(NA, length(n))
+     .n <- max(unlist(lapply(full_data, length)))
+     for(i in names(full_data)) if(is.null(full_data[[i]])) full_data[[i]] <- rep(NA, .n)
      if(any(is.na(full_data$measure_x))) full_data$measure_x[is.na(full_data$measure_x)] <- "No measure specified"
      if(any(is.na(full_data$measure_y))) full_data$measure_y[is.na(full_data$measure_y)] <- "No measure specified"
      full_data <- as.data.frame(full_data)
@@ -329,7 +331,6 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"), n, sample_id = NULL,
      out <- ungroup(out)
      out$analysis_id <- NULL
      
-     # out <- bind_cols(analysis_id = 1:nrow(out), out)
      attributes(out) <- append(attributes(out), list(call_history = list(call), 
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                      fyi = NULL)) 
@@ -354,7 +355,7 @@ create_ad_list <- create_ad_tibble
 #'
 #' @keywords internal
 .ma_artifacts <- function(data, ma_arg_list){
-
+     
      ad_obj <- .create_ad_list_internal(full_data = data, 
                                         ad_type = ma_arg_list$ad_type,
                                         intercor = ma_arg_list$intercor,
@@ -374,7 +375,6 @@ create_ad_list <- create_ad_tibble
      
 }
 
-
 .create_ad_list_internal <- function(full_data, intercor, collapse_method, check_dependence,
                                      estimate_rxxa, estimate_rxxi,
                                      estimate_ux, estimate_ut, var_unbiased,
@@ -390,27 +390,39 @@ create_ad_list <- create_ad_tibble
      data_y <- full_data[,c("sample_id", "n", "construct_y", "measure_y", "ryy", "ryy_restricted", "ryy_type", "k_items_y", "uy", "uy_observed")]
      colnames(data_y) <- colnames(data_x)
      
-     ..create_ad_list_internal <- function(index)
+     ..create_ad_list_internal <- function(index){
+          
           by(1:length(construct_pair), index, function(i){
                
                if(!is.null(sample_id) & check_dependence){
+
                     independent_arts <- by(1:length(i), full_data$sample_id[i], function(j){
                          
                          .data <- full_data[i,][j,]
+                         
                          measure_averages <- by(.data, .data$measure_x, function(x){
                               out <- x[1,]
                               out$n <- mean(x$n, na.rm = TRUE)
-                              out$rxx <- mean(x$rxx, na.rm = TRUE)
-                              out$rxx_restricted <- as.logical(mean(x$rxx_restricted, na.rm = TRUE))
-                              out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type), na.rm = TRUE)))
-                              out$k_items_x <- suppressWarnings(mean(x$k_items_x, na.rm = TRUE))
-                              out$ux <- mean(x$ux, na.rm = TRUE)
-                              out$ux_observed <- as.logical(mean(x$ux_observed), na.rm = TRUE)
+                              if(all(is.na(x$n))){
+                                   out$rxx <- mean(x$rxx, na.rm = TRUE)
+                                   out$rxx_restricted <- as.logical(mean(x$rxx_restricted, na.rm = TRUE))
+                                   out$rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = x$rxx_type), na.rm = TRUE)))
+                                   out$k_items_x <- suppressWarnings(mean(x$k_items_x, na.rm = TRUE))
+                                   out$ux <- mean(x$ux, na.rm = TRUE)
+                                   out$ux_observed <- as.logical(mean(x$ux_observed), na.rm = TRUE)    
+                              }else{
+                                   out$rxx <- wt_mean(x = x$rxx)
+                                   out$rxx_restricted <- as.logical(wt_mean(x = x$rxx_restricted, wt = x$n))
+                                   out$rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = x$rxx_type), wt = x$n)))
+                                   out$k_items_x <- suppressWarnings(wt_mean(x = x$k_items_x, wt = x$n))
+                                   out$ux <- wt_mean(x = x$ux, wt = x$n)
+                                   out$ux_observed <- as.logical(wt_mean(x = x$ux_observed, wt = x$n))    
+                              }
                               out
                          })
-                         .data <- NULL
-                         for(d in 1:length(measure_averages)) .data <- rbind(.data, measure_averages[[d]])
                          
+                         .data <- as.data.frame(data.table::rbindlist(measure_averages))
+
                          if(nrow(.data) > 1){
                               if(collapse_method == "composite"){
                                    if(length(intercor) > 1){
@@ -424,33 +436,62 @@ create_ad_list <- create_ad_tibble
                                    }
                                    if(!is.na(.intercor)){
                                         n <- mean(.data$n, na.rm = TRUE)
-                                        rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = length(.data$n), mean_intercor = .intercor)
-                                        rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
-                                        rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
-                                        k_items_x <- wt_mean(x = .data$k_items_x, wt = .data$n)
-                                        ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = length(.data$n), mean_ri = .intercor)
-                                        ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))    
+                                        if(all(is.na(.data$n))){
+                                             rxx <- composite_rel_scalar(mean_rel = mean(.data$rxx, na.rm = TRUE), k_vars = sum(!is.na(.data$rxx)), mean_intercor = .intercor)
+                                             rxx_restricted <- as.logical(mean(x = .data$rxx_restricted, na.rm = TRUE))
+                                             rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
+                                             k_items_x <- suppressWarnings(mean(.data$k_items_x, na.rm = TRUE))
+                                             ux  <- composite_u_scalar(mean_u = mean(.data$ux, na.rm = TRUE), k_vars = sum(!is.na(.data$ux)), mean_ri = .intercor)
+                                             ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))      
+                                        }else{
+                                             rxx <- composite_rel_scalar(mean_rel = wt_mean(x = .data$rxx, wt = .data$n), k_vars = sum(!is.na(.data$rxx) & !is.na(.data$n)), mean_intercor = .intercor)
+                                             rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
+                                             rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
+                                             k_items_x <- wt_mean(x = .data$k_items_x, wt = .data$n)
+                                             ux  <- composite_u_scalar(mean_u = wt_mean(x = .data$ux, wt = .data$n), k_vars = sum(!is.na(.data$ux) & !is.na(.data$n)), mean_ri = .intercor)
+                                             ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))       
+                                        }
                                    }else{
                                         warning("Valid same-construct intercorrelation not provided for construct'", as.character(.data$construct_x)[1], 
                                                 "' in sample '", .data$sample_id[1], 
                                                 "': '\n     Computing average instead of composite", call. = FALSE)
                                         
                                         n <- mean(.data$n, na.rm = TRUE)
+                                        if(all(is.na(.data$n))){
+                                             rxx <- mean(.data$rxx, na.rm = TRUE)
+                                             rxx_restricted <- as.logical(mean(x = .data$rxx_restricted, na.rm = TRUE))
+                                             rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
+                                             k_items_x <- suppressWarnings(mean(.data$k_items_x, na.rm = TRUE))
+                                             ux  <- mean(.data$ux, na.rm = TRUE)
+                                             ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))      
+                                        }else{
+                                             n <- mean(.data$n, na.rm = TRUE)
+                                             rxx <- wt_mean(x = .data$rxx, wt = .data$n)
+                                             rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
+                                             rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
+                                             k_items_x <- wt_mean(x = .data$k_items_x, wt = .data$n)
+                                             ux  <- wt_mean(x = .data$ux, wt = .data$n)
+                                             ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))       
+                                        }
+                                   }
+                              }else if(collapse_method == "average"){
+                                   n <- mean(.data$n, na.rm = TRUE)
+                                   if(all(is.na(.data$n))){
                                         rxx <- mean(.data$rxx, na.rm = TRUE)
-                                        rxx_restricted <- as.logical(mean(.data$rxx_restricted, na.rm = TRUE))
+                                        rxx_restricted <- as.logical(mean(x = .data$rxx_restricted, na.rm = TRUE))
                                         rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
                                         k_items_x <- suppressWarnings(mean(.data$k_items_x, na.rm = TRUE))
-                                        ux <- mean(.data$ux, na.rm = TRUE)
+                                        ux  <- mean(.data$ux, na.rm = TRUE)
                                         ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))      
+                                   }else{
+                                        n <- mean(.data$n, na.rm = TRUE)
+                                        rxx <- wt_mean(x = .data$rxx, wt = .data$n)
+                                        rxx_restricted <- as.logical(wt_mean(x = .data$rxx_restricted, wt = .data$n))
+                                        rxx_type <- convert_consistency2reltype(consistency = as.logical(wt_mean(x = convert_reltype2consistency(rel_type = .data$rxx_type), wt = .data$n)))
+                                        k_items_x <- wt_mean(x = .data$k_items_x, wt = .data$n)
+                                        ux  <- wt_mean(x = .data$ux, wt = .data$n)
+                                        ux_observed <- as.logical(wt_mean(x = .data$ux_observed, wt = .data$n))       
                                    }
-                              }else{
-                                   n <- mean(.data$n, na.rm = TRUE)
-                                   rxx <- mean(.data$rxx, na.rm = TRUE)
-                                   rxx_restricted <- as.logical(mean(.data$rxx_restricted, na.rm = TRUE))
-                                   rxx_type <- convert_consistency2reltype(consistency = as.logical(mean(convert_reltype2consistency(rel_type = .data$rxx_type), na.rm = TRUE)))
-                                   k_items_x <- suppressWarnings(mean(.data$k_items_x, na.rm = TRUE))
-                                   ux <- mean(.data$ux, na.rm = TRUE)
-                                   ux_observed <- as.logical(mean(.data$ux_observed, na.rm = TRUE))
                               }
                          }else{
                               n <- as.numeric(.data$n)
@@ -487,7 +528,7 @@ create_ad_list <- create_ad_tibble
                     ux <- full_data$ux[i]
                     ux_observed <- full_data$ux_observed[i]
                }
-               
+
                rxxa <-   if(!is.null(rxx)){if(any(!rxx_restricted)){rxx[!rxx_restricted]}else{NULL}}else{NULL}
                n_rxxa <- if(!is.null(rxx)){if(any(!rxx_restricted)){n[!rxx_restricted]}else{NULL}}else{NULL}
                rxxi <-   if(!is.null(rxx)){if(any(rxx_restricted)){rxx[rxx_restricted]}else{NULL}}else{NULL}
@@ -544,27 +585,43 @@ create_ad_list <- create_ad_tibble
                     .supplemental_ads <- NULL
                }
                
-               if(process_ads){
-                    ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type,
-                                                                      rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
-                                                                      rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
-                                                                      ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                                                                      ut = ut, ni_ut = n_ut, wt_ut = n_ut,
-                                                                      estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                                                      estimate_ux = estimate_ux, estimate_ut = estimate_ut,
-                                                                      var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads))
+               if(all(is.na(n_rxxa))){
+                    wt_rxxa <- rep(1, length(n_rxxa))
                }else{
-                    ad_obj <- list(rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = n_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
-                                   rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = n_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
-                                   ux = ux, ni_ux = n_ux, wt_ux = n_ux,
-                                   ut = ut, ni_ut = n_ut, wt_ut = n_ut)
-                    if(!is.null(.supplemental_ads))
-                         ad_obj <- consolidate_ads(ad_obj, .supplemental_ads)
+                    wt_rxxa <- n_rxxa
                }
+               
+               if(all(is.na(n_rxxi))){
+                    wt_rxxi <- rep(1, length(n_rxxi))
+               }else{
+                    wt_rxxi <- n_rxxi
+               } 
+               
+               if(all(is.na(n_ux))){
+                    wt_ux <- rep(1, length(n_ux))
+               }else{
+                    wt_ux <- n_ux
+               }
+               
+               if(all(is.na(n_ut))){
+                    wt_ut <- rep(1, length(n_ut))
+               }else{
+                    wt_ut <- n_ut
+               }
+               
+               ad_obj <- suppressWarnings(create_ad_supplemental(ad_type = ad_type,
+                                                                 rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa,
+                                                                 rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
+                                                                 ux = ux, ni_ux = n_ux, wt_ux = wt_ux,
+                                                                 ut = ut, ni_ut = n_ut, wt_ut = wt_ut,
+                                                                 estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                                                                 estimate_ux = estimate_ux, estimate_ut = estimate_ut,
+                                                                 var_unbiased = var_unbiased, supplemental_ads = .supplemental_ads, process_ads = process_ads))
                
                list(ad_obj = ad_obj,
                     construct = as.character(full_data$construct_x[i][1]))
           })
+     }
      
      if(pairwise_ads){
           full_data <- data_x

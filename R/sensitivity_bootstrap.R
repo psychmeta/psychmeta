@@ -3,7 +3,8 @@
 sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .95,
                                   boot_ci_type = c("bca", "norm","basic", "stud", "perc"), ...){
 
-     screen_ma(ma_obj = ma_obj)
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      boot_ci_type <- match.arg(boot_ci_type, choices = c("bca", "norm", "basic", "stud", "perc"))
      
@@ -23,7 +24,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
 
      d_metric <- ifelse(any((ma_metric == "d_as_d" & (any(ma_methods == "ic") | any(ma_methods == "ad"))) | ma_metric == "r_as_d"), TRUE, FALSE)
      if(d_metric){
-          ma_obj <- convert_ma(ma_obj)
+          ma_obj <- convert_ma(ma_obj, record_call = FALSE)
           convert_back <- TRUE
      }else{
           convert_back <- FALSE
@@ -131,7 +132,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                            artifact_distribution = NULL)
           
           if(meta_tables$barebones$k >= min_k){
-               if(!is.null(escalc$barebones$pi)){
+               if("pi" %in% colnames(escalc$barebones)){
                     p <- wt_mean(x = escalc$barebones$pi, wt = escalc$barebones$n_adj)
                }else{
                     p <- .5
@@ -189,19 +190,19 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                
                if(any(ma_methods == "ic") | any(ma_methods == "ad")){
                     if(any(ma_methods == "ic")){
-                         if(!is.null(escalc$individual_correction$true_score$pa)){
+                         if("pa" %in% colnames(escalc$individual_correction$true_score)){
                               p_ts <- wt_mean(x = escalc$individual_correction$true_score$pa,
                                               wt = escalc$individual_correction$true_score$weight)
                          }else{
                               p_ts <- .5
                          }
-                         if(!is.null(escalc$individual_correction$validity_generalization_x$pa)){
+                         if("pa" %in% colnames(escalc$individual_correction$validity_generalization_x)){
                               p_vgx <- wt_mean(x = escalc$individual_correction$validity_generalization_x$pa,
                                                wt = escalc$individual_correction$validity_generalization_x$weight)
                          }else{
                               p_vgx <- .5
                          }
-                         if(!is.null(escalc$individual_correction$validity_generalization_y$pa)){
+                         if("pa" %in% colnames(escalc$individual_correction$validity_generalization_y)){
                               p_vgy <- wt_mean(x = escalc$individual_correction$validity_generalization_y$pa,
                                                wt = escalc$individual_correction$validity_generalization_y$weight)
                          }else{
@@ -278,10 +279,11 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
      
      ma_obj$bootstrap <- out_list
      
-     if(convert_back) ma_obj <- convert_ma(ma_obj)
+     if(convert_back) ma_obj <- convert_ma(ma_obj, record_call = FALSE)
      
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Bootstrapped meta-analyses have been added to 'ma_obj' - use get_bootstrap() to retrieve them.")
 
      ma_obj

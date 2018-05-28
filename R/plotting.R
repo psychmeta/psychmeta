@@ -20,14 +20,25 @@
 #' @author Based on code by John Sakaluk
 #'
 #' @examples
+#' ## Correlations
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
 #'                moderators = moderator, data = data_r_meas_multi)
 #' plot_funnel(ma_obj = ma_obj)
-#' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1))
+#' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 2))
+#' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
+#' 
+#' ## d values
+#' ma_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
+#'                construct_y = construct, sample_id = sample_id,
+#'                data = data_d_meas_multi)
+#' plot_funnel(ma_obj = ma_obj)
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 2))
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
+     
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
      escalc_list <- get_escalc(ma_obj = ma_obj_filtered)
@@ -68,6 +79,7 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      for(i in names(out)) .out[[i]] <- out[[i]]
      ma_obj$funnel <- .out
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
      
      ma_obj
@@ -110,13 +122,23 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
 #'                moderators = moderator, data = data_r_meas_multi)
 #' plot_forest(ma_obj = ma_obj)
-#' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1))
 #' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 2))
 #' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1), show_filtered = TRUE)
+#' 
+#' ## d values
+#' ma_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
+#'                construct_y = construct, sample_id = sample_id,
+#'                data = data_d_meas_multi)
+#' plot_forest(ma_obj = ma_obj)
+#' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 2))
+#' plot_forest(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE,
                         ma_facetname = "Summary", facet_levels = NULL,
                         conf_level = .95, conf_method = "t",
                         x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference"){
+     
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      ma_metric <- attributes(ma_obj)$ma_metric
      ma_methods <- attributes(ma_obj)$ma_methods
@@ -226,8 +248,9 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_obj$forest <- out
      rm(out_pair, out_analysis)
      
+     if(flag_summary) ma_obj <- summary(ma_obj)
      message("Forest plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
-     
+
      ma_obj
 }
 

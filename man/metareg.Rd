@@ -10,7 +10,8 @@ metareg(ma_obj, formula_list = NULL, ...)
 \item{ma_obj}{Meta-analysis object.}
 
 \item{formula_list}{Optional list of regression formulas to evaluate.
-NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly.}
+NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly. 
+The function will remove spaces in the data, you only have to account for this in \code{formula_list} when you supply your own formula(s).}
 
 \item{...}{Additional arguments.}
 }
@@ -38,5 +39,22 @@ ma_obj <- metareg(ma_obj)
 ## Examine the meta-regression results for the bare-bones and corrected data:
 ma_obj$metareg[[1]]$barebones$`Main Effects`
 ma_obj$metareg[[1]]$individual_correction$true_score$`Main Effects`
+
+
+## Meta-analyze simulated d-value data
+dat <- data_d_meas_multi
+## Simulate a random moderator
+set.seed(100)
+dat$moderator <- sample(1:2, nrow(dat), replace = TRUE)
+ma_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
+               construct_y = construct, sample_id = sample_id,
+               moderators = moderator, data = dat)
+
+## Pass the meta-analysis object to the meta-regression function:
+ma_obj <- metareg(ma_obj)
+
+## Examine the meta-regression results for the bare-bones and corrected data:
+ma_obj$metareg[[1]]$barebones$`Main Effects`
+ma_obj$metareg[[1]]$individual_correction$latentGroup_latentY$`Main Effects`
 }
 \keyword{regression}

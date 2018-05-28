@@ -22,7 +22,7 @@ summary.ma_psychmeta <- function(object, ...){
      ma_metric <- attributes(object)$ma_metric
      ma_methods <- attributes(object)$ma_methods
      
-     ma_tables <- get_metatab(ma_obj = object, as_list = TRUE)
+     meta_tables <- get_metatab(ma_obj = object, as_list = TRUE)
 
      if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
           ts_label <- "true_score"
@@ -33,8 +33,8 @@ summary.ma_psychmeta <- function(object, ...){
           vgx_title <- "\nValidity-generalization results (X as the predictor) \n"
           vgy_title <- "\nValidity-generalization results (Y as the predictor) \n"
 
-          correction_types_ic <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(ma_tables$individual_correction)]
-          correction_types_ad <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(ma_tables$artifact_distribution)]
+          correction_types_ic <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(meta_tables$individual_correction)]
+          correction_types_ad <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(meta_tables$artifact_distribution)]
           correction_types_ic <- correction_types_ad <- c(ts_label, vgx_label, vgy_label)
           
      }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
@@ -46,8 +46,8 @@ summary.ma_psychmeta <- function(object, ...){
           vgx_title <- "\nResults with observed groups and latent Y scores \n"
           vgy_title <- "\nResults with latent groups and observed Y scores \n"
 
-          correction_types_ic <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(ma_tables$individual_correction)]
-          correction_types_ad <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(ma_tables$artifact_distribution)]
+          correction_types_ic <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(meta_tables$individual_correction)]
+          correction_types_ad <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(meta_tables$artifact_distribution)]
           correction_types_ic <- correction_types_ad <- c(ts_label, vgx_label, vgy_label)
 
      }else if(ma_metric == "r_order2"){
@@ -99,7 +99,7 @@ summary.ma_psychmeta <- function(object, ...){
                                vgy = vgy_label)
      
      out <- list(ma_obj = object, 
-                 ma_tables = ma_tables, 
+                 meta_tables = meta_tables, 
                  ma_metric = ma_metric, 
                  ma_methods = ma_methods, 
                  correction_types = list(ic = correction_types_ic, 

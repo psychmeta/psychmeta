@@ -143,7 +143,7 @@ Artifact distribution object (matrix of artifact-distribution means and variance
 }
 \description{
 This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions.
-Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
+Use this to create objects that can be supplied to the \code{\link{ma_r_ad}} and \code{\link{ma_r_ad}} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
 
 Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
 

@@ -1,22 +1,6 @@
 #' @rdname ma_r
 #' @export
 #' @aliases ma_r_barebones
-#' @examples
-#' ### Demonstration of ma_r_bb ###
-#' ## Example analysis using data from Gonzalez-Mule et al. (2014):
-#'
-#' ## Not correcting for bias and using normal distributions to compute uncertainty intervals
-#' ## allows for exact replication of the results reported in the text:
-#' ma_r_bb(r = rxyi, n = n, correct_bias = FALSE, conf_method = "norm", cred_method = "norm",
-#'                data = data_r_gonzalezmule_2014)
-#'
-#' ## Using hs_override = TRUE allows one to easily implement the traditional Hunter-Schmidt method:
-#' ma_r_bb(r = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014)
-#'
-#' ## With hs_override = FALSE, the program defaults will compute unbiased variances and use
-#' ## t-distributions to estimate confidence and credibility intervals - these settings make
-#' ## a noticeable difference for small studies like the textbook example:
-#' ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
 ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                       wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
                                                   "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
@@ -282,10 +266,6 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
           var_res <- sd_res <- NA
           se_r <- sd_e
           ci <- confidence(mean = mean_r_xy, sd = sd_e, k = 1, conf_level = conf_level, conf_method = "norm")
-
-          # se_r <- NA
-          # ci <- cbind(NA, NA)
-          # colnames(ci) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
      }else{
           se_r <- sd_r / sqrt(k)
           ci <- confidence(mean = mean_r_xy, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)

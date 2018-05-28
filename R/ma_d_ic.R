@@ -1,14 +1,6 @@
 #' @rdname ma_d
 #' @export
-#' @examples
-#' ### Demonstration of ma_d_ic ###
-#' ## Example meta-analyses using simulated data:
-#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
-#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                    treat_as_d = TRUE, 
+ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_r = FALSE, 
                     wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
                                 "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
                     correct_bias = TRUE,
@@ -30,6 +22,9 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
      
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
                                   .control_psychmeta_arg = control)
+     
+     treat_as_d <- list(...)$treat_as_d
+     if(is.null(treat_as_d)) treat_as_d <- !treat_as_r
      
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
@@ -167,8 +162,12 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
                     ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
                     es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa)
      
-     attributes(out)$call_history <- append(list(call), attributes(out)$call_history)
-     out <- convert_ma(ma_obj = out)
+     if(treat_as_d) attributes(out)$ma_metric <- "d_as_r"
+     
+     attributes(out)$call_history <- list(call)
+     
+     out <- convert_ma(ma_obj = out, record_call = FALSE)
+     
      return(out)
 }
 

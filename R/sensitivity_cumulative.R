@@ -2,7 +2,8 @@
 #' @rdname sensitivity
 sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_var"), ...){
      
-     screen_ma(ma_obj = ma_obj)
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      sort_method <- match.arg(sort_method, choices = c("weight", "n", "inv_var"))
      
@@ -18,7 +19,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
      
      d_metric <- ifelse(any((ma_metric == "d_as_d" & (any(ma_methods == "ic") | any(ma_methods == "ad"))) | ma_metric == "r_as_d"), TRUE, FALSE)
      if(d_metric){
-          ma_obj <- convert_ma(ma_obj)
+          ma_obj <- convert_ma(ma_obj, record_call = FALSE)
           convert_back <- TRUE
      }else{
           convert_back <- FALSE
@@ -119,7 +120,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                            individual_correction = NULL,
                            artifact_distribution = NULL)
           
-          if(!is.null(escalc$barebones$pi)){
+          if("pi" %in% colnames(escalc$barebones)){
                p <- wt_mean(x = escalc$barebones$pi, wt = escalc$barebones$n_adj)
           }else{
                p <- .5
@@ -384,6 +385,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
      
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      
+     if(flag_summary) ma_obj <- summary(ma_obj, record_call = FALSE)
      message("Cumulative meta-analyses have been added to 'ma_obj' - use get_cumulative() to retrieve them.")
      
      ma_obj

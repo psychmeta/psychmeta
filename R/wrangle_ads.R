@@ -1,8 +1,8 @@
 organize_ads <- function(ad_obj, ad_suffix = NULL){
      
-     if(is.null(ad_obj)){
-          ad_obj_x <- ad_obj_y <- NULL
-     }else{
+     ad_obj_x <- ad_obj_y <- NULL
+     if(!is.null(ad_obj)){
+
           if("ad_x" %in% colnames(ad_obj)){
                if(!("ad_y" %in% colnames(ad_obj))){
                     ad_obj_x <- ad_obj_y <- ad_obj
@@ -108,15 +108,21 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
      primary_ads <- organize_ads(ad_obj = primary_ads, ad_suffix = "_primary")
      harvested_ads <- organize_ads(ad_obj = harvested_ads, ad_suffix = "_harvested")
      if(!is.null(supplemental_ads)){
-          supplemental_ads_x <- organize_ads(NULL, ad_suffix = "_supplemental")
-          supplemental_ads_y <- organize_ads(NULL, ad_suffix = "_supplemental") 
+          supplemental_ads_x <- organize_ads(ad_obj = NULL, ad_suffix = "_supplemental")
+          supplemental_ads_y <- organize_ads(ad_obj = NULL, ad_suffix = "_supplemental") 
      }else{
-          supplemental_ads_x <- organize_ads(reshape_suppad2tibble(supplemental_ads_x, as_individual_pair = TRUE, construct_name = "X"), ad_suffix = "_supplemental")
-          supplemental_ads_y <- organize_ads(reshape_suppad2tibble(supplemental_ads_y, as_individual_pair = TRUE, construct_name = "Y"), ad_suffix = "_supplemental")
+          supplemental_ads_x <- reshape_suppad2tibble(supplemental_ads_x, as_individual_pair = TRUE, construct_name = "X")
+          if(any(colnames(supplemental_ads_x) == "ad_y")) supplemental_ads_x$ad_y <- NULL
+          supplemental_ads_x <- organize_ads(ad_obj = supplemental_ads_x, ad_suffix = "_supplemental")
+          
+          supplemental_ads_y <- reshape_suppad2tibble(supplemental_ads_y, as_individual_pair = TRUE, construct_name = "X")
+          if(any(colnames(supplemental_ads_y) == "ad_x")) supplemental_ads_y$ad_x <- NULL
+          supplemental_ads_y <- organize_ads(ad_obj = supplemental_ads_y, ad_suffix = "_supplemental")
+          
           supplemental_ads_x$ad_obj_y <- NULL
           supplemental_ads_y$ad_obj_x <- NULL
      }
-     supplemental_ads <- organize_ads(reshape_suppad2tibble(supplemental_ads), ad_suffix = "_supplemental")
+     supplemental_ads <- organize_ads(ad_obj = reshape_suppad2tibble(supplemental_ads), ad_suffix = "_supplemental")
      
      .join_adobjs <- function(..., exclude_from_matching = NULL){
           exclude_from_matching <- c("analysis_type", "analysis_id", "pair_id", exclude_from_matching)
@@ -238,9 +244,10 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
      ad_obj
 }
 
-join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
+join_maobj_adobj <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL){
      
      .attributes <- attributes(ma_obj)
+     .nrows <- nrow(ma_obj)
      
      match_names <- colnames(ma_obj)[1:(which(colnames(ma_obj) == "meta_tables") - 1)]
      match_names <- match_names[match_names != "analysis_id"]
@@ -254,13 +261,35 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
                ad_obj_x <- ad_obj_x %>% rename(construct_x = "construct_y")
           if(!("ad_x" %in% colnames(ad_obj_x)) & "ad_y" %in% colnames(ad_obj_x))
                ad_obj_x <- ad_obj_x %>% rename(ad_x = "ad_y")
-          
           if("ad_y" %in% colnames(ad_obj_x))
                ad_obj_x$ad_y <- NULL
           
+          if(any(!(colnames(ad_obj_x) %in% c(match_names, "ad_x")))){
+               warning("'ad_obj_x' contains columns not matchable to 'ma_obj': Attempting to resolve ambiguities", call. = FALSE)
+               
+               .ad_obj_x <- ad_obj_x %>% select(colnames(ad_obj_x)[!(colnames(ad_obj_x) %in% c(match_names, "ad_x"))])
+               modinfo <- apply(.ad_obj_x, 2, function(x){
+                    x <- as.character(x)
+                    which(x == "All Levels")
+               })
+               if(is.matrix(modinfo)){
+                    modinfo <- which(apply(modinfo, 1, function(x) all(x == x[1])))
+               }
+               if(is.list(modinfo)){
+                    .modinfo <- modinfo[unlist(map(modinfo, function(x) length(x) > 0))]
+                    modinfo <- 1:nrow(ma_obj)
+                    for(i in 1:length(.modinfo)) modinfo <- modinfo[modinfo %in% .modinfo]
+               }
+               if(length(modinfo) > 0)
+                    ad_obj_x <- ad_obj_x[modinfo,]
+               ad_obj_x <- ad_obj_x %>% select(colnames(ad_obj_x)[colnames(ad_obj_x) %in% c(match_names, "ad_x")])    
+          }
+          
           match_names_x <- match_names[match_names %in% colnames(ad_obj_x)]
           if(length(match_names_x) > 0){
-               ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_x, by = match_names_x))      
+               ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_x, by = match_names_x))     
+               if(nrow(ma_obj) > .nrows) 
+                    stop("Attempts to join artifact distributions to meta-analysis object failed: Check structure of supplemental artifact distributions", call. = FALSE)
           }else{
                if(nrow(ad_obj_x) == 1) ma_obj <- bind_cols(ma_obj, ad_obj_x)
           }
@@ -273,13 +302,35 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
                ad_obj_y <- ad_obj_y %>% rename(construct_y = "construct_x")
           if(!("ad_y" %in% colnames(ad_obj_y)) & "ad_x" %in% colnames(ad_obj_y))
                ad_obj_y <- ad_obj_y %>% rename(ad_y = "ad_x")
-          
           if("ad_x" %in% colnames(ad_obj_y))
                ad_obj_y$ad_x <- NULL
           
+          if(any(!(colnames(ad_obj_y) %in% c(match_names, "ad_y")))){
+               warning("'ad_obj_y' contains columns not matchable to 'ma_obj': Attempting to resolve ambiguities", call. = FALSE)
+               
+               .ad_obj_y <- ad_obj_y %>% select(colnames(ad_obj_y)[!(colnames(ad_obj_y) %in% c(match_names, "ad_y"))])
+               modinfo <- apply(.ad_obj_y, 2, function(x){
+                    x <- as.character(x)
+                    which(x == "All Levels")
+               })
+               if(is.matrix(modinfo)){
+                    modinfo <- which(apply(modinfo, 1, function(x) all(x == x[1])))
+               }
+               if(is.list(modinfo)){
+                    .modinfo <- modinfo[unlist(map(modinfo, function(x) length(x) > 0))]
+                    modinfo <- 1:nrow(ma_obj)
+                    for(i in 1:length(.modinfo)) modinfo <- modinfo[modinfo %in% .modinfo]
+               }
+               if(length(modinfo) > 0)
+                    ad_obj_y <- ad_obj_y[modinfo,]
+               ad_obj_y <- ad_obj_y %>% select(colnames(ad_obj_y)[colnames(ad_obj_y) %in% c(match_names, "ad_y")])    
+          }
+          
           match_names_y <- match_names[match_names %in% colnames(ad_obj_y)]
           if(length(match_names_y) > 0){
-               ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_y, by = match_names_y))   
+               ma_obj <- suppressWarnings(left_join(ma_obj, ad_obj_y, by = match_names_y))  
+               if(nrow(ma_obj) > .nrows) 
+                    stop("Attempts to join artifact distributions to meta-analysis object failed: Check structure of supplemental artifact distributions", call. = FALSE)
           }else{
                if(nrow(ad_obj_y) == 1) ma_obj <- bind_cols(ma_obj, ad_obj_y)
           }
@@ -409,16 +460,16 @@ manage_ad_objs <- function(ma_obj, ad_obj_x, ad_obj_y = ad_obj_x){
 
 
 
-mock_ad <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)),
-                    rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)),
+mock_ad <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
+                    rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)),
                     ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux, length(mean_ux)),
                     ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
 
-                    mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)),
-                    mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)),
+                    mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)), mean_k_items_qxi = rep(NA, length(mean_qxi)),
+                    mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_k_items_rxxi = rep(NA, length(mean_rxxi)),
 
-                    mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)),
-                    mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)),
+                    mean_qxa = NULL, var_qxa = NULL, k_qxa = NULL, mean_n_qxa = NULL, qxa_dist_type = rep("alpha", length(mean_qxa)), mean_k_items_qxa = rep(NA, length(mean_qxa)),
+                    mean_rxxa = NULL, var_rxxa = NULL, k_rxxa = NULL, mean_n_rxxa = NULL, rxxa_dist_type = rep("alpha", length(mean_rxxa)), mean_k_items_rxxa = rep(NA, length(mean_rxxa)),
 
                     mean_ux = NULL, var_ux = NULL, k_ux = NULL, mean_ni_ux = NULL,
                     mean_na_ux = rep(NA, length(mean_ux)), dep_sds_ux_spec = rep(FALSE, length(mean_ux)),
@@ -426,13 +477,13 @@ mock_ad <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = re
                     mean_ut = NULL, var_ut = NULL, k_ut = NULL, mean_ni_ut = NULL,
                     mean_na_ut = rep(NA, length(mean_ut)), dep_sds_ut_spec = rep(FALSE, length(mean_ut)), ...){
 
-     out <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type,
-                 mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type,
-                 mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type,
+     out <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, rxxi_type = rxxi_type, k_items_rxxi = k_items_rxxi,
+                 mean_qxi = mean_qxi, var_qxi = var_qxi, k_qxi = k_qxi, mean_n_qxi = mean_n_qxi, qxi_dist_type = qxi_dist_type, mean_k_items_qxi = mean_k_items_qxi, 
+                 mean_rxxi = mean_rxxi, var_rxxi = var_rxxi, k_rxxi = k_rxxi, mean_n_rxxi = mean_n_rxxi, rxxi_dist_type = rxxi_dist_type, mean_k_items_rxxi = mean_k_items_rxxi, 
 
-                 rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type,
-                 mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa, qxa_dist_type = qxa_dist_type,
-                 mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa, rxxa_dist_type = rxxa_dist_type,
+                 rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, rxxa_type = rxxa_type, k_items_rxxa = k_items_rxxa, 
+                 mean_qxa = mean_qxa, var_qxa = var_qxa, k_qxa = k_qxa, mean_n_qxa = mean_n_qxa, qxa_dist_type = qxa_dist_type, mean_k_items_qxa = mean_k_items_qxa, 
+                 mean_rxxa = mean_rxxa, var_rxxa = var_rxxa, k_rxxa = k_rxxa, mean_n_rxxa = mean_n_rxxa, rxxa_dist_type = rxxa_dist_type, mean_k_items_rxxa = mean_k_items_rxxa, 
 
                  ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux, dep_sds_ux_obs = dep_sds_ux_obs,
                  mean_ux = mean_ux, var_ux = var_ux, k_ux = k_ux, mean_ni_ux = mean_ni_ux, mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
@@ -450,17 +501,17 @@ manage_ad_inputs <- function(ad_list){
           NULL
      }else{
           ad_list <- do.call(what = mock_ad, args = ad_list)
-
-          rxxi_raw <- ad_list[c("rxxi", "n_rxxi", "wt_rxxi", "rxxi_type")]
-          qxi_prespec <- ad_list[c("mean_qxi", "var_qxi", "k_qxi", "mean_n_qxi", "qxi_dist_type")]
-          rxxi_prespec <- ad_list[c("mean_rxxi", "var_rxxi", "k_rxxi", "mean_n_rxxi", "rxxi_dist_type")]
+          
+          rxxi_raw <- ad_list[c("rxxi", "n_rxxi", "wt_rxxi", "rxxi_type", "k_items_rxxi")]
+          qxi_prespec <- ad_list[c("mean_qxi", "var_qxi", "k_qxi", "mean_n_qxi", "qxi_dist_type", "mean_k_items_qxi")]
+          rxxi_prespec <- ad_list[c("mean_rxxi", "var_rxxi", "k_rxxi", "mean_n_rxxi", "rxxi_dist_type", "mean_k_items_rxxi")]
           rxxi_raw <- filter_listnonnull(rxxi_raw)
           qxi_prespec <- filter_listnonnull(qxi_prespec)
           rxxi_prespec <- filter_listnonnull(rxxi_prespec)
 
-          rxxa_raw <- ad_list[c("rxxa", "n_rxxa", "wt_rxxa", "rxxa_type")]
-          qxa_prespec <- ad_list[c("mean_qxa", "var_qxa", "k_qxa", "mean_n_qxa", "qxa_dist_type")]
-          rxxa_prespec <- ad_list[c("mean_rxxa", "var_rxxa", "k_rxxa", "mean_n_rxxa", "rxxa_dist_type")]
+          rxxa_raw <- ad_list[c("rxxa", "n_rxxa", "wt_rxxa", "rxxa_type", "k_items_rxxa")]
+          qxa_prespec <- ad_list[c("mean_qxa", "var_qxa", "k_qxa", "mean_n_qxa", "qxa_dist_type", "mean_k_items_qxa")]
+          rxxa_prespec <- ad_list[c("mean_rxxa", "var_rxxa", "k_rxxa", "mean_n_rxxa", "rxxa_dist_type", "mean_k_items_rxxa")]
           rxxa_raw <- filter_listnonnull(rxxa_raw)
           qxa_prespec <- filter_listnonnull(qxa_prespec)
           rxxa_prespec <- filter_listnonnull(rxxa_prespec)

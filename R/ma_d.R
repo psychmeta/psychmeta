@@ -12,7 +12,7 @@
 #' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
 #' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
-#' @param treat_as_d Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).
+#' @param treat_as_r Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{FALSE}; default) or whether they should be meta-analyzed as correlations and have the final results converted to the \emph{d} metric (\code{TRUE}).
 #' @param ma_method Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
 #' @param ad_type For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".
 #' @param correction_method Character scalar or a matrix with \code{group_id} levels as row names and \code{construct_y} levels as column names.
@@ -213,6 +213,7 @@
 #' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
 #'
 #' @examples
+#' ### Demonstration of ma_d ###
 #' ## The 'ma_d' function can compute multi-construct bare-bones meta-analyses:
 #' ma_d(d = d, n1 = n1, n2 = n2, construct_y = construct, data = data_d_meas_multi)
 #'
@@ -225,7 +226,23 @@
 #' ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
 #'      ryy = ryyi, correct_rr_y = FALSE,
 #'      construct_y = construct, data = data_d_meas_multi)
-ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_d = TRUE, 
+#'      
+#'      
+#' ### Demonstration of ma_d_bb ###
+#' ## Example meta-analyses using simulated data:
+#' ma_d_bb(d = d, n1 = n1, n2 = n2,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
+#' ma_d_bb(d = d, n1 = n1, n2 = n2,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
+#'         
+#'         
+#' ### Demonstration of ma_d_ic ###
+#' ## Example meta-analyses using simulated data:
+#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
+#' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
+#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
+ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_r = FALSE, 
                  ma_method = c("bb", "ic", "ad"), 
                  ad_type = c("tsa", "int"), 
                  correction_method = "auto",
@@ -265,6 +282,9 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
           residual_ads <- FALSE
      }
 
+     treat_as_d <- list(...)$treat_as_d
+     if(is.null(treat_as_d)) treat_as_d <- !treat_as_r
+     
      cat(" **** Running ma_d: Meta-analysis of d values **** \n")
 
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
@@ -520,5 +540,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      attributes(out)$call_history <- list(call)
 
+     if(attributes(out)$ma_metric %in% c("d_as_r", "r_as_r"))
+          out <- convert_ma(ma_obj = out, record_call = FALSE)
+     
      return(out)
 }

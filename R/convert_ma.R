@@ -1,5 +1,6 @@
-#' Function to convert meta-analysis of correlations to d values or vice-versa
+#' @title Function to convert meta-analysis of correlations to d values or vice-versa
 #'
+#' @description 
 #' Takes a meta-analysis class object of \emph{d} values or correlations (classes \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, and \code{d_as_r}; second-order meta-analyses are currently not supported) as an input and uses conversion formulas and Taylor series approximations to convert effect sizes and variance estimates, respectively.
 #'
 #' @param ma_obj A meta-analysis object of class \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, or \code{d_as_r}
@@ -26,6 +27,9 @@
 #' \deqn{a_{r}=\frac{\sqrt{\frac{1}{p-p^{2}}}}{\left(1-r^{2}\right)^{1.5}}}{a_r = sqrt(1 / (p - p^2)) / (1 - r^2)^1.5}
 convert_ma <- function(ma_obj, ...){
 
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     if(flag_summary) ma_obj <- ma_obj$ma_obj
+     
      additional_args <- list(...)
      .attributes <- attributes(ma_obj)
 
@@ -63,6 +67,7 @@ convert_ma <- function(ma_obj, ...){
                colnames(ma_obj)[colnames(ma_obj) == "group_contrast"] <- "construct_x"
      }
 
+     ma_obj <- namelists.ma_psychmeta(ma_obj = ma_obj)
      .attributes$names <- attributes(ma_obj)$names
      attributes(ma_obj) <- .attributes
      attributes(ma_obj)$ma_metric <- .ma_metric
@@ -70,8 +75,15 @@ convert_ma <- function(ma_obj, ...){
           attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history,
                                                     list(match.call()))
 
+     if(flag_summary) ma_obj <- summary(ma_obj)
+     
      ma_obj
 }
+
+#' @rdname convert_ma
+#' @export
+convert_meta <- convert_ma
+
 
 .convert_ma <- function(ma_obj_i, ma_obj, ma_methods, ma_metric){
 
@@ -82,29 +94,29 @@ convert_ma <- function(ma_obj, ...){
      conf_method <- att$inputs$conf_method
      cred_method <- att$inputs$cred_method
      error_type <- att$inputs$error_type
-
-     if(is.null(ma_obj_i$escalc[[1]]$barebones$pi)){
-          pi_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
-          pi_vec <- rep(.5, length(k))
-     }else{
+     
+     if("pi" %in% colnames(ma_obj_i$escalc[[1]]$barebones)){
           pi_list <- ma_obj_i$escalc[[1]]$barebones$pi
           pi_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pi, wt = ma_obj_i$escalc[[1]]$barebones$weight)
-     }
-
-     if(is.null(ma_obj_i$escalc[[1]]$barebones$pa)){
-          pa_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
-          pa_vec <- rep(.5, length(k))
      }else{
+          pi_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
+          pi_vec <- rep(.5, length(k))
+     }
+     
+     if("pa" %in% colnames(ma_obj_i$escalc[[1]]$barebones)){
           pa_list <- ma_obj_i$escalc[[1]]$barebones$pa
           pa_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pa, wt = ma_obj_i$escalc[[1]]$barebones$weight)
-     }
-
-     if(is.null(ma_obj_i$escalc[[1]]$barebones$pa_ad)){
-          pa_ad_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
-          pa_ad_vec <- rep(.5, length(k))
      }else{
+          pa_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
+          pa_vec <- rep(.5, length(k))
+     }
+     
+     if("pa_ad" %in% colnames(ma_obj_i$escalc[[1]]$barebones)){
           pa_ad_list <- ma_obj_i$escalc[[1]]$barebones$pa_ad
           pa_ad_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pa_ad, wt = ma_obj_i$escalc[[1]]$barebones$weight)
+     }else{
+          pa_ad_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
+          pa_ad_vec <- rep(.5, length(k))  
      }
 
      correction_names_r <- c("true_score", "validity_generalization_x", "validity_generalization_y")
@@ -298,12 +310,6 @@ convert_ma <- function(ma_obj, ...){
 
      ma_obj_i
 }
-
-
-#' @rdname convert_ma
-#' @export
-convert_meta <- convert_ma
-
 
 #' Convert the variance of a dichotomous variable (i.d., pq) to the proportion of one of the categories in the variable (i.e., p)
 #'

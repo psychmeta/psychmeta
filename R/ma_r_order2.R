@@ -321,6 +321,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                dat <- data.frame(yi = r_vec, vi = var_e_vec, d = r_vec, var_d = var_r_vec, 
                                  k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r)
           }
+          class(dat) <- c("escalc", "data.frame")
      }
 
      k <- sum(k_vec[!is.na(wt_vec) & !is.na(r_vec)])
@@ -410,6 +411,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, var_d_c = var_r_c_vec, 
                                  k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
           }
+          class(dat) <- c("escalc", "data.frame")
      }
 
 
@@ -500,6 +502,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, 
                                  k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
           }
+          class(dat) <- c("escalc", "data.frame")
      }
 
      k <- sum(k_vec[!is.na(wt_vec)])

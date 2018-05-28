@@ -1,21 +1,5 @@
 #' @rdname ma_r
 #' @export
-#' @examples
-#' ### Demonstration of ma_r_ic ###
-#' ## Simulated example satisfying the assumptions of the Case IV 
-#' ## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
-#' ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
-#' 
-#' ## Simulated example satisfying the assumptions of the Case V 
-#' ## range-restriction correction
-#' ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
-#'         rxx_type = "parallel", ryy_type = "parallel", 
-#'         ux = ux, uy = uy, data = data_r_bvirr)
-#' 
-#' ## Published example from Gonzalez-Mule et al. (2014)
-#' ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
-#'         rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
-#'         moderators = c("Rating source", "Published", "Type", "Complexity"))
 ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     wt_type = c("sample_size", "inv_var_mean", "inv_var_sample",
                                 "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
@@ -72,7 +56,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
 
-     inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias,
+     inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias, moderated_ads = control$moderated_ads,
                     conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased)
      additional_args <- list(...)
 
@@ -319,7 +303,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                          primary_ads = ad_obj_list, 
                                          harvested_ads = harvested_ads, 
                                          supplemental_ads_x = supplemental_ads_x, supplemental_ads_y = supplemental_ads_y)
-          
           ad_obj_list_int <- join_adobjs(ad_type = "int", 
                                          primary_ads = ad_obj_list, 
                                          harvested_ads = harvested_ads, 
@@ -887,10 +870,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                            construct_y = rep("Y", nrow(out)), 
                            out)
           
-          out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa)
+          out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa, ad_obj_y = ad_obj_list_tsa)
           out <- out %>% rename(ad_x_tsa = "ad_x", ad_y_tsa = "ad_y")
-          out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_int)
+          out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_int, ad_obj_y = ad_obj_list_tsa)
           out <- out %>% rename(ad_x_int = "ad_x", ad_y_int = "ad_y")
+          
           out$ad <- apply(out, 1, function(x){
                list(ic = list(ad_x_int = x$ad_x_int, 
                               ad_x_tsa = x$ad_x_tsa, 

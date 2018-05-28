@@ -2,13 +2,6 @@
 #' @export
 #' @import dplyr
 #' @aliases ma_d_barebones
-#' @examples
-#' ### Demonstration of ma_d_bb ###
-#' ## Example meta-analyses using simulated data:
-#' ma_d_bb(d = d, n1 = n1, n2 = n2,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
-#' ma_d_bb(d = d, n1 = n1, n2 = n2,
-#'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
 ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL, citekey = NULL,
                                       wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
                                                   "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
@@ -277,10 +270,6 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           var_res <- sd_res <- NA
           se_d <- sd_e
           ci <- confidence(mean = mean_d, sd = sd_e, k = 1, conf_level = conf_level, conf_method = "norm")
-
-          # se_d <- NA
-          # ci <- cbind(NA, NA)
-          # colnames(ci) <- paste("CI", c("LL", "UL"), round(conf_level * 100), sep = "_")
      }else{
           se_d <- sd_d / sqrt(k)
           ci <- confidence(mean = mean_d, sd = var_d^.5, k = k, conf_level = conf_level, conf_method = conf_method)

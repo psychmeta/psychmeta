@@ -1,5 +1,6 @@
-#' Filter meta-analyses
-#'
+#' @title  Filter meta-analyses
+#' 
+#' @description 
 #' Filter \code{psychmeta} meta-analysis objects based on specified criteria.
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
@@ -35,15 +36,13 @@
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="any")
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
 filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
-
-     # Check if ma_obj is a sumamry object
-     if("summary.ma_psychmeta" %in% class(ma_obj)) {
-             flag_summary <- TRUE
-             ma_obj <- ma_obj$ma_obj
-     } else flag_summary <- FALSE
-
-     screen_ma(ma_obj = ma_obj)
-
+     
+     traffic_from_get <- list(...)$traffic_from_get
+     if(is.null(traffic_from_get)) traffic_from_get <- FALSE
+     
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj) & !traffic_from_get
+     ma_obj <- screen_ma(ma_obj = ma_obj)
+     
      match <- match.arg(match, c("all", "any"))
      case_sensitive <- scalar_arg_warning(arg = case_sensitive, arg_name = "case_sensitive")
 
@@ -80,9 +79,9 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           construct_x <- NULL
           construct_y <- NULL
      }
-
-     if(mode(analyses) != "list") {
-          if(analyses == "all" ) {
+     
+     if(mode(analyses) != "list"){
+          if(analyses == "all" ){
                construct_ids <- NULL
                analyses <- list()
           }else stop("'analyses' must be either 'all' or a list. See help(filter_meta).")
@@ -97,8 +96,9 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                     keep_meta <- construct_x %in% analyses[["construct"]] | construct_y %in% analyses[["construct"]]
                }
           }
+          
+          if(!is.null(analyses[["construct_pair"]])){
 
-          if(!is.null(analyses[["construct_pair"]])) {
                construct_pair_ids <-
                     lapply(analyses[["construct_pair"]], function(x){
                          construct_x %in% x & construct_y %in% x
@@ -112,8 +112,9 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                }
           }
      }
+     
+     if(!is.null(analyses[["k_min"]])){
 
-     if(!is.null(analyses[["k_min"]])) {
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$k >= analyses[["k_min"]]))
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
@@ -121,8 +122,9 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                keep_meta <- keep_meta & .keep_meta
           }
      }
+     
+     if(!is.null(analyses[["N_min"]])){
 
-     if(!is.null(analyses[["N_min"]])) {
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$N >= analyses[["N_min"]]))
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
@@ -130,8 +132,9 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                keep_meta <- keep_meta & .keep_meta
           }
      }
+     
+     if(!is.null(analyses$analysis_id)){
 
-     if(!is.null(analyses$analysis_id)) {
           .keep_meta <- ma_obj[["analysis_id"]] %in% analyses[["analysis_id"]]
           if(match == "any"){
                keep_meta <- keep_meta | .keep_meta
@@ -151,9 +154,8 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }
 
      ma_obj <- ma_obj[keep_meta,]
-
-     if(flag_summary == TRUE) ma_obj <- summary(ma_obj)
-
+     if(flag_summary) ma_obj <- summary(ma_obj)
+     
      return(ma_obj)
 }
 
@@ -170,6 +172,10 @@ namelists.ma_psychmeta <- function(ma_obj){
 
 
 screen_ma <- function(ma_obj){
+     
+     if("summary.ma_psychmeta" %in% class(ma_obj))
+          ma_obj <- ma_obj$ma_obj
+     
      correct_class <- "ma_psychmeta" %in% class(ma_obj)
      correct_attributes <- all(c("ma_metric", "ma_methods") %in% names(attributes(ma_obj)))
 

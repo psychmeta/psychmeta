@@ -5,7 +5,7 @@
 \alias{create_ad_list}
 \title{Create a tibble of artifact distributions by construct}
 \usage{
-create_ad_tibble(ad_type = c("tsa", "int"), n, sample_id = NULL,
+create_ad_tibble(ad_type = c("tsa", "int"), n = NULL, sample_id = NULL,
   construct_x = NULL, measure_x = NULL, construct_y = NULL,
   measure_y = NULL, rxx = NULL, rxx_restricted = TRUE,
   rxx_type = "alpha", k_items_x = NA, ryy = NULL, ryy_restricted = TRUE,
@@ -16,7 +16,7 @@ create_ad_tibble(ad_type = c("tsa", "int"), n, sample_id = NULL,
   "hierarchical", "none"), construct_order = NULL, supplemental_ads = NULL,
   data = NULL, control = control_psychmeta(), ...)
 
-create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL,
+create_ad_list(ad_type = c("tsa", "int"), n = NULL, sample_id = NULL,
   construct_x = NULL, measure_x = NULL, construct_y = NULL,
   measure_y = NULL, rxx = NULL, rxx_restricted = TRUE,
   rxx_type = "alpha", k_items_x = NA, ryy = NULL, ryy_restricted = TRUE,
@@ -46,7 +46,7 @@ create_ad_list(ad_type = c("tsa", "int"), n, sample_id = NULL,
 
 \item{rxx_restricted}{Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
-\item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. See documentation of \code{ma_r()} for a full list of acceptable values.}
+\item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. See documentation of \code{\link{ma_r}} for a full list of acceptable values.}
 
 \item{k_items_x, k_items_y}{Numeric vector identifying the number of items in each scale.}
 
