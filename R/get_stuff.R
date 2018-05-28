@@ -26,7 +26,7 @@
 #' @param ma_obj A psychmeta meta-analysis object.
 #' @param moderators Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param follow_up Vector of follow-up analysis names (options are: "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg").
-#' @param plot_types Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative").
+#' @param plot_type Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative"; multiple allowed).
 #' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
 #' \itemize{
 #' \item{construct:}{ A list or vector of construct names to search for.}
@@ -86,7 +86,7 @@
 
 #' @rdname get_stuff
 #' @export
-get_metafor <- get_escalc <- function(ma_obj, moderators = FALSE, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
+get_escalc <- function(ma_obj, moderators = FALSE, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
@@ -108,22 +108,26 @@ get_metafor <- get_escalc <- function(ma_obj, moderators = FALSE, analyses = "al
 
 #' @rdname get_stuff
 #' @export
+get_metafor <- get_escalc
+
+#' @rdname get_stuff
+#' @export
 get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
-                        ma_methods = c("bb", "ic", "ad"), correction_types = c("ts", "vgx", "vgy"), ...){
+                        ma_method = c("bb", "ic", "ad"), correction_type = c("ts", "vgx", "vgy"), ...){
 
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      additional_args <- list(...)
 
-     ma_methods <- match.arg(ma_methods, c("bb", "ic", "ad"), several.ok = TRUE)
-     correction_types <- match.arg(correction_types, c("ts", "vgx", "vgy"), several.ok = TRUE)
+     ma_method <- match.arg(ma_method, c("bb", "ic", "ad"), several.ok = TRUE)
+     correction_type <- match.arg(correction_type, c("ts", "vgx", "vgy"), several.ok = TRUE)
      ma_metric <- attributes(ma_obj)$ma_metric
 
-     invalid_methods <- ma_methods[!(ma_methods %in% attributes(ma_obj)$ma_methods)]
-     ma_methods <- ma_methods[ma_methods %in% attributes(ma_obj)$ma_methods]
-     if(length(ma_methods) == 0)
+     invalid_methods <- ma_method[!(ma_method %in% attributes(ma_obj)$ma_methods)]
+     ma_method <- ma_method[ma_method %in% attributes(ma_obj)$ma_methods]
+     if(length(ma_method) == 0)
           stop("Results for the following method(s) were not available in the supplied object: ", paste(invalid_methods, collapse = ", "), call. = FALSE)
-     
+
      if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
           ts_label <- "true_score"
           vgx_label <- "validity_generalization_x"
@@ -140,103 +144,103 @@ get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           ts_label <- vgx_label <- vgy_label <- NULL
      }
 
-     ma_methods <- ma_methods[ma_methods %in% attributes(ma_obj)$ma_methods]
+     ma_method <- ma_method[ma_method %in% attributes(ma_obj)$ma_methods]
 
      out <- list(barebones = NULL,
                  individual_correction = NULL,
-                 artifact_distribution = NULL)[c("bb", "ic", "ad") %in% ma_methods]
+                 artifact_distribution = NULL)[c("bb", "ic", "ad") %in% ma_method]
 
      contents <- NULL
      total_tables <- 0
 
-     if("bb" %in% ma_methods){
+     if("bb" %in% ma_method){
           out$barebones <- compile_metatab(ma_obj = ma_obj, ma_method = "bb")
           contents <- c(contents, "- barebones")
           total_tables <- total_tables + 1
      }
 
-     if("ic" %in% ma_methods){
+     if("ic" %in% ma_method){
           .contents <- NULL
-          
+
           if(ma_metric %in% c("r_order2", "d_order2")){
                out$individual_correction <-
                     compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                     correction_type = "ts")
                total_tables <- total_tables + 1
-               
+
                contents <- c(contents, "- individual_correction \n")
           }else{
-               if("ts" %in% correction_types){
+               if("ts" %in% correction_type){
                     out$individual_correction[[ts_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                          correction_type = "ts")
                     .contents <- c(.contents, ts_label)
-                    
+
                     total_tables <- total_tables + 1
                }
-               
-               if("vgx" %in% correction_types){
+
+               if("vgx" %in% correction_type){
                     out$individual_correction[[vgx_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                          correction_type = "vgx")
                     .contents <- c(.contents, vgx_label)
-                    
+
                     total_tables <- total_tables + 1
                }
-               
-               if("vgy" %in% correction_types){
+
+               if("vgy" %in% correction_type){
                     out$individual_correction[[vgy_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ic",
                                          correction_type = "vgy")
                     .contents <- c(.contents, vgy_label)
-                    
+
                     total_tables <- total_tables + 1
-               }    
-               
+               }
+
                if(!is.null(.contents))
                     contents <- c(contents, paste0("- individual_correction \n     - ",
                                                    paste0(.contents, collapse = "\n     - ")))
           }
      }
 
-     if("ad" %in% ma_methods){
+     if("ad" %in% ma_method){
           .contents <- NULL
-          
+
           if(ma_metric %in% c("r_order2", "d_order2")){
                out$artifact_distribution <-
                     compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                     correction_type = "ts")
                total_tables <- total_tables + 1
-               
+
                contents <- c(contents, "- artifact distribution \n")
           }else{
-               if("ts" %in% correction_types){
+               if("ts" %in% correction_type){
                     out$artifact_distribution[[ts_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                          correction_type = "ts")
                     .contents <- c(.contents, ts_label)
-                    
+
                     total_tables <- total_tables + 1
                }
-               
-               if("vgx" %in% correction_types){
+
+               if("vgx" %in% correction_type){
                     out$artifact_distribution[[vgx_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                          correction_type = "vgx")
                     .contents <- c(.contents, vgx_label)
-                    
+
                     total_tables <- total_tables + 1
                }
-               
-               if("vgy" %in% correction_types){
+
+               if("vgy" %in% correction_type){
                     out$artifact_distribution[[vgy_label]] <-
                          compile_metatab(ma_obj = ma_obj, ma_method = "ad",
                                          correction_type = "vgy")
                     .contents <- c(.contents, vgy_label)
-                    
+
                     total_tables <- total_tables + 1
                }
-               
+
                if(!is.null(.contents))
                     contents <- c(contents, paste0("- artifact_distribution \n     - ",
                                                    paste0(.contents, collapse = "\n     - ")))
@@ -571,7 +575,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 
 #' @rdname get_stuff
 #' @export
-get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "cumulative"),
+get_plots <- function(ma_obj, plot_type = c("funnel", "forest", "leave1out", "cumulative"),
                       analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
      plot_types <- match.arg(plot_types, c("funnel", "forest", "leave1out", "cumulative"), several.ok = TRUE)
@@ -590,9 +594,9 @@ get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "c
           vgy <- "latentGroup_observedY"
      }
 
-     plot_types <- plot_types[plot_types %in% colnames(ma_obj)]
+     plot_type <- plot_type[plot_type %in% colnames(ma_obj)]
      class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
-     .plots <- ma_obj[,plot_types]
+     .plots <- ma_obj[,plot_type]
 
      out <- apply(.plots, 2, function(x){
           as.list(x)
@@ -664,7 +668,7 @@ compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_
           }
 
      }
-     
+
      out <- as_tibble(out)
      attributes(out) <- append(attributes(out), list(ma_type = ma_type,
                                                      ma_method = ma_method,
