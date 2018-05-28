@@ -24,7 +24,7 @@ get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
 
 get_ad(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, as_ad_obj = FALSE, inputs_only = TRUE,
-  ma_method = c("ad", "ic"), ad_type = c("tsa", "int"), ...)
+  ma_methods = c("ad", "ic"), ad_types = c("tsa", "int"), ...)
 
 get_followup(ma_obj, follow_up = c("heterogeneity", "leave1out", "cumulative",
   "bootstrap", "metareg"), analyses = "all", match = c("all", "any"),
@@ -82,9 +82,7 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 
 \item{inputs_only}{Used only if \code{as_ad_obj = TRUE}: Logical scalar that determines whether artifact information should be returned as summaries of the raw input values (\code{TRUE}; default) or artifact values that have been cross-corrected for range restriction and measurement error (\code{FALSE}).}
 
-\item{ma_method}{Character scalar indicating whether artifact distributions should be retrieved from artifact-distribution meta-analyses ("ad"; default) or from individual-correction meta-analyses ("ic").}
-
-\item{ad_type}{Used only if \code{ma_method} = "ic": Character scalar indicating whether Taylor-series approximation artifact distributions ("tsa") or interactive artifact distributions ("int") should be retrieved.}
+\item{ad_types}{Used only if \code{ma_method} = "ic": Character value(s) indicating whether Taylor-series approximation artifact distributions ("tsa") and/or interactive artifact distributions ("int") should be retrieved.}
 
 \item{follow_up}{Vector of follow-up analysis names (options are: "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg").}
 
@@ -128,6 +126,9 @@ ma_obj <- sensitivity(ma_obj, bootstrap = FALSE)
 ma_obj <- metareg(ma_obj)
 ma_obj <- plot_funnel(ma_obj)
 ma_obj <- plot_forest(ma_obj)
+
+## View summary:
+summary(ma_obj)
 
 ## Extract selected analyses:
 get_metatab(ma_obj)
