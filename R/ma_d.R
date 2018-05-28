@@ -537,5 +537,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      attributes(out)$call_history <- list(call)
 
+     if(attributes(out)$ma_metric %in% c("d_as_r", "r_as_r"))
+          out <- convert_ma(ma_obj = out, record_call = FALSE)
+     
      return(out)
 }

@@ -24,7 +24,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
 
      d_metric <- ifelse(any((ma_metric == "d_as_d" & (any(ma_methods == "ic") | any(ma_methods == "ad"))) | ma_metric == "r_as_d"), TRUE, FALSE)
      if(d_metric){
-          ma_obj <- convert_ma(ma_obj)
+          ma_obj <- convert_ma(ma_obj, record_call = FALSE)
           convert_back <- TRUE
      }else{
           convert_back <- FALSE
@@ -279,7 +279,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
      
      ma_obj$bootstrap <- out_list
      
-     if(convert_back) ma_obj <- convert_ma(ma_obj)
+     if(convert_back) ma_obj <- convert_ma(ma_obj, record_call = FALSE)
      
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 

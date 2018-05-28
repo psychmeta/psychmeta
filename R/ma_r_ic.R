@@ -56,7 +56,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
 
-     inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias,
+     inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias, moderated_ads = control$moderated_ads,
                     conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased)
      additional_args <- list(...)
 

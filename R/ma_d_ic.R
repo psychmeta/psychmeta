@@ -162,8 +162,10 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
      
      if(treat_as_d) attributes(out)$ma_metric <- "d_as_r"
      
-     attributes(out)$call_history <- append(list(call), attributes(out)$call_history)
-     out <- convert_ma(ma_obj = out)
+     attributes(out)$call_history <- list(call)
+     
+     out <- convert_ma(ma_obj = out, record_call = FALSE)
+     
      return(out)
 }
 

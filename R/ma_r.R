@@ -552,7 +552,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
      set.seed(seed)
      
-     inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads, correct_bias = correct_bias, 
+     inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads, moderated_ads = moderated_ads, correct_bias = correct_bias, 
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased)
      additional_args <- list(...)
      inputs <- append(inputs, additional_args)
@@ -1645,9 +1645,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
 
      attributes(out) <- append(attributes(out), list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())))
-
-     if(attributes(out)$ma_metric == "d_as_r")
-          out <- convert_ma(ma_obj = out)
      
      if(!("ma_psychmeta" %in% class(out)))
           class(out) <- c("ma_psychmeta", class(out))
