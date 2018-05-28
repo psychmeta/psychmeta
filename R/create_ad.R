@@ -12,7 +12,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
                           estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                           estimate_ux = TRUE, estimate_ut = TRUE,
-                          ...){
+                          
+                          var_unbiased = TRUE, ...){
 
      if(length(rxxi) > 0){
           
@@ -190,9 +191,9 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           }
      }
 
-     art_var <- function(art_vec, wt_vec, null_value = NULL){
+     art_var <- function(art_vec, wt_vec, null_value = NULL, var_unbiased = TRUE){
           if(!is.null(art_vec) & !is.null(wt_vec)){
-               wt_var(x = art_vec, wt = wt_vec)
+               wt_var(x = art_vec, wt = wt_vec, unbiased = var_unbiased)
           }else{
                null_value
           }
@@ -254,10 +255,10 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      rxxa_mean <- art_mean(art_vec = rxxa, wt_vec = wt_rxxa)
      rxxi_mean <- art_mean(art_vec = rxxi, wt_vec = wt_rxxi)
 
-     qxa_var <- art_var(art_vec = rxxa^.5, wt_vec = wt_rxxa)
-     qxi_var <- art_var(art_vec = rxxi^.5, wt_vec = wt_rxxi)
-     rxxa_var <- art_var(art_vec = rxxa, wt_vec = wt_rxxa)
-     rxxi_var <- art_var(art_vec = rxxi, wt_vec = wt_rxxi)
+     qxa_var <- art_var(art_vec = rxxa^.5, wt_vec = wt_rxxa, var_unbiased = var_unbiased)
+     qxi_var <- art_var(art_vec = rxxi^.5, wt_vec = wt_rxxi, var_unbiased = var_unbiased)
+     rxxa_var <- art_var(art_vec = rxxa, wt_vec = wt_rxxa, var_unbiased = var_unbiased)
+     rxxi_var <- art_var(art_vec = rxxi, wt_vec = wt_rxxi, var_unbiased = var_unbiased)
 
      ux_mean <- art_mean(art_vec = ux, wt_vec = wt_ux)
      ut_mean <- art_mean(art_vec = ut, wt_vec = wt_ut)
@@ -285,8 +286,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxa_mean_c <- art_mean(art_vec = rxxa_c^.5, wt_vec = wt_rxxa_c)
                rxxa_mean_c <- art_mean(art_vec = rxxa_c, wt_vec = wt_rxxa_c)
 
-               qxa_var_c <- art_var(art_vec = rxxa_c^.5, wt_vec = wt_rxxa_c)
-               rxxa_var_c <- art_var(art_vec = rxxa_c, wt_vec = wt_rxxa_c)
+               qxa_var_c <- art_var(art_vec = rxxa_c^.5, wt_vec = wt_rxxa_c, var_unbiased = var_unbiased)
+               rxxa_var_c <- art_var(art_vec = rxxa_c, wt_vec = wt_rxxa_c, var_unbiased = var_unbiased)
 
                if(!is.null(n_rxxa_c)){
                     mean_n_rxxa_c <- mean(n_rxxa_c, na.rm = TRUE)
@@ -317,8 +318,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxa_mean_m <- art_mean(art_vec = rxxa_m^.5, wt_vec = wt_rxxa_m)
                rxxa_mean_m <- art_mean(art_vec = rxxa_m, wt_vec = wt_rxxa_m)
 
-               qxa_var_m <- art_var(art_vec = rxxa_m^.5, wt_vec = wt_rxxa_m)
-               rxxa_var_m <- art_var(art_vec = rxxa_m, wt_vec = wt_rxxa_m)
+               qxa_var_m <- art_var(art_vec = rxxa_m^.5, wt_vec = wt_rxxa_m, var_unbiased = var_unbiased)
+               rxxa_var_m <- art_var(art_vec = rxxa_m, wt_vec = wt_rxxa_m, var_unbiased = var_unbiased)
 
                if(!is.null(n_rxxa_m)){
                     mean_n_rxxa_m <- mean(n_rxxa_m, na.rm = TRUE)
@@ -372,8 +373,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxi_mean_c <- art_mean(art_vec = rxxi_c^.5, wt_vec = wt_rxxi_c)
                rxxi_mean_c <- art_mean(art_vec = rxxi_c, wt_vec = wt_rxxi_c)
 
-               qxi_var_c <- art_var(art_vec = rxxi_c^.5, wt_vec = wt_rxxi_c)
-               rxxi_var_c <- art_var(art_vec = rxxi_c, wt_vec = wt_rxxi_c)
+               qxi_var_c <- art_var(art_vec = rxxi_c^.5, wt_vec = wt_rxxi_c, var_unbiased = var_unbiased)
+               rxxi_var_c <- art_var(art_vec = rxxi_c, wt_vec = wt_rxxi_c, var_unbiased = var_unbiased)
 
                if(!is.null(n_rxxi_c)){
                     mean_n_rxxi_c <- mean(n_rxxi_c, na.rm = TRUE)
@@ -404,8 +405,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                qxi_mean_m <- art_mean(art_vec = rxxi_m^.5, wt_vec = wt_rxxi_m)
                rxxi_mean_m <- art_mean(art_vec = rxxi_m, wt_vec = wt_rxxi_m)
 
-               qxi_var_m <- art_var(art_vec = rxxi_m^.5, wt_vec = wt_rxxi_m)
-               rxxi_var_m <- art_var(art_vec = rxxi_m, wt_vec = wt_rxxi_m)
+               qxi_var_m <- art_var(art_vec = rxxi_m^.5, wt_vec = wt_rxxi_m, var_unbiased = var_unbiased)
+               rxxi_var_m <- art_var(art_vec = rxxi_m, wt_vec = wt_rxxi_m, var_unbiased = var_unbiased)
 
                if(!is.null(n_rxxi_m)){
                     mean_n_rxxi_m <- mean(n_rxxi_m, na.rm = TRUE)
@@ -861,16 +862,16 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           mean_ux <- art_mean(art_vec = ux, wt_vec = wt_ux, null_value = NA)
           mean_ut <- art_mean(art_vec = ut, wt_vec = wt_ut, null_value = NA)
 
-          var_qxi_irr <- art_var(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr, null_value = NA)
-          var_qxi_drr <- art_var(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr, null_value = NA)
-          var_qxa_irr <- art_var(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr, null_value = NA)
-          var_qxa_drr <- art_var(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr, null_value = NA)
-          var_rxxi_irr <- art_var(art_vec = rxxi_vec_irr, wt_vec = wt_rxxi_irr, null_value = NA)
-          var_rxxi_drr <- art_var(art_vec = rxxi_vec_drr, wt_vec = wt_rxxi_drr, null_value = NA)
-          var_rxxa_irr <- art_var(art_vec = rxxa_vec_irr, wt_vec = wt_rxxa_irr, null_value = NA)
-          var_rxxa_drr <- art_var(art_vec = rxxa_vec_drr, wt_vec = wt_rxxa_drr, null_value = NA)
-          var_ux <- art_var(art_vec = ux, wt_vec = wt_ux, null_value = NA)
-          var_ut <- art_var(art_vec = ut, wt_vec = wt_ut, null_value = NA)
+          var_qxi_irr <- art_var(art_vec = rxxi_vec_irr^.5, wt_vec = wt_rxxi_irr, null_value = NA, var_unbiased = var_unbiased)
+          var_qxi_drr <- art_var(art_vec = rxxi_vec_drr^.5, wt_vec = wt_rxxi_drr, null_value = NA, var_unbiased = var_unbiased)
+          var_qxa_irr <- art_var(art_vec = rxxa_vec_irr^.5, wt_vec = wt_rxxa_irr, null_value = NA, var_unbiased = var_unbiased)
+          var_qxa_drr <- art_var(art_vec = rxxa_vec_drr^.5, wt_vec = wt_rxxa_drr, null_value = NA, var_unbiased = var_unbiased)
+          var_rxxi_irr <- art_var(art_vec = rxxi_vec_irr, wt_vec = wt_rxxi_irr, null_value = NA, var_unbiased = var_unbiased)
+          var_rxxi_drr <- art_var(art_vec = rxxi_vec_drr, wt_vec = wt_rxxi_drr, null_value = NA, var_unbiased = var_unbiased)
+          var_rxxa_irr <- art_var(art_vec = rxxa_vec_irr, wt_vec = wt_rxxa_irr, null_value = NA, var_unbiased = var_unbiased)
+          var_rxxa_drr <- art_var(art_vec = rxxa_vec_drr, wt_vec = wt_rxxa_drr, null_value = NA, var_unbiased = var_unbiased)
+          var_ux <- art_var(art_vec = ux, wt_vec = wt_ux, null_value = NA, var_unbiased = var_unbiased)
+          var_ut <- art_var(art_vec = ut, wt_vec = wt_ut, null_value = NA, var_unbiased = var_unbiased)
 
           .sum_weights <- function(x) if(length(x) == 0){NULL}else{sum(x)}
           wtsum_vec_rxxa_irr <- unlist(lapply(list(wt_rxxa, wt_rxxa_ux, wt_rxxa_ut), .sum_weights))

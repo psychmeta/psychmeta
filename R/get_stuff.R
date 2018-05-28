@@ -4,8 +4,8 @@
 #' @title Extract results from a psychmeta meta-analysis object
 #'
 #' @description
-#' Functions to estimate the values of artifacts from other artifacts. These functions allow for reliability estimates to be corrected/attenuated for range restriction and allow
-#' u ratios to be converted between observed-score and true-score metrics. Some functions also allow for the extrapolation of an artifact from other available information.
+#' Functions to extract specific results from a meta-analysis tibble. 
+#' This family of functions harvests information from meta-analysis objects and returns it as lists or tibbles that are easily navigable. 
 #'
 #' Available functions include:
 #' \itemize{
@@ -20,6 +20,7 @@
 #' \item{\code{get_bootstrap}}{\cr Retrieve list of bootstrap meta-analyses (special case of \code{get_followup}).}
 #' \item{\code{get_metareg}}{\cr Retrieve list of meta-regression analyses (special case of \code{get_followup}).}
 #' \item{\code{get_heterogeneity}}{\cr Retrieve list of heterogeneity analyses (special case of \code{get_followup}).}
+#' \item{\code{get_matrix}}{\cr Retrieve a tibble of matrices summarizing the relationships among constructs (only applicable to meta-analyses with multiple constructs).}
 #' }
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
@@ -60,7 +61,7 @@
 #'
 #' ## Run additional analyses:
 #' ma_obj <- heterogeneity(ma_obj)
-#' ma_obj <- sensitivity(ma_obj, bootstrap = FALSE)
+#' ma_obj <- sensitivity(ma_obj, boot_iter = 10, boot_ci_type = "norm")
 #' ma_obj <- metareg(ma_obj)
 #' ma_obj <- plot_funnel(ma_obj)
 #' ma_obj <- plot_forest(ma_obj)
@@ -72,6 +73,7 @@
 #' get_metatab(ma_obj)
 #' get_matrix(ma_obj)
 #' get_escalc(ma_obj)
+#' get_bootstrap(ma_obj)
 #' get_cumulative(ma_obj)
 #' get_leave1out(ma_obj)
 #' get_heterogeneity(ma_obj)
@@ -86,7 +88,7 @@
 #' @export
 get_metafor <- get_escalc <- function(ma_obj, moderators = FALSE, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      out <- ma_obj$escalc
      if(!moderators)
@@ -109,7 +111,7 @@ get_metafor <- get_escalc <- function(ma_obj, moderators = FALSE, analyses = "al
 get_metatab <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
                         ma_methods = c("bb", "ic", "ad"), correction_types = c("ts", "vgx", "vgy"), ...){
 
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      additional_args <- list(...)
 
@@ -267,7 +269,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
      ma_methods <- match.arg(ma_methods, c("ad", "ic"), several.ok = TRUE)
      additional_args <- list(...)
 
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      ma_methods <- ma_methods[ma_methods %in%  attributes(ma_obj)$ma_methods]
      if(length(ma_methods) == 0)
@@ -391,7 +393,7 @@ get_followup <- function(ma_obj, follow_up = c("heterogeneity", "leave1out", "cu
      follow_up <- match.arg(follow_up, c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"),
                             several.ok = TRUE)
 
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      follow_up <- follow_up[follow_up %in% colnames(ma_obj)]
      class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
@@ -460,7 +462,7 @@ get_metareg <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @export
 get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      if(any(colnames(ma_obj) == "pair_id")){
           do_matrix <- length(unique(ma_obj$pair_id)) > 1
@@ -472,14 +474,24 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
           ma_list <- get_metatab(ma_obj = ma_obj)
           ma_methods <- names(ma_list)
 
-          constructs <- unique(c(as.character(ma_list$barebones$construct_x),
-                                 as.character(ma_list$barebones$construct_y)))
+          if("construct_x" %in% colnames(ma_list$barebones))
+               constructs <- unique(c(as.character(ma_list$barebones$construct_x),
+                                      as.character(ma_list$barebones$construct_y)))
+          
+          if("group_contrast" %in% colnames(ma_list$barebones))
+               constructs <- unique(c(as.character(ma_list$barebones$group_contrast),
+                                      as.character(ma_list$barebones$construct_y)))
+          
           if(which(colnames(ma_list$barebones) == "analysis_type") + 1 == which(colnames(ma_list$barebones) == "k")){
                moderator_combs <- rep(1, nrow(ma_obj))
                out <- tibble(moderator_comb = 1, moderator = list(NULL))
           }else{
                moderator_names <- colnames(ma_list$barebones)[(which(colnames(ma_list$barebones) == "analysis_type") + 1):(which(colnames(ma_list$barebones) == "k") - 1)]
-               moderator_combs <- apply(ma_list$barebones[,moderator_names], 1, function(x) paste0(moderator_names, ": ", x, collapse = ", "))
+               
+               moderator_mat <- as.data.frame(as.data.frame(ma_list$barebones)[,moderator_names])
+               colnames(moderator_mat) <- moderator_names
+               
+               moderator_combs <- apply(moderator_mat, 1, function(x) paste0(moderator_names, ": ", x, collapse = ", "))
                moderator_combs <- paste0("moderator_comb: ", as.numeric(factor(moderator_combs, levels = unique(moderator_combs))))
                out <- ma_list$barebones[!duplicated(moderator_combs),moderator_names]
                out <- bind_cols(moderator_comb = 1:nrow(out), out)
@@ -563,7 +575,7 @@ get_plots <- function(ma_obj, plot_types = c("funnel", "forest", "leave1out", "c
                       analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
 
      plot_types <- match.arg(plot_types, c("funnel", "forest", "leave1out", "cumulative"), several.ok = TRUE)
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ...)
+     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      ma_metric <- attributes(ma_obj)$ma_metric
      ma_methods <- attributes(ma_obj)$ma_methods

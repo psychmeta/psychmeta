@@ -118,7 +118,7 @@ sensitivity_leave1out <- function(ma_obj, ...){
                            individual_correction = NULL,
                            artifact_distribution = NULL)
           
-          if(!is.null(escalc$barebones$pi)){
+          if("pi" %in% colnames(escalc$barebones)){
                p <- wt_mean(x = escalc$barebones$pi, wt = escalc$barebones$n_adj)
           }else{
                p <- .5

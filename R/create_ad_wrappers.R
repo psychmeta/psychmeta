@@ -188,8 +188,144 @@ create_ad <- function(ad_type = c("tsa", "int"),
                                ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
                                
                                estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                               estimate_ux = estimate_ux, estimate_ut = estimate_ut)
+                               estimate_ux = estimate_ux, estimate_ut = estimate_ut, 
+                               var_unbiased = var_unbiased)
      }
+     out
+}
+
+
+
+#' @name create_ad_group
+#' 
+#' @title Generate an artifact distribution object for a dichotomous grouping variable.
+#'
+#' @description 
+#' This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
+#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
+#'
+#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
+#'
+#' @param ad_type Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
+#'
+#' @param rGg Vector of incumbent reliability estimates.
+#' @param n_rGg Vector of sample sizes associated with the elements of \code{rGg.}
+#' @param wt_rGg Vector of weights associated with the elements of \code{rGg} (by default, sample sizes will be used as weights if provided).
+#'
+#' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of \code{pi}/\code{pa} can be vectors - if both are vectors, they must be of equal length).
+#' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of \code{pi}/\code{pa} can be vectors - if both are vectors, they must be of equal length).
+#' @param n_pi Vector of sample sizes associated with the elements in \code{pi}.
+#' @param n_pa Vector of sample sizes associated with the elements in \code{pa}.
+#' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
+#'
+#' @param mean_rGg Vector that can be used to supply the means of externally computed distributions of correlations between observed and latent group membership.
+#' @param var_rGg Vector that can be used to supply the variances of externally computed distributions of correlations between observed and latent group membership.
+#' @param k_rGg Vector that can be used to supply the number of studies included in externally computed distributions of correlations between observed and latent group membership.
+#' @param mean_n_rGg Vector that can be used to supply the mean sample sizes of externally computed distributions of correlations between observed and latent group membership.
+#'
+#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
+#' @param ... Further arguments.
+#'
+#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use in artifact-distribution meta-analyses.
+#' @export
+#'
+#' @examples
+#' ## Example artifact distribution for a dichotomous grouping variable:
+#' create_ad_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
+#'                 mean_rGg = .9, var_rGg = .05,
+#'                 k_rGg = 5, mean_n_rGg = 100,
+#'                 pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
+#'                 var_unbiased = TRUE)
+#'                 
+#' create_ad_group(ad_type = "int", rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
+#'                 mean_rGg = .9, var_rGg = .05,
+#'                 k_rGg = 5, mean_n_rGg = 100,
+#'                 pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
+#'                 var_unbiased = TRUE)
+create_ad_group <- function(ad_type = c("tsa", "int"),
+                            rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
+                            pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
+                            mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
+                            var_unbiased = TRUE, ...){
+     
+     ad_type <- match.arg(ad_type, c("tsa", "int"))
+     
+     if(!is.null(pi))
+          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
+     if(!is.null(pa))
+          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
+     
+     if(ad_type == "tsa"){
+          out <- create_ad_tsa_group(rGg = rGg, n_rGg = n_rGg, wt_rGg = wt_rGg,
+                                     mean_rGg = mean_rGg, var_rGg = var_rGg, k_rGg = k_rGg, mean_n_rGg = mean_n_rGg,
+                                     pi = pi, pa = pa, n_pi = n_pi, n_pa = n_pa, wt_p = wt_p,
+                                     var_unbiased = var_unbiased, ...)
+     }else{
+          out <- create_ad_int_group(rGg = rGg,n_rGg = n_rGg, wt_rGg = wt_rGg,
+                                     pi = pi, pa = pa, n_pi = n_pi, n_pa = n_pa, wt_p = wt_p,
+                                     var_unbiased = var_unbiased, ...)
+     }
+     out
+}
+
+
+
+
+create_ad_supplemental <- function(ad_type = c("tsa", "int"),
+                                   rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
+                                   rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)),
+                                   ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux,
+                                   ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut,
+                                   
+                                   estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+                                   estimate_ux = TRUE, estimate_ut = TRUE,
+                                   var_unbiased = TRUE, supplemental_ads = NULL, process_ads = TRUE, ...){
+     
+     
+     ad_type <- match.arg(ad_type, c("tsa", "int"))
+     
+     art_distributions <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, k_items_rxxi = k_items_rxxi, rxxi_type = rxxi_type,
+                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, k_items_rxxa = k_items_rxxa, rxxa_type = rxxa_type,
+                               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
+                               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut)
+     art_distributions <- map(art_distributions, function(x) if(length(x) > 0){x}else{NULL})
+     
+     if(!is.null(supplemental_ads)){
+          supplemental_ads <-
+               if(is.list(supplemental_ads)){
+                    if(any(c("ad_tsa", "ad_int") %in% class(supplemental_ads))){
+                         list(supplemental_ads)
+                    }else{
+                         supplemental_ads
+                    }
+               }else{
+                    list(supplemental_ads)
+               }
+          
+          is_adobj <- unlist(lapply(supplemental_ads, function(x) any(c("ad_tsa", "ad_int") %in% class(x))))
+          if(any(!is_adobj)){
+               if(any(names(supplemental_ads)[!is_adobj] == ""))
+                    warning("Some elements in 'supplemental_ads' were not named: These elements were NOT included in artifact distributions", call. = FALSE)
+          }
+          
+          art_distributions <- consolidate_ads(art_distributions, supplemental_ads)
+     }
+     
+     art_distributions <- map(art_distributions, function(x) if(length(x) > 0){x}else{NULL})
+     art_distributions <- append(art_distributions,
+                                 list(estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
+                                      estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased))
+     
+     if(process_ads){
+          if(ad_type == "tsa"){
+               out <- suppressWarnings(do.call(what = create_ad_tsa, args = art_distributions))
+          }else{
+               out <- suppressWarnings(do.call(what = create_ad_int, args = art_distributions))
+          }
+     }else{
+          out <- suppressWarnings(do.call(what = create_ad_unprocessed, args = art_distributions))
+     }
+     
      out
 }
 
@@ -317,35 +453,10 @@ create_ad_array <- function(ad_list, name_vec = NULL){
 }
 
 
-#' Generate an artifact distribution object for a dichotomous grouping variable for use in interactive artifact-distribution meta-analysis programs.
-#'
-#' This wrapper for \code{link{create_ad_int}} generates artifact-distribution objects containing interactive artifact distributions for dichotomous group-membership variables.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#' All artifact distributions are optional; null distributions will be given an artifact value of 1 and a weight of 1 as placeholders.
-#'
-#' @param rGg Vector of correlations between observed-group status and latent-group status.
-#' @param n_rGg Vector of sample sizes associated with the elements of rGg.
-#' @param wt_rGg Vector of weights associated with the elements in rxxi.
-#' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param n_pi Vector of sample sizes associated with the elements in \code{pi}.
-#' @param n_pa Vector of sample sizes associated with the elements in \code{pa}.
-#' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (list of artifact-distribution tables) for use in interactive artifact-distribution meta-analyses.
-#' @export
-#'
-#' @keywords internal
-#'
-#' @examples
-#' create_ad_int_group(rGg = c(.9, .8), wt_rGg = c(50, 150),
-#'                     pi = c(.9, .8), pa = c(.5, .5), wt_p = c(50, 150))
+
 create_ad_int_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
                                 pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
-                                ...){
+                                var_unbiased = TRUE, ...){
 
      if(!is.null(pi))
           if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
@@ -367,48 +478,9 @@ create_ad_int_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
      }
 
      create_ad_int(rxxi = rxxi, wt_rxxi = wt_rGg, rxxi_type = "group_treatment",
-                   ux = ux, wt_ux = wt_p, ni_ux = n_pi, na_ux = n_pa)
+                   ux = ux, wt_ux = wt_p, ni_ux = n_pi, na_ux = n_pa, var_unbiased = var_unbiased, ...)
 }
 
-
-#' Generate an artifact distribution object for a dichotomous grouping variable for use in Taylor series artifact-distribution meta-analysis programs.
-#'
-#' This wrapper for \code{link{create_ad_tsa}} generates artifact-distribution objects containing Taylor series artifact distributions for dichotomous group-membership variables.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' All artifact distributions are optional; null distributions will be given a mean of 1 and variance of 0 if not information is supplied.
-#'
-#' @param rGg Vector of incumbent reliability estimates.
-#' @param n_rGg Vector of sample sizes associated with the elements of rGg.
-#' @param wt_rGg Vector of weights associated with the elements of rGg (by default, sample sizes will be used as weights).
-#' @param mean_rGg Vector that can be used to supply the means of externally computed distributions of correlations between observed and latent group membership.
-#' @param var_rGg Vector that can be used to supply the variances of externally computed distributions of correlations between observed and latent group membership.
-#' @param k_rGg Vector that can be used to supply the number of studies included in externally computed distributions of correlations between observed and latent group membership.
-#' @param mean_n_rGg Vector that can be used to supply the mean sample sizes of externally computed distributions of correlations between observed and latent group membership.
-#'
-#' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of pi/pa can be vectors - if both are vectors, they must be of equal length).
-#' @param n_pi Vector of sample sizes associated with the elements in \code{pi}.
-#' @param n_pa Vector of sample sizes associated with the elements in \code{pa}.
-#' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
-#'
-#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use in Taylor serices artifact-distribution meta-analyses.
-#' @export
-#'
-#' @keywords internal
-#'
-#' @examples
-#' ## Example artifact distribution for a dichotomous grouping variable:
-#' create_ad_tsa_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
-#'                     mean_rGg = .9, var_rGg = .05,
-#'                     k_rGg = 5, mean_n_rGg = 100,
-#'                     pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
-#'                     var_unbiased = TRUE)
 create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
                                 mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
                                 pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
@@ -441,136 +513,4 @@ create_ad_tsa_group <- function(rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
 
 
 
-
-#' @name create_ad_group
-#' 
-#' @title Generate an artifact distribution object for a dichotomous grouping variable.
-#'
-#' @description 
-#' This function generates artifact-distribution objects containing either interactive or Taylor series artifact distributions for dichotomous group-membership variables.
-#' Use this to create objects that can be supplied to the \code{ma_r_ad} and \code{ma_d_ad} functions to apply psychometric corrections to barebones meta-analysis objects via artifact distribution methods.
-#'
-#' Allows consolidation of observed and estimated artifact information by cross-correcting artifact distributions and forming weighted artifact summaries.
-#'
-#' @param ad_type Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
-#'
-#' @param rGg Vector of incumbent reliability estimates.
-#' @param n_rGg Vector of sample sizes associated with the elements of \code{rGg.}
-#' @param wt_rGg Vector of weights associated with the elements of \code{rGg} (by default, sample sizes will be used as weights if provided).
-#'
-#' @param pi Vector of incumbent/sample proportions of members in one of the two groups being compared (one or both of \code{pi}/\code{pa} can be vectors - if both are vectors, they must be of equal length).
-#' @param pa Vector of applicant/population proportions of members in one of the two groups being compared (one or both of \code{pi}/\code{pa} can be vectors - if both are vectors, they must be of equal length).
-#' @param n_pi Vector of sample sizes associated with the elements in \code{pi}.
-#' @param n_pa Vector of sample sizes associated with the elements in \code{pa}.
-#' @param wt_p Vector of weights associated with the collective element pairs in \code{pi} and pa.
-#'
-#' @param mean_rGg Vector that can be used to supply the means of externally computed distributions of correlations between observed and latent group membership.
-#' @param var_rGg Vector that can be used to supply the variances of externally computed distributions of correlations between observed and latent group membership.
-#' @param k_rGg Vector that can be used to supply the number of studies included in externally computed distributions of correlations between observed and latent group membership.
-#' @param mean_n_rGg Vector that can be used to supply the mean sample sizes of externally computed distributions of correlations between observed and latent group membership.
-#'
-#' @param var_unbiased Logical scalar determining whether variance should be unbiased (\code{TRUE}) or maximum-likelihood (\code{FALSE}).
-#' @param ... Further arguments.
-#'
-#' @return Artifact distribution object (matrix of artifact-distribution means and variances) for use in artifact-distribution meta-analyses.
-#' @export
-#'
-#' @examples
-#' ## Example artifact distribution for a dichotomous grouping variable:
-#' create_ad_group(rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
-#'                 mean_rGg = .9, var_rGg = .05,
-#'                 k_rGg = 5, mean_n_rGg = 100,
-#'                 pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
-#'                 var_unbiased = TRUE)
-#'                 
-#' create_ad_group(ad_type = "int", rGg = c(.8, .9, .95), n_rGg = c(100, 200, 250),
-#'                 mean_rGg = .9, var_rGg = .05,
-#'                 k_rGg = 5, mean_n_rGg = 100,
-#'                 pi = c(.6, .55, .3), pa = .5, n_pi = c(100, 200, 250), n_pa = c(300, 300, 300),
-#'                 var_unbiased = TRUE)
-create_ad_group <- function(ad_type = c("tsa", "int"),
-                            rGg = NULL, n_rGg = NULL, wt_rGg = n_rGg,
-                            pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL, wt_p = n_pi,
-                            mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL, mean_n_rGg = NULL,
-                            var_unbiased = TRUE, ...){
-
-     ad_type <- match.arg(ad_type, c("tsa", "int"))
-
-     if(!is.null(pi))
-          if(any(!is.na(pi))) if(any(pi[!is.na(pi)] <= 0 | pi[!is.na(pi)] >= 1)) stop("Incumbent subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-     if(!is.null(pa))
-          if(any(!is.na(pa))) if(any(pa[!is.na(pa)] <= 0 | pa[!is.na(pa)] >= 1)) stop("Applicant subgroup proportions must be between 0 and 1 (exclusive)", call. = FALSE)
-
-     if(ad_type == "tsa"){
-          out <- create_ad_tsa_group(rGg = rGg, n_rGg = n_rGg, wt_rGg = wt_rGg,
-                                     mean_rGg = mean_rGg, var_rGg = var_rGg, k_rGg = k_rGg, mean_n_rGg = mean_n_rGg,
-                                     pi = pi, pa = pa, n_pi = n_pi, n_pa = n_pa, wt_p = wt_p,
-                                     var_unbiased = var_unbiased)
-     }else{
-          out <- create_ad_int_group(rGg = rGg,n_rGg = n_rGg, wt_rGg = wt_rGg,
-                                     pi = pi, pa = pa, n_pi = n_pi, n_pa = n_pa, wt_p = wt_p)
-     }
-     out
-}
-
-
-
-
-create_ad_supplemental <- function(ad_type = c("tsa", "int"),
-                                   rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
-                                   rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)),
-                                   ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux,
-                                   ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut,
-
-                                   estimate_rxxa = TRUE, estimate_rxxi = TRUE,
-                                   estimate_ux = TRUE, estimate_ut = TRUE,
-                                   var_unbiased = TRUE, supplemental_ads = NULL, process_ads = TRUE, ...){
-
-     
-     ad_type <- match.arg(ad_type, c("tsa", "int"))
-     
-     art_distributions <- list(rxxi = rxxi, n_rxxi = n_rxxi, wt_rxxi = wt_rxxi, k_items_rxxi = k_items_rxxi, rxxi_type = rxxi_type,
-                               rxxa = rxxa, n_rxxa = n_rxxa, wt_rxxa = wt_rxxa, k_items_rxxa = k_items_rxxa, rxxa_type = rxxa_type,
-                               ux = ux, ni_ux = ni_ux, na_ux = na_ux, wt_ux = wt_ux,
-                               ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut)
-     art_distributions <- map(art_distributions, function(x) if(length(x) > 0){x}else{NULL})
-     
-     if(!is.null(supplemental_ads)){
-          supplemental_ads <-
-               if(is.list(supplemental_ads)){
-                    if(any(c("ad_tsa", "ad_int") %in% class(supplemental_ads))){
-                         list(supplemental_ads)
-                    }else{
-                         supplemental_ads
-                    }
-               }else{
-                    list(supplemental_ads)
-               }
-
-          is_adobj <- unlist(lapply(supplemental_ads, function(x) any(c("ad_tsa", "ad_int") %in% class(x))))
-          if(any(!is_adobj)){
-               if(any(names(supplemental_ads)[!is_adobj] == ""))
-                    warning("Some elements in 'supplemental_ads' were not named: These elements were NOT included in artifact distributions", call. = FALSE)
-          }
-
-          art_distributions <- consolidate_ads(art_distributions, supplemental_ads)
-     }
-
-     art_distributions <- map(art_distributions, function(x) if(length(x) > 0){x}else{NULL})
-     art_distributions <- append(art_distributions,
-                                 list(estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
-                                      estimate_ux = estimate_ux, estimate_ut = estimate_ut, var_unbiased = var_unbiased))
-     
-     if(process_ads){
-          if(ad_type == "tsa"){
-               out <- suppressWarnings(do.call(what = create_ad_tsa, args = art_distributions))
-          }else{
-               out <- suppressWarnings(do.call(what = create_ad_int, args = art_distributions))
-          }
-     }else{
-          out <- suppressWarnings(do.call(what = create_ad_unprocessed, args = art_distributions))
-     }
-
-     out
-}
 

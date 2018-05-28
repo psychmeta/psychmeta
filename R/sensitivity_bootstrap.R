@@ -132,7 +132,7 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                            artifact_distribution = NULL)
           
           if(meta_tables$barebones$k >= min_k){
-               if(!is.null(escalc$barebones$pi)){
+               if("pi" %in% colnames(escalc$barebones)){
                     p <- wt_mean(x = escalc$barebones$pi, wt = escalc$barebones$n_adj)
                }else{
                     p <- .5
@@ -190,19 +190,19 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                
                if(any(ma_methods == "ic") | any(ma_methods == "ad")){
                     if(any(ma_methods == "ic")){
-                         if(!is.null(escalc$individual_correction$true_score$pa)){
+                         if("pa" %in% colnames(escalc$individual_correction$true_score)){
                               p_ts <- wt_mean(x = escalc$individual_correction$true_score$pa,
                                               wt = escalc$individual_correction$true_score$weight)
                          }else{
                               p_ts <- .5
                          }
-                         if(!is.null(escalc$individual_correction$validity_generalization_x$pa)){
+                         if("pa" %in% colnames(escalc$individual_correction$validity_generalization_x)){
                               p_vgx <- wt_mean(x = escalc$individual_correction$validity_generalization_x$pa,
                                                wt = escalc$individual_correction$validity_generalization_x$weight)
                          }else{
                               p_vgx <- .5
                          }
-                         if(!is.null(escalc$individual_correction$validity_generalization_y$pa)){
+                         if("pa" %in% colnames(escalc$individual_correction$validity_generalization_y)){
                               p_vgy <- wt_mean(x = escalc$individual_correction$validity_generalization_y$pa,
                                                wt = escalc$individual_correction$validity_generalization_y$weight)
                          }else{

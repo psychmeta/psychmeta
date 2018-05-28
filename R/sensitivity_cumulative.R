@@ -120,7 +120,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                            individual_correction = NULL,
                            artifact_distribution = NULL)
           
-          if(!is.null(escalc$barebones$pi)){
+          if("pi" %in% colnames(escalc$barebones)){
                p <- wt_mean(x = escalc$barebones$pi, wt = escalc$barebones$n_adj)
           }else{
                p <- .5

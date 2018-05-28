@@ -37,7 +37,10 @@
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
 filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
      
-     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     traffic_from_get <- list(...)$traffic_from_get
+     if(is.null(traffic_from_get)) traffic_from_get <- FALSE
+     
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj) & !traffic_from_get
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
      match <- match.arg(match, c("all", "any"))
