@@ -130,10 +130,10 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
                var_e_ux <- var_ux
           }else{
                if(is.null(mean_ux)){
-                    var_e_ux <- var_error_u(u = ux, n_i = ni, n_a = na)
+                    var_e_ux <- var_error_u(u = ux, ni = ni, na = na)
                     mean_ux <- ux[qx_restricted]
                }else{
-                    var_e_ux <- var_error_u(u = mean_ux, n_i = ni, n_a = na)
+                    var_e_ux <- var_error_u(u = mean_ux, ni = ni, na = na)
                }
           }
 
@@ -141,10 +141,10 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
                var_e_uy <- var_uy
           }else{
                if(is.null(mean_uy)){
-                    var_e_uy <- var_error_u(u = uy, n_i = ni, n_a = na)
+                    var_e_uy <- var_error_u(u = uy, ni = ni, na = na)
                     mean_uy <- uy[qy_restricted]
                }else{
-                    var_e_uy <- var_error_u(u = mean_uy, n_i = ni, n_a = na)
+                    var_e_uy <- var_error_u(u = mean_uy, ni = ni, na = na)
                }
           }
 

@@ -441,9 +441,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           if(is.null(dep_sds_ux_obs)) dep_sds_ux_obs <- rep(FALSE, length(dep_sds_ux_obs))
           
           mean_ni_ux <- mean(ni_ux, na.rm = TRUE)
-          var_e_ux <- var_error_u(u = ux_mean, n_i = mean_ni_ux)
-          
-          var_e_ux <- var_error_u(u = ux_mean, n_i = ni_ux, n_a = na_ux, dependent_sds = dep_sds_ux_obs)
+          var_e_ux <- var_error_u(u = ux_mean, ni = ni_ux, na = na_ux, dependent_sds = dep_sds_ux_obs)
           var_e_ux <- wt_mean(x = var_e_ux, wt = ni_ux)
      }else{
           mean_ni_ux <- NULL
@@ -455,9 +453,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           if(is.null(dep_sds_ut_obs)) dep_sds_ut_obs <- rep(FALSE, length(dep_sds_ut_obs))
           
           mean_ni_ut <- mean(ni_ut, na.rm = TRUE)
-          var_e_ut <- var_error_u(u = ut_mean, n_i = mean_ni_ut)
-          
-          var_e_ut <- var_error_u(u = ut_mean, n_i = ni_ut, n_a = na_ut, dependent_sds = dep_sds_ut_obs)
+          var_e_ut <- var_error_u(u = ut_mean, ni = ni_ut, na = na_ut, dependent_sds = dep_sds_ut_obs)
           var_e_ut <- wt_mean(x = var_e_ut, wt = ni_ut)
      }else{
           mean_ni_ut <- NULL
@@ -1293,14 +1289,14 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                     }
                     if(art == "u"){
                          if(!is.null(na_vec)){
-                              var_e <- var_error_u(u = art_desc_obs[,"mean"], n_i = ni_vec, n_a = na_vec, dependent_sds = dependent_sds)
+                              var_e <- var_error_u(u = art_desc_obs[,"mean"], ni = ni_vec, na = na_vec, dependent_sds = dependent_sds)
                               if(length(var_e) == 0){
                                    var_e <- 0
                               }else{
                                    var_e <- wt_mean(x = var_e, wt = ni_vec)
                               }
                          }else{
-                              var_e <- var_error_u(u = art_desc_obs[,"mean"], n_i = mean(ni_vec, na.rm = TRUE))
+                              var_e <- var_error_u(u = art_desc_obs[,"mean"], ni = mean(ni_vec, na.rm = TRUE))
                          }
                          var_res <- as.numeric(art_desc_obs[,"var"] - var_e)
                     }
@@ -1325,8 +1321,8 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                                                                                                rel_type = dist_type_1, k_items = mean_k_items_art_1))
                     if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_rel(rel = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n], 
                                                                                                                    rel_type = dist_type_1, k_items = mean_k_items_art_1))
-                    if(art == "u") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_u(u = art_desc_spec_1[valid_n,"mean"], n_i = mean_ni_art_1[valid_n],
-                                                                                                               n_a = mean_na_art_1, dependent_sds = dependent_sds_art_1))
+                    if(art == "u") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_u(u = art_desc_spec_1[valid_n,"mean"], ni = mean_ni_art_1[valid_n],
+                                                                                                               na = mean_na_art_1, dependent_sds = dependent_sds_art_1))
                     if(!is.null(k_art_1)){
                          art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = var_res, total_n = k_art_1 * mean_ni_art_1, n_wt = as.numeric(valid_n))
                     }else{

@@ -37,8 +37,8 @@ var_error_r <- function(r, n, correct_bias = TRUE){
 #' Estimate the error variance of u ratios
 #'
 #' @param u Vector of u ratios.
-#' @param n_i Vector of incumbent-group sample sizes.
-#' @param n_a Vector of applicant-group sample sizes.
+#' @param ni Vector of incumbent-group sample sizes.
+#' @param na Vector of applicant-group sample sizes.
 #' @param dependent_sds Logical vector identifying whether each u ratio is based on standard deviations from independent samples (FALSE) or based on
 #' standard deviations from an applicant sample and an incumbent sample that is a subset of that applicant sample (TRUE).
 #'
@@ -64,16 +64,16 @@ var_error_r <- function(r, n, correct_bias = TRUE){
 #' where \emph{u} is the u ratio, \eqn{n_{i}}{ni} is the incumbent sample size, and \eqn{n_{a}}{na} is the applicant sample size.
 #'
 #' @examples
-#' var_error_u(u = .8, n_i = 100, n_a = 200)
-#' var_error_u(u = .8, n_i = 100, n_a = NA)
-var_error_u <- function(u, n_i, n_a = NA, dependent_sds = FALSE){
+#' var_error_u(u = .8, ni = 100, na = 200)
+#' var_error_u(u = .8, ni = 100, na = NA)
+var_error_u <- function(u, ni, na = NA, dependent_sds = FALSE){
      if(is.data.frame(u)) u <- as.matrix(u)
-     if(is.data.frame(n_i)) n_i <- as.matrix(n_i)
-     if(is.data.frame(n_a)) n_a <- as.matrix(n_a)
+     if(is.data.frame(ni)) ni <- as.matrix(ni)
+     if(is.data.frame(na)) na <- as.matrix(na)
 
-     n_term <- 1 / (n_i - 1)
-     n_term[!dependent_sds & !is.na(n_a)] <- n_term[!dependent_sds & !is.na(n_a)] + 1 / (n_a[!dependent_sds & !is.na(n_a)] - 1)
-     n_term[dependent_sds & !is.na(n_a)] <- n_term[dependent_sds & !is.na(n_a)] - 1 / (n_a[dependent_sds & !is.na(n_a)] - 1)
+     n_term <- 1 / (ni - 1)
+     n_term[!dependent_sds & !is.na(na)] <- n_term[!dependent_sds & !is.na(na)] + 1 / (na[!dependent_sds & !is.na(na)] - 1)
+     n_term[dependent_sds & !is.na(na)] <- n_term[dependent_sds & !is.na(na)] - 1 / (na[dependent_sds & !is.na(na)] - 1)
      var_e <- .5 * u^2 * n_term
 
      if(!is.null(dim(var_e)))

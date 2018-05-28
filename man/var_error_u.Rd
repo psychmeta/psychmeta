@@ -4,14 +4,14 @@
 \alias{var_error_u}
 \title{Estimate the error variance of u ratios}
 \usage{
-var_error_u(u, n_i, n_a = NA, dependent_sds = FALSE)
+var_error_u(u, ni, na = NA, dependent_sds = FALSE)
 }
 \arguments{
 \item{u}{Vector of u ratios.}
 
-\item{n_i}{Vector of incumbent-group sample sizes.}
+\item{ni}{Vector of incumbent-group sample sizes.}
 
-\item{n_a}{Vector of applicant-group sample sizes.}
+\item{na}{Vector of applicant-group sample sizes.}
 
 \item{dependent_sds}{Logical vector identifying whether each u ratio is based on standard deviations from independent samples (FALSE) or based on
 standard deviations from an applicant sample and an incumbent sample that is a subset of that applicant sample (TRUE).}
@@ -36,8 +36,8 @@ and the sampling variance for dependent samples is:
 where \emph{u} is the u ratio, \eqn{n_{i}}{ni} is the incumbent sample size, and \eqn{n_{a}}{na} is the applicant sample size.
 }
 \examples{
-var_error_u(u = .8, n_i = 100, n_a = 200)
-var_error_u(u = .8, n_i = 100, n_a = NA)
+var_error_u(u = .8, ni = 100, na = 200)
+var_error_u(u = .8, ni = 100, na = NA)
 }
 \references{
 Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
