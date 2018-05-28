@@ -19,14 +19,14 @@ simulate_psych(n, rho_mat, mu_vec = rep(0, ncol(rho_mat)),
 
 \item{sigma_vec}{Vector of observed-score standard deviations.}
 
-\item{rel_vec}{Vector of reliabilities corresponding to the variables in \code{rho_mat.}}
+\item{rel_vec}{Vector of reliabilities corresponding to the variables in \code{rho_mat}.}
 
-\item{sr_vec}{Vector of selection ratios corresponding to the variables in \code{rho_mat}
+\item{sr_vec}{Vector of selection ratios corresponding to the variables in \code{rho_mat}.
 (set selection ratios to 1 for variables that should not be used in selection).}
 
 \item{k_items_vec}{Number of test items comprising each of the variables to be simulated (all are single-item variables by default).}
 
-\item{wt_mat}{Optional matrix of weights to use in forming a composite of the variables in \code{rho_mat.} Matrix should have as many rows (or vector elements) as there are variables in \code{rho_mat}.}
+\item{wt_mat}{Optional matrix of weights to use in forming a composite of the variables in \code{rho_mat}. Matrix should have as many rows (or vector elements) as there are variables in \code{rho_mat}.}
 
 \item{sr_composites}{Optional vector selection ratios for composite variables. If not \code{NULL}, \code{sr_composites} must have as many elements as there are columns in \code{wt_mat}.}
 
@@ -37,7 +37,7 @@ simulate_psych(n, rho_mat, mu_vec = rep(0, ncol(rho_mat)),
 \item{...}{Further arguments.}
 }
 \value{
-A list of observed-score, true-score, and error-score data frames. If selection is requested, the data frames will include logical variables indicating whether each case would be selected on the basis of observed scores, true scores, and error scores.
+A list of observed-score, true-score, and error-score data frames. If selection is requested, the data frames will include logical variables indicating whether each case would be selected on the basis of observed scores, true scores, or error scores.
 }
 \description{
 Simulate Monte Carlo psychometric data (observed, true, and error scores)
