@@ -1,4 +1,4 @@
-Changes in Version 2.0.0 (2018-05-27)
+Changes in Version 2.0.0 (2018-05-28)
 =====================================
 - Major overhauls to the format of meta-analysis objects to improve the user experience. The outputs of meta-analysis functions are now nested tibbles rather than nested lists. This provides users with a clearer overview of the structure of the object, streamlines the manipulation of results objects (e.g., selecting/subsetting columns, filtering, and arranging), and makes the objects more flexible in terms of performing follow up analyses and performing artifact-distribution corrections (because AD corrections can now by done separately by moderator level). As the print methods for meta-analyses no longer report grand tables of results, we recommend using summary() or get_metatab() to obtain this information. 
 
