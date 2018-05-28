@@ -9,7 +9,7 @@
 \title{Meta-analysis of \emph{d} values}
 \usage{
 ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
-  treat_as_d = TRUE, ma_method = c("bb", "ic", "ad"), ad_type = c("tsa",
+  treat_as_r = FALSE, ma_method = c("bb", "ic", "ad"), ad_type = c("tsa",
   "int"), correction_method = "auto", group_id = NULL, group1 = NULL,
   group2 = NULL, group_order = NULL, construct_y = NULL,
   measure_y = NULL, construct_order = NULL, wt_type = c("sample_size",
@@ -39,7 +39,7 @@ ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL,
   control = control_psychmeta(), ...)
 
 ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
-  citekey = NULL, treat_as_d = TRUE, wt_type = c("sample_size",
+  citekey = NULL, treat_as_r = FALSE, wt_type = c("sample_size",
   "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
   "PM"), correct_bias = TRUE, correct_rGg = FALSE, correct_ryy = TRUE,
   correct_rr_g = FALSE, correct_rr_y = TRUE, indirect_rr_g = TRUE,
@@ -63,7 +63,7 @@ ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
 
 \item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").}
 
-\item{treat_as_d}{Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{TRUE}) or whether they should be meta-analyzed as correlations (\code{FALSE}).}
+\item{treat_as_r}{Logical scalar determining whether \emph{d} values are to be meta-analyzed as \emph{d} values (\code{FALSE}; default) or whether they should be meta-analyzed as correlations and have the final results converted to the \emph{d} metric (\code{TRUE}).}
 
 \item{ma_method}{Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).}
 

@@ -1,7 +1,6 @@
 #' @rdname ma_d
 #' @export
-ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                    treat_as_d = TRUE, 
+ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_r = FALSE, 
                     wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
                                 "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
                     correct_bias = TRUE,
@@ -23,6 +22,9 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
      
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
                                   .control_psychmeta_arg = control)
+     
+     treat_as_d <- list(...)$treat_as_d
+     if(is.null(treat_as_d)) treat_as_d <- !treat_as_r
      
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
