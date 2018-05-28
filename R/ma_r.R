@@ -1252,14 +1252,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                }
           }
 
-          # if(!is.null(str_compmod_temp))
-          #      for(i in 1:length(str_compmod_temp)){
-          #           for(j in levels(factor(duplicates$sample_id))){
-          #                if(!cat_moderators_temp[i])
-          #                     duplicates[duplicates$sample_id == j, str_compmod_temp[i]] <- mean(duplicates[duplicates$sample_id == j, str_compmod_temp[i]])
-          #           }
-          #      }
-
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
                                       total = length(unique(duplicates$analysis_id)), clear = FALSE, width = options()$width)
           collapsed_data_list <- by(1:length(duplicates$analysis_id), duplicates$analysis_id, function(i){
