@@ -29,6 +29,9 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
         if(is.null(dim(x))) {
                 x_type <- "vector"
                 x <- as.data.frame(x)
+        } else if("huxtable" %in% class(x)) {
+                x_type <- "huxtable"
+                x <- as.data.frame(x)
         } else if("tbl_df" %in% class(x)) {
                 x_type <- "tibble"
                 x <- as.data.frame(x)
@@ -107,6 +110,8 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 
         if(x_type == "tibble") {
                 out <- as_tibble(out, validate = FALSE)
+        } else if(x_type == "huxtable") {
+                out <- as_huxtable(out)
         } else if(x_type == "vector") {
                 out <- unlist(out)
         } else if(x_type == "matrix") {
@@ -121,9 +126,11 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
 #' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} or \code{"print"} to output directly to the R console.
-#' @param show_conf Logical scalar determining whether to show confidence intervals (\code{TRUE}; default) or not (\code{FALSE}).
-#' @param show_cred Logical scalar determining whether to show credibility intervals (\code{TRUE}; default) or not (\code{FALSE}).
-#' @param show_se Logical scalar determining whether to show standard errors (\code{TRUE}) or not (\code{FALSE}; default).
+#' @param show_msd Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})
+#' @param show_conf Logical. Should confidence intervals be shown (default: \code{TRUE})?
+#' @param show_cred Logical. Should credibility intervals be shown (default: \code{TRUE})?
+#' @param show_se Logical Should standard errors be shown (default: \code{FALSE})?
+#' @param show_var Logical. Should variances be shown (default: \code{FALSE})?
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
@@ -143,7 +150,13 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param big.interval See \code{big.mark} above; defaults to 3.
 #' @param small.mark Character to sparate groups of decimal digits. See \code{\link{num_format}} for details.
 #' @param small.interval See \code{small.mark} above; defaults to 3.
+#' @param conf_format How should confidence intervals be formatted? Options are:
+#' \item{parentheses}{Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+#' \item{brackets}{Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+#' \item{columns}{Bounds are shown in individual columns.}
+#' @param cred_format How should credility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).
+#' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
 #' @param ... Additional arguments (not used).
 #'
 #' @return Formatted tables of meta-analytic output.
@@ -174,20 +187,24 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 #' metabulate(ma_obj = ma_obj, file = "meta tables generic es.rtf")
 #' }
-metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se = FALSE,
-                       analyses="all", match=c("all", "any"), case_sensitive = TRUE,
+metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
+                       show_se = FALSE, show_var = FALSE, analyses="all",
+                       match=c("all", "any"), case_sensitive = TRUE,
                        output_format=c("word", "html", "pdf", "text", "rmd"),
                        ma_method = "ad", correction_type = "ts",
                        bib = NULL, title.bib = NULL, additional_citekeys = NULL,
                        header = NULL, digits = 2L, leading0 = "figure", neg.sign = "\u2212",
                        pos.sign = "figure", drop0integer = TRUE, big.mark = "\u2009",
                        big.interval = 3L, small.mark = "\u2009", small.interval = 3L,
-                       symbol_es = "ES", ...){
+                       conf_format = "parentheses", cred_format = "brackets",
+                       symbol_es = "ES", verbose = FALSE, ...){
 
         # Match arguments
         output_format <- match.arg(tolower(output_format))
         ma_method <- match.arg(ma_method, c("bb", "ic", "ad"), several.ok = TRUE)
         correction_type <- match.arg(correction_type, c("ts", "vgx", "vgy"), several.ok = TRUE)
+        conf_format <- match.arg(conf_format, c("parentheses", "brackets", "columns"))
+        cred_format <- match.arg(cred_format, c("parentheses", "brackets", "columns"))
 
         # Get the requested meta-analyses
         ma_obj <- filter_ma(ma_obj = ma_obj,
@@ -198,8 +215,9 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
         # Get summary.ma_psychmeta object
         if(!"summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- summary(ma_obj)
 
-        ma_metric <- attributes(ma_obj)$ma_metric
-        ma_methods <- attributes(ma_obj)$ma_methods
+        ma_metric <- ma_obj$ma_metric
+        if(ma_metric %in% c("r_order2", "d_order2")) stop("metabulate does not currently support second-order meta-analyses.", call=FALSE)
+        ma_methods <- ma_obj$ma_methods
         es_type <- case_when(
                 ma_metric %in% c("r_as_r", "d_as_r") ~ "r",
                 ma_metric %in% c("r_as_d", "d_as_d") ~ "d",
@@ -217,19 +235,21 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
                      paste(rep(ma_method[ma_method != "bb"], each = length(correction_type)),
                            correction_type, sep = "_"))
 
-        if(!"summary.ma_psychmeta" %in% class(ma_obj)) {
-                ma_summary <- get_metatab(ma_obj)
-        } else ma_summary <- ma_obj$ma_tables
+        meta_tables <- ma_obj$meta_tables
+        conf_level <- attributes(ma_obj$ma_obj)$inputs$conf_level
+        cred_level <- attributes(ma_obj$ma_obj)$inputs$cred_level
 
         # Generate formatted tables (includes generation of captions)
-        ma_tables <- .metabulate(ma_summary = ma_summary, show_conf = show_conf,
-                                 show_cred = show_cred,  show_se = show_se,
-                                 output_format = output_format, ma_type = ma_type,
+        meta_tables <- .metabulate(meta_tables = meta_tables, show_msd = show_msd,
+                                 show_conf = show_conf, show_cred = show_cred,
+                                 show_se = show_se, show_var = show_var,
                                  es_type = es_type, symbol_es = symbol_es,
                                  digits = digits, leading0 = leading0, neg.sign = neg.sign,
                                  pos.sign = pos.sign, drop0integer = drop0integer,
                                  big.mark = big.mark, big.interval = big.interval,
-                                 small.mark = small.mark, small.interval = small.interval)
+                                 small.mark = small.mark, small.interval = small.interval,
+                                 conf_format = conf_format, cred_format = cred_format,
+                                 verbose = verbose, conf_level = conf_level, cred_level = cred_level)
 
         # Set the output file name
         if(is.null(file)) file <- "psychmeta_output"
@@ -239,7 +259,7 @@ metabulate <- function(ma_obj, file, show_conf = TRUE, show_cred = TRUE, show_se
         if(!is.null(bib)) .generate_bib(ma_obj, bib, additional_citekeys)
 
         # Render the output
-        .psychmeta_render(file = file, output_format = output_format, ma_tables = ma_tables,
+        .psychmeta_render(file = file, output_format = output_format, meta_tables = meta_tables,
                           ma_type = ma_type, es_type = es_type,
                           bib = bib, citations = citations, citekeys = citekeys,
                           title.bib = title.bib,
@@ -292,9 +312,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                          style="apa", output_format=c("word", "html", "pdf", "text", "rmd", "biblatex", "citekeys"),
                          file=NULL, title.bib = NULL, save_build_files = FALSE, header=list()){
 
+
+
         output_format <- match.arg(tolower(output_format))
 
         if("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
+
+        if(class(ma_obj))
 
         # Get the requested meta-analyses
         ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
@@ -389,7 +413,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         }
 }
 
-.psychmeta_render <- function(file, output_format, ma_tables = NULL, ma_type = NULL, es_type = NULL,
+.psychmeta_render <- function(file, output_format, meta_tables = NULL, ma_type = NULL, es_type = NULL,
                               bib = NULL, citations = NULL, citekeys = NULL, title.bib = NULL,
                               save_build_files = FALSE, header = list()){
 
@@ -400,11 +424,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                 switch(output_format,
 
-                       text = {if(!is.null(ma_tables)) print(ma_tables) # TODO: Fix table rendering once I can experiment
+                       text = {if(!is.null(meta_tables)) print(meta_tables) # TODO: Fix table rendering once I can experiment
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
-                                       cat(rep("\n", 2*as.numeric(is.null(ma_tables))),
+                                       cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib, "\n",
                                            rep("=", nchar(title.bib)), "\n\n"
                                            )
@@ -428,12 +452,18 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                bib_file)
                                }
 
-                               if(!is.null(ma_tables)) print(ma_tables) # TODO: Fix table rendering once I can experiment
+                               if(!is.null(meta_tables)) print(meta_tables) # TODO: Fix table rendering once I can experiment
+
+
+                                # The way that this can work is that metabulate will produce the list of meta tables.
+                                # If the length of the tables is 1, it will print the table.
+                                # Otherwise, it will retun the list with comments instructing the user how to output the list
+                                # (i.e., titles of the tables, code chunks to add)
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
 
-                                       cat(rep("\n", 2*as.numeric(is.null(ma_tables))),
+                                       cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib,
                                            "\n\n---\n"
                                            )
@@ -448,11 +478,15 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 switch(output_format,
 
                        text = {sink(file =)
-                               if(!is.null(ma_tables)) print(ma_tables) # TODO: Fix table rendering once I can experiment
+                               if(!is.null(meta_tables)) for(i in 1:length(meta_tables)) {
+                                       cat(names(meta_tables)[i], "\n", rep("=", nchar(names(meta_tables)[i])), "\n\n")
+                                       print_screen(meta_tables[[i]])
+                                       cat("\n\n")
+                               }
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
-                                       cat(rep("\n", 2*as.numeric(is.null(ma_tables))),
+                                       cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib, "\n",
                                            rep("=", nchar(title.bib)), "\n\n"
                                        )
@@ -465,7 +499,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                        # else =
                               {# Fill in critical header slots and write .bib file if necessary
                                 if(is.null(header$title)) {
-                                        if(is.null(ma_tables)) {
+                                        if(is.null(meta_tables)) {
                                                 if(is.null(title.bib)) {
                                                         header$title <- "Sources Contributing to Meta-Analyses"
                                                 } else {
@@ -518,7 +552,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                header <- paste(names(header), header, sep=": ", collapse="\n")
                                document <- sprintf("---\n%s\n---\n\n%s%s%s",
                                                    header,
-                                                   if(!is.null(ma_tables)) "print(ma_tables)\ncat('\n\n')", # TODO: Fix table rendering once I can experiment)
+                                                   if(!is.null(meta_tables)) "print(meta_tables)\ncat('\n\n')", # TODO: Fix table rendering once I can experiment)
                                                    if(!is.null(title.bib)) "paste0(title.bib, '\n\n')",
                                                    if(!is.null(bib)) "sprintf('---\nnocite: |\n  %s', citations)"
                                )
@@ -546,239 +580,260 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 #' @importFrom huxtable add_colnames()
 #'
 #' @keywords internal
-.metabulate <- function(ma_summary, show_conf = TRUE, show_cred = TRUE,
-                        show_se = FALSE, output_format = output_format,
-                        ma_type = NULL, es_type = NULL, symbol_es = "ES",
+.metabulate <- function(meta_tables, show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
+                        show_se = FALSE, show_var = FALSE, es_type = NULL, symbol_es = "ES",
                         digits = 2L, leading0 = "figure", neg.sign = "\u2212",
                         pos.sign = "figure", drop0integer = TRUE, big.mark = "\u2009",
-                        big.interval = 3L, small.mark = "\u2009", small.interval = 3L) {
+                        big.interval = 3L, small.mark = "\u2009", small.interval = 3L,
+                        conf_format = "parentheses", cred_format = "brackets",
+                        verbose = FALSE, conf_level = .95, cred_level = .80) {
 
-        # Basic idea:\
-        # - Identify effect size
-        # -- Select label set
-        # - Identify ma_method and correction_type
-        # -- For each combination, produce a huxtable
-        # -- -- Caption
-        # -- -- Title
-        # - In .psychmeta_render(), for each table
-        # -- Check if exists,
-        # -- Insert caption (necessary?)
-        # -- Insert table
-        # -- Insert newline
-
-
-
-
-
-        # Huxtable
-        ma_table <- as_huxtable(ma_table)
-        colnames(ma_table) <- c(newcolnames)
-        ma_table <- huxtable::add_colnames()
-
-        if(ma_type == "bb") ma_tab <- ma_list$barebones
-
-        ma_metric <- attributes(ma_obj)$ma_metric
-        is_r <- any(ma_metric %in% c("r_as_r", "d_as_r"))
-        is_d <- any(ma_metric %in% c("r_as_d", "d_as_d"))
-
-        if(is_r){
-                if(ma_type == "ic_ts")
-                        ma_tab <- ma_list$individual_correction$true_score
-
-                if(ma_type == "ic_vgx")
-                        ma_tab <- ma_list$individual_correction$validity_generalization_x
-
-                if(ma_type == "ic_vgy")
-                        ma_tab <- ma_list$individual_correction$validity_generalization_y
-
-
-                if(ma_type == "ad_ts")
-                        ma_tab <- ma_list$artifact_distribution$true_score
-
-                if(ma_type == "ad_vgx")
-                        ma_tab <- ma_list$artifact_distribution$validity_generalization_x
-
-                if(ma_type == "ad_vgy")
-                        ma_tab <- ma_list$artifact_distribution$validity_generalization_y
+        if(es_type == "r") {
+                meta_tables <- list(bb = meta_tables$barebones,
+                                  ic_ts  = meta_tables$individual_correction$true_score,
+                                  ic_vgx = meta_tables$individual_correction$validity_generalization_x,
+                                  ic_vgy = meta_tables$individual_correction$validity_generalization_y,
+                                  ad_ts  = meta_tables$artifact_distribution$true_score,
+                                  ad_vgx = meta_tables$artifact_distribution$validity_generalization_x,
+                                  ad_vgy = meta_tables$artifact_distribution$validity_generalization_y
+                )[ma_type]
+        } else if(es_type == "d") {
+                meta_tables <- list(bb = meta_tables$barebones,
+                                  ic_ts  = meta_tables$individual_correction$latentGroup_latentY,
+                                  ic_vgx = meta_tables$individual_correction$observedGroup_latentY,
+                                  ic_vgy = meta_tables$individual_correction$latentGroup_observedY,
+                                  ad_ts  = meta_tables$artifact_distribution$latentGroup_latentY,
+                                  ad_vgx = meta_tables$artifact_distribution$observedGroup_latentY,
+                                  ad_vgy = meta_tables$artifact_distribution$latentGroup_observedY
+                )[ma_type]
+        } else {
+                meta_tables <- list(bb = meta_tables$barebones)
         }
 
-        if(is_d){
-                if(ma_type == "ic_ts")
-                        ma_tab <- ma_list$individual_correction$latentGroup_latentY
+        meta_tables <- meta_tables[!lapply(meta_tables, is.null)]
+        meta_tables <- lapply(meta_tables, as_huxtable)
 
-                if(ma_type == "ic_vgx")
-                        ma_tab <- ma_list$individual_correction$observedGroup_latentY
+        # Select, rearrange, and format columns of meta_tables
+        .arrange_format_columns <- function(ma_table) {
+                ma_table <- mutate(ma_table,
+                                   spacer1 = " ",
+                                   spacer2 = " ",
+                                   spacer3 = " ",
+                                   spacer4 = " ",
+                                   spacer5 = " ")
+                x <- colnames(ma_table)
 
-                if(ma_type == "ic_vgy")
-                        ma_tab <- ma_list$individual_correction$latentGroup_observedY
+                # Select columns
+                col_initial <- x[1:which(x == "analysis_type")]
+                col_initial <- col_initial[col_initial != c("analysis_id", "pair_id", "analysis_type")]
+                length_initial <<- length(col_initial)
 
+                col_moderators <- if(1 + which(x == "analysis_type") != which(x == "k")) x[(1 + which(x == "analysis_type")):(which(x == "k") - 1)] else NULL
+                length_moderators <<- length(col_moderators)
 
-                if(ma_type == "ad_ts")
-                        ma_tab <- ma_list$artifact_distribution$latentGroup_latentY
+                col_sampsize <- x[which(x %in% c("k", "N"))]
 
-                if(ma_type == "ad_vgx")
-                        ma_tab <- ma_list$artifact_distribution$observedGroup_latentY
+                if(show_msd == TRUE) {
 
-                if(ma_type == "ad_vgy")
-                        ma_tab <- ma_list$artifact_distribution$latentGroup_observedY
+                        col_m_bb   <- x[which(x %in% c("mean_r", "mean_d", "mean_es"))]
+                        col_sd_bb  <- if(verbose == TRUE) {
+                                x[which(x %in% c("sd_r", "sd_d", "sd_es", "sd_e", "sd_art", "sd_pre", "sd_res"))]
+                        } else col_sd_bb <- x[which(x %in% c("sd_r", "sd_d", "sd_es", "sd_res"))]
+
+                        col_m_cor  <- x[which(x %in% c("mean_rho", "mean_delta"))]
+                        col_sd_cor <- if(verbose == TRUE) {
+                                x[which(x %in% c("sd_r_c", "sd_d_c", "sd_e_c", "sd_art_c", "sd_pre_c", "sd_rho", "sd_delta"))]
+                        } else col_sd_bb <- x[which(x %in% c("sd_r_c", "sd_d_c", "sd_rho", "sd_delta"))]
+
+                } else {
+                        col_m_bb   <- NULL
+                        col_sd_bb  <- NULL
+                        col_m_cor  <- NULL
+                        col_sd_cor <- NULL
+                }
+
+                if(show_se == TRUE) {
+                        col_se_bb  <- x[which(x %in% c("se_r", "se_d", "se_es"))]
+                        col_se_cor <- x[which(x %in% c("se_r_c", "se_d_c"))]
+
+                } else {
+                        col_se_bb  <- NULL
+                        col_sd_cor <- NULL
+                }
+                if(show_var == TRUE) {
+
+                        col_var_bb  <- if(verbose == TRUE) {
+                                x[which(x %in% c("var_r", "var_d", "var_es", "var_e", "var_art", "var_pre", "var_res"))]
+                        } else col_var_bb <- x[which(x %in% c("var_r", "var_d", "var_es", "var_res"))]
+                        col_var_cor <- if(verbose == TRUE) {
+                                x[which(x %in% c("var_r_c", "var_d_c", "var_e_c", "var_art_c", "var_pre_c", "var_rho", "var_delta"))]
+                        } else col_var_bb <- x[which(x %in% c("var_r_c", "var_d_c", "var_rho", "var_delta"))]
+
+                }
+
+                if(show_conf == TRUE) col_conf <- grep("^CI_.+", x, value = TRUE) else col_conf <- NULL
+                if(show_cred == TRUE) col_cred <- grep("^CV_.+", x, value = TRUE) else col_cred <- NULL
+
+                # Rearrange columns
+                ma_table <- ma_table[,c(col_initial, col_moderators, col_sampsize,
+                                        col_m_bb, col_se_bb, col_sd_bb,
+                                        "spacer1"[show_var], col_var_bb,
+                                        "spacer2"[is.null(col_m_cor)], col_m_cor, col_se_cor, col_sd_cor,
+                                        "spacer3"[show_var], col_var_cor,
+                                        "spacer4"[show_conf], col_conf,
+                                        "spacer5"[show_cred], col_cred)]
+
+                colnames(ma_table)[grep("spacer\\d+", colnames(ma_table))] <- " "
+                colnames(ma_table)[colnames(ma_table) %in% col_conf] <- c("ci_lower", "ci_upper")
+                colnames(ma_table)[colnames(ma_table) %in% col_cred] <- c("cv_lower", "cv_upper")
+
+                # Format columns
+                ma_table[, col_sampsize] <- num_format(ma_table[, col_sampsize], digits = 0L, decimal.mark = decimal.mark,
+                                                       leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                                       drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                                       small.mark = small.mark, small.interval = small.interval)
+
+                numeric_columns <- c(col_m_bb, col_se_bb, col_sd_bb, col_var_bb, col_m_cor, col_se_cor, col_sd_cor, col_var_cor, col_conf, col_cred)
+
+                ma_table[, numeric_columns] <-
+                        num_format(ma_table[, numeric_columns], digits = digits, decimal.mark = decimal.mark,
+                                                       leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                                       drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                                       small.mark = small.mark, small.interval = small.interval)
+
+                # Format the interval columns
+                if(show_conf == TRUE) {
+                        switch(conf_format,
+                               parentheses = {ma_table <- rename(select(mutate(ma_table, ci_lower = paste0("(", CI_LL_95, ", ", CI_UL_95, ")")),
+                                                                        -ci_upper), conf_int = ci_lower)},
+                               brackets = {ma_table <- rename(select(mutate(ma_table, ci_lower = paste0("[", CI_LL_95, ", ", CI_UL_95, "]")),
+                                                                     -ci_upper), conf_int = ci_lower)},
+                               )
+                }
+                if(show_cred == TRUE) {
+                        switch(cred_format,
+                               parentheses = {ma_table <- rename(select(mutate(ma_table, cv_lower = paste0("(", CV_LL_95, ", ", CV_UL_95, ")")),
+                                                                        -cv_upper), cred_int = cv_lower)},
+                               brackets = {ma_table <- rename(select(mutate(ma_table, cv_lower = paste0("[", CV_LL_95, ", ", CV_UL_95, "]")),
+                                                                     -cv_upper), cred_int = cv_lower)},
+                        )
+                }
+
+                return(ma_table)
+
+                rename(select(mutate(ad_ts, CI_LL_95 = ), -CI_UL_95), conf_int = CI_LL_95)
         }
 
-        if(!is_r & !is_d){
-                if(ma_type == "ic_ts") ma_tab <- NULL
-                if(ma_type == "ic_vgx") ma_tab <- NULL
-                if(ma_type == "ic_vgy") ma_tab <- NULL
+        meta_tables <- lapply(meta_tables, .arrange_format_columns)
 
-                if(ma_type == "ad_ts") ma_tab <- NULL
-                if(ma_type == "ad_vgx") ma_tab <- NULL
-                if(ma_type == "ad_vgy") ma_tab <- NULL
+        # Rename columns
+        .rename_columns <- function(ma_table) {
+                name_map <- c(
+                        group_contrast    = "Group Contrast",
+                        construct_x       = "Construct X",
+                        construct_y       = "Construct Y",
+                        k                 = "*k*",
+                        N                 = "*N*",
+
+                        mean_r            = "$\\overline{r}$",
+                        var_r             = "$\\sigma^{2}_{r}$",
+                        sd_r              = "$SD_{r}$",
+                        se_r              = "$SE_{\\overline{r}}$",
+
+                        mean_d            = "$\\overline{d}$",
+                        var_d             = "$\\sigma^{2}_{d}$",
+                        sd_d              = "$SD_{d}$",
+                        se_d              = "$SE_{\\overline{d}}$",
+
+                        mean_es           = paste0("$\\overline{", symbol_es, "}$"),
+                        var_es            = paste0("$\\sigma^{2}_{", symbol_es, "}$"),
+                        sd_es             = paste0("$SD{", symbol_es, "}$"),
+                        se_es             = paste0("$SE_{\\overline{", symbol_es, "}}$"),
+
+                        var_e             = "$\\sigma^{2}_{e}$",
+                        var_res           = "$\\sigma^{2}_{\\mathrm{res}}$",
+                        sd_e              = "$SD_{\\mathrm{e}}$",
+                        sd_res            = "$SD_{\\mathrm{res}}$",
+
+                        mean_rho          = "$\\overline{\\mathrm{\\rho}}$",
+                        var_r_c           = "$\\sigma^{2}_{r_{c}}$",
+                        var_e_c           = "$\\sigma^{2}_{e_{c}}$",
+                        var_rho           = "$\\sigma^{2}_{\\mathrm{\\rho}}$",
+                        sd_r_c            = "$SD_{r_{c}}$",
+                        se_r_c            = "$SE_{\\overline{\\mathrm{\\rho}}}$",
+                        sd_e_c            = "$SD_{e_{c}}$",
+                        sd_rho            = "$SD_{\\mathrm{\\rho}}$",
+
+                        mean_delta        = "$\\overline{\\mathrm{\\delta}}$",
+                        var_d_c           = "$\\sigma^{2}_{d_{c}}$",
+                        sd_d_c            = "$SD_{d_{c}}$",
+                        se_d_c            = "$SE_{\\overline{\\mathrm{\\delta}}}$",
+                        var_delta         = "$\\sigma^{2}_{\\mathrm{\\delta}}$",
+                        sd_delta          = "$SD_{\\mathrm{\\delta}}$",
+
+                        var_art           = "$\\sigma^{2}_{art}$",
+                        var_pre           = "$\\sigma^{2}_{pre}$",
+                        sd_art            = "$SD_{art}$",
+                        sd_pre            = "$SD_{pre}$",
+
+                        ci_lower          = "CI Lower",
+                        ci_upper          = "CI Upper",
+                        cv_lower          = "CV Lower",
+                        cv_upper          = "CV Upper",
+
+                        conf_int          = paste0(ci_width*100, c("% Conf. Int.")),
+                        cred_int          = paste0(cv_width*100, c("% Cred. Int."))
+                )
+
+                formatted_names <- names(name_map)
+                names(formatted_names) <- name_map
+
+                ma_table <- rename(ma_table, !!formatted_names[formatted_names %in% colnames(ma_table)])
+
         }
+        meta_tables <- lapply(meta_tables, .rename_columns)
 
+        # Add first header rower
+        meta_tables <- lapply(meta_tables, add_colnames)
 
-        if(!is.null(ma_tab)){
-                ma_tab <- as.data.frame(ma_tab)
+        # Bold header rows
+        #
 
-                ma_tab[,c("k", "N")] <- round2char(x = ma_tab[,c("k", "N")], digits = 0)
-                if(is_r){
-                        ma_tab[,which(colnames(ma_tab) == "mean_r"):ncol(ma_tab)] <- round2char(x = ma_tab[,which(colnames(ma_tab) == "mean_r"):ncol(ma_tab)])
-                        for(i in which(colnames(ma_tab) == "mean_r"):ncol(ma_tab)) ma_tab[,i] <- str_replace(x = ma_tab[,i], pattern = "0[.]", replacement = ".")
-                }
-                if(is_d){
-                        ma_tab[,which(colnames(ma_tab) == "mean_d"):ncol(ma_tab)] <- round2char(x = ma_tab[,which(colnames(ma_tab) == "mean_d"):ncol(ma_tab)])
-                }
-                if(!is_r & !is_d){
-                        ma_tab[,which(colnames(ma_tab) == "mean_es"):ncol(ma_tab)] <- round2char(x = ma_tab[,which(colnames(ma_tab) == "mean_es"):ncol(ma_tab)])
-                }
+        # Align cells
+        # Center numeric row headings
+        # Right-align numeric rows
+        # Center intervals if they are merged
 
-                for(i in 1:ncol(ma_tab)) ma_tab[,i] <- as.character(ma_tab[,i])
+        # Add moderators upper-row and CI/CV upper-row
+        if(length_moderators > 1 | (show_conf & conf_format == "columns") | (show_cred & cred_format == "columns")) {
+                num_header_rows <- 2
+                if(length_moderators > 1) {
+                        col_moderators <- (length_intial + 1):(length_intial + length_moderators)
+                        .moderator_span <- function(ma_table) {
+                                colnames(ma_table)[1:length_initial] = " "
+                                colnames(ma_table)[(1 + length_initial):(length_initial + length_moderators)] <- "Moderators"
 
-                ma_tab$var_r <- ma_tab$var_d <- ma_tab$var_es <- ma_tab$var_e <- ma_tab$var_res <- NULL
-                ma_tab$var_art <- ma_tab$var_pre <- NULL
-                ma_tab$var_e_c <- ma_tab$var_art_c <- ma_tab$var_pre_c <- NULL
-                ma_tab$sd_e_c <- ma_tab$sd_art_c <- ma_tab$sd_pre_c <- NULL
-                ma_tab$var_r_c <- ma_tab$var_d_c <- ma_tab$var_e_c <- ma_tab$var_rho <- ma_tab$var_delta <- NULL
-                ma_tab$sd_e <- ma_tab$sd_e_c <- NULL
-
-                if(!show_se){
-                        ma_tab$se_r <- ma_tab$se_r_c <- NULL
-                        ma_tab$se_d <- ma_tab$se_d_c <- NULL
-                        ma_tab$se_es <- NULL
-                }
-
-                ma_tab$analysis_id <- ma_tab$analysis_type <- NULL
-
-                if(!is.null(ma_tab$pair_id)){
-                        ma_tab_list <- by(ma_tab, ma_tab$pair_id, function(x) x)
-                }else{
-                        ma_tab_list <- list(ma_tab)
-                }
-
-                .nrow <- nrow(ma_tab)
-                construct_names <- any(colnames(ma_tab) %in% c("Construct_X", "Construct_Y"))
-                ma_tab <- NULL
-                for(i in 1:length(ma_tab_list)){
-                        p <- nrow(ma_tab_list[[i]])
-
-                        if(p > 1 & construct_names) ma_tab_list[[i]][2:p, c("Construct_X", "Construct_Y")] <- ""
-
-                        if(i == length(ma_tab_list) | (.nrow / length(ma_tab_list) == 1)){
-                                ma_tab <- rbind(ma_tab, ma_tab_list[[i]])
-                        }else{
-                                ma_tab <- rbind(ma_tab, ma_tab_list[[i]], "")
+                                # Add underline
                         }
+                        lapply(meta_tables, .moderator_span)
+
+                } else {
+                        # rename columns up to the intervals
                 }
-                ma_tab$pair_id <- NULL
-                rownames(ma_tab) <- 1:nrow(ma_tab)
+                if(show_conf & conf_format == "columns") {
 
-                name_vec <- colnames(ma_tab)
-                ci_cols <- which(grepl(name_vec, pattern = "CI_LL_") | grepl(name_vec, pattern = "CI_UL_"))
-                cv_cols <- which(grepl(name_vec, pattern = "CV_LL_") | grepl(name_vec, pattern = "CV_UL_"))
-                ci_width <- str_replace(name_vec[ci_cols[1]], pattern = "CI_LL_", replacement = "")
-                cv_width <- str_replace(name_vec[cv_cols[1]], pattern = "CV_LL_", replacement = "")
-
-                colnames(ma_tab)[name_vec == "group_contrast"]    <- "Group Contrast"
-                colnames(ma_tab)[name_vec == "construct_x"]       <- "Construct X"
-                colnames(ma_tab)[name_vec == "construct_y"]       <- "Construct Y"
-                colnames(ma_tab)[name_vec == "k"]                 <- "*k*"
-                colnames(ma_tab)[name_vec == "N"]                 <- "*N*"
-
-                colnames(ma_tab)[name_vec == "mean_r"]            <- "$\\overline{r}$"
-                colnames(ma_tab)[name_vec == "var_r"]             <- "$\\sigma^{2}_{r}$"
-                colnames(ma_tab)[name_vec == "sd_r"]              <- "$SD_{r}$"
-                colnames(ma_tab)[name_vec == "se_r"]              <- "$SE_{\\overline{r}}$"
-
-                colnames(ma_tab)[name_vec == "mean_d"]            <- "$\\overline{d}$"
-                colnames(ma_tab)[name_vec == "var_d"]             <- "$\\sigma^{2}_{d}$"
-                colnames(ma_tab)[name_vec == "sd_d"]              <- "$SD_{d}$"
-                colnames(ma_tab)[name_vec == "se_d"]              <- "$SE_{\\overline{d}}$"
-
-                colnames(ma_tab)[name_vec == "mean_es"]           <- paste0("$\\overline{", symbol_es, "}$")
-                colnames(ma_tab)[name_vec == "var_es"]            <- paste0("$\\sigma^{2}_{", symbol_es, "}$")
-                colnames(ma_tab)[name_vec == "sd_es"]             <- paste0("$SD{", symbol_es, "}$")
-                colnames(ma_tab)[name_vec == "se_es"]             <- paste0("$SE_{\\overline{", symbol_es, "}}$")
-
-                colnames(ma_tab)[name_vec == "var_e"]             <- "$\\sigma^{2}_{e}$"
-                colnames(ma_tab)[name_vec == "var_res"]           <- "$\\sigma^{2}_{\\mathrm{res}}$"
-                colnames(ma_tab)[name_vec == "sd_e"]              <- "$SD_{\\mathrm{e}}$"
-                colnames(ma_tab)[name_vec == "sd_res"]            <- "$SD_{\\mathrm{res}}$"
-
-                colnames(ma_tab)[name_vec == "mean_rho"]          <- "$\\overline{\\mathrm{\\rho}}$"
-                colnames(ma_tab)[name_vec == "var_r_c"]           <- "$\\sigma^{2}_{r_{c}}$"
-                colnames(ma_tab)[name_vec == "var_e_c"]           <- "$\\sigma^{2}_{e_{c}}$"
-                colnames(ma_tab)[name_vec == "var_rho"]           <- "$\\sigma^{2}_{\\mathrm{\\rho}}$"
-                colnames(ma_tab)[name_vec == "sd_r_c"]            <- "$SD_{r_{c}}$"
-                colnames(ma_tab)[name_vec == "se_r_c"]            <- "$SE_{\\overline{\\mathrm{\\rho}}}$"
-                colnames(ma_tab)[name_vec == "sd_e_c"]            <- "$SD_{e_{c}}$"
-                colnames(ma_tab)[name_vec == "sd_rho"]            <- "$SD_{\\mathrm{\\rho}}$"
-
-                colnames(ma_tab)[name_vec == "mean_delta"]        <- "$\\overline{\\mathrm{\\delta}}$"
-                colnames(ma_tab)[name_vec == "var_d_c"]           <- "$\\sigma^{2}_{d_{c}}$"
-                colnames(ma_tab)[name_vec == "sd_d_c"]            <- "$SD_{d_{c}}$"
-                colnames(ma_tab)[name_vec == "se_d_c"]            <- "$SE_{\\overline{\\mathrm{\\delta}}}$"
-                colnames(ma_tab)[name_vec == "var_delta"]         <- "$\\sigma^{2}_{\\mathrm{\\delta}}$"
-                colnames(ma_tab)[name_vec == "sd_delta"]          <- "$SD_{\\mathrm{\\delta}}$"
-
-                colnames(ma_tab)[name_vec == "var_art"]           <- "$\\sigma^{2}_{art}$"
-                colnames(ma_tab)[name_vec == "var_pre"]           <- "$\\sigma^{2}_{pre}$"
-                colnames(ma_tab)[name_vec == "sd_art"]            <- "$SD_{art}$"
-                colnames(ma_tab)[name_vec == "sd_pre"]            <- "$SD_{pre}$"
-
-                colnames(ma_tab)[ci_cols] <- paste0(ci_width, c("% CI Lower", "% CI Upper"))
-                colnames(ma_tab)[cv_cols] <- paste0(cv_width, c("% CV Lower", "% CV Upper"))
-
-                ma_tab <- cbind(ma_tab[,1:(ci_cols[1] - 1)], "", ma_tab[,ci_cols], "", ma_tab[,cv_cols])
-                colnames(ma_tab)[colnames(ma_tab) == "\"\""] <- " "
-
-                col.widths <- c(rep(.8, which(name_vec == "k") - 1),
-                                .3, .6,
-                                rep(.5, ncol(ma_tab) - which(name_vec == "k") - 7),
-                                c(.01, rep(.7, 2),
-                                  .01, rep(.7, 2)))
-
-                if(!show_conf){
-                        id <- which(grepl(colnames(ma_tab), pattern = "% CI Lower") | grepl(colnames(ma_tab), pattern = "% CI Upper"))
-                        id <- c(min(id)-1, id)
-                        col.widths <- col.widths[-id]
-                        ma_tab <- ma_tab[,-id]
                 }
 
-                if(!show_cred){
-                        id <- which(grepl(colnames(ma_tab), pattern = "% CV Lower") | grepl(colnames(ma_tab), pattern = "% CV Upper"))
-                        id <- c(min(id)-1, id)
-                        col.widths <- col.widths[-id]
-                        ma_tab <- ma_tab[,-id]
+                if(show_cred & cred_format == "columns") {
+
+                        # Rename CI/CV lower columns
+                        # Add CI/CV upper column
+                        # Add underline
                 }
 
-                header.col.justify <- c(rep("L", which(name_vec == "k") - 1),
-                                        rep("C", ncol(ma_tab) - (which(name_vec == "k") - 1)))
+        } else num_header_rows <- 1
 
-                col.justify <- c(rep("L", which(name_vec == "k") - 1),
-                                 rep("R", ncol(ma_tab) - which(name_vec == "k") + 1))
 
-                list(table = ma_tab,
-                     col.widths = col.widths,
-                     header.col.justify = header.col.justify,
-                     col.justify = col.justify)
-        }else{
-                NULL
-        }
+        # Add lines above headers, below headers, to bottom of table
+
 }
