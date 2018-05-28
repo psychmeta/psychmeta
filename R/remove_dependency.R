@@ -162,15 +162,7 @@
                if(!is.null(moderator_names$cat))
                     moderators_comp[,moderator_names$cat] <-
                     apply(as.data.frame(moderators_comp_i[,moderator_names$cat]), 2, function(x){
-                         x <- as.character(x)
-
-                         out <- list()
-                         for(i in unique(x)){
-                              out[[i]] <- data.frame(value = i, freq = sum(x == i))
-                         }
-                         out <- as.data.frame(data.table::rbindlist(out))
-
-                         as.character(out[which.max(out$freq),"value"])
+                         paste(sort(unique(as.character(x))), collapse = " & ")
                     })
                
                if(!is.null(moderator_names$noncat))
