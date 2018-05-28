@@ -1177,8 +1177,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      data_y <- cleaned_data$data_y
      complete_moderators <- cleaned_data$complete_moderators
      categorical_moderators <- cleaned_data$categorical_moderators
+     if(!is.null(complete_moderators)) colnames(complete_moderators) <- moderator_names$all
+     if(!is.null(categorical_moderators)) colnames(categorical_moderators) <- moderator_names$cat
      if(any(!cat_moderators)){
-          continuous_moderators <- cleaned_data$complete_moderators[,!cat_moderators]
+          continuous_moderators <- data.frame(as_tibble(cleaned_data$complete_moderators)[,!cat_moderators])
+          if(!is.null(continuous_moderators)) colnames(continuous_moderators) <- moderator_names$noncat
      }else{
           continuous_moderators <- NULL
      }
@@ -1195,7 +1198,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      study_construct_pair <- paste(sample_id, construct_x, construct_y)
      dups_exist <- any(duplicated(study_construct_pair))
-
+     
      ##### Check for dependent correlations #####
      if(!is.null(sample_id) & dups_exist & check_dependence) {
           # Separate duplicate from non-duplicate Study IDs. Pass-through non-duplicates, use duplicates for further compositing
@@ -1207,9 +1210,15 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(!is.null(complete_moderators)){
                complete_moderators_temp <- complete_moderators
+               colnames(complete_moderators_temp) <- moderator_names$all
                colnames(complete_moderators_temp) <- paste0(colnames(complete_moderators_temp), "_temp")
                full_data <- cbind(full_data, complete_moderators_temp)
 
+               moderator_names_temp <- moderator_names
+               if(!is.null(moderator_names_temp$all)) moderator_names_temp$all <- paste0(moderator_names_temp$all, "_temp")
+               if(!is.null(moderator_names_temp$cat)) moderator_names_temp$cat <- paste0(moderator_names_temp$cat, "_temp")
+               if(!is.null(moderator_names_temp$noncat)) moderator_names_temp$noncat <- paste0(moderator_names_temp$noncat, "_temp")
+               
                str_compmod <- colnames(complete_moderators)
                str_compmod_temp <- colnames(complete_moderators_temp)
           }else{
@@ -1239,17 +1248,17 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                if(!is.null(complete_moderators)){
                     cat_moderators_temp <- rep(cat_moderators, ncol(complete_moderators))
                }else{
-                    cat_moderators_temp <- complete_moderators
+                    cat_moderators_temp <- NULL
                }
           }
 
-          if(!is.null(str_compmod_temp))
-               for(i in 1:length(str_compmod_temp)){
-                    for(j in levels(factor(duplicates$sample_id))){
-                         if(!cat_moderators_temp[i])
-                              duplicates[duplicates$sample_id == j, str_compmod_temp[i]] <- mean(duplicates[duplicates$sample_id == j, str_compmod_temp[i]])
-                    }
-               }
+          # if(!is.null(str_compmod_temp))
+          #      for(i in 1:length(str_compmod_temp)){
+          #           for(j in levels(factor(duplicates$sample_id))){
+          #                if(!cat_moderators_temp[i])
+          #                     duplicates[duplicates$sample_id == j, str_compmod_temp[i]] <- mean(duplicates[duplicates$sample_id == j, str_compmod_temp[i]])
+          #           }
+          #      }
 
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
                                       total = length(unique(duplicates$analysis_id)), clear = FALSE, width = options()$width)
@@ -1258,13 +1267,12 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                out <- .remove_dependency(sample_id = "sample_id", citekey = "citekey", es_data = str_es_data,
                                          data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
                                          intercor=intercor, partial_intercor = FALSE, construct_x = "construct_x", construct_y = "construct_y",
-                                         measure_x = "measure_x", measure_y = "measure_y",
+                                         measure_x = "measure_x", measure_y = "measure_y", moderator_names = moderator_names_temp, 
                                          es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
-               cbind(duplicates[i, c("analysis_id", "analysis_type", str_moderators, str_compmod_temp)], out)
+               as.data.frame(cbind(as_tibble(duplicates)[i, c("analysis_id", "analysis_type", str_moderators)][1,], out))
           })
           
-          collapsed_data <- NULL
-          for(i in 1:length(collapsed_data_list)) collapsed_data <- rbind(collapsed_data, collapsed_data_list[[i]])
+          collapsed_data <- data.frame(data.table::rbindlist(collapsed_data_list))
           colnames(collapsed_data)[colnames(collapsed_data) == "es"] <- "rxyi"
           collapsed_data <- collapsed_data[,colnames(full_data_mod)]
 
@@ -1282,7 +1290,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(!is.null(construct_y)) construct_y <- as.character(indep_data$construct_y)
           if(!is.null(data_x)) data_x <- indep_data[,str_data_x]
           if(!is.null(data_y)) data_y <- indep_data[,str_data_y]
-          if(!is.null(str_moderators)) categorical_moderators <- apply(indep_data[,str_moderators],2,as.character)
+          if(!is.null(str_moderators)) categorical_moderators <- apply(indep_data[,str_moderators], 2, as.character)
           if(!is.null(str_compmod_temp)) complete_moderators <- indep_data[, str_compmod_temp]
           analysis_id <- indep_data$analysis_id
           analysis_type <- as.character(indep_data$analysis_type)
@@ -1307,14 +1315,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           construct_pair <- factor(construct_pair, levels = possible_levels)
      }
 
-     if(!is.null(moderators)){
-          moderators <- as.data.frame(moderators)
-          if(!is.null(moderator_names[["all"]])){
-               colnames(moderators) <- moderator_names[["all"]]
-          }else{
-               colnames(moderators) <- paste0("Moderator_", 1:ncol(moderators))
-          }
-     }
+     rm(moderators)
 
      ##### Compute meta-analyses and artifact distributions #####
      n_pairs <- length(unique(construct_pair))

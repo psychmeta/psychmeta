@@ -94,7 +94,8 @@
                                collapse_method = c("stop", "composite", "average"), retain_original = TRUE,
                                intercor = .5, partial_intercor = FALSE,
                                construct_x = NULL, construct_y = NULL,
-                               measure_x = NULL, measure_y = NULL, data=NULL, es_metric=c("r", "d"), ma_method, ...) {
+                               measure_x = NULL, measure_y = NULL, moderator_names = NULL,
+                               data=NULL, es_metric=c("r", "d"), ma_method, ...) {
 
      if(!is.null(data)) {
           es_data <- data[,es_data]
@@ -118,9 +119,17 @@
           }else{
                measure_y <- NULL
           }
-     }
-     additions <- list(...)
+          
+          if(length(moderator_names$all) > 0){
+               moderators <- as.data.frame(as_tibble(data)[,moderator_names$all])
+          }else{
+               moderators <- NULL
+          }
 
+     }
+
+     additional_args <- list(...)
+     
      es_metric <- match.arg(es_metric, c("r", "d"))
 
      dup_IDs <- duplicated(sample_id) | duplicated(sample_id,fromLast=TRUE)
@@ -137,12 +146,42 @@
      p_vec <- es_data$pi
      if(is.null(p_vec)) p_vec <- rep(.5, nrow(es_data))
 
+     i <- (1:length(sample_id_construct_pair))[sample_id_construct_pair == sample_id_construct_pair[1]]
      out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair, function(i) {
 
           if(!is.null(citekey)){
                citekey_comp <- paste(unique(as.character(citekey)[i]), collapse = ",")
           }else{
                citekey_comp <- NULL
+          }
+          
+          if(!is.null(moderators)){
+               moderators_comp_i <- (as_tibble(moderators)[i,])
+               moderators_comp <- (as_tibble(moderators)[1,])
+               
+               if(!is.null(moderator_names$cat))
+                    moderators_comp[,moderator_names$cat] <-
+                    apply(as.data.frame(moderators_comp_i[,moderator_names$cat]), 2, function(x){
+                         x <- as.character(x)
+
+                         out <- list()
+                         for(i in unique(x)){
+                              out[[i]] <- data.frame(value = i, freq = sum(x == i))
+                         }
+                         out <- as.data.frame(data.table::rbindlist(out))
+
+                         as.character(out[which.max(out$freq),"value"])
+                    })
+               
+               if(!is.null(moderator_names$noncat))
+                    moderators_comp[,moderator_names$noncat] <- 
+                    apply(as.data.frame(moderators_comp_i[,moderator_names$noncat]), 2, function(x){
+                         mean(x, na.rm = TRUE)
+                    })
+               
+               moderators_comp <- as.data.frame(moderators_comp)
+          }else{
+               moderators_comp <- NULL
           }
 
           if(ma_method != "bb"){
@@ -243,7 +282,7 @@
                }
                
                if(partial_y){
-                    if(!is.null(additions$.dx_internal_designation)){
+                    if(!is.null(additional_args$.dx_internal_designation)){
                          intercor_y <- mix_r_2group(rxy = intercor_y, dx = es_data$d, dy = es_data$d, p = es_data$pi)
                          partial_y <- FALSE
                     }
@@ -367,6 +406,7 @@
           }
 
           out <- list(sample_id = sample_id[i][1],
+                      moderators_comp = moderators_comp, 
                       es_comp = es_comp, n_comp = n_comp, n_adj_comp = n_adj_comp,
                       rxx_comp = rxx_comp, ryy_comp = ryy_comp,
                       ux_comp = ux_comp, uy_comp = uy_comp,
@@ -432,6 +472,12 @@
 
           out
      })
+     
+     if(!is.null(moderators)){
+          mod_out <- as.data.frame(data.table::rbindlist(lapply(out, function(x) x$moderators_comp)))
+     }else{
+          mod_out <- NULL
+     }
 
      es_data_list <- list(construct_x = unlist(lapply(out, function(x) x$construct_x)),
                           construct_y = unlist(lapply(out, function(x) x$construct_y)),
@@ -480,7 +526,7 @@
      for(i in names(data_x_list)) if(is.null(data_x_list[[i]])) data_x_list[[i]] <- NULL
      for(i in names(data_y_list)) if(is.null(data_y_list[[i]])) data_y_list[[i]] <- NULL
 
-     es_data <- as.data.frame(es_data_list)
+     es_data <- cbind(as.data.frame(es_data_list), mod_out)
      data_x <- as.data.frame(data_x_list)
      data_y <- as.data.frame(data_y_list)
 

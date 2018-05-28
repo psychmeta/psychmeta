@@ -334,6 +334,7 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
      }
 
      data <- moderator_info$data
+     
      analysis_id_variables <- moderator_info$id_variables
      if(moderator_type == "none"){
           moderator_matrix <- cat_moderator_matrix <- NULL

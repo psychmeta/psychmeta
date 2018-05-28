@@ -37,7 +37,8 @@
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
 filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
      
-     screen_ma(ma_obj = ma_obj)
+     flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
+     ma_obj <- screen_ma(ma_obj = ma_obj)
      
      match <- match.arg(match, c("all", "any"))
      case_sensitive <- scalar_arg_warning(arg = case_sensitive, arg_name = "case_sensitive")
@@ -146,7 +147,8 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           }
 
      ma_obj <- ma_obj[keep_meta,]
-
+     if(flag_summary) ma_obj <- summary(ma_obj)
+     
      return(ma_obj)
 }
 
