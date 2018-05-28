@@ -27,7 +27,7 @@
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Additional arguments
 #' 
-#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. See documentation of \code{ma_r()} for a full list of acceptable values. 
+#' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied. See documentation of \code{\link{ma_r}} for a full list of acceptable values. 
 #' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale. 
 #' @param moderators Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).
 #' @param cat_moderators Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).

@@ -1290,7 +1290,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(!is.null(construct_y)) construct_y <- as.character(indep_data$construct_y)
           if(!is.null(data_x)) data_x <- indep_data[,str_data_x]
           if(!is.null(data_y)) data_y <- indep_data[,str_data_y]
-          if(!is.null(str_moderators)) categorical_moderators <- apply(indep_data[,str_moderators], 2, as.character)
+          if(!is.null(str_moderators)) categorical_moderators <- apply(indep_data[,paste0(str_moderators)], 2, as.character)
           if(!is.null(str_compmod_temp)) complete_moderators <- indep_data[, str_compmod_temp]
           analysis_id <- indep_data$analysis_id
           analysis_type <- as.character(indep_data$analysis_type)

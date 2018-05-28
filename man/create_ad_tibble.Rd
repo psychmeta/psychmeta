@@ -46,7 +46,7 @@ create_ad_list(ad_type = c("tsa", "int"), n = NULL, sample_id = NULL,
 
 \item{rxx_restricted}{Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
-\item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. See documentation of \code{ma_r()} for a full list of acceptable values.}
+\item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. See documentation of \code{\link{ma_r}} for a full list of acceptable values.}
 
 \item{k_items_x, k_items_y}{Numeric vector identifying the number of items in each scale.}
 
