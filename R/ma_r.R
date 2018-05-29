@@ -1222,7 +1222,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                str_compmod <- colnames(complete_moderators)
                str_compmod_temp <- colnames(complete_moderators_temp)
           }else{
-               str_compmod <- str_compmod_temp <- NULL
+               str_compmod <- str_compmod_temp <- moderator_names_temp <- NULL
           }
           
           full_data_mod <- organize_moderators(moderator_matrix = categorical_moderators, es_data = full_data,
