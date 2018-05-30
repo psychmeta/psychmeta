@@ -58,7 +58,7 @@
          cran_v_char <- gsub(x = stringr::str_split(as.character(pkg_badge), "\n")[[1]][9], pattern = " ", replacement = "")
          vcheck <- check_version(cran_version = cran_v_char, sys_version = version)
 
-         use_symbols <- (.Platform$OS.type != "windows" | .Options$cli.unicode)
+         use_symbols <- (.Platform$OS.type != "windows" | if(!is.null(.Options$cli.unicode)) .Options$cli.unicode else FALSE)
 
          packageStartupMessage(crayon::white("\n----------------------------------------------------- ", crayon::bold("Version check"), " ---------------- "))
          if(vcheck$best_version == "CRAN"){

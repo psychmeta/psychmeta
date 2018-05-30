@@ -442,6 +442,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         }
 }
 
+
 .psychmeta_render <- function(file, output_format, meta_tables = NULL, ma_type = NULL, es_type = NULL,
                               bib = NULL, citations = NULL, citekeys = NULL, title.bib = NULL,
                               style = style, save_build_files = FALSE, header = list(), caption = NULL){
@@ -454,31 +455,31 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 switch(output_format,
 
                        text = {if(!is.null(meta_tables)) {
-                                 for(i in names(meta_tables)) {
-                                   if(!is.null(caption)) {
-                                     if(length(caption) > 1) {
-                                       cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])))
-                                     } else cat(caption, "\n", rep("=", nchar(caption)))
-                                   }
-                                   cat("\n")
-                                   print(meta_tables[[i]])
-                                   cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
-                                 }
+                               for(i in names(meta_tables)) {
+                                       if(!is.null(caption)) {
+                                               if(length(caption) > 1) {
+                                                       cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])))
+                                               } else cat(caption, "\n", rep("=", nchar(caption)))
+                                       }
+                                       cat("\n")
+                                       print(meta_tables[[i]])
+                                       cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
                                }
+                       }
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
                                        cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib, "\n",
                                            rep("=", nchar(title.bib)), "\n\n"
-                                           )
+                                       )
                                        # TODO: Replace this with a call to citation.js to use CSL styles
                                        print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
                                }
                        },
 
                        # else =
-                              {# TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
+                       {# TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
                                # the same metadata block as citations and style below.
                                if(!is.null(bib)) {
                                        # Write the bibliography file
@@ -492,15 +493,15 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                bib_file)
                                }
 
-                                if(!is.null(meta_tables)) {
-                                  for(i in names(meta_tables)) {
-                                    cat("\n\n")
-                                    knitr::kable(meta_tables[[i]], caption = if(length(caption) > 1) caption[[i]] else caption)
-                                    cat("\n\n")
-                                    cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
-                                  }
+                               if(!is.null(meta_tables)) {
+                                       for(i in names(meta_tables)) {
+                                               cat("\n\n")
+                                               knitr::kable(meta_tables[[i]], caption = if(length(caption) > 1) caption[[i]] else caption)
+                                               cat("\n\n")
+                                               cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
+                                       }
 
-                                }
+                               }
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
@@ -508,7 +509,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib,
                                            "\n\n---\n"
-                                           )
+                                       )
                                        if(!is.null(style)) sprintf("csl: %s\n", style )
                                        sprintf("nocite: |\n  %s\n---\n", citations)
                                }
@@ -521,16 +522,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                        text = {sink(file = file)
                                if(!is.null(meta_tables)) {
-                                 for(i in names(meta_tables)) {
-                                   if(!is.null(caption)) {
-                                     if(length(caption) > 1) {
-                                       cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])))
-                                     } else cat(caption, "\n", rep("=", nchar(caption)))
-                                   }
-                                   cat("\n")
-                                   print(meta_tables[[i]])
-                                   cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
-                                 }
+                                       for(i in names(meta_tables)) {
+                                               if(!is.null(caption)) {
+                                                       if(length(caption) > 1) {
+                                                               cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])))
+                                                       } else cat(caption, "\n", rep("=", nchar(caption)))
+                                               }
+                                               cat("\n")
+                                               print(meta_tables[[i]])
+                                               cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
+                                       }
                                }
 
                                if(!is.null(bib)) {
@@ -546,59 +547,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                        },
 
                        # else =
-                              {# Fill in critical header slots and write .bib file if necessary
-                                if(is.null(header$title)) {
-                                        if(is.null(meta_tables)) {
-                                                if(is.null(title.bib)) {
-                                                        header$title <- "Sources Contributing to Meta-Analyses"
-                                                } else {
-                                                        header$title <- title.bib
-                                                        title.bib <- NULL
-                                                }
-                                        } else {
-                                                header$title <- "Results of Meta-Analyses"
-                                                if(is.null(title.bib)) {
-                                                        title.bib <- "\n\n# Sources Contributing to Meta-Analyses\n\n"
-                                                } else {
-                                                        title.bib <- sprintf("\n\n# %s\n\n", title.bib)
-                                                }
-                                        }
-                                }
-
-                                header$output <- paste0(output_format, "_document")
-
-                                if(!is.null(bib)) {
-                                        # Write the bibliography file
-                                        if(save_build_files) {
-                                                bib_file <- str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
-                                        } else bib_file <- tempfile("psychmeta.bib")
-                                        suppressMessages(WriteBib(bib[citekeys],
-                                                                  file = bib_file))
-
-                                        header$bibliography <- bib_file
-
-                                        if(!is.null(style)) {
-                                                if(attr(style, "source") %in% c("url", "Zotero")) {
-                                                        if(url.exists(style)) {
-                                                                header$csl <- style
-                                                        } else {
-                                                                message(sprintf("Caution: Style not found at %s\n         Check the %s or specify a local CSL style file.\n         References formatted using to the Chicago Manual of Style.",
-                                                                                style,
-                                                                                if(attr(style, "source") == "url") "URL" else "style name"))
-                                                        }
-                                                } else {
-                                                        if(file.exists(style)) {
-                                                                header$csl <- style
-                                                        } else {
-                                                                message(sprintf("Caution: Style not found at %s\n         Check the file path or specify a CSL style name from the Zotero Style Repository (https://zotero.org/styles).\n         References formatted using to the Chicago Manual of Style.",
-                                                                                style))
-                                                        }
-                                                }
-                                        }
-                                }
-
-                               ## Create the markdown header and document
-                               header <- paste(names(header), header, sep=": ", collapse="\n")
+                       { # Generate table output
                                mt_output <- character(0)
                                for(i in names(meta_tables)) {
                                        if(is.character(meta_tables[[i]])) enc2native(meta_tables[[i]])
@@ -607,7 +556,61 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                       paste0(knitr::kable(meta_tables[[i]], caption = {if(length(caption) > 1) caption[[i]] else caption}), collapse="\n"),
                                                       "\n",
                                                       paste(attr(meta_tables, "footnotes")[[i]]), sep = "\n")
+                               }
+
+                               # Fill in critical header slots and write .bib file if necessary
+                               if(is.null(header$title)) {
+                                       if(is.null(meta_tables)) {
+                                               if(is.null(title.bib)) {
+                                                       header$title <- "Sources Contributing to Meta-Analyses"
+                                               } else {
+                                                       header$title <- title.bib
+                                                       title.bib <- NULL
+                                               }
+                                       } else {
+                                               header$title <- "Results of Meta-Analyses"
+                                               if(is.null(title.bib)) {
+                                                       title.bib <- "\n\n# Sources Contributing to Meta-Analyses\n\n"
+                                               } else {
+                                                       title.bib <- sprintf("\n\n# %s\n\n", title.bib)
+                                               }
                                        }
+                               }
+
+                               header$output <- paste0("\n  ", output_format, "_document", if(output_format == "pdf" & any(!stringi::stri_enc_isascii(mt_output))) "\n    latex_engine: xelatex")
+
+                               if(!is.null(bib)) {
+                                       # Write the bibliography file
+                                       if(save_build_files) {
+                                               bib_file <- str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
+                                       } else bib_file <- tempfile("psychmeta.bib")
+                                       suppressMessages(WriteBib(bib[citekeys],
+                                                                 file = bib_file))
+
+                                       header$bibliography <- bib_file
+
+                                       if(!is.null(style)) {
+                                               if(attr(style, "source") %in% c("url", "Zotero")) {
+                                                       if(url.exists(style)) {
+                                                               header$csl <- style
+                                                       } else {
+                                                               message(sprintf("Caution: Style not found at %s\n         Check the %s or specify a local CSL style file.\n         References formatted using to the Chicago Manual of Style.",
+                                                                               style,
+                                                                               if(attr(style, "source") == "url") "URL" else "style name"))
+                                                       }
+                                               } else {
+                                                       if(file.exists(style)) {
+                                                               header$csl <- style
+                                                       } else {
+                                                               message(sprintf("Caution: Style not found at %s\n         Check the file path or specify a CSL style name from the Zotero Style Repository (https://zotero.org/styles).\n         References formatted using to the Chicago Manual of Style.",
+                                                                               style))
+                                                       }
+                                               }
+                                       }
+                               }
+
+                               ## Create the markdown header and document
+                               header <- paste(names(header), header, sep=": ", collapse="\n")
 
                                document <- paste0("---\n", header, "\n---\n\n",
                                                   mt_output, "\n\n",
@@ -792,51 +795,51 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
             k                 = "**_k_**",
             N                 = "**_N_**",
 
-            mean_r            = "**$\\overline{r}$**",
-            var_r             = "**$\\sigma^{2}_{r}$**",
-            sd_r              = "**$SD_{r}$**",
-            se_r              = "**$SE_{\\overline{r}}$**",
+            mean_r            = "$\\mathbf{\\overline{r}}$",
+            var_r             = "$\\mathbf{\\sigma^{2}_{r}}$",
+            sd_r              = "$\\mathbf{SD_{r}}$",
+            se_r              = "$\\mathbf{SE_{\\overline{r}}}$",
 
-            mean_d            = "**$\\overline{d}$",
-            var_d             = "**$\\sigma^{2}_{d}$",
-            sd_d              = "**$SD_{d}$",
-            se_d              = "**$SE_{\\overline{d}}$",
+            mean_d            = "$\\mathbf{\\overline{d}}$",
+            var_d             = "$\\mathbf{\\sigma^{2}_{d}}$",
+            sd_d              = "$\\mathbf{SD_{d}}$",
+            se_d              = "$\\mathbf{SE_{\\overline{d}}}$",
 
-            mean_es           = paste0("**$\\overline{", symbol_es, "}$**"),
-            var_es            = paste0("**$\\sigma^{2}_{", symbol_es, "}$**"),
-            sd_es             = paste0("**$SD{", symbol_es, "}$"),
-            se_es             = paste0("**$SE_{\\overline{", symbol_es, "}}$**"),
+            mean_es           = paste0("$\\mathbf{\\overline{", symbol_es, "}}$"),
+            var_es            = paste0("$\\mathbf{\\sigma^{2}_{", symbol_es, "}}$"),
+            sd_es             = paste0("$\\mathbf{SD{", symbol_es, "}}$"),
+            se_es             = paste0("$\\mathbf{SE_{\\overline{", symbol_es, "}}}$"),
 
-            var_e             = "**$\\sigma^{2}_{e}$**",
-            var_res           = "**$\\sigma^{2}_{res}$**",
-            sd_e              = "**$SD_{e}$**",
-            sd_res            = "**$SD_{res}$**",
-            var_art           = "**$\\sigma^{2}_{art}$**",
-            var_pre           = "**$\\sigma^{2}_{pre}$**",
-            sd_art            = "**$SD_{art}$**",
-            sd_pre            = "**$SD_{pre}$**",
+            var_e             = "$\\mathbf{\\sigma^{2}_{e}}$",
+            var_res           = "$\\mathbf{\\sigma^{2}_{res}}$",
+            sd_e              = "$\\mathbf{SD_{e}}$",
+            sd_res            = "$\\mathbf{SD_{res}}$",
+            var_art           = "$\\mathbf{\\sigma^{2}_{art}}$",
+            var_pre           = "$\\mathbf{\\sigma^{2}_{pre}}$",
+            sd_art            = "$\\mathbf{SD_{art}}$",
+            sd_pre            = "$\\mathbf{SD_{pre}}$",
 
-            mean_rho          = "**$\\overline{\\mathrm{\\rho}}$**",
-            var_r_c           = "**$\\sigma^{2}_{r_{c}}$**",
+            mean_rho          = "$\\mathbf{\\overline{\\mathrm{\\rho}}}$",
+            var_r_c           = "$\\mathbf{\\sigma^{2}_{r_{c}}}$",
 
-            var_rho           = "**$\\sigma^{2}_{\\mathrm{\\rho}}$**",
-            sd_r_c            = "**$SD_{r_{c}}$**",
-            se_r_c            = "**$SE_{\\overline{\\mathrm{\\rho}}}**$",
-            sd_rho            = "**$SD_{\\mathrm{\\rho}}$**",
+            var_rho           = "$\\mathbf{\\sigma^{2}_{\\mathrm{\\rho}}}$",
+            sd_r_c            = "$\\mathbf{SD_{r_{c}}}$",
+            se_r_c            = "$\\mathbf{SE_{\\overline{\\mathrm{\\rho}}}}$",
+            sd_rho            = "$\\mathbf{SD_{\\mathrm{\\rho}}}$",
 
-            mean_delta        = "**$\\overline{\\mathrm{\\delta}}$**",
-            var_d_c           = "**$\\sigma^{2}_{d_{c}}$**",
-            sd_d_c            = "**$SD_{d_{c}}$**",
-            se_d_c            = "**$SE_{\\overline{\\mathrm{\\delta}}}$**",
-            var_delta         = "**$\\sigma^{2}_{\\mathrm{\\delta}}$**",
-            sd_delta          = "**$SD_{\\mathrm{\\delta}}$**",
+            mean_delta        = "$\\mathbf{\\overline{\\mathrm{\\delta}}}$",
+            var_d_c           = "$\\mathbf{\\sigma^{2}_{d_{c}}}$",
+            sd_d_c            = "$\\mathbf{SD_{d_{c}}}$",
+            se_d_c            = "$\\mathbf{SE_{\\overline{\\mathrm{\\delta}}}}$",
+            var_delta         = "$\\mathbf{\\sigma^{2}_{\\mathrm{\\delta}}}$",
+            sd_delta          = "$\\mathbf{SD_{\\mathrm{\\delta}}}$",
 
-            var_e_c           = "**$\\sigma^{2}_{e_{c}}$**",
-            var_art_c         = "**$\\sigma^{2}_{art_{c}}$**",
-            var_pre_c         = "**$\\sigma^{2}_{pre_{c}}$**",
-            sd_e_c            = "**$SD_{e_{c}}$**",
-            sd_art_c          = "**$SD_{art_{c}}$**",
-            sd_pre_c          = "**$SD_{pre_{c}}$**",
+            var_e_c           = "$\\mathbf{\\sigma^{2}_{e_{c}}}$",
+            var_art_c         = "$\\mathbf{\\sigma^{2}_{art_{c}}}$",
+            var_pre_c         = "$\\mathbf{\\sigma^{2}_{pre_{c}}}$",
+            sd_e_c            = "$\\mathbf{SD_{e_{c}}}$",
+            sd_art_c          = "$\\mathbf{SD_{art_{c}}}$",
+            sd_pre_c          = "$\\mathbf{SD_{pre_{c}}}$",
 
             ci_lower          = paste0("**", conf_level*100, "% conf. int.**"),
             ci_upper          = " ",
@@ -1165,3 +1168,4 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
       return(meta_tables)
 
 }
+
