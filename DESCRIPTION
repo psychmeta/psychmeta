@@ -4,7 +4,7 @@ Title: Psychometric Meta-Analysis Toolkit
 Version: 2.0.0.99
 Date: 2018-05-28
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
-                     email = "dahlk068@umn.edu"),
+                     email = "jeffrey@psychmeta.com"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
               person("Michael T.", "Brannick", role = "ctb", comment = "Testing"),
               person("Jack", "Kostal", role = "ctb", comment = "Code for reshape_mat2dat function"),
@@ -19,9 +19,9 @@ Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
 Imports: stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
-        ggplot2, metafor, nor1mix, progress, tidyr, rtf,
-        fungible, stringr , rmarkdown, RefManageR, rlang, RCurl, xml2, purrr, data.table, cli, crayon
-Suggests: knitr
+         ggplot2, metafor, nor1mix, progress, tidyr, stringi,
+         fungible, stringr , rlang, RCurl, xml2, purrr, data.table, cli, crayon
+Suggests: RefManageR, rmarkdown, knitr,
 RoxygenNote: 6.0.1
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068

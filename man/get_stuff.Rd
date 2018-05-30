@@ -2,6 +2,7 @@
 % Please edit documentation in R/get_stuff.R
 \name{get_stuff}
 \alias{get_stuff}
+\alias{get_escalc}
 \alias{get_metafor}
 \alias{get_metatab}
 \alias{get_ad}
@@ -15,16 +16,19 @@
 \alias{get_plots}
 \title{Extract results from a psychmeta meta-analysis object}
 \usage{
+get_escalc(ma_obj, moderators = FALSE, analyses = "all", match = c("all",
+  "any"), case_sensitive = TRUE, ...)
+
 get_metafor(ma_obj, moderators = FALSE, analyses = "all", match = c("all",
   "any"), case_sensitive = TRUE, ...)
 
 get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ma_methods = c("bb", "ic", "ad"),
-  correction_types = c("ts", "vgx", "vgy"), ...)
+  case_sensitive = TRUE, ma_method = c("bb", "ic", "ad"),
+  correction_type = c("ts", "vgx", "vgy"), ...)
 
 get_ad(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, as_ad_obj = FALSE, inputs_only = TRUE,
-  ma_methods = c("ad", "ic"), ad_types = c("tsa", "int"), ...)
+  ma_method = c("ad", "ic"), ad_type = c("tsa", "int"), ...)
 
 get_followup(ma_obj, follow_up = c("heterogeneity", "leave1out", "cumulative",
   "bootstrap", "metareg"), analyses = "all", match = c("all", "any"),
@@ -48,7 +52,7 @@ get_metareg(ma_obj, analyses = "all", match = c("all", "any"),
 get_matrix(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
 
-get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
+get_plots(ma_obj, plot_type = c("funnel", "forest", "leave1out",
   "cumulative"), analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
 }
@@ -74,26 +78,26 @@ get_plots(ma_obj, plot_types = c("funnel", "forest", "leave1out",
 
 \item{...}{Additional arguments.}
 
-\item{ma_methods}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
+\item{ma_method}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
 
-\item{correction_types}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
+\item{correction_type}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
 
 \item{as_ad_obj}{Logical scalar that determines whether artifact information should be returned as artifact-distribution objects (\code{TRUE}) or a summary table of artifact-distribution descriptive statistics (\code{FALSE}; default).}
 
 \item{inputs_only}{Used only if \code{as_ad_obj = TRUE}: Logical scalar that determines whether artifact information should be returned as summaries of the raw input values (\code{TRUE}; default) or artifact values that have been cross-corrected for range restriction and measurement error (\code{FALSE}).}
 
-\item{ad_types}{Used only if \code{ma_method} = "ic": Character value(s) indicating whether Taylor-series approximation artifact distributions ("tsa") and/or interactive artifact distributions ("int") should be retrieved.}
+\item{ad_type}{Used only if \code{ma_method} = "ic": Character value(s) indicating whether Taylor-series approximation artifact distributions ("tsa") and/or interactive artifact distributions ("int") should be retrieved.}
 
 \item{follow_up}{Vector of follow-up analysis names (options are: "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg").}
 
-\item{plot_types}{Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative").}
+\item{plot_type}{Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative"; multiple allowed).}
 }
 \value{
 Selected set of results.
 }
 \description{
-Functions to extract specific results from a meta-analysis tibble. 
-This family of functions harvests information from meta-analysis objects and returns it as lists or tibbles that are easily navigable. 
+Functions to extract specific results from a meta-analysis tibble.
+This family of functions harvests information from meta-analysis objects and returns it as lists or tibbles that are easily navigable.
 
 Available functions include:
 \itemize{
