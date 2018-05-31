@@ -146,7 +146,6 @@
      p_vec <- es_data$pi
      if(is.null(p_vec)) p_vec <- rep(.5, nrow(es_data))
 
-     i <- (1:length(sample_id_construct_pair))[sample_id_construct_pair == sample_id_construct_pair[1]]
      out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair, function(i) {
 
           if(!is.null(citekey)){
@@ -518,7 +517,8 @@
      for(i in names(data_x_list)) if(is.null(data_x_list[[i]])) data_x_list[[i]] <- NULL
      for(i in names(data_y_list)) if(is.null(data_y_list[[i]])) data_y_list[[i]] <- NULL
 
-     es_data <- cbind(as.data.frame(es_data_list), mod_out)
+     es_data <- as.data.frame(es_data_list)
+     if(!is.null(mod_out)) es_data <- cbind(es_data, mod_out)
      data_x <- as.data.frame(data_x_list)
      data_y <- as.data.frame(data_y_list)
 
