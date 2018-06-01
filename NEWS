@@ -1,50 +1,55 @@
+Changes in Version 2.1.0 (2018-06-01)
+=====================================
+- Updated "metabulate" function based on RMarkdown. The metabulate function can now output to Word, PDF, HTML, Markdown, ODT, and plain text and accepts arguments to include a bibliography in the same output as results tables. Output can be rendered directly into the selected format or placed into a larger RMarkdown document. The function also includes improvements to the typesetting of numeric results and column headings (e.g., ρ̅ instead of Mean<sub>ρ</sub>).
+- New "num_format" function to format numbers to a specified number of digits and allowing control of the characters used for decimal points, thousands and decimal digit group separators, leading zeros, and positive and negative signs. It's useful to avoid unpleasant surprises during publisher typesetting of tables.
+
 Changes in Version 2.0.2 (2018-05-30)
 =====================================
 Hotfix for handling NULL moderator objects in dependency resolution procedure.
 
 Changes in Version 2.0.1 (2018-05-29)
 =====================================
-Hotfix for missing object in the dependency resolution procedure when no moderators are present. 
+Hotfix for missing object in the dependency resolution procedure when no moderators are present.
 
 Changes in Version 2.0.0 (2018-05-28)
 =====================================
-- Major overhauls to the format of meta-analysis objects to improve the user experience. The outputs of meta-analysis functions are now nested tibbles rather than nested lists. This provides users with a clearer overview of the structure of the object, streamlines the manipulation of results objects (e.g., selecting/subsetting columns, filtering, and arranging), and makes the objects more flexible in terms of performing follow up analyses and performing artifact-distribution corrections (because AD corrections can now by done separately by moderator level). As the print methods for meta-analyses no longer report grand tables of results, we recommend using summary() or get_metatab() to obtain this information. 
+- Major overhauls to the format of meta-analysis objects to improve the user experience. The outputs of meta-analysis functions are now nested tibbles rather than nested lists. This provides users with a clearer overview of the structure of the object, streamlines the manipulation of results objects (e.g., selecting/subsetting columns, filtering, and arranging), and makes the objects more flexible in terms of performing follow up analyses and performing artifact-distribution corrections (because AD corrections can now by done separately by moderator level). As the print methods for meta-analyses no longer report grand tables of results, we recommend using summary() or get_metatab() to obtain this information.
 
-- Arguments for specifying methodological parameters (e.g., conf_method, conf_level, var_unbiased) in meta-analyses have been migrated to a new control_psychmeta() function - the output of this function can be passed to the “control” argument of meta-analysis functions to select the methodological parameters. This is meant to reduce the number of arguments native to meta-analysis functions and simplify the documentation of psychmeta’s core functions. All of the arguments to control_psychmeta can still be passed directly to meta-analysis functions and all function calls accepted by previous versions of psychmeta should continue to work in this version of the package. 
+- Arguments for specifying methodological parameters (e.g., conf_method, conf_level, var_unbiased) in meta-analyses have been migrated to a new control_psychmeta() function - the output of this function can be passed to the “control” argument of meta-analysis functions to select the methodological parameters. This is meant to reduce the number of arguments native to meta-analysis functions and simplify the documentation of psychmeta’s core functions. All of the arguments to control_psychmeta can still be passed directly to meta-analysis functions and all function calls accepted by previous versions of psychmeta should continue to work in this version of the package.
 
-- The dependency resolution process in ma_r() and ma_d() in which dependent effect sizes are automatically combined into composites has been enhanced. The “intercor” argument now accepts a variety of types of information. The user can now set a default scalar value to use as well as supply a named vector of values (the names can refer to construct names and/or sample_id and construct pairings) and/or a database from which to harvest intercorrelation information. This allows the compositing procedure to use sample-specific information to compute composites when that information is available. 
+- The dependency resolution process in ma_r() and ma_d() in which dependent effect sizes are automatically combined into composites has been enhanced. The “intercor” argument now accepts a variety of types of information. The user can now set a default scalar value to use as well as supply a named vector of values (the names can refer to construct names and/or sample_id and construct pairings) and/or a database from which to harvest intercorrelation information. This allows the compositing procedure to use sample-specific information to compute composites when that information is available.
 
-- “summary” methods have been added for classes exported from psychmeta. 
+- “summary” methods have been added for classes exported from psychmeta.
 
-- The overview vignette has been updated to provide instructions on how to navigate the output objects from meta-analyses. 
+- The overview vignette has been updated to provide instructions on how to navigate the output objects from meta-analyses.
 
 - The class structure of meta-analysis objects has been simplified. There is now only one class for meta-analyses ("ma_psychmeta").
 
-- Data management has been streamlined within the ma_r() and ma_d() functions to permit more efficient cleaning and imputation of artifact information.  
+- Data management has been streamlined within the ma_r() and ma_d() functions to permit more efficient cleaning and imputation of artifact information.
 
-- To complement the new structure of meta-analysis objects, the create_ad_list function now produces tibbles of artifact distributions and the function is now an alias of create_ad_tibbles. This function can now create artifact distributions for construct pairs and/or specific moderator combinations. 
+- To complement the new structure of meta-analysis objects, the create_ad_list function now produces tibbles of artifact distributions and the function is now an alias of create_ad_tibbles. This function can now create artifact distributions for construct pairs and/or specific moderator combinations.
 
-- The behavior of the supplemental_ads argument to meta-analysis functions has been expanded to allow artifact information to be supplied as individual artifact distributions, lists of artifact distributions, or tibbles of artifact distributions. 
+- The behavior of the supplemental_ads argument to meta-analysis functions has been expanded to allow artifact information to be supplied as individual artifact distributions, lists of artifact distributions, or tibbles of artifact distributions.
 
-- "print" methods have been updated for a variety of object classes. 
+- "print" methods have been updated for a variety of object classes.
 
-- Bug fixes and stability improvements have been made to follow-up analyses, plotting functions, dependency resolution, convert_ma(), and dMod(). 
+- Bug fixes and stability improvements have been made to follow-up analyses, plotting functions, dependency resolution, convert_ma(), and dMod().
 
 
 Changes in Version 1.0.3 (2018-05-08)
 =====================================
-- The performance of the "hs_override" argument has been improved in ma_r and ma_d by correcting a bug that caused the argument to not be evaluated when running an artifact-distribution meta-analysis or only a bare-bones meta-analysis.  
+- The performance of the "hs_override" argument has been improved in ma_r and ma_d by correcting a bug that caused the argument to not be evaluated when running an artifact-distribution meta-analysis or only a bare-bones meta-analysis.
 
-- The default value for the "use_all_arts" argument in ma_r and ma_d has been changed from FALSE to TRUE. This is meant to improve the ease with which the most robust artifact-distribution corrections can be applied. 
+- The default value for the "use_all_arts" argument in ma_r and ma_d has been changed from FALSE to TRUE. This is meant to improve the ease with which the most robust artifact-distribution corrections can be applied.
 
 
 Changes in Version 1.0.2 (2018-05-01)
 =====================================
-- Bug fixes have been made for defining confidence-interval method in bare-bones and artifact-distribution meta-analyses computed with the ma_r function. 
+- Bug fixes have been made for defining confidence-interval method in bare-bones and artifact-distribution meta-analyses computed with the ma_r function.
 
-- A new “seed” argument has been added to ma_r and ma_d to set the seed value when imputing artifacts for greater reproducibility. 
+- A new “seed” argument has been added to ma_r and ma_d to set the seed value when imputing artifacts for greater reproducibility.
 
-- New console messages have been introduced for when follow-up results are added to a meta-analysis object. 
+- New console messages have been introduced for when follow-up results are added to a meta-analysis object.
 
 
 Changes in Version 1.0.1 (2018-04-25)
@@ -56,18 +61,18 @@ Changes in Version 1.0.1 (2018-04-25)
 
 Changes in Version 1.0.0 (2018-04-17)
 =====================================
-- New “citekey” arguments have been added to meta-analysis function that allow users to supply citation keys for use in reference-management programs. The new generate_bib() function can harvest the citation keys from studies that are included in meta-analysis objects and create formatted reference lists for use in publications. 
+- New “citekey” arguments have been added to meta-analysis function that allow users to supply citation keys for use in reference-management programs. The new generate_bib() function can harvest the citation keys from studies that are included in meta-analysis objects and create formatted reference lists for use in publications.
 
-- Plotting functions have been added. The plot_forest() and plot_funnel() functions use ggplot2 to create forest and funnel plots, respectively. These functions take a meta-analysis object as an input and add a list of plots to the object. 
+- Plotting functions have been added. The plot_forest() and plot_funnel() functions use ggplot2 to create forest and funnel plots, respectively. These functions take a meta-analysis object as an input and add a list of plots to the object.
 
-- New functions to retrieve results from within meta-analysis objects have been added. The “get_stuff” family of functions provide easy ways to extract meta-analysis tables, follow-up analyses (e.g., cumulative meta-analyses, leave-one-out meta-analyses, bootstrap results), plots, and more. 
+- New functions to retrieve results from within meta-analysis objects have been added. The “get_stuff” family of functions provide easy ways to extract meta-analysis tables, follow-up analyses (e.g., cumulative meta-analyses, leave-one-out meta-analyses, bootstrap results), plots, and more.
 
-- Assorted bug fixes have been implemented to improve the stability of the dependency resolution process, the handling of artifact distributions, and the accommodation of continuous moderators. 
+- Assorted bug fixes have been implemented to improve the stability of the dependency resolution process, the handling of artifact distributions, and the accommodation of continuous moderators.
 
 
 Changes in Version 0.2.5 (2018-03-21)
 =====================================
-- Hot fix for consolidating dependent effect sizes. 
+- Hot fix for consolidating dependent effect sizes.
 
 
 Changes in Version 0.2.4 (2018-03-20)
@@ -76,9 +81,9 @@ Changes in Version 0.2.4 (2018-03-20)
 
 - Stability improvements for dMod functions.
 
-- Artifacts harvested from rows of a database that do not contain effects sizes in the ma_r and ma_d functions are now organized to avoid redundancy with observations from the same sample that are included in the meta-analytic computations. 
+- Artifacts harvested from rows of a database that do not contain effects sizes in the ma_r and ma_d functions are now organized to avoid redundancy with observations from the same sample that are included in the meta-analytic computations.
 
-- Bug fixes to metabulate(). 
+- Bug fixes to metabulate().
 
 
 Changes in Version 0.2.3 (2018-02-09)
@@ -92,7 +97,7 @@ Changes in Version 0.2.3 (2018-02-09)
 
 Changes in Version 0.2.2 (2018-01-24)
 =====================================
-- A new function (called matreg, with aliases of matrixreg, lm_mat, and lm_matrix) has been added that computes regression models from covariance matrices and vectors of means and generates output that resembles that of the "lm" function. Output from matreg can be used with the summary(), predict(), and confint() functions. 
+- A new function (called matreg, with aliases of matrixreg, lm_mat, and lm_matrix) has been added that computes regression models from covariance matrices and vectors of means and generates output that resembles that of the "lm" function. Output from matreg can be used with the summary(), predict(), and confint() functions.
 
 - The ma_r and mad_d functions have been modified to allow for more flexibility in computing multiple meta-analyses in a single function call, especially when those meta-analyses use artifact-distribution corrections. Several new arguments have been added to allow users to name the types artifact corrections they would like to apply to each construct - see function documentation for argument details.
 
@@ -105,21 +110,21 @@ Changes in Version 0.2.1 (2018-01-07)
 =====================================
 - Hotfixes for bugs in “simulate_d_sample” function affecting composite variables.
 - A “k_items_vec” argument is now included in the “simulate_psych” function.
-- The “simulate_d_database” function has been improved for faster computations. 
+- The “simulate_d_database” function has been improved for faster computations.
 
 
 Changes in Version 0.2.0 (2018-01-05)
 =====================================
 - Bug fixes for identifying independent artifacts in artifact-distribution meta-analyses using ma_r and ma_d.
-- The simulation functions (simulate_r_sample, simulate_r_database, simulate_d_sample, simulate_d_database) can now simulate alpha reliabilities for variables when the number of items in a scale is indicated with the “k_items_vec” or “k_items_params” arguments. 
-- A new function called “metabulate" has been added that writes meta-analytic tables as rich text files with near publication-quality formatting. 
+- The simulation functions (simulate_r_sample, simulate_r_database, simulate_d_sample, simulate_d_database) can now simulate alpha reliabilities for variables when the number of items in a scale is indicated with the “k_items_vec” or “k_items_params” arguments.
+- A new function called “metabulate" has been added that writes meta-analytic tables as rich text files with near publication-quality formatting.
 
 
 Changes in Version 0.1.3 (2017-12-13)
 =====================================
 - Bug fixes and stability improvements for moderator analyses, the creation of artifact distributions, and computation of follow-up analyses.
 
-- Added reliability types arguments (e.g., “rxx_type”, “ryy_type”) to functions requiring reliability estimates to be corrected for range restriction. String vectors of reliability labels (e.g., “alpha”, “retest”, “parallel”; see documentation for the ma_r function for a complete list of supported labels) can now be supplied to many functions. When direct range restriction occurs, different corrections for range restriction are applied to internal-consistency reliability estimates and reliability estimates computed by correlating data from different testing occasions. 
+- Added reliability types arguments (e.g., “rxx_type”, “ryy_type”) to functions requiring reliability estimates to be corrected for range restriction. String vectors of reliability labels (e.g., “alpha”, “retest”, “parallel”; see documentation for the ma_r function for a complete list of supported labels) can now be supplied to many functions. When direct range restriction occurs, different corrections for range restriction are applied to internal-consistency reliability estimates and reliability estimates computed by correlating data from different testing occasions.
 
 - The ma_r and ma_d functions now allow users to supply lists of external artifact information using the “supplemental_ads” argument (the ma_r_ic and ma_d_ic functions also allow this with the “supplemental_ads_x” and “supplemental_ads_y” arguments). These functions can also now harvest artifact information from studies in a database with invalid or missing effect sizes by setting the “use_all_arts” argument to TRUE.
 
@@ -148,7 +153,7 @@ Changes in Version 0.1.1 (2017-09-21)
 
 - A new "ma_generic" function has been added that allow users to do a psychmeta-style meta-analysis for any effect size for which the user has error-variance estimates. This function is supported by psychmeta's sensitivity() and heterogeneity() functions.
 
-- Taylor series methods for estimating the variance of converted artifact values (e.g., a rxxi distribution converted to a rxxa distribution) have been expanded to account for the correlation between artifact distributions when such information is available. Correlations among  artifacts' sampling distributions can also be passed to the var_error_r_bvirr() function when it is called outside of a meta-analysis routine. 
+- Taylor series methods for estimating the variance of converted artifact values (e.g., a rxxi distribution converted to a rxxa distribution) have been expanded to account for the correlation between artifact distributions when such information is available. Correlations among  artifacts' sampling distributions can also be passed to the var_error_r_bvirr() function when it is called outside of a meta-analysis routine.
 
 - The implementation of corrections of bivariate range restriction in individual-correction meta-analyses have been updated. Corrections for bivariate direct range restriction now use conventional compound attenuation factors, while the attenuation factors for bivariate indirect range restriction are now computed using mean effect sizes and artifacts to estimate sampling variances.
 
@@ -159,4 +164,4 @@ Changes in Version 0.1.0 (2017-08-15)
 =====================================
 - psychmeta has officially launched for public beta!
 
-- Please see the "psychmeta-package" entry in the psychmeta manual for an overview of the package and its applications. 
+- Please see the "psychmeta-package" entry in the psychmeta manual for an overview of the package and its applications.
