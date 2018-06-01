@@ -204,7 +204,8 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' ## Output to ODT (LibreOffice):
 #' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt")
 #'
-#' ## To produce Markdown tables to include inline in an RMarkdown report, set file to "console" and output_format to anything but "text":
+#' ## To produce Markdown tables to include inline in an RMarkdown report,
+#' ## set file to "console" and output_format to anything but "text":
 #' metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
 #'
 #' ## Create output table for meta-analysis of d values:

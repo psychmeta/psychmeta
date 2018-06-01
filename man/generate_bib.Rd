@@ -27,7 +27,7 @@ generate_bib(ma_obj = NULL, bib = NULL, additional_citekeys = NULL,
 
 \item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.}
 
-\item{file}{The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} or \code{"print"} to output directly to the R console.}
+\item{file}{The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} to output directly to the R console.}
 
 \item{title.bib}{The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
 
@@ -36,7 +36,7 @@ generate_bib(ma_obj = NULL, bib = NULL, additional_citekeys = NULL,
 \item{header}{A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.}
 }
 \value{
-A formatted reference list.
+A list containing the RefManageR BibEntry object. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
 }
 \description{
 This function generates a list of studies contributing to a meta-analysis

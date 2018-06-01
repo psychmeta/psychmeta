@@ -21,7 +21,7 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
 
-\item{file}{The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} or \code{"print"} to output directly to the R console.}
+\item{file}{The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).}
 
 \item{show_msd}{Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})}
 
@@ -95,6 +95,10 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 \item{...}{Additional arguments (not used).}
 }
 \value{
+If file is "rename", a list of meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")}. Otherwise, a list containing the meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")} and the RefManageR BibEntry object.
+
+In addition, formatted tables and bibliographies are exported in the requested \code{output_format}. If file is "console" and output_format is not "text", a character vector containing RMarkdown meta-analysis results tables with captions, footnotes, and bibliography is printed (so \code{metabulate()} can be entered into a larger RMarkdown document to produce the requested output). If file is "console" and output_format is "text", a tibble with formatted column names and the bibliography (if any) are printed.
+
 Formatted tables of meta-analytic output.
 }
 \description{
@@ -102,12 +106,21 @@ Write a summary table of meta-analytic results
 }
 \examples{
 \dontrun{
-## Create output table for meta-analysis of correlations:
+## Create a results table for meta-analysis of correlations and output to Word:
 ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                  construct_x = x_name, construct_y = y_name,
                  moderators = moderator, data = data_r_meas_multi)
-ma_r_obj <- ma_r_ad(ma_obj = ma_r_obj, correct_rr_x = FALSE, correct_rr_y = FALSE)
 metabulate(ma_obj = ma_r_obj, file = "meta tables correlations")
+
+## Output to PDF:
+metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "pdf")
+
+## Output to ODT (LibreOffice):
+metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt")
+
+## To produce Markdown tables to include inline in an RMarkdown report,
+## set file to "console" and output_format to anything but "text":
+metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
 
 ## Create output table for meta-analysis of d values:
 ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
