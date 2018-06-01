@@ -139,7 +139,7 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' Write a summary table of meta-analytic results
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
-#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} or \code{"print"} to output directly to the R console.
+#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).
 #' @param show_msd Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})
 #' @param show_conf Logical. Should confidence intervals be shown (default: \code{TRUE})?
 #' @param show_cred Logical. Should credibility intervals be shown (default: \code{TRUE})?
@@ -178,6 +178,10 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
 #' @param save_build_files Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?
 #' @param ... Additional arguments (not used).
+#'
+#' @return If file is "rename", a list of meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")}. Otherwise, a list containing the meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")} and the RefManageR BibEntry object.
+#'
+#' In addition, formatted tables and bibliographies are exported in the requested \code{output_format}. If file is "console" and output_format is not "text", a character vector containing RMarkdown meta-analysis results tables with captions, footnotes, and bibliography is printed (so \code{metabulate()} can be entered into a larger RMarkdown document to produce the requested output). If file is "console" and output_format is "text", a tibble with formatted column names and the bibliography (if any) are printed.
 #'
 #' @return Formatted tables of meta-analytic output.
 #' @export
@@ -285,7 +289,9 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 
         # Set the output file name
         if(is.null(file)) file <- "psychmeta_output"
-        if(file != "console") file <- .filename_check(file, output_format)
+        if(file %in% c("console", "rename")) file <- .filename_check(file, output_format)
+
+        if(file == "rename") return(meta_tables)
 
         # Assign values to citekeys and citations, convert bib to R bibliography
         if(!is.null(bib)) bib <- .generate_bib(ma_obj, bib, additional_citekeys)
@@ -313,12 +319,13 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
-#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} or \code{"print"} to output directly to the R console.
+#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} to output directly to the R console.
 #' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
 #' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{TRUE})?
 #' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
 #'
-#' @return A formatted reference list.
+#' @return A list containing the RefManageR BibEntry object. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
+#'
 #' @export
 #'
 #' @importFrom rmarkdown render
@@ -464,17 +471,17 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 switch(output_format,
 
                        text = {if(!is.null(meta_tables)) {
-                               for(i in names(meta_tables)) {
-                                       if(!is.null(caption)) {
-                                               if(length(caption) > 1) {
-                                                       cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])), sep="")
-                                               } else cat(caption, "\n", rep("=", nchar(caption)), sep="")
-                                       }
-                                       cat("\n")
-                                       print(meta_tables[[i]])
-                                       cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
-                               }
-                       }
+                                 for(i in names(meta_tables)) {
+                                         if(!is.null(caption)) {
+                                                 if(length(caption) > 1) {
+                                                         cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])), sep="")
+                                                 } else cat(caption, "\n", rep("=", nchar(caption)), sep="")
+                                         }
+                                         cat("\n")
+                                         print(meta_tables[[i]])
+                                         cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
+                                 }
+                              }
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
@@ -485,6 +492,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        # TODO: Replace this with a call to citation.js to use CSL styles
                                        print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
                                }
+
+                         out <- vector(mode = list)
+
+                         invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
+
                        },
 
                        # else =
@@ -533,6 +545,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        if(!is.null(style)) sprintf("csl: %s\n", style )
                                        sprintf('nocite: |\n  %s\n---\n', citations)
                                }
+
+                         invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
                        }
                 )
 
@@ -652,6 +666,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                               output_dir  = getwd(),
                                               encoding = "UTF-8")
                                }
+                               invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
                        }
                 )
         }
