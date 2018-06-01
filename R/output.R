@@ -188,12 +188,20 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #'
 #' @examples
 #' \dontrun{
-#' ## Create output table for meta-analysis of correlations:
+#' ## Create a results table for meta-analysis of correlations and output to Word:
 #' ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                  construct_x = x_name, construct_y = y_name,
 #'                  moderators = moderator, data = data_r_meas_multi)
-#' ma_r_obj <- ma_r_ad(ma_obj = ma_r_obj, correct_rr_x = FALSE, correct_rr_y = FALSE)
 #' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations")
+#'
+#' ## Output to PDF:
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "pdf")
+#'
+#' ## Output to ODT (LibreOffice):
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt")
+#'
+#' ## To produce Markdown tables to include inline in an RMarkdown report, set file to "console" and output_format to anything but "text":
+#' metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
 #'
 #' ## Create output table for meta-analysis of d values:
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
