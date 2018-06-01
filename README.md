@@ -1,7 +1,7 @@
 <img width="200" src="/icon/psychmeta_icon_twitter.png?raw=TRUE" alt="psychmeta logo" align="left">
 
-psychmeta: Psychometric Meta-Analysis Toolkit
-======================================
+# psychmeta
+## Psychometric Meta-Analysis Toolkit
 
 [![CRAN Version](http://www.r-pkg.org/badges/version/psychmeta)](https://cran.r-project.org/package=psychmeta "CRAN version")
 [![Build Status](https://travis-ci.org/psychmeta/psychmeta.svg?branch=master)](https://travis-ci.org/psychmeta/psychmeta "Build status")
