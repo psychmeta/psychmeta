@@ -6,8 +6,8 @@
 \usage{
 generate_bib(ma_obj = NULL, bib = NULL, additional_citekeys = NULL,
   analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
-  style = "apa", output_format = c("word", "html", "pdf", "text", "rmd",
-  "biblatex", "citekeys"), file = NULL, title.bib = NULL,
+  style = "apa", output_format = c("word", "html", "pdf", "text", "odt",
+  "rmd", "biblatex", "citekeys"), file = NULL, title.bib = NULL,
   save_build_files = TRUE, header = list())
 }
 \arguments{
@@ -25,7 +25,7 @@ generate_bib(ma_obj = NULL, bib = NULL, additional_citekeys = NULL,
 
 \item{style}{What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
 
-\item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.}
+\item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.}
 
 \item{file}{The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} or \code{"print"} to output directly to the R console.}
 

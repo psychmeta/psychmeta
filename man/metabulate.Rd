@@ -7,14 +7,14 @@
 metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
   show_cred = TRUE, show_se = FALSE, show_var = FALSE, analyses = "all",
   match = c("all", "any"), case_sensitive = TRUE,
-  output_format = c("word", "html", "pdf", "text", "rmd"), ma_method = "ad",
-  correction_type = "ts", bib = NULL, title.bib = NULL,
-  additional_citekeys = NULL, style = "apa", header = NULL, digits = 2L,
-  decimal.mark = getOption("OutDec"), leading0 = "figure",
-  neg.sign = "minus", pos.sign = "figure", drop0integer = TRUE,
-  big.mark = "thinspace", big.interval = 3L, small.mark = "thinspace",
-  small.interval = 3L, conf_format = "parentheses",
-  cred_format = "brackets", symbol_es = "ES",
+  output_format = c("word", "html", "pdf", "text", "rmd", "odt"),
+  ma_method = "ad", correction_type = "ts", bib = NULL,
+  title.bib = NULL, additional_citekeys = NULL, style = "apa",
+  header = NULL, digits = 2L, decimal.mark = getOption("OutDec"),
+  leading0 = "figure", neg.sign = "minus", pos.sign = "figure",
+  drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
+  small.mark = "thinspace", small.interval = 3L,
+  conf_format = "parentheses", cred_format = "brackets", symbol_es = "ES",
   caption = "Results of meta-analyses", save_build_files = TRUE,
   verbose = FALSE, ...)
 }
@@ -39,7 +39,7 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 
 \item{case_sensitive}{Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).}
 
-\item{output_format}{The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), Rmarkdown, and plain text.}
+\item{output_format}{The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, Rmarkdown, and plain text.}
 
 \item{ma_method}{Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.}
 

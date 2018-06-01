@@ -148,7 +148,7 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), Rmarkdown, and plain text.
+#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, Rmarkdown, and plain text.
 #' @param ma_method Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.
 #' @param correction_type Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses. If not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
@@ -211,7 +211,7 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
                        show_se = FALSE, show_var = FALSE, analyses="all",
                        match=c("all", "any"), case_sensitive = TRUE,
-                       output_format=c("word", "html", "pdf", "text", "rmd"),
+                       output_format=c("word", "html", "pdf", "text", "rmd", "odt"),
                        ma_method = "ad", correction_type = "ts",
                        bib = NULL, title.bib = NULL, additional_citekeys = NULL, style = "apa",
                        header = NULL, digits = 2L, decimal.mark = getOption("OutDec"),
@@ -255,8 +255,7 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
                 )
         }
         ma_type <- c(ma_method[ma_method == "bb"],
-                     paste(rep(ma_method[ma_method != "bb"], each = length(correction_type)),
-                           correction_type, sep = "_"))
+                     if(length(ma_method[ma_method != "bb"]) > 0) paste(rep(ma_method[ma_method != "bb"], each = length(correction_type)), correction_type, sep = "_"))
 
         meta_tables <- ma_obj$meta_tables
         conf_level <- attributes(ma_obj$ma_obj)$inputs$conf_level
@@ -264,6 +263,7 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 
         # Generate formatted tables (includes generation of captions)
         meta_tables <- .metabulate(meta_tables = meta_tables, ma_type = ma_type,
+                                   output_format = output_format,
                                    show_msd = show_msd, show_conf = show_conf,
                                    show_cred = show_cred, show_se = show_se,
                                    show_var = show_var, es_type = es_type, symbol_es = symbol_es,
@@ -304,7 +304,7 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
-#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
+#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
 #' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} or \code{"print"} to output directly to the R console.
 #' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
 #' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{TRUE})?
@@ -333,7 +333,7 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #' }
 generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
-                         style="apa", output_format=c("word", "html", "pdf", "text", "rmd", "biblatex", "citekeys"),
+                         style="apa", output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
                          file=NULL, title.bib = NULL, save_build_files = TRUE, header=list()){
 
 
@@ -425,6 +425,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 output_format == "biblatex" ~ if(!grepl("\\.bib$",  file, ignore.case = TRUE)) paste0(file, ".bib")  else file,
                 output_format == "text"     ~ if(!grepl("\\.txt$",  file, ignore.case = TRUE)) paste0(file, ".txt")  else file,
                 output_format == "citekeys" ~ if(!grepl("\\.txt$",  file, ignore.case = TRUE)) paste0(file, ".txt")  else file,
+                output_format == "odt"      ~ if(!grepl("\\.odt$",  file, ignore.case = TRUE)) paste0(file, ".odt")  else file,
                 TRUE ~ file)
 }
 
@@ -458,8 +459,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                for(i in names(meta_tables)) {
                                        if(!is.null(caption)) {
                                                if(length(caption) > 1) {
-                                                       cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])))
-                                               } else cat(caption, "\n", rep("=", nchar(caption)))
+                                                       cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])), sep="")
+                                               } else cat(caption, "\n", rep("=", nchar(caption)), sep="")
                                        }
                                        cat("\n")
                                        print(meta_tables[[i]])
@@ -471,7 +472,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
                                        cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib, "\n",
-                                           rep("=", nchar(title.bib)), "\n\n"
+                                           rep("=", nchar(title.bib)), "\n\n", sep = ""
                                        )
                                        # TODO: Replace this with a call to citation.js to use CSL styles
                                        print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
@@ -518,66 +519,55 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
         } else {
 
+                # Prepare tables for output
+                mt_output <- character(0)
+                for(i in names(meta_tables)) {
+                     mt_output <-
+                       paste0(mt_output, "\n",
+                              paste0(knitr::kable(meta_tables[[i]],
+                                                  caption = {if(length(caption) > 1) paste(caption[[i]], paste0(rep("=", nchar(caption[[i]])), collapse=""), sep = "\n") else paste(caption, paste0(rep("=", nchar(caption)), collapse=""), sep = "\n")}),
+                                     collapse="\n"),
+                              "\n",
+                              paste(attr(meta_tables, "footnotes")[[i]]), sep = "\n")
+                }
+
+                # Fill in critical header slots
+                if(is.null(header$title)) {
+                     if(is.null(meta_tables)) {
+                          if(is.null(title.bib)) {
+                               header$title <- "Sources Contributing to Meta-Analyses"
+                          } else {
+                               header$title <- title.bib
+                               title.bib <- NULL
+                          }
+                     } else {
+                          header$title <- "Results of Meta-Analyses"
+                          if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
+                     }
+                }
+
                 switch(output_format,
 
-                       text = {sink(file = file)
-                               if(!is.null(meta_tables)) {
-                                       for(i in names(meta_tables)) {
-                                               if(!is.null(caption)) {
-                                                       if(length(caption) > 1) {
-                                                               cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])))
-                                                       } else cat(caption, "\n", rep("=", nchar(caption)))
-                                               }
-                                               cat("\n")
-                                               print(meta_tables[[i]])
-                                               cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
-                                       }
-                               }
+                       text = {if(!is.null(bib)) {
+                                     sink("NUL")
+                                     # TODO: Replace this with a call to citation.js to use CSL styles
+                                     bibliography <- print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
+                                     sink()
+                                } else bibliography <- NULL
 
-                               if(!is.null(bib)) {
-                                       if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
-                                       cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
-                                           title.bib, "\n",
-                                           rep("=", nchar(title.bib)), "\n\n"
-                                       )
-                                       # TODO: Replace this with a call to citation.js to use CSL styles
-                                       print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
-                               }
-                               sink()
+                               document <- paste0(header$title, "\n\n",
+                                                  paste0(mt_output, "\n\n")[!is.null(meta_tables)],
+                                                  paste0(title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
+                                                  bibliography[!is.null(bib)]
+                               )
+
+                               stringi::stri_write_lines(document, file)
                        },
 
                        # else =
-                       { # Generate table output
-                               mt_output <- character(0)
-                               for(i in names(meta_tables)) {
-                                       if(is.character(meta_tables[[i]])) enc2native(meta_tables[[i]])
-                                       mt_output <-
-                                               paste0(mt_output, "\n",
-                                                      paste0(knitr::kable(meta_tables[[i]], caption = {if(length(caption) > 1) caption[[i]] else caption}), collapse="\n"),
-                                                      "\n",
-                                                      paste(attr(meta_tables, "footnotes")[[i]]), sep = "\n")
-                               }
-
+                       {
                                # Fill in critical header slots and write .bib file if necessary
-                               if(is.null(header$title)) {
-                                       if(is.null(meta_tables)) {
-                                               if(is.null(title.bib)) {
-                                                       header$title <- "Sources Contributing to Meta-Analyses"
-                                               } else {
-                                                       header$title <- title.bib
-                                                       title.bib <- NULL
-                                               }
-                                       } else {
-                                               header$title <- "Results of Meta-Analyses"
-                                               if(is.null(title.bib)) {
-                                                       title.bib <- "\n\n# Sources Contributing to Meta-Analyses\n\n"
-                                               } else {
-                                                       title.bib <- sprintf("\n\n# %s\n\n", title.bib)
-                                               }
-                                       }
-                               }
-
-                               header$output <- paste0("\n  ", output_format, "_document", if(output_format == "pdf" & any(!stringi::stri_enc_isascii(mt_output))) "\n    latex_engine: xelatex")
+                               header$output <- paste0("\n  ", output_format, "_document", if(output_format == "pdf" & any(!stringi::stri_enc_isascii(mt_output))) ":\n    latex_engine: lualatex")
 
                                if(!is.null(bib)) {
                                        # Write the bibliography file
@@ -613,8 +603,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                header <- paste(names(header), header, sep=": ", collapse="\n")
 
                                document <- paste0("---\n", header, "\n---\n\n",
-                                                  mt_output, "\n\n",
-                                                  paste0("# ", title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
+                                                  paste0(mt_output, "\n\n")[!is.null(meta_tables)],
+                                                  paste0("## ", title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
                                                   sprintf('---\nnocite: |\n  %s', citations)[!is.null(bib)]
                                )
                                document <- gsub("<U\\+(.{1,4})>", "\\\\u{\\1}", x = document)
@@ -642,7 +632,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 #' Internal function for .metabulating results tables
 #'
 #' @keywords internal
-.metabulate <- function(meta_tables, ma_type = "ad_ts", show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
+.metabulate <- function(meta_tables, ma_type = "ad_ts", output_format = "word", show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
                         show_se = FALSE, show_var = FALSE, es_type = NULL, symbol_es = "ES",
                         digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "figure", neg.sign = "\u2212",
                         pos.sign = "figure", drop0integer = TRUE, big.mark = "\u202F",
@@ -672,8 +662,12 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 meta_tables <- list(bb = meta_tables$barebones)
         }
 
-        length_intial <- max(sapply(meta_tables, function(x) length(colnames(x)[1:which(colnames(x) == "analysis_id")][colnames(x)[1:which(colnames(x) == "analysis_id")] %in% c("analysis_id", "pair_id", "analysis_type")])))
-        length_moderators <- max(sapply(meta_tables, function(x) if(1 + which(colnames(x) == "analysis_type") != which(colnames(x) == "k")) length(colnames(x)[(1 + which(colnames(x) == "analysis_type")):(which(colnames(x) == "k") -1)]) else 0))
+        length_initial <- max(sapply(meta_tables, function(x) {
+             initial_names <- colnames(x)[1:which(colnames(x) == "analysis_type")]
+             initial_names <- initial_names[!initial_names %in% c("analysis_id", "pair_id", "analysis_type")]
+             length(initial_names)
+        }))
+        length_moderators <- max(sapply(meta_tables, function(x) (which(colnames(x) == "k") -1) - which(colnames(x) == "analysis_type") ))
 
         # Select, rearrange, and format columns of meta_tables
         .arrange_format_columns <- function(ma_table) {
@@ -787,385 +781,1117 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         }
 
         # Rename columns
-        .rename_columns <- function(ma_table, symbol_es, conf_level, cred_level) {
-          name_map <- c(
-            group_contrast    = "**Group Contrast**",
-            construct_x       = "**Construct X**",
-            construct_y       = "**Construct Y**",
-            k                 = "**_k_**",
-            N                 = "**_N_**",
+        .rename_columns <- function(ma_table, formatted_strings, output_format, length_initial, length_moderators) {
+                formatted_names <- names(formatted_strings$col_names)
+                names(formatted_names) <- formatted_strings$col_names
 
-            mean_r            = "$\\mathbf{\\overline{r}}$",
-            var_r             = "$\\mathbf{\\sigma^{2}_{r}}$",
-            sd_r              = "$\\mathbf{SD_{r}}$",
-            se_r              = "$\\mathbf{SE_{\\overline{r}}}$",
+                ma_table <- rename(ma_table, !!formatted_names[formatted_names %in% colnames(ma_table)])
 
-            mean_d            = "$\\mathbf{\\overline{d}}$",
-            var_d             = "$\\mathbf{\\sigma^{2}_{d}}$",
-            sd_d              = "$\\mathbf{SD_{d}}$",
-            se_d              = "$\\mathbf{SE_{\\overline{d}}}$",
+                colnames(ma_table)[grep("spacer\\d+", colnames(ma_table))] <- " "
+                if(output_format != "text" & length_moderators > 0) {
+                        colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)] <-
+                                paste0("**", colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)], "**")
+                }
 
-            mean_es           = paste0("$\\mathbf{\\overline{", symbol_es, "}}$"),
-            var_es            = paste0("$\\mathbf{\\sigma^{2}_{", symbol_es, "}}$"),
-            sd_es             = paste0("$\\mathbf{SD{", symbol_es, "}}$"),
-            se_es             = paste0("$\\mathbf{SE_{\\overline{", symbol_es, "}}}$"),
-
-            var_e             = "$\\mathbf{\\sigma^{2}_{e}}$",
-            var_res           = "$\\mathbf{\\sigma^{2}_{res}}$",
-            sd_e              = "$\\mathbf{SD_{e}}$",
-            sd_res            = "$\\mathbf{SD_{res}}$",
-            var_art           = "$\\mathbf{\\sigma^{2}_{art}}$",
-            var_pre           = "$\\mathbf{\\sigma^{2}_{pre}}$",
-            sd_art            = "$\\mathbf{SD_{art}}$",
-            sd_pre            = "$\\mathbf{SD_{pre}}$",
-
-            mean_rho          = "$\\mathbf{\\overline{\\mathrm{\\rho}}}$",
-            var_r_c           = "$\\mathbf{\\sigma^{2}_{r_{c}}}$",
-
-            var_rho           = "$\\mathbf{\\sigma^{2}_{\\mathrm{\\rho}}}$",
-            sd_r_c            = "$\\mathbf{SD_{r_{c}}}$",
-            se_r_c            = "$\\mathbf{SE_{\\overline{\\mathrm{\\rho}}}}$",
-            sd_rho            = "$\\mathbf{SD_{\\mathrm{\\rho}}}$",
-
-            mean_delta        = "$\\mathbf{\\overline{\\mathrm{\\delta}}}$",
-            var_d_c           = "$\\mathbf{\\sigma^{2}_{d_{c}}}$",
-            sd_d_c            = "$\\mathbf{SD_{d_{c}}}$",
-            se_d_c            = "$\\mathbf{SE_{\\overline{\\mathrm{\\delta}}}}$",
-            var_delta         = "$\\mathbf{\\sigma^{2}_{\\mathrm{\\delta}}}$",
-            sd_delta          = "$\\mathbf{SD_{\\mathrm{\\delta}}}$",
-
-            var_e_c           = "$\\mathbf{\\sigma^{2}_{e_{c}}}$",
-            var_art_c         = "$\\mathbf{\\sigma^{2}_{art_{c}}}$",
-            var_pre_c         = "$\\mathbf{\\sigma^{2}_{pre_{c}}}$",
-            sd_e_c            = "$\\mathbf{SD_{e_{c}}}$",
-            sd_art_c          = "$\\mathbf{SD_{art_{c}}}$",
-            sd_pre_c          = "$\\mathbf{SD_{pre_{c}}}$",
-
-            ci_lower          = paste0("**", conf_level*100, "% conf. int.**"),
-            ci_upper          = " ",
-            cv_lower          = paste0("**", cred_level*100, "% cred. int.**"),
-            cv_upper          = " ",
-
-            conf_int          = paste0("**", conf_level*100, "% conf. int.**"),
-            cred_int          = paste0("**", cred_level*100, "% cred. int.**")
-          )
-
-          formatted_names <- names(name_map)
-          names(formatted_names) <- name_map
-
-          ma_table <- rename(ma_table, !!formatted_names[formatted_names %in% colnames(ma_table)])
-
-          colnames(ma_table)[grep("spacer\\d+", colnames(ma_table))] <- " "
-
-          ma_table
-
+                ma_table
         }
 
-        .format_meta_table <- function(ma_table, symbol_es, conf_level, cred_level) {
+        .format_meta_table <- function(ma_table, formatted_strings) {
           ma_table <- ma_table %>%
             .arrange_format_columns() %>%
-            .rename_columns(symbol_es, conf_level, cred_level)
+            .rename_columns(formatted_strings, output_format, length_initial, length_moderators)
           ma_table
         }
 
-        meta_tables <- lapply(meta_tables, .format_meta_table, symbol_es = symbol_es, conf_level = conf_level, cred_level = cred_level)
+        ### TODO: Add notes about actual corrections applied
+        formatted_strings <- .formatted_strings(output_format = output_format, es_type = es_type, symbol_es = symbol_es,
+                                                conf_level = conf_level, cred_level = cred_level, corrections = NULL,
+                                                show_msd = show_msd, show_se = show_se, show_var = show_var,
+                                                verbose = verbose, show_conf = show_conf, show_cred = show_cred)
+
+        meta_tables <- lapply(meta_tables, .format_meta_table, formatted_strings = formatted_strings)
 
         # Table footnotes
-        footnote_list <-
-          ### TODO: Add notes about actual corrections applied
-          if(es_type == "r") {
-            c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{r}$\u00a0=\u00a0 mean observed correlation; "[show_msd],
-                                 "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{r}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{r}$."[show_cred]),
-
-                 ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
-                                 "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\rho}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\rho}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\rho}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\rho}}$; "[show_cred],
-
-                                 "correlations corrected individually."),
-
-                 ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
-                                 "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\rho}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\rho}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\rho}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\rho}}$; "[show_cred],
-
-                                 "correlations corrected individually."),
-
-                 ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
-                                 "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\rho}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\rho}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\rho}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\rho}}$; "[show_cred],
-
-                                 "correlations corrected individually."),
-
-                 ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
-                                 "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\rho}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\rho}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\rho}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\rho}}$; "[show_cred],
-
-                                 "correlations corrected using artifact distributions."),
-
-                 ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
-                                 "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\rho}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\rho}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\rho}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\rho}}$; "[show_cred],
-
-                                 "correlations corrected using artifact distributions."),
-
-                 ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
-                                 "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
-                                 "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\rho}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\rho}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\rho}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\rho}}$; "[show_cred],
-
-                                 "correlations corrected using artifact distributions.")
-            )
-
-          } else if(es_type == "d") {
-            ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
-            c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{d}$\u00a0=\u00a0 mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
-                                 "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{d}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{d}$."[show_cred]),
-
-                 ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
-                                 "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\delta}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\delta}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\delta}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\delta}}$; "[show_cred],
-
-                                 "effect sizes corrected individually."),
-
-                 ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
-                                 "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between observed groups; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\delta}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\delta}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\delta}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\delta}}$; "[show_cred],
-
-                                 "effect sizes corrected individually."),
-
-                 ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
-                                 "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\delta}}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\delta}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\delta}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\delta}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\delta}}$; "[show_cred],
-
-                                 "effect sizes corrected individually."),
-
-                 ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
-                                 "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\delta}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\delta}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\delta}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\delta}}$; "[show_cred],
-
-                                 "effect sizes corrected using artifact distributions."),
-
-                 ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
-                                 "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between observed groups; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\delta}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\delta}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\delta}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\delta}}$; "[show_cred],
-
-                                 "effect sizes corrected using artifact distributions"),
-
-                 ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                 "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
-                                 "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
-                                 "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
-
-                                 "$\\overline{\\mathrm{\\delta}}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
-                                 "$SE_{\\overline{\\mathrm{\\delta}}}$\u00a0=\u00a0standard error of $\\overline{\\mathrm{\\delta}}$; "[show_se],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
-                                 "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
-
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
-                                 "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
-
-                                 "conf. int.\u00a0=\u00a0confidence interval around $\\overline{\\mathrm{\\delta}}$; "[show_conf],
-                                 "cred. int.\u00a0=\u00a0credibility interval around $\\overline{\\mathrm{\\delta}}$; "[show_cred],
-
-                                 "effect sizes corrected using artifact distributions")
-            )
-
-          } else {
-            c(bb = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                          "$\\overline{", symbol_es, "}$\u00a0=\u00a0 mean observed effect size ($", symbol_es, "$); "[show_msd],
-                          "$SE_{\\overline{", symbol_es, "}}$\u00a0=\u00a0standard error of $\\overline{", symbol_es, "}$; "[show_se],
-                          "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & !verbose],
-                          "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{e}$\u00a0=\u00a0predicted $SD_{", symbol_es, "}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & verbose],
-                          "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$ ;"[show_var & !verbose],
-                          "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $", symbol_es, "$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$; "[show_var & verbose],
-                          "conf. int.\u00a0=\u00a0confidence interval around $\\overline{", symbol_es, "}$; "[show_conf],
-                          "cred. int.\u00a0=\u00a0credibility interval around $\\overline{", symbol_es, "}$."[show_cred])
-            )
-          }
-
-        attr(meta_tables, "footnotes") <- footnote_list[ma_type]
+        attr(meta_tables, "footnotes") <- formatted_strings$footnote[ma_type]
 
       return(meta_tables)
 
 }
 
+
+#' Internal list of strings with formatted variable names for output
+#'
+#' @keywords Internal
+#'
+.formatted_strings <- function(output_format, es_type, symbol_es = "ES", conf_level = .95, cred_level = .80, corrections = NULL,
+                               show_msd = TRUE, show_se = FALSE, show_var = FALSE, verbose = FALSE, show_conf = TRUE, show_cred = TRUE) {
+
+        col_names <- if(output_format == "text") {
+                if(.support_unicode()) {
+                        c(
+                                group_contrast    = "Group Contrast",
+                                construct_x       = "Construct X",
+                                construct_y       = "Construct Y",
+                                k                 = "k",
+                                N                 = "N",
+
+                                mean_r            = "r\u0305",
+                                var_r             = "\u03C3\u00B2_r",
+                                sd_r              = "SD_r",
+                                se_r              = "SE_r\u0305",
+
+                                mean_d            = "d\u0305",
+                                var_d             = "\u03C3\u00B2_d",
+                                sd_d              = "SD_d",
+                                se_d              = "SE_r\u0305",
+
+                                mean_es           = paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""),
+                                var_es            = paste0("\u03C3\u00B2_", symbol_es),
+                                sd_es             = paste0("$\\mathbf{SD{", symbol_es, "}}$"),
+                                se_es             = paste0("SE_", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = "")),
+
+                                var_e             = "\u03C3\u00B2_e",
+                                var_res           = "\u03C3\u00B2_res",
+                                sd_e              = "SD_e",
+                                sd_res            = "SD_res",
+                                var_art           = "\u03C3\u00B2_art",
+                                var_pre           = "\u03C3\u00B2_pre",
+                                sd_art            = "SD_art",
+                                sd_pre            = "SD_pre",
+
+                                mean_rho          = "\u03C1\u0305",
+                                var_r_c           = "\u03C3\u00B2_r(c)",
+
+                                var_rho           = "\u03C3\u00B2_\u03C1",
+                                sd_r_c            = "SD_r(c)",
+                                se_r_c            = "SE_\u03C1\u0305",
+                                sd_rho            = "SD_\u03C1",
+
+                                mean_delta        = "\u03B4\u0305",
+                                var_d_c           = "\u03C3\u00B2_d(c)",
+                                sd_d_c            = "SD_d(c)",
+                                se_d_c            = "SE_\u03B4\u0305",
+                                var_delta         = "\u03C3\u00B2_\u03B4",
+                                sd_delta          = "SD_\u03B4",
+
+                                var_e_c           = "\u03C3\u00B2_e(c)",
+                                var_art_c         = "\u03C3\u00B2_art(c)",
+                                var_pre_c         = "\u03C3\u00B2_pre(c)",
+                                sd_e_c            = "SD_e(c)",
+                                sd_art_c          = "SD_art(c)",
+                                sd_pre_c          = "SD_pre(c)",
+
+                                ci_lower          = paste0(conf_level*100, "% CI"),
+                                ci_upper          = " ",
+                                cv_lower          = paste0(cred_level*100, "% CV"),
+                                cv_upper          = " ",
+
+                                conf_int          = paste0(conf_level*100, "% CI"),
+                                cred_int          = paste0(cred_level*100, "% CV")
+                        )
+                } else {
+                        c(
+                                group_contrast    = "Group Contrast",
+                                construct_x       = "Construct X",
+                                construct_y       = "Construct Y",
+                                k                 = "k",
+                                N                 = "N",
+
+                                mean_r            = "Mean r",
+                                var_r             = "Var_r",
+                                sd_r              = "SD_r",
+                                se_r              = "SE_[Mean r]",
+
+                                mean_d            = "Mean d",
+                                var_d             = "Var_d",
+                                sd_d              = "SD_d",
+                                se_d              = "SE_[Mean d]",
+
+                                mean_es           = paste0("Mean ", symbol_es),
+                                var_es            = paste0("Var_", symbol_es),
+                                sd_es             = paste0("SD_", symbol_es),
+                                se_es             = paste0("SE_[Mean ", symbol_es, "]"),
+
+                                var_e             = "Var_e",
+                                var_res           = "Var_res",
+                                sd_e              = "SD_e",
+                                sd_res            = "SD_res",
+                                var_art           = "Var_art",
+                                var_pre           = "Var_pre",
+                                sd_art            = "SD_art",
+                                sd_pre            = "SD_pre",
+
+                                mean_rho          = "Mean rho",
+                                var_r_c           = "Var_r(c)",
+
+                                var_rho           = "Var_rho",
+                                sd_r_c            = "SD_r(c)",
+                                se_r_c            = "SE_[Mean rho]",
+                                sd_rho            = "SD_rho",
+
+                                mean_delta        = "Mean delta",
+                                var_d_c           = "Var_d(c)",
+                                sd_d_c            = "SD_d(c)",
+                                se_d_c            = "SE_[Mean delta]",
+                                var_delta         = "Var_delta",
+                                sd_delta          = "SD_delta",
+
+                                var_e_c           = "Var_e(c)",
+                                var_art_c         = "Var_art(c)",
+                                var_pre_c         = "Var_pre(c)",
+                                sd_e_c            = "SD_e(c)",
+                                sd_art_c          = "SD_art(c)",
+                                sd_pre_c          = "SD_pre(c)",
+
+                                ci_lower          = paste0(conf_level*100, "% CI"),
+                                ci_upper          = " ",
+                                cv_lower          = paste0(cred_level*100, "% CV"),
+                                cv_upper          = " ",
+
+                                conf_int          = paste0(conf_level*100, "% CI"),
+                                cred_int          = paste0(cred_level*100, "% CV")
+                        )
+                }
+        } else {
+                c(
+                        group_contrast    = "**Group Contrast**",
+                        construct_x       = "**Construct X**",
+                        construct_y       = "**Construct Y**",
+                        k                 = "**_k_**",
+                        N                 = "**_N_**",
+
+                        mean_r            = "$\\mathbfit{\\overline{r}}$",
+                        var_r             = "$\\mathbfit{\\sigma^{2}_{r}}$",
+                        sd_r              = "$\\mathbfit{SD_{r}}$",
+                        se_r              = "$\\mathbfit{SE_{\\overline{r}}}$",
+
+                        mean_d            = "$\\mathbfit{\\overline{d}}$",
+                        var_d             = "$\\mathbfit{\\sigma^{2}_{d}}$",
+                        sd_d              = "$\\mathbfit{SD_{d}}$",
+                        se_d              = "$\\mathbfit{SE_{\\overline{d}}}$",
+
+                        mean_es           = paste0("$\\mathbfit{\\overline{", symbol_es, "}}$"),
+                        var_es            = paste0("$\\mathbfit{\\sigma^{2}_{", symbol_es, "}}$"),
+                        sd_es             = paste0("$\\mathbfit{SD{", symbol_es, "}}$"),
+                        se_es             = paste0("$\\mathbfit{SE_{\\overline{", symbol_es, "}}}$"),
+
+                        var_e             = "$\\mathbfit{\\sigma^{2}_{e}}$",
+                        var_res           = "$\\mathbfit{\\sigma^{2}_{res}}$",
+                        sd_e              = "$\\mathbfit{SD_{e}}$",
+                        sd_res            = "$\\mathbfit{SD_{res}}$",
+                        var_art           = "$\\mathbfit{\\sigma^{2}_{art}}$",
+                        var_pre           = "$\\mathbfit{\\sigma^{2}_{pre}}$",
+                        sd_art            = "$\\mathbfit{SD_{art}}$",
+                        sd_pre            = "$\\mathbfit{SD_{pre}}$",
+
+                        mean_rho          = "$\\mathbf{\\overline{\\rho}}$",
+                        var_r_c           = "$\\mathbfit{\\sigma^{2}_{r_{c}}}$",
+
+                        var_rho           = "$\\mathbfit{\\sigma^{2}_{\\mathbf{\\rho}}}$",
+                        sd_r_c            = "$\\mathbfit{SD_{r_{c}}}$",
+                        se_r_c            = "$\\mathbfit{SE_{\\mathbf{\\overline{\\rho}}}}$",
+                        sd_rho            = "$\\mathbfit{SD_{\\mathbf{\\rho}}}$",
+
+                        mean_delta        = "$\\mathbf{\\overline{\\delta}}$",
+                        var_d_c           = "$\\mathbfit{\\sigma^{2}_{d_{c}}}$",
+                        sd_d_c            = "$\\mathbfit{SD_{d_{c}}}$",
+                        se_d_c            = "$\\mathbfit{SE_{\\mathbf{\\overline{\\delta}}}}$",
+                        var_delta         = "$\\mathbfit{\\sigma^{2}_{\\mathbf{\\delta}}}$",
+                        sd_delta          = "$\\mathbfit{SD_{\\mathbf{\\delta}}}$",
+
+                        var_e_c           = "$\\mathbfit{\\sigma^{2}_{e_{c}}}$",
+                        var_art_c         = "$\\mathbfit{\\sigma^{2}_{art_{c}}}$",
+                        var_pre_c         = "$\\mathbfit{\\sigma^{2}_{pre_{c}}}$",
+                        sd_e_c            = "$\\mathbfit{SD_{e_{c}}}$",
+                        sd_art_c          = "$\\mathbfit{SD_{art_{c}}}$",
+                        sd_pre_c          = "$\\mathbfit{SD_{pre_{c}}}$",
+
+                        ci_lower          = paste0("**", conf_level*100, "% CI**"),
+                        ci_upper          = " ",
+                        cv_lower          = paste0("**", cred_level*100, "% CV**"),
+                        cv_upper          = " ",
+
+                        conf_int          = paste0("**", conf_level*100, "% CI**"),
+                        cred_int          = paste0("**", cred_level*100, "% CV**")
+                )
+        }
+
+        footnote <- if(output_format == "text") {
+                ### TODO: Add notes about actual corrections applied
+                if(.support_unicode()) {
+                        if(es_type == "r") {
+                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "r\u0305 =  mean observed correlation; "[show_msd],
+                                                  "SE_r\u0305 = standard error of r\u0305; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_res = residual variance of r ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_e = predicted variance of r due to sampling error; \u03C3\u00B2_res = residual variance of r; "[show_var & verbose],
+                                                  "CI = confidence interval around r\u0305; "[show_conf],
+                                                  "CV = credibility interval around r\u0305."[show_cred]),
+
+                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "r\u0305 = mean observed correlation; "[show_msd],
+                                                  "SE_r\u0305 = standard error of r\u0305; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_res = residual variance of r ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_e = predicted variance of r due to sampling error; \u03C3\u00B2_art = predicted variance of r due to artifacts; \u03C3\u00B2_pre = total predicted variance of r; \u03C3\u00B2_res = residual variance of r; "[show_var & verbose],
+
+                                                  "\u03C1\u0305 = mean true-score correlation; "[show_msd],
+                                                  "SE_\u03C1\u0305 = standard error of \u03C1\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_e(c) = predicted variance of r(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of r(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03C1\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03C1\u0305; "[show_cred],
+
+                                                  "correlations corrected individually."),
+
+                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "r\u0305 = mean observed correlation; "[show_msd],
+                                                  "SE_r\u0305 = standard error of r\u0305; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_res = residual variance of r ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_e = predicted variance of r due to sampling error; \u03C3\u00B2_art = predicted variance of r due to artifacts; \u03C3\u00B2_pre = total predicted variance of r; \u03C3\u00B2_res = residual variance of r; "[show_var & verbose],
+
+                                                  "\u03C1\u0305 = mean operational validity (X measured with error); "[show_msd],
+                                                  "SE_\u03C1\u0305 = standard error of \u03C1\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_e(c) = predicted variance of r(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of r(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03C1\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03C1\u0305; "[show_cred],
+
+                                                  "correlations corrected individually."),
+
+                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "r\u0305 = mean observed correlation; "[show_msd],
+                                                  "SE_r\u0305 = standard error of r\u0305; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_res = residual variance of r ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_e = predicted variance of r due to sampling error; \u03C3\u00B2_art = predicted variance of r due to artifacts; \u03C3\u00B2_pre = total predicted variance of r; \u03C3\u00B2_res = residual variance of r; "[show_var & verbose],
+
+                                                  "\u03C1\u0305 = mean operational validity (Y measured with error); "[show_msd],
+                                                  "SE_\u03C1\u0305 = standard error of \u03C1\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_e(c) = predicted variance of r(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of r(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03C1\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03C1\u0305; "[show_cred],
+
+                                                  "correlations corrected individually."),
+
+                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "r\u0305 = mean observed correlation; "[show_msd],
+                                                  "SE_r\u0305 = standard error of r\u0305; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_res = residual variance of r ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_e = predicted variance of r due to sampling error; \u03C3\u00B2_art = predicted variance of r due to artifacts; \u03C3\u00B2_pre = total predicted variance of r; \u03C3\u00B2_res = residual variance of r; "[show_var & verbose],
+
+                                                  "\u03C1\u0305 = mean true-score correlation; "[show_msd],
+                                                  "SE_\u03C1\u0305 = standard error of \u03C1\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_e(c) = predicted variance of r(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of r(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03C1\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03C1\u0305; "[show_cred],
+
+                                                  "correlations corrected using artifact distributions."),
+
+                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "r\u0305 = mean observed correlation; "[show_msd],
+                                                  "SE_r\u0305 = standard error of r\u0305; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_res = residual variance of r ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_e = predicted variance of r due to sampling error; \u03C3\u00B2_art = predicted variance of r due to artifacts; \u03C3\u00B2_pre = total predicted variance of r; \u03C3\u00B2_res = residual variance of r; "[show_var & verbose],
+
+                                                  "\u03C1\u0305 = mean operational validity (X measured with error); "[show_msd],
+                                                  "SE_\u03C1\u0305 = standard error of \u03C1\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_e(c) = predicted variance of r(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of r(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03C1\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03C1\u0305; "[show_cred],
+
+                                                  "correlations corrected using artifact distributions."),
+
+                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "r\u0305 = mean observed correlation; "[show_msd],
+                                                  "SE_r\u0305 = standard error of r\u0305; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_res = residual variance of r ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r = observed variance of r; \u03C3\u00B2_e = predicted variance of r due to sampling error; \u03C3\u00B2_art = predicted variance of r due to artifacts; \u03C3\u00B2_pre = total predicted variance of r; \u03C3\u00B2_res = residual variance of r; "[show_var & verbose],
+
+                                                  "\u03C1\u0305 = mean operational validity (Y measured with error); "[show_msd],
+                                                  "SE_\u03C1\u0305 = standard error of \u03C1\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_\u03C1 = residual standard deviation of \u03C1; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_r(c) = observed variance of r(c); \u03C3\u00B2_e(c) = predicted variance of r(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of r(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of r(c); \u03C3\u00B2_\u03C1 = residual variance of \u03C1; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03C1\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03C1\u0305; "[show_cred],
+
+                                                  "correlations corrected using artifact distributions.")
+                                )
+
+                        } else if(es_type == "d") {
+                                ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
+                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "d\u0305 =  mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[d\u0305] = standard error of d\u0305; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_res = residual variance of d ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_e = predicted variance of d due to sampling error; \u03C3\u00B2_res = residual variance of d; "[show_var & verbose],
+                                                  "CI = confidence interval around d\u0305; "[show_conf],
+                                                  "CV = credibility interval around d\u0305."[show_cred]),
+
+                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[d\u0305] = standard error of d\u0305; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_res = residual variance of d ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_e = predicted variance of d due to sampling error; \u03C3\u00B2_art = predicted variance of d due to artifacts; \u03C3\u00B2_pre = total predicted variance of d; \u03C3\u00B2_res = residual variance of d; "[show_var & verbose],
+
+                                                  "\u03B4\u0305 = mean true-score Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_\u03B4\u0305 = standard error of \u03B4\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_e(c) = predicted variance of d(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of d(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03B4\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03B4\u0305; "[show_cred],
+
+                                                  "effect sizes corrected individually."),
+
+                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[d\u0305] = standard error of d\u0305; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_res = residual variance of d ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_e = predicted variance of d due to sampling error; \u03C3\u00B2_art = predicted variance of d due to artifacts; \u03C3\u00B2_pre = total predicted variance of d; \u03C3\u00B2_res = residual variance of d; "[show_var & verbose],
+
+                                                  "\u03B4\u0305 = mean true-score Cohen's d (Hedges' g) between observed groups; "[show_msd],
+                                                  "SE_\u03B4\u0305 = standard error of \u03B4\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_e(c) = predicted variance of d(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of d(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03B4\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03B4\u0305; "[show_cred],
+
+                                                  "effect sizes corrected individually."),
+
+                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[d\u0305] = standard error of d\u0305; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_res = residual variance of d ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_e = predicted variance of d due to sampling error; \u03C3\u00B2_art = predicted variance of d due to artifacts; \u03C3\u00B2_pre = total predicted variance of d; \u03C3\u00B2_res = residual variance of d; "[show_var & verbose],
+
+                                                  "\u03B4\u0305 = mean observed Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_\u03B4\u0305 = standard error of \u03B4\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_e(c) = predicted variance of d(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of d(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03B4\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03B4\u0305; "[show_cred],
+
+                                                  "effect sizes corrected individually."),
+
+                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[d\u0305] = standard error of d\u0305; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_res = residual variance of d ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_e = predicted variance of d due to sampling error; \u03C3\u00B2_art = predicted variance of d due to artifacts; \u03C3\u00B2_pre = total predicted variance of d; \u03C3\u00B2_res = residual variance of d; "[show_var & verbose],
+
+                                                  "\u03B4\u0305 = mean true-score Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_\u03B4\u0305 = standard error of \u03B4\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_e(c) = predicted variance of d(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of d(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03B4\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03B4\u0305; "[show_cred],
+
+                                                  "effect sizes corrected using artifact distributions."),
+
+                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[d\u0305] = standard error of d\u0305; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_res = residual variance of d ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_e = predicted variance of d due to sampling error; \u03C3\u00B2_art = predicted variance of d due to artifacts; \u03C3\u00B2_pre = total predicted variance of d; \u03C3\u00B2_res = residual variance of d; "[show_var & verbose],
+
+                                                  "\u03B4\u0305 = mean true-score Cohen's d (Hedges' g) between observed groups; "[show_msd],
+                                                  "SE_\u03B4\u0305 = standard error of \u03B4\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_e(c) = predicted variance of d(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of d(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03B4\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03B4\u0305; "[show_cred],
+
+                                                  "effect sizes corrected using artifact distributions."),
+
+                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[d\u0305] = standard error of d\u0305; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_res = residual variance of d ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d = observed variance of d; \u03C3\u00B2_e = predicted variance of d due to sampling error; \u03C3\u00B2_art = predicted variance of d due to artifacts; \u03C3\u00B2_pre = total predicted variance of d; \u03C3\u00B2_res = residual variance of d; "[show_var & verbose],
+
+                                                  "\u03B4\u0305 = mean observed Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_\u03B4\u0305 = standard error of \u03B4\u0305; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_\u03B4 = residual standard deviation of \u03B4; "[show_msd & verbose],
+
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4 ;"[show_var & !verbose],
+                                                  "\u03C3\u00B2_d(c) = observed variance of d(c); \u03C3\u00B2_e(c) = predicted variance of d(c) due to sampling error; \u03C3\u00B2_art(c) = predicted variance of d(c) due to artifacts; \u03C3\u00B2_pre(c) = total predicted variance of d(c); \u03C3\u00B2_\u03B4 = residual variance of \u03B4; "[show_var & verbose],
+
+                                                  "CI = confidence interval around \u03B4\u0305; "[show_conf],
+                                                  "CV = credibility interval around \u03B4\u0305; "[show_cred],
+
+                                                  "effect sizes corrected using artifact distributions.")
+                                )
+
+                        } else {
+                                c(bb = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                              paste0(paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), " =  mean observed effect size (", symbol_es, "); ")[show_msd],
+                                              paste0("SE_", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), " = standard error of ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), "; ")[show_se],
+                                              paste0("SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_res = residual standard deviation of ", symbol_es, "; ")[show_msd & !verbose],
+                                              paste0("SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_e = predicted SD_", symbol_es, " due to sampling error; SD_res = residual standard deviation of ", symbol_es, "; ")[show_msd & verbose],
+                                              paste0("\u03C3\u00B2_", symbol_es, " = observed variance of ", symbol_es, "; \u03C3\u00B2_res = residual variance of ", symbol_es, " ;")[show_var & !verbose],
+                                              paste0("\u03C3\u00B2_", symbol_es, " = observed variance of ", symbol_es, "; \u03C3\u00B2_e = predicted variance of ", symbol_es, " due to sampling error; \u03C3\u00B2_res = residual variance of ", symbol_es, "; ")[show_var & verbose],
+                                              paste0("CI = confidence interval around ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), "; ")[show_conf],
+                                              paste0("CV = credibility interval around ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), ".")[show_cred])
+                                )
+                        }
+
+                } else {
+                        if(es_type == "r") {
+                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean r =  mean observed correlation; "[show_msd],
+                                                  "SE_[Mean r] = standard error of Mean r; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "Var_r = observed variance of r; Var_res = residual variance of r ;"[show_var & !verbose],
+                                                  "Var_r = observed variance of r; Var_e = predicted variance of r due to sampling error; Var_res = residual variance of r; "[show_var & verbose],
+                                                  "CI = confidence interval around Mean r; "[show_conf],
+                                                  "CV = credibility interval around Mean r."[show_cred]),
+
+                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean r = mean observed correlation; "[show_msd],
+                                                  "SE_[Mean r] = standard error of Mean r; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "Var_r = observed variance of r; Var_res = residual variance of r ;"[show_var & !verbose],
+                                                  "Var_r = observed variance of r; Var_e = predicted variance of r due to sampling error; Var_art = predicted variance of r due to artifacts; Var_pre = total predicted variance of r; Var_res = residual variance of r; "[show_var & verbose],
+
+                                                  "Mean rho = mean true-score correlation; "[show_msd],
+                                                  "SE_[Mean rho] = standard error of Mean rho; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_rho = residual standard deviation of rho; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_rho = residual standard deviation of rho; "[show_msd & verbose],
+
+                                                  "Var_r(c) = observed variance of r(c); Var_rho = residual variance of rho ;"[show_var & !verbose],
+                                                  "Var_r(c) = observed variance of r(c); Var_e(c) = predicted variance of r(c) due to sampling error; Var_art(c) = predicted variance of r(c) due to artifacts; Var_pre(c) = total predicted variance of r(c); Var_rho = residual variance of rho; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean rho; "[show_conf],
+                                                  "CV = credibility interval around Mean rho; "[show_cred],
+
+                                                  "correlations corrected individually."),
+
+                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean r = mean observed correlation; "[show_msd],
+                                                  "SE_[Mean r] = standard error of Mean r; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "Var_r = observed variance of r; Var_res = residual variance of r ;"[show_var & !verbose],
+                                                  "Var_r = observed variance of r; Var_e = predicted variance of r due to sampling error; Var_art = predicted variance of r due to artifacts; Var_pre = total predicted variance of r; Var_res = residual variance of r; "[show_var & verbose],
+
+                                                  "Mean rho = mean operational validity (X measured with error); "[show_msd],
+                                                  "SE_[Mean rho] = standard error of Mean rho; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_rho = residual standard deviation of rho; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_rho = residual standard deviation of rho; "[show_msd & verbose],
+
+                                                  "Var_r(c) = observed variance of r(c); Var_rho = residual variance of rho ;"[show_var & !verbose],
+                                                  "Var_r(c) = observed variance of r(c); Var_e(c) = predicted variance of r(c) due to sampling error; Var_art(c) = predicted variance of r(c) due to artifacts; Var_pre(c) = total predicted variance of r(c); Var_rho = residual variance of rho; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean rho; "[show_conf],
+                                                  "CV = credibility interval around Mean rho; "[show_cred],
+
+                                                  "correlations corrected individually."),
+
+                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean r = mean observed correlation; "[show_msd],
+                                                  "SE_[Mean r] = standard error of Mean r; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "Var_r = observed variance of r; Var_res = residual variance of r ;"[show_var & !verbose],
+                                                  "Var_r = observed variance of r; Var_e = predicted variance of r due to sampling error; Var_art = predicted variance of r due to artifacts; Var_pre = total predicted variance of r; Var_res = residual variance of r; "[show_var & verbose],
+
+                                                  "Mean rho = mean operational validity (Y measured with error); "[show_msd],
+                                                  "SE_[Mean rho] = standard error of Mean rho; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_rho = residual standard deviation of rho; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_rho = residual standard deviation of rho; "[show_msd & verbose],
+
+                                                  "Var_r(c) = observed variance of r(c); Var_rho = residual variance of rho ;"[show_var & !verbose],
+                                                  "Var_r(c) = observed variance of r(c); Var_e(c) = predicted variance of r(c) due to sampling error; Var_art(c) = predicted variance of r(c) due to artifacts; Var_pre(c) = total predicted variance of r(c); Var_rho = residual variance of rho; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean rho; "[show_conf],
+                                                  "CV = credibility interval around Mean rho; "[show_cred],
+
+                                                  "correlations corrected individually."),
+
+                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean r = mean observed correlation; "[show_msd],
+                                                  "SE_[Mean r] = standard error of Mean r; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "Var_r = observed variance of r; Var_res = residual variance of r ;"[show_var & !verbose],
+                                                  "Var_r = observed variance of r; Var_e = predicted variance of r due to sampling error; Var_art = predicted variance of r due to artifacts; Var_pre = total predicted variance of r; Var_res = residual variance of r; "[show_var & verbose],
+
+                                                  "Mean rho = mean true-score correlation; "[show_msd],
+                                                  "SE_[Mean rho] = standard error of Mean rho; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_rho = residual standard deviation of rho; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_rho = residual standard deviation of rho; "[show_msd & verbose],
+
+                                                  "Var_r(c) = observed variance of r(c); Var_rho = residual variance of rho ;"[show_var & !verbose],
+                                                  "Var_r(c) = observed variance of r(c); Var_e(c) = predicted variance of r(c) due to sampling error; Var_art(c) = predicted variance of r(c) due to artifacts; Var_pre(c) = total predicted variance of r(c); Var_rho = residual variance of rho; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean rho; "[show_conf],
+                                                  "CV = credibility interval around Mean rho; "[show_cred],
+
+                                                  "correlations corrected using artifact distributions."),
+
+                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean r = mean observed correlation; "[show_msd],
+                                                  "SE_[Mean r] = standard error of Mean r; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "Var_r = observed variance of r; Var_res = residual variance of r ;"[show_var & !verbose],
+                                                  "Var_r = observed variance of r; Var_e = predicted variance of r due to sampling error; Var_art = predicted variance of r due to artifacts; Var_pre = total predicted variance of r; Var_res = residual variance of r; "[show_var & verbose],
+
+                                                  "Mean rho = mean operational validity (X measured with error); "[show_msd],
+                                                  "SE_[Mean rho] = standard error of Mean rho; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_rho = residual standard deviation of rho; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_rho = residual standard deviation of rho; "[show_msd & verbose],
+
+                                                  "Var_r(c) = observed variance of r(c); Var_rho = residual variance of rho ;"[show_var & !verbose],
+                                                  "Var_r(c) = observed variance of r(c); Var_e(c) = predicted variance of r(c) due to sampling error; Var_art(c) = predicted variance of r(c) due to artifacts; Var_pre(c) = total predicted variance of r(c); Var_rho = residual variance of rho; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean rho; "[show_conf],
+                                                  "CV = credibility interval around Mean rho; "[show_cred],
+
+                                                  "correlations corrected using artifact distributions."),
+
+                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean r = mean observed correlation; "[show_msd],
+                                                  "SE_[Mean r] = standard error of Mean r; "[show_se],
+                                                  "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
+                                                  "SD_r = observed standard deviation of r; SD_e = predicted SD_r due to sampling error; SD_art = predicted SD_r due to artifacts; SD_pre = total predicted SD_r; SD_res = residual standard deviation of r; "[show_msd & verbose],
+                                                  "Var_r = observed variance of r; Var_res = residual variance of r ;"[show_var & !verbose],
+                                                  "Var_r = observed variance of r; Var_e = predicted variance of r due to sampling error; Var_art = predicted variance of r due to artifacts; Var_pre = total predicted variance of r; Var_res = residual variance of r; "[show_var & verbose],
+
+                                                  "Mean rho = mean operational validity (Y measured with error); "[show_msd],
+                                                  "SE_[Mean rho] = standard error of Mean rho; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_rho = residual standard deviation of rho; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected correlations (r(c)); SD_e = predicted SD_r(c) due to sampling error; SD_art(c) = predicted SD_r(c) due to artifacts; SD_pre(c) = total predicted SD_r(c); SD_rho = residual standard deviation of rho; "[show_msd & verbose],
+
+                                                  "Var_r(c) = observed variance of r(c); Var_rho = residual variance of rho ;"[show_var & !verbose],
+                                                  "Var_r(c) = observed variance of r(c); Var_e(c) = predicted variance of r(c) due to sampling error; Var_art(c) = predicted variance of r(c) due to artifacts; Var_pre(c) = total predicted variance of r(c); Var_rho = residual variance of rho; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean rho; "[show_conf],
+                                                  "CV = credibility interval around Mean rho; "[show_cred],
+
+                                                  "correlations corrected using artifact distributions.")
+                                )
+
+                        } else if(es_type == "d") {
+                                ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
+                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean d =  mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[Mean d] = standard error of Mean d; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "Var_d = observed variance of d; Var_res = residual variance of d ;"[show_var & !verbose],
+                                                  "Var_d = observed variance of d; Var_e = predicted variance of d due to sampling error; Var_res = residual variance of d; "[show_var & verbose],
+                                                  "CI = confidence interval around Mean d; "[show_conf],
+                                                  "CV = credibility interval around Mean d."[show_cred]),
+
+                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[Mean d] = standard error of Mean d; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "Var_d = observed variance of d; Var_res = residual variance of d ;"[show_var & !verbose],
+                                                  "Var_d = observed variance of d; Var_e = predicted variance of d due to sampling error; Var_art = predicted variance of d due to artifacts; Var_pre = total predicted variance of d; Var_res = residual variance of d; "[show_var & verbose],
+
+                                                  "Mean delta = mean true-score Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_[Mean delta] = standard error of Mean delta; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_delta = residual standard deviation of delta; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_delta = residual standard deviation of delta; "[show_msd & verbose],
+
+                                                  "Var_d(c) = observed variance of d(c); Var_delta = residual variance of delta ;"[show_var & !verbose],
+                                                  "Var_d(c) = observed variance of d(c); Var_e(c) = predicted variance of d(c) due to sampling error; Var_art(c) = predicted variance of d(c) due to artifacts; Var_pre(c) = total predicted variance of d(c); Var_delta = residual variance of delta; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean delta; "[show_conf],
+                                                  "CV = credibility interval around Mean delta; "[show_cred],
+
+                                                  "effect sizes corrected individually."),
+
+                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[Mean d] = standard error of Mean d; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "Var_d = observed variance of d; Var_res = residual variance of d ;"[show_var & !verbose],
+                                                  "Var_d = observed variance of d; Var_e = predicted variance of d due to sampling error; Var_art = predicted variance of d due to artifacts; Var_pre = total predicted variance of d; Var_res = residual variance of d; "[show_var & verbose],
+
+                                                  "Mean delta = mean true-score Cohen's d (Hedges' g) between observed groups; "[show_msd],
+                                                  "SE_[Mean delta] = standard error of Mean delta; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_delta = residual standard deviation of delta; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_delta = residual standard deviation of delta; "[show_msd & verbose],
+
+                                                  "Var_d(c) = observed variance of d(c); Var_delta = residual variance of delta ;"[show_var & !verbose],
+                                                  "Var_d(c) = observed variance of d(c); Var_e(c) = predicted variance of d(c) due to sampling error; Var_art(c) = predicted variance of d(c) due to artifacts; Var_pre(c) = total predicted variance of d(c); Var_delta = residual variance of delta; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean delta; "[show_conf],
+                                                  "CV = credibility interval around Mean delta; "[show_cred],
+
+                                                  "effect sizes corrected individually."),
+
+                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[Mean d] = standard error of Mean d; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "Var_d = observed variance of d; Var_res = residual variance of d ;"[show_var & !verbose],
+                                                  "Var_d = observed variance of d; Var_e = predicted variance of d due to sampling error; Var_art = predicted variance of d due to artifacts; Var_pre = total predicted variance of d; Var_res = residual variance of d; "[show_var & verbose],
+
+                                                  "Mean delta = mean observed Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_[Mean delta] = standard error of Mean delta; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_delta = residual standard deviation of delta; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_delta = residual standard deviation of delta; "[show_msd & verbose],
+
+                                                  "Var_d(c) = observed variance of d(c); Var_delta = residual variance of delta ;"[show_var & !verbose],
+                                                  "Var_d(c) = observed variance of d(c); Var_e(c) = predicted variance of d(c) due to sampling error; Var_art(c) = predicted variance of d(c) due to artifacts; Var_pre(c) = total predicted variance of d(c); Var_delta = residual variance of delta; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean delta; "[show_conf],
+                                                  "CV = credibility interval around Mean delta; "[show_cred],
+
+                                                  "effect sizes corrected individually."),
+
+                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[Mean d] = standard error of Mean d; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "Var_d = observed variance of d; Var_res = residual variance of d ;"[show_var & !verbose],
+                                                  "Var_d = observed variance of d; Var_e = predicted variance of d due to sampling error; Var_art = predicted variance of d due to artifacts; Var_pre = total predicted variance of d; Var_res = residual variance of d; "[show_var & verbose],
+
+                                                  "Mean delta = mean true-score Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_[Mean delta] = standard error of Mean delta; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_delta = residual standard deviation of delta; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_delta = residual standard deviation of delta; "[show_msd & verbose],
+
+                                                  "Var_d(c) = observed variance of d(c); Var_delta = residual variance of delta ;"[show_var & !verbose],
+                                                  "Var_d(c) = observed variance of d(c); Var_e(c) = predicted variance of d(c) due to sampling error; Var_art(c) = predicted variance of d(c) due to artifacts; Var_pre(c) = total predicted variance of d(c); Var_delta = residual variance of delta; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean delta; "[show_conf],
+                                                  "CV = credibility interval around Mean delta; "[show_cred],
+
+                                                  "effect sizes corrected using artifact distributions."),
+
+                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[Mean d] = standard error of Mean d; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "Var_d = observed variance of d; Var_res = residual variance of d ;"[show_var & !verbose],
+                                                  "Var_d = observed variance of d; Var_e = predicted variance of d due to sampling error; Var_art = predicted variance of d due to artifacts; Var_pre = total predicted variance of d; Var_res = residual variance of d; "[show_var & verbose],
+
+                                                  "Mean delta = mean true-score Cohen's d (Hedges' g) between observed groups; "[show_msd],
+                                                  "SE_[Mean delta] = standard error of Mean delta; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_delta = residual standard deviation of delta; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_delta = residual standard deviation of delta; "[show_msd & verbose],
+
+                                                  "Var_d(c) = observed variance of d(c); Var_delta = residual variance of delta ;"[show_var & !verbose],
+                                                  "Var_d(c) = observed variance of d(c); Var_e(c) = predicted variance of d(c) due to sampling error; Var_art(c) = predicted variance of d(c) due to artifacts; Var_pre(c) = total predicted variance of d(c); Var_delta = residual variance of delta; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean delta; "[show_conf],
+                                                  "CV = credibility interval around Mean delta; "[show_cred],
+
+                                                  "effect sizes corrected using artifact distributions."),
+
+                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                                  "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
+                                                  "SE_[Mean d] = standard error of Mean d; "[show_se],
+                                                  "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
+                                                  "SD_d = observed standard deviation of d; SD_e = predicted SD_d due to sampling error; SD_art = predicted SD_d due to artifacts; SD_pre = total predicted SD_d; SD_res = residual standard deviation of d; "[show_msd & verbose],
+                                                  "Var_d = observed variance of d; Var_res = residual variance of d ;"[show_var & !verbose],
+                                                  "Var_d = observed variance of d; Var_e = predicted variance of d due to sampling error; Var_art = predicted variance of d due to artifacts; Var_pre = total predicted variance of d; Var_res = residual variance of d; "[show_var & verbose],
+
+                                                  "Mean delta = mean observed Cohen's d (Hedges' g) between latent groups; "[show_msd],
+                                                  "SE_[Mean delta] = standard error of Mean delta; "[show_se],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_delta = residual standard deviation of delta; "[show_msd & !verbose],
+                                                  "SD_r(c) = observed standard deviation of corrected d values (d(c)); SD_e = predicted SD_d(c) due to sampling error; SD_art(c) = predicted SD_d(c) due to artifacts; SD_pre(c) = total predicted SD_d(c); SD_delta = residual standard deviation of delta; "[show_msd & verbose],
+
+                                                  "Var_d(c) = observed variance of d(c); Var_delta = residual variance of delta ;"[show_var & !verbose],
+                                                  "Var_d(c) = observed variance of d(c); Var_e(c) = predicted variance of d(c) due to sampling error; Var_art(c) = predicted variance of d(c) due to artifacts; Var_pre(c) = total predicted variance of d(c); Var_delta = residual variance of delta; "[show_var & verbose],
+
+                                                  "CI = confidence interval around Mean delta; "[show_conf],
+                                                  "CV = credibility interval around Mean delta; "[show_cred],
+
+                                                  "effect sizes corrected using artifact distributions.")
+                                )
+
+                        } else {
+                                c(bb = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                              "Mean ", symbol_es, " =  mean observed effect size (", symbol_es, "); "[show_msd],
+                                              "SE_[Mean ", symbol_es, "] = standard error of [Mean ", symbol_es, "]; "[show_se],
+                                              "SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_res = residual standard deviation of ", symbol_es, "; "[show_msd & !verbose],
+                                              "SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_e = predicted SD_", symbol_es, " due to sampling error; SD_res = residual standard deviation of ", symbol_es, "; "[show_msd & verbose],
+                                              "Var_", symbol_es, " = observed variance of ", symbol_es, "; Var_res = residual variance of ", symbol_es, " ;"[show_var & !verbose],
+                                              "Var_", symbol_es, " = observed variance of ", symbol_es, "; Var_e = predicted variance of ", symbol_es, " due to sampling error; Var_res = residual variance of ", symbol_es, "; "[show_var & verbose],
+                                              "CI = confidence interval around Mean [", symbol_es, "]; "[show_conf],
+                                              "CV = credibility interval around Mean [", symbol_es, "]."[show_cred])
+                                        )
+                        }
+                }
+        } else {
+                if(es_type == "r") {
+                        c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{r}$\u00a0=\u00a0 mean observed correlation; "[show_msd],
+                                          "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
+                                          "CI\u00a0=\u00a0confidence interval around $\\overline{r}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\overline{r}$."[show_cred]),
+
+                          ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
+                                          "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+
+                                          "correlations corrected individually."),
+
+                          ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
+                                          "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+
+                                          "correlations corrected individually."),
+
+                          ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
+                                          "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+
+                                          "correlations corrected individually."),
+
+                          ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
+                                          "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+
+                                          "correlations corrected using artifact distributions."),
+
+                          ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
+                                          "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+
+                                          "correlations corrected using artifact distributions."),
+
+                          ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
+                                          "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
+                                          "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{e}$\u00a0=\u00a0predicted $SD_{r}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{r}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{r}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+
+                                          "correlations corrected using artifact distributions.")
+                        )
+
+                } else if(es_type == "d") {
+                        ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
+                        c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{d}$\u00a0=\u00a0 mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
+                                          "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
+                                          "CI\u00a0=\u00a0confidence interval around $\\overline{d}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\overline{d}$."[show_cred]),
+
+                          ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
+                                          "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\delta}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\delta}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\delta}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\delta}}$; "[show_cred],
+
+                                          "effect sizes corrected individually."),
+
+                          ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
+                                          "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between observed groups; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\delta}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\delta}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\delta}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\delta}}$; "[show_cred],
+
+                                          "effect sizes corrected individually."),
+
+                          ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
+                                          "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\delta}}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\delta}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\delta}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\delta}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\delta}}$; "[show_cred],
+
+                                          "effect sizes corrected individually."),
+
+                          ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
+                                          "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\delta}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\delta}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\delta}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\delta}}$; "[show_cred],
+
+                                          "effect sizes corrected using artifact distributions."),
+
+                          ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
+                                          "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\delta}}$\u00a0=\u00a0mean true-score Cohen's $d$ (Hedges' $g$) between observed groups; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\delta}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\delta}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\delta}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\delta}}$; "[show_cred],
+
+                                          "effect sizes corrected using artifact distributions"),
+
+                          ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                          "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
+                                          "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
+                                          "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{e}$\u00a0=\u00a0predicted $SD_{d}$ due to sampling error; $SD_{art}$\u00a0=\u00a0predicted $SD_{d}$ due to artifacts; $SD_{pre}$\u00a0=\u00a0total predicted $SD_{d}$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d}$\u00a0=\u00a0observed variance of $d$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $d$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $d$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $d$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $d$; "[show_var & verbose],
+
+                                          "$\\mathrm{\\overline{\\delta}}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$) between latent groups; "[show_msd],
+                                          "$SE_{\\mathrm{\\overline{\\delta}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\delta}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected $d$ values ($d_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{d_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{d_{c}}$; $SD_{\\mathrm{\\delta}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\delta}$; "[show_msd & verbose],
+
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{d_{c}}$\u00a0=\u00a0observed variance of $d_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $d_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $d{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $d_{c}$; $\\sigma^{2}_{\\mathrm{\\delta}}$\u00a0=\u00a0residual variance of $\\mathrm{\\delta}$; "[show_var & verbose],
+
+                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\delta}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\delta}}$; "[show_cred],
+
+                                          "effect sizes corrected using artifact distributions")
+                        )
+
+                } else {
+                        c(bb = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                      "$\\overline{", symbol_es, "}$\u00a0=\u00a0 mean observed effect size ($", symbol_es, "$); "[show_msd],
+                                      "$SE_{\\overline{", symbol_es, "}}$\u00a0=\u00a0standard error of $\\overline{", symbol_es, "}$; "[show_se],
+                                      "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & !verbose],
+                                      "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{e}$\u00a0=\u00a0predicted $SD_{", symbol_es, "}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & verbose],
+                                      "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$ ;"[show_var & !verbose],
+                                      "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $", symbol_es, "$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$; "[show_var & verbose],
+                                      "CI\u00a0=\u00a0confidence interval around $\\overline{", symbol_es, "}$; "[show_conf],
+                                      "CV\u00a0=\u00a0credibility interval around $\\overline{", symbol_es, "}$."[show_cred])
+                        )
+                }
+        }
+
+        return(list(col_names = col_names,
+                    footnote = footnote))
+}

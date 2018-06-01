@@ -2,7 +2,7 @@
 #' @importFrom rlang .data
 .onAttach <- function(libname, pkgname) {
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
-    packageStartupMessage(crayon::white("----------------------------------------------------- ", crayon::bold(paste(pkgname, "version", version)), " -- "))
+    packageStartupMessage(crayon::white("----------------------------------------------------- ", crayon::bold(paste(pkgname, "version", version)), " --"))
     packageStartupMessage("\nPlease report any bugs to ", crayon::italic("github.com/psychmeta/psychmeta/issues"), "\nor ", crayon::italic("issues@psychmeta.com"))
     packageStartupMessage("\nWe work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \n  Dahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for \n     psychometric meta-analysis. ", crayon::italic("Applied Psychological Measurement"), ".")
     packageStartupMessage("\nFind info about psychmeta on the web at ", crayon::italic("psychmeta.com"), " and ", crayon::italic("twitter.com/psychmetaR"))
@@ -58,9 +58,9 @@
          cran_v_char <- gsub(x = stringr::str_split(as.character(pkg_badge), "\n")[[1]][9], pattern = " ", replacement = "")
          vcheck <- check_version(cran_version = cran_v_char, sys_version = version)
 
-         use_symbols <- (.Platform$OS.type != "windows" | if(!is.null(.Options$cli.unicode)) .Options$cli.unicode else FALSE)
+         use_symbols <- .support_unicode()
 
-         packageStartupMessage(crayon::white("\n----------------------------------------------------- ", crayon::bold("Version check"), " ---------------- "))
+         packageStartupMessage(crayon::white("\n", paste0("-----------------------------------------------------", paste0(rep_len("-", nchar(paste(pkgname, "version", version)) - 13), collapse = ""), " "), crayon::bold("Version check"), " --"))
          if(vcheck$best_version == "CRAN"){
               version_message <- "Oh no! It looks like your copy of psychmeta is out of date!"
               if(use_symbols) version_message <- paste0(cli::symbol$cross, " ", version_message)
@@ -85,6 +85,8 @@
     if(sys_v_num[4] > 0)
          packageStartupMessage(crayon::blue(paste0("NOTE: You are currently using an UNRELEASED development build (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")")))
 }
+
+.support_unicode <- function() (l10n_info()$`UTF-8` | if(!is.null(.Options$cli.unicode)) isTRUE(.Options$cli.unicode) else FALSE | nzchar(Sys.getenv("RSTUDIO_USER_IDENTITY")) )
 
 
 #' Retrieve the NEWS file for the psychmeta package
