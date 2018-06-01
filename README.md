@@ -1,4 +1,4 @@
-<img width="200" src="https://github.com/psychmeta/psychmeta/blob/project/new-table/icon/psychmeta_icon_twitter.png?raw=TRUE" alt="psychmeta logo" align="left">
+<img width="200" src="https://github.com/psychmeta/psychmeta/blob/develop/icon/psychmeta_icon_twitter.png?raw=TRUE" alt="psychmeta logo" align="left">
 
 psychmeta: Psychometric Meta-Analysis Toolkit
 ======================================
