@@ -1,8 +1,8 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 2.0.2.99
-Date: 2018-05-30
+Version: 2.1.0
+Date: 2018-06-01
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "jeffrey@psychmeta.com"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
