@@ -290,7 +290,7 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 
         # Set the output file name
         if(is.null(file)) file <- "psychmeta_output"
-        if(file %in% c("console", "rename")) file <- .filename_check(file, output_format)
+        if(!file %in% c("console", "rename")) file <- .filename_check(file, output_format)
 
         if(file == "rename") return(meta_tables)
 
