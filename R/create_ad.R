@@ -982,7 +982,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
                                mean = mean_vec,
                                var = var_vec, var_e = vare_vec, var_res = var_res_vec,
                                sd = var_vec^.5, sd_e = vare_vec^.5, sd_res = var_res_vec^.5,
-                               rel_coef = rel_vec, rel_index = sqrt(rel_vec))
+                               reliability = rel_vec)
           rownames(summary_mat) <- name_vec
           summary_mat <- summary_mat[c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
                                        "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
@@ -1229,9 +1229,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                     mean_ux = mean_ux, var_ux = var_ux, k_ux = k_ux, mean_ni_ux = mean_ni_ux, mean_na_ux = mean_na_ux, dep_sds_ux_spec = dep_sds_ux_spec,
 
                     ut = ut, ni_ut = ni_ut, na_ut = na_ut, wt_ut = wt_ut, dep_sds_ut_obs = dep_sds_ut_obs,
-                    mean_ut = mean_ut, var_ut = var_ut, k_ut = k_ut, mean_ni_ut = mean_ni_ut, mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec,
-
-                    ...)
+                    mean_ut = mean_ut, var_ut = var_ut, k_ut = k_ut, mean_ni_ut = mean_ni_ut, mean_na_ut = mean_na_ut, dep_sds_ut_spec = dep_sds_ut_spec)
 
      N_qxi <- mean_n_qxi * k_qxi
      N_rxxi <- mean_n_rxxi * k_rxxi
@@ -1268,7 +1266,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(art == "u") art_desc_obs <- t(wt_dist(x = art_vec, wt = wt_vec, unbiased = var_unbiased))
 
                if(is.null(ni_vec)){
-                    art_desc_obs <- cbind(art_desc_obs, var_res = as.numeric(art_desc_obs[,"var"]), total_n = 1, n_wt = 0)
+                    art_desc_obs <- cbind(art_desc_obs, var_e = 0, var_res = as.numeric(art_desc_obs[,"var"]), total_n = 1, n_wt = 0)
                }else{
                     if(art == "q"){
                          var_e <- var_error_q(q = art_desc_obs[,"mean"], n = ni_vec, rel_type = art_type, k_items = k_items)
@@ -1302,7 +1300,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                          var_res <- as.numeric(art_desc_obs[,"var"] - var_e)
                     }
 
-                    art_desc_obs <- cbind(art_desc_obs, var_res = var_res, total_n = sum(ni_vec, na.rm = TRUE), n_wt = 1)
+                    art_desc_obs <- cbind(art_desc_obs, var_e = var_e, var_res = var_res, total_n = sum(ni_vec, na.rm = TRUE), n_wt = 1)
                     art_desc_obs[,"var_res"] <- ifelse(art_desc_obs[,"var_res"] < 0, 0, as.numeric(art_desc_obs[,"var_res"]))
                }
           }else{
@@ -1317,21 +1315,25 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                if(!is.null(mean_ni_art_1)){
                     valid_n <- !is.na(mean_ni_art_1)
+                    var_e <- rep(0, nrow(art_desc_spec_1))
                     var_res <- as.numeric(art_desc_spec_1[,"var"])
-                    if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_q(q = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n], 
-                                                                                                               rel_type = dist_type_1, k_items = mean_k_items_art_1))
-                    if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_rel(rel = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n], 
-                                                                                                                   rel_type = dist_type_1, k_items = mean_k_items_art_1))
-                    if(art == "u") var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_error_u(u = art_desc_spec_1[valid_n,"mean"], ni = mean_ni_art_1[valid_n],
-                                                                                                               na = mean_na_art_1, dependent_sds = dependent_sds_art_1))
+                    if(art == "q") var_e[valid_n] <- as.numeric(var_error_q(q = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n], 
+                                                                              rel_type = dist_type_1, k_items = mean_k_items_art_1))
+                    if(art == "rel") var_e[valid_n] <- as.numeric(var_error_rel(rel = art_desc_spec_1[valid_n,"mean"], n = mean_ni_art_1[valid_n], 
+                                                                                  rel_type = dist_type_1, k_items = mean_k_items_art_1))
+                    if(art == "u") var_e[valid_n] <- as.numeric(var_error_u(u = art_desc_spec_1[valid_n,"mean"], ni = mean_ni_art_1[valid_n],
+                                                                              na = mean_na_art_1, dependent_sds = dependent_sds_art_1))
+                    
+                    var_res[valid_n] <- as.numeric(art_desc_spec_1[valid_n,"var"] - var_e[valid_n])
+                    
                     if(!is.null(k_art_1)){
-                         art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = var_res, total_n = k_art_1 * mean_ni_art_1, n_wt = as.numeric(valid_n))
+                         art_desc_spec_1 <- cbind(art_desc_spec_1, var_e = var_e, var_res = var_res, total_n = k_art_1 * mean_ni_art_1, n_wt = as.numeric(valid_n))
                     }else{
-                         art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = var_res, total_n = 1, n_wt = 0)
+                         art_desc_spec_1 <- cbind(art_desc_spec_1, var_e = var_e, var_res = var_res, total_n = 1, n_wt = 0)
                     }
                     art_desc_spec_1[,"var_res"] <- ifelse(art_desc_spec_1[,"var_res"] < 0, 0, as.numeric(art_desc_spec_1[,"var_res"]))
                }else{
-                    art_desc_spec_1 <- cbind(art_desc_spec_1, var_res = as.numeric(art_desc_spec_1[,"var"]), total_n = 1, n_wt = 0)
+                    art_desc_spec_1 <- cbind(art_desc_spec_1, var_e = 0, var_res = as.numeric(art_desc_spec_1[,"var"]), total_n = 1, n_wt = 0)
                }
           }else{
                art_desc_spec_1 <- NULL
@@ -1344,33 +1346,38 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                if(!is.null(mean_n_art_2)){
                     valid_n <- !is.na(mean_n_art_2)
+                    var_e <- rep(0, nrow(art_desc_spec_2))
                     var_res <- as.numeric(art_desc_spec_2[,"var"])
-                    if(art == "q") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_rel(rel = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n], 
-                                                                                                                 rel_type = dist_type_2, k_items = mean_k_items_art_2))
-                    if(art == "rel") var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_error_q(q = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n], 
-                                                                                                                 rel_type = dist_type_2, k_items = mean_k_items_art_2))
-
+                    if(art == "q") var_e[valid_n] <- as.numeric(var_error_rel(rel = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n], 
+                                                                                rel_type = dist_type_2, k_items = mean_k_items_art_2))
+                    if(art == "rel") var_e[valid_n] <- as.numeric(var_error_q(q = art_desc_spec_2[valid_n,"mean"], n = mean_n_art_2[valid_n], 
+                                                                                rel_type = dist_type_2, k_items = mean_k_items_art_2))
+                    
+                    var_res[valid_n] <- as.numeric(art_desc_spec_2[valid_n,"var"] - var_e[valid_n])
+                    
                     if(!is.null(k_art_2)){
-                         art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = var_res, total_n = k_art_2 * mean_n_art_2, n_wt = as.numeric(valid_n))
+                         art_desc_spec_2 <- cbind(art_desc_spec_2, var_e = var_e, var_res = var_res, total_n = k_art_2 * mean_n_art_2, n_wt = as.numeric(valid_n))
                     }else{
-                         art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = var_res, total_n = 1, n_wt = 0)
+                         art_desc_spec_2 <- cbind(art_desc_spec_2, var_e = var_e, var_res = var_res, total_n = 1, n_wt = 0)
                     }
                     art_desc_spec_2[,"var_res"] <- ifelse(art_desc_spec_2[,"var_res"] < 0, 0, as.numeric(art_desc_spec_2[,"var_res"]))
                }else{
-                    art_desc_spec_2 <- cbind(art_desc_spec_2, var_res = as.numeric(art_desc_spec_2[,"var"]), total_n = 1, n_wt = 0)
+                    art_desc_spec_2 <- cbind(art_desc_spec_2, var_e = 0, var_res = as.numeric(art_desc_spec_2[,"var"]), total_n = 1, n_wt = 0)
                }
 
                if(art == "q")
                     art_desc_spec_2 <- as.matrix(cbind(estimate_q_dist(mean_rel = art_desc_spec_2[,"mean"], var_rel = art_desc_spec_2[,"var"]),
+                                                       cbind(var_e = estimate_q_dist(mean_rel = art_desc_spec_2[,"mean"], var_rel = art_desc_spec_2[,"var_e"])[,2]),
                                                        cbind(var_res = estimate_q_dist(mean_rel = art_desc_spec_2[,"mean"], var_rel = art_desc_spec_2[,"var_res"])[,2]),
-                                                       matrix(art_desc_spec_2[,4:5], ncol = 2)))
+                                                       matrix(art_desc_spec_2[,c("total_n", "n_wt")], ncol = 2)))
 
                if(art == "rel")
                     art_desc_spec_2 <- as.matrix(cbind(estimate_rel_dist(mean_q = art_desc_spec_2[,"mean"], var_q = art_desc_spec_2[,"var"]),
+                                                       cbind(var_e = estimate_rel_dist(mean_q = art_desc_spec_2[,"mean"], var_q = art_desc_spec_2[,"var_e"])[,2]),
                                                        cbind(var_res = estimate_rel_dist(mean_q = art_desc_spec_2[,"mean"], var_q = art_desc_spec_2[,"var_res"])[,2]),
-                                                       matrix(art_desc_spec_2[,4:5], ncol = 2)))
+                                                       matrix(art_desc_spec_2[,c("total_n", "n_wt")], ncol = 2)))
 
-               colnames(art_desc_spec_2) <- c("mean", "var", "var_res", "total_n", "n_wt")
+               colnames(art_desc_spec_2) <- c("mean", "var", "var_e", "var_res", "total_n", "n_wt")
           }else{
                art_desc_spec_2 <- NULL
           }
@@ -1400,22 +1407,24 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                          n_wt_vec <- rep(1, nrow(art_desc_mat))
                     }
                     art_desc <- setNames(as.numeric(mix_dist(mean_vec = art_desc_mat[,"mean"], var_vec = art_desc_mat[,"var"], n_vec = n_wt_vec, unbiased = var_unbiased)[c(1,4)]), c("mean", "var"))
-                    art_desc <- c(art_desc, var_res = as.numeric(mix_dist(mean_vec = art_desc_mat[,"mean"], var_vec = art_desc_mat[,"var_res"], n_vec = n_wt_vec, unbiased = var_unbiased))[4],
+                    art_desc <- c(art_desc,
+                                  var_e = as.numeric(mix_dist(mean_vec = art_desc_mat[,"mean"], var_vec = art_desc_mat[,"var_e"], n_vec = n_wt_vec, unbiased = var_unbiased))[4],
+                                  var_res = as.numeric(mix_dist(mean_vec = art_desc_mat[,"mean"], var_vec = art_desc_mat[,"var_res"], n_vec = n_wt_vec, unbiased = var_unbiased))[4],
                                   total_n = sum(n_wt_vec), n_wt = as.numeric(n_wt))
                }else{
                     art_desc <- setNames(c(art_desc_mat), colnames(art_desc_mat))
                }
 
           }else{
-               art_desc <- matrix(0, 0, 5)
-               colnames(art_desc) <- c("mean", "var", "var_res", "total_n", "n_wt")
+               art_desc <- matrix(0, 0, 6)
+               colnames(art_desc) <- c("mean", "var", "var_e", "var_res", "total_n", "n_wt")
           }
           if(is.null(dim(art_desc))) art_desc <- t(art_desc)
           art_desc
      }
 
-     art_desc <- matrix(0, 0, 5)
-     colnames(art_desc) <- c("mean", "var", "var_res", "total_n", "n_wt")
+     art_desc <- matrix(0, 0, 6)
+     colnames(art_desc) <- c("mean", "var", "var_e", "var_res", "total_n", "n_wt")
 
 
      if(!is.null(rxxi)){
@@ -1668,7 +1677,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                              mean_art_1 = mean_qxi, var_art_1 = var_qxi, k_art_1 = k_qxi, mean_ni_art_1 = mean_n_qxi, dist_type_1 = qxi_dist_type, mean_k_items_art_1 = mean_k_items_qxi, 
                              mean_art_2 = mean_rxxi, var_art_2 = var_rxxi, k_art_2 = k_rxxi, mean_n_art_2 = mean_n_rxxi, dist_type_2 = rxxi_dist_type, mean_k_items_art_2 = mean_k_items_rxxi,  
                              art = "q", var_unbiased = var_unbiased)
-     
+
      ## All reliability coefficients
      rxxa_desc <- art_summary(art_vec = rxxa, wt_vec = wt_rxxa, ni_vec = n_rxxa, art_type = rxxa_type, k_items = k_items_rxxa, 
                               mean_art_1 = mean_rxxa, var_art_1 = var_rxxa, k_art_1 = k_rxxa, mean_ni_art_1 = mean_n_rxxa, dist_type_1 = rxxa_dist_type, mean_k_items_art_1 = mean_k_items_rxxa, 
@@ -1740,8 +1749,8 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                                estimate_rxxa = TRUE, estimate_rxxi = TRUE,
                                estimate_ux = TRUE, estimate_ut = TRUE){
-          filler <- matrix(0, 0, 4)
-          colnames(filler) <- c("mean", "var", "var_res", "wt")
+          filler <- matrix(0, 0, 5)
+          colnames(filler) <- c("mean", "var", "var_e", "var_res", "wt")
 
           ux_wt <- as.numeric(ifelse(nrow(ux_desc) > 0, ifelse(ux_desc[,"n_wt"] == 1, ux_desc[,"total_n"], 1), 0))
           ut_wt <- as.numeric(ifelse(nrow(ut_desc) > 0, ifelse(ut_desc[,"n_wt"] == 1, ut_desc[,"total_n"], 1), 0))
@@ -1759,56 +1768,56 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           p_ux[is.na(p_ux)] <- p_ut[is.na(p_ut)] <- p_qxa[is.na(p_qxa)] <- p_qxi[is.na(p_qxi)] <- 0
 
           if(nrow(qxa_desc) > 0){
-               qxa_desc <- t(c(qxa_desc[,1:3], wt = qxa_wt))
-               rxxa_desc <- t(c(rxxa_desc[,1:3], wt = qxa_wt))
+               qxa_desc <- t(c(qxa_desc[,1:4], wt = qxa_wt))
+               rxxa_desc <- t(c(rxxa_desc[,1:4], wt = qxa_wt))
           }else{
                qxa_desc <- rxxa_desc <- filler
           }
 
           if(nrow(qxa_desc_c) > 0){
-               qxa_desc_c <- t(c(qxa_desc_c[,1:3], wt = qxa_wt_c))
-               rxxa_desc_c <- t(c(rxxa_desc_c[,1:3], wt = qxa_wt_c))
+               qxa_desc_c <- t(c(qxa_desc_c[,1:4], wt = qxa_wt_c))
+               rxxa_desc_c <- t(c(rxxa_desc_c[,1:4], wt = qxa_wt_c))
           }else{
                qxa_desc_c <- rxxa_desc_c <- filler
           }
 
           if(nrow(qxa_desc_m) > 0){
-               qxa_desc_m <- t(c(qxa_desc_m[,1:3], wt = qxa_wt_m))
-               rxxa_desc_m <- t(c(rxxa_desc_m[,1:3], wt = qxa_wt_m))
+               qxa_desc_m <- t(c(qxa_desc_m[,1:4], wt = qxa_wt_m))
+               rxxa_desc_m <- t(c(rxxa_desc_m[,1:4], wt = qxa_wt_m))
           }else{
                qxa_desc_m <- rxxa_desc_m <- filler
           }
 
 
           if(nrow(qxi_desc) > 0){
-               qxi_desc <- t(c(qxi_desc[,1:3], wt = qxi_wt))
-               rxxi_desc <- t(c(rxxi_desc[,1:3], wt = qxi_wt))
+               qxi_desc <- t(c(qxi_desc[,1:4], wt = qxi_wt))
+               rxxi_desc <- t(c(rxxi_desc[,1:4], wt = qxi_wt))
           }else{
                qxi_desc <- rxxi_desc <- filler
           }
 
           if(nrow(qxi_desc_c) > 0){
-               qxi_desc_c <- t(c(qxi_desc_c[,1:3], wt = qxi_wt_c))
-               rxxi_desc_c <- t(c(rxxi_desc_c[,1:3], wt = qxi_wt_c))
+               qxi_desc_c <- t(c(qxi_desc_c[,1:4], wt = qxi_wt_c))
+               rxxi_desc_c <- t(c(rxxi_desc_c[,1:4], wt = qxi_wt_c))
           }else{
                qxi_desc_c <- rxxi_desc_c <- filler
           }
 
           if(nrow(qxi_desc_m) > 0){
-               qxi_desc_m <- t(c(qxi_desc_m[,1:3], wt = qxi_wt_m))
-               rxxi_desc_m <- t(c(rxxi_desc_m[,1:3], wt = qxi_wt_m))
+               qxi_desc_m <- t(c(qxi_desc_m[,1:4], wt = qxi_wt_m))
+               rxxi_desc_m <- t(c(rxxi_desc_m[,1:4], wt = qxi_wt_m))
           }else{
                qxi_desc_m <- rxxi_desc_m <- filler
           }
 
           if(nrow(ux_desc) > 0){
-               ux_desc <- t(c(ux_desc[,1:3], wt = ux_wt))
+               ux_desc <- t(c(ux_desc[,1:4], wt = ux_wt))
           }else{
                ux_desc <- filler
           }
 
           if(nrow(ut_desc) > 0){
-               ut_desc <- t(c(ut_desc[,1:3], wt = ut_wt))
+               ut_desc <- t(c(ut_desc[,1:4], wt = ut_wt))
           }else{
                ut_desc <- filler
           }
@@ -1817,14 +1826,16 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxi_desc) > 0 & nrow(ux_desc) > 0){
                     est_mean_qxa_irr <- estimate_rxxa(rxxi = qxi_desc[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = TRUE)^.5
                     est_var_qxa_irr <- estimate_var_qxa_ux(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
+                    est_var_e_qxa_irr <- estimate_var_qxa_ux(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_var_res_qxa_irr <- estimate_var_qxa_ux(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
-                    est_qxa_desc_ux_irr <- t(c(mean = est_mean_qxa_irr, var = est_var_qxa_irr, var_res = est_var_res_qxa_irr, wt = as.numeric(p_ux * qxi_desc[,"wt"])))
+                    est_qxa_desc_ux_irr <- t(c(mean = est_mean_qxa_irr, var = est_var_qxa_irr, var_e = est_var_e_qxa_irr, var_res = est_var_res_qxa_irr, wt = as.numeric(p_ux * qxi_desc[,"wt"])))
 
                     if(nrow(qxi_desc_c) > 0){
                          est_mean_qxa_drr_c <- estimate_rxxa(rxxi = qxi_desc_c[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")^.5
                          est_var_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "internal_consistency")
+                         est_var_e_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "internal_consistency")
                          est_var_res_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "internal_consistency")
-                         est_qxa_desc_ux_drr_c <- t(c(mean = est_mean_qxa_drr_c, var = est_var_qxa_drr_c, var_res = est_var_res_qxa_drr_c, wt = as.numeric(p_ux * qxi_desc_c[,"wt"])))
+                         est_qxa_desc_ux_drr_c <- t(c(mean = est_mean_qxa_drr_c, var = est_var_qxa_drr_c, var_e = est_var_e_qxa_drr_c, var_res = est_var_res_qxa_drr_c, wt = as.numeric(p_ux * qxi_desc_c[,"wt"])))
                     }else{
                          est_qxa_desc_ux_drr_c <- filler
                     }
@@ -1832,8 +1843,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                     if(nrow(qxi_desc_m) > 0){
                          est_mean_qxa_drr_m <- estimate_rxxa(rxxi = qxi_desc_m[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")^.5
                          est_var_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "multiple_administrations")
+                         est_var_e_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "multiple_administrations")
                          est_var_res_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxi_type = "multiple_administrations")
-                         est_qxa_desc_ux_drr_m <- t(c(mean = est_mean_qxa_drr_m, var = est_var_qxa_drr_m, var_res = est_var_res_qxa_drr_m, wt = as.numeric(p_ux * qxi_desc_m[,"wt"])))
+                         est_qxa_desc_ux_drr_m <- t(c(mean = est_mean_qxa_drr_m, var = est_var_qxa_drr_m, var_e = est_var_e_qxa_drr_m, var_res = est_var_res_qxa_drr_m, wt = as.numeric(p_ux * qxi_desc_m[,"wt"])))
                     }else{
                          est_qxa_desc_ux_drr_m <- filler
                     }
@@ -1841,14 +1853,16 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                     est_mean_rxxa_irr <- estimate_rxxa(rxxi = rxxi_desc[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = TRUE)
                     est_var_rxxa_irr <- estimate_var_rxxa_ux(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
+                    est_var_e_rxxa_irr <- estimate_var_rxxa_ux(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_var_res_rxxa_irr <- estimate_var_rxxa_ux(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
-                    est_rxxa_desc_ux_irr <- t(c(mean = est_mean_rxxa_irr, var = est_var_rxxa_irr, var_res = est_var_res_rxxa_irr, wt = as.numeric(p_ux * rxxi_desc[,"wt"])))
+                    est_rxxa_desc_ux_irr <- t(c(mean = est_mean_rxxa_irr, var = est_var_rxxa_irr, var_e = est_var_e_rxxa_irr, var_res = est_var_res_rxxa_irr, wt = as.numeric(p_ux * rxxi_desc[,"wt"])))
 
                     if(nrow(rxxi_desc_c) > 0){
                          est_mean_rxxa_drr_c <- estimate_rxxa(rxxi = rxxi_desc_c[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
                          est_var_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                         est_var_e_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "internal_consistency")
                          est_var_res_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "internal_consistency")
-                         est_rxxa_desc_ux_drr_c <- t(c(mean = est_mean_rxxa_drr_c, var = est_var_rxxa_drr_c, var_res = est_var_res_rxxa_drr_c, wt = as.numeric(p_ux * rxxi_desc_c[,"wt"])))
+                         est_rxxa_desc_ux_drr_c <- t(c(mean = est_mean_rxxa_drr_c, var = est_var_rxxa_drr_c, var_e = est_var_e_rxxa_drr_c, var_res = est_var_res_rxxa_drr_c, wt = as.numeric(p_ux * rxxi_desc_c[,"wt"])))
                     }else{
                          est_rxxa_desc_ux_drr_c <- filler
                     }
@@ -1856,8 +1870,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                     if(nrow(rxxi_desc_m) > 0){
                          est_mean_rxxa_drr_m <- estimate_rxxa(rxxi = rxxi_desc_m[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
                          est_var_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                         est_var_e_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "multiple_administrations")
                          est_var_res_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxi_type = "multiple_administrations")
-                         est_rxxa_desc_ux_drr_m <- t(c(mean = est_mean_rxxa_drr_m, var = est_var_rxxa_drr_m, var_res = est_var_res_rxxa_drr_m, wt = as.numeric(p_ux * rxxi_desc_m[,"wt"])))
+                         est_rxxa_desc_ux_drr_m <- t(c(mean = est_mean_rxxa_drr_m, var = est_var_rxxa_drr_m, var_e = est_var_e_rxxa_drr_m, var_res = est_var_res_rxxa_drr_m, wt = as.numeric(p_ux * rxxi_desc_m[,"wt"])))
                     }else{
                          est_rxxa_desc_ux_drr_m <- filler
                     }
@@ -1870,15 +1885,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxi_desc) > 0 & nrow(ut_desc) > 0){
                     est_mean_qxa <- estimate_rxxa(rxxi = qxi_desc[,"mean"]^2, ux = ut_desc[,"mean"], ux_observed = FALSE)^.5
                     est_var_qxa <- estimate_var_qxa_ut(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var"], ut = ut_desc[,"mean"])
+                    est_var_e_qxa <- estimate_var_qxa_ut(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var_e"], ut = ut_desc[,"mean"])
                     est_var_res_qxa <- estimate_var_qxa_ut(qxi = qxi_desc[,"mean"], var_qxi = qxi_desc[,"var_res"], ut = ut_desc[,"mean"])
-                    est_qxa_desc_ut_irr <- t(c(mean = est_mean_qxa, var = est_var_qxa, var_res = est_var_res_qxa, wt = as.numeric(p_ut * qxi_desc[,"wt"])))
+                    est_qxa_desc_ut_irr <- t(c(mean = est_mean_qxa, var = est_var_qxa, var_e = est_var_e_qxa, var_res = est_var_res_qxa, wt = as.numeric(p_ut * qxi_desc[,"wt"])))
 
                     if(nrow(qxi_desc_c) > 0){
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = qxi_desc_c[,"mean"]^2, rxx_restricted = TRUE)
                          est_mean_qxa_drr_c <- estimate_rxxa(rxxi = qxi_desc_c[,"mean"]^2, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")^.5
                          est_var_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var"], ux = .ux_mean, indirect_rr = FALSE, qxi_type = "internal_consistency")
+                         est_var_e_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, qxi_type = "internal_consistency")
                          est_var_res_qxa_drr_c <- estimate_var_qxa_ux(qxi = qxi_desc_c[,"mean"], var_qxi = qxi_desc_c[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, qxi_type = "internal_consistency")
-                         est_qxa_desc_ut_drr_c <- t(c(mean = est_mean_qxa_drr_c, var = est_var_qxa_drr_c, var_res = est_var_res_qxa_drr_c, wt = as.numeric(p_ut * qxi_desc_c[,"wt"])))
+                         est_qxa_desc_ut_drr_c <- t(c(mean = est_mean_qxa_drr_c, var = est_var_qxa_drr_c, var_e = est_var_e_qxa_drr_c, var_res = est_var_res_qxa_drr_c, wt = as.numeric(p_ut * qxi_desc_c[,"wt"])))
                     }else{
                          est_qxa_desc_ut_drr_c <- filler
                     }
@@ -1887,8 +1904,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = qxi_desc_m[,"mean"]^2, rxx_restricted = TRUE)
                          est_mean_qxa_drr_m <- estimate_rxxa(rxxi = qxi_desc_m[,"mean"]^2, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")^.5
                          est_var_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var"], ux = .ux_mean, indirect_rr = FALSE, qxi_type = "multiple_administrations")
+                         est_var_e_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, qxi_type = "multiple_administrations")
                          est_var_res_qxa_drr_m <- estimate_var_qxa_ux(qxi = qxi_desc_m[,"mean"], var_qxi = qxi_desc_m[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, qxi_type = "multiple_administrations")
-                         est_qxa_desc_ut_drr_m <- t(c(mean = est_mean_qxa_drr_m, var = est_var_qxa_drr_m, var_res = est_var_res_qxa_drr_m, wt = as.numeric(p_ut * qxi_desc_m[,"wt"])))
+                         est_qxa_desc_ut_drr_m <- t(c(mean = est_mean_qxa_drr_m, var = est_var_qxa_drr_m, var_e = est_var_e_qxa_drr_m, var_res = est_var_res_qxa_drr_m, wt = as.numeric(p_ut * qxi_desc_m[,"wt"])))
                     }else{
                          est_qxa_desc_ut_drr_m <- filler
                     }
@@ -1896,15 +1914,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                     est_mean_rxxa <- estimate_rxxa(rxxi = rxxi_desc[,"mean"], ux = ut_desc[,"mean"], ux_observed = FALSE)
                     est_var_rxxa <- estimate_var_rxxa_ut(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var"], ut = ut_desc[,"mean"])
+                    est_var_e_rxxa <- estimate_var_rxxa_ut(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var_e"], ut = ut_desc[,"mean"])
                     est_var_res_rxxa <- estimate_var_rxxa_ut(rxxi = rxxi_desc[,"mean"], var_rxxi = rxxi_desc[,"var_res"], ut = ut_desc[,"mean"])
-                    est_rxxa_desc_ut_irr <- t(c(mean = est_mean_rxxa, var = est_var_rxxa, var_res = est_var_res_rxxa, wt = as.numeric(p_ut * qxi_desc[,"wt"])))
+                    est_rxxa_desc_ut_irr <- t(c(mean = est_mean_rxxa, var = est_var_rxxa, var_e = est_var_e_rxxa, var_res = est_var_res_rxxa, wt = as.numeric(p_ut * qxi_desc[,"wt"])))
 
                     if(nrow(rxxi_desc_c) > 0){
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = rxxi_desc_c[,"mean"], rxx_restricted = TRUE)
                          est_mean_rxxa_drr_c <- estimate_rxxa(rxxi = rxxi_desc_c[,"mean"], ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "internal_consistency")
                          est_var_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var"], ux = .ux_mean, indirect_rr = FALSE, rxxi_type = "internal_consistency")
+                         est_var_e_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, rxxi_type = "internal_consistency")
                          est_var_res_rxxa_drr_c <- estimate_var_rxxa_ux(rxxi = rxxi_desc_c[,"mean"], var_rxxi = rxxi_desc_c[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, rxxi_type = "internal_consistency")
-                         est_rxxa_desc_ut_drr_c <- t(c(mean = est_mean_rxxa_drr_c, var = est_var_rxxa_drr_c, var_res = est_var_res_rxxa_drr_c, wt = as.numeric(p_ut * rxxi_desc_c[,"wt"])))
+                         est_rxxa_desc_ut_drr_c <- t(c(mean = est_mean_rxxa_drr_c, var = est_var_rxxa_drr_c, var_e = est_var_e_rxxa_drr_c, var_res = est_var_res_rxxa_drr_c, wt = as.numeric(p_ut * rxxi_desc_c[,"wt"])))
                     }else{
                          est_rxxa_desc_ut_drr_c <- filler
                     }
@@ -1913,8 +1933,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = rxxi_desc_m[,"mean"], rxx_restricted = TRUE)
                          est_mean_rxxa_drr_m <- estimate_rxxa(rxxi = rxxi_desc_m[,"mean"], ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
                          est_var_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var"], ux = .ux_mean, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
+                         est_var_e_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
                          est_var_res_rxxa_drr_m <- estimate_var_rxxa_ux(rxxi = rxxi_desc_m[,"mean"], var_rxxi = rxxi_desc_m[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, rxxi_type = "multiple_administrations")
-                         est_rxxa_desc_ut_drr_m <- t(c(mean = est_mean_rxxa_drr_m, var = est_var_rxxa_drr_m, var_res = est_var_res_rxxa_drr_m, wt = as.numeric(p_ut * rxxi_desc_m[,"wt"])))
+                         est_rxxa_desc_ut_drr_m <- t(c(mean = est_mean_rxxa_drr_m, var = est_var_rxxa_drr_m, var_e = est_var_e_rxxa_drr_m, var_res = est_var_res_rxxa_drr_m, wt = as.numeric(p_ut * rxxi_desc_m[,"wt"])))
                     }else{
                          est_rxxa_desc_ut_drr_m <- filler
                     }
@@ -1937,14 +1958,16 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxa_desc) > 0 & nrow(ux_desc) > 0){
                     est_mean_qxi_irr <- estimate_rxxi(rxxa = qxa_desc[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = TRUE)^.5
                     est_var_qxi_irr <- estimate_var_qxi_ux(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
+                    est_var_e_qxi_irr <- estimate_var_qxi_ux(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_var_res_qxi_irr <- estimate_var_qxi_ux(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
-                    est_qxi_desc_ux_irr <- t(c(mean = est_mean_qxi_irr, var = est_var_qxi_irr, var_res = est_var_res_qxi_irr, wt = as.numeric(p_ux * qxa_desc[,"wt"])))
+                    est_qxi_desc_ux_irr <- t(c(mean = est_mean_qxi_irr, var = est_var_qxi_irr, var_e = est_var_e_qxi_irr, var_res = est_var_res_qxi_irr, wt = as.numeric(p_ux * qxa_desc[,"wt"])))
 
                     if(nrow(qxa_desc_c) > 0){
                          est_mean_qxi_drr_c <- estimate_rxxi(rxxa = qxa_desc_c[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")^.5
                          est_var_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "internal_consistency")
+                         est_var_e_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "internal_consistency")
                          est_var_res_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "internal_consistency")
-                         est_qxi_desc_ux_drr_c <- t(c(mean = est_mean_qxi_drr_c, var = est_var_qxi_drr_c, var_res = est_var_res_qxi_drr_c, wt = as.numeric(p_ux * qxa_desc_c[,"wt"])))
+                         est_qxi_desc_ux_drr_c <- t(c(mean = est_mean_qxi_drr_c, var = est_var_qxi_drr_c, var_e = est_var_e_qxi_drr_c, var_res = est_var_res_qxi_drr_c, wt = as.numeric(p_ux * qxa_desc_c[,"wt"])))
                     }else{
                          est_qxi_desc_ux_drr_c <- filler
                     }
@@ -1952,8 +1975,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                     if(nrow(qxa_desc_m) > 0){
                          est_mean_qxi_drr_m <- estimate_rxxi(rxxa = qxa_desc_m[,"mean"]^2, ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")^.5
                          est_var_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "multiple_administrations")
+                         est_var_e_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "multiple_administrations")
                          est_var_res_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, qxa_type = "multiple_administrations")
-                         est_qxi_desc_ux_drr_m <- t(c(mean = est_mean_qxi_drr_m, var = est_var_qxi_drr_m, var_res = est_var_res_qxi_drr_m, wt = as.numeric(p_ux * qxa_desc_m[,"wt"])))
+                         est_qxi_desc_ux_drr_m <- t(c(mean = est_mean_qxi_drr_m, var = est_var_qxi_drr_m, var_e = est_var_e_qxi_drr_m, var_res = est_var_res_qxi_drr_m, wt = as.numeric(p_ux * qxa_desc_m[,"wt"])))
                     }else{
                          est_qxi_desc_ux_drr_m <- filler
                     }
@@ -1961,14 +1985,16 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                     est_mean_rxxi_irr <- estimate_rxxi(rxxa = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = TRUE)
                     est_var_rxxi_irr <- estimate_var_rxxi_ux(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
+                    est_var_e_rxxi_irr <- estimate_var_rxxi_ux(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
                     est_var_res_rxxi_irr <- estimate_var_rxxi_ux(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = TRUE)
-                    est_rxxi_desc_ux_irr <- t(c(mean = est_mean_rxxi_irr, var = est_var_rxxi_irr, var_res = est_var_res_rxxi_irr, wt = as.numeric(p_ux * qxa_desc[,"wt"])))
+                    est_rxxi_desc_ux_irr <- t(c(mean = est_mean_rxxi_irr, var = est_var_rxxi_irr, var_e = est_var_e_rxxi_irr, var_res = est_var_res_rxxi_irr, wt = as.numeric(p_ux * qxa_desc[,"wt"])))
 
                     if(nrow(rxxa_desc_c) > 0){
                          est_mean_rxxi_drr_c <- estimate_rxxi(rxxa = rxxa_desc_c[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
                          est_var_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                         est_var_e_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "internal_consistency")
                          est_var_res_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "internal_consistency")
-                         est_rxxi_desc_ux_drr_c <- t(c(mean = est_mean_rxxi_drr_c, var = est_var_rxxi_drr_c, var_res = est_var_res_rxxi_drr_c, wt = as.numeric(p_ux * rxxa_desc_c[,"wt"])))
+                         est_rxxi_desc_ux_drr_c <- t(c(mean = est_mean_rxxi_drr_c, var = est_var_rxxi_drr_c, var_e = est_var_e_rxxi_drr_c, var_res = est_var_res_rxxi_drr_c, wt = as.numeric(p_ux * rxxa_desc_c[,"wt"])))
                     }else{
                          est_rxxi_desc_ux_drr_c <- filler
                     }
@@ -1976,8 +2002,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                     if(nrow(rxxa_desc_m) > 0){
                          est_mean_rxxi_drr_m <- estimate_rxxi(rxxa = rxxa_desc_m[,"mean"], ux = ux_desc[,"mean"], ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
                          est_var_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                         est_var_e_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var_e"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "multiple_administrations")
                          est_var_res_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var_res"], ux = ux_desc[,"mean"], indirect_rr = FALSE, rxxa_type = "multiple_administrations")
-                         est_rxxi_desc_ux_drr_m <- t(c(mean = est_mean_rxxi_drr_m, var = est_var_rxxi_drr_m, var_res = est_var_res_rxxi_drr_m, wt = as.numeric(p_ux * rxxa_desc_m[,"wt"])))
+                         est_rxxi_desc_ux_drr_m <- t(c(mean = est_mean_rxxi_drr_m, var = est_var_rxxi_drr_m, var_e = est_var_e_rxxi_drr_m, var_res = est_var_res_rxxi_drr_m, wt = as.numeric(p_ux * rxxa_desc_m[,"wt"])))
                     }else{
                          est_rxxi_desc_ux_drr_m <- filler
                     }
@@ -1990,15 +2017,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxa_desc) > 0 & nrow(ut_desc) > 0){
                     est_mean_qxi <- estimate_rxxi(rxxa = qxa_desc[,"mean"]^2, ux = ut_desc[,"mean"], ux_observed = FALSE)^.5
                     est_var_qxi <- estimate_var_qxi_ut(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var"], ut = ut_desc[,"mean"])
+                    est_var_e_qxi <- estimate_var_qxi_ut(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var_e"], ut = ut_desc[,"mean"])
                     est_var_res_qxi <- estimate_var_qxi_ut(qxa = qxa_desc[,"mean"], var_qxa = qxa_desc[,"var_res"], ut = ut_desc[,"mean"])
-                    est_qxi_desc_ut_irr <- t(c(mean = est_mean_qxi, var = est_var_qxi, var_res = est_var_res_qxi, wt = as.numeric(p_ut * qxa_desc[,"wt"])))
+                    est_qxi_desc_ut_irr <- t(c(mean = est_mean_qxi, var = est_var_qxi, var_e = est_var_e_qxi, var_res = est_var_res_qxi, wt = as.numeric(p_ut * qxa_desc[,"wt"])))
 
                     if(nrow(qxa_desc_c) > 0){
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = qxa_desc_c[,"mean"]^2, rxx_restricted = FALSE)
                          est_mean_qxi_drr_c <- estimate_rxxi(rxxa = qxa_desc_c[,"mean"]^2, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")^.5
                          est_var_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var"], ux = .ux_mean, indirect_rr = FALSE, qxa_type = "internal_consistency")
+                         est_var_e_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, qxa_type = "internal_consistency")
                          est_var_res_qxi_drr_c <- estimate_var_qxi_ux(qxa = qxa_desc_c[,"mean"], var_qxa = qxa_desc_c[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, qxa_type = "internal_consistency")
-                         est_qxi_desc_ut_drr_c <- t(c(mean = est_mean_qxi_drr_c, var = est_var_qxi_drr_c, var_res = est_var_res_qxi_drr_c, wt = as.numeric(p_ut * qxa_desc_c[,"wt"])))
+                         est_qxi_desc_ut_drr_c <- t(c(mean = est_mean_qxi_drr_c, var = est_var_qxi_drr_c, var_e = est_var_e_qxi_drr_c, var_res = est_var_res_qxi_drr_c, wt = as.numeric(p_ut * qxa_desc_c[,"wt"])))
                     }else{
                          est_qxi_desc_ut_drr_c <- filler
                     }
@@ -2007,8 +2036,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = qxa_desc_m[,"mean"]^2, rxx_restricted = FALSE)
                          est_mean_qxi_drr_m <- estimate_rxxi(rxxa = qxa_desc_m[,"mean"]^2, ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")^.5
                          est_var_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var"], ux = .ux_mean, indirect_rr = FALSE, qxa_type = "multiple_administrations")
+                         est_var_e_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, qxa_type = "multiple_administrations")
                          est_var_res_qxi_drr_m <- estimate_var_qxi_ux(qxa = qxa_desc_m[,"mean"], var_qxa = qxa_desc_m[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, qxa_type = "multiple_administrations")
-                         est_qxi_desc_ut_drr_m <- t(c(mean = est_mean_qxi_drr_m, var = est_var_qxi_drr_m, var_res = est_var_res_qxi_drr_m, wt = as.numeric(p_ut * qxa_desc_m[,"wt"])))
+                         est_qxi_desc_ut_drr_m <- t(c(mean = est_mean_qxi_drr_m, var = est_var_qxi_drr_m, var_e = est_var_e_qxi_drr_m, var_res = est_var_res_qxi_drr_m, wt = as.numeric(p_ut * qxa_desc_m[,"wt"])))
                     }else{
                          est_qxi_desc_ut_drr_m <- filler
                     }
@@ -2016,15 +2046,17 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                     est_mean_rxxi <- estimate_rxxi(rxxa = rxxa_desc[,"mean"], ux = ut_desc[,"mean"], ux_observed = FALSE)
                     est_var_qxi <- estimate_var_rxxi_ut(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var"], ut = ut_desc[,"mean"])
+                    est_var_e_qxi <- estimate_var_rxxi_ut(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var_e"], ut = ut_desc[,"mean"])
                     est_var_res_qxi <- estimate_var_rxxi_ut(rxxa = rxxa_desc[,"mean"], var_rxxa = rxxa_desc[,"var_res"], ut = ut_desc[,"mean"])
-                    est_rxxi_desc_ut_irr <- t(c(mean = est_mean_rxxi, var = est_var_qxi, var_res = est_var_res_qxi, wt = as.numeric(p_ut * qxa_desc[,"wt"])))
+                    est_rxxi_desc_ut_irr <- t(c(mean = est_mean_rxxi, var = est_var_qxi, var_e = est_var_e_qxi, var_res = est_var_res_qxi, wt = as.numeric(p_ut * qxa_desc[,"wt"])))
 
                     if(nrow(rxxa_desc_c) > 0){
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = rxxa_desc_c[,"mean"], rxx_restricted = FALSE)
                          est_mean_rxxi_drr_c <- estimate_rxxi(rxxa = rxxa_desc_c[,"mean"], ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "internal_consistency")
                          est_var_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var"], ux = .ux_mean, indirect_rr = FALSE, rxxa_type = "internal_consistency")
+                         est_var_e_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, rxxa_type = "internal_consistency")
                          est_var_res_rxxi_drr_c <- estimate_var_rxxi_ux(rxxa = rxxa_desc_c[,"mean"], var_rxxa = rxxa_desc_c[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, rxxa_type = "internal_consistency")
-                         est_rxxi_desc_ut_drr_c <- t(c(mean = est_mean_rxxi_drr_c, var = est_var_rxxi_drr_c, var_res = est_var_res_rxxi_drr_c, wt = as.numeric(p_ut * rxxa_desc_c[,"wt"])))
+                         est_rxxi_desc_ut_drr_c <- t(c(mean = est_mean_rxxi_drr_c, var = est_var_rxxi_drr_c, var_e = est_var_e_rxxi_drr_c, var_res = est_var_res_rxxi_drr_c, wt = as.numeric(p_ut * rxxa_desc_c[,"wt"])))
                     }else{
                          est_rxxi_desc_ut_drr_c <- filler
                     }
@@ -2033,8 +2065,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                          .ux_mean <- estimate_ux(ut = ut_desc[,"mean"], rxx = rxxa_desc_m[,"mean"], rxx_restricted = FALSE)
                          est_mean_rxxi_drr_m <- estimate_rxxi(rxxa = rxxa_desc_m[,"mean"], ux = .ux_mean, ux_observed = TRUE, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
                          est_var_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var"], ux = .ux_mean, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
+                         est_var_e_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var_e"], ux = .ux_mean, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
                          est_var_res_rxxi_drr_m <- estimate_var_rxxi_ux(rxxa = rxxa_desc_m[,"mean"], var_rxxa = rxxa_desc_m[,"var_res"], ux = .ux_mean, indirect_rr = FALSE, rxxa_type = "multiple_administrations")
-                         est_rxxi_desc_ut_drr_m <- t(c(mean = est_mean_rxxi_drr_m, var = est_var_rxxi_drr_m, var_res = est_var_res_rxxi_drr_m, wt = as.numeric(p_ut * rxxa_desc_m[,"wt"])))
+                         est_rxxi_desc_ut_drr_m <- t(c(mean = est_mean_rxxi_drr_m, var = est_var_rxxi_drr_m, var_e = est_var_e_rxxi_drr_m, var_res = est_var_res_rxxi_drr_m, wt = as.numeric(p_ut * rxxa_desc_m[,"wt"])))
                     }else{
                          est_rxxi_desc_ut_drr_m <- filler
                     }
@@ -2057,13 +2090,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxi_desc) > 0 & nrow(ut_desc) > 0){
                     est_mean_ux <- estimate_ux(rxx = qxi_desc[,"mean"]^2, ut = ut_desc[,"mean"], rxx_restricted = TRUE)
                     est_var_ux <- estimate_var_ux_qxi(qxi = qxi_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var"])
+                    est_var_e_ux <- estimate_var_ux_qxi(qxi = qxi_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_e"])
                     est_var_res_ux <- estimate_var_ux_qxi(qxi = qxi_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_res"])
-                    est_ux_desc_qxi <- t(c(mean = est_mean_ux, var = est_var_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxi * ut_desc[,"wt"])))
+                    est_ux_desc_qxi <- t(c(mean = est_mean_ux, var = est_var_ux, var_e = est_var_e_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxi * ut_desc[,"wt"])))
 
                     est_mean_ux <- estimate_ux(rxx = rxxi_desc[,"mean"], ut = ut_desc[,"mean"], rxx_restricted = TRUE)
                     est_var_ux <- estimate_var_ux_rxxi(rxxi = rxxi_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var"])
+                    est_var_e_ux <- estimate_var_ux_rxxi(rxxi = rxxi_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_e"])
                     est_var_res_ux <- estimate_var_ux_rxxi(rxxi = rxxi_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_res"])
-                    est_ux_desc_rxxi <- t(c(mean = est_mean_ux, var = est_var_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxi * ut_desc[,"wt"])))
+                    est_ux_desc_rxxi <- t(c(mean = est_mean_ux, var = est_var_ux, var_e = est_var_e_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxi * ut_desc[,"wt"])))
 
                     est_ux_desc_qxi <- zapsmall((est_ux_desc_qxi + est_ux_desc_rxxi) / 2)
                }else{
@@ -2073,13 +2108,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxa_desc) > 0 & nrow(ut_desc) > 0){
                     est_mean_ux <- estimate_ux(rxx = qxa_desc[,"mean"]^2, ut = ut_desc[,"mean"], rxx_restricted = FALSE)
                     est_var_ux <- estimate_var_ux_qxa(qxa = qxa_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var"])
+                    est_var_e_ux <- estimate_var_ux_qxa(qxa = qxa_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_e"])
                     est_var_res_ux <- estimate_var_ux_qxa(qxa = qxa_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_res"])
-                    est_ux_desc_qxa <- t(c(mean = est_mean_ux, var = est_var_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxa * ut_desc[,"wt"])))
+                    est_ux_desc_qxa <- t(c(mean = est_mean_ux, var = est_var_ux, var_e = est_var_e_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxa * ut_desc[,"wt"])))
 
                     est_mean_ux <- estimate_ux(rxx = rxxa_desc[,"mean"], ut = ut_desc[,"mean"], rxx_restricted = FALSE)
                     est_var_ux <- estimate_var_ux_rxxa(rxxa = rxxa_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var"])
+                    est_var_e_ux <- estimate_var_ux_rxxa(rxxa = rxxa_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_e"])
                     est_var_res_ux <- estimate_var_ux_rxxa(rxxa = rxxa_desc[,"mean"], ut = ut_desc[,"mean"], var_ut = ut_desc[,"var_res"])
-                    est_ux_desc_rxxa <- t(c(mean = est_mean_ux, var = est_var_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxa * ut_desc[,"wt"])))
+                    est_ux_desc_rxxa <- t(c(mean = est_mean_ux, var = est_var_ux, var_e = est_var_e_ux, var_res = est_var_res_ux, wt = as.numeric(p_qxa * ut_desc[,"wt"])))
 
                     est_ux_desc_qxa <- zapsmall((est_ux_desc_qxa + est_ux_desc_rxxa) / 2)
                }else{
@@ -2093,13 +2130,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxi_desc) > 0 & nrow(ux_desc) > 0){
                     est_mean_ut <- estimate_ut(rxx = qxi_desc[,"mean"]^2, ux = ux_desc[,"mean"], rxx_restricted = TRUE)
                     est_var_ut <- estimate_var_ut_qxi(qxi = qxi_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var"])
+                    est_var_e_ut <- estimate_var_ut_qxi(qxi = qxi_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_e"])
                     est_var_res_ut <- estimate_var_ut_qxi(qxi = qxi_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_res"])
-                    est_ut_desc_qxi <- t(c(mean = est_mean_ut, var = est_var_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxi * ux_desc[,"wt"])))
+                    est_ut_desc_qxi <- t(c(mean = est_mean_ut, var = est_var_ut, var_e = est_var_e_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxi * ux_desc[,"wt"])))
 
                     est_mean_ut <- estimate_ut(rxx = rxxi_desc[,"mean"], ux = ux_desc[,"mean"], rxx_restricted = TRUE)
                     est_var_ut <- estimate_var_ut_rxxi(rxxi = rxxi_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var"])
+                    est_var_e_ut <- estimate_var_ut_rxxi(rxxi = rxxi_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_e"])
                     est_var_res_ut <- estimate_var_ut_rxxi(rxxi = rxxi_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_res"])
-                    est_ut_desc_rxxi <- t(c(mean = est_mean_ut, var = est_var_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxi * ux_desc[,"wt"])))
+                    est_ut_desc_rxxi <- t(c(mean = est_mean_ut, var = est_var_ut, var_e = est_var_e_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxi * ux_desc[,"wt"])))
 
                     est_ut_desc_qxi <- zapsmall((est_ut_desc_qxi + est_ut_desc_rxxi) / 2)
                }else{
@@ -2109,13 +2148,15 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(nrow(qxa_desc) > 0 & nrow(ux_desc) > 0){
                     est_mean_ut <- estimate_ut(rxx = qxa_desc[,"mean"]^2, ux = ux_desc[,"mean"], rxx_restricted = FALSE)
                     est_var_ut <- estimate_var_ut_qxa(qxa = qxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var"])
+                    est_var_e_ut <- estimate_var_ut_qxa(qxa = qxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_e"])
                     est_var_res_ut <- estimate_var_ut_qxa(qxa = qxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_res"])
-                    est_ut_desc_qxa <- t(c(mean = est_mean_ut, var = est_var_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxa * ux_desc[,"wt"])))
+                    est_ut_desc_qxa <- t(c(mean = est_mean_ut, var = est_var_ut, var_e = est_var_e_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxa * ux_desc[,"wt"])))
 
                     est_mean_ut <- estimate_ut(rxx = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], rxx_restricted = FALSE)
                     est_var_ut <- estimate_var_ut_rxxi(rxxi = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var"])
+                    est_var_e_ut <- estimate_var_ut_rxxi(rxxi = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_e"])
                     est_var_res_ut <- estimate_var_ut_rxxi(rxxi = rxxa_desc[,"mean"], ux = ux_desc[,"mean"], var_ux = ux_desc[,"var_res"])
-                    est_ut_desc_rxxa <- t(c(mean = est_mean_ut, var = est_var_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxa * ux_desc[,"wt"])))
+                    est_ut_desc_rxxa <- t(c(mean = est_mean_ut, var = est_var_ut, var_e = est_var_e_ut, var_res = est_var_res_ut, wt = as.numeric(p_qxa * ux_desc[,"wt"])))
 
                     est_ut_desc_qxa <- zapsmall((est_ut_desc_qxa + est_ut_desc_rxxa) / 2)
                }else{
@@ -2129,8 +2170,9 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           summarize_ad <- function(desc_mat, var_unbiased){
                if(nrow(desc_mat) > 0){
                     c(mean = wt_mean(x = desc_mat[,"mean"], wt = desc_mat[,"wt"]),
-                      var = wt_mean(x = desc_mat[,"var"], wt = desc_mat[,"wt"]) + wt_var(x = desc_mat[,"mean"], wt = desc_mat[,"wt"], unbiased = var_unbiased),
-                      var_res = wt_mean(x = desc_mat[,"var_res"], wt = desc_mat[,"wt"]) + wt_var(x = desc_mat[,"mean"], wt = desc_mat[,"wt"], unbiased = var_unbiased))
+                      var = wt_mean(x = desc_mat[,"var"], wt = desc_mat[,"wt"]) + wt_var(x = desc_mat[,"mean"], wt = desc_mat[,"wt"], unbiased = FALSE),
+                      var_e = wt_mean(x = desc_mat[,"var_e"], wt = desc_mat[,"wt"]),
+                      var_res = wt_mean(x = desc_mat[,"var_res"], wt = desc_mat[,"wt"]) + wt_var(x = desc_mat[,"mean"], wt = desc_mat[,"wt"], unbiased = FALSE))
                }else{
                     NULL
                }
@@ -2155,9 +2197,12 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                        ux = summarize_ad(rbind(ux_desc, est_ux_desc_qxi, est_ux_desc_qxa), var_unbiased = var_unbiased),
                        ut = summarize_ad(rbind(ut_desc, est_ut_desc_qxi, est_ut_desc_qxa), var_unbiased = var_unbiased))
 
+          out[,"var_res"] <- out[,"var"] - out[,"var_e"]
+          out[,"var_res"][out[,"var_res"] < 0] <- 0
+          
           if(is.null(out)){
-               out <- matrix(0, 0, 3)
-               colnames(out) <- c("mean", "var", "var_res")
+               out <- matrix(0, 0, 4)
+               colnames(out) <- c("mean", "var", "var_e", "var_res")
           }
 
           valid_rxxa_irr <- any(grepl(x = rownames(out), pattern = "qxa_irr"))
@@ -2167,12 +2212,12 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           valid_ux <- any(grepl(x = rownames(out), pattern = "ux"))
           valid_ut <- any(grepl(x = rownames(out), pattern = "ut"))
 
-          if(!valid_rxxa_irr) out <- rbind(out, qxa_irr = c(1, 0, 0), rxxa_irr = c(1, 0, 0))
-          if(!valid_rxxa_drr) out <- rbind(out, qxa_drr = c(1, 0, 0), rxxa_drr = c(1, 0, 0))
-          if(!valid_rxxi_irr) out <- rbind(out, qxi_irr = c(1, 0, 0), rxxi_irr = c(1, 0, 0))
-          if(!valid_rxxi_drr) out <- rbind(out, qxi_drr = c(1, 0, 0), rxxi_drr = c(1, 0, 0))
-          if(!valid_ux) out <- rbind(out, ux = c(1, 0, 0))
-          if(!valid_ut) out <- rbind(out, ut = c(1, 0, 0))
+          if(!valid_rxxa_irr) out <- rbind(out, qxa_irr = c(1, 0, 0, 0), rxxa_irr = c(1, 0, 0, 0))
+          if(!valid_rxxa_drr) out <- rbind(out, qxa_drr = c(1, 0, 0, 0), rxxa_drr = c(1, 0, 0, 0))
+          if(!valid_rxxi_irr) out <- rbind(out, qxi_irr = c(1, 0, 0, 0), rxxi_irr = c(1, 0, 0, 0))
+          if(!valid_rxxi_drr) out <- rbind(out, qxi_drr = c(1, 0, 0, 0), rxxi_drr = c(1, 0, 0, 0))
+          if(!valid_ux) out <- rbind(out, ux = c(1, 0, 0, 0))
+          if(!valid_ut) out <- rbind(out, ut = c(1, 0, 0, 0))
 
           if(valid_rxxa_irr) if(is.na(out["qxa_irr",1])) valid_rxxa_irr <- FALSE
           if(valid_rxxa_drr) if(is.na(out["qxa_drr",1])) valid_rxxa_drr <- FALSE
@@ -2184,7 +2229,8 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           out[is.na(out[,1]),1] <- 1
           out[is.na(out[,2]),2] <- 0
           out[is.na(out[,3]),3] <- 0
-
+          out[is.na(out[,4]),4] <- 0
+          
           out <- out[c("qxa_irr", "qxa_drr", "qxi_irr", "qxi_drr",
                        "rxxa_irr", "rxxa_drr", "rxxi_irr", "rxxi_drr",
                        "ux", "ut"),]
@@ -2208,7 +2254,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                          sum(n_rxxa[.valid_rxxa], na.rm = TRUE), sum(n_rxxa[.valid_rxxa], na.rm = TRUE), sum(n_rxxi[.valid_rxxi], na.rm = TRUE), sum(n_rxxi[.valid_rxxi], na.rm = TRUE),
                                          sum(ni_ux[.valid_ux], na.rm = TRUE), sum(ni_ut[.valid_ut], na.rm = TRUE)),
 
-                               p_dists = c(length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
+                               L_dists = c(length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
                                            length(c(mean_qxa, mean_rxxa)), length(c(mean_qxa, mean_rxxa)), length(c(mean_qxi, mean_rxxi)), length(c(mean_qxi, mean_rxxi)),
                                            length(mean_ux), length(mean_ut)),
 
@@ -2239,7 +2285,8 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
           summary_mat <- cbind(k_total = apply(summary_mat[,c("k_obs", "k_dists")], 1, sum, na.rm = TRUE),
                                N_total = apply(summary_mat[,c("N_obs", "N_dists")], 1, sum, na.rm = TRUE),
                                summary_mat, out)
-          summary_mat <- cbind(summary_mat, sd = summary_mat[,"var"]^.5, sd_res = summary_mat[,"var_res"]^.5)
+          summary_mat <- cbind(summary_mat, sd = summary_mat[,"var"]^.5, sd_e = summary_mat[,"var_e"]^.5, sd_res = summary_mat[,"var_res"]^.5, 
+                               reliability = summary_mat[,"var_res"] / summary_mat[,"var"])
           attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
 
           out
@@ -2258,7 +2305,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 
                           estimate_rxxa = estimate_rxxa, estimate_rxxi = estimate_rxxi,
                           estimate_ux = estimate_ux, estimate_ut = estimate_ut)
-
+     
      out_raw <- est_summaries(qxi_desc = qxi_desc, qxa_desc = qxa_desc,
                               rxxi_desc = rxxi_desc, rxxa_desc = rxxa_desc,
 
