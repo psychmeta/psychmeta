@@ -70,7 +70,7 @@ print.ad_tsa <- function(x, ..., digits = 3){
 #' @exportClass ad_int_list
 #' @method print ad_int_list
 print.ad_int_list <- function(x, ..., digits = 3){
-     cat("Interactive Distributions\n")
+     cat("Interactive Artifact Distributions\n")
      cat("-------------------------\n")
      
      cat("\n")

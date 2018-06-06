@@ -141,8 +141,8 @@
 create_ad <- function(ad_type = c("tsa", "int"),
                       rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_type = rep("alpha", length(rxxi)), k_items_rxxi = rep(NA, length(rxxi)),
                       rxxa = NULL, n_rxxa = NULL, wt_rxxa = n_rxxa, rxxa_type = rep("alpha", length(rxxa)), k_items_rxxa = rep(NA, length(rxxa)),
-                      ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(ux, length(mean_ux)),
-                      ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = rep(ut, length(mean_ux)),
+                      ux = NULL, ni_ux = NULL, na_ux = NULL, wt_ux = ni_ux, dep_sds_ux_obs = rep(FALSE, length(ux)),
+                      ut = NULL, ni_ut = NULL, na_ut = NULL, wt_ut = ni_ut, dep_sds_ut_obs = rep(FALSE, length(ut)),
 
                       mean_qxi = NULL, var_qxi = NULL, k_qxi = NULL, mean_n_qxi = NULL, qxi_dist_type = rep("alpha", length(mean_qxi)), mean_k_items_qxi = rep(NA, length(mean_qxi)),
                       mean_rxxi = NULL, var_rxxi = NULL, k_rxxi = NULL, mean_n_rxxi = NULL, rxxi_dist_type = rep("alpha", length(mean_rxxi)), mean_k_items_rxxi = rep(NA, length(mean_rxxi)),
@@ -358,7 +358,7 @@ prepare_ad_int <- function(ad_obj, residual_ads = TRUE, decimals = Inf){
           for(i in names(ad_obj)){
                ad_obj_i <- ad_obj[[i]]
                mean_i <- wt_mean(x = ad_obj_i$Value, wt = ad_obj_i$Weight)
-               sd_i <- wt_var(x = ad_obj_i$Value, wt = ad_obj_i$Weight)^.5
+               sd_i <- attributes(ad_obj)$summary[i,"sd"]
                if(new_sd[i] == 0 | nrow(ad_obj_i) == 1){
                     ad_obj_i <- data.frame(Value = mean_i, Weight = sum(ad_obj_i$Weight))
                }else{
