@@ -358,7 +358,6 @@ prepare_ad_int <- function(ad_obj, residual_ads = TRUE, decimals = Inf){
           for(i in names(ad_obj)){
                ad_obj_i <- ad_obj[[i]]
                mean_i <- wt_mean(x = ad_obj_i$Value, wt = ad_obj_i$Weight)
-               # sd_i <- wt_var(x = ad_obj_i$Value, wt = ad_obj_i$Weight)^.5
                sd_i <- attributes(ad_obj)$summary[i,"sd"]
                if(new_sd[i] == 0 | nrow(ad_obj_i) == 1){
                     ad_obj_i <- data.frame(Value = mean_i, Weight = sum(ad_obj_i$Weight))

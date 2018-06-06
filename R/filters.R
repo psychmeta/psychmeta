@@ -290,7 +290,7 @@ screen_ad_tsa <- function(x){
      }
 
      if(is.matrix(x)){
-          if(ncol(x) != 4){
+          if(ncol(x) != 3){
                stop("x is not a Taylor series artifact distribution object", call. = FALSE)
           }else{
                nomenclature <- (grepl(x = ad_contents, pattern = "NULL") |
@@ -301,7 +301,7 @@ screen_ad_tsa <- function(x){
                                      grepl(x = ad_contents, pattern = "ux") | grepl(x = ad_contents, pattern = "ut")) &
                     all(names(x) %in% c("qxi_irr", "qxi_drr", "qxa_irr", "qxa_drr",
                                         "rxxi_irr", "rxxi_drr", "rxxa_irr", "rxxa_drr", "ux", "ut")) &
-                    all(colnames(x) %in% c("mean", "var", "var_e", "var_res"))
+                    all(colnames(x) %in% c("mean", "var", "var_res"))
           }
           if(!nomenclature){
                stop("x is not a Taylor series artifact distribution object", call. = FALSE)

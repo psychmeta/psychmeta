@@ -2287,6 +2287,8 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                                summary_mat, out)
           summary_mat <- cbind(summary_mat, sd = summary_mat[,"var"]^.5, sd_e = summary_mat[,"var_e"]^.5, sd_res = summary_mat[,"var_res"]^.5, 
                                reliability = summary_mat[,"var_res"] / summary_mat[,"var"])
+          
+          out <- out[,c("mean", "var", "var_res")]
           attributes(out) <- append(attributes(out), list(summary = summary_mat, ad_contents = ad_contents))
 
           out
