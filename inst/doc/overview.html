@@ -207,8 +207,8 @@ var_names &lt;- c(&quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;)
 es_design = matrix(NA, 3, 3)            # Matrix containing the column names
 es_design[lower.tri(es_design)] &lt;-      # for the intercorrelations among variables
   c(&quot;rxyi_X_Y&quot;, &quot;rxyi_X_Z&quot;, &quot;rxyi_Y_Z&quot;) # in the lower triangle of the matrix
-rownames(es_design) &lt;- 
-  colnames(es_design) &lt;- 
+rownames(es_design) &lt;-
+  colnames(es_design) &lt;-
   var_names
 n_design &lt;- &quot;ni&quot;                        # Sample size column name or es_design-like
                                         # matrix
@@ -247,8 +247,8 @@ convert_es(es = .021, input_es = &quot;p.chisq&quot;, output_es = &quot;d&quot;,
 convert_es(es = 4.37, input_es = &quot;or&quot;,      output_es = &quot;d&quot;, n1 = 100, n2 = 100)
 convert_es(es = 1.47, input_es = &quot;lor&quot;,     output_es = &quot;d&quot;, n1 = 100, n2 = 100)</code></pre>
 <p>To convert effect sizes for inclusion in a meta-analysis, pull out the <code>meta_input</code> object:</p>
-<pre class="r"><code>convert_es(es = c(.4, .3, .25), 
-           input_es = &quot;r&quot;, output_es = &quot;d&quot;, 
+<pre class="r"><code>convert_es(es = c(.4, .3, .25),
+           input_es = &quot;r&quot;, output_es = &quot;d&quot;,
            n1 = c(50, 110, 65), n2 = c(50, 70, 65)
            )$meta_input</code></pre>
 <div data-pagedtable="false">
@@ -275,7 +275,7 @@ correct_r_split(r = c(.3, .5), pi = .2, n = 100)</code></pre>
 #### Commonly used arguments: ####
 # Which data set would you like to use?
      data = NULL,
-      
+
 # Specify essential effect-size information.
      rxyi, n, n_adj = NULL,
 
@@ -291,7 +291,7 @@ correct_r_split(r = c(.3, .5), pi = .2, n = 100)</code></pre>
      measure_x = NULL, measure_y = NULL,
 
 # Weighting method
-     wt_type = &quot;sample_size&quot;, 
+     wt_type = &quot;sample_size&quot;,
 
 # Correct for small-sample bias?
      correct_bias = TRUE,
@@ -320,7 +320,7 @@ correct_r_split(r = c(.3, .5), pi = .2, n = 100)</code></pre>
 # What type of moderator analysis do you want (simple vs. hierarchical)?
      moderator_type = &quot;simple&quot;,
 
-# If correcting for bivariate indirect RR, how do constructs correlate 
+# If correcting for bivariate indirect RR, how do constructs correlate
 # with selection mechanisms? (only need to specify the +1 or -1 sign of the relationships)
      sign_rxz = 1, sign_ryz = 1,
 
@@ -343,7 +343,7 @@ correct_r_split(r = c(.3, .5), pi = .2, n = 100)</code></pre>
 # the selection mechanism?
      sign_rz = NULL,
 
-# Additional methological parameters can be modified using the &quot;control&quot; argument. 
+# Additional methological parameters can be modified using the &quot;control&quot; argument.
      control =  control_psychmeta()
 )</code></pre>
 
@@ -352,61 +352,61 @@ correct_r_split(r = c(.3, .5), pi = .2, n = 100)</code></pre>
      # Should the mean or the sample-specific effect sizes be used to estimate error variance?
      error_type = c(&quot;mean&quot;, &quot;sample&quot;),
      # What proportion of the distribution of means should be included in confidence intervals?
-     conf_level = .95, 
+     conf_level = .95,
      # What proportion of the residual distribution of observations should be included in credibility intervals?
-     cred_level = .8, 
+     cred_level = .8,
      # How should confidence and credibility intervals be computed? With the t or normal distribution?
-     conf_method = c(&quot;t&quot;, &quot;norm&quot;), 
-     cred_method = c(&quot;t&quot;, &quot;norm&quot;), 
+     conf_method = c(&quot;t&quot;, &quot;norm&quot;),
+     cred_method = c(&quot;t&quot;, &quot;norm&quot;),
      # Should weighted variance estimates be computed as unbiased (i.e., multiplied by k / [k-1])?
      var_unbiased = TRUE,
-     # Should overall artifaction distributions be computed for each construct (pairwise_ads == FALSE) or should 
+     # Should overall artifaction distributions be computed for each construct (pairwise_ads == FALSE) or should
      # artifact distributions be computed separately for each construct pair (pairwise_ads == TRUE)?
      pairwise_ads = FALSE,
-     # Should artifact distributions be computed by collapsing across moderator 
-     # levels (moderated_ads == FALSE) or should artifact distributions be computed 
+     # Should artifact distributions be computed by collapsing across moderator
+     # levels (moderated_ads == FALSE) or should artifact distributions be computed
      # separately for each moderator combination (moderated_ads == TRUE)?
      moderated_ads = FALSE,
-     # Should artifact-distribution corrections be computed using artifact distributions 
-     # that have had sampling error removed (residual_ads == TRUE) or should the observed 
+     # Should artifact-distribution corrections be computed using artifact distributions
+     # that have had sampling error removed (residual_ads == TRUE) or should the observed
      # distributions be used (residual_ads == TRUE)?
      residual_ads = TRUE,
-     # Should dependent observations (i.e., multiple observations of the same relationship in a single sample) be 
-     # consolidated so that there is just one independent observation per sample? 
-     check_dependence = TRUE, 
-     # If check_dependence is TRUE, how should dependency be resolved? Options are to compute a composite 
-     # effect size (default), compute the average of the effect sizes, or to stop with an error message. 
+     # Should dependent observations (i.e., multiple observations of the same relationship in a single sample) be
+     # consolidated so that there is just one independent observation per sample?
+     check_dependence = TRUE,
+     # If check_dependence is TRUE, how should dependency be resolved? Options are to compute a composite
+     # effect size (default), compute the average of the effect sizes, or to stop with an error message.
      collapse_method = c(&quot;composite&quot;, &quot;average&quot;, &quot;stop&quot;),
-     # The intercor argument uses the control_intercor() function to control how the intercorrelations 
+     # The intercor argument uses the control_intercor() function to control how the intercorrelations
      # among variables are handled with collapse_method == &quot;composite&quot;
      intercor = control_intercor(),
-     # Should artifact information be cleaned to resolve discrepancies among values recorded for multiple   
-     # relationsips involving a given construct in a given sample? 
-     clean_artifacts = TRUE, 
+     # Should artifact information be cleaned to resolve discrepancies among values recorded for multiple
+     # relationsips involving a given construct in a given sample?
+     clean_artifacts = TRUE,
      # Should missing artifact information be imputed? (For use with individual-correction method only)
      impute_artifacts = TRUE,
-     # If impute_artifacts is TRUE, how should imputation be performed? See the documentation for the 
-     # control_psychmeta() function for descriptions of the available options. 
-     impute_method = c(&quot;bootstrap_mod&quot;, &quot;bootstrap_full&quot;, &quot;simulate_mod&quot;, &quot;simulate_full&quot;, 
-                       &quot;wt_mean_mod&quot;, &quot;wt_mean_full&quot;, &quot;unwt_mean_mod&quot;, &quot;unwt_mean_full&quot;, 
+     # If impute_artifacts is TRUE, how should imputation be performed? See the documentation for the
+     # control_psychmeta() function for descriptions of the available options.
+     impute_method = c(&quot;bootstrap_mod&quot;, &quot;bootstrap_full&quot;, &quot;simulate_mod&quot;, &quot;simulate_full&quot;,
+                       &quot;wt_mean_mod&quot;, &quot;wt_mean_full&quot;, &quot;unwt_mean_mod&quot;, &quot;unwt_mean_full&quot;,
                        &quot;replace_unity&quot;, &quot;stop&quot;),
      # What seed value should be set for the imputation process? (This makes the imputation reproducible)
      seed = 42,
      # Should artifact information from observations not included in meta-analyses be harvested from &quot;data&quot;
      # and included in artifact distributions?
-     use_all_arts = TRUE, 
+     use_all_arts = TRUE,
      # For meta-analyses of d values, should the proportionality of membership in the unrestricted sample
      # be estimated from the range-restricted proportions and the range-restriction correction factor?
      estimate_pa = FALSE,
-     # To what number of decimal places should interactive artifact distributions be rounded prior to use? 
-     # Rounding reduces the computational burden of creating multi-dimensional arrays of artifact information. 
+     # To what number of decimal places should interactive artifact distributions be rounded prior to use?
+     # Rounding reduces the computational burden of creating multi-dimensional arrays of artifact information.
      decimals = 2,
      # Should the &quot;Hunter-Schmidt&quot; override settings be used? When TRUE, this will override settings for:
      # - wt_type will set to &quot;sample_size&quot;
      # - error_type will set to &quot;mean&quot;
      # - correct_bias will set to TRUE
      # - conf_method will set to &quot;norm&quot;
-     # - cred_method will set to &quot;norm&quot; 
+     # - cred_method will set to &quot;norm&quot;
      # - var_unbiased will set to FALSE
      # - residual_ads will be set to FALSE
      # - use_all_arts will set to FALSE
@@ -515,11 +515,11 @@ ma_r(rxyi = rxyi, n = n, sample_id = sample_id,
 <p>The results of <strong><code>psychmeta</code></strong>’s meta-analysis functions take the form of nested tibbles. A tibble is a type of tabular array that is a modernized version on the data frame (if you’re new to tibbles, a vignette on the topic is available from the <strong><code>tibble</code></strong> package’s <a href="https://CRAN.R-project.org/package=tibble">CRAN documentation</a>). The “nesting” of results means that the some cells of the tibble contain complex objects, such as data frames and lists (i.e., objects that have their own indexing structures, hence the nesting). This nested structure allows a lot of information to be organized in a very concise way so that an overview of even a very complicated meta-analysis can fit in your console window.</p>
 <p>As an example, below are some results computed using the <code>data_r_gonzalezmule_2014</code> data set included with <strong><code>psychmeta</code></strong>, which is an updated version of the database reported by Gonzalez-Mulé, Mount, and Oh <span class="citation">(2014)</span> in their meta-analysis of the relationship between general mental ability (GMA) and organizational citizenship behaviors (i.e., prosocial behaviors exhibited in the workplace; OCBs). Gonzalez-Mulé et al. explored a number of moderators, but for this analysis we have chosen to use only two: <code>Rating source</code> (OCBs rated by self vs. supervisor) and <code>Type</code> (the target of the OCBs; OCB-I = targeted toward individuals, OCB-O = targeted toward the organization, OCB-CH = targeted toward change). To demonstrate the structure of meta-analysis objects, we have chosen to run this example using hierarchical moderator analyses (i.e., <code>moderator_type = &quot;hierarchical&quot;</code>), which means we will be able to see the main effects of each moderator as well as the results from individual combinations of the levels of the moderators.</p>
 <p><strong>Note</strong>: This table of results is larger than can fit in most HTML viewers. Use the arrow buttons in the header to scroll horizonally through the content and use the page numbers in the lower-right corner of the object to scroll vertically.</p>
-<pre class="r"><code>(gonzalezmule &lt;- ma_r(ma_method = &quot;ic&quot;, rxyi = rxyi, n = n, 
+<pre class="r"><code>(gonzalezmule &lt;- ma_r(ma_method = &quot;ic&quot;, rxyi = rxyi, n = n,
                      construct_x = &quot;GMA&quot;,
                      construct_y = &quot;OCB&quot;,
                      rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
-                     moderators = c(&quot;Rating source&quot;, &quot;Type&quot;, &quot;Published&quot;), 
+                     moderators = c(&quot;Rating source&quot;, &quot;Type&quot;, &quot;Published&quot;),
                      moderator_type = &quot;hierarchical&quot;,
                      control = control_psychmeta(hs_override = TRUE),
                      data = data_r_gonzalezmule_2014))</code></pre>
@@ -563,13 +563,13 @@ metatab_list$individual_correction$true_score</code></pre>
 <li><code>leave1out</code> (compute meta-anlayses leaving out 1 sample at a time—for outlier/influential point detection)</li>
 </ul>
 <p>You can either call all sensitivity analyses at once (<code>sensitivity()</code>) or call each type of analysis individually (<code>sensitivity_bootstrap()</code>, <code>sensitivity_cumulative()</code>, <code>sensitivity_leave1out()</code>):</p>
-<pre class="r"><code>ma_obj &lt;- sensitivity(ma_obj, 
+<pre class="r"><code>ma_obj &lt;- sensitivity(ma_obj,
                       leave1out = TRUE,
-                      bootstrap = TRUE, 
+                      bootstrap = TRUE,
                       cumulative = TRUE,
-                      
+
                       sort_method = &quot;weight&quot;,
-                      
+
                       boot_iter = 100,
                       boot_conf_level = 0.95,
                       boot_ci_type = &quot;norm&quot;)</code></pre>
@@ -695,31 +695,31 @@ out_plots$cumulative$`analysis id: 1`$barebones$plots</code></pre>
                citekey = citekey,
                data = data_r_meas_multi)
 
-generate_bib(ma_obj, 
-             
+generate_bib(ma_obj,
+
              # The location of your .bib file (normally should be in the same directory
              # as the analysis script).
-             bib = system.file(&quot;sample_bibliography.bib&quot;, package=&quot;psychmeta&quot;),
-             
-             # Your citation style. Must be the style ID for a style hosted at 
+             bib = system.file(&quot;templates&#x2F;sample_bibliography.bib&quot;, package=&quot;psychmeta&quot;),
+
+             # Your citation style. Must be the style ID for a style hosted at
              # http://zotero.org/styles/
-             style = &quot;apa&quot;, 
-             
+             style = &quot;apa&quot;,
+
              # What format to write output as (options are: &quot;word&quot;, &quot;html&quot;, &quot;pdf&quot;, &quot;text&quot;,
              # &quot;Rmd&quot;, &quot;biblatex&quot;, &quot;citekeys&quot;)?
              output_format = &quot;word&quot;,
-             
+
              # What filename to output to (use &quot;console&quot; to print to the R console).
              file = &quot;sources.docx&quot;
              )</code></pre>
 <p>You can also generate a bibliography containing only sources contributing to a specific subset of the meta-analyses:</p>
-<pre class="r"><code>generate_bib(ma_obj, 
-             
-             bib = system.file(&quot;sample_bibliography.bib&quot;, 
+<pre class="r"><code>generate_bib(ma_obj,
+
+             bib = system.file(&quot;templates&#x2F;sample_bibliography.bib&quot;,
                                package=&quot;psychmeta&quot;),
-             
+
              analyses = list(construct_pair = list(c(&quot;X&quot;, &quot;Y&quot;)))
-             
+
              )</code></pre>
 
 </div>
@@ -741,11 +741,11 @@ ad_z &lt;- create_ad(mean_qxi = 0.8962108, var_qxi = 0.0007840593, k_qxi = 40,
                   mean_n_qxi = 11927 / 40, qxi_dist_type = &quot;alpha&quot;)
 
 # Compute a meta-analysis of X and Y.
-ma_bb_xy &lt;- ma_r_bb(r = rxyi, n = n, 
+ma_bb_xy &lt;- ma_r_bb(r = rxyi, n = n,
                     data = filter(data_r_meas_multi, x_name == &quot;X&quot;, y_name == &quot;Y&quot;))
 
 # Correct the meta-analysis for measurement error.
-ma_r_ad(ma_obj = ma_bb_xy, ad_obj_x = ad_x, ad_obj_y = ad_y, 
+ma_r_ad(ma_obj = ma_bb_xy, ad_obj_x = ad_x, ad_obj_y = ad_y,
         correct_rr_x = FALSE, correct_rr_y = FALSE)</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Rather than applying a two-step process (first compute bare-bones, then apply corrections), you can use the <code>ma_r()</code> function to automate your workflow! Just supply the artifact distributions as a list with the <code>supplemental_ads</code> argument.</li>
@@ -755,7 +755,7 @@ ma_r_ad(ma_obj = ma_bb_xy, ad_obj_x = ad_x, ad_obj_y = ad_y,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
      clean_artifacts = FALSE, impute_artifacts = FALSE,
      moderators = moderator, data = data_r_meas_multi,
-     # The &quot;supplemental_ads&quot; argument can take a list of artifact-distribution objects. 
+     # The &quot;supplemental_ads&quot; argument can take a list of artifact-distribution objects.
      supplemental_ads =
           list(X = ad_x,
                Y = ad_y,
@@ -770,8 +770,8 @@ ma_r_ad(ma_obj = ma_bb_xy, ad_obj_x = ad_x, ad_obj_y = ad_y,
      clean_artifacts = FALSE, impute_artifacts = FALSE,
      moderators = moderator, data = data_r_meas_multi,
      supplemental_ads =
-          # The &quot;supplemental_ads&quot; argument can also take raw artifact values. 
-          # (These values are unrounded so our examples all produce identical results.) 
+          # The &quot;supplemental_ads&quot; argument can also take raw artifact values.
+          # (These values are unrounded so our examples all produce identical results.)
           list(X = list(mean_qxi = 0.8927818, var_qxi = 0.0008095520, k_qxi = 40,
                         mean_n_qxi = 11927 / 40, qxi_dist_type = &quot;alpha&quot;),
                Y = list(mean_qxi = 0.8941266, var_qxi = 0.0009367234, k_qxi = 40,
@@ -791,7 +791,7 @@ ma_r(ma_method = &quot;ad&quot;, rxyi = rxyi, n = n,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
      clean_artifacts = FALSE, impute_artifacts = FALSE,
      moderators = moderator, data = data_r_meas_multi,
-     # The &quot;supplemental_ads&quot; argument can take the output of create_ad_list(). 
+     # The &quot;supplemental_ads&quot; argument can take the output of create_ad_list().
      supplemental_ads = ad_list)</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>It’s possible to mix-and-match any of the above methods, as well as use artifacts from your database.</li>
@@ -820,8 +820,8 @@ ma_r(ma_method = &quot;ad&quot;, rxyi = rxyi, n = n,
 <div id="psychometric-data-sets" class="section level2">
 <h2>Psychometric data sets</h2>
 <p>You can generate data impacted by psychometric artifacts for a single sample by using the <code>simulate_psych()</code> function. This function reports three datasets per sample: Observed scores, true scores, and error scores. It can also perform selection and indicate (1) which cases would be selected on the basis of observed scores (i.e., actual selection), (2) which cases would be selected on the basis of true scores (i.e., error-free selection), and (3) which cases would be selected on the basis of error scores (i.e., random selection).</p>
-<pre class="r"><code>sim_dat &lt;- simulate_psych(n = 1000, 
-                          rho_mat = reshape_vec2mat(.5), 
+<pre class="r"><code>sim_dat &lt;- simulate_psych(n = 1000,
+                          rho_mat = reshape_vec2mat(.5),
                           sigma_vec = c(1, 1),
                           sr_vec = c(1, .5),
                           rel_vec = c(.8, .8), var_names = c(&quot;Y&quot;, &quot;X&quot;))</code></pre>
@@ -829,65 +829,65 @@ ma_r(ma_method = &quot;ad&quot;, rxyi = rxyi, n = n,
 <div id="psychometric-correlations" class="section level2">
 <h2>Psychometric correlations</h2>
 <p>You can automate the process of analyzing a simulated sample when you are interested in effect sizes and artifact estimates. For example, you can generate correlations impacted by psychometric artifacts for a single sample of data using the <code>simulate_r_sample()</code> function. This function generates sample statistics when the <code>n</code> argument is a finite value, but it can also analyze parameters when <code>n = Inf</code>!</p>
-<pre class="r"><code>simulate_r_sample(n = 1000, 
+<pre class="r"><code>simulate_r_sample(n = 1000,
                   # Correlation parameter matrix
                   rho_mat = reshape_vec2mat(.5, order = 5),
                   # Reliability parameter vector
-                  rel_vec = rep(.8, 5), 
-                  # Selection ratio vector 
+                  rel_vec = rep(.8, 5),
+                  # Selection ratio vector
                   sr_vec = c(1, 1, 1, 1, .5),
                   # Number of items in each scale
                   k_items_vec = 1:5,
                   # Matrix of weights to use in creating composites
-                  wt_mat = cbind(c(0, 0, 0, .3, 1), 
+                  wt_mat = cbind(c(0, 0, 0, .3, 1),
                                  c(1, .3, 0, 0, 0)),
                   # Selection ratios for composites
                   sr_composites = c(.7, .5))
 
-simulate_r_sample(n = Inf, 
+simulate_r_sample(n = Inf,
                   rho_mat = reshape_vec2mat(.5, order = 5),
-                  rel_vec = rep(.8, 5), 
+                  rel_vec = rep(.8, 5),
                   sr_vec = c(1, 1, 1, 1, .5),
                   k_items_vec = 1:5,
-                  wt_mat = cbind(c(0, 0, 0, .3, 1), 
+                  wt_mat = cbind(c(0, 0, 0, .3, 1),
                                  c(1, .3, 0, 0, 0)),
                   sr_composites = c(.7, .5))</code></pre>
 
 <p>One of the most powerful simulation functions in <strong><code>psychmeta</code></strong> is <code>simulate_r_database()</code>, which can generate entire databases of correlations for use in meta-analysis simulations. This function is a wrapper for <code>simulate_r_sample()</code> and it can sample parameter values from whichever distributions you specify.</p>
 <pre class="r"><code># Note the varying methods for defining parameters:
-simulate_r_database(k = 10, 
-                    
+simulate_r_database(k = 10,
+
                     # Sample-size parameters
                     # Parameters can be defined as functions.
                     n_params = function(n) rgamma(n, shape = 100),
-                    
+
                     # Correlation parameters (one parameter distribution per correlation)
                     # Parameters can also be defined as vectors...
                     rho_params = list(c(.1, .3, .5),
                                       # ...as a mean + a standard deviation...
                                       c(mean = .3, sd = .05),
                                       # ...or as a matrix of values and weights.
-                                      rbind(value = c(.1, .3, .5), 
+                                      rbind(value = c(.1, .3, .5),
                                             weight = c(1, 2, 1))),
-                    
+
                     # Reliability parameters
                     rel_params = list(c(.7, .8, .9),
                                       c(mean = .8, sd = .05),
                                       rbind(value = c(.7, .8, .9),
-                                            weight = c(1, 2, 1))), 
-                    
+                                            weight = c(1, 2, 1))),
+
                     # Selection-ratio parameters
                     sr_params = list(1, 1, c(.5, .7)),
-                    
+
                     # Measure-length parameters
                     k_items_params = list(5, 8, 10),
-                    
+
                      # Composite weight parameters
-                    wt_params = list(list(1, 1, 0)), 
-                    
+                    wt_params = list(list(1, 1, 0)),
+
                     # Selection-ratio parameters for composites
                     sr_composite_params = list(1),
-                    
+
                     # Variable names
                     var_names = c(&quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;))</code></pre>
 
@@ -898,72 +898,72 @@ simulate_r_database(k = 10,
 <p>To simulate a single sample of results, use the <code>simulate_d_sample()</code> function. This function can generate data for any number of variables with any number of groups and it can form composite variables and perform selection.</p>
 <pre class="r"><code>## Simulate statistics by providing integers as &quot;n_vec&quot;:
 simulate_d_sample(n_vec = c(200, 100),
-                  
+
                   # List of rho matrices - one per group
                   rho_mat_list = list(reshape_vec2mat(.5),
                                       reshape_vec2mat(.4)),
-                  
+
                   # Matrix of group means (groups on rows, variables on columns)
-                  mu_mat = rbind(c(1, .5), 
-                                 c(0, 0)), 
-                  
+                  mu_mat = rbind(c(1, .5),
+                                 c(0, 0)),
+
                   # Matrix of group SDs (groups on rows, variables on columns)
                   sigma_mat = rbind(c(1, 1),
                                     c(1, 1)),
-                  
+
                   # Matrix of group reliabilities (groups on rows, variables on columns)
                   rel_mat = rbind(c(.8, .7),
                                   c(.7, .7)),
-                  
+
                   # Vector of selection ratios
                   sr_vec = c(1, .5),
-                  
+
                   # Number of items in each scale
                   k_items_vec = c(5, 10),
-                  
+
                   # Group names
                   group_names = c(&quot;A&quot;, &quot;B&quot;))</code></pre>
 <p>Like <code>simulate_r_sample()</code>, <code>simulate_d_sample()</code> can also analyze parameters. To get parameter estimates, simply define the sample sizes as proportions (with the <code>n_vec</code> argument) rather than as integers.</p>
 <pre class="r"><code>simulate_d_sample(n_vec = c(2/3, 1/3),
                   rho_mat_list = list(reshape_vec2mat(.5),
                                       reshape_vec2mat(.4)),
-                  mu_mat = rbind(c(1, .5), 
+                  mu_mat = rbind(c(1, .5),
                                  c(0, 0)),
-                  sigma_mat = rbind(c(1, 1), 
+                  sigma_mat = rbind(c(1, 1),
                                     c(1, 1)),
-                  rel_mat = rbind(c(.8, .7), 
-                                  c(.7, .7)), 
+                  rel_mat = rbind(c(.8, .7),
+                                  c(.7, .7)),
                   sr_vec = c(1, .5),
                   k_items_vec = c(5, 10),
                   group_names = c(&quot;A&quot;, &quot;B&quot;))</code></pre>
 
 <p>The <code>simulate_d_database()</code> function is the <em>d</em>-value counterpart to <code>simulate_r_database()</code>. However, each parameter argument now requires a set of parameters for each group (e.g., a distribution of correlations, means, reliabilities, etc. must be specified for each group).</p>
-<pre class="r"><code>simulate_d_database(k = 5, 
+<pre class="r"><code>simulate_d_database(k = 5,
                     # &quot;Group1&quot; and &quot;Group2&quot; labels are not required for parameter arguments:
-                    # They are shown only for enhanced interpretability. 
-                    
+                    # They are shown only for enhanced interpretability.
+
                     # Sample-size parameter distributions
                     n_params = list(Group1 = c(mean = 200, sd = 20),
-                                    Group2 = c(mean = 100, sd = 20)), 
-                    
+                                    Group2 = c(mean = 100, sd = 20)),
+
                     # Correlation parameter distributions
                     rho_params = list(Group1 = list(c(.3, .4, .5)),
                                       Group2 = list(c(.3, .4, .5))),
-                    
+
                     # Mean parameter distributions
-                    mu_params = list(Group1 = list(c(mean = .5, sd = .5), 
+                    mu_params = list(Group1 = list(c(mean = .5, sd = .5),
                                                    c(-.5, 0, .5)),
-                                     Group2 = list(c(mean = 0, sd = .5), 
+                                     Group2 = list(c(mean = 0, sd = .5),
                                                    c(-.2, 0, .2))),
-                    
+
                     # Reliability parameter distributions
                     rel_params = list(Group1 = list(.8, .8),
-                                      Group2 = list(c(.7, .8, .8), 
+                                      Group2 = list(c(.7, .8, .8),
                                                     c(.7, .8, .8))),
-                    
+
                     # Group names
                     group_names = c(&quot;Group1&quot;, &quot;Group2&quot;),
-                    
+
                     # Variable names
                     var_names = c(&quot;Y&quot;, &quot;Z&quot;))</code></pre>
 </div>
@@ -977,13 +977,13 @@ Sigma_xx_a &lt;- reshape_vec2mat(cov = .5, order = 2)
 
 # Correct &quot;Sigma_i&quot; for range restriction in variables 1 &amp; 2:
 correct_matrix_mvrr(Sigma_i = Sigma_i,
-                    Sigma_xx_a = Sigma_xx_a, 
+                    Sigma_xx_a = Sigma_xx_a,
                     x_col = 1:2)
 
 # Correct the means of variables 1 &amp; 2 for range restriction:
 correct_means_mvrr(Sigma = Sigma_i,
-                   means_i = c(2, 2, 1, 1), 
-                   means_x_a = c(1, 1), 
+                   means_i = c(2, 2, 1, 1),
+                   means_x_a = c(1, 1),
                    x_col = 1:2)</code></pre>
 
 </div>
@@ -1008,15 +1008,15 @@ composite_r_scalar(mean_rxy = .4, k_vars_x = 4, mean_intercor_x = .4)
 # Correlation between two composites
 composite_r_matrix(r_mat = reshape_vec2mat(.3, order = 5), x_col = 1:3, y_col = 4:5)
 
-composite_r_scalar(mean_rxy = .3, 
+composite_r_scalar(mean_rxy = .3,
                    k_vars_x = 3, mean_intercor_x = .3, k_vars_y = 2, mean_intercor_y = .3)</code></pre>
 </div>
 <div id="d-values-of-composites" class="section level2">
 <h2><em>d</em> values of composites</h2>
 <p>The <code>composite_d_matrix()</code> and <code>composite_d_scalar()</code> functions can compute composite <em>d</em> values using matrix and scalar inputs, respectively.</p>
-<pre class="r"><code>composite_d_matrix(d_vec = c(1, 1), 
+<pre class="r"><code>composite_d_matrix(d_vec = c(1, 1),
                    r_mat = reshape_vec2mat(.7),
-                   wt_vec = c(1, 1), 
+                   wt_vec = c(1, 1),
                    p = .5)
 
 composite_d_scalar(mean_d = 1, mean_intercor = .7, k_vars = 2, p = .5)</code></pre>

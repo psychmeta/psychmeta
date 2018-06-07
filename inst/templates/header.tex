@@ -1,0 +1,14 @@
+% Load necessary packages
+\usepackage{unicode-math}
+\usepackage{pdflscape}
+\usepackage{pdfpages}
+
+
+% pandoc does not parse LaTeX environments, so need to make new commands
+% - https://groups.google.com/forum/?fromgroups=#!topic/pandoc-discuss/oZETB5Ii1Cw
+\newcommand{\blandscape}{\begin{landscape}}
+\newcommand{\elandscape}{\end{landscape}}
+
+% Make new page before each section
+\let\stdsection\section
+\renewcommand\section{\newpage\stdsection}

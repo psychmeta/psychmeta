@@ -304,7 +304,7 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #'                moderators = moderator, citekey = citekey, data = data_r_meas_multi)
 #'
 #' generate_bib(ma_obj, analyses="all", match=c("all", "any"),
-#' bib=system.file("sample_bibliography.bib", package="psychmeta"), style="apa",
+#' bib=system.file("templates/sample_bibliography.bib", package="psychmeta"), style="apa",
 #' output_format="word", header=list())
 #' }
 generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
