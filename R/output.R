@@ -142,7 +142,8 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' Write a summary table of meta-analytic results
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
-#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).
+#' @param file The filename (optionally with a subfolder path) for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).
+#' @param output_dir The filepath for the output file. Defaults to the current working directory.
 #' @param show_msd Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})
 #' @param show_conf Logical. Should confidence intervals be shown (default: \code{TRUE})?
 #' @param show_cred Logical. Should credibility intervals be shown (default: \code{TRUE})?
@@ -181,6 +182,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
 #' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
 #' @param save_build_files Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?
+#' 
 #' @param ... Additional arguments (not used).
 #'
 #' @return If file is "rename", a list of meta-analysis results tibbles with "caption" and "footnote" attributions. Otherwise, a list containing the meta-analysis results tibbles with "caption" and "footnote" attributes and the RefManageR BibEntry object.
@@ -195,18 +197,17 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @importFrom stringi stri_write_lines
 #'
 #' @examples
-#' \dontrun{
 #' ## Create a results table for meta-analysis of correlations and output to Word:
 #' ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                  construct_x = x_name, construct_y = y_name,
 #'                  moderators = moderator, data = data_r_meas_multi)
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations")
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_dir = tempdir())
 #'
 #' ## Output to PDF:
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "pdf")
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "pdf", output_dir = tempdir())
 #'
 #' ## Output to ODT (LibreOffice):
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt")
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt", output_dir = tempdir())
 #'
 #' ## To produce Markdown tables to include inline in an RMarkdown report,
 #' ## set file to "console" and output_format to anything but "text":
@@ -227,19 +228,19 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
 #'                  construct_y = construct, data = data_d_meas_multi)
 #' ma_d_obj <- ma_d_ad(ma_obj = ma_d_obj, correct_rr_g = FALSE, correct_rr_y = FALSE)
-#' metabulate(ma_obj = ma_d_obj, file = "meta tables d values")
+#' metabulate(ma_obj = ma_d_obj, file = "meta tables d values", output_dir = tempdir())
 #'
 #' ## Create output table for meta-analysis of generic effect sizes:
 #' dat <- data.frame(es = data_r_meas_multi$rxyi,
 #'                   n = data_r_meas_multi$n,
 #'                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
-#' metabulate(ma_obj = ma_obj, file = "meta tables generic es")
-#' }
-metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                       show_se = FALSE, show_var = FALSE, analyses="all",
-                       match=c("all", "any"), case_sensitive = TRUE,
+#' metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
+metabulate <- function(ma_obj, file, ouput_dir = getwd(),
                        output_format=c("word", "html", "pdf", "odt", "text", "rmd"),
+                       show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
+                       show_se = FALSE, show_var = FALSE, 
+                       analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                        ma_method = "ad", correction_type = "ts",
                        bib = NULL, title.bib = NULL, additional_citekeys = NULL, style = "apa",
                        header = NULL, digits = 2L, decimal.mark = getOption("OutDec"),
@@ -314,7 +315,7 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
         if(!is.null(bib)) bib <- .generate_bib(ma_obj, bib, additional_citekeys)
 
         # Render the output
-        .psychmeta_render(file = file, output_format = output_format,
+        .psychmeta_render(file = file, output_format = output_format, output_dir = output_dir,
                           meta_tables = meta_tables, ma_type = ma_type, es_type = es_type,
                           bib = bib$bib, citations = bib$citations, citekeys = bib$citekeys,
                           title.bib = title.bib, style = style,
@@ -331,12 +332,13 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #' @param ma_obj A psychmeta meta-analysis object with \code{citekeys} supplied.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses.
 #' @param additional_citekeys Additional citekeys to include in the reference list.
+#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} to output directly to the R console.
+#' @param output_dir The filepath for the output file. Defaults to the current working directory.
+#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
-#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
-#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} to output directly to the R console.
 #' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
 #' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{TRUE})?
 #' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
@@ -354,23 +356,25 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #' @importFrom RefManageR BibOptions
 #'
 #' @examples
-#' \dontrun{
+#' ## Run a meta-analysis using ma_r() and include a citekey argument to provide
+#' ## citation information for each source contributing to the meta-analyses.
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
 #'                moderators = moderator, citekey = citekey, data = data_r_meas_multi)
 #'
-#' generate_bib(ma_obj, analyses="all", match=c("all", "any"),
-#' bib=system.file("templates/sample_bibliography.bib", package="psychmeta"), style="apa",
-#' output_format="word", header=list())
-#' }
+#' ## Next, use generate_bib() to generate the bibliography for the retained studies.
+#' ## The bib argument is the BibTeX or BibLaTeX .bib file containing the full
+#' ## reference information for each of the citekeys included in the meta-analysis database.
+#' generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
+#'              file = "sample bibliography", output_dir = tempdir(), output_format = "word")
 generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
+                         file = NULL, outuput_dir = getwd(),
+                         output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
-                         style="apa", output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
-                         file=NULL, title.bib = NULL, save_build_files = TRUE, header=list()){
+                         style="apa", title.bib = NULL, save_build_files = TRUE, header=list()){
 
-
-
-        output_format <- match.arg(tolower(output_format))
+        output_format <- tolower(output_format)
+        output_format <- match.arg(output_format)
 
         if("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
 
@@ -410,7 +414,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                # else =
                         {
                         .psychmeta_render(file = file, output_format = output_format,
-                                          bib = bib, citations = citations,
+                                          output_dir = output_dir, bib = bib, citations = citations,
                                           citekeys = citekeys, title.bib = title.bib, style = style,
                                           save_build_files = save_build_files, header = header)
                 }
@@ -476,7 +480,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
 .psychmeta_render <- function(file, output_format, meta_tables = NULL, ma_type = NULL, es_type = NULL,
                               bib = NULL, citations = NULL, citekeys = NULL, title.bib = NULL,
-                              style = style, save_build_files = FALSE, header = list()){
+                              style = style, save_build_files = FALSE, output_dir = NULL, header = list()){
 
         if(output_format == "rmd") save_build_files <- TRUE
         if(!is.null(style)) style <- .clean_style_name(style)
@@ -494,8 +498,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                     },
                                     simplify = FALSE, USE.NAMES = TRUE)
              class(meta_tables) <- "metabulate"
-        } ### TODO: Do this.
-
+        }
 
         if(file == "console") {
 
@@ -526,7 +529,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        # Write the bibliography file
                                        if(save_build_files) {
                                                bib_file <- stringr::str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
-                                       } else bib_file <- tempfile("psychmeta.bib")
+                                       } else bib_file <- tempfile(file, fileext = ".bib")
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
 
@@ -681,7 +684,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        # Write the bibliography file
                                        if(save_build_files) {
                                                bib_file <- stringr::str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
-                                       } else bib_file <- tempfile("psychmeta.bib")
+                                       } else bib_file <- tempfile(file, fileext = ".bib")
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
 
@@ -712,7 +715,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                  if(save_build_files) {
                                    rdata_document <- stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata")
 
-                                 } else rdata_document <- tempfile("psychmeta.rdata")
+                                 } else rdata_document <- tempfile(file, fileext = ".Rdata")
                                  save(meta_tables, file = rdata_document)
 
                                  tables_document <- c(
@@ -784,15 +787,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                # Create Rmd and output files
                                if(save_build_files) {
                                        rmd_document <- stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd")
-
-                               } else rmd_document <- tempfile("psychmeta.rmd")
+                               } else rmd_document <- tempfile(file, fileext = ".rmd")
 
                                stringi::stri_write_lines(document, rmd_document)
+                                                                               
+                               if(is.null(output_dir)) {output_dir <- getwd()}
 
                                if(output_format != "rmd") {
                                        render(rmd_document,
                                               output_file = file,
-                                              output_dir  = getwd(),
+                                              output_dir  = output_dir,
                                               encoding = "UTF-8")
                                }
                                invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
