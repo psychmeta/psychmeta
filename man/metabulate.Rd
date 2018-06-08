@@ -15,8 +15,8 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
   drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
   small.mark = "thinspace", small.interval = 3L,
   conf_format = "parentheses", cred_format = "brackets", symbol_es = "ES",
-  caption = "Results of meta-analyses", save_build_files = TRUE,
-  verbose = FALSE, ...)
+  caption = "Results of meta-analyses", verbose = FALSE, unicode = NULL,
+  save_build_files = TRUE, ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
@@ -88,9 +88,11 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 
 \item{caption}{Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).}
 
-\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?}
-
 \item{verbose}{Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?}
+
+\item{unicode}{Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).}
+
+\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?}
 
 \item{...}{Additional arguments (not used).}
 }
