@@ -151,7 +151,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, Rmarkdown, and plain text.
+#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package), ODT, Rmarkdown, and plain text.
 #' @param ma_method Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.
 #' @param correction_type Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses. If not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
@@ -211,6 +211,17 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' ## To produce Markdown tables to include inline in an RMarkdown report,
 #' ## set file to "console" and output_format to anything but "text":
 #' metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
+#'
+#' ## You can use metabulate() to simply rename results table columns and create captions
+#' ## and footnotes, then use other packages, such as \code{kableExtra}, \code{flextable},
+#' ## \code{xtable}, or others, for more advanced formatting. To do so, set file to
+#' ## "rename" and output_format to anything but "text":
+#' \dontrun{
+#'      ma_table <- metabulate(ma_obj = ma_r_obj, file = "rename", output_format = "pdf")
+#'      knitr::kable(ma_table[[1]], "latex", booktabs = TRUE, caption = attr(ma_table[[1]], "caption")) %>% 
+#'        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) %>%
+#'        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
+#' }
 #'
 #' ## Create output table for meta-analysis of d values:
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
@@ -537,37 +548,37 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[1]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))
-                               cat(paste0(attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[1]]])])
+                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[1]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[1]]]) & length(ma_type) > 1])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[2]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))
-                               cat(paste0(attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[2]]])])
+                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[2]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[2]]]) & length(ma_type) > 2])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[3]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))
-                               cat(paste0(attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[3]]])])
+                               cat"*Note: *", (paste0(attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[3]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[3]]]) & length(ma_type) > 3])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[4]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))
-                               cat(paste0(attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[4]]])])
+                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[4]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[4]]]) & length(ma_type) > 4])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[5]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))
-                               cat(paste0(attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[5]]])])
+                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[5]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[5]]]) & length(ma_type) > 5])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[6]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))
-                               cat(paste0(attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[6]]])])
+                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[6]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[6]]]) & length(ma_type) > 6])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[7]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))
-                               cat(paste0(attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[7]]])])
+                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[7]]])])
                                cat("\\newpage"[!is.null(meta_tables) & !is.null(bib)])
 
                                if(!is.null(bib)) {
@@ -615,37 +626,37 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                              paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"))[!is.null(meta_tables[[ma_type[1]]])],
                                              suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))[!is.null(meta_tables[[ma_type[1]]])]),
-                                             paste0(attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[1]]])],
+                                             paste0("Note: ", attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[1]]])],
                                              "\\newpage"[!is.null(meta_tables[[ma_type[1]]]) & length(ma_type) > 1],
 
                                              paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"))[!is.null(meta_tables[[ma_type[2]]])],
                                              suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))[!is.null(meta_tables[[ma_type[2]]])]),
-                                             paste0(attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[2]]])],
+                                             paste0("Note: ", attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[2]]])],
                                              "\\newpage"[!is.null(meta_tables[[ma_type[2]]]) & length(ma_type) > 2],
 
                                              paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"))[!is.null(meta_tables[[ma_type[3]]])],
                                              suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))[!is.null(meta_tables[[ma_type[3]]])]),
-                                             paste0(attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[3]]])],
+                                             paste0("Note: ", attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[3]]])],
                                              "\\newpage"[!is.null(meta_tables[[ma_type[3]]]) & length(ma_type) > 3],
 
                                              paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"))[!is.null(meta_tables[[ma_type[4]]])],
                                              suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))[!is.null(meta_tables[[ma_type[4]]])]),
-                                             paste0(attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[4]]])],
+                                             paste0("Note: ", attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[4]]])],
                                              "\\newpage"[!is.null(meta_tables[[ma_type[4]]]) & length(ma_type) > 4],
 
                                              paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"))[!is.null(meta_tables[[ma_type[5]]])],
                                              suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))[!is.null(meta_tables[[ma_type[5]]])]),
-                                             paste0(attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[5]]])],
+                                             paste0("Note: ", attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[5]]])],
                                              "\\newpage"[!is.null(meta_tables[[ma_type[5]]]) & length(ma_type) > 5],
 
                                              paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"))[!is.null(meta_tables[[ma_type[6]]])],
                                              suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))[!is.null(meta_tables[[ma_type[6]]])]),
-                                             paste0(attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[6]]])],
+                                             paste0("Note: ", attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[6]]])],
                                              "\\newpage"[!is.null(meta_tables[[ma_type[6]]]) & length(ma_type) > 6],
 
                                              paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"))[!is.null(meta_tables[[ma_type[7]]])],
                                              suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))[!is.null(meta_tables[[ma_type[7]]])]),
-                                             paste0(attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[7]]])],
+                                             paste0("Note: ", attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[7]]])],
                                              "\\newpage"[!is.null(meta_tables) & !is.null(bib)],
 
                                              paste0(title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
@@ -723,37 +734,37 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[1]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))',
-                                   'cat(paste0(attr(meta_tables[[ma_type[1]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[1]]])])',
+                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[1]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[1]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[1]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[2]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))',
-                                   'cat(paste0(attr(meta_tables[[ma_type[2]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[2]]])])',
+                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[2]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[2]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[2]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[3]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))',
-                                   'cat(paste0(attr(meta_tables[[ma_type[3]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[3]]])])',
+                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[3]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[3]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[3]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[4]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))',
-                                   'cat(paste0(attr(meta_tables[[ma_type[4]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[4]]])])',
+                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[4]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[4]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[4]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[5]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))',
-                                   'cat(paste0(attr(meta_tables[[ma_type[5]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[5]]])])',
+                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[5]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[5]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[5]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[6]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))',
-                                   'cat(paste0(attr(meta_tables[[ma_type[6]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[6]]])])',
+                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[6]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[6]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[6]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[7]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))',
-                                   'cat(paste0(attr(meta_tables[[ma_type[7]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[7]]])])',
+                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[7]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[7]]])])',
 
                                    '```',
 
@@ -1150,7 +1161,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                         mean_es           = paste0("$\\symbfit{\\overline{", symbol_es, "}}$"),
                         var_es            = paste0("$\\symbfit{\\sigma^{2}_{", symbol_es, "}}$"),
-                        sd_es             = paste0("$\\symbfit{SD{", symbol_es, "}}$"),
+                        sd_es             = paste0("$\\symbfit{SD_{", symbol_es, "}}$"),
                         se_es             = paste0("$\\symbfit{SE_{\\overline{", symbol_es, "}}}$"),
 
                         var_e             = "$\\symbfit{\\sigma^{2}_{e}}$",
@@ -1198,7 +1209,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 ### TODO: Add notes about actual corrections applied
                 if(.support_unicode(unicode)) {
                         if(es_type == "r") {
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 =  mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1208,7 +1219,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around r\u0305; "[show_conf],
                                                   "CV = credibility interval around r\u0305."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1229,7 +1240,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1250,7 +1261,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1271,7 +1282,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1292,7 +1303,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1313,7 +1324,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1337,7 +1348,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                         } else if(es_type == "d") {
                                 ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 =  mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1347,7 +1358,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around d\u0305; "[show_conf],
                                                   "CV = credibility interval around d\u0305."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1368,7 +1379,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1389,7 +1400,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1410,7 +1421,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1431,7 +1442,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1452,7 +1463,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1475,7 +1486,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                 )
 
                         } else {
-                                c(bb = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                               paste0(paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), " =  mean observed effect size (", symbol_es, "); ")[show_msd],
                                               paste0("SE_", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), " = standard error of ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), "; ")[show_se],
                                               paste0("SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_res = residual standard deviation of ", symbol_es, "; ")[show_msd & !verbose],
@@ -1489,7 +1500,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                 } else {
                         if(es_type == "r") {
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r =  mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1499,7 +1510,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around Mean r; "[show_conf],
                                                   "CV = credibility interval around Mean r."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1520,7 +1531,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1541,7 +1552,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1562,7 +1573,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1583,7 +1594,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1604,7 +1615,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1628,7 +1639,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                         } else if(es_type == "d") {
                                 ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d =  mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1638,7 +1649,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around Mean d; "[show_conf],
                                                   "CV = credibility interval around Mean d."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1659,7 +1670,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1680,7 +1691,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1701,7 +1712,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1722,7 +1733,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1743,7 +1754,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1766,7 +1777,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                 )
 
                         } else {
-                                c(bb = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                               "Mean ", symbol_es, " =  mean observed effect size (", symbol_es, "); "[show_msd],
                                               "SE_[Mean ", symbol_es, "] = standard error of [Mean ", symbol_es, "]; "[show_se],
                                               "SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_res = residual standard deviation of ", symbol_es, "; "[show_msd & !verbose],
@@ -1780,7 +1791,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 }
         } else {
                 if(es_type == "r") {
-                        c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                        c(bb     = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0 mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1790,7 +1801,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "CI\u00a0=\u00a0confidence interval around $\\overline{r}$; "[show_conf],
                                           "CV\u00a0=\u00a0credibility interval around $\\overline{r}$."[show_cred]),
 
-                          ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1811,7 +1822,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "correlations corrected individually."),
 
-                          ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1832,7 +1843,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "correlations corrected individually."),
 
-                          ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1853,7 +1864,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "correlations corrected individually."),
 
-                          ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1874,7 +1885,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "correlations corrected using artifact distributions."),
 
-                          ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1895,7 +1906,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "correlations corrected using artifact distributions."),
 
-                          ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1919,7 +1930,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                 } else if(es_type == "d") {
                         ### f: Don't refer to latent/observed groups if group membership reliability is not corrected.
-                        c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                        c(bb     = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0 mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1929,7 +1940,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "CI\u00a0=\u00a0confidence interval around $\\overline{d}$; "[show_conf],
                                           "CV\u00a0=\u00a0credibility interval around $\\overline{d}$."[show_cred]),
 
-                          ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1950,7 +1961,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected individually."),
 
-                          ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1971,7 +1982,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected individually."),
 
-                          ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1992,7 +2003,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected individually."),
 
-                          ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -2013,7 +2024,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected using artifact distributions."),
 
-                          ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -2034,7 +2045,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected using artifact distributions"),
 
-                          ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -2057,7 +2068,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                         )
 
                 } else {
-                        c(bb = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                        c(bb = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                       "$\\overline{", symbol_es, "}$\u00a0=\u00a0 mean observed effect size ($", symbol_es, "$); "[show_msd],
                                       "$SE_{\\overline{", symbol_es, "}}$\u00a0=\u00a0standard error of $\\overline{", symbol_es, "}$; "[show_se],
                                       "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & !verbose],
