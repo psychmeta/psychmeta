@@ -1,13 +1,13 @@
 #' @name summary
-#' 
+#'
 #' @title Summary methods for \pkg{psychmeta}
-#' 
-#' @description 
+#'
+#' @description
 #' Summary methods for \pkg{psychmeta} output objects with classes exported from \pkg{psychmeta}.
-#' 
-#' @param object Object to be printed (object is used to select a method). 
-#' @param ... Additional arguments. 
-#' 
+#'
+#' @param object Object to be printed (object is used to select a method).
+#' @param ... Additional arguments.
+#'
 #' @return Summary object.
 NULL
 
@@ -17,11 +17,11 @@ NULL
 #' @keywords internal
 #' @method summary ma_psychmeta
 summary.ma_psychmeta <- function(object, ...){
-     
+
      default_print <- attributes(object)$default_print
      ma_metric <- attributes(object)$ma_metric
      ma_methods <- attributes(object)$ma_methods
-     
+
      meta_tables <- get_metatab(ma_obj = object, as_list = TRUE)
 
      if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
@@ -36,7 +36,7 @@ summary.ma_psychmeta <- function(object, ...){
           correction_types_ic <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(meta_tables$individual_correction)]
           correction_types_ad <- c("ts", "vgx", "vgy")[c(ts_label, vgx_label, vgy_label) %in% names(meta_tables$artifact_distribution)]
           correction_types_ic <- correction_types_ad <- c(ts_label, vgx_label, vgy_label)
-          
+
      }else if(ma_metric == "r_as_d" | ma_metric == "d_as_d"){
           ts_label <- "latentGroup_latentY"
           vgx_label <- "observedGroup_latentY"
@@ -89,26 +89,26 @@ summary.ma_psychmeta <- function(object, ...){
      }else{
           method_details_ad <- NULL
      }
-     
-     correction_titles <- list(ts = ts_title, 
-                               vgx = vgx_title, 
+
+     correction_titles <- list(ts = ts_title,
+                               vgx = vgx_title,
                                vgy = vgy_title)
-     
-     correction_labels <- list(ts = ts_label, 
-                               vgx = vgx_label, 
+
+     correction_labels <- list(ts = ts_label,
+                               vgx = vgx_label,
                                vgy = vgy_label)
-     
-     out <- list(ma_obj = object, 
-                 meta_tables = meta_tables, 
-                 ma_metric = ma_metric, 
-                 ma_methods = ma_methods, 
-                 correction_types = list(ic = correction_types_ic, 
-                                         ad = correction_types_ad), 
-                 method_details = list(ic = method_details_ic, 
-                                       ad = method_details_ad), 
-                 correction_titles = correction_titles, 
+
+     out <- list(ma_obj = object,
+                 meta_tables = meta_tables,
+                 ma_metric = ma_metric,
+                 ma_methods = ma_methods,
+                 correction_types = list(ic = correction_types_ic,
+                                         ad = correction_types_ad),
+                 method_details = list(ic = method_details_ic,
+                                       ad = method_details_ad),
+                 correction_titles = correction_titles,
                  correction_labels = correction_labels)
-                 
+
      class(out) <- "summary.ma_psychmeta"
      out
 }
@@ -379,5 +379,10 @@ summary.ma_ad_list <- function(object, ...){
      object
 }
 
-
+#' @export
+#' @keywords internal
+#' @method summary metabulate
+summary.metabulate <- function(object, ...){
+        object
+}
 

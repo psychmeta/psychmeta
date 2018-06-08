@@ -1,13 +1,13 @@
 #' @name print
-#' 
+#'
 #' @title Print methods for \pkg{psychmeta}
-#' 
-#' @description 
+#'
+#' @description
 #' Print methods for \pkg{psychmeta} output objects with classes exported from \pkg{psychmeta}.
-#' 
-#' @param x Object to be printed (object is used to select a method). 
-#' @param ... Additional arguments. 
-#' @param digits Number of digits to which results should be rounded. 
+#'
+#' @param x Object to be printed (object is used to select a method).
+#' @param ... Additional arguments.
+#' @param digits Number of digits to which results should be rounded.
 #' @param ma_methods Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"
 #' @param correction_types Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"
 #' @param verbose Logical scalar that determines whether printed object should contain verbose information (e.g., non-standard columns of meta-analytic output; \code{TRUE}) or not (\code{FALSE}).
@@ -72,33 +72,33 @@ print.ad_tsa <- function(x, ..., digits = 3){
 print.ad_int_list <- function(x, ..., digits = 3){
      cat("Interactive Distributions\n")
      cat("-------------------------\n")
-     
+
      cat("\n")
      cat("qxa Artifact Distribution - Indirect Range Restriction\n")
      print.data.frame(x[["qxa_irr"]], digits = digits)
-     
+
      cat("\n")
      cat("qxa Artifact Distribution - Direct Range Restriction\n")
      print.data.frame(x[["qxa_drr"]], digits = digits)
-     
-     
+
+
      cat("\n")
      cat("qxi Artifact Distribution - Indirect Range Restriction\n")
      print.data.frame(x[["qxi_irr"]], digits = digits)
-     
+
      cat("\n")
      cat("qxi Artifact Distribution - Direct Range Restriction\n")
      print.data.frame(x[["qxi_drr"]], digits = digits)
-     
-     
+
+
      cat("\n")
      cat("ux Artifact Distribution\n")
      print.data.frame(x[["ux"]], digits = digits)
-     
+
      cat("\n")
      cat("ut Artifact Distribution\n")
      print.data.frame(x[["ut"]], digits = digits)
-     
+
      cat("\n")
 }
 
@@ -110,7 +110,7 @@ print.ad_int_list <- function(x, ..., digits = 3){
 print.ad_int <- function(x, ..., digits = 3){
      cat("Interactive Distributions\n")
      cat("-------------------------\n")
-     
+
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)
@@ -131,21 +131,21 @@ print.ad_int <- function(x, ..., digits = 3){
 print.correct_r <- function(x, ..., digits = 3){
      if(any(class(x) == "meas"))
           cat("Correlations Corrected for Measurement Error:\n")
-     
+
      if(any(class(x) == "uvdrr"))
           cat("Correlations Corrected for Measurement Error and Univariate Direct Range Restriction:\n")
-     
+
      if(any(class(x) == "uvirr"))
           cat("Correlations Corrected for Measurement Error and Univariate Indirect Range Restriction:\n")
-     
+
      if(any(class(x) == "bvirr"))
           cat("Correlations Corrected for Measurement Error and Bivariate Indirect Range Restriction:\n")
-     
+
      if(any(class(x) == "bvdrr"))
           cat("Correlations Corrected for Measurement Error and Bivariate Direct Range Restriction:\n")
-     
+
      cat("---------------------------------------------------------------------------------------\n")
-     
+
      if(is.data.frame(x[["correlations"]])){
           print.data.frame(x[["correlations"]], digits = digits)
      }else{
@@ -170,21 +170,21 @@ print.correct_r <- function(x, ..., digits = 3){
 print.correct_d <- function(x, ..., digits = 3){
      if(any(class(x) == "meas"))
           cat("d Values Corrected for Measurement Error:\n")
-     
+
      if(any(class(x) == "uvdrr"))
           cat("d Values Corrected for Measurement Error and Univariate Direct Range Restriction:\n")
-     
+
      if(any(class(x) == "uvirr"))
           cat("d Values Corrected for Measurement Error and Univariate Indirect Range Restriction:\n")
-     
+
      if(any(class(x) == "bvirr"))
           cat("d Values Corrected for Measurement Error and Bivariate Indirect Range Restriction:\n")
-     
+
      if(any(class(x) == "bvdrr"))
           cat("d Values Corrected for Measurement Error and Bivariate Direct Range Restriction:\n")
-     
+
      cat("---------------------------------------------------------------------------------------\n")
-     
+
      if(is.data.frame(x[["d_values"]])){
           print.data.frame(x[["d_values"]], digits = digits)
      }else{
@@ -208,13 +208,13 @@ print.correct_d <- function(x, ..., digits = 3){
 print.simdat_psych <- function(x, ..., digits = 3){
      cat("Data from a Simulated Study of", nrow(x$obs), "Cases\n")
      cat("--------------------------\n")
-     
+
      cat("\nObserved scores:\n")
      print(x$observed, digits = digits)
-     
+
      cat("\nTrue scores:\n")
      print(x$true, digits = digits)
-     
+
      cat("\nError scores:\n")
      print(x$error, digits = digits)
 
@@ -279,12 +279,12 @@ print.simdat_r_database <- function(x, ..., digits = 3){
 
      cat("Overview of simulated statistics (i.e., results with sampling error):\n")
      print(x[["statistics"]], digits = digits)
-     
+
      cat("\n")
 
      cat("Overview of simulated parameters (i.e., results without sampling error):\n")
      print(x[["parameters"]], digits = digits)
-     
+
 }
 
 
@@ -334,13 +334,13 @@ print.simdat_d_database <- function(x, ..., digits = 3){
      cat("Overview of simulated statistics (i.e., results with sampling error):\n")
      cat("\n")
      print(x[["statistics"]], digits = digits)
-     
+
      cat("\n")
 
      cat("Overview of simulated parameters (i.e., results without sampling error):\n")
      cat("\n")
      print(x[["parameters"]], digits = digits)
-     
+
 }
 
 
@@ -617,7 +617,7 @@ print.get_ad <- function(x, ..., digits = 3){
      cat("List of artifact-distributions \n")
      cat("---------------------------------------- \n")
      cat("To view specific results, use the '$' operator to search this list object. \n")
-     
+
      includes <- "\nThis object includes artifact distributions from the following meta-analytic methods:"
      if("ic" %in% names(x)){
           includes <- c(includes, "\n- ic (distributions generated during individual-correction meta-analsyis)")
@@ -625,9 +625,9 @@ print.get_ad <- function(x, ..., digits = 3){
           if("int" %in% names(x$ic)) includes <- c(includes, "\n     - int (Interactive distributions)")
      }
      if("ic" %in% names(x)) includes <- c(includes, "\n- ad (distributions used to make artifact-distribution corrections)")
-     
+
      cat(includes)
-     
+
 }
 
 
@@ -637,13 +637,13 @@ print.get_ad <- function(x, ..., digits = 3){
 #' @method print ma_psychmeta
 print.ma_psychmeta <- function(x, ..., digits = 3){
      ma_method <- attributes(x)$ma_method
-     correction_type <- attributes(x)$correction_type 
-     ma_metric <- attributes(x)$ma_metric 
-     
+     correction_type <- attributes(x)$correction_type
+     ma_metric <- attributes(x)$ma_metric
+
      additional_args <- list(...)
      suppress_title <- additional_args$suppress_title
      if(is.null(suppress_title)) suppress_title <- FALSE
-     
+
      title_text <- "Overview tibble of psychmeta meta-analysis"
      if(ma_metric == "r_as_r" | ma_metric == "d_as_r"){
           title_text <- "Overview tibble of psychmeta meta-analysis of correlations"
@@ -656,15 +656,15 @@ print.ma_psychmeta <- function(x, ..., digits = 3){
      }else if(ma_metric == "d_order2"){
           title_text <- "Overview tibble of psychmeta second-order meta-analysis of d values"
      }
-     
+
      if(!suppress_title){
           cat(title_text, " \n")
-          cat("---------------------------------------------------------------------- \n")    
+          cat("---------------------------------------------------------------------- \n")
      }
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)
-     
+
      cat("\nTo extract results, try summary() or the get_stuff functions (run ?get_stuff for help)")
 }
 
@@ -678,10 +678,10 @@ print.ad_tibble <- function(x, ..., digits = 3){
      additional_args <- list(...)
      suppress_title <- additional_args$suppress_title
      if(is.null(suppress_title)) suppress_title <- FALSE
-    
+
      if(!suppress_title){
           cat("Tibble of artifact distributions \n")
-          cat("---------------------------------------------------------------------- \n")    
+          cat("---------------------------------------------------------------------- \n")
      }
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
@@ -694,11 +694,11 @@ print.ad_tibble <- function(x, ..., digits = 3){
 #' @method print ma_table
 print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
      ma_type <- attributes(x)$ma_type
-     
+
      additional_args <- list(...)
      suppress_title <- additional_args$suppress_title
      if(is.null(suppress_title)) suppress_title <- FALSE
-     
+
      if(ma_type == "r_bb"){
           full_names <- c("mean_r", "var_r", "var_e", "var_res", "sd_r", "se_r", "sd_e", "sd_res")
           verbose_names <- c("mean_r", "sd_r", "se_r", "sd_e", "sd_res")
@@ -720,8 +720,8 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
           succinct_names <- c("mean_r", "sd_r", "se_r", "sd_res",
                               "mean_rho", "sd_r_c", "se_r_c", "sd_rho")
      }
-     
-     
+
+
      if(ma_type == "d_bb"){
           full_names <- c("mean_d", "var_d", "var_e", "var_res", "sd_d", "se_d", "sd_e", "sd_res")
           verbose_names <- c("mean_d", "sd_d", "se_d", "sd_e", "sd_res")
@@ -743,15 +743,15 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
           succinct_names <- c("mean_d", "sd_d", "se_d", "sd_res",
                               "mean_delta", "sd_d_c", "se_r_c", "sd_delta")
      }
-     
-     
+
+
      if(ma_type == "generic_bb"){
           full_names <- c("mean_es", "var_es", "var_e", "var_res", "sd_es", "se_es", "sd_e", "sd_res")
           verbose_names <- c("mean_es", "sd_es", "se_es", "sd_e", "sd_res")
           succinct_names <- c("mean_es", "sd_es", "se_es", "sd_res")
      }
-     
-     
+
+
      if(ma_type == "r_bb_order2"){
           full_names <- c("mean_r_bar", "var_r_bar", "var_e", "var_r_bar_res", "sd_r_bar", "se_r_bar", "sd_e", "sd_r_bar_res")
           verbose_names <- c("mean_r_bar", "sd_r_bar", "se_r_bar", "sd_e", "sd_r_bar_res")
@@ -767,8 +767,8 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
           verbose_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_e", "sd_rho_bar_res")
           succinct_names <- c("mean_rho_bar", "sd_rho_bar", "se_rho_bar", "sd_rho_bar_res")
      }
-     
-     
+
+
      if(ma_type == "d_bb_order2"){
           full_names <- c("mean_d_bar", "var_d_bar", "var_e", "var_d_bar_res", "sd_d_bar", "se_d_bar", "sd_e", "sd_d_bar_res")
           verbose_names <- c("mean_d_bar", "sd_d_bar", "se_d_bar", "sd_e", "sd_d_bar_res")
@@ -784,21 +784,21 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
           verbose_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_e", "sd_delta_bar_res")
           succinct_names <- c("mean_delta_bar", "sd_delta_bar", "se_delta_bar", "sd_delta_bar_res")
      }
-     
+
      .colnames <- colnames(x)
      leading_cols <- 1:max(which(.colnames == "N"))
      trailing_cols <- which(grepl(x = .colnames, pattern = "CI_LL_") | grepl(x = .colnames, pattern = "CI_UL_") | grepl(x = .colnames, pattern = "CV_LL_") | grepl(x = .colnames, pattern = "CV_UL_"))
      trailing_cols <- trailing_cols[trailing_cols > max(leading_cols)]
-     
+
      if(verbose){
           middle_cols <- which(.colnames %in% verbose_names)
      }else{
           middle_cols <- which(.colnames %in% succinct_names)
      }
-     
+
      if(!suppress_title)
           cat("Meta-analysis table \n")
-     
+
      x <- ungroup(x)
      class(x) <- class(x)[class(x) != "ma_table"]
      print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
@@ -818,7 +818,7 @@ print.ma_ic_list <- function(x, ..., digits = 3){
           cat("\nWith measurement error in X \n")
           print(x$validity_generalization_x, suppress_title = TRUE)
           cat("\nWith measurement error in Y \n")
-          print(x$validity_generalization_y, suppress_title = TRUE)    
+          print(x$validity_generalization_y, suppress_title = TRUE)
      }else{
           cat("\nFully corrected \n")
           print(x$latentGroup_latentY, suppress_title = TRUE)
@@ -843,7 +843,7 @@ print.ma_ad_list <- function(x, ..., digits = 3){
           cat("\nWith measurement error in X \n")
           print(x$validity_generalization_x, suppress_title = TRUE)
           cat("\nWith measurement error in Y \n")
-          print(x$validity_generalization_y, suppress_title = TRUE)    
+          print(x$validity_generalization_y, suppress_title = TRUE)
      }else{
           cat("\nFully corrected \n")
           print(x$latentGroup_latentY, suppress_title = TRUE)
@@ -861,22 +861,22 @@ print.ma_ad_list <- function(x, ..., digits = 3){
 #' @exportClass summary.ma_psychmeta
 #' @method print summary.ma_psychmeta
 print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_types = "ts", verbose = FALSE){
-     
+
      ma_obj <- x$ma_obj
      meta_tables <- x$meta_tables
      ma_metric <- x$ma_metric
      correction_titles <- x$correction_titles
      correction_labels <- x$correction_labels
      method_details <- x$method_details
-     
+
      if(!is.null(ma_methods)){
           if(!all(ma_methods %in% x$ma_methods)){
                stop("Supplied 'ma_methods' not represented in the summary x")
           }
      }else{
           ma_methods <- (c("ad", "ic", "bb")[c("ad", "ic", "bb") %in% x$ma_methods])[1]
-     }    
-     
+     }
+
      if(any(c("ic", "ad") %in% ma_methods))
           if(!is.null(correction_types)){
                if(!all(correction_types %in% c("ts", "vgx", "vgy"))){
@@ -885,27 +885,27 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
           }else{
                correction_types <- "ts"
           }
-     
+
      ts_title <- correction_titles$ts
      vgx_title <- correction_titles$vgx
      vgy_title <- correction_titles$vgy
-     
+
      ts_label <- correction_labels$ts
      vgx_label <- correction_labels$vgx
      vgy_label <- correction_labels$vgy
-     
+
      correction_types_ic <- correction_types_ad <- correction_types
-     
+
      if("bb" %in% ma_methods){
           if(ma_metric %in% c("r_order2", "d_order2")){
                cat("Second-order bare-bones meta-analysis results \n")
           }else{
                cat("Bare-bones meta-analysis results \n")
           }
-          cat("---------------------------------------------------------------------- \n")    
-          print(meta_tables$barebones, suppress_title = TRUE, verbose = verbose)    
+          cat("---------------------------------------------------------------------- \n")
+          print(meta_tables$barebones, suppress_title = TRUE, verbose = verbose)
      }
-     
+
      if("ic" %in% ma_methods){
           if(length(unlist(correction_labels)) == 0){
                if(ma_metric %in% c("r_order2", "d_order2")){
@@ -913,30 +913,30 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                }else{
                     cat("\nIndividual-correction meta-analysis results \n")
                }
-               cat("---------------------------------------------------------------------- \n")    
+               cat("---------------------------------------------------------------------- \n")
                print(meta_tables$individual_correction, suppress_title = TRUE, verbose = verbose)
           }else{
                cat("\nIndividual-correction meta-analysis results \n")
-               cat("----------------------------------------------------------------------")     
-               
+               cat("----------------------------------------------------------------------")
+
                if("ts" %in% correction_types_ic){
                     cat(ts_title)
                     print(meta_tables$individual_correction[[ts_label]], suppress_title = TRUE, verbose = verbose)
                }
-               
+
                if("vgx" %in% correction_types_ic){
                     cat(vgx_title)
                     print(meta_tables$individual_correction[[vgx_label]], suppress_title = TRUE, verbose = verbose)
                }
-               
+
                if("vgy" %in% correction_types_ic){
                     cat(vgy_title)
                     print(meta_tables$individual_correction[[vgy_label]], suppress_title = TRUE, verbose = verbose)
-               }   
-               
+               }
+
                cat("\n")
                cat("\nSummary of correction methods \n")
-               
+
                method_details$ic$Correction <- as.character(method_details$ic$Correction)
                if(nrow(method_details$ic) > 1 & all(method_details$ic$Correction == method_details$ic$Correction[1])){
                     .method_details <- data.frame(analysis_id = "All", Correction = method_details$ic$Correction[1])
@@ -944,59 +944,59 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                }else{
                     print(method_details$ic)
                }
-               
+
           }
      }
-     
-     
+
+
      if("ad" %in% ma_methods){
-          
+
           if(length(unlist(correction_labels)) == 0){
                if(ma_metric %in% c("r_order2", "d_order2")){
                     cat("\nSecond-order artifact-distribution meta-analysis results \n")
                }else{
                     cat("\nArtifact-distribution meta-analysis results \n")
                }
-               cat("---------------------------------------------------------------------- \n")    
+               cat("---------------------------------------------------------------------- \n")
                print(meta_tables$artifact_distribution, suppress_title = TRUE, verbose = verbose)
           }else{
                cat("\nArtifact-distribution meta-analysis results \n")
-               cat("----------------------------------------------------------------------")    
-               
+               cat("----------------------------------------------------------------------")
+
                if("ts" %in% correction_types_ad){
                     cat(ts_title)
                     print(meta_tables$artifact_distribution[[ts_label]], suppress_title = TRUE, verbose = verbose)
                }
-               
+
                if("vgx" %in% correction_types_ad){
                     cat(vgx_title)
                     print(meta_tables$artifact_distribution[[vgx_label]], suppress_title = TRUE, verbose = verbose)
                }
-               
+
                if("vgy" %in% correction_types_ad){
                     cat(vgy_title)
                     print(meta_tables$artifact_distribution[[vgy_label]], suppress_title = TRUE, verbose = verbose)
                }
-               
+
                cat("\n")
                cat("\nSummary of correction methods \n")
                for(i in 2:4) method_details$ad[,i] <- paste0("     ", method_details$ad[,i])
-               
+
                .ad_corrections <- apply(method_details$ad[,-1], 1, paste, collapse = "")
-               
+
                if(length(.ad_corrections) > 1 & all(.ad_corrections == .ad_corrections[1])){
                     .method_details <- cbind(analysis_id = "All", method_details$ad[1,-1])
                     print(.method_details)
                }else{
                     print(method_details$ad)
                }
-               
+
           }
      }
-     
+
      .cols <- colnames(ma_obj)
-     .cols <- .cols[which(.cols == "meta_tables"):length(.cols)]  
-     
+     .cols <- .cols[which(.cols == "meta_tables"):length(.cols)]
+
      .cols[.cols == "meta_tables"]   <- paste("meta_tables   [ access using get_metatab() ]")
      .cols[.cols == "escalc"]        <- paste("escalc        [ access using get_escalc() ]")
      .cols[.cols == "ad"]            <- paste("ad            [ access using get_ad() ]")
@@ -1004,14 +1004,32 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
      .cols[.cols == "bootstrap"]     <- paste("bootstrap     [ access using get_bootstrap() ]")
      .cols[.cols == "cumulative"]    <- paste("cumulative    [ access using get_cumulative() ]")
      .cols[.cols == "leave1out"]     <- paste("leave1out     [ access using get_leave1out() ]")
-     
+
      .cols[.cols == "heterogeneity"] <- paste("heterogeneity [ access using get_heterogeneity() ]")
 
      .cols[.cols == "metareg"]       <- paste("metareg       [ access using get_metareg() ]")
-     
+
      .cols[.cols == "funnel"]        <- paste("funnel        [ access using get_plots() ]")
      .cols[.cols == "forest"]        <- paste("forest        [ access using get_plots() ]")
-     
+
      cat("\n")
      cat("\nInformation available in the meta-analysis object includes:\n", paste0(paste("-", .cols), "\n"))
 }
+
+
+#' @export
+#' @exportClass metabulate
+#' @method print metabulate
+print.metabulate <- function(x, ...){
+    for(i in names(x)) {
+        if(!is.null(attr(x[[i]], "caption"))) {
+            cat(attr(x[[i]], "caption"), "\n", rep("=", nchar(attr(x[[i]], "caption"))), "\n", sep="")
+        }
+        print(x[[i]])
+        cat("\n", attr(x[[i]], "footnote"), "\n\n")
+    }
+
+}
+
+
+

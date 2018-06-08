@@ -7,16 +7,16 @@
 metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
   show_cred = TRUE, show_se = FALSE, show_var = FALSE, analyses = "all",
   match = c("all", "any"), case_sensitive = TRUE,
-  output_format = c("word", "html", "pdf", "text", "rmd", "odt"),
+  output_format = c("word", "html", "pdf", "odt", "text", "rmd"),
   ma_method = "ad", correction_type = "ts", bib = NULL,
   title.bib = NULL, additional_citekeys = NULL, style = "apa",
   header = NULL, digits = 2L, decimal.mark = getOption("OutDec"),
   leading0 = "figure", neg.sign = "minus", pos.sign = "figure",
   drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
   small.mark = "thinspace", small.interval = 3L,
-  conf_format = "parentheses", cred_format = "brackets", symbol_es = "ES",
-  caption = "Results of meta-analyses", save_build_files = TRUE,
-  verbose = FALSE, ...)
+  conf_format = "parentheses", cred_format = "parentheses",
+  symbol_es = "ES", caption = "Results of meta-analyses", verbose = FALSE,
+  unicode = NULL, save_build_files = TRUE, ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
@@ -59,27 +59,27 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 
 \item{decimal.mark}{The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})}
 
-\item{leading0}{How to print leading zeros on decimals. See \code{\link{num_format}} for details.}
+\item{leading0}{How to print leading zeros on decimals. See \code{\link{format_num}} for details.}
 
-\item{neg.sign}{Character to use as negative sign. See \code{\link{num_format}} for details.}
+\item{neg.sign}{Character to use as negative sign. See \code{\link{format_num}} for details.}
 
-\item{pos.sign}{Character to use as positive sign. See \code{\link{num_format}} for details.}
+\item{pos.sign}{Character to use as positive sign. See \code{\link{format_num}} for details.}
 
 \item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
 
-\item{big.mark}{Character to separate groups of large digits. See \code{\link{num_format}} for details.}
+\item{big.mark}{Character to separate groups of large digits. See \code{\link{format_num}} for details.}
 
 \item{big.interval}{See \code{big.mark} above; defaults to 3.}
 
-\item{small.mark}{Character to sparate groups of decimal digits. See \code{\link{num_format}} for details.}
+\item{small.mark}{Character to sparate groups of decimal digits. See \code{\link{format_num}} for details.}
 
 \item{small.interval}{See \code{small.mark} above; defaults to 3.}
 
 \item{conf_format}{How should confidence intervals be formatted? Options are:
 \itemize{
-\item{parentheses}{Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
-\item{brackets}{Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
-\item{columns}{Bounds are shown in individual columns.}
+\item{parentheses}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+\item{brackets}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+\item{columns}{: Bounds are shown in individual columns.}
 }}
 
 \item{cred_format}{How should credility intervals be formatted? Options are the same as for \code{conf_format} above.}
@@ -88,14 +88,16 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 
 \item{caption}{Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).}
 
-\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?}
-
 \item{verbose}{Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?}
+
+\item{unicode}{Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).}
+
+\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?}
 
 \item{...}{Additional arguments (not used).}
 }
 \value{
-If file is "rename", a list of meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")}. Otherwise, a list containing the meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")} and the RefManageR BibEntry object.
+If file is "rename", a list of meta-analysis results tibbles with "caption" and "footnote" attributions. Otherwise, a list containing the meta-analysis results tibbles with "caption" and "footnote" attributes and the RefManageR BibEntry object.
 
 In addition, formatted tables and bibliographies are exported in the requested \code{output_format}. If file is "console" and output_format is not "text", a character vector containing RMarkdown meta-analysis results tables with captions, footnotes, and bibliography is printed (so \code{metabulate()} can be entered into a larger RMarkdown document to produce the requested output). If file is "console" and output_format is "text", a tibble with formatted column names and the bibliography (if any) are printed.
 
