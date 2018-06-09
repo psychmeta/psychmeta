@@ -264,7 +264,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 metabulate <- function(ma_obj, file, output_dir = getwd(),
                        output_format=c("word", "html", "pdf", "odt", "text", "rmd"),
                        show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                       show_se = FALSE, show_var = FALSE, simplify_construct_labels  = TRUE, 
+                       show_se = FALSE, show_var = FALSE, simplify_construct_labels  = TRUE,
                        analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                        ma_method = "ad", correction_type = "ts",
                        bib = NULL, title.bib = NULL, additional_citekeys = NULL, style = "apa",
@@ -506,7 +506,10 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                               bib = NULL, citations = NULL, citekeys = NULL, title.bib = NULL,
                               style = style, save_build_files = FALSE, output_dir = NULL, header = list()){
 
-        if(output_format == "rmd") save_build_files <- TRUE
+        if(output_format == "rmd" | file == "console") save_build_files <- TRUE
+        if(!output_format %in% c("text", "rmd", "md_document")) {
+                stop("Output to ", output_format, " requires Pandoc 2.0.0 or greater.\nInstall from http://pandoc.org/installing.html or\nupdate to RStudio 1.2.679-1 or greater. ")
+        }
         if(!is.null(style)) style <- .clean_style_name(style)
 
         # Prevent LaTeX from removing figure space characters
@@ -559,18 +562,19 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                        sprintf("---\n### This metadata line must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s\n---\n",
                                                bib_file)
+                                       unlink(bib_file)
                                }
 
                                if(!is.null(meta_tables)) {
-                                       cat("```{r eval=knitr::is_html_output(), results='asis', echo = FALSE}\n",
-                                           "cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfit}{\\boldsymbol}\\newcommand{\\symbfup}{\\boldsymbol}')\n",
-                                           "```\n\n",
-                                           sep="")
 
-                                       cat("```{r eval=!knitr::is_latex_output() & !knitr::is_html_output(), results='asis', echo = FALSE}\n",
-                                           "cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfup}{\\mathbfup}\\newcommand{\\symbfit}{\\mathbfit}')\n",
-                                           "```\n\n",
-                                           sep="")
+                                       if(knitr::is_html_output()) {
+                                            cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfit}{\\boldsymbol}\\newcommand{\\symbfup}{\\boldsymbol}')
+                                       }
+
+                                       if(!knitr::is_latex_output() & !knitr::is_html_output()) {
+                                            cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfup}{\\mathbfup}\\newcommand{\\symbfit}{\\mathbfit}')
+                                       }
+
                                }
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[1]]])])
@@ -836,7 +840,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 #' @keywords internal
 .metabulate <- function(meta_tables, ma_type = "ad_ts", output_format = "word", caption = caption,
                         show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                        show_se = FALSE, show_var = FALSE, simplify_construct_labels = TRUE, 
+                        show_se = FALSE, show_var = FALSE, simplify_construct_labels = TRUE,
                         es_type = NULL, symbol_es = "ES",
                         digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "figure", neg.sign = "\u2212",
                         pos.sign = "figure", drop0integer = TRUE, big.mark = "\u202F",
@@ -886,7 +890,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                      if("construct_y" %in% x)    ma_table[["construct_y"]][delete_id] <- ""
                      rm(pair_ids, delete_id)
                 }
-                
+
                 # Select columns
                 col_initial <- x[1:which(x == "analysis_type")]
                 col_initial <- col_initial[!col_initial %in% c("analysis_id", "pair_id", "analysis_type")]
