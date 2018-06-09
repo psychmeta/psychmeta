@@ -23,8 +23,6 @@ generate_bib(ma_obj = NULL, bib = NULL, additional_citekeys = NULL,
 
 \item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.}
 
-\item{additional_citekeys}{Additional citekeys to include in the reference list.}
-
 \item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
 
 \item{match}{Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.}

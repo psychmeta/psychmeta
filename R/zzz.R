@@ -90,8 +90,6 @@
     if(!is.null(override)) override else (l10n_info()$`UTF-8` | if(!is.null(.Options$cli.unicode)) isTRUE(.Options$cli.unicode) else FALSE | nzchar(Sys.getenv("RSTUDIO_USER_IDENTITY")) )
 }
 
-.support_unicode <- function() (l10n_info()$`UTF-8` | if(!is.null(.Options$cli.unicode)) isTRUE(.Options$cli.unicode) else FALSE | nzchar(Sys.getenv("RSTUDIO_USER_IDENTITY")) )
-
 
 #' Retrieve the NEWS file for the psychmeta package
 #'
