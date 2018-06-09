@@ -586,6 +586,23 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                }
 
+                               ### Ugly hack to accommodate limits of RMarkdown output:
+                               ### Replace thin space, non-breaking thin space, and hair space
+                               ### with non-breaking space "\u00a0"
+                               ### TODO: Remove this when a proper UTF-8 solution is available.
+                               meta_tables <- sapply(names(meta_tables),
+                                                     function(x) {
+                                                             ma_table <- mutate_all(meta_tables[[x]],
+                                                                                    funs(stringr::str_replace_all(.data$.,
+                                                                                                                  "(\u2007|\u2009|\u202f|\u200a)", # Figure space | Thin space | Narrow non-break space | Hair space
+                                                                                                                  "\u00a0")))
+                                                             attributes(ma_table) <- attributes(meta_tables[[x]])
+                                                             return(ma_table)
+                                                     },
+                                                     simplify = FALSE, USE.NAMES = TRUE)
+                               class(meta_tables) <- "metabulate"
+
+
                                cat("\n\n\\blandscape\n\n")
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[1]]])])
