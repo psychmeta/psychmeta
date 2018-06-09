@@ -7,7 +7,7 @@
 #' @param x A vector, matrix, or data.frame of numbers to format
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"figure"} (default), leading zeros are replaced with figure-spaces (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.
 #' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "<U+2212>").
 #' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "<U+2007>") if a column contains any negative numbers and suppressed otherwise.
 #' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
@@ -37,7 +37,7 @@
 #' # as decimal marks in various countries. If you prefer to use commmas to separate
 #' # large digit groups, set big.mark = ",":
 #' format_num(x = 10000, big.mark = ",")
-format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "figure", neg.sign = "minus",
+format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "conditional", neg.sign = "minus",
                        pos.sign = "figure", drop0integer = TRUE, big.mark = "thinspace",
                        big.interval = 3L, small.mark = "thinspace", small.interval = 3L) {
 
@@ -80,6 +80,20 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
                         small.mark = small.mark, small.interval = small.interval,
                         drop0trailing = FALSE)
 
+        # Clean up zero values
+        if(flag == "") {
+                out[] <- mutate_all(out,
+                                    funs(stringr::str_replace_all(.data$.,
+                                                                  "^0$",
+                                                                  "0.00")))
+        } else {
+                out[] <- mutate_all(out,
+                                    funs(stringr::str_replace_all(.data$.,
+                                                                  "^\\+0$",
+                                                                  "+0.00")))
+        }
+
+
         # Clean up unicode big.mark and small.mark
         out[] <- mutate_all(out,
                             funs(stringr::str_replace_all(.data$.,
@@ -94,6 +108,10 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
         switch(leading0,
                "TRUE" = {},
                "FALSE" = out[] <- sapply(out, function(x) stringr::str_replace_all(x, paste0("^(-?)0", decimal.mark), paste0("\\1", decimal.mark))),
+               conditional = {
+                       out <- mutate_if(out, apply(x, 2, function(i) {!any(abs(i) >= 1)}),
+                                        function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
+               },
                figure = {
                        out <- mutate_if(out, apply(x, 2, function(i) {any(abs(i) >= 1)}),
                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1\u2007", decimal.mark)))
@@ -152,7 +170,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package), ODT, Rmarkdown, and plain text.
+#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param ma_method Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.
 #' @param correction_type Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses. If not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
@@ -172,9 +190,9 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param small.interval See \code{small.mark} above; defaults to 3.
 #' @param conf_format How should confidence intervals be formatted? Options are:
 #' \itemize{
-#' \item{parentheses}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
-#' \item{brackets}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
-#' \item{columns}{: Bounds are shown in individual columns.}
+#' \item{\code{parentheses}}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+#' \item{\code{brackets}}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+#' \item{\code{columns}}{: Bounds are shown in individual columns.}
 #' }
 #' @param cred_format How should credility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).
@@ -182,7 +200,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
 #' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
 #' @param save_build_files Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?
-#' 
+#'
 #' @param ... Additional arguments (not used).
 #'
 #' @return If file is "rename", a list of meta-analysis results tibbles with "caption" and "footnote" attributions. Otherwise, a list containing the meta-analysis results tibbles with "caption" and "footnote" attributes and the RefManageR BibEntry object.
@@ -201,13 +219,16 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                  construct_x = x_name, construct_y = y_name,
 #'                  moderators = moderator, data = data_r_meas_multi)
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_dir = tempdir())
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+#'            output_format = "word", output_dir = tempdir())
 #'
 #' ## Output to PDF:
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "pdf", output_dir = tempdir())
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+#'            output_format = "pdf", output_dir = tempdir())
 #'
 #' ## Output to ODT (LibreOffice):
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt", output_dir = tempdir())
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+#'            output_format = "odt", output_dir = tempdir())
 #'
 #' ## To produce Markdown tables to include inline in an RMarkdown report,
 #' ## set file to "console" and output_format to anything but "text":
@@ -219,7 +240,8 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' ## "rename" and output_format to anything but "text":
 #' \dontrun{
 #'      ma_table <- metabulate(ma_obj = ma_r_obj, file = "rename", output_format = "pdf")
-#'      knitr::kable(ma_table[[1]], "latex", booktabs = TRUE, caption = attr(ma_table[[1]], "caption")) %>% 
+#'      knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
+#'                   caption = attr(ma_table[[1]], "caption")) %>%
 #'        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) %>%
 #'        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
 #' }
@@ -236,10 +258,10 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #'                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 #' metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
-metabulate <- function(ma_obj, file, ouput_dir = getwd(),
+metabulate <- function(ma_obj, file, output_dir = getwd(),
                        output_format=c("word", "html", "pdf", "odt", "text", "rmd"),
                        show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                       show_se = FALSE, show_var = FALSE, 
+                       show_se = FALSE, show_var = FALSE,
                        analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                        ma_method = "ad", correction_type = "ts",
                        bib = NULL, title.bib = NULL, additional_citekeys = NULL, style = "apa",
@@ -368,7 +390,7 @@ metabulate <- function(ma_obj, file, ouput_dir = getwd(),
 #' generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
 #'              file = "sample bibliography", output_dir = tempdir(), output_format = "word")
 generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
-                         file = NULL, outuput_dir = getwd(),
+                         file = NULL, output_dir = getwd(),
                          output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                          style="apa", title.bib = NULL, save_build_files = TRUE, header=list()){
@@ -377,8 +399,6 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         output_format <- match.arg(output_format)
 
         if("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
-
-        if(class(ma_obj))
 
         # Get the requested meta-analyses
         ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
@@ -486,7 +506,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         if(!is.null(style)) style <- .clean_style_name(style)
 
         # Prevent LaTeX from removing figure space characters
-        if(!output_format == "text") {
+        if(!output_format == "text" & !is.null(meta_tables)) {
              meta_tables <- sapply(names(meta_tables),
                                    function(x) {
                                      ma_table <- mutate_all(meta_tables[[x]],
@@ -528,7 +548,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                if(!is.null(bib)) {
                                        # Write the bibliography file
                                        if(save_build_files) {
-                                               bib_file <- stringr::str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
+                                               bib_file <- stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib")
                                        } else bib_file <- tempfile(file, fileext = ".bib")
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
@@ -551,37 +571,37 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[1]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))
-                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[1]]])])
+                               cat(paste0("*Note:* ", attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[1]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[1]]]) & length(ma_type) > 1])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[2]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))
-                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[2]]])])
+                               cat(paste0("*Note:* ", attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[2]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[2]]]) & length(ma_type) > 2])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[3]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))
-                               cat"*Note: *", (paste0(attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[3]]])])
+                               cat(paste0("*Note:* ", attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[3]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[3]]]) & length(ma_type) > 3])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[4]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))
-                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[4]]])])
+                               cat(paste0("*Note:* ", attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[4]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[4]]]) & length(ma_type) > 4])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[5]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))
-                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[5]]])])
+                               cat(paste0("*Note:* ", attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[5]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[5]]]) & length(ma_type) > 5])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[6]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))
-                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[6]]])])
+                               cat(paste0("*Note:* ", attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[6]]])])
                                cat("\\newpage"[!is.null(meta_tables[[ma_type[6]]]) & length(ma_type) > 6])
 
                                cat(paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[7]]])])
                                knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))
-                               cat("*Note: *", paste0(attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[7]]])])
+                               cat(paste0("*Note:* ", attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[7]]])])
                                cat("\\newpage"[!is.null(meta_tables) & !is.null(bib)])
 
                                if(!is.null(bib)) {
@@ -675,7 +695,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                if (output_format %in% c("word", "html", "pdf", "odt")) {
                                  header$output <- paste0("\n  ", output_format, "_document",
                                                          if(output_format == "pdf") paste0(":\n    latex_engine: lualatex\n    includes:\n      in_header: ", system.file('templates/header.tex', package='psychmeta')),
-                                                         if(output_format == "word") paste0(":\n    reference_docx: ", system.file('templates/reference_docx.docx', package='psychmeta'))
+                                                         if(output_format == "word") paste0(":\n    reference_docx: ", system.file('templates/reference_docx.docx', package='psychmeta')),
+                                                         if(output_format == "odt") paste0(":\n    reference_odt: ", system.file('templates/reference_odt.odt', package='psychmeta'))
                                                          )
                                } else header$output <- output_format
 
@@ -683,7 +704,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                if(!is.null(bib)) {
                                        # Write the bibliography file
                                        if(save_build_files) {
-                                               bib_file <- stringr::str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
+                                               bib_file <- stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib")
                                        } else bib_file <- tempfile(file, fileext = ".bib")
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
@@ -721,10 +742,10 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                  tables_document <- c(
 
                                    "```{r eval=knitr::is_html_output(), results='asis', echo = FALSE}",
-                                   "cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfit}{\\boldsymbol}\\newcommand{\\symbfup}{\\boldsymbol}')",
+                                   "cat('\\\\newcommand{\\\\symup}{\\\\mathrm}\\\\newcommand{\\\\symbfit}{\\\\boldsymbol}\\\\newcommand{\\\\symbfup}{\\\\boldsymbol}')",
                                    "```\n",
                                    "```{r eval=!knitr::is_latex_output() & !knitr::is_html_output(), results='asis', echo = FALSE}",
-                                   "cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfup}{\\mathbfup}\\newcommand{\\symbfit}{\\mathbfit}')",
+                                   "cat('\\\\newcommand{\\\\symup}{\\\\mathrm}\\\\newcommand{\\\\symbfup}{\\\\mathbfup}\\\\newcommand{\\\\symbfit}{\\\\mathbfit}')",
                                    "```\n",
 
                                    "```{r, echo=FALSE}",
@@ -737,41 +758,41 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[1]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))',
-                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[1]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[1]]])])',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[1]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[1]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[1]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[2]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))',
-                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[2]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[2]]])])',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[2]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[2]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[2]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[3]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))',
-                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[3]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[3]]])])',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[3]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[3]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[3]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[4]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))',
-                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[4]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[4]]])])',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[4]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[4]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[4]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[5]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))',
-                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[5]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[5]]])])',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[5]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[5]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[5]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[6]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))',
-                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[6]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[6]]])])',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[6]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[6]]])])',
                                    'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[6]]])])',
 
                                    'cat(paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[7]]])])',
                                    'knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))',
-                                   'cat("*Note: *", paste0(attr(meta_tables[[ma_type[7]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[7]]])])',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[7]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[7]]])])',
 
                                    '```',
 
-                                   "\n\n\\elandscape"
+                                   "\n\n\\elandscape\n\n"
                                  )
                                } else tables_document <- NULL
 
@@ -780,7 +801,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                document <- c("---", header, "---\n\n",
                                              tables_document,
-                                             paste0("## ", title.bib, "\n\n")[!output_format == "word" & !is.null(title.bib) & !is.null(bib)],
+                                             "<br/>\n\n<br/>\n\n<br/>\n\n",
+                                             paste0("# ", title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
                                              sprintf('---\nnocite: |\n  %s\n---\n', citations)[!is.null(bib)]
                                )
 
@@ -790,7 +812,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                } else rmd_document <- tempfile(file, fileext = ".rmd")
 
                                stringi::stri_write_lines(document, rmd_document)
-                                                                               
+
                                if(is.null(output_dir)) {output_dir <- getwd()}
 
                                if(output_format != "rmd") {
@@ -849,12 +871,6 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
         # Select, rearrange, and format columns of meta_tables
         .arrange_format_columns <- function(ma_table) {
-                ma_table <- mutate(ma_table,
-                                   spacer1 = " ",
-                                   spacer2 = " ",
-                                   spacer3 = " ",
-                                   spacer4 = " ",
-                                   spacer5 = " ")
                 x <- colnames(ma_table)
 
                 # Select columns
@@ -910,19 +926,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 if(show_cred == TRUE) col_cred <- grep("^CV_.+", x, value = TRUE) else col_cred <- NULL
 
                 # Rearrange columns
-                ma_table <- ma_table[,c(col_initial, col_moderators, col_sampsize,
-                                        #"spacer1",
-                                        col_m_bb, col_se_bb, col_sd_bb,
-                                        #"spacer1"[show_var],
-                                        col_var_bb,
-                                        #"spacer2"[!is.null(col_m_cor)],
-                                        col_m_cor, col_se_cor, col_sd_cor,
-                                        #"spacer3"[!is.null(col_m_cor) & show_var],
-                                        col_var_cor,
-                                        #"spacer4"[show_conf],
-                                        col_conf,
-                                        #"spacer5"[show_cred],
-                                        col_cred)]
+                ma_table <- ma_table[1:nrow(ma_table), c(col_initial, col_moderators, col_sampsize,
+                                                         col_m_bb, col_se_bb, col_sd_bb,
+                                                         col_var_bb,
+                                                         col_m_cor, col_se_cor, col_sd_cor,
+                                                         col_var_cor,
+                                                         col_conf,
+                                                         col_cred)]
 
                 colnames(ma_table)[colnames(ma_table) %in% col_conf] <- c("ci_lower", "ci_upper")
                 if(show_conf == TRUE) col_conf <- c("ci_lower", "ci_upper")
@@ -930,18 +940,19 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 if(show_cred == TRUE) col_cred <- c("cv_lower", "cv_upper")
 
                 # Format columns
-                ma_table[, col_sampsize] <- format_num(ma_table[, col_sampsize], digits = 0L, decimal.mark = decimal.mark,
-                                                       leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
-                                                       drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                                                       small.mark = small.mark, small.interval = small.interval)
+                ma_table[1:nrow(ma_table), col_sampsize] <-
+                        format_num(ma_table[1:nrow(ma_table), col_sampsize], digits = 0L, decimal.mark = decimal.mark,
+                                   leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                   drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                   small.mark = small.mark, small.interval = small.interval)
 
                 numeric_columns <- c(col_m_bb, col_se_bb, col_sd_bb, col_var_bb, col_m_cor, col_se_cor, col_sd_cor, col_var_cor, col_conf, col_cred)
 
-                ma_table[, numeric_columns] <-
-                        format_num(ma_table[, numeric_columns], digits = digits, decimal.mark = decimal.mark,
-                                                       leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
-                                                       drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                                                       small.mark = small.mark, small.interval = small.interval)
+                ma_table[1:nrow(ma_table), numeric_columns] <-
+                        format_num(ma_table[1:nrow(ma_table), numeric_columns], digits = digits, decimal.mark = decimal.mark,
+                                   leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                   drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                   small.mark = small.mark, small.interval = small.interval)
 
                 # Format the interval columns
                 if(show_conf == TRUE) {
@@ -971,7 +982,6 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                 ma_table <- rename(ma_table, !!formatted_names[formatted_names %in% colnames(ma_table)])
 
-                colnames(ma_table)[grep("spacer\\d+", colnames(ma_table))] <- " "
                 if(output_format != "text" & length_moderators > 0) {
                         colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)] <-
                                 paste0("**", colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)], "**")
@@ -2073,14 +2083,14 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                 } else {
                         c(bb = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                      "$\\overline{", symbol_es, "}$\u00a0=\u00a0 mean observed effect size ($", symbol_es, "$); "[show_msd],
-                                      "$SE_{\\overline{", symbol_es, "}}$\u00a0=\u00a0standard error of $\\overline{", symbol_es, "}$; "[show_se],
-                                      "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & !verbose],
-                                      "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{e}$\u00a0=\u00a0predicted $SD_{", symbol_es, "}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & verbose],
-                                      "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$ ;"[show_var & !verbose],
-                                      "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $", symbol_es, "$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$; "[show_var & verbose],
-                                      "CI\u00a0=\u00a0confidence interval around $\\overline{", symbol_es, "}$; "[show_conf],
-                                      "CV\u00a0=\u00a0credibility interval around $\\overline{", symbol_es, "}$."[show_cred])
+                                      paste0("$\\overline{", symbol_es, "}$\u00a0=\u00a0 mean observed effect size ($", symbol_es, "$); ")[show_msd],
+                                      paste0("$SE_{\\overline{", symbol_es, "}}$\u00a0=\u00a0standard error of $\\overline{", symbol_es, "}$; ")[show_se],
+                                      paste0("$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; ")[show_msd & !verbose],
+                                      paste0("$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{e}$\u00a0=\u00a0predicted $SD_{", symbol_es, "}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; ")[show_msd & verbose],
+                                      paste0("$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$ ;")[show_var & !verbose],
+                                      paste0("$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $", symbol_es, "$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$; ")[show_var & verbose],
+                                      paste0("CI\u00a0=\u00a0confidence interval around $\\overline{", symbol_es, "}$; ")[show_conf],
+                                      paste0("CV\u00a0=\u00a0credibility interval around $\\overline{", symbol_es, "}$.")[show_cred])
                         )
                 }
         }
