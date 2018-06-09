@@ -8,9 +8,9 @@
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
 #' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "<U+2212>").
 #' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "<U+2007>") if a column contains any negative numbers and suppressed otherwise.
-#' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "<U+202F>").
 #' @param big.interval See \code{big.mark} above; defaults to 3.
 #' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "<U+202F>").
@@ -37,9 +37,11 @@
 #' # as decimal marks in various countries. If you prefer to use commmas to separate
 #' # large digit groups, set big.mark = ",":
 #' format_num(x = 10000, big.mark = ",")
-format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "conditional", neg.sign = "minus",
-                       pos.sign = "figure", drop0integer = TRUE, big.mark = "thinspace",
-                       big.interval = 3L, small.mark = "thinspace", small.interval = 3L) {
+format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
+                       leading0 = "conditional", drop0integer = FALSE,
+                       neg.sign = "minus", pos.sign = "figure",
+                       big.mark = "thinspace", big.interval = 3L,
+                       small.mark = "thinspace", small.interval = 3L) {
 
         is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {abs(x - round(x)) < tol}
         all_equal_vector <- function(x, tol = .Machine$double.eps^0.5) {diff(range(x)) < tol}
@@ -79,20 +81,6 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
                         big.mark = big.mark, big.interval = big.interval,
                         small.mark = small.mark, small.interval = small.interval,
                         drop0trailing = FALSE)
-
-        # Clean up zero values
-        if(flag == "") {
-                out[] <- mutate_all(out,
-                                    funs(stringr::str_replace_all(.data$.,
-                                                                  "^0$",
-                                                                  "0.00")))
-        } else {
-                out[] <- mutate_all(out,
-                                    funs(stringr::str_replace_all(.data$.,
-                                                                  "^\\+0$",
-                                                                  "+0.00")))
-        }
-
 
         # Clean up unicode big.mark and small.mark
         out[] <- mutate_all(out,
@@ -160,31 +148,27 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' Write a summary table of meta-analytic results
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
-#' @param file The filename (optionally with a subfolder path) for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).
-#' @param output_dir The filepath for the output file. Defaults to the current working directory.
+#' @param file The filename (optionally with a subfolder path) for the output file. If \code{NULL}, the function will output directly to the R console (also useful if you want to include psychmeta results in a larger RMarkdown document).
+#' @param output_dir The filepath for the output directory/folder. Defaults to the current working directory.
 #' @param show_msd Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})
 #' @param show_conf Logical. Should confidence intervals be shown (default: \code{TRUE})?
 #' @param show_cred Logical. Should credibility intervals be shown (default: \code{TRUE})?
 #' @param show_se Logical Should standard errors be shown (default: \code{FALSE})?
 #' @param show_var Logical. Should variances be shown (default: \code{FALSE})?
-#' @param collapse_construct_labels  Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
+#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package to be installed), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param ma_method Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.
 #' @param correction_type Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
-#' @param bib A BibTeX file containing the citekeys for the meta-analyses. If not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
-#' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param additional_citekeys Additional citekeys to include in the reference list.
-#' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
-#' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
+#' @param collapse_construct_labels  Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).
+#' @param bold_headers Logical. Should column headers be bolded (default: \code{TRUE})?
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
 #' @param leading0 How to print leading zeros on decimals. See \code{\link{format_num}} for details.
+#' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param neg.sign Character to use as negative sign. See \code{\link{format_num}} for details.
 #' @param pos.sign Character to use as positive sign. See \code{\link{format_num}} for details.
-#' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param big.mark Character to separate groups of large digits. See \code{\link{format_num}} for details.
 #' @param big.interval See \code{big.mark} above; defaults to 3.
 #' @param small.mark Character to sparate groups of decimal digits. See \code{\link{format_num}} for details.
@@ -198,16 +182,19 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param cred_format How should credility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).
 #' @param caption Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).
-#' @param bold_headers Logical. Should column headers be bolded (default: \code{TRUE})?
+#' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
 #' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
 #' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
-#' @param save_build_files Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{FALSE})?
-#'
+#' @param bib A BibTeX file containing the citekeys for the meta-analyses. If provided and file is not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
+#' @param title.bib The title to give to the bibliography (see \code{bib} above). If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
+#' @param style What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
+#' @param additional_citekeys Additional citekeys to include in the reference list (see \code{bib} above).
+#' @param save_build_files Should the RMarkdown and BibLaTeX (if any) files used to generate the output be saved (default: \code{FALSE})?
 #' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
 #'
-#' @return If file is "rename", a list of meta-analysis results tibbles with "caption" and "footnote" attributions. Otherwise, a list containing the meta-analysis results tibbles with "caption" and "footnote" attributes and the RefManageR BibEntry object.
+#' @return A list of meta-analysis results \code{\link[tibble]{tibble}}s with "caption" and "footnote" attributes.
 #'
-#' In addition, formatted tables and bibliographies are exported in the requested \code{output_format}. If file is "console" and output_format is not "text", a character vector containing RMarkdown meta-analysis results tables with captions, footnotes, and bibliography is printed (so \code{metabulate()} can be entered into a larger RMarkdown document to produce the requested output). If file is "console" and output_format is "text", a tibble with formatted column names and the bibliography (if any) are printed.
+#' If \code{file} is specified, formatted tables and bibliographies are exported in the requested \code{output_format}.
 #'
 #' @return Formatted tables of meta-analytic output.
 #' @export
@@ -235,20 +222,30 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
 #'            output_format = "odt", output_dir = tempdir())
 #'
-#' ## To produce Markdown tables to include inline in an RMarkdown report,
-#' ## set file to "console" and output_format to anything but "text":
-#' metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
 #'
-#' ## You can use metabulate() to simply rename results table columns and create captions
-#' ## and footnotes, then use other packages, such as \code{kableExtra}, \code{flextable},
-#' ## \code{xtable}, or others, for more advanced formatting. To do so, set file to
-#' ## "rename" and output_format to anything but "text":
-#'      ma_table <- metabulate(ma_obj = ma_r_obj, file = "rename", output_format = "pdf")
-#'      knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
+#' ## To produce Markdown tables to include inline in an RMarkdown report,
+#' ## leave file == NULL and output_format to anything but "text":
+#' ma_table <- metabulate(ma_obj = ma_r_obj, file = NULL, output_format = "rmd")
+#'
+#' ## Then, add the formatted table to your document using your preferred table
+#' ## formatting functions:
+#'
+#' #### Using just the \link[knitr] package:
+#' knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
+#' cat("\n", attr(ma_table[[1]], "footnote"))
+#'
+#' #### Using \link[knitr] plus the \link[kableExtra] package:
+#' knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
 #'                   caption = attr(ma_table[[1]], "caption")) %>%
 #'        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) %>%
 #'        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
-#' }
+#'
+#'
+#' # !!! Note: On Windows, R currently cannot handle Unicode characters if kables
+#' # are printed not at top-level (e.g., in an if() statement, in a for() loop,
+#' # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
+#' # kable() as a top-level function (as above).
+#'
 #'
 #' ## Create output table for meta-analysis of d values:
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
@@ -262,24 +259,26 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #'                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 #' metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
-metabulate <- function(ma_obj, file, output_dir = getwd(),
+metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
                        output_format=c("word", "html", "pdf", "odt", "text", "rmd"),
                        show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                       show_se = FALSE, show_var = FALSE, collapse_construct_labels  = TRUE,
+                       show_se = FALSE, show_var = FALSE,
                        analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                        ma_method = "ad", correction_type = "ts",
-                       bib = NULL, title.bib = NULL, additional_citekeys = NULL, style = "apa",
-                       header = NULL, digits = 2L, decimal.mark = getOption("OutDec"),
-                       leading0 = "figure", neg.sign = "minus", pos.sign = "figure",
-                       drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
-                       small.mark = "thinspace", small.interval = 3L,  conf_format = "parentheses",
-                       cred_format = "parentheses", symbol_es = "ES", caption = "Results of meta-analyses",
-                       bold_headers = TRUE, verbose = FALSE, unicode = NULL,
+                       collapse_construct_labels  = TRUE, bold_headers = TRUE,
+                       digits = 2L, decimal.mark = getOption("OutDec"),
+                       leading0 = "conditional", drop0integer = FALSE,
+                       neg.sign = "minus", pos.sign = "figure",
+                       big.mark = "thinspace", big.interval = 3L,
+                       small.mark = "thinspace", small.interval = 3L,
+                       conf_format = "parentheses", cred_format = "parentheses",
+                       symbol_es = "ES", caption = "Results of meta-analyses",
+                       header = NULL, verbose = FALSE, unicode = NULL,
+                       bib = NULL, title.bib = NULL, style = "apa", additional_citekeys = NULL,
                        save_build_files = FALSE, ...){
 
         # Match arguments
         output_format <- tolower(output_format)
-        output_format <- match.arg(output_format)
         ma_method <- match.arg(ma_method, c("bb", "ic", "ad"), several.ok = TRUE)
         correction_type <- match.arg(correction_type, c("ts", "vgx", "vgy"), several.ok = TRUE)
         conf_format <- match.arg(conf_format, c("parentheses", "brackets", "columns"))
@@ -335,13 +334,15 @@ metabulate <- function(ma_obj, file, output_dir = getwd(),
                                    conf_level = conf_level, cred_level = cred_level)
 
         # Set the output file name
-        if(is.null(file)) file <- "psychmeta_output"
-        if(!file %in% c("console", "rename")) file <- .filename_check(file, output_format)
-
-        if(file == "rename") return(meta_tables)
+        if(!is.null(file)) file <- .filename_check(file, output_format)
 
         # Assign values to citekeys and citations, convert bib to R bibliography
-        if(!is.null(bib)) bib <- .generate_bib(ma_obj, bib, additional_citekeys)
+        if(!is.null(file)) {
+                if(!is.null(bib)) warning("Bibliography not generated when file == NULL.\nTry generate_bib() to include a bibliography in an RMarkdown document.")
+                bib <- NULL
+        } else if(!is.null(bib)) {
+                bib <- .generate_bib(ma_obj, bib, additional_citekeys)
+        }
 
         # Render the output
         .psychmeta_render(file = file, output_format = output_format, output_dir = output_dir,
@@ -360,16 +361,16 @@ metabulate <- function(ma_obj, file, output_dir = getwd(),
 #'
 #' @param ma_obj A psychmeta meta-analysis object with \code{citekeys} supplied.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses.
+#' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
+#' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list.
-#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} to output directly to the R console.
+#' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions }} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
 #' @param output_dir The filepath for the output file. Defaults to the current working directory.
-#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
+#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
-#' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{TRUE})?
+#' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{FALSE}; always \code{TRUE} if file is \code{NULL})?
 #' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
 #' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
 #'
@@ -397,11 +398,12 @@ metabulate <- function(ma_obj, file, output_dir = getwd(),
 #' ## reference information for each of the citekeys included in the meta-analysis database.
 #' generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
 #'              file = "sample bibliography", output_dir = tempdir(), output_format = "word")
-generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
+generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
+                         additional_citekeys=NULL,
                          file = NULL, output_dir = getwd(),
                          output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
-                         style="apa", title.bib = NULL, save_build_files = TRUE,
+                         save_build_files = TRUE,
                          header=list(), ...){
 
         output_format <- tolower(output_format)
@@ -419,14 +421,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         bib <- bib$bib
 
         # Set the output file name
-        if(is.null(file)) file <- "reference_list"
-        if(file != "console") file <- .filename_check(file, output_format)
+        if(!is.null(file)) file <- .filename_check(file, output_format)
 
         # Render the output
         switch(output_format,
 
                citekeys = {
-                       if(file == "console") {
+                       if(!is.null(file)) {
                                return(citations)
                        } else {
                                writeLines(citations, con = file)
@@ -434,7 +435,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                },
 
                biblatex = {
-                       if(file == "console") {
+                       if(!is.null(file)) {
                                print(bib[citekeys], .opts = list(style = "Biblatex"))
                        } else {
                                suppressMessages(WriteBib(bib[citekeys], file = file))
@@ -446,6 +447,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           output_dir = output_dir, bib = bib, citations = citations,
                                           citekeys = citekeys, title.bib = title.bib, style = style,
                                           save_build_files = save_build_files, header = header, ...)
+                        invisible(bib[citekeys])
                 }
                )
 }
@@ -475,7 +477,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         # Reset BibOptions to original
         BibOptions(check.entries = Bib_check.entries_original)
 
-        return(list(citekeys = citekeys, citations = citations, bib = bib))
+        return(list(bib = bib, citekeys = citekeys, citations = citations))
 
 }
 
@@ -507,36 +509,20 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 }
 
 
-.psychmeta_render <- function(file, output_format, meta_tables = NULL, ma_type = NULL,
+.psychmeta_render <- function(file = NULL, output_format, meta_tables = NULL, ma_type = NULL,
                               es_type = NULL, bib = NULL, citations = NULL,
                               citekeys = NULL, title.bib = NULL, style = style,
                               save_build_files = FALSE, output_dir = NULL,
                               header = list(), ...){
 
-        if(output_format == "rmd" | file == "console") save_build_files <- TRUE
         if(!output_format %in% c("text", "rmd", "md_document") & !rmarkdown::pandoc_available("2")) {
                 stop("Output to ", output_format, " requires Pandoc 2.0.0 or greater.\nInstall from http://pandoc.org/installing.html or\nupdate to RStudio 1.2.679-1 or greater. ")
         }
         if(!is.null(style)) style <- .clean_style_name(style)
 
-        if(is.null(output_dir)) {output_dir <- getwd()}
+        if(is.null(output_dir)) output_dir <- getwd()
 
-        # Prevent LaTeX from removing figure space characters
-        if(!output_format == "text" & !is.null(meta_tables)) {
-             meta_tables <- sapply(names(meta_tables),
-                                   function(x) {
-                                     ma_table <- mutate_all(meta_tables[[x]],
-                                                            funs(stringr::str_replace_all(.data$.,
-                                                                                        "\u2007",
-                                                                                        "\u2007\\\\phantom{\u2212}")))
-                                     attributes(ma_table) <- attributes(meta_tables[[x]])
-                                     return(ma_table)
-                                    },
-                                    simplify = FALSE, USE.NAMES = TRUE)
-             class(meta_tables) <- "metabulate"
-        }
-
-        if(file == "console") {
+        if(is.null(file)) {
 
                 switch(output_format,
 
@@ -554,110 +540,71 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
                                }
 
-                         invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
+                         invisible(meta_tables[!is.null(meta_tables)])
 
                        },
 
                        # else =
-                       {# TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
-                               # the same metadata block as citations and style below.
-                               if(!is.null(bib)) {
-                                       # Write the bibliography file
-                                       if(save_build_files) {
-                                               bib_file <- paste0(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
-                                       } else bib_file <- tempfile(file, fileext = ".bib")
+                       {     if(!is.null(meta_talbes)) {
+                                  # Prevent LaTeX from removing figure space characters
+                                  meta_tables <- sapply(names(meta_tables),
+                                                        function(x) {
+                                                                ma_table <- mutate_all(meta_tables[[x]],
+                                                                                       funs(stringr::str_replace_all(.data$.,
+                                                                                                                     "\u2007",
+                                                                                                                     "\u2007\\\\phantom{\u2212}")))
+                                                                attributes(ma_table) <- attributes(meta_tables[[x]])
+                                                                return(ma_table)
+                                                        },
+                                                        simplify = FALSE, USE.NAMES = TRUE)
+                                  class(meta_tables) <- "metabulate"
+                                  return(meta_tables[!is.null(meta_tables)])
+                             }
+
+                             # TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
+                             # the same metadata block as citations and style below.
+                             if(!is.null(bib)) {
+                                  # Write the bibliography file
+                                       # Ignore save_build_files
+                                       bib_file <- paste0(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
 
-                                       sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s\noutput:\n  pdf_document:\n    include:\n      in_header: %s",
-                                               bib_file, system.file('templates/header.tex', package='psychmeta'))
-                                       unlink(bib_file)
-                               }
+                                       sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s",
+                                               bib_file)
 
-                               if(!is.null(meta_tables)) {
-
-                                       if(knitr::is_html_output()) {
-                                            cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfit}{\\boldsymbol}\\newcommand{\\symbfup}{\\boldsymbol}\n\n')
-                                       }
-
-                                       if(!knitr::is_latex_output() & !knitr::is_html_output()) {
-                                            cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfup}{\\mathbfup}\\newcommand{\\symbfit}{\\mathbfit}\n\n')
-                                       }
-
-                               }
-
-                               ### Ugly hack to accommodate limits of RMarkdown output:
-                               ### Replace thin space, non-breaking thin space, and hair space
-                               ### with non-breaking space "\u00a0"
-                               ### TODO: Remove this when a proper UTF-8 solution is available.
-                               meta_tables <- sapply(names(meta_tables),
-                                                     function(x) {
-                                                             ma_table <- mutate_all(meta_tables[[x]],
-                                                                                    funs(stringr::str_replace_all(.data$.,
-                                                                                                                  "(\u2007|\u2009|\u202f|\u200a)", # Figure space | Thin space | Narrow non-break space | Hair space
-                                                                                                                  "\u00a0")))
-                                                             attributes(ma_table) <- attributes(meta_tables[[x]])
-                                                             return(ma_table)
-                                                     },
-                                                     simplify = FALSE, USE.NAMES = TRUE)
-                               class(meta_tables) <- "metabulate"
-
-
-                               cat("\n\n\\blandscape\n\n")
-
-                               cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[1]]])])
-                               print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))
-                               cat(paste0("\n*Note:* ", attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[1]]])])
-                               cat("\\newpage"[!is.null(meta_tables[[ma_type[1]]]) & length(ma_type) > 1])
-
-                               cat(paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[2]]])])
-                               print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))
-                               cat(paste0("\n*Note:* ", attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[2]]])])
-                               cat("\\newpage"[!is.null(meta_tables[[ma_type[2]]]) & length(ma_type) > 2])
-
-                               cat(paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[3]]])])
-                               print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))
-                               cat(paste0("\n*Note:* ", attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[3]]])])
-                               cat("\\newpage"[!is.null(meta_tables[[ma_type[3]]]) & length(ma_type) > 3])
-
-                               cat(paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[4]]])])
-                               print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))
-                               cat(paste0("\n*Note:* ", attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[4]]])])
-                               cat("\\newpage"[!is.null(meta_tables[[ma_type[4]]]) & length(ma_type) > 4])
-
-                               cat(paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[5]]])])
-                               print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))
-                               cat(paste0("\n*Note:* ", attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[5]]])])
-                               cat("\\newpage"[!is.null(meta_tables[[ma_type[5]]]) & length(ma_type) > 5])
-
-                               cat(paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[6]]])])
-                               print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))
-                               cat(paste0("\n*Note:* ", attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[6]]])])
-                               cat("\\newpage"[!is.null(meta_tables[[ma_type[6]]]) & length(ma_type) > 6])
-
-                               cat(paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"), "\n")[!is.null(meta_tables[[ma_type[7]]])])
-                               print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))
-                               cat(paste0("\n*Note:* ", attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n")[!is.null(meta_tables[[ma_type[7]]])])
-                               cat("\\newpage"[!is.null(meta_tables) & !is.null(bib)])
-
-                               cat("\n\n\\elandscape\n\n")
-
-                               if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
 
                                        cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib,
                                            "\n\n---\n"
                                        )
+
                                        if(!is.null(style)) sprintf("csl: %s\n", style )
                                        sprintf('nocite: |\n  %s\n---\n', citations)
+
+                                       invisible(bib[citekeys])
                                }
 
-                         invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
                        }
                 )
 
         } else {
+                if(output_format == "rmd") save_build_files <- TRUE
+                # Prevent LaTeX from removing figure space characters
+                if(output_format != "text" & !is.null(meta_tables)) {
+                        meta_tables <- sapply(names(meta_tables),
+                                              function(x) {
+                                                      ma_table <- mutate_all(meta_tables[[x]],
+                                                                             funs(stringr::str_replace_all(.data$.,
+                                                                                                           "\u2007",
+                                                                                                           "\u2007\\\\phantom{\u2212}")))
+                                                      attributes(ma_table) <- attributes(meta_tables[[x]])
+                                                      return(ma_table)
+                                              },
+                                              simplify = FALSE, USE.NAMES = TRUE)
+                        class(meta_tables) <- "metabulate"
+                }
 
                 # Fill in critical header slots
                 if(is.null(header$title)) {
