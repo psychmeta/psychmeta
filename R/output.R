@@ -704,7 +704,6 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                          )
                                } else header$output <- output_format
 
-
                                if(!is.null(bib)) {
                                        # Write the bibliography file
                                        if(save_build_files) {
