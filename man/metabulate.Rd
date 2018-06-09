@@ -7,17 +7,17 @@
 metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
   "html", "pdf", "odt", "text", "rmd"), show_msd = TRUE, show_conf = TRUE,
   show_cred = TRUE, show_se = FALSE, show_var = FALSE,
-  simplify_construct_labels = TRUE, analyses = "all", match = c("all",
-  "any"), case_sensitive = TRUE, ma_method = "ad", correction_type = "ts",
-  bib = NULL, title.bib = NULL, additional_citekeys = NULL,
-  style = "apa", header = NULL, digits = 2L,
+  simplify_construct_labels = TRUE, bold_headers = TRUE, analyses = "all",
+  match = c("all", "any"), case_sensitive = TRUE, ma_method = "ad",
+  correction_type = "ts", bib = NULL, title.bib = NULL,
+  additional_citekeys = NULL, style = "apa", header = NULL, digits = 2L,
   decimal.mark = getOption("OutDec"), leading0 = "figure",
   neg.sign = "minus", pos.sign = "figure", drop0integer = TRUE,
   big.mark = "thinspace", big.interval = 3L, small.mark = "thinspace",
   small.interval = 3L, conf_format = "parentheses",
   cred_format = "parentheses", symbol_es = "ES",
   caption = "Results of meta-analyses", verbose = FALSE, unicode = NULL,
-  save_build_files = TRUE, ...)
+  save_build_files = FALSE, ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
@@ -39,6 +39,8 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 \item{show_var}{Logical. Should variances be shown (default: \code{FALSE})?}
 
 \item{simplify_construct_labels}{Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).}
+
+\item{bold_headers}{Logical. Should column headers be bolded? (default \code{TRUE})}
 
 \item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
 
@@ -97,7 +99,7 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 
 \item{unicode}{Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).}
 
-\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?}
+\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{FALSE})?}
 
 \item{...}{Additional arguments (not used).}
 }
