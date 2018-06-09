@@ -79,9 +79,9 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 
 \item{conf_format}{How should confidence intervals be formatted? Options are:
 \itemize{
-\item{parentheses}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
-\item{brackets}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
-\item{columns}{: Bounds are shown in individual columns.}
+\item{\code{parentheses}}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+\item{\code{brackets}}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+\item{\code{columns}}{: Bounds are shown in individual columns.}
 }}
 
 \item{cred_format}{How should credility intervals be formatted? Options are the same as for \code{conf_format} above.}
@@ -116,6 +116,9 @@ ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
            output_format = "word", output_dir = tempdir())
 
+
+\dontrun{
+
 ## Output to PDF:
 metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
            output_format = "pdf", output_dir = tempdir())
@@ -132,7 +135,6 @@ metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
 ## and footnotes, then use other packages, such as \\code{kableExtra}, \\code{flextable},
 ## \\code{xtable}, or others, for more advanced formatting. To do so, set file to
 ## "rename" and output_format to anything but "text":
-\dontrun{
      ma_table <- metabulate(ma_obj = ma_r_obj, file = "rename", output_format = "pdf")
      knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
                   caption = attr(ma_table[[1]], "caption")) \%>\%

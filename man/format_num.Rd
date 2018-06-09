@@ -6,7 +6,7 @@
 \title{Format numbers for presentation}
 \usage{
 format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
-  leading0 = "figure", neg.sign = "minus", pos.sign = "figure",
+  leading0 = "conditional", neg.sign = "minus", pos.sign = "figure",
   drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
   small.mark = "thinspace", small.interval = 3L)
 }
@@ -17,7 +17,7 @@ format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
 \item{decimal.mark}{The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})}
 
-\item{leading0}{How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"figure"} (default), leading zeros are replaced with figure-spaces (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.}
+\item{leading0}{How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.}
 
 \item{neg.sign}{Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "<U+2212>").}
 

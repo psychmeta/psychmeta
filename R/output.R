@@ -222,6 +222,9 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
 #'            output_format = "word", output_dir = tempdir())
 #'
+#'
+#' \dontrun{
+#'
 #' ## Output to PDF:
 #' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
 #'            output_format = "pdf", output_dir = tempdir())
@@ -238,7 +241,6 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' ## and footnotes, then use other packages, such as \code{kableExtra}, \code{flextable},
 #' ## \code{xtable}, or others, for more advanced formatting. To do so, set file to
 #' ## "rename" and output_format to anything but "text":
-#' \dontrun{
 #'      ma_table <- metabulate(ma_obj = ma_r_obj, file = "rename", output_format = "pdf")
 #'      knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
 #'                   caption = attr(ma_table[[1]], "caption")) %>%
