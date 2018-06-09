@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(psychmeta)
 ```
 
-**`psychmeta`** is a comprehensive and open-source **R** package for computing psychometric meta-analyses, conducting follow-up analyses of meta-analytic results (e.g., cumulative meta-analyses, leave-one-out meta-analyses, bootstrapped meta-analyses, and meta-regressions [with help from **`metafor`**]), simulating data impacted by psychometric artifacts, and much more! This tutorial is meant to introduce you to some of the most critical features of **`psychmeta`** and familiarize you with workflows within the package. We'll start with the basics (installation and data import) and work our way up to the more techncial topics. 
+**`psychmeta`** is a comprehensive and open-source **R** package for computing psychometric meta-analyses, conducting follow-up analyses of meta-analytic results (e.g., cumulative meta-analyses, leave-one-out meta-analyses, bootstrapped meta-analyses, and meta-regressions [with help from **`metafor`**]), simulating data impacted by psychometric artifacts, and much more! This tutorial is meant to introduce you to some of the most critical features of **`psychmeta`** and familiarize you with workflows within the package. We'll start with the basics (installation and data import) and work our way up to the more techncial topics.
 
 # Installing and loading **`psychmeta`**
 Install the official CRAN version of the package:
@@ -54,7 +54,7 @@ Other packages for data import:
 
 ```{r, echo=FALSE}
 # First 10 observations from the the database of Gonzalez-Mulé, Mount, and Oh (2014; JAP)
-head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source", 
+head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source",
                                 "rxxi", "ryyi", "ux")])
 ```
 
@@ -65,7 +65,7 @@ head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source",
 Not all data come in a long format, so data manipulation tools can be helpful to convert it to a long format.
 
 Recommended packages for data manipulation:
- 
+
 * **`dplyr`** (flexible package for fast, intuitive data manipulation)
 * **`tidyr`** (functions to convert between wide and long data)
 
@@ -83,7 +83,7 @@ dat_matrix <- data.frame(var_names = c("X", "Y", "Z"),
                          mean = c(4, 5, 3),
                          sd = c(2.4, 2.6, 2),
                          rel = c(.8, .7, .85),
-                         reshape_vec2mat(cov = c(.3, .4, .5), 
+                         reshape_vec2mat(cov = c(.3, .4, .5),
                                          var_names = c("X", "Y", "Z")))
 rownames(dat_matrix) <- NULL
 ```
@@ -127,8 +127,8 @@ var_names <- c("X", "Y", "Z")
 es_design = matrix(NA, 3, 3)            # Matrix containing the column names
 es_design[lower.tri(es_design)] <-      # for the intercorrelations among variables
   c("rxyi_X_Y", "rxyi_X_Z", "rxyi_Y_Z") # in the lower triangle of the matrix
-rownames(es_design) <- 
-  colnames(es_design) <- 
+rownames(es_design) <-
+  colnames(es_design) <-
   var_names
 n_design <- "ni"                        # Sample size column name or es_design-like
                                         # matrix
@@ -170,8 +170,8 @@ convert_es(es = 1.47, input_es = "lor",     output_es = "d", n1 = 100, n2 = 100)
 
 To convert effect sizes for inclusion in a meta-analysis, pull out the `meta_input` object:
 ```{r, eval=TRUE}
-convert_es(es = c(.4, .3, .25), 
-           input_es = "r", output_es = "d", 
+convert_es(es = c(.4, .3, .25),
+           input_es = "r", output_es = "d",
            n1 = c(50, 110, 65), n2 = c(50, 70, 65)
            )$meta_input
 ```
@@ -203,7 +203,7 @@ ma_r(
 #### Commonly used arguments: ####
 # Which data set would you like to use?
      data = NULL,
-      
+
 # Specify essential effect-size information.
      rxyi, n, n_adj = NULL,
 
@@ -219,7 +219,7 @@ ma_r(
      measure_x = NULL, measure_y = NULL,
 
 # Weighting method
-     wt_type = "sample_size", 
+     wt_type = "sample_size",
 
 # Correct for small-sample bias?
      correct_bias = TRUE,
@@ -248,7 +248,7 @@ ma_r(
 # What type of moderator analysis do you want (simple vs. hierarchical)?
      moderator_type = "simple",
 
-# If correcting for bivariate indirect RR, how do constructs correlate 
+# If correcting for bivariate indirect RR, how do constructs correlate
 # with selection mechanisms? (only need to specify the +1 or -1 sign of the relationships)
      sign_rxz = 1, sign_ryz = 1,
 
@@ -271,7 +271,7 @@ ma_r(
 # the selection mechanism?
      sign_rz = NULL,
 
-# Additional methological parameters can be modified using the "control" argument. 
+# Additional methological parameters can be modified using the "control" argument.
      control =  control_psychmeta()
 )
 ```
@@ -284,61 +284,61 @@ control_psychmeta(
      # Should the mean or the sample-specific effect sizes be used to estimate error variance?
      error_type = c("mean", "sample"),
      # What proportion of the distribution of means should be included in confidence intervals?
-     conf_level = .95, 
+     conf_level = .95,
      # What proportion of the residual distribution of observations should be included in credibility intervals?
-     cred_level = .8, 
+     cred_level = .8,
      # How should confidence and credibility intervals be computed? With the t or normal distribution?
-     conf_method = c("t", "norm"), 
-     cred_method = c("t", "norm"), 
+     conf_method = c("t", "norm"),
+     cred_method = c("t", "norm"),
      # Should weighted variance estimates be computed as unbiased (i.e., multiplied by k / [k-1])?
      var_unbiased = TRUE,
-     # Should overall artifaction distributions be computed for each construct (pairwise_ads == FALSE) or should 
+     # Should overall artifaction distributions be computed for each construct (pairwise_ads == FALSE) or should
      # artifact distributions be computed separately for each construct pair (pairwise_ads == TRUE)?
      pairwise_ads = FALSE,
-     # Should artifact distributions be computed by collapsing across moderator 
-     # levels (moderated_ads == FALSE) or should artifact distributions be computed 
+     # Should artifact distributions be computed by collapsing across moderator
+     # levels (moderated_ads == FALSE) or should artifact distributions be computed
      # separately for each moderator combination (moderated_ads == TRUE)?
      moderated_ads = FALSE,
-     # Should artifact-distribution corrections be computed using artifact distributions 
-     # that have had sampling error removed (residual_ads == TRUE) or should the observed 
+     # Should artifact-distribution corrections be computed using artifact distributions
+     # that have had sampling error removed (residual_ads == TRUE) or should the observed
      # distributions be used (residual_ads == TRUE)?
      residual_ads = TRUE,
-     # Should dependent observations (i.e., multiple observations of the same relationship in a single sample) be 
-     # consolidated so that there is just one independent observation per sample? 
-     check_dependence = TRUE, 
-     # If check_dependence is TRUE, how should dependency be resolved? Options are to compute a composite 
-     # effect size (default), compute the average of the effect sizes, or to stop with an error message. 
+     # Should dependent observations (i.e., multiple observations of the same relationship in a single sample) be
+     # consolidated so that there is just one independent observation per sample?
+     check_dependence = TRUE,
+     # If check_dependence is TRUE, how should dependency be resolved? Options are to compute a composite
+     # effect size (default), compute the average of the effect sizes, or to stop with an error message.
      collapse_method = c("composite", "average", "stop"),
-     # The intercor argument uses the control_intercor() function to control how the intercorrelations 
+     # The intercor argument uses the control_intercor() function to control how the intercorrelations
      # among variables are handled with collapse_method == "composite"
      intercor = control_intercor(),
-     # Should artifact information be cleaned to resolve discrepancies among values recorded for multiple   
-     # relationsips involving a given construct in a given sample? 
-     clean_artifacts = TRUE, 
+     # Should artifact information be cleaned to resolve discrepancies among values recorded for multiple
+     # relationsips involving a given construct in a given sample?
+     clean_artifacts = TRUE,
      # Should missing artifact information be imputed? (For use with individual-correction method only)
      impute_artifacts = TRUE,
-     # If impute_artifacts is TRUE, how should imputation be performed? See the documentation for the 
-     # control_psychmeta() function for descriptions of the available options. 
-     impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod", "simulate_full", 
-                       "wt_mean_mod", "wt_mean_full", "unwt_mean_mod", "unwt_mean_full", 
+     # If impute_artifacts is TRUE, how should imputation be performed? See the documentation for the
+     # control_psychmeta() function for descriptions of the available options.
+     impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod", "simulate_full",
+                       "wt_mean_mod", "wt_mean_full", "unwt_mean_mod", "unwt_mean_full",
                        "replace_unity", "stop"),
      # What seed value should be set for the imputation process? (This makes the imputation reproducible)
      seed = 42,
      # Should artifact information from observations not included in meta-analyses be harvested from "data"
      # and included in artifact distributions?
-     use_all_arts = TRUE, 
+     use_all_arts = TRUE,
      # For meta-analyses of d values, should the proportionality of membership in the unrestricted sample
      # be estimated from the range-restricted proportions and the range-restriction correction factor?
      estimate_pa = FALSE,
-     # To what number of decimal places should interactive artifact distributions be rounded prior to use? 
-     # Rounding reduces the computational burden of creating multi-dimensional arrays of artifact information. 
+     # To what number of decimal places should interactive artifact distributions be rounded prior to use?
+     # Rounding reduces the computational burden of creating multi-dimensional arrays of artifact information.
      decimals = 2,
      # Should the "Hunter-Schmidt" override settings be used? When TRUE, this will override settings for:
      # - wt_type will set to "sample_size"
      # - error_type will set to "mean"
      # - correct_bias will set to TRUE
      # - conf_method will set to "norm"
-     # - cred_method will set to "norm" 
+     # - cred_method will set to "norm"
      # - var_unbiased will set to FALSE
      # - residual_ads will be set to FALSE
      # - use_all_arts will set to FALSE
@@ -469,29 +469,29 @@ ma_r(rxyi = rxyi, n = n, sample_id = sample_id,
 
 # Navigating meta-analysis output objects
 
-The results of **`psychmeta`**'s meta-analysis functions take the form of nested tibbles. A tibble is a type of tabular array that is a modernized version on the data frame (if you're new to tibbles, a vignette on the topic is available from the **`tibble`** package's [CRAN documentation](https://CRAN.R-project.org/package=tibble)). The "nesting" of results means that the some cells of the tibble contain complex objects, such as data frames and lists (i.e., objects that have their own indexing structures, hence the nesting). This nested structure allows a lot of information to be organized in a very concise way so that an overview of even a very complicated meta-analysis can fit in your console window. 
+The results of **`psychmeta`**'s meta-analysis functions take the form of nested tibbles. A tibble is a type of tabular array that is a modernized version on the data frame (if you're new to tibbles, a vignette on the topic is available from the **`tibble`** package's [CRAN documentation](https://CRAN.R-project.org/package=tibble)). The "nesting" of results means that the some cells of the tibble contain complex objects, such as data frames and lists (i.e., objects that have their own indexing structures, hence the nesting). This nested structure allows a lot of information to be organized in a very concise way so that an overview of even a very complicated meta-analysis can fit in your console window.
 
-As an example, below are some results computed using the `data_r_gonzalezmule_2014` data set included with **`psychmeta`**, which is an updated version of the database reported by Gonzalez-Mulé, Mount, and Oh [-@gonzalez-mule_meta-analysis_2014] in their meta-analysis of the relationship between general mental ability (GMA) and organizational citizenship behaviors (i.e., prosocial behaviors exhibited in the workplace; OCBs). Gonzalez-Mulé et al. explored a number of moderators, but for this analysis we have chosen to use only two: `Rating source` (OCBs rated by self vs. supervisor) and `Type` (the target of the OCBs; OCB-I = targeted toward individuals, OCB-O = targeted toward the organization, OCB-CH = targeted toward change). To demonstrate the structure of meta-analysis objects, we have chosen to run this example using hierarchical moderator analyses (i.e., `moderator_type = "hierarchical"`), which means we will be able to see the main effects of each moderator as well as the results from individual combinations of the levels of the moderators.  
+As an example, below are some results computed using the `data_r_gonzalezmule_2014` data set included with **`psychmeta`**, which is an updated version of the database reported by Gonzalez-Mulé, Mount, and Oh [-@gonzalez-mule_meta-analysis_2014] in their meta-analysis of the relationship between general mental ability (GMA) and organizational citizenship behaviors (i.e., prosocial behaviors exhibited in the workplace; OCBs). Gonzalez-Mulé et al. explored a number of moderators, but for this analysis we have chosen to use only two: `Rating source` (OCBs rated by self vs. supervisor) and `Type` (the target of the OCBs; OCB-I = targeted toward individuals, OCB-O = targeted toward the organization, OCB-CH = targeted toward change). To demonstrate the structure of meta-analysis objects, we have chosen to run this example using hierarchical moderator analyses (i.e., `moderator_type = "hierarchical"`), which means we will be able to see the main effects of each moderator as well as the results from individual combinations of the levels of the moderators.
 
-**Note**: This table of results is larger than can fit in most HTML viewers. Use the arrow buttons in the header to scroll horizonally through the content and use the page numbers in the lower-right corner of the object to scroll vertically. 
+**Note**: This table of results is larger than can fit in most HTML viewers. Use the arrow buttons in the header to scroll horizonally through the content and use the page numbers in the lower-right corner of the object to scroll vertically.
 ```{r, eval=TRUE, echo=TRUE}
-(gonzalezmule <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, 
+(gonzalezmule <- ma_r(ma_method = "ic", rxyi = rxyi, n = n,
                      construct_x = "GMA",
                      construct_y = "OCB",
                      rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
-                     moderators = c("Rating source", "Type", "Published"), 
+                     moderators = c("Rating source", "Type", "Published"),
                      moderator_type = "hierarchical",
                      control = control_psychmeta(hs_override = TRUE),
                      data = data_r_gonzalezmule_2014))
 ```
 
-From this tibble, we see that there are a total of 13 meta-analyses (each row of the tibble is a distinct analysis representing a unique set of construct pairings and/or combinations of moderator levels) and these meta-analyses are indexed by a unique number in the `analysis_id` column. We also see that the `pair_id` column indexes the individual construct pairs (in this example, there is only one contstruct pair: GMA and OCB), with the names of the constructs displayed in the `construct_x` and `construct_y` columns. 
+From this tibble, we see that there are a total of 13 meta-analyses (each row of the tibble is a distinct analysis representing a unique set of construct pairings and/or combinations of moderator levels) and these meta-analyses are indexed by a unique number in the `analysis_id` column. We also see that the `pair_id` column indexes the individual construct pairs (in this example, there is only one contstruct pair: GMA and OCB), with the names of the constructs displayed in the `construct_x` and `construct_y` columns.
 
-In terms of moderator analyses, the `analysis_type` column tells us how moderator information was treated in each meta-analysis. Analyses labeled as "Overall" represent meta-analyses of all information, with all observations collapsed across moderator levels (when moderator levels are collapsed, it is indicated by "All Levels" in the columns bearing the moderator names). Analyses labeled as "Simple Moderator" represent meta-analyses of a particular level of a single moderator, collapsing across all of the other moderators (the moderator levels used in these analyses are indicated in the columns bearing the moderator names). Finally, analyses labled as "Fully Hierarchical Moderator" represent intersections of the categories of the moderators. Note that this database is smaller than what would be needed to do a good hierarchical moderator analysis and we have run this analysis for purposes of illustration only. When hierarchical moderator analyses are run with more than two moderators, results will also be diplayed for "Partial Hierarchical Moderator" analyses, which means that the results represent intersections among only a subset of the moderators while levels of the other moderators are collapsed. 
+In terms of moderator analyses, the `analysis_type` column tells us how moderator information was treated in each meta-analysis. Analyses labeled as "Overall" represent meta-analyses of all information, with all observations collapsed across moderator levels (when moderator levels are collapsed, it is indicated by "All Levels" in the columns bearing the moderator names). Analyses labeled as "Simple Moderator" represent meta-analyses of a particular level of a single moderator, collapsing across all of the other moderators (the moderator levels used in these analyses are indicated in the columns bearing the moderator names). Finally, analyses labled as "Fully Hierarchical Moderator" represent intersections of the categories of the moderators. Note that this database is smaller than what would be needed to do a good hierarchical moderator analysis and we have run this analysis for purposes of illustration only. When hierarchical moderator analyses are run with more than two moderators, results will also be diplayed for "Partial Hierarchical Moderator" analyses, which means that the results represent intersections among only a subset of the moderators while levels of the other moderators are collapsed.
 
 To the right of the moderator columns are columns that contain data and results from the meta-analyses. The `meta_tables` column contains the meta-analysis tables for each analysis, the `escalc` column contains the data from each meta-analysis (these data are in the format of "escalc" class objects that can be used with the **metafor** package's functions), and the `ad` column contains artifact distributions from psychometric meta-analyses (each cell contains artifact distributions from individual-correction analyses, if present, and from artifact-distribution analyses, if present).
 
-To see a summary view of the statistical results of the meta-analysis, use the `summary()` function. 
+To see a summary view of the statistical results of the meta-analysis, use the `summary()` function.
 ```{r, eval=FALSE}
 summary(gonzalezmule)
 ```
@@ -522,13 +522,13 @@ gonzalezmule$meta_tables$`analysis_id: 1`$individual_correction$true_score
 
 You can either call all sensitivity analyses at once (`sensitivity()`) or call each type of analysis individually (`sensitivity_bootstrap()`, `sensitivity_cumulative()`, `sensitivity_leave1out()`):
 ```{r, eval=FALSE}
-ma_obj <- sensitivity(ma_obj, 
+ma_obj <- sensitivity(ma_obj,
                       leave1out = TRUE,
-                      bootstrap = TRUE, 
+                      bootstrap = TRUE,
                       cumulative = TRUE,
-                      
+
                       sort_method = "weight",
-                      
+
                       boot_iter = 100,
                       boot_conf_level = 0.95,
                       boot_ci_type = "norm")
@@ -538,7 +538,7 @@ ma_obj <- sensitivity(ma_obj,
 
 ## `metareg()`
 
-`metareg()` computes meta-regression results using both categorical and continuous moderators via the `rma()` function from the **`metafor`** package. 
+`metareg()` computes meta-regression results using both categorical and continuous moderators via the `rma()` function from the **`metafor`** package.
 ```{r, eval=FALSE}
 ma_obj_gm <- ma_r(ma_method = "ic",
                   rxyi = rxyi, n = n,
@@ -638,7 +638,7 @@ get_ad(ma_obj, ma_method = "ic")
 
 ## Writing (mostly) formatted tables of results to rich-text format
 
-**`psychmeta`** can automatically produce publication-ready tables of meta-analysis results that can be copied into your word processor. These tables will generally only require light formatting adjustments. 
+**`psychmeta`** can automatically produce publication-ready tables of meta-analysis results that can be copied into your word processor. These tables will generally only require light formatting adjustments.
 
 ```{r, eval=FALSE}
 # Write meta-analysis tables to a file called "Meta-analysis table.rtf"
@@ -697,20 +697,20 @@ ma_obj <- ma_r(ma_method = "ic",
                citekey = citekey,
                data = data_r_meas_multi)
 
-generate_bib(ma_obj, 
-             
+generate_bib(ma_obj,
+
              # The location of your .bib file (normally should be in the same directory
              # as the analysis script).
-             bib = system.file("sample_bibliography.bib", package="psychmeta"),
-             
-             # Your citation style. Must be the style ID for a style hosted at 
+             bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
+
+             # Your citation style. Must be the style ID for a style hosted at
              # http://zotero.org/styles/
-             style = "apa", 
-             
+             style = "apa",
+
              # What format to write output as (options are: "word", "html", "pdf", "text",
              # "Rmd", "biblatex", "citekeys")?
              output_format = "word",
-             
+
              # What filename to output to (use "console" to print to the R console).
              file = "sources.docx"
              )
@@ -718,13 +718,13 @@ generate_bib(ma_obj,
 
 You can also generate a bibliography containing only sources contributing to a specific subset of the meta-analyses:
 ```{r, eval=FALSE}
-generate_bib(ma_obj, 
-             
-             bib = system.file("sample_bibliography.bib", 
+generate_bib(ma_obj,
+
+             bib = system.file("templates/sample_bibliography.bib",
                                package="psychmeta"),
-             
+
              analyses = list(construct_pair = list(c("X", "Y")))
-             
+
              )
 ```
 
@@ -733,9 +733,9 @@ generate_bib(ma_obj,
 # Supplemental tools
 
 ## Computing meta-analyses with pre-existing artifact distributions
-Even if no studies in your meta-analytic database provide artifact information, pre-specified artifact distributions from previous meta-analyses can still be used in **`psychmeta`**! There are several ways to use pre-specified distributions, ranging from using them on their on their own to combining them with observed artifact information. Below are four potential methods, but **`psychmeta`** allows many other ways to use artifact distributions.  
+Even if no studies in your meta-analytic database provide artifact information, pre-specified artifact distributions from previous meta-analyses can still be used in **`psychmeta`**! There are several ways to use pre-specified distributions, ranging from using them on their on their own to combining them with observed artifact information. Below are four potential methods, but **`psychmeta`** allows many other ways to use artifact distributions.
 
-1. You can use the `create_ad()` function to create artifact distribution objects, which can then be used with the `ma_r_ad()` and `ma_d_ad()` functions to correct bare-bones meta-analyses. 
+1. You can use the `create_ad()` function to create artifact distribution objects, which can then be used with the `ma_r_ad()` and `ma_d_ad()` functions to correct bare-bones meta-analyses.
 
 ```{r, eval=FALSE}
 # Create artifact-distribution objects for X, Y, and Z.
@@ -747,11 +747,11 @@ ad_z <- create_ad(mean_qxi = 0.8962108, var_qxi = 0.0007840593, k_qxi = 40,
                   mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha")
 
 # Compute a meta-analysis of X and Y.
-ma_bb_xy <- ma_r_bb(r = rxyi, n = n, 
+ma_bb_xy <- ma_r_bb(r = rxyi, n = n,
                     data = filter(data_r_meas_multi, x_name == "X", y_name == "Y"))
 
 # Correct the meta-analysis for measurement error.
-ma_r_ad(ma_obj = ma_bb_xy, ad_obj_x = ad_x, ad_obj_y = ad_y, 
+ma_r_ad(ma_obj = ma_bb_xy, ad_obj_x = ad_x, ad_obj_y = ad_y,
         correct_rr_x = FALSE, correct_rr_y = FALSE)
 ```
 
@@ -763,7 +763,7 @@ ma_r(ma_method = "ad", rxyi = rxyi, n = n,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
      clean_artifacts = FALSE, impute_artifacts = FALSE,
      moderators = moderator, data = data_r_meas_multi,
-     # The "supplemental_ads" argument can take a list of artifact-distribution objects. 
+     # The "supplemental_ads" argument can take a list of artifact-distribution objects.
      supplemental_ads =
           list(X = ad_x,
                Y = ad_y,
@@ -781,8 +781,8 @@ ma_r(ma_method = "ad", rxyi = rxyi, n = n,
      clean_artifacts = FALSE, impute_artifacts = FALSE,
      moderators = moderator, data = data_r_meas_multi,
      supplemental_ads =
-          # The "supplemental_ads" argument can also take raw artifact values. 
-          # (These values are unrounded so our examples all produce identical results.) 
+          # The "supplemental_ads" argument can also take raw artifact values.
+          # (These values are unrounded so our examples all produce identical results.)
           list(X = list(mean_qxi = 0.8927818, var_qxi = 0.0008095520, k_qxi = 40,
                         mean_n_qxi = 11927 / 40, qxi_dist_type = "alpha"),
                Y = list(mean_qxi = 0.8941266, var_qxi = 0.0009367234, k_qxi = 40,
@@ -792,7 +792,7 @@ ma_r(ma_method = "ad", rxyi = rxyi, n = n,
 
 ```
 
-4. You can also create a list of artifact distributions using the `create_ad_list()` function. This list can then be passed to `ma_r()` as before. 
+4. You can also create a list of artifact distributions using the `create_ad_list()` function. This list can then be passed to `ma_r()` as before.
 ```{r, eval=FALSE}
 ad_list <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
                           construct_x = x_name, construct_y = y_name,
@@ -804,11 +804,11 @@ ma_r(ma_method = "ad", rxyi = rxyi, n = n,
      construct_x = x_name, construct_y = y_name, sample_id = sample_id,
      clean_artifacts = FALSE, impute_artifacts = FALSE,
      moderators = moderator, data = data_r_meas_multi,
-     # The "supplemental_ads" argument can take the output of create_ad_list(). 
+     # The "supplemental_ads" argument can take the output of create_ad_list().
      supplemental_ads = ad_list)
 ```
 
-5. It's possible to mix-and-match any of the above methods, as well as use artifacts from your database. 
+5. It's possible to mix-and-match any of the above methods, as well as use artifacts from your database.
 ```{r, eval=FALSE}
 # For purposes of illustration, delete all reliability values not associated with "Z":
 dat_zarts <- data_r_meas_multi
@@ -831,13 +831,13 @@ ma_r(ma_method = "ad", rxyi = rxyi, n = n,
 
 
 # Simulations
-In addition to its collection of tools for computing meta-analyses, **`psychmeta`** also boasts a robust suite of simulation functions. These functions are intended to support high-quality meta-analytic simulations by correctly introducing sampling error, measurement error, and range restriction into a set of parameter values. These functions can be valuable for both research and pedagogical applications.  
+In addition to its collection of tools for computing meta-analyses, **`psychmeta`** also boasts a robust suite of simulation functions. These functions are intended to support high-quality meta-analytic simulations by correctly introducing sampling error, measurement error, and range restriction into a set of parameter values. These functions can be valuable for both research and pedagogical applications.
 
 ## Psychometric data sets
 You can generate data impacted by psychometric artifacts for a single sample by using the `simulate_psych()` function. This function reports three datasets per sample: Observed scores, true scores, and error scores. It can also perform selection and indicate (1) which cases would be selected on the basis of observed scores (i.e., actual selection), (2) which cases would be selected on the basis of true scores (i.e., error-free selection), and (3) which cases would be selected on the basis of error scores (i.e., random selection).
 ```{r, eval=FALSE}
-sim_dat <- simulate_psych(n = 1000, 
-                          rho_mat = reshape_vec2mat(.5), 
+sim_dat <- simulate_psych(n = 1000,
+                          rho_mat = reshape_vec2mat(.5),
                           sigma_vec = c(1, 1),
                           sr_vec = c(1, .5),
                           rel_vec = c(.8, .8), var_names = c("Y", "X"))
@@ -855,69 +855,69 @@ cor(sim_dat$error[,1:2])
 You can automate the process of analyzing a simulated sample when you are interested in effect sizes and artifact estimates. For example, you can generate correlations impacted by psychometric artifacts for a single sample of data using the `simulate_r_sample()` function. This function generates sample statistics when the `n` argument is a finite value, but it can also analyze parameters when `n = Inf`!
 
 ```{r, eval=FALSE}
-simulate_r_sample(n = 1000, 
+simulate_r_sample(n = 1000,
                   # Correlation parameter matrix
                   rho_mat = reshape_vec2mat(.5, order = 5),
                   # Reliability parameter vector
-                  rel_vec = rep(.8, 5), 
-                  # Selection ratio vector 
+                  rel_vec = rep(.8, 5),
+                  # Selection ratio vector
                   sr_vec = c(1, 1, 1, 1, .5),
                   # Number of items in each scale
                   k_items_vec = 1:5,
                   # Matrix of weights to use in creating composites
-                  wt_mat = cbind(c(0, 0, 0, .3, 1), 
+                  wt_mat = cbind(c(0, 0, 0, .3, 1),
                                  c(1, .3, 0, 0, 0)),
                   # Selection ratios for composites
                   sr_composites = c(.7, .5))
 
-simulate_r_sample(n = Inf, 
+simulate_r_sample(n = Inf,
                   rho_mat = reshape_vec2mat(.5, order = 5),
-                  rel_vec = rep(.8, 5), 
+                  rel_vec = rep(.8, 5),
                   sr_vec = c(1, 1, 1, 1, .5),
                   k_items_vec = 1:5,
-                  wt_mat = cbind(c(0, 0, 0, .3, 1), 
+                  wt_mat = cbind(c(0, 0, 0, .3, 1),
                                  c(1, .3, 0, 0, 0)),
                   sr_composites = c(.7, .5))
 ```
 
 \pagebreak
 
-One of the most powerful simulation functions in **`psychmeta`** is `simulate_r_database()`, which can generate entire databases of correlations for use in meta-analysis simulations. This function is a wrapper for `simulate_r_sample()` and it can sample parameter values from whichever distributions you specify. 
+One of the most powerful simulation functions in **`psychmeta`** is `simulate_r_database()`, which can generate entire databases of correlations for use in meta-analysis simulations. This function is a wrapper for `simulate_r_sample()` and it can sample parameter values from whichever distributions you specify.
 ```{r, eval=FALSE}
 # Note the varying methods for defining parameters:
-simulate_r_database(k = 10, 
-                    
+simulate_r_database(k = 10,
+
                     # Sample-size parameters
                     # Parameters can be defined as functions.
                     n_params = function(n) rgamma(n, shape = 100),
-                    
+
                     # Correlation parameters (one parameter distribution per correlation)
                     # Parameters can also be defined as vectors...
                     rho_params = list(c(.1, .3, .5),
                                       # ...as a mean + a standard deviation...
                                       c(mean = .3, sd = .05),
                                       # ...or as a matrix of values and weights.
-                                      rbind(value = c(.1, .3, .5), 
+                                      rbind(value = c(.1, .3, .5),
                                             weight = c(1, 2, 1))),
-                    
+
                     # Reliability parameters
                     rel_params = list(c(.7, .8, .9),
                                       c(mean = .8, sd = .05),
                                       rbind(value = c(.7, .8, .9),
-                                            weight = c(1, 2, 1))), 
-                    
+                                            weight = c(1, 2, 1))),
+
                     # Selection-ratio parameters
                     sr_params = list(1, 1, c(.5, .7)),
-                    
+
                     # Measure-length parameters
                     k_items_params = list(5, 8, 10),
-                    
+
                      # Composite weight parameters
-                    wt_params = list(list(1, 1, 0)), 
-                    
+                    wt_params = list(list(1, 1, 0)),
+
                     # Selection-ratio parameters for composites
                     sr_composite_params = list(1),
-                    
+
                     # Variable names
                     var_names = c("X", "Y", "Z"))
 ```
@@ -928,49 +928,49 @@ simulate_r_database(k = 10,
 
 **`psychmeta`** includes *d*-value simulation functions that parallel the correlation simulation functions described above. These functions automate the simulation of subgroup comparisons and can introduce sampling error, measurement error, and range-restriction artifacts into *d*-value parameters.
 
-To simulate a single sample of results, use the `simulate_d_sample()` function. This function can generate data for any number of variables with any number of groups and it can form composite variables and perform selection. 
+To simulate a single sample of results, use the `simulate_d_sample()` function. This function can generate data for any number of variables with any number of groups and it can form composite variables and perform selection.
 
 ```{r simulate_d_sample stats, eval=FALSE}
 ## Simulate statistics by providing integers as "n_vec":
 simulate_d_sample(n_vec = c(200, 100),
-                  
+
                   # List of rho matrices - one per group
                   rho_mat_list = list(reshape_vec2mat(.5),
                                       reshape_vec2mat(.4)),
-                  
+
                   # Matrix of group means (groups on rows, variables on columns)
-                  mu_mat = rbind(c(1, .5), 
-                                 c(0, 0)), 
-                  
+                  mu_mat = rbind(c(1, .5),
+                                 c(0, 0)),
+
                   # Matrix of group SDs (groups on rows, variables on columns)
                   sigma_mat = rbind(c(1, 1),
                                     c(1, 1)),
-                  
+
                   # Matrix of group reliabilities (groups on rows, variables on columns)
                   rel_mat = rbind(c(.8, .7),
                                   c(.7, .7)),
-                  
+
                   # Vector of selection ratios
                   sr_vec = c(1, .5),
-                  
+
                   # Number of items in each scale
                   k_items_vec = c(5, 10),
-                  
+
                   # Group names
                   group_names = c("A", "B"))
 ```
 
-Like `simulate_r_sample()`, `simulate_d_sample()` can also analyze parameters. To get parameter estimates, simply define the sample sizes as proportions (with the `n_vec` argument)  rather than as integers. 
+Like `simulate_r_sample()`, `simulate_d_sample()` can also analyze parameters. To get parameter estimates, simply define the sample sizes as proportions (with the `n_vec` argument)  rather than as integers.
 ```{r simulate_d_sample params, eval=FALSE}
 simulate_d_sample(n_vec = c(2/3, 1/3),
                   rho_mat_list = list(reshape_vec2mat(.5),
                                       reshape_vec2mat(.4)),
-                  mu_mat = rbind(c(1, .5), 
+                  mu_mat = rbind(c(1, .5),
                                  c(0, 0)),
-                  sigma_mat = rbind(c(1, 1), 
+                  sigma_mat = rbind(c(1, 1),
                                     c(1, 1)),
-                  rel_mat = rbind(c(.8, .7), 
-                                  c(.7, .7)), 
+                  rel_mat = rbind(c(.8, .7),
+                                  c(.7, .7)),
                   sr_vec = c(1, .5),
                   k_items_vec = c(5, 10),
                   group_names = c("A", "B"))
@@ -980,32 +980,32 @@ simulate_d_sample(n_vec = c(2/3, 1/3),
 
 The `simulate_d_database()` function is the *d*-value counterpart to `simulate_r_database()`. However, each parameter argument now requires a set of parameters for each group (e.g., a distribution of correlations, means, reliabilities, etc. must be specified for each group).
 ```{r simulate_d_database, eval=FALSE}
-simulate_d_database(k = 5, 
+simulate_d_database(k = 5,
                     # "Group1" and "Group2" labels are not required for parameter arguments:
-                    # They are shown only for enhanced interpretability. 
-                    
+                    # They are shown only for enhanced interpretability.
+
                     # Sample-size parameter distributions
                     n_params = list(Group1 = c(mean = 200, sd = 20),
-                                    Group2 = c(mean = 100, sd = 20)), 
-                    
+                                    Group2 = c(mean = 100, sd = 20)),
+
                     # Correlation parameter distributions
                     rho_params = list(Group1 = list(c(.3, .4, .5)),
                                       Group2 = list(c(.3, .4, .5))),
-                    
+
                     # Mean parameter distributions
-                    mu_params = list(Group1 = list(c(mean = .5, sd = .5), 
+                    mu_params = list(Group1 = list(c(mean = .5, sd = .5),
                                                    c(-.5, 0, .5)),
-                                     Group2 = list(c(mean = 0, sd = .5), 
+                                     Group2 = list(c(mean = 0, sd = .5),
                                                    c(-.2, 0, .2))),
-                    
+
                     # Reliability parameter distributions
                     rel_params = list(Group1 = list(.8, .8),
-                                      Group2 = list(c(.7, .8, .8), 
+                                      Group2 = list(c(.7, .8, .8),
                                                     c(.7, .8, .8))),
-                    
+
                     # Group names
                     group_names = c("Group1", "Group2"),
-                    
+
                     # Variable names
                     var_names = c("Y", "Z"))
 ```
@@ -1020,13 +1020,13 @@ Sigma_xx_a <- reshape_vec2mat(cov = .5, order = 2)
 
 # Correct "Sigma_i" for range restriction in variables 1 & 2:
 correct_matrix_mvrr(Sigma_i = Sigma_i,
-                    Sigma_xx_a = Sigma_xx_a, 
+                    Sigma_xx_a = Sigma_xx_a,
                     x_col = 1:2)
 
 # Correct the means of variables 1 & 2 for range restriction:
 correct_means_mvrr(Sigma = Sigma_i,
-                   means_i = c(2, 2, 1, 1), 
-                   means_x_a = c(1, 1), 
+                   means_i = c(2, 2, 1, 1),
+                   means_x_a = c(1, 1),
                    x_col = 1:2)
 ```
 
@@ -1055,18 +1055,18 @@ composite_r_scalar(mean_rxy = .4, k_vars_x = 4, mean_intercor_x = .4)
 # Correlation between two composites
 composite_r_matrix(r_mat = reshape_vec2mat(.3, order = 5), x_col = 1:3, y_col = 4:5)
 
-composite_r_scalar(mean_rxy = .3, 
+composite_r_scalar(mean_rxy = .3,
                    k_vars_x = 3, mean_intercor_x = .3, k_vars_y = 2, mean_intercor_y = .3)
 ```
 
 
 ## *d* values of composites
-The `composite_d_matrix()` and `composite_d_scalar()` functions can compute composite *d* values using matrix and scalar inputs, respectively. 
+The `composite_d_matrix()` and `composite_d_scalar()` functions can compute composite *d* values using matrix and scalar inputs, respectively.
 
 ```{r, eval=FALSE}
-composite_d_matrix(d_vec = c(1, 1), 
+composite_d_matrix(d_vec = c(1, 1),
                    r_mat = reshape_vec2mat(.7),
-                   wt_vec = c(1, 1), 
+                   wt_vec = c(1, 1),
                    p = .5)
 
 composite_d_scalar(mean_d = 1, mean_intercor = .7, k_vars = 2, p = .5)
@@ -1074,7 +1074,7 @@ composite_d_scalar(mean_d = 1, mean_intercor = .7, k_vars = 2, p = .5)
 
 
 ## Reliability of composites
-The `composite_rel_matrix()` and `composite_rel_scalar()` functions can compute composite reliabilities (i.e., Mosier reliabilities) using matrix and scalar inputs, respectively. 
+The `composite_rel_matrix()` and `composite_rel_scalar()` functions can compute composite reliabilities (i.e., Mosier reliabilities) using matrix and scalar inputs, respectively.
 
 ```{r, eval=FALSE}
 composite_rel_matrix(rel_vec = c(.8, .8), r_mat = reshape_vec2mat(.4), sd_vec = c(1, 1))
@@ -1087,7 +1087,7 @@ composite_rel_scalar(mean_rel = .8, mean_intercor = .4, k_vars = 2)
 
 # Matrix regression
 
-The `lm_mat()` function mimics the structure and appearance of the `lm()` function from the **`stats`** package, but uses correlation/covariance matrices to compute regression models instead of raw data sets. 
+The `lm_mat()` function mimics the structure and appearance of the `lm()` function from the **`stats`** package, but uses correlation/covariance matrices to compute regression models instead of raw data sets.
 
 ```{r, eval=FALSE}
 # For purposes of demonstration, generate a dataset from the following matrix:
@@ -1117,7 +1117,7 @@ summary(lm_out1)
 summary(lm_mat_out1)
 ```
 
-`lm_mat()` results can also be used with functions such as `anova()`, `predict()`, and `confint()` to yield output comparable to what one would get with `lm()` results. 
+`lm_mat()` results can also be used with functions such as `anova()`, `predict()`, and `confint()` to yield output comparable to what one would get with `lm()` results.
 ```{r, eval=FALSE}
 anova(lm_out1, lm_out2)
 anova(lm_mat_out1, lm_mat_out2)
@@ -1126,7 +1126,7 @@ anova(lm_mat_out1, lm_mat_out2)
 
 
 # Matrix regression applied to meta-analytic correlations
-The `get_matrix()` function can extract correlation matrices from meta-analysis objects for use in subsequent multivariate analyses. 
+The `get_matrix()` function can extract correlation matrices from meta-analysis objects for use in subsequent multivariate analyses.
 ```{r, eval=FALSE}
 mat_array <- get_matrix(ma_obj = ma_obj)
 R <- mat_array$individual_correction$`moderator_comb: 1`$true_score$mean_rho
@@ -1139,7 +1139,7 @@ lm_x <- lm_mat(formula = Y ~ X, cov_mat = R, n = n)
 lm_xz <- lm_mat(formula = Y ~ X + Z, cov_mat = R, n = n)
 ```
 
-Meta-analytic incremental validity analyses are simple with the `anova()` method applied to `lm_mat()` results. 
+Meta-analytic incremental validity analyses are simple with the `anova()` method applied to `lm_mat()` results.
 ```{r, eval=FALSE}
 summary(lm_x)
 summary(lm_xz)
@@ -1154,7 +1154,7 @@ anova(lm_x, lm_xz)
 1. Include your **`R`** script as an appendix or online supplement.
 2. Include your data table as a CSV in an online supplement.
 3. Cite **`psychmeta`**.
-     - To cite **`psychmeta`**, please reference our in-press software announcement in *Applied Psychological Measurement* [@DahlkePsychmetaAPM, see the bibliography below for reference information]. 
+     - To cite **`psychmeta`**, please reference our in-press software announcement in *Applied Psychological Measurement* [@DahlkePsychmetaAPM, see the bibliography below for reference information].
 
 
 # Bibliography

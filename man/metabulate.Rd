@@ -4,24 +4,29 @@
 \alias{metabulate}
 \title{Write a summary table of meta-analytic results}
 \usage{
-metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
-  show_cred = TRUE, show_se = FALSE, show_var = FALSE, analyses = "all",
-  match = c("all", "any"), case_sensitive = TRUE,
-  output_format = c("word", "html", "pdf", "text", "rmd", "odt"),
-  ma_method = "ad", correction_type = "ts", bib = NULL,
-  title.bib = NULL, additional_citekeys = NULL, style = "apa",
-  header = NULL, digits = 2L, decimal.mark = getOption("OutDec"),
-  leading0 = "figure", neg.sign = "minus", pos.sign = "figure",
-  drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
-  small.mark = "thinspace", small.interval = 3L,
-  conf_format = "parentheses", cred_format = "brackets", symbol_es = "ES",
-  caption = "Results of meta-analyses", save_build_files = TRUE,
-  verbose = FALSE, ...)
+metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
+  "html", "pdf", "odt", "text", "rmd"), show_msd = TRUE, show_conf = TRUE,
+  show_cred = TRUE, show_se = FALSE, show_var = FALSE,
+  simplify_construct_labels = TRUE, analyses = "all", match = c("all",
+  "any"), case_sensitive = TRUE, ma_method = "ad", correction_type = "ts",
+  bib = NULL, title.bib = NULL, additional_citekeys = NULL,
+  style = "apa", header = NULL, digits = 2L,
+  decimal.mark = getOption("OutDec"), leading0 = "figure",
+  neg.sign = "minus", pos.sign = "figure", drop0integer = TRUE,
+  big.mark = "thinspace", big.interval = 3L, small.mark = "thinspace",
+  small.interval = 3L, conf_format = "parentheses",
+  cred_format = "parentheses", symbol_es = "ES",
+  caption = "Results of meta-analyses", verbose = FALSE, unicode = NULL,
+  save_build_files = TRUE, ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
 
-\item{file}{The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).}
+\item{file}{The filename (optionally with a subfolder path) for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).}
+
+\item{output_dir}{The filepath for the output file. Defaults to the current working directory.}
+
+\item{output_format}{The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.}
 
 \item{show_msd}{Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})}
 
@@ -33,13 +38,13 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 
 \item{show_var}{Logical. Should variances be shown (default: \code{FALSE})?}
 
+\item{simplify_construct_labels}{Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).}
+
 \item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
 
 \item{match}{Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.}
 
 \item{case_sensitive}{Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).}
-
-\item{output_format}{The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, Rmarkdown, and plain text.}
 
 \item{ma_method}{Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.}
 
@@ -59,27 +64,27 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 
 \item{decimal.mark}{The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})}
 
-\item{leading0}{How to print leading zeros on decimals. See \code{\link{num_format}} for details.}
+\item{leading0}{How to print leading zeros on decimals. See \code{\link{format_num}} for details.}
 
-\item{neg.sign}{Character to use as negative sign. See \code{\link{num_format}} for details.}
+\item{neg.sign}{Character to use as negative sign. See \code{\link{format_num}} for details.}
 
-\item{pos.sign}{Character to use as positive sign. See \code{\link{num_format}} for details.}
+\item{pos.sign}{Character to use as positive sign. See \code{\link{format_num}} for details.}
 
 \item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
 
-\item{big.mark}{Character to separate groups of large digits. See \code{\link{num_format}} for details.}
+\item{big.mark}{Character to separate groups of large digits. See \code{\link{format_num}} for details.}
 
 \item{big.interval}{See \code{big.mark} above; defaults to 3.}
 
-\item{small.mark}{Character to sparate groups of decimal digits. See \code{\link{num_format}} for details.}
+\item{small.mark}{Character to sparate groups of decimal digits. See \code{\link{format_num}} for details.}
 
 \item{small.interval}{See \code{small.mark} above; defaults to 3.}
 
 \item{conf_format}{How should confidence intervals be formatted? Options are:
 \itemize{
-\item{parentheses}{Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
-\item{brackets}{Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
-\item{columns}{Bounds are shown in individual columns.}
+\item{\code{parentheses}}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+\item{\code{brackets}}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+\item{\code{columns}}{: Bounds are shown in individual columns.}
 }}
 
 \item{cred_format}{How should credility intervals be formatted? Options are the same as for \code{conf_format} above.}
@@ -88,14 +93,16 @@ metabulate(ma_obj, file, show_msd = TRUE, show_conf = TRUE,
 
 \item{caption}{Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).}
 
-\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?}
-
 \item{verbose}{Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?}
+
+\item{unicode}{Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).}
+
+\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?}
 
 \item{...}{Additional arguments (not used).}
 }
 \value{
-If file is "rename", a list of meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")}. Otherwise, a list containing the meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")} and the RefManageR BibEntry object.
+If file is "rename", a list of meta-analysis results tibbles with "caption" and "footnote" attributions. Otherwise, a list containing the meta-analysis results tibbles with "caption" and "footnote" attributes and the RefManageR BibEntry object.
 
 In addition, formatted tables and bibliographies are exported in the requested \code{output_format}. If file is "console" and output_format is not "text", a character vector containing RMarkdown meta-analysis results tables with captions, footnotes, and bibliography is printed (so \code{metabulate()} can be entered into a larger RMarkdown document to produce the requested output). If file is "console" and output_format is "text", a tibble with formatted column names and the bibliography (if any) are printed.
 
@@ -105,34 +112,49 @@ Formatted tables of meta-analytic output.
 Write a summary table of meta-analytic results
 }
 \examples{
-\dontrun{
 ## Create a results table for meta-analysis of correlations and output to Word:
 ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                  construct_x = x_name, construct_y = y_name,
                  moderators = moderator, data = data_r_meas_multi)
-metabulate(ma_obj = ma_r_obj, file = "meta tables correlations")
+metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+           output_format = "word", output_dir = tempdir())
+
+
+\dontrun{
 
 ## Output to PDF:
-metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "pdf")
+metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+           output_format = "pdf", output_dir = tempdir())
 
 ## Output to ODT (LibreOffice):
-metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt")
+metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+           output_format = "odt", output_dir = tempdir())
 
 ## To produce Markdown tables to include inline in an RMarkdown report,
 ## set file to "console" and output_format to anything but "text":
 metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
 
+## You can use metabulate() to simply rename results table columns and create captions
+## and footnotes, then use other packages, such as \\code{kableExtra}, \\code{flextable},
+## \\code{xtable}, or others, for more advanced formatting. To do so, set file to
+## "rename" and output_format to anything but "text":
+     ma_table <- metabulate(ma_obj = ma_r_obj, file = "rename", output_format = "pdf")
+     knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
+                  caption = attr(ma_table[[1]], "caption")) \%>\%
+       kableExtra::kable_styling(latex_options = c("striped", "hold_position")) \%>\%
+       kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
+}
+
 ## Create output table for meta-analysis of d values:
 ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
                  construct_y = construct, data = data_d_meas_multi)
 ma_d_obj <- ma_d_ad(ma_obj = ma_d_obj, correct_rr_g = FALSE, correct_rr_y = FALSE)
-metabulate(ma_obj = ma_d_obj, file = "meta tables d values")
+metabulate(ma_obj = ma_d_obj, file = "meta tables d values", output_dir = tempdir())
 
 ## Create output table for meta-analysis of generic effect sizes:
 dat <- data.frame(es = data_r_meas_multi$rxyi,
                   n = data_r_meas_multi$n,
                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
-metabulate(ma_obj = ma_obj, file = "meta tables generic es")
-}
+metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
 }
