@@ -167,6 +167,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param show_cred Logical. Should credibility intervals be shown (default: \code{TRUE})?
 #' @param show_se Logical Should standard errors be shown (default: \code{FALSE})?
 #' @param show_var Logical. Should variances be shown (default: \code{FALSE})?
+#' @param simplify_construct_labels  Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
@@ -263,7 +264,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 metabulate <- function(ma_obj, file, output_dir = getwd(),
                        output_format=c("word", "html", "pdf", "odt", "text", "rmd"),
                        show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                       show_se = FALSE, show_var = FALSE,
+                       show_se = FALSE, show_var = FALSE, simplify_construct_labels  = TRUE, 
                        analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                        ma_method = "ad", correction_type = "ts",
                        bib = NULL, title.bib = NULL, additional_citekeys = NULL, style = "apa",
@@ -319,7 +320,8 @@ metabulate <- function(ma_obj, file, output_dir = getwd(),
                                    output_format = output_format, caption = caption,
                                    show_msd = show_msd, show_conf = show_conf,
                                    show_cred = show_cred, show_se = show_se,
-                                   show_var = show_var, es_type = es_type, symbol_es = symbol_es,
+                                   show_var = show_var, simplify_construct_labels = simplify_construct_labels,
+                                   es_type = es_type, symbol_es = symbol_es,
                                    digits = digits, decimal.mark = decimal.mark,
                                    leading0 = leading0, neg.sign = neg.sign,
                                    pos.sign = pos.sign, drop0integer = drop0integer,
@@ -835,7 +837,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 #' @keywords internal
 .metabulate <- function(meta_tables, ma_type = "ad_ts", output_format = "word", caption = caption,
                         show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                        show_se = FALSE, show_var = FALSE, es_type = NULL, symbol_es = "ES",
+                        show_se = FALSE, show_var = FALSE, simplify_construct_labels = TRUE, 
+                        es_type = NULL, symbol_es = "ES",
                         digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "figure", neg.sign = "\u2212",
                         pos.sign = "figure", drop0integer = TRUE, big.mark = "\u202F",
                         big.interval = 3L, small.mark = "\u202F", small.interval = 3L,
@@ -872,9 +875,19 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         length_moderators <- max(sapply(meta_tables, function(x) (which(colnames(x) == "k") -1) - which(colnames(x) == "analysis_type") ))
 
         # Select, rearrange, and format columns of meta_tables
-        .arrange_format_columns <- function(ma_table) {
+        .arrange_format_columns <- function(ma_table, simplify_construct_labels) {
                 x <- colnames(ma_table)
 
+                if(simplify_construct_labels & nrow(ma_table) > 1 & "pair_id" %in% x){
+                     pair_ids <- unlist(ma_table[["pair_id"]])
+                     delete_id <- FALSE
+                     for(i in 2:length(pair_ids)) delete_id[i] <- pair_ids[i] == pair_ids[i-1]
+                     if("construct_x" %in% x)    ma_table[["construct_x"]][delete_id] <- ""
+                     if("group_contrast" %in% x) ma_table[["group_contrast"]][delete_id] <- ""
+                     if("construct_y" %in% x)    ma_table[["construct_y"]][delete_id] <- ""
+                     rm(pair_ids, delete_id)
+                }
+                
                 # Select columns
                 col_initial <- x[1:which(x == "analysis_type")]
                 col_initial <- col_initial[!col_initial %in% c("analysis_id", "pair_id", "analysis_type")]
@@ -994,7 +1007,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
         .format_meta_table <- function(ma_table_name, meta_tables, formatted_strings, caption, output_format, length_initial, length_moderators) {
           ma_table <- meta_tables[[ma_table_name]] %>%
-            .arrange_format_columns() %>%
+            .arrange_format_columns(simplify_construct_labels = simplify_construct_labels) %>%
             .rename_columns(formatted_strings, output_format, length_initial, length_moderators)
           attr(ma_table, "footnote") <- formatted_strings$footnote[[ma_table_name]]
           if(length(caption) > 1) attr(ma_table, "caption") <- caption[[ma_table_name]] else attr(ma_table, "caption") <- caption

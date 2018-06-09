@@ -6,10 +6,11 @@
 \usage{
 metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
   "html", "pdf", "odt", "text", "rmd"), show_msd = TRUE, show_conf = TRUE,
-  show_cred = TRUE, show_se = FALSE, show_var = FALSE, analyses = "all",
-  match = c("all", "any"), case_sensitive = TRUE, ma_method = "ad",
-  correction_type = "ts", bib = NULL, title.bib = NULL,
-  additional_citekeys = NULL, style = "apa", header = NULL, digits = 2L,
+  show_cred = TRUE, show_se = FALSE, show_var = FALSE,
+  simplify_construct_labels = TRUE, analyses = "all", match = c("all",
+  "any"), case_sensitive = TRUE, ma_method = "ad", correction_type = "ts",
+  bib = NULL, title.bib = NULL, additional_citekeys = NULL,
+  style = "apa", header = NULL, digits = 2L,
   decimal.mark = getOption("OutDec"), leading0 = "figure",
   neg.sign = "minus", pos.sign = "figure", drop0integer = TRUE,
   big.mark = "thinspace", big.interval = 3L, small.mark = "thinspace",
@@ -36,6 +37,8 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 \item{show_se}{Logical Should standard errors be shown (default: \code{FALSE})?}
 
 \item{show_var}{Logical. Should variances be shown (default: \code{FALSE})?}
+
+\item{simplify_construct_labels}{Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).}
 
 \item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
 
