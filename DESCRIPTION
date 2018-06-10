@@ -12,7 +12,7 @@ Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
               person("John", "Sakaluk", role = "ctb", comment = "Code for funnel and forest plots"),
               person("Yuejia (Mandy)", "Teng", role = "ctb", comment = "Testing"))
 BugReports: https://github.com/psychmeta/psychmeta/issues
-Description: Tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and d values. Includes tools for converting effect sizes, computing sporadic artifact corrections, reshaping meta-analytic databases, computing multivariate corrections for range variation, and more. Bugs can be reported to <https://github.com/jadahlke/psychmeta/issues> or <issues@psychmeta.com>.
+Description: Tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and d values. Includes tools for converting effect sizes, computing sporadic artifact corrections, reshaping meta-analytic databases, computing multivariate corrections for range variation, and more. Bugs can be reported to <https://github.com/psychmeta/psychmeta/issues> or <issues@psychmeta.com>.
 License: GPL (>= 3)
 Depends: R (>= 3.4.0)
 Encoding: UTF-8
