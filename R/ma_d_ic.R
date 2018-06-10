@@ -161,7 +161,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
 
                     ## Ellipsis arguments - pass d value information to ma_r to facilitate effect-size metric conversions
                     es_d = TRUE, treat_as_d = treat_as_d, d_orig = d, n1_d = n1, n2_d = n2, pi_d = pi, pa_d = pa)
-     
+
      if(treat_as_d) attributes(out)$ma_metric <- "d_as_r"
      
      attributes(out)$call_history <- list(call)
