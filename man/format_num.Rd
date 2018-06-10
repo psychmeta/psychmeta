@@ -6,8 +6,8 @@
 \title{Format numbers for presentation}
 \usage{
 format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
-  leading0 = "conditional", neg.sign = "minus", pos.sign = "figure",
-  drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
+  leading0 = "conditional", drop0integer = FALSE, neg.sign = "minus",
+  pos.sign = "figure", big.mark = "thinspace", big.interval = 3L,
   small.mark = "thinspace", small.interval = 3L)
 }
 \arguments{
@@ -19,11 +19,11 @@ format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
 \item{leading0}{How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.}
 
+\item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
+
 \item{neg.sign}{Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "<U+2212>").}
 
 \item{pos.sign}{Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "<U+2007>") if a column contains any negative numbers and suppressed otherwise.}
-
-\item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
 
 \item{big.mark}{Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "<U+202F>").}
 

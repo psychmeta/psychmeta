@@ -720,7 +720,7 @@ You can also generate a bibliography containing only sources contributing to a s
 ```{r, eval=FALSE}
 generate_bib(ma_obj,
 
-             bib = system.file("templates/sample_bibliography.bib", 
+             bib = system.file("templates/sample_bibliography.bib",
                                package="psychmeta"),
 
              analyses = list(construct_pair = list(c("X", "Y")))

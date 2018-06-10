@@ -4,29 +4,29 @@
 \alias{metabulate}
 \title{Write a summary table of meta-analytic results}
 \usage{
-metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
-  "html", "pdf", "odt", "text", "rmd"), show_msd = TRUE, show_conf = TRUE,
-  show_cred = TRUE, show_se = FALSE, show_var = FALSE,
-  simplify_construct_labels = TRUE, bold_headers = TRUE, analyses = "all",
-  match = c("all", "any"), case_sensitive = TRUE, ma_method = "ad",
-  correction_type = "ts", bib = NULL, title.bib = NULL,
-  additional_citekeys = NULL, style = "apa", header = NULL, digits = 2L,
-  decimal.mark = getOption("OutDec"), leading0 = "figure",
-  neg.sign = "minus", pos.sign = "figure", drop0integer = TRUE,
+metabulate(ma_obj, file = NULL, output_dir = getwd(),
+  output_format = c("word", "html", "pdf", "odt", "text", "rmd"),
+  show_msd = TRUE, show_conf = TRUE, show_cred = TRUE, show_se = FALSE,
+  show_var = FALSE, analyses = "all", match = c("all", "any"),
+  case_sensitive = TRUE, ma_method = "ad", correction_type = "ts",
+  collapse_construct_labels = TRUE, bold_headers = TRUE, digits = 2L,
+  decimal.mark = getOption("OutDec"), leading0 = "conditional",
+  drop0integer = FALSE, neg.sign = "minus", pos.sign = "figure",
   big.mark = "thinspace", big.interval = 3L, small.mark = "thinspace",
   small.interval = 3L, conf_format = "parentheses",
   cred_format = "parentheses", symbol_es = "ES",
-  caption = "Results of meta-analyses", verbose = FALSE, unicode = NULL,
-  save_build_files = FALSE, ...)
+  caption = "Results of meta-analyses", header = NULL, verbose = FALSE,
+  unicode = NULL, bib = NULL, title.bib = NULL, style = "apa",
+  additional_citekeys = NULL, save_build_files = FALSE, ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
 
-\item{file}{The filename (optionally with a subfolder path) for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).}
+\item{file}{The filename (optionally with a subfolder path) for the output file. If \code{NULL}, the function will output directly to the R console (also useful if you want to include psychmeta results in a larger RMarkdown document).}
 
-\item{output_dir}{The filepath for the output file. Defaults to the current working directory.}
+\item{output_dir}{The filepath for the output directory/folder. Defaults to the current working directory.}
 
-\item{output_format}{The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.}
+\item{output_format}{The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package to be installed), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.}
 
 \item{show_msd}{Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})}
 
@@ -38,10 +38,6 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 
 \item{show_var}{Logical. Should variances be shown (default: \code{FALSE})?}
 
-\item{simplify_construct_labels}{Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).}
-
-\item{bold_headers}{Logical. Should column headers be bolded? (default \code{TRUE})}
-
 \item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
 
 \item{match}{Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.}
@@ -52,15 +48,9 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 
 \item{correction_type}{Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.}
 
-\item{bib}{A BibTeX file containing the citekeys for the meta-analyses. If not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.}
+\item{collapse_construct_labels}{Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).}
 
-\item{title.bib}{The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
-
-\item{additional_citekeys}{Additional citekeys to include in the reference list.}
-
-\item{style}{What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
-
-\item{header}{A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.}
+\item{bold_headers}{Logical. Should column headers be bolded (default: \code{TRUE})?}
 
 \item{digits}{The number of decimal digits desired (used strictly; default: 2)}
 
@@ -68,11 +58,11 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 
 \item{leading0}{How to print leading zeros on decimals. See \code{\link{format_num}} for details.}
 
+\item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
+
 \item{neg.sign}{Character to use as negative sign. See \code{\link{format_num}} for details.}
 
 \item{pos.sign}{Character to use as positive sign. See \code{\link{format_num}} for details.}
-
-\item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
 
 \item{big.mark}{Character to separate groups of large digits. See \code{\link{format_num}} for details.}
 
@@ -95,18 +85,28 @@ metabulate(ma_obj, file, output_dir = getwd(), output_format = c("word",
 
 \item{caption}{Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).}
 
+\item{header}{A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.}
+
 \item{verbose}{Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?}
 
 \item{unicode}{Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).}
 
-\item{save_build_files}{Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{FALSE})?}
+\item{bib}{A BibTeX file containing the citekeys for the meta-analyses. If provided and file is not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.}
 
-\item{...}{Additional arguments (not used).}
+\item{title.bib}{The title to give to the bibliography (see \code{bib} above). If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
+
+\item{style}{What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
+
+\item{additional_citekeys}{Additional citekeys to include in the reference list (see \code{bib} above).}
+
+\item{save_build_files}{Should the RMarkdown and BibLaTeX (if any) files used to generate the output be saved (default: \code{FALSE})?}
+
+\item{...}{Additional arguments to pass to \code{\link[rmarkdown]{render}}.}
 }
 \value{
-If file is "rename", a list of meta-analysis results tibbles with "caption" and "footnote" attributions. Otherwise, a list containing the meta-analysis results tibbles with "caption" and "footnote" attributes and the RefManageR BibEntry object.
+A list of meta-analysis results \code{\link[tibble]{tibble}}s with "caption" and "footnote" attributes.
 
-In addition, formatted tables and bibliographies are exported in the requested \code{output_format}. If file is "console" and output_format is not "text", a character vector containing RMarkdown meta-analysis results tables with captions, footnotes, and bibliography is printed (so \code{metabulate()} can be entered into a larger RMarkdown document to produce the requested output). If file is "console" and output_format is "text", a tibble with formatted column names and the bibliography (if any) are printed.
+If \code{file} is specified, formatted tables and bibliographies are exported in the requested \code{output_format}.
 
 Formatted tables of meta-analytic output.
 }
@@ -132,20 +132,32 @@ metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
 metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
            output_format = "odt", output_dir = tempdir())
 
-## To produce Markdown tables to include inline in an RMarkdown report,
-## set file to "console" and output_format to anything but "text":
-metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
 
-## You can use metabulate() to simply rename results table columns and create captions
-## and footnotes, then use other packages, such as \\code{kableExtra}, \\code{flextable},
-## \\code{xtable}, or others, for more advanced formatting. To do so, set file to
-## "rename" and output_format to anything but "text":
-     ma_table <- metabulate(ma_obj = ma_r_obj, file = "rename", output_format = "pdf")
-     knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
+## To produce Markdown tables to include inline in an RMarkdown report,
+## leave file == NULL and output_format to anything but "text":
+ma_table <- metabulate(ma_obj = ma_r_obj, file = NULL, output_format = "rmd")
+
+## Then, add the formatted table to your document using your preferred table
+## formatting functions:
+
+#### Using just the \\link[knitr] package:
+knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
+cat("\\n", attr(ma_table[[1]], "footnote"))
+
+#### Using \\link[knitr] plus the \\link[kableExtra] package:
+knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
                   caption = attr(ma_table[[1]], "caption")) \%>\%
        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) \%>\%
        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
+
+
+# !!! Note: On Windows, R currently cannot handle Unicode characters if kables
+# are printed not at top-level (e.g., in an if() statement, in a for() loop,
+# or in lapply() or map() ). To correctly print Unicode metabulate tables, call
+# kable() as a top-level function (as above).
+
 }
+
 
 ## Create output table for meta-analysis of d values:
 ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,

@@ -246,6 +246,8 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #' # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 #' # kable() as a top-level function (as above).
 #'
+#' }
+#'
 #'
 #' ## Create output table for meta-analysis of d values:
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
@@ -279,6 +281,12 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 
         # Match arguments
         output_format <- tolower(output_format)
+        output_format <- tryCatch(match.arg(output_format),
+                                  error = function(e) {
+                                          if(length(output_format) > 1) {
+                                                  stop("Multiple output formats specified. Please specify a single output format.", call. = FALSE)
+                                          } else output_format})
+
         ma_method <- match.arg(ma_method, c("bb", "ic", "ad"), several.ok = TRUE)
         correction_type <- match.arg(correction_type, c("ts", "vgx", "vgy"), several.ok = TRUE)
         conf_format <- match.arg(conf_format, c("parentheses", "brackets", "columns"))
@@ -364,7 +372,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
 #' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list.
-#' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions }} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
+#' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions}} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
 #' @param output_dir The filepath for the output file. Defaults to the current working directory.
 #' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
@@ -403,11 +411,14 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                          file = NULL, output_dir = getwd(),
                          output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
-                         save_build_files = TRUE,
-                         header=list(), ...){
+                         save_build_files = FALSE, header=list(), ...){
 
         output_format <- tolower(output_format)
-        output_format <- match.arg(output_format)
+        output_format <- tryCatch(match.arg(output_format),
+                                  error = function(e) {
+                                          if(length(output_format) > 1) {
+                                                  stop("Multiple output formats specified. Please specify a single output format.", call. = FALSE)
+                                          } else output_format})
 
         if("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
 
@@ -545,7 +556,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                        },
 
                        # else =
-                       {     if(!is.null(meta_talbes)) {
+                       {     if(!is.null(meta_tables)) {
                                   # Prevent LaTeX from removing figure space characters
                                   meta_tables <- sapply(names(meta_tables),
                                                         function(x) {
@@ -566,7 +577,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                              if(!is.null(bib)) {
                                   # Write the bibliography file
                                        # Ignore save_build_files
-                                       bib_file <- paste0(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
+                                       bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
 
@@ -680,20 +691,25 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                if (output_format %in% c("word", "html", "pdf", "odt")) {
                                  header$output <- paste0("\n  ", output_format, "_document",
                                                          if(output_format == "pdf") paste0(":\n    latex_engine: lualatex\n    includes:\n      in_header: ", system.file('templates/header.tex', package='psychmeta')),
-                                                         if(output_format == "word") paste0(":\n    reference_docx: ", system.file('templates/reference_docx.docx', package='psychmeta')),
-                                                         if(output_format == "odt") paste0(":\n    reference_odt: ", system.file('templates/reference_odt.odt', package='psychmeta'))
+                                                         if(output_format == "word" & is.null(meta_tables)) paste0(":\n    reference_docx: ", system.file('templates/reference_docx.docx', package='psychmeta')),
+                                                         if(output_format == "word" & !is.null(meta_tables)) paste0(":\n    reference_docx: ", system.file('templates/reference_docx_landscape.docx', package='psychmeta')),
+                                                         if(output_format == "odt"& is.null(meta_tables)) paste0(":\n    reference_odt: ", system.file('templates/reference_odt.odt', package='psychmeta')),
+                                                         if(output_format == "odt"& !is.null(meta_tables)) paste0(":\n    reference_odt: ", system.file('templates/reference_odt_landscape.odt', package='psychmeta'))
                                                          )
                                } else header$output <- output_format
 
                                if(!is.null(bib)) {
                                        # Write the bibliography file
                                        if(save_build_files) {
-                                               bib_file <- paste0(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
-                                       } else bib_file <- tempfile(file, fileext = ".bib")
+                                               bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
+                                       } else bib_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
 
-                                       header$bibliography <- bib_file
+                                       header$bibliography <- if(.Platform$`OS.type` == "windows") {
+                                               gsub("\\\\", "/", bib_file)
+                                       } else bib_file
+
 
                                        if(!is.null(style)) {
                                                if(attr(style, "source") %in% c("url", "Zotero")) {
@@ -718,9 +734,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                # Save meta_tables to an RData workspace for later loading by Rmarkdown
                                if(!is.null(meta_tables)) {
                                  if(save_build_files) {
-                                   rdata_document <- paste0(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
-                                 } else rdata_document <- tempfile(file, fileext = ".Rdata")
-                                 save(meta_tables, file = rdata_document)
+                                   rdata_file <- file.path(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
+                                 } else rdata_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
+                                 save(meta_tables, file = rdata_file)
+
+                                 rdata_file <- if(.Platform$`OS.type` == "windows") {
+                                         gsub("\\\\", "/", rdata_file)
+                                 } else rdata_file
 
                                  tables_document <- c(
 
@@ -732,7 +752,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                    "```\n",
 
                                    "```{r, echo=FALSE}",
-                                   paste0("load('", rdata_document, "')"),
+                                   paste0("load('", rdata_file, "')"),
                                    "```\n",
                                    "\\blandscape\n",
 
@@ -791,8 +811,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
                                # Create Rmd and output files
                                if(save_build_files) {
-                                       rmd_document <- paste0(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd"))
-                               } else rmd_document <- tempfile(file, fileext = ".rmd")
+                                       rmd_document <- file.path(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd"))
+                               } else rmd_document <- file.path(tempdir(), stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd"))
 
                                stringi::stri_write_lines(document, rmd_document)
 
