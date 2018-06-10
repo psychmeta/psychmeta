@@ -85,7 +85,7 @@ metabulate(ma_obj, file = NULL, output_dir = getwd(),
 
 \item{caption}{Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).}
 
-\item{header}{A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.}
+\item{header}{A list of YAML header parameters to pass to \code{link[rmarkdown]{render}}.}
 
 \item{verbose}{Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?}
 
@@ -137,22 +137,24 @@ metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
 ## leave file == NULL and output_format to anything but "text":
 ma_table <- metabulate(ma_obj = ma_r_obj, file = NULL, output_format = "rmd")
 
+## Use the metabulate_rmd_helper() function to ensure all symbols render properly:
+metabulate_rmd_helper()
+
 ## Then, add the formatted table to your document using your preferred table
 ## formatting functions:
 
-#### Using just the \\link[knitr] package:
+#### Using just the \\link{knitr} package:
 knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
 cat("\\n", attr(ma_table[[1]], "footnote"))
 
-#### Using \\link[knitr] plus the \\link[kableExtra] package:
+#### Using \\link{knitr} plus the \\link{kableExtra} package:
 knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
                   caption = attr(ma_table[[1]], "caption")) \%>\%
        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) \%>\%
        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
 
-
-# !!! Note: On Windows, R currently cannot handle Unicode characters if kables
-# are printed not at top-level (e.g., in an if() statement, in a for() loop,
+# !!! Note: On Windows, R currently can only handle Unicode characters if kables
+# are printed at top-level (e.g., in an if() statement, in a for() loop,
 # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 # kable() as a top-level function (as above).
 
@@ -171,4 +173,8 @@ dat <- data.frame(es = data_r_meas_multi$rxyi,
                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
+}
+\seealso{
+Other output functions: \code{\link{generate_bib}},
+  \code{\link{metabulate_rmd_helper}}
 }

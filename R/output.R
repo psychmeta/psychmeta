@@ -145,6 +145,84 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 }
 
 
+#' Add metabulate equation commands and LaTeX dependencies
+#'
+#' \code{\link{metabulate}} requires several lines of code to correctly render meta-analysis results table column headings and footnotes. If \code{metabulate} is used to render files directly, these are added to the internal RMarkdown document. If you use \code{metabulate} output in a larger RMarkdown document, use this function to automatically add the necessary lines of code based on your chosen output format.
+#'
+#' @param latex Should required commands be included when converting to PDF, LaTeX, and related formats?
+#' @param html Should required commands be included when converting to HTML and related formats?
+#' @param word_proc Should required commands be included when converting to Word, ODT, and related formats?
+#'
+#' @section PDF and LaTeX output:
+#' If \code{latex} is \code{TRUE} and you render to PDF, LaTeX, or other output
+#' formats requiring LaTeX (e.g., \code{beamer_presentation}, see \code{\link[knitr]{is_latex_output}}),
+#' a YAML metadata block with a \code{header-includes} argument calling the required
+#' \code{unicode-math} LaTeX package is printed.
+#'
+#' An RMarkdown file can only include one \code{header-includes} metadata entry. If
+#' your document already has one, set \code{latex} to \code{FALSE} and manually add
+#' add the \code{unicode-math} package to your LaTeX header instead.
+#'
+#' (Note that \code{header-includes} is generally discouraged in favor of adding
+#' an \code{include} argument to specific output formats, see
+#' \url{http://rmarkdown.rstudio.com/pdf_document_format.html#includes}.)
+#'
+#' @section HTML output:
+#' If \code{html} is \code{TRUE} and you render to HTML (or related formats, see
+#' \code{\link[knitr]{is_html_output}}, the following LaTeX math commands are defined:
+#' \itemize{
+#'   \item{\code{symit}}{}
+#'   \item{\code{symup}}{}
+#'   \item{\code{symbfit}}{}
+#'   \item{\code{symbfup}}{}
+#' }
+#'
+#' If you define your own LaTeX or MathJax macros for these commands, set
+#' \code{html} to \code{FALSE}.
+#'
+#' @section Microsoft Office and LibreOffice output:
+#' If \code{word_proc} is \code{TRUE} and you render to Word or ODT (or related
+#' formats such as PowerPoint), the following LaTeX math commands are defined:
+#' \itemize{
+#'   \item{\code{symit}}{}
+#'   \item{\code{symup}}{}
+#'   \item{\code{symbfit}}{}
+#'   \item{\code{symbfup}}{}
+#' }
+#'
+#' If you define your own LaTeX, Office, OpenDocument macros for these commands,
+#' set \code{word_proc} to \code{FALSE}.
+#'
+#'
+#' @return Requested commands are printed to the console.
+#' @export
+#'
+#' @family output functions
+#'
+#' @examples
+#' ## Include this line as 'asis' output in your RMarkdown document:
+#' metabulate_rmd_helper()
+#'
+#' ## If you've already included \\usepackage{unicode-math} in your RMarkdown header
+#' ## for PDF (and related formats) header, set latex to FALSE:
+#' metabulate_rmd_helper(latex = FALSE)
+metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
+                                  word_proc = TRUE) {
+
+        if(knitr::is_latex_output() & latex == TRUE) {
+                cat("\n\n---\nheader-includes:\n  - \\usepackage{unicode-math}\n---\n\n")
+        }
+
+        if(knitr::is_html_output() & html == TRUE) {
+                cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfit}{\\boldsymbol}\\newcommand{\\symbfup}{\\boldsymbol}\\newcommand{\\symit}{}\n\n')
+        }
+
+        if(!knitr::is_latex_output() & !knitr::is_html_output() & word_proc == TRUE ) {
+                cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfup}{\\mathbfup}\\newcommand{\\symbfit}{\\mathbfit}\\newcommand{\\symit}{}\n\n')
+        }
+
+}
+
 #' Write a summary table of meta-analytic results
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
@@ -182,7 +260,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #' @param cred_format How should credility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).
 #' @param caption Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).
-#' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
+#' @param header A list of YAML header parameters to pass to \code{link[rmarkdown]{render}}.
 #' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
 #' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses. If provided and file is not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
@@ -202,6 +280,8 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #' @importFrom rmarkdown render
 #' @importFrom dplyr case_when
 #' @importFrom stringi stri_write_lines
+#'
+#' @family output functions
 #'
 #' @examples
 #' ## Create a results table for meta-analysis of correlations and output to Word:
@@ -227,22 +307,24 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #' ## leave file == NULL and output_format to anything but "text":
 #' ma_table <- metabulate(ma_obj = ma_r_obj, file = NULL, output_format = "rmd")
 #'
+#' ## Use the metabulate_rmd_helper() function to ensure all symbols render properly:
+#' metabulate_rmd_helper()
+#'
 #' ## Then, add the formatted table to your document using your preferred table
 #' ## formatting functions:
 #'
-#' #### Using just the \link[knitr] package:
+#' #### Using just the \link{knitr} package:
 #' knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
 #' cat("\n", attr(ma_table[[1]], "footnote"))
 #'
-#' #### Using \link[knitr] plus the \link[kableExtra] package:
+#' #### Using \link{knitr} plus the \link{kableExtra} package:
 #' knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
 #'                   caption = attr(ma_table[[1]], "caption")) %>%
 #'        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) %>%
 #'        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
 #'
-#'
-#' # !!! Note: On Windows, R currently cannot handle Unicode characters if kables
-#' # are printed not at top-level (e.g., in an if() statement, in a for() loop,
+#' # !!! Note: On Windows, R currently can only handle Unicode characters if kables
+#' # are printed at top-level (e.g., in an if() statement, in a for() loop,
 #' # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 #' # kable() as a top-level function (as above).
 #'
@@ -393,6 +475,8 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @importFrom RefManageR ReadBib
 #' @importFrom RCurl url.exists
 #' @importFrom RefManageR BibOptions
+#'
+#' @family output functions
 #'
 #' @examples
 #' ## Run a meta-analysis using ma_r() and include a citekey argument to provide
@@ -1235,9 +1319,9 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
         }
 
         if(!bold_headers){
-             col_names <- gsub(x = col_names, pattern = "symbfup", replacement = "symup")
-             col_names <- gsub(x = col_names, pattern = "symbfit", replacement = "symit")
-             col_names <- gsub(x = col_names, pattern = "[*][*]", replacement = "")
+             col_names <- stringr::str_replace_all(col_names, pattern = "symbfup", replacement = "symup")
+             col_names <- stringr::str_replace_all(col_names, pattern = "symbfit", replacement = "symit")
+             col_names <- stringr::str_replace_all(col_names, pattern = "[*][*]", replacement = "")
         }
 
         footnote <- if(output_format == "text") {

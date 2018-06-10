@@ -58,3 +58,7 @@ ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
              file = "sample bibliography", output_dir = tempdir(), output_format = "word")
 }
+\seealso{
+Other output functions: \code{\link{metabulate_rmd_helper}},
+  \code{\link{metabulate}}
+}
