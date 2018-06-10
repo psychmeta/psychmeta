@@ -284,15 +284,13 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' @family output functions
 #'
 #' @examples
+#' \dontrun{
 #' ## Create a results table for meta-analysis of correlations and output to Word:
 #' ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                  construct_x = x_name, construct_y = y_name,
 #'                  moderators = moderator, data = data_r_meas_multi)
 #' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
 #'            output_format = "word", output_dir = tempdir())
-#'
-#'
-#' \dontrun{
 #'
 #' ## Output to PDF:
 #' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
@@ -328,8 +326,6 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 #' # kable() as a top-level function (as above).
 #'
-#' }
-#'
 #'
 #' ## Create output table for meta-analysis of d values:
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
@@ -343,6 +339,7 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #'                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 #' metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
+#' }
 metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
                        output_format=c("word", "html", "pdf", "odt", "text", "rmd"),
                        show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
@@ -479,6 +476,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @family output functions
 #'
 #' @examples
+#' \dontrun{
 #' ## Run a meta-analysis using ma_r() and include a citekey argument to provide
 #' ## citation information for each source contributing to the meta-analyses.
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
@@ -490,6 +488,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' ## reference information for each of the citekeys included in the meta-analysis database.
 #' generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
 #'              file = "sample bibliography", output_dir = tempdir(), output_format = "word")
+#' }
 generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                          additional_citekeys=NULL,
                          file = NULL, output_dir = getwd(),

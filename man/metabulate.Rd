@@ -114,15 +114,13 @@ Formatted tables of meta-analytic output.
 Write a summary table of meta-analytic results
 }
 \examples{
+\dontrun{
 ## Create a results table for meta-analysis of correlations and output to Word:
 ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                  construct_x = x_name, construct_y = y_name,
                  moderators = moderator, data = data_r_meas_multi)
 metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
            output_format = "word", output_dir = tempdir())
-
-
-\dontrun{
 
 ## Output to PDF:
 metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
@@ -158,8 +156,6 @@ knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
 # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 # kable() as a top-level function (as above).
 
-}
-
 
 ## Create output table for meta-analysis of d values:
 ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
@@ -173,6 +169,7 @@ dat <- data.frame(es = data_r_meas_multi$rxyi,
                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
 metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
+}
 }
 \seealso{
 Other output functions: \code{\link{generate_bib}},
