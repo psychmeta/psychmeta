@@ -29,21 +29,21 @@
 #'                    sample_id = NULL, moderators = NULL,
 #'                    construct_x = NULL, construct_y = NULL,
 #'                    data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
-#' out$meta_tables[[1]]
+#' summary(out)
 #' 
 #' ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
 #'                    sample_id = NULL, moderators = NULL, construct_x = Predictor,
 #'                    data = data_r_oh_2009)
-#' out$meta_tables[[1]]
+#' summary(out)
 #' 
 #' ## Analysis of the average validity of the Big Five traits as predictors of
 #' ## job performance by Eastern Asian country
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
 #'                    sample_id = NULL, moderators = "Country", data = data_r_oh_2009)
-#' out$meta_tables[[1]]
+#' summary(out)
 ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
                         construct_x = NULL, construct_y = NULL, data = NULL, control = control_psychmeta(), ...){
@@ -324,6 +324,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           class(dat) <- c("escalc", "data.frame")
      }
 
+     L <- sum(!is.na(wt_vec))
      k <- sum(k_vec[!is.na(wt_vec) & !is.na(r_vec)])
      N <- sum(N_vec[!is.na(wt_vec)])
      conf_int <- confidence(mean = mean_r, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -336,7 +337,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      rel_r <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
      if(ma_metric == "r"){
-          meta <- as.data.frame(t(c(k = k, 
+          meta <- as.data.frame(t(c(L = L, 
+                                    k = k, 
                                     N = N,
                                     mean_r_bar = mean_r, 
                                     var_r_bar = var_r,
@@ -354,7 +356,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_bb_order2"))
      }else if(ma_metric == "d"){
-          meta <- as.data.frame(t(c(k = k, 
+          meta <- as.data.frame(t(c(L = L, 
+                                    k = k, 
                                     N = N,
                                     mean_d_bar = mean_r, 
                                     var_d_bar = var_r,
@@ -414,7 +417,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           class(dat) <- c("escalc", "data.frame")
      }
 
-
+     L <- sum(!is.na(wt_vec))
      k <- sum(k_vec[!is.na(wt_vec) & !is.na(rho_vec)])
      N <- sum(N_vec[!is.na(wt_vec)])
      conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -427,7 +430,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      rel_rho <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
      if(ma_metric == "r"){
-          meta <- as.data.frame(t(c(k = k, 
+          meta <- as.data.frame(t(c(L = L, 
+                                    k = k, 
                                     N = N,
                                     mean_rho_bar = mean_rho,
                                     var_rho_bar = var_r_c, 
@@ -445,7 +449,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ad_order2"))
      }else if(ma_metric == "d"){
-          meta <- as.data.frame(t(c(k = k, 
+          meta <- as.data.frame(t(c(L = L, 
+                                    k = k, 
                                     N = N,
                                     mean_delta_bar = mean_rho,
                                     var_delta_bar = var_r_c, 
@@ -505,6 +510,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           class(dat) <- c("escalc", "data.frame")
      }
 
+     L <- sum(!is.na(wt_vec))
      k <- sum(k_vec[!is.na(wt_vec)])
      N <- sum(N_vec[!is.na(wt_vec)])
      conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
@@ -517,7 +523,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      rel_rho <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
      if(ma_metric == "r"){
-          meta <- as.data.frame(t(c(k = k,
+          meta <- as.data.frame(t(c(L = L, 
+                                    k = k,
                                     N = N, 
                                     mean_rho_bar = mean_rho, 
                                     var_rho_bar = var_r_c, 
@@ -535,7 +542,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ad_order2"))
      }else if(ma_metric == "d"){
-          meta <- as.data.frame(t(c(k = k,
+          meta <- as.data.frame(t(c(L = L, 
+                                    k = k,
                                     N = N, 
                                     mean_delta_bar = mean_rho, 
                                     var_delta_bar = var_r_c, 

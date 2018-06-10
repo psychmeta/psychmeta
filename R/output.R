@@ -7,36 +7,41 @@
 #' @param x A vector, matrix, or data.frame of numbers to format
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"figure"} (default), leading zeros are replaced with figure-spaces (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "<U+2212>").
 #' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "<U+2007>") if a column contains any negative numbers and suppressed otherwise.
-#' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "<U+202F>").
 #' @param big.interval See \code{big.mark} above; defaults to 3.
 #' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "<U+202F>").
 #' @param small.interval See \code{small.mark} above; defaults to 3.
 #'
-#' @importFrom stringr str_replace
-#'
 #' @export
 #' @examples
-#' num_format(x = c(10000, 1000, 2.41, -1.20, 0.41, -0.20))
+#' # format_num() converts numeric values to characters with the specified formatting options.
+#' # By default, thousands digit groups are separated by thin spaces, negative signs are replaced
+#' # with minus signs, and positive signs and leading zeros are replaced with figure spaces
+#' # (which have the same width as numbers and minus signs). These options ensure that all
+#' # results will align neatly in columns when tabled.
+#' format_num(x = c(10000, 1000, 2.41, -1.20, 0.41, -0.20))
 #'
-#' # By default, num_format() uses your computer locale's default decimal mark as
+#' # By default, format_num() uses your computer locale's default decimal mark as
 #' # the decimal point. To force the usage of "." instead (e.g., for submission to
-#' # an American journal), set decimal.mark = ".":
-#' num_format(x = .41, decimal.mark = ".")
+#' # a U.S. journal), set decimal.mark = ".":
+#' format_num(x = .41, decimal.mark = ".")
 #'
-#' # By default, num_format() separates groups of large digits using thin spaces.
+#' # By default, format_num() separates groups of large digits using thin spaces.
 #' # This is following the international standard for scientific communication (SI/ISO 31-0),
 #' # which advises against using "." or "," to seprate digits because doing so can lead
 #' # to confusion for human and computer readers because "." and "," are also used
 #' # as decimal marks in various countries. If you prefer to use commmas to separate
 #' # large digit groups, set big.mark = ",":
-#' num_format(x = 10000, big.mark = ",")
-num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "figure", neg.sign = "minus",
-                       pos.sign = "figure", drop0integer = TRUE, big.mark = "thinspace",
-                       big.interval = 3L, small.mark = "thinspace", small.interval = 3L) {
+#' format_num(x = 10000, big.mark = ",")
+format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
+                       leading0 = "conditional", drop0integer = FALSE,
+                       neg.sign = "minus", pos.sign = "figure",
+                       big.mark = "thinspace", big.interval = 3L,
+                       small.mark = "thinspace", small.interval = 3L) {
 
         is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {abs(x - round(x)) < tol}
         all_equal_vector <- function(x, tol = .Machine$double.eps^0.5) {diff(range(x)) < tol}
@@ -79,26 +84,30 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 
         # Clean up unicode big.mark and small.mark
         out[] <- mutate_all(out,
-                            funs(str_replace(.data$.,
-                                             paste0("(",paste(rev(strsplit(sub(" ", big.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", big.mark, " "),")"),
-                                             big.mark)))
+                            funs(stringr::str_replace_all(.data$.,
+                                                 paste0("(",paste(rev(strsplit(sub(" ", big.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", big.mark, " "),")"),
+                                                 big.mark)))
         out[] <- mutate_all(out,
-                            funs(str_replace(.data$.,
-                                             paste0("(",paste(rev(strsplit(sub(" ", small.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", small.mark, " "),")"),
-                                             small.mark)))
+                            funs(stringr::str_replace_all(.data$.,
+                                                 paste0("(",paste(rev(strsplit(sub(" ", small.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", small.mark, " "),")"),
+                                                 small.mark)))
 
         # Clean up leading zeros
         switch(leading0,
                "TRUE" = {},
-               "FALSE" = out[] <- sapply(out, function(x) str_replace(x, paste0("^(-?)0", decimal.mark), paste0("\\1", decimal.mark))),
+               "FALSE" = out[] <- sapply(out, function(x) stringr::str_replace_all(x, paste0("^(-?)0", decimal.mark), paste0("\\1", decimal.mark))),
+               conditional = {
+                       out <- mutate_if(out, apply(x, 2, function(i) {!any(abs(i) >= 1)}),
+                                        function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
+               },
                figure = {
                        out <- mutate_if(out, apply(x, 2, function(i) {any(abs(i) >= 1)}),
-                                        function(i) str_replace(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1\u2007", decimal.mark)))
+                                        function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1\u2007", decimal.mark)))
                        out <- mutate_if(out, apply(x, 2, function(i) {!any(abs(i) >= 1)}),
-                                        function(i) str_replace(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
+                                        function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
                },
                # else =
-               {out[] <- sapply(out, function(x) str_replace(x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", leading0, decimal.mark)))}
+               {out[] <- sapply(out, function(x) stringr::str_replace_all(x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", leading0, decimal.mark)))}
         )
 
         # Clean up positive signs
@@ -107,12 +116,12 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
                "FALSE" = {},
                figure = {
                        out <- mutate_if(out, apply(x, 2, function(i) {!any(i < 0)}),
-                                        function(i) str_replace(i, "^\\+", ""))
+                                        function(i) stringr::str_replace_all(i, "^\\+", ""))
                        out <- mutate_if(out, apply(x, 2, function(i) {any(i < 0)}),
-                                        function(i) str_replace(i, "^\\+", "\u2007"))
+                                        function(i) stringr::str_replace_all(i, "^\\+", "\u2007"))
                },
                # else =
-               {out[] <- sapply(out, function(i) str_replace(i, "^\\+", pos.sign))}
+               {out[] <- sapply(out, function(i) stringr::str_replace_all(i, "^\\+", pos.sign))}
         )
 
         # Clean up negative signs
@@ -121,7 +130,7 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
                "FALSE" = {},
                "-" = {},
                # else =
-               {out[] <- sapply(out, function(x) str_replace(x, "^-", neg.sign))}
+               {out[] <- sapply(out, function(x) stringr::str_replace_all(x, "^-", neg.sign))}
         )
 
         if(x_type == "tibble") {
@@ -136,10 +145,89 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 }
 
 
+#' Add metabulate equation commands and LaTeX dependencies
+#'
+#' \code{\link{metabulate}} requires several lines of code to correctly render meta-analysis results table column headings and footnotes. If \code{metabulate} is used to render files directly, these are added to the internal RMarkdown document. If you use \code{metabulate} output in a larger RMarkdown document, use this function to automatically add the necessary lines of code based on your chosen output format.
+#'
+#' @param latex Should required commands be included when converting to PDF, LaTeX, and related formats?
+#' @param html Should required commands be included when converting to HTML and related formats?
+#' @param word_proc Should required commands be included when converting to Word, ODT, and related formats?
+#'
+#' @section PDF and LaTeX output:
+#' If \code{latex} is \code{TRUE} and you render to PDF, LaTeX, or other output
+#' formats requiring LaTeX (e.g., \code{beamer_presentation}, see \code{\link[knitr]{is_latex_output}}),
+#' a YAML metadata block with a \code{header-includes} argument calling the required
+#' \code{unicode-math} LaTeX package is printed.
+#'
+#' An RMarkdown file can only include one \code{header-includes} metadata entry. If
+#' your document already has one, set \code{latex} to \code{FALSE} and manually add
+#' add the \code{unicode-math} package to your LaTeX header instead.
+#'
+#' (Note that \code{header-includes} is generally discouraged in favor of adding
+#' an \code{include} argument to specific output formats, see
+#' \url{http://rmarkdown.rstudio.com/pdf_document_format.html#includes}.)
+#'
+#' @section HTML output:
+#' If \code{html} is \code{TRUE} and you render to HTML (or related formats, see
+#' \code{\link[knitr]{is_html_output}}, the following LaTeX math commands are defined:
+#' \itemize{
+#'   \item{\code{symit}}{}
+#'   \item{\code{symup}}{}
+#'   \item{\code{symbfit}}{}
+#'   \item{\code{symbfup}}{}
+#' }
+#'
+#' If you define your own LaTeX or MathJax macros for these commands, set
+#' \code{html} to \code{FALSE}.
+#'
+#' @section Microsoft Office and LibreOffice output:
+#' If \code{word_proc} is \code{TRUE} and you render to Word or ODT (or related
+#' formats such as PowerPoint), the following LaTeX math commands are defined:
+#' \itemize{
+#'   \item{\code{symit}}{}
+#'   \item{\code{symup}}{}
+#'   \item{\code{symbfit}}{}
+#'   \item{\code{symbfup}}{}
+#' }
+#'
+#' If you define your own LaTeX, Office, OpenDocument macros for these commands,
+#' set \code{word_proc} to \code{FALSE}.
+#'
+#'
+#' @return Requested commands are printed to the console.
+#' @export
+#'
+#' @family output functions
+#'
+#' @examples
+#' ## Include this line as 'asis' output in your RMarkdown document:
+#' metabulate_rmd_helper()
+#'
+#' ## If you've already included \\usepackage{unicode-math} in your RMarkdown header
+#' ## for PDF (and related formats) header, set latex to FALSE:
+#' metabulate_rmd_helper(latex = FALSE)
+metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
+                                  word_proc = TRUE) {
+
+        if(knitr::is_latex_output() & latex == TRUE) {
+                cat("\n\n---\nheader-includes:\n  - \\usepackage{unicode-math}\n---\n\n")
+        }
+
+        if(knitr::is_html_output() & html == TRUE) {
+                cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfit}{\\boldsymbol}\\newcommand{\\symbfup}{\\boldsymbol}\\newcommand{\\symit}{}\n\n')
+        }
+
+        if(!knitr::is_latex_output() & !knitr::is_html_output() & word_proc == TRUE ) {
+                cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfup}{\\mathbfup}\\newcommand{\\symbfit}{\\mathbfit}\\newcommand{\\symit}{}\n\n')
+        }
+
+}
+
 #' Write a summary table of meta-analytic results
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
-#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{psychmeta_output}. Set to \code{"console"} to output directly to the R console. Set to \code{"rename"} to simple rename the meta-analysis table columns with formatted RMarkdown headings (this is useful if you want to use other functions for more complex table formatting).
+#' @param file The filename (optionally with a subfolder path) for the output file. If \code{NULL}, the function will output directly to the R console (also useful if you want to include psychmeta results in a larger RMarkdown document).
+#' @param output_dir The filepath for the output directory/folder. Defaults to the current working directory.
 #' @param show_msd Logical. Should means and standard deviations of effect sizes be shown (default \code{TRUE})
 #' @param show_conf Logical. Should confidence intervals be shown (default: \code{TRUE})?
 #' @param show_cred Logical. Should credibility intervals be shown (default: \code{TRUE})?
@@ -148,40 +236,43 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, Rmarkdown, and plain text.
+#' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package to be installed), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param ma_method Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.
 #' @param correction_type Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
-#' @param bib A BibTeX file containing the citekeys for the meta-analyses. If not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
-#' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param additional_citekeys Additional citekeys to include in the reference list.
-#' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
-#' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
+#' @param collapse_construct_labels  Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).
+#' @param bold_headers Logical. Should column headers be bolded (default: \code{TRUE})?
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. See \code{\link{num_format}} for details.
-#' @param neg.sign Character to use as negative sign. See \code{\link{num_format}} for details.
-#' @param pos.sign Character to use as positive sign. See \code{\link{num_format}} for details.
+#' @param leading0 How to print leading zeros on decimals. See \code{\link{format_num}} for details.
 #' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
-#' @param big.mark Character to separate groups of large digits. See \code{\link{num_format}} for details.
+#' @param neg.sign Character to use as negative sign. See \code{\link{format_num}} for details.
+#' @param pos.sign Character to use as positive sign. See \code{\link{format_num}} for details.
+#' @param big.mark Character to separate groups of large digits. See \code{\link{format_num}} for details.
 #' @param big.interval See \code{big.mark} above; defaults to 3.
-#' @param small.mark Character to sparate groups of decimal digits. See \code{\link{num_format}} for details.
+#' @param small.mark Character to sparate groups of decimal digits. See \code{\link{format_num}} for details.
 #' @param small.interval See \code{small.mark} above; defaults to 3.
 #' @param conf_format How should confidence intervals be formatted? Options are:
 #' \itemize{
-#' \item{parentheses}{Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
-#' \item{brackets}{Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
-#' \item{columns}{Bounds are shown in individual columns.}
+#' \item{\code{parentheses}}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+#' \item{\code{brackets}}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+#' \item{\code{columns}}{: Bounds are shown in individual columns.}
 #' }
 #' @param cred_format How should credility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).
 #' @param caption Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).
+#' @param header A list of YAML header parameters to pass to \code{link[rmarkdown]{render}}.
 #' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
-#' @param save_build_files Should the RMarkdown and BibTeX (files) files used to generate the output be saved (default: \code{TRUE})?
-#' @param ... Additional arguments (not used).
+#' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
+#' @param bib A BibTeX file containing the citekeys for the meta-analyses. If provided and file is not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
+#' @param title.bib The title to give to the bibliography (see \code{bib} above). If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
+#' @param style What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
+#' @param additional_citekeys Additional citekeys to include in the reference list (see \code{bib} above).
+#' @param save_build_files Should the RMarkdown and BibLaTeX (if any) files used to generate the output be saved (default: \code{FALSE})?
+#' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
 #'
-#' @return If file is "rename", a list of meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")}. Otherwise, a list containing the meta-analysis results tibbles with \code{attr(ma_tables, "footnotes")} and the RefManageR BibEntry object.
+#' @return A list of meta-analysis results \code{\link[tibble]{tibble}}s with "caption" and "footnote" attributes.
 #'
-#' In addition, formatted tables and bibliographies are exported in the requested \code{output_format}. If file is "console" and output_format is not "text", a character vector containing RMarkdown meta-analysis results tables with captions, footnotes, and bibliography is printed (so \code{metabulate()} can be entered into a larger RMarkdown document to produce the requested output). If file is "console" and output_format is "text", a tibble with formatted column names and the bibliography (if any) are printed.
+#' If \code{file} is specified, formatted tables and bibliographies are exported in the requested \code{output_format}.
 #'
 #' @return Formatted tables of meta-analytic output.
 #' @export
@@ -190,53 +281,94 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 #' @importFrom dplyr case_when
 #' @importFrom stringi stri_write_lines
 #'
+#' @family output functions
+#'
 #' @examples
-#' \dontrun{
 #' ## Create a results table for meta-analysis of correlations and output to Word:
 #' ma_r_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                  construct_x = x_name, construct_y = y_name,
 #'                  moderators = moderator, data = data_r_meas_multi)
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations")
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+#'            output_format = "word", output_dir = tempdir())
+#'
+#'
+#' \dontrun{
 #'
 #' ## Output to PDF:
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "pdf")
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+#'            output_format = "pdf", output_dir = tempdir())
 #'
 #' ## Output to ODT (LibreOffice):
-#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations", output_format = "odt")
+#' metabulate(ma_obj = ma_r_obj, file = "meta tables correlations",
+#'            output_format = "odt", output_dir = tempdir())
+#'
 #'
 #' ## To produce Markdown tables to include inline in an RMarkdown report,
-#' ## set file to "console" and output_format to anything but "text":
-#' metabulate(ma_obj = ma_r_obj, file = "console", output_format = "rmd")
+#' ## leave file == NULL and output_format to anything but "text":
+#' ma_table <- metabulate(ma_obj = ma_r_obj, file = NULL, output_format = "rmd")
+#'
+#' ## Use the metabulate_rmd_helper() function to ensure all symbols render properly:
+#' metabulate_rmd_helper()
+#'
+#' ## Then, add the formatted table to your document using your preferred table
+#' ## formatting functions:
+#'
+#' #### Using just the \link{knitr} package:
+#' knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
+#' cat("\n", attr(ma_table[[1]], "footnote"))
+#'
+#' #### Using \link{knitr} plus the \link{kableExtra} package:
+#' knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
+#'                   caption = attr(ma_table[[1]], "caption")) %>%
+#'        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) %>%
+#'        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
+#'
+#' # !!! Note: On Windows, R currently can only handle Unicode characters if kables
+#' # are printed at top-level (e.g., in an if() statement, in a for() loop,
+#' # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
+#' # kable() as a top-level function (as above).
+#'
+#' }
+#'
 #'
 #' ## Create output table for meta-analysis of d values:
 #' ma_d_obj <- ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
 #'                  construct_y = construct, data = data_d_meas_multi)
 #' ma_d_obj <- ma_d_ad(ma_obj = ma_d_obj, correct_rr_g = FALSE, correct_rr_y = FALSE)
-#' metabulate(ma_obj = ma_d_obj, file = "meta tables d values")
+#' metabulate(ma_obj = ma_d_obj, file = "meta tables d values", output_dir = tempdir())
 #'
 #' ## Create output table for meta-analysis of generic effect sizes:
 #' dat <- data.frame(es = data_r_meas_multi$rxyi,
 #'                   n = data_r_meas_multi$n,
 #'                   var_e = (1 - data_r_meas_multi$rxyi^2)^2 / (data_r_meas_multi$n - 1))
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e, data = dat)
-#' metabulate(ma_obj = ma_obj, file = "meta tables generic es")
-#' }
-metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                       show_se = FALSE, show_var = FALSE, analyses="all",
-                       match=c("all", "any"), case_sensitive = TRUE,
-                       output_format=c("word", "html", "pdf", "text", "rmd", "odt"),
+#' metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdir())
+metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
+                       output_format=c("word", "html", "pdf", "odt", "text", "rmd"),
+                       show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
+                       show_se = FALSE, show_var = FALSE,
+                       analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                        ma_method = "ad", correction_type = "ts",
-                       bib = NULL, title.bib = NULL, additional_citekeys = NULL, style = "apa",
-                       header = NULL, digits = 2L, decimal.mark = getOption("OutDec"),
-                       leading0 = "figure", neg.sign = "minus", pos.sign = "figure",
-                       drop0integer = TRUE, big.mark = "thinspace", big.interval = 3L,
-                       small.mark = "thinspace", small.interval = 3L,  conf_format = "parentheses",
-                       cred_format = "brackets", symbol_es = "ES", caption = "Results of meta-analyses",
-                       save_build_files = TRUE, verbose = FALSE, ...){
+                       collapse_construct_labels  = TRUE, bold_headers = TRUE,
+                       digits = 2L, decimal.mark = getOption("OutDec"),
+                       leading0 = "conditional", drop0integer = FALSE,
+                       neg.sign = "minus", pos.sign = "figure",
+                       big.mark = "thinspace", big.interval = 3L,
+                       small.mark = "thinspace", small.interval = 3L,
+                       conf_format = "parentheses", cred_format = "parentheses",
+                       symbol_es = "ES", caption = "Results of meta-analyses",
+                       header = NULL, verbose = FALSE, unicode = NULL,
+                       bib = NULL, title.bib = NULL, style = "apa", additional_citekeys = NULL,
+                       save_build_files = FALSE, ...){
 
         # Match arguments
         output_format <- tolower(output_format)
-        output_format <- match.arg(output_format)
+        output_format <- tryCatch(match.arg(output_format),
+                                  error = function(e) {
+                                          if(length(output_format) > 1) {
+                                                  stop("Multiple output formats specified. Please specify a single output format.", call. = FALSE)
+                                          } else output_format})
+
         ma_method <- match.arg(ma_method, c("bb", "ic", "ad"), several.ok = TRUE)
         correction_type <- match.arg(correction_type, c("ts", "vgx", "vgy"), several.ok = TRUE)
         conf_format <- match.arg(conf_format, c("parentheses", "brackets", "columns"))
@@ -274,35 +406,40 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
         conf_level <- attributes(ma_obj$ma_obj)$inputs$conf_level
         cred_level <- attributes(ma_obj$ma_obj)$inputs$cred_level
 
-        # Generate formatted tables (includes generation of captions)
+        # Generate formatted tables (includes generation of captions and footnotes)
         meta_tables <- .metabulate(meta_tables = meta_tables, ma_type = ma_type,
-                                   output_format = output_format,
+                                   output_format = output_format, caption = caption,
                                    show_msd = show_msd, show_conf = show_conf,
                                    show_cred = show_cred, show_se = show_se,
-                                   show_var = show_var, es_type = es_type, symbol_es = symbol_es,
+                                   show_var = show_var,
+                                   collapse_construct_labels = collapse_construct_labels, bold_headers = bold_headers,
+                                   es_type = es_type, symbol_es = symbol_es,
                                    digits = digits, decimal.mark = decimal.mark,
                                    leading0 = leading0, neg.sign = neg.sign,
                                    pos.sign = pos.sign, drop0integer = drop0integer,
                                    big.mark = big.mark, big.interval = big.interval,
                                    small.mark = small.mark, small.interval = small.interval,
                                    conf_format = conf_format, cred_format = cred_format,
-                                   verbose = verbose, conf_level = conf_level, cred_level = cred_level)
+                                   verbose = verbose, unicode = unicode,
+                                   conf_level = conf_level, cred_level = cred_level)
 
         # Set the output file name
-        if(is.null(file)) file <- "psychmeta_output"
-        if(file %in% c("console", "rename")) file <- .filename_check(file, output_format)
-
-        if(file == "rename") return(meta_tables)
+        if(!is.null(file)) file <- .filename_check(file, output_format)
 
         # Assign values to citekeys and citations, convert bib to R bibliography
-        if(!is.null(bib)) bib <- .generate_bib(ma_obj, bib, additional_citekeys)
+        if(!is.null(file)) {
+                if(!is.null(bib)) warning("Bibliography not generated when file == NULL.\nTry generate_bib() to include a bibliography in an RMarkdown document.")
+                bib <- NULL
+        } else if(!is.null(bib)) {
+                bib <- .generate_bib(ma_obj, bib, additional_citekeys)
+        }
 
         # Render the output
-        .psychmeta_render(file = file, output_format = output_format, meta_tables = meta_tables,
-                          ma_type = ma_type, es_type = es_type,
+        .psychmeta_render(file = file, output_format = output_format, output_dir = output_dir,
+                          meta_tables = meta_tables, ma_type = ma_type, es_type = es_type,
                           bib = bib$bib, citations = bib$citations, citekeys = bib$citekeys,
-                          title.bib = title.bib, style = style, caption = caption,
-                          save_build_files = save_build_files, header = header)
+                          title.bib = title.bib, style = style,
+                          save_build_files = save_build_files, header = header, ...)
 
 }
 
@@ -314,16 +451,18 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #'
 #' @param ma_obj A psychmeta meta-analysis object with \code{citekeys} supplied.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses.
+#' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
+#' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list.
+#' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions}} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
+#' @param output_dir The filepath for the output file. Defaults to the current working directory.
+#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
 #' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
-#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.
-#' @param file The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} to output directly to the R console.
-#' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{TRUE})?
+#' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{FALSE}; always \code{TRUE} if file is \code{NULL})?
 #' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
+#' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
 #'
 #' @return A list containing the RefManageR BibEntry object. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
 #'
@@ -337,28 +476,35 @@ metabulate <- function(ma_obj, file, show_msd = TRUE, show_conf = TRUE, show_cre
 #' @importFrom RCurl url.exists
 #' @importFrom RefManageR BibOptions
 #'
+#' @family output functions
+#'
 #' @examples
-#' \dontrun{
+#' ## Run a meta-analysis using ma_r() and include a citekey argument to provide
+#' ## citation information for each source contributing to the meta-analyses.
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 #'                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
 #'                moderators = moderator, citekey = citekey, data = data_r_meas_multi)
 #'
-#' generate_bib(ma_obj, analyses="all", match=c("all", "any"),
-#' bib=system.file("sample_bibliography.bib", package="psychmeta"), style="apa",
-#' output_format="word", header=list())
-#' }
-generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
+#' ## Next, use generate_bib() to generate the bibliography for the retained studies.
+#' ## The bib argument is the BibTeX or BibLaTeX .bib file containing the full
+#' ## reference information for each of the citekeys included in the meta-analysis database.
+#' generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
+#'              file = "sample bibliography", output_dir = tempdir(), output_format = "word")
+generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
+                         additional_citekeys=NULL,
+                         file = NULL, output_dir = getwd(),
+                         output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
-                         style="apa", output_format=c("word", "html", "pdf", "text", "odt", "rmd", "biblatex", "citekeys"),
-                         file=NULL, title.bib = NULL, save_build_files = TRUE, header=list()){
+                         save_build_files = FALSE, header=list(), ...){
 
-
-
-        output_format <- match.arg(tolower(output_format))
+        output_format <- tolower(output_format)
+        output_format <- tryCatch(match.arg(output_format),
+                                  error = function(e) {
+                                          if(length(output_format) > 1) {
+                                                  stop("Multiple output formats specified. Please specify a single output format.", call. = FALSE)
+                                          } else output_format})
 
         if("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
-
-        if(class(ma_obj))
 
         # Get the requested meta-analyses
         ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
@@ -370,14 +516,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         bib <- bib$bib
 
         # Set the output file name
-        if(is.null(file)) file <- "reference_list"
-        if(file != "console") file <- .filename_check(file, output_format)
+        if(!is.null(file)) file <- .filename_check(file, output_format)
 
         # Render the output
         switch(output_format,
 
                citekeys = {
-                       if(file == "console") {
+                       if(!is.null(file)) {
                                return(citations)
                        } else {
                                writeLines(citations, con = file)
@@ -385,7 +530,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                },
 
                biblatex = {
-                       if(file == "console") {
+                       if(!is.null(file)) {
                                print(bib[citekeys], .opts = list(style = "Biblatex"))
                        } else {
                                suppressMessages(WriteBib(bib[citekeys], file = file))
@@ -394,17 +539,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                # else =
                         {
                         .psychmeta_render(file = file, output_format = output_format,
-                                          bib = bib, citations = citations,
+                                          output_dir = output_dir, bib = bib, citations = citations,
                                           citekeys = citekeys, title.bib = title.bib, style = style,
-                                          save_build_files = save_build_files, header = header)
+                                          save_build_files = save_build_files, header = header, ...)
+                        invisible(bib[citekeys])
                 }
                )
 }
 
 
 .generate_bib <- function(ma_obj, bib, additional_citekeys){
-
-        # TODO: Make RefManageR, RCurl, rmarkdown optional packages
 
         if(is.null(ma_obj) & is.null(additional_citekeys)) stop("Either ma_obj or additional_citekeys must be provided.")
 
@@ -428,20 +572,20 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         # Reset BibOptions to original
         BibOptions(check.entries = Bib_check.entries_original)
 
-        return(list(citekeys = citekeys, citations = citations, bib = bib))
+        return(list(bib = bib, citekeys = citekeys, citations = citations))
 
 }
 
 .filename_check <- function(file, output_format){
         case_when(
-                output_format == "pdf"      ~ if(!grepl("\\.pdf$",  file, ignore.case = TRUE)) paste0(file, ".pdf")  else file,
-                output_format == "html"     ~ if(!grepl("\\.html$", file, ignore.case = TRUE)) paste0(file, ".html") else file,
-                output_format == "word"     ~ if(!grepl("\\.docx$", file, ignore.case = TRUE)) paste0(file, ".docx") else file,
-                output_format == "rmd"      ~ if(!grepl("\\.rmd$",  file, ignore.case = TRUE)) paste0(file, ".Rmd")  else file,
-                output_format == "biblatex" ~ if(!grepl("\\.bib$",  file, ignore.case = TRUE)) paste0(file, ".bib")  else file,
-                output_format == "text"     ~ if(!grepl("\\.txt$",  file, ignore.case = TRUE)) paste0(file, ".txt")  else file,
-                output_format == "citekeys" ~ if(!grepl("\\.txt$",  file, ignore.case = TRUE)) paste0(file, ".txt")  else file,
-                output_format == "odt"      ~ if(!grepl("\\.odt$",  file, ignore.case = TRUE)) paste0(file, ".odt")  else file,
+                output_format == "pdf"      ~ if(!grepl("\\.pdf$",  file, ignore.case = TRUE)) {paste0(file, ".pdf")}  else {file},
+                output_format == "html"     ~ if(!grepl("\\.html$", file, ignore.case = TRUE)) {paste0(file, ".html")} else {file},
+                output_format == "word"     ~ if(!grepl("\\.docx$", file, ignore.case = TRUE)) {paste0(file, ".docx")} else {file},
+                output_format == "rmd"      ~ if(!grepl("\\.rmd$",  file, ignore.case = TRUE)) {paste0(file, ".Rmd")}  else {file},
+                output_format == "biblatex" ~ if(!grepl("\\.bib$",  file, ignore.case = TRUE)) {paste0(file, ".bib")}  else {file},
+                output_format == "text"     ~ if(!grepl("\\.txt$",  file, ignore.case = TRUE)) {paste0(file, ".txt")}  else {file},
+                output_format == "citekeys" ~ if(!grepl("\\.txt$",  file, ignore.case = TRUE)) {paste0(file, ".txt")}  else {file},
+                output_format == "odt"      ~ if(!grepl("\\.odt$",  file, ignore.case = TRUE)) {paste0(file, ".odt")}  else {file},
                 TRUE ~ file)
 }
 
@@ -453,36 +597,33 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 attributes(style) <- list(source = "local")
                 return(style)
         } else {
-                style <- paste0("https://zotero.org/styles/", str_replace(style, "\\.csl$", "") )
+                style <- paste0("https://zotero.org/styles/", stringr::str_replace(style, "\\.csl$", "") )
                 attributes(style) <- list(source = "Zotero")
                 return(style)
         }
 }
 
 
-.psychmeta_render <- function(file, output_format, meta_tables = NULL, ma_type = NULL, es_type = NULL,
-                              bib = NULL, citations = NULL, citekeys = NULL, title.bib = NULL,
-                              style = style, save_build_files = FALSE, header = list(), caption = NULL){
+.psychmeta_render <- function(file = NULL, output_format, meta_tables = NULL, ma_type = NULL,
+                              es_type = NULL, bib = NULL, citations = NULL,
+                              citekeys = NULL, title.bib = NULL, style = style,
+                              save_build_files = FALSE, output_dir = NULL,
+                              header = list(), ...){
 
-        if(output_format == "rmd") save_build_files <- TRUE
+        if(!output_format %in% c("text", "rmd", "md_document") & !rmarkdown::pandoc_available("2")) {
+                stop("Output to ", output_format, " requires Pandoc 2.0.0 or greater.\nInstall from http://pandoc.org/installing.html or\nupdate to RStudio 1.2.679-1 or greater. ")
+        }
         if(!is.null(style)) style <- .clean_style_name(style)
 
-        if(file == "console") {
+        if(is.null(output_dir)) output_dir <- getwd()
+
+        if(is.null(file)) {
 
                 switch(output_format,
 
                        text = {if(!is.null(meta_tables)) {
-                                 for(i in names(meta_tables)) {
-                                         if(!is.null(caption)) {
-                                                 if(length(caption) > 1) {
-                                                         cat("\n\n", caption[[i]], "\n", rep("=", nchar(caption[[i]])), sep="")
-                                                 } else cat(caption, "\n", rep("=", nchar(caption)), sep="")
-                                         }
-                                         cat("\n")
-                                         print(meta_tables[[i]])
-                                         cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
-                                 }
-                              }
+                                 print(meta_tables)
+                               }
 
                                if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
@@ -494,75 +635,70 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
                                }
 
-                         out <- vector(mode = list)
-
-                         invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
+                         invisible(meta_tables[!is.null(meta_tables)])
 
                        },
 
                        # else =
-                       {# TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
-                               # the same metadata block as citations and style below.
-                               if(!is.null(bib)) {
-                                       # Write the bibliography file
-                                       if(save_build_files) {
-                                               bib_file <- str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
-                                       } else bib_file <- tempfile("psychmeta.bib")
+                       {     if(!is.null(meta_tables)) {
+                                  # Prevent LaTeX from removing figure space characters
+                                  meta_tables <- sapply(names(meta_tables),
+                                                        function(x) {
+                                                                ma_table <- mutate_all(meta_tables[[x]],
+                                                                                       funs(stringr::str_replace_all(.data$.,
+                                                                                                                     "\u2007",
+                                                                                                                     "\u2007\\\\phantom{\u2212}")))
+                                                                attributes(ma_table) <- attributes(meta_tables[[x]])
+                                                                return(ma_table)
+                                                        },
+                                                        simplify = FALSE, USE.NAMES = TRUE)
+                                  class(meta_tables) <- "metabulate"
+                                  return(meta_tables[!is.null(meta_tables)])
+                             }
+
+                             # TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
+                             # the same metadata block as citations and style below.
+                             if(!is.null(bib)) {
+                                  # Write the bibliography file
+                                       # Ignore save_build_files
+                                       bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
 
-                                       sprintf("---### This metadata line must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s\n---\n",
+                                       sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s",
                                                bib_file)
-                               }
 
-                               if(!is.null(meta_tables)) {
-                                       cat("```{r output-specific format control, include=FALSE}\n",
-                                           "is_html_output = function() {knitr::opts_knit$get('rmarkdown.pandoc.to') == 'html'}\n",
-                                           "is_pdf_output = function() {knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex'}\n",
-                                           "```",
-                                           "\n\n",
-                                           "```{r eval=is_html_output(), results='asis', echo = FALSE}\n",
-                                           "cat('\\\\newcommand{\\\\mathbfit}{\\\\boldsymbol}\\\\newcommand{\\\\mathbf}{\\\\boldsymbol}')\n",
-                                           "```\n\n",
-                                           "```{r eval=is_pdf_output(), results='asis', echo = FALSE}\n",
-                                           "cat('\\\\newcommand{\\\\mathbfit}{\\\\boldsymbol}\\\\renewcommand{\\\\mathbf}{\\\\boldsymbol}')\n",
-                                           "```\n\n", sep="")
-
-                                       for(i in names(meta_tables)) {
-                                               cat("\n\n", if(length(caption) > 1) caption[[i]] else caption, "\n")
-                                               print(knitr::kable(meta_tables[[i]]))
-                                               cat("\n", attr(meta_tables, "footnotes")[[i]], "\n")
-                                       }
-
-                               }
-
-                               if(!is.null(bib)) {
                                        if(is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
 
                                        cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                            title.bib,
                                            "\n\n---\n"
                                        )
+
                                        if(!is.null(style)) sprintf("csl: %s\n", style )
                                        sprintf('nocite: |\n  %s\n---\n', citations)
+
+                                       invisible(bib[citekeys])
                                }
 
-                         invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
                        }
                 )
 
         } else {
-
-                # Prepare tables for output
-                mt_output <- character(0)
-                for(i in names(meta_tables)) {
-                     mt_output <-
-                       paste0(mt_output, "\n",
-                              paste0(knitr::kable(meta_tables[[i]],
-                                                  caption = {if(length(caption) > 1) paste(caption[[i]], paste0(rep("=", nchar(caption[[i]])), collapse=""), sep = "\n") else paste(caption, paste0(rep("=", nchar(caption)), collapse=""), sep = "\n")}),
-                                     collapse="\n"),
-                              "\n",
-                              paste(attr(meta_tables, "footnotes")[[i]]), sep = "\n")
+                if(output_format == "rmd") save_build_files <- TRUE
+                # Prevent LaTeX from removing figure space characters
+                if(output_format != "text" & !is.null(meta_tables)) {
+                        meta_tables <- sapply(names(meta_tables),
+                                              function(x) {
+                                                      ma_table <- mutate_all(meta_tables[[x]],
+                                                                             funs(stringr::str_replace_all(.data$.,
+                                                                                                           "\u2007",
+                                                                                                           "\u2007\\\\phantom{\u2212}")))
+                                                      attributes(ma_table) <- attributes(meta_tables[[x]])
+                                                      return(ma_table)
+                                              },
+                                              simplify = FALSE, USE.NAMES = TRUE)
+                        class(meta_tables) <- "metabulate"
                 }
 
                 # Fill in critical header slots
@@ -589,29 +725,75 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                      sink()
                                 } else bibliography <- NULL
 
-                               document <- paste0(header$title, "\n\n",
-                                                  paste0(mt_output, "\n\n")[!is.null(meta_tables)],
-                                                  paste0(title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
-                                                  bibliography[!is.null(bib)]
+                               document <- c(paste(stringr::str_to_title(names(header)), ": ", header, collapse = "\n"), "\n\n",
+
+                                             paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"))[!is.null(meta_tables[[ma_type[1]]])],
+                                             suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))[!is.null(meta_tables[[ma_type[1]]])]),
+                                             paste0("Note: ", attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[1]]])],
+                                             "\\newpage"[!is.null(meta_tables[[ma_type[1]]]) & length(ma_type) > 1],
+
+                                             paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"))[!is.null(meta_tables[[ma_type[2]]])],
+                                             suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))[!is.null(meta_tables[[ma_type[2]]])]),
+                                             paste0("Note: ", attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[2]]])],
+                                             "\\newpage"[!is.null(meta_tables[[ma_type[2]]]) & length(ma_type) > 2],
+
+                                             paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"))[!is.null(meta_tables[[ma_type[3]]])],
+                                             suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))[!is.null(meta_tables[[ma_type[3]]])]),
+                                             paste0("Note: ", attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[3]]])],
+                                             "\\newpage"[!is.null(meta_tables[[ma_type[3]]]) & length(ma_type) > 3],
+
+                                             paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"))[!is.null(meta_tables[[ma_type[4]]])],
+                                             suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))[!is.null(meta_tables[[ma_type[4]]])]),
+                                             paste0("Note: ", attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[4]]])],
+                                             "\\newpage"[!is.null(meta_tables[[ma_type[4]]]) & length(ma_type) > 4],
+
+                                             paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"))[!is.null(meta_tables[[ma_type[5]]])],
+                                             suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))[!is.null(meta_tables[[ma_type[5]]])]),
+                                             paste0("Note: ", attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[5]]])],
+                                             "\\newpage"[!is.null(meta_tables[[ma_type[5]]]) & length(ma_type) > 5],
+
+                                             paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"))[!is.null(meta_tables[[ma_type[6]]])],
+                                             suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))[!is.null(meta_tables[[ma_type[6]]])]),
+                                             paste0("Note: ", attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[6]]])],
+                                             "\\newpage"[!is.null(meta_tables[[ma_type[6]]]) & length(ma_type) > 6],
+
+                                             paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"))[!is.null(meta_tables[[ma_type[7]]])],
+                                             suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))[!is.null(meta_tables[[ma_type[7]]])]),
+                                             paste0("Note: ", attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[7]]])],
+                                             "\\newpage"[!is.null(meta_tables) & !is.null(bib)],
+
+                                             paste0(title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
+                                             bibliography[!is.null(bib)]
                                )
 
-                               stringi::stri_write_lines(document, file)
+                               stringi::stri_write_lines(document, file, sep="")
                        },
 
                        # else =
                        {
                                # Fill in critical header slots and write .bib file if necessary
-                               header$output <- paste0("\n  ", output_format, "_document", if(output_format == "pdf" & any(!stringi::stri_enc_isascii(mt_output))) ":\n    latex_engine: xelatex")
+                               if (output_format %in% c("word", "html", "pdf", "odt")) {
+                                 header$output <- paste0("\n  ", output_format, "_document",
+                                                         if(output_format == "pdf") paste0(":\n    latex_engine: lualatex\n    includes:\n      in_header: ", system.file('templates/header.tex', package='psychmeta')),
+                                                         if(output_format == "word" & is.null(meta_tables)) paste0(":\n    reference_docx: ", system.file('templates/reference_docx.docx', package='psychmeta')),
+                                                         if(output_format == "word" & !is.null(meta_tables)) paste0(":\n    reference_docx: ", system.file('templates/reference_docx_landscape.docx', package='psychmeta')),
+                                                         if(output_format == "odt"& is.null(meta_tables)) paste0(":\n    reference_odt: ", system.file('templates/reference_odt.odt', package='psychmeta')),
+                                                         if(output_format == "odt"& !is.null(meta_tables)) paste0(":\n    reference_odt: ", system.file('templates/reference_odt_landscape.odt', package='psychmeta'))
+                                                         )
+                               } else header$output <- output_format
 
                                if(!is.null(bib)) {
                                        # Write the bibliography file
                                        if(save_build_files) {
-                                               bib_file <- str_replace(file, "\\.(Rmd|pdf|docx|html)$", "\\.bib")
-                                       } else bib_file <- tempfile("psychmeta.bib")
+                                               bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
+                                       } else bib_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
                                        suppressMessages(WriteBib(bib[citekeys],
                                                                  file = bib_file))
 
-                                       header$bibliography <- bib_file
+                                       header$bibliography <- if(.Platform$`OS.type` == "windows") {
+                                               gsub("\\\\", "/", bib_file)
+                                       } else bib_file
+
 
                                        if(!is.null(style)) {
                                                if(attr(style, "source") %in% c("url", "Zotero")) {
@@ -633,39 +815,97 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                        }
                                }
 
+                               # Save meta_tables to an RData workspace for later loading by Rmarkdown
+                               if(!is.null(meta_tables)) {
+                                 if(save_build_files) {
+                                   rdata_file <- file.path(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
+                                 } else rdata_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
+                                 save(meta_tables, file = rdata_file)
+
+                                 rdata_file <- if(.Platform$`OS.type` == "windows") {
+                                         gsub("\\\\", "/", rdata_file)
+                                 } else rdata_file
+
+                                 tables_document <- c(
+
+                                   "```{r eval=knitr::is_html_output(), results='asis', echo = FALSE}",
+                                   "cat('\\\\newcommand{\\\\symup}{\\\\mathrm}\\\\newcommand{\\\\symbfit}{\\\\boldsymbol}\\\\newcommand{\\\\symbfup}{\\\\boldsymbol}\\\\newcommand{\\\\symit}{}')",
+                                   "```\n",
+                                   "```{r eval=!knitr::is_latex_output() & !knitr::is_html_output(), results='asis', echo = FALSE}",
+                                   "cat('\\\\newcommand{\\\\symup}{\\\\mathrm}\\\\newcommand{\\\\symbfup}{\\\\mathbfup}\\\\newcommand{\\\\symbfit}{\\\\mathbfit}\\\\newcommand{\\\\symit}{}')",
+                                   "```\n",
+
+                                   "```{r, echo=FALSE}",
+                                   paste0("load('", rdata_file, "')"),
+                                   "```\n",
+                                   "\\blandscape\n",
+
+                                   '```{r, results = "asis", echo = FALSE}',
+                                   'ma_type <- names(meta_tables)',
+
+                                   'cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[1]]])])',
+                                   'knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[1]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[1]]])])',
+                                   'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[1]]])])',
+
+                                   'cat(paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[2]]])])',
+                                   'knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[2]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[2]]])])',
+                                   'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[2]]])])',
+
+                                   'cat(paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[3]]])])',
+                                   'knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[3]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[3]]])])',
+                                   'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[3]]])])',
+
+                                   'cat(paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[4]]])])',
+                                   'knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[4]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[4]]])])',
+                                   'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[4]]])])',
+
+                                   'cat(paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[5]]])])',
+                                   'knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[5]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[5]]])])',
+                                   'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[5]]])])',
+
+                                   'cat(paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[6]]])])',
+                                   'knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[6]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[6]]])])',
+                                   'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[6]]])])',
+
+                                   'cat(paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[7]]])])',
+                                   'knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))',
+                                   'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[7]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[7]]])])',
+
+                                   '```',
+
+                                   "\n\n\\elandscape\n\n"
+                                 )
+                               } else tables_document <- NULL
+
                                ## Create the markdown header and document
                                header <- paste(names(header), header, sep=": ", collapse="\n")
 
-                               document <- paste0("---\n", header, "\n---\n\n",
-                                                  "```{r output-specific format control, include=FALSE}\n",
-                                                  "is_html_output = function() {knitr::opts_knit$get('rmarkdown.pandoc.to') == 'html'}\n",
-                                                  "is_pdf_output = function() {knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex'}\n",
-                                                  "```\n\n",
-                                                  "```{r eval=is_html_output(), results='asis', echo = FALSE}\n",
-                                                  "cat('\\\\newcommand{\\\\mathbfit}{\\\\boldsymbol}\\\\newcommand{\\\\mathbf}{\\\\boldsymbol}')\n",
-                                                  "```\n\n",
-                                                  "```{r eval=is_pdf_output(), results='asis', echo = FALSE}\n",
-                                                  "cat('\\\\newcommand{\\\\mathbfit}{\\\\boldsymbol}\\\\renewcommand{\\\\mathbf}{\\\\boldsymbol}')\n",
-                                                  "```\n",
-                                                  paste0(mt_output, "\n\n")[!is.null(meta_tables)],
-                                                  paste0("## ", title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
-                                                  sprintf('---\nnocite: |\n  %s\n---\n', citations)[!is.null(bib)]
+                               document <- c("---", header, "---\n\n",
+                                             tables_document,
+                                             "<br/>\n\n<br/>\n\n<br/>\n\n",
+                                             paste0("# ", title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
+                                             sprintf('---\nnocite: |\n  %s\n---\n', citations)[!is.null(bib)]
                                )
-                               document <- gsub("<U\\+(.{1,4})>", "\\\\u{\\1}", x = document)
 
                                # Create Rmd and output files
                                if(save_build_files) {
-                                       rmd_document <- str_replace(file, "\\.(pdf|docx|html)$", "\\.rmd")
-
-                               } else rmd_document <- tempfile("psychmeta.rmd")
+                                       rmd_document <- file.path(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd"))
+                               } else rmd_document <- file.path(tempdir(), stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd"))
 
                                stringi::stri_write_lines(document, rmd_document)
 
                                if(output_format != "rmd") {
-                                       render(rmd_document,
-                                              output_file = file,
-                                              output_dir  = getwd(),
-                                              encoding = "UTF-8")
+                                       rmarkdown::render(rmd_document,
+                                                         output_file = file,
+                                                         output_dir  = output_dir,
+                                                         encoding = "UTF-8",
+                                                         ...)
                                }
                                invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
                        }
@@ -677,13 +917,17 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 #' Internal function for .metabulating results tables
 #'
 #' @keywords internal
-.metabulate <- function(meta_tables, ma_type = "ad_ts", output_format = "word", show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
-                        show_se = FALSE, show_var = FALSE, es_type = NULL, symbol_es = "ES",
-                        digits = 2L, decimal.mark = getOption("OutDec"), leading0 = "figure", neg.sign = "\u2212",
-                        pos.sign = "figure", drop0integer = TRUE, big.mark = "\u202F",
-                        big.interval = 3L, small.mark = "\u202F", small.interval = 3L,
-                        conf_format = "parentheses", cred_format = "brackets",
-                        verbose = FALSE, conf_level = .95, cred_level = .80) {
+.metabulate <- function(meta_tables, ma_type = "ad_ts", output_format = "word",
+                        caption = caption, show_msd = TRUE, show_conf = TRUE,
+                        show_cred = TRUE, show_se = FALSE, show_var = FALSE,
+                        collapse_construct_labels = TRUE, bold_headers = TRUE,
+                        es_type = NULL, symbol_es = "ES", digits = 2L,
+                        decimal.mark = getOption("OutDec"), leading0 = "figure",
+                        neg.sign = "\u2212", pos.sign = "figure", drop0integer = TRUE,
+                        big.mark = "\u202F", big.interval = 3L, small.mark = "\u202F",
+                        small.interval = 3L, conf_format = "parentheses",
+                        cred_format = "parentheses", verbose = FALSE,
+                        unicode = unicode, conf_level = .95, cred_level = .80) {
 
         if(es_type == "r") {
                 meta_tables <- list(bb = meta_tables$barebones,
@@ -715,14 +959,18 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         length_moderators <- max(sapply(meta_tables, function(x) (which(colnames(x) == "k") -1) - which(colnames(x) == "analysis_type") ))
 
         # Select, rearrange, and format columns of meta_tables
-        .arrange_format_columns <- function(ma_table) {
-                ma_table <- mutate(ma_table,
-                                   spacer1 = " ",
-                                   spacer2 = " ",
-                                   spacer3 = " ",
-                                   spacer4 = " ",
-                                   spacer5 = " ")
+        .arrange_format_columns <- function(ma_table, collapse_construct_labels) {
                 x <- colnames(ma_table)
+
+                if(collapse_construct_labels & nrow(ma_table) > 1 & "pair_id" %in% x){
+                     pair_ids <- unlist(ma_table[["pair_id"]])
+                     delete_id <- FALSE
+                     for(i in 2:length(pair_ids)) delete_id[i] <- pair_ids[i] == pair_ids[i-1]
+                     if("construct_x" %in% x)    ma_table[["construct_x"]][delete_id] <- ""
+                     if("group_contrast" %in% x) ma_table[["group_contrast"]][delete_id] <- ""
+                     if("construct_y" %in% x)    ma_table[["construct_y"]][delete_id] <- ""
+                     rm(pair_ids, delete_id)
+                }
 
                 # Select columns
                 col_initial <- x[1:which(x == "analysis_type")]
@@ -777,13 +1025,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 if(show_cred == TRUE) col_cred <- grep("^CV_.+", x, value = TRUE) else col_cred <- NULL
 
                 # Rearrange columns
-                ma_table <- ma_table[,c(col_initial, col_moderators, col_sampsize,
-                                        col_m_bb, col_se_bb, col_sd_bb,
-                                        "spacer1"[show_var], col_var_bb,
-                                        "spacer2"[!is.null(col_m_cor)], col_m_cor, col_se_cor, col_sd_cor,
-                                        "spacer3"[!is.null(col_m_cor) & show_var], col_var_cor,
-                                        "spacer4"[show_conf], col_conf,
-                                        "spacer5"[show_cred], col_cred)]
+                ma_table <- ma_table[1:nrow(ma_table), c(col_initial, col_moderators, col_sampsize,
+                                                         col_m_bb, col_se_bb, col_sd_bb,
+                                                         col_var_bb,
+                                                         col_m_cor, col_se_cor, col_sd_cor,
+                                                         col_var_cor,
+                                                         col_conf,
+                                                         col_cred)]
 
                 colnames(ma_table)[colnames(ma_table) %in% col_conf] <- c("ci_lower", "ci_upper")
                 if(show_conf == TRUE) col_conf <- c("ci_lower", "ci_upper")
@@ -791,18 +1039,19 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 if(show_cred == TRUE) col_cred <- c("cv_lower", "cv_upper")
 
                 # Format columns
-                ma_table[, col_sampsize] <- num_format(ma_table[, col_sampsize], digits = 0L, decimal.mark = decimal.mark,
-                                                       leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
-                                                       drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                                                       small.mark = small.mark, small.interval = small.interval)
+                ma_table[1:nrow(ma_table), col_sampsize] <-
+                        format_num(ma_table[1:nrow(ma_table), col_sampsize], digits = 0L, decimal.mark = decimal.mark,
+                                   leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                   drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                   small.mark = small.mark, small.interval = small.interval)
 
                 numeric_columns <- c(col_m_bb, col_se_bb, col_sd_bb, col_var_bb, col_m_cor, col_se_cor, col_sd_cor, col_var_cor, col_conf, col_cred)
 
-                ma_table[, numeric_columns] <-
-                        num_format(ma_table[, numeric_columns], digits = digits, decimal.mark = decimal.mark,
-                                                       leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
-                                                       drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                                                       small.mark = small.mark, small.interval = small.interval)
+                ma_table[1:nrow(ma_table), numeric_columns] <-
+                        format_num(ma_table[1:nrow(ma_table), numeric_columns], digits = digits, decimal.mark = decimal.mark,
+                                   leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                   drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                   small.mark = small.mark, small.interval = small.interval)
 
                 # Format the interval columns
                 if(show_conf == TRUE) {
@@ -826,14 +1075,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         }
 
         # Rename columns
-        .rename_columns <- function(ma_table, formatted_strings, output_format, length_initial, length_moderators) {
+        .rename_columns <- function(ma_table, formatted_strings, output_format, length_initial, length_moderators, bold_headers) {
                 formatted_names <- names(formatted_strings$col_names)
                 names(formatted_names) <- formatted_strings$col_names
 
                 ma_table <- rename(ma_table, !!formatted_names[formatted_names %in% colnames(ma_table)])
 
-                colnames(ma_table)[grep("spacer\\d+", colnames(ma_table))] <- " "
-                if(output_format != "text" & length_moderators > 0) {
+                if(bold_headers & output_format != "text" & length_moderators > 0) {
                         colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)] <-
                                 paste0("**", colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)], "**")
                 }
@@ -841,10 +1089,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 ma_table
         }
 
-        .format_meta_table <- function(ma_table, formatted_strings) {
-          ma_table <- ma_table %>%
-            .arrange_format_columns() %>%
-            .rename_columns(formatted_strings, output_format, length_initial, length_moderators)
+        .format_meta_table <- function(ma_table_name, meta_tables, formatted_strings, caption, output_format, length_initial, length_moderators) {
+          ma_table <- meta_tables[[ma_table_name]] %>%
+            .arrange_format_columns(collapse_construct_labels = collapse_construct_labels) %>%
+            .rename_columns(formatted_strings, output_format, length_initial, length_moderators, bold_headers = bold_headers)
+          attr(ma_table, "footnote") <- formatted_strings$footnote[[ma_table_name]]
+          if(length(caption) > 1) attr(ma_table, "caption") <- caption[[ma_table_name]] else attr(ma_table, "caption") <- caption
+          attr(ma_table, "align") <- c(rep("l", length_initial + length_moderators), rep("r", 2), rep("c", ncol(ma_table) - length_initial - length_moderators - 2))
           ma_table
         }
 
@@ -852,12 +1103,17 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
         formatted_strings <- .formatted_strings(output_format = output_format, es_type = es_type, symbol_es = symbol_es,
                                                 conf_level = conf_level, cred_level = cred_level, corrections = NULL,
                                                 show_msd = show_msd, show_se = show_se, show_var = show_var,
-                                                verbose = verbose, show_conf = show_conf, show_cred = show_cred)
+                                                verbose = verbose, unicode = unicode,
+                                                show_conf = show_conf, show_cred = show_cred, bold_headers = bold_headers)
 
-        meta_tables <- lapply(meta_tables, .format_meta_table, formatted_strings = formatted_strings)
+        meta_tables <- sapply(names(meta_tables), .format_meta_table,
+                              meta_tables = meta_tables, caption = caption,
+                              formatted_strings = formatted_strings,
+                              output_format = output_format, length_initial = length_initial,
+                              length_moderators = length_moderators,
+                              simplify = FALSE, USE.NAMES = TRUE)
 
-        # Table footnotes
-        attr(meta_tables, "footnotes") <- formatted_strings$footnote[ma_type]
+        class(meta_tables) <- "metabulate"
 
       return(meta_tables)
 
@@ -869,10 +1125,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 #' @keywords Internal
 #'
 .formatted_strings <- function(output_format, es_type, symbol_es = "ES", conf_level = .95, cred_level = .80, corrections = NULL,
-                               show_msd = TRUE, show_se = FALSE, show_var = FALSE, verbose = FALSE, show_conf = TRUE, show_cred = TRUE) {
+                               show_msd = TRUE, show_se = FALSE, show_var = FALSE, verbose = FALSE, show_conf = TRUE, show_cred = TRUE,
+                               unicode = NULL, bold_headers = TRUE) {
 
         col_names <- if(output_format == "text") {
-                if(.support_unicode()) {
+                if(.support_unicode(unicode)) {
                         c(
                                 group_contrast    = "Group Contrast",
                                 construct_x       = "Construct X",
@@ -892,7 +1149,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                 mean_es           = paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""),
                                 var_es            = paste0("\u03C3\u00B2_", symbol_es),
-                                sd_es             = paste0("$\\mathbf{SD{", symbol_es, "}}$"),
+                                sd_es             = paste0("SD_", symbol_es),
                                 se_es             = paste0("SE_", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = "")),
 
                                 var_e             = "\u03C3\u00B2_e",
@@ -926,10 +1183,10 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                 sd_art_c          = "SD_art(c)",
                                 sd_pre_c          = "SD_pre(c)",
 
-                                ci_lower          = paste0(conf_level*100, "% CI"),
-                                ci_upper          = " ",
-                                cv_lower          = paste0(cred_level*100, "% CV"),
-                                cv_upper          = " ",
+                                ci_lower          = paste0(conf_level*100, "% CI Lower"),
+                                ci_upper          = paste0(conf_level*100, "% CI Upper"),
+                                cv_lower          = paste0(cred_level*100, "% CV Lower"),
+                                cv_upper          = paste0(cred_level*100, "% CV Upper"),
 
                                 conf_int          = paste0(conf_level*100, "% CI"),
                                 cred_int          = paste0(cred_level*100, "% CV")
@@ -988,10 +1245,10 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                 sd_art_c          = "SD_art(c)",
                                 sd_pre_c          = "SD_pre(c)",
 
-                                ci_lower          = paste0(conf_level*100, "% CI"),
-                                ci_upper          = " ",
-                                cv_lower          = paste0(cred_level*100, "% CV"),
-                                cv_upper          = " ",
+                                ci_lower          = paste0(conf_level*100, "% CI Lower"),
+                                ci_upper          = paste0(conf_level*100, "% CI Upper"),
+                                cv_lower          = paste0(cred_level*100, "% CV Lower"),
+                                cv_upper          = paste0(cred_level*100, "% CV Upper"),
 
                                 conf_int          = paste0(conf_level*100, "% CI"),
                                 cred_int          = paste0(cred_level*100, "% CV")
@@ -1005,67 +1262,75 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                         k                 = "**_k_**",
                         N                 = "**_N_**",
 
-                        mean_r            = "$\\mathbfit{\\overline{r}}$",
-                        var_r             = "$\\mathbfit{\\sigma^{2}_{r}}$",
-                        sd_r              = "$\\mathbfit{SD_{r}}$",
-                        se_r              = "$\\mathbfit{SE_{\\overline{r}}}$",
+                        mean_r            = "$\\symbfit{\\overline{r}}$",
+                        var_r             = "$\\symbfit{\\sigma^{2}_{r}}$",
+                        sd_r              = "$\\symbfit{SD_{r}}$",
+                        se_r              = "$\\symbfit{SE_{\\overline{r}}}$",
 
-                        mean_d            = "$\\mathbfit{\\overline{d}}$",
-                        var_d             = "$\\mathbfit{\\sigma^{2}_{d}}$",
-                        sd_d              = "$\\mathbfit{SD_{d}}$",
-                        se_d              = "$\\mathbfit{SE_{\\overline{d}}}$",
+                        mean_d            = "$\\symbfit{\\overline{d}}$",
+                        var_d             = "$\\symbfit{\\sigma^{2}_{d}}$",
+                        sd_d              = "$\\symbfit{SD_{d}}$",
+                        se_d              = "$\\symbfit{SE_{\\overline{d}}}$",
 
-                        mean_es           = paste0("$\\mathbfit{\\overline{", symbol_es, "}}$"),
-                        var_es            = paste0("$\\mathbfit{\\sigma^{2}_{", symbol_es, "}}$"),
-                        sd_es             = paste0("$\\mathbfit{SD{", symbol_es, "}}$"),
-                        se_es             = paste0("$\\mathbfit{SE_{\\overline{", symbol_es, "}}}$"),
+                        mean_es           = paste0("$\\symbfit{\\overline{", symbol_es, "}}$"),
+                        var_es            = paste0("$\\symbfit{\\sigma^{2}_{", symbol_es, "}}$"),
+                        sd_es             = paste0("$\\symbfit{SD_{", symbol_es, "}}$"),
+                        se_es             = paste0("$\\symbfit{SE_{\\overline{", symbol_es, "}}}$"),
 
-                        var_e             = "$\\mathbfit{\\sigma^{2}_{e}}$",
-                        var_res           = "$\\mathbfit{\\sigma^{2}_{res}}$",
-                        sd_e              = "$\\mathbfit{SD_{e}}$",
-                        sd_res            = "$\\mathbfit{SD_{res}}$",
-                        var_art           = "$\\mathbfit{\\sigma^{2}_{art}}$",
-                        var_pre           = "$\\mathbfit{\\sigma^{2}_{pre}}$",
-                        sd_art            = "$\\mathbfit{SD_{art}}$",
-                        sd_pre            = "$\\mathbfit{SD_{pre}}$",
+                        var_e             = "$\\symbfit{\\sigma^{2}_{e}}$",
+                        var_res           = "$\\symbfit{\\sigma^{2}_{res}}$",
+                        sd_e              = "$\\symbfit{SD_{e}}$",
+                        sd_res            = "$\\symbfit{SD_{res}}$",
+                        var_art           = "$\\symbfit{\\sigma^{2}_{art}}$",
+                        var_pre           = "$\\symbfit{\\sigma^{2}_{pre}}$",
+                        sd_art            = "$\\symbfit{SD_{art}}$",
+                        sd_pre            = "$\\symbfit{SD_{pre}}$",
 
-                        mean_rho          = "$\\mathbf{\\overline{\\rho}}$",
-                        var_r_c           = "$\\mathbfit{\\sigma^{2}_{r_{c}}}$",
+                        mean_rho          = "$\\symbfup{\\overline{\\rho}}$",
+                        var_r_c           = "$\\symbfit{\\sigma^{2}_{r_{c}}}$",
 
-                        var_rho           = "$\\mathbfit{\\sigma^{2}_{\\mathbf{\\rho}}}$",
-                        sd_r_c            = "$\\mathbfit{SD_{r_{c}}}$",
-                        se_r_c            = "$\\mathbfit{SE_{\\mathbf{\\overline{\\rho}}}}$",
-                        sd_rho            = "$\\mathbfit{SD_{\\mathbf{\\rho}}}$",
+                        var_rho           = "$\\symbfit{\\sigma^{2}_{\\symbfup{\\rho}}}$",
+                        sd_r_c            = "$\\symbfit{SD_{r_{c}}}$",
+                        se_r_c            = "$\\symbfit{SE_{\\symbfup{\\overline{\\rho}}}}$",
+                        sd_rho            = "$\\symbfit{SD_{\\symbfup{\\rho}}}$",
 
-                        mean_delta        = "$\\mathbfit{\\overline{\\delta}}$",
-                        var_d_c           = "$\\mathbfit{\\sigma^{2}_{d_{c}}}$",
-                        sd_d_c            = "$\\mathbfit{SD_{d_{c}}}$",
-                        se_d_c            = "$\\mathbfit{SE_{\\overline{\\delta}}}$",
-                        var_delta         = "$\\mathbfit{\\sigma^{2}_{\\delta}}$",
-                        sd_delta          = "$\\mathbfit{SD_{\\delta}}$",
+                        mean_delta        = "$\\symbfit{\\overline{\\delta}}$",
+                        var_d_c           = "$\\symbfit{\\sigma^{2}_{d_{c}}}$",
+                        sd_d_c            = "$\\symbfit{SD_{d_{c}}}$",
+                        se_d_c            = "$\\symbfit{SE_{\\overline{\\delta}}}$",
+                        var_delta         = "$\\symbfit{\\sigma^{2}_{\\delta}}$",
+                        sd_delta          = "$\\symbfit{SD_{\\delta}}$",
 
-                        var_e_c           = "$\\mathbfit{\\sigma^{2}_{e_{c}}}$",
-                        var_art_c         = "$\\mathbfit{\\sigma^{2}_{art_{c}}}$",
-                        var_pre_c         = "$\\mathbfit{\\sigma^{2}_{pre_{c}}}$",
-                        sd_e_c            = "$\\mathbfit{SD_{e_{c}}}$",
-                        sd_art_c          = "$\\mathbfit{SD_{art_{c}}}$",
-                        sd_pre_c          = "$\\mathbfit{SD_{pre_{c}}}$",
+                        var_e_c           = "$\\symbfit{\\sigma^{2}_{e_{c}}}$",
+                        var_art_c         = "$\\symbfit{\\sigma^{2}_{art_{c}}}$",
+                        var_pre_c         = "$\\symbfit{\\sigma^{2}_{pre_{c}}}$",
+                        sd_e_c            = "$\\symbfit{SD_{e_{c}}}$",
+                        sd_art_c          = "$\\symbfit{SD_{art_{c}}}$",
+                        sd_pre_c          = "$\\symbfit{SD_{pre_{c}}}$",
 
-                        ci_lower          = paste0("**", conf_level*100, "% CI**"),
-                        ci_upper          = " ",
-                        cv_lower          = paste0("**", cred_level*100, "% CV**"),
-                        cv_upper          = " ",
+                        ci_lower          = paste0("**", conf_level*100, "% CI Lower**"),
+                        ci_upper          = paste0("**", conf_level*100, "% CI Upper**"),
+                        cv_lower          = paste0("**", cred_level*100, "% CV Lower**"),
+                        cv_upper          = paste0("**", cred_level*100, "% CV Upper**"),
 
                         conf_int          = paste0("**", conf_level*100, "% CI**"),
                         cred_int          = paste0("**", cred_level*100, "% CV**")
                 )
         }
 
+        if(!bold_headers){
+             var_labels <- names(col_names)
+             col_names <- stringr::str_replace_all(col_names, pattern = "symbfup", replacement = "symup")
+             col_names <- stringr::str_replace_all(col_names, pattern = "symbfit", replacement = "symit")
+             col_names <- stringr::str_replace_all(col_names, pattern = "[*][*]", replacement = "")
+             names(col_names) <- var_labels
+        }
+
         footnote <- if(output_format == "text") {
                 ### TODO: Add notes about actual corrections applied
-                if(.support_unicode()) {
+                if(.support_unicode(unicode)) {
                         if(es_type == "r") {
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 =  mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1075,7 +1340,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around r\u0305; "[show_conf],
                                                   "CV = credibility interval around r\u0305."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1096,7 +1361,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1117,7 +1382,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1138,7 +1403,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1159,7 +1424,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1180,7 +1445,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "r\u0305 = mean observed correlation; "[show_msd],
                                                   "SE_r\u0305 = standard error of r\u0305; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1204,7 +1469,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                         } else if(es_type == "d") {
                                 ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 =  mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1214,7 +1479,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around d\u0305; "[show_conf],
                                                   "CV = credibility interval around d\u0305."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1235,7 +1500,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1256,7 +1521,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1277,7 +1542,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1298,7 +1563,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1319,7 +1584,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "d\u0305 = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[d\u0305] = standard error of d\u0305; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1342,7 +1607,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                 )
 
                         } else {
-                                c(bb = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                               paste0(paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), " =  mean observed effect size (", symbol_es, "); ")[show_msd],
                                               paste0("SE_", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), " = standard error of ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""), "; ")[show_se],
                                               paste0("SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_res = residual standard deviation of ", symbol_es, "; ")[show_msd & !verbose],
@@ -1356,7 +1621,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                 } else {
                         if(es_type == "r") {
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r =  mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1366,7 +1631,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around Mean r; "[show_conf],
                                                   "CV = credibility interval around Mean r."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1387,7 +1652,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1408,7 +1673,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1429,7 +1694,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1450,7 +1715,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1471,7 +1736,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "correlations corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean r = mean observed correlation; "[show_msd],
                                                   "SE_[Mean r] = standard error of Mean r; "[show_se],
                                                   "SD_r = observed standard deviation of r; SD_res = residual standard deviation of r; "[show_msd & !verbose],
@@ -1495,7 +1760,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                         } else if(es_type == "d") {
                                 ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
-                                c(bb     = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb     = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d =  mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1505,7 +1770,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                                   "CI = confidence interval around Mean d; "[show_conf],
                                                   "CV = credibility interval around Mean d."[show_cred]),
 
-                                  ic_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1526,7 +1791,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1547,7 +1812,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ic_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ic_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1568,7 +1833,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected individually."),
 
-                                  ad_ts  = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_ts  = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1589,7 +1854,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgx = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgx = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1610,7 +1875,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                                   "effect sizes corrected using artifact distributions."),
 
-                                  ad_vgy = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                  ad_vgy = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                                   "Mean d = mean observed Cohen's d (Hedges' g); "[show_msd],
                                                   "SE_[Mean d] = standard error of Mean d; "[show_se],
                                                   "SD_d = observed standard deviation of d; SD_res = residual standard deviation of d; "[show_msd & !verbose],
@@ -1633,7 +1898,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                 )
 
                         } else {
-                                c(bb = paste0("Note: k = number of studies contributing to meta-analysis; N = total sample size; ",
+                                c(bb = paste0("k = number of studies contributing to meta-analysis; N = total sample size; ",
                                               "Mean ", symbol_es, " =  mean observed effect size (", symbol_es, "); "[show_msd],
                                               "SE_[Mean ", symbol_es, "] = standard error of [Mean ", symbol_es, "]; "[show_se],
                                               "SD_", symbol_es, " = observed standard deviation of ", symbol_es, "; SD_res = residual standard deviation of ", symbol_es, "; "[show_msd & !verbose],
@@ -1647,7 +1912,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                 }
         } else {
                 if(es_type == "r") {
-                        c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                        c(bb     = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0 mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1657,7 +1922,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "CI\u00a0=\u00a0confidence interval around $\\overline{r}$; "[show_conf],
                                           "CV\u00a0=\u00a0credibility interval around $\\overline{r}$."[show_cred]),
 
-                          ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1665,20 +1930,20 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
 
-                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
-                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+                                          "$\\symup{\\overline{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
+                                          "$SE_{\\symup{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\symup{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & verbose],
 
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$; "[show_var & verbose],
 
-                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
-                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+                                          "CI\u00a0=\u00a0confidence interval around $\\symup{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\symup{\\overline{\\rho}}$; "[show_cred],
 
                                           "correlations corrected individually."),
 
-                          ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1686,20 +1951,20 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
 
-                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
-                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+                                          "$\\symup{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
+                                          "$SE_{\\symup{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\symup{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & verbose],
 
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$; "[show_var & verbose],
 
-                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
-                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+                                          "CI\u00a0=\u00a0confidence interval around $\\symup{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\symup{\\overline{\\rho}}$; "[show_cred],
 
                                           "correlations corrected individually."),
 
-                          ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1707,20 +1972,20 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
 
-                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
-                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+                                          "$\\symup{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
+                                          "$SE_{\\symup{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\symup{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & verbose],
 
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$; "[show_var & verbose],
 
-                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
-                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+                                          "CI\u00a0=\u00a0confidence interval around $\\symup{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\symup{\\overline{\\rho}}$; "[show_cred],
 
                                           "correlations corrected individually."),
 
-                          ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1728,20 +1993,20 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
 
-                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
-                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+                                          "$\\symup{\\overline{\\rho}}$\u00a0=\u00a0mean true-score correlation; "[show_msd],
+                                          "$SE_{\\symup{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\symup{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & verbose],
 
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$; "[show_var & verbose],
 
-                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
-                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+                                          "CI\u00a0=\u00a0confidence interval around $\\symup{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\symup{\\overline{\\rho}}$; "[show_cred],
 
                                           "correlations corrected using artifact distributions."),
 
-                          ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1749,20 +2014,20 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
 
-                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
-                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+                                          "$\\symup{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*X* measured with error); "[show_msd],
+                                          "$SE_{\\symup{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\symup{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & verbose],
 
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$; "[show_var & verbose],
 
-                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
-                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+                                          "CI\u00a0=\u00a0confidence interval around $\\symup{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\symup{\\overline{\\rho}}$; "[show_cred],
 
                                           "correlations corrected using artifact distributions."),
 
-                          ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{r}$\u00a0=\u00a0mean observed correlation; "[show_msd],
                                           "$SE_{\\overline{r}}$\u00a0=\u00a0standard error of $\\overline{r}$; "[show_se],
                                           "$SD_{r}$\u00a0=\u00a0observed standard deviation of $r$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $r$; "[show_msd & !verbose],
@@ -1770,23 +2035,23 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$ ;"[show_var & !verbose],
                                           "$\\sigma^{2}_{r}$\u00a0=\u00a0observed variance of $r$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $r$ due to sampling error; $\\sigma^{2}_{art}$\u00a0=\u00a0predicted variance of $r$ due to artifacts; $\\sigma^{2}_{pre}$\u00a0=\u00a0total predicted variance of $r$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $r$; "[show_var & verbose],
 
-                                          "$\\mathrm{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
-                                          "$SE_{\\mathrm{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\mathrm{\\overline{\\rho}}$; "[show_se],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & !verbose],
-                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\mathrm{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\mathrm{\\rho}$; "[show_msd & verbose],
+                                          "$\\symup{\\overline{\\rho}}$\u00a0=\u00a0mean operational validity (*Y* measured with error); "[show_msd],
+                                          "$SE_{\\symup{\\overline{\\rho}}}$\u00a0=\u00a0standard error of $\\symup{\\overline{\\rho}}$; "[show_se],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & !verbose],
+                                          "$SD_{r_{c}}$\u00a0=\u00a0observed standard deviation of corrected correlations ($r_{c}$); $SD_{e}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to sampling error; $SD_{art_{c}}$\u00a0=\u00a0predicted $SD_{r_{c}}$ due to artifacts; $SD_{pre_{c}}$\u00a0=\u00a0total predicted $SD_{r_{c}}$; $SD_{\\symup{\\rho}}$\u00a0=\u00a0residual standard deviation of $\\symup{\\rho}$; "[show_msd & verbose],
 
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$ ;"[show_var & !verbose],
-                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\mathrm{\\rho}}$\u00a0=\u00a0residual variance of $\\mathrm{\\rho}$; "[show_var & verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$ ;"[show_var & !verbose],
+                                          "$\\sigma^{2}_{r_{c}}$\u00a0=\u00a0observed variance of $r_{c}$; $\\sigma^{2}_{e_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to sampling error; $\\sigma^{2}_{art_{c}}$\u00a0=\u00a0predicted variance of $r_{c}$ due to artifacts; $\\sigma^{2}_{pre_{c}}$\u00a0=\u00a0total predicted variance of $r_{c}$; $\\sigma^{2}_{\\symup{\\rho}}$\u00a0=\u00a0residual variance of $\\symup{\\rho}$; "[show_var & verbose],
 
-                                          "CI\u00a0=\u00a0confidence interval around $\\mathrm{\\overline{\\rho}}$; "[show_conf],
-                                          "CV\u00a0=\u00a0credibility interval around $\\mathrm{\\overline{\\rho}}$; "[show_cred],
+                                          "CI\u00a0=\u00a0confidence interval around $\\symup{\\overline{\\rho}}$; "[show_conf],
+                                          "CV\u00a0=\u00a0credibility interval around $\\symup{\\overline{\\rho}}$; "[show_cred],
 
                                           "correlations corrected using artifact distributions.")
                         )
 
                 } else if(es_type == "d") {
-                        ### TODO: Don't refer to latent/observed groups if group membership reliability is not corrected.
-                        c(bb     = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                        ### f: Don't refer to latent/observed groups if group membership reliability is not corrected.
+                        c(bb     = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0 mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1796,7 +2061,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                                           "CI\u00a0=\u00a0confidence interval around $\\overline{d}$; "[show_conf],
                                           "CV\u00a0=\u00a0credibility interval around $\\overline{d}$."[show_cred]),
 
-                          ic_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1817,7 +2082,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected individually."),
 
-                          ic_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1838,7 +2103,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected individually."),
 
-                          ic_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ic_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1859,7 +2124,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected individually."),
 
-                          ad_ts  = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_ts  = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1880,7 +2145,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected using artifact distributions."),
 
-                          ad_vgx = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgx = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1901,7 +2166,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
 
                                           "effect sizes corrected using artifact distributions"),
 
-                          ad_vgy = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                          ad_vgy = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
                                           "$\\overline{d}$\u00a0=\u00a0mean observed Cohen's $d$ (Hedges' $g$); "[show_msd],
                                           "$SE_{\\overline{d}}$\u00a0=\u00a0standard error of $\\overline{d}$; "[show_se],
                                           "$SD_{d}$\u00a0=\u00a0observed standard deviation of $d$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $d$; "[show_msd & !verbose],
@@ -1924,15 +2189,15 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, additional_citekeys=NULL,
                         )
 
                 } else {
-                        c(bb = paste0("*Note:* *k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
-                                      "$\\overline{", symbol_es, "}$\u00a0=\u00a0 mean observed effect size ($", symbol_es, "$); "[show_msd],
-                                      "$SE_{\\overline{", symbol_es, "}}$\u00a0=\u00a0standard error of $\\overline{", symbol_es, "}$; "[show_se],
-                                      "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & !verbose],
-                                      "$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{e}$\u00a0=\u00a0predicted $SD_{", symbol_es, "}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; "[show_msd & verbose],
-                                      "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$ ;"[show_var & !verbose],
-                                      "$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $", symbol_es, "$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$; "[show_var & verbose],
-                                      "CI\u00a0=\u00a0confidence interval around $\\overline{", symbol_es, "}$; "[show_conf],
-                                      "CV\u00a0=\u00a0credibility interval around $\\overline{", symbol_es, "}$."[show_cred])
+                        c(bb = paste0("*k*\u00a0=\u00a0number of studies contributing to meta-analysis; *N*\u00a0=\u00a0total sample size; ",
+                                      paste0("$\\overline{", symbol_es, "}$\u00a0=\u00a0 mean observed effect size ($", symbol_es, "$); ")[show_msd],
+                                      paste0("$SE_{\\overline{", symbol_es, "}}$\u00a0=\u00a0standard error of $\\overline{", symbol_es, "}$; ")[show_se],
+                                      paste0("$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; ")[show_msd & !verbose],
+                                      paste0("$SD_{", symbol_es, "}$\u00a0=\u00a0observed standard deviation of $", symbol_es, "$; $SD_{e}$\u00a0=\u00a0predicted $SD_{", symbol_es, "}$ due to sampling error; $SD_{res}$\u00a0=\u00a0residual standard deviation of $", symbol_es, "$; ")[show_msd & verbose],
+                                      paste0("$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$ ;")[show_var & !verbose],
+                                      paste0("$\\sigma^{2}_{", symbol_es, "}$\u00a0=\u00a0observed variance of $", symbol_es, "$; $\\sigma^{2}_{e}$\u00a0=\u00a0predicted variance of $", symbol_es, "$ due to sampling error; $\\sigma^{2}_{res}$\u00a0=\u00a0residual variance of $", symbol_es, "$; ")[show_var & verbose],
+                                      paste0("CI\u00a0=\u00a0confidence interval around $\\overline{", symbol_es, "}$; ")[show_conf],
+                                      paste0("CV\u00a0=\u00a0credibility interval around $\\overline{", symbol_es, "}$.")[show_cred])
                         )
                 }
         }

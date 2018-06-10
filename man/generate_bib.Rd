@@ -4,18 +4,28 @@
 \alias{generate_bib}
 \title{Generate a list of references included in meta-analyses}
 \usage{
-generate_bib(ma_obj = NULL, bib = NULL, additional_citekeys = NULL,
-  analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
-  style = "apa", output_format = c("word", "html", "pdf", "text", "odt",
-  "rmd", "biblatex", "citekeys"), file = NULL, title.bib = NULL,
-  save_build_files = TRUE, header = list())
+generate_bib(ma_obj = NULL, bib = NULL, title.bib = NULL, style = "apa",
+  additional_citekeys = NULL, file = NULL, output_dir = getwd(),
+  output_format = c("word", "html", "pdf", "text", "odt", "rmd", "biblatex",
+  "citekeys"), analyses = "all", match = c("all", "any"),
+  case_sensitive = TRUE, save_build_files = FALSE, header = list(), ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object with \code{citekeys} supplied.}
 
 \item{bib}{A BibTeX file containing the citekeys for the meta-analyses.}
 
+\item{title.bib}{The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
+
+\item{style}{What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
+
 \item{additional_citekeys}{Additional citekeys to include in the reference list.}
+
+\item{file}{The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions}} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).}
+
+\item{output_dir}{The filepath for the output file. Defaults to the current working directory.}
+
+\item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.}
 
 \item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
 
@@ -23,17 +33,11 @@ generate_bib(ma_obj = NULL, bib = NULL, additional_citekeys = NULL,
 
 \item{case_sensitive}{Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).}
 
-\item{style}{What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
-
-\item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX, see the \code{tinytex} package), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible.}
-
-\item{file}{The filename or filepath for the output file. If \code{NULL}, file will be saved as \code{reference_list}. Set to \code{"console"} to output directly to the R console.}
-
-\item{title.bib}{The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
-
-\item{save_build_files}{Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{TRUE})?}
+\item{save_build_files}{Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{FALSE}; always \code{TRUE} if file is \code{NULL})?}
 
 \item{header}{A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.}
+
+\item{...}{Additional arguments to pass to \code{\link[rmarkdown]{render}}.}
 }
 \value{
 A list containing the RefManageR BibEntry object. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
@@ -42,13 +46,19 @@ A list containing the RefManageR BibEntry object. Additionally, a reference list
 This function generates a list of studies contributing to a meta-analysis
 }
 \examples{
-\dontrun{
+## Run a meta-analysis using ma_r() and include a citekey argument to provide
+## citation information for each source contributing to the meta-analyses.
 ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
                moderators = moderator, citekey = citekey, data = data_r_meas_multi)
 
-generate_bib(ma_obj, analyses="all", match=c("all", "any"),
-bib=system.file("sample_bibliography.bib", package="psychmeta"), style="apa",
-output_format="word", header=list())
+## Next, use generate_bib() to generate the bibliography for the retained studies.
+## The bib argument is the BibTeX or BibLaTeX .bib file containing the full
+## reference information for each of the citekeys included in the meta-analysis database.
+generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
+             file = "sample bibliography", output_dir = tempdir(), output_format = "word")
 }
+\seealso{
+Other output functions: \code{\link{metabulate_rmd_helper}},
+  \code{\link{metabulate}}
 }

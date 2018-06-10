@@ -83,10 +83,12 @@
     sys_v_num <- as.numeric(sys_v_char)
     if(length(sys_v_num) == 3) sys_v_num <- c(sys_v_num, 0)
     if(sys_v_num[4] > 0)
-         packageStartupMessage(crayon::blue(paste0("NOTE: You are currently using an UNRELEASED development build (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")")))
+         packageStartupMessage(paste0("NOTE: You are currently using an UNRELEASED development build (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
 }
 
-.support_unicode <- function() (l10n_info()$`UTF-8` | if(!is.null(.Options$cli.unicode)) isTRUE(.Options$cli.unicode) else FALSE | nzchar(Sys.getenv("RSTUDIO_USER_IDENTITY")) )
+.support_unicode <- function(override = NULL) {
+    if(!is.null(override)) override else (l10n_info()$`UTF-8` | if(!is.null(.Options$cli.unicode)) isTRUE(.Options$cli.unicode) else FALSE | nzchar(Sys.getenv("RSTUDIO_USER_IDENTITY")) )
+}
 
 
 #' Retrieve the NEWS file for the psychmeta package

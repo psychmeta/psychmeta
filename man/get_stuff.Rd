@@ -16,23 +16,33 @@
 \alias{get_plots}
 \title{Extract results from a psychmeta meta-analysis object}
 \usage{
-get_escalc(ma_obj, moderators = FALSE, analyses = "all", match = c("all",
-  "any"), case_sensitive = TRUE, ...)
+get_stuff(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "followup",
+  "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", "matrix",
+  "plots"), analyses = "all", match = c("all", "any"),
+  case_sensitive = TRUE, ma_method = c("bb", "ic", "ad"),
+  correction_type = c("ts", "vgx", "vgy"), moderators = FALSE,
+  as_ad_obj = TRUE, inputs_only = FALSE, ad_type = c("tsa", "int"),
+  follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap",
+  "metareg"), plot_types = c("funnel", "forest", "leave1out", "cumulative"),
+  ...)
 
-get_metafor(ma_obj, moderators = FALSE, analyses = "all", match = c("all",
-  "any"), case_sensitive = TRUE, ...)
+get_escalc(ma_obj, analyses = "all", match = c("all", "any"),
+  case_sensitive = TRUE, moderators = FALSE, ...)
+
+get_metafor(ma_obj, analyses = "all", match = c("all", "any"),
+  case_sensitive = TRUE, moderators = FALSE, ...)
 
 get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ma_method = c("bb", "ic", "ad"),
   correction_type = c("ts", "vgx", "vgy"), ...)
 
 get_ad(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, as_ad_obj = FALSE, inputs_only = TRUE,
-  ma_method = c("ad", "ic"), ad_type = c("tsa", "int"), ...)
+  case_sensitive = TRUE, ma_method = c("ad", "ic"), ad_type = c("tsa",
+  "int"), as_ad_obj = FALSE, inputs_only = FALSE, ...)
 
-get_followup(ma_obj, follow_up = c("heterogeneity", "leave1out", "cumulative",
-  "bootstrap", "metareg"), analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_followup(ma_obj, analyses = "all", match = c("all", "any"),
+  case_sensitive = TRUE, follow_up = c("heterogeneity", "leave1out",
+  "cumulative", "bootstrap", "metareg"), ...)
 
 get_heterogeneity(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
@@ -52,14 +62,16 @@ get_metareg(ma_obj, analyses = "all", match = c("all", "any"),
 get_matrix(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
 
-get_plots(ma_obj, plot_type = c("funnel", "forest", "leave1out",
-  "cumulative"), analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_plots(ma_obj, analyses = "all", match = c("all", "any"),
+  case_sensitive = TRUE, plot_types = c("funnel", "forest", "leave1out",
+  "cumulative"), ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
 
-\item{moderators}{Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).}
+\item{what}{For the \code{get_stuff()} function only: Character scalar telling \code{get_stuff()} what to get. 
+All suffixes from functions in the "get_" family can be passed as arguments to \code{what}:
+"metatab", "escalc", "metafor", "ad", "followup", "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", "matrix", "plots"}
 
 \item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
 \itemize{
@@ -76,21 +88,23 @@ get_plots(ma_obj, plot_type = c("funnel", "forest", "leave1out",
 
 \item{case_sensitive}{Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).}
 
-\item{...}{Additional arguments.}
-
 \item{ma_method}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
 
 \item{correction_type}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
 
+\item{moderators}{Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).}
+
 \item{as_ad_obj}{Logical scalar that determines whether artifact information should be returned as artifact-distribution objects (\code{TRUE}) or a summary table of artifact-distribution descriptive statistics (\code{FALSE}; default).}
 
-\item{inputs_only}{Used only if \code{as_ad_obj = TRUE}: Logical scalar that determines whether artifact information should be returned as summaries of the raw input values (\code{TRUE}; default) or artifact values that have been cross-corrected for range restriction and measurement error (\code{FALSE}).}
+\item{inputs_only}{Used only if \code{as_ad_obj = TRUE}: Logical scalar that determines whether artifact information should be returned as summaries of the raw input values (\code{TRUE}) or artifact values that may have been cross-corrected for range restriction and measurement error (\code{FALSE}; default).}
 
 \item{ad_type}{Used only if \code{ma_method} = "ic": Character value(s) indicating whether Taylor-series approximation artifact distributions ("tsa") and/or interactive artifact distributions ("int") should be retrieved.}
 
 \item{follow_up}{Vector of follow-up analysis names (options are: "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg").}
 
-\item{plot_type}{Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative"; multiple allowed).}
+\item{plot_types}{Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative"; multiple allowed).}
+
+\item{...}{Additional arguments.}
 }
 \value{
 Selected set of results.
@@ -101,6 +115,7 @@ This family of functions harvests information from meta-analysis objects and ret
 
 Available functions include:
 \itemize{
+\item{\code{get_stuff}}{\cr Wrapper function for all other "get_" functions.}
 \item{\code{get_metatab}}{\cr Retrieve list of meta-analytic tables.}
 \item{\code{get_ad}}{\cr Retrieve list of artifact-distribution objects or a summary table of artifact descriptive statistics.}
 \item{\code{get_plots}}{\cr Retrieve list of meta-analytic plots.}
@@ -147,5 +162,18 @@ get_metareg(ma_obj)
 get_plots(ma_obj)
 get_ad(ma_obj, ma_method = "ic", as_ad_obj = TRUE)
 get_ad(ma_obj, ma_method = "ic", as_ad_obj = FALSE)
+
+## Same extractions as above, but using get_stuff() and the "what" argument:
+get_stuff(ma_obj, what = "metatab")
+get_stuff(ma_obj, what = "matrix")
+get_stuff(ma_obj, what = "escalc")
+get_stuff(ma_obj, what = "bootstrap")
+get_stuff(ma_obj, what = "cumulative")
+get_stuff(ma_obj, what = "leave1out")
+get_stuff(ma_obj, what = "heterogeneity")
+get_stuff(ma_obj, what = "metareg")
+get_stuff(ma_obj, what = "plots")
+get_stuff(ma_obj, what = "ad", ma_method = "ic", as_ad_obj = TRUE)
+get_stuff(ma_obj, what = "ad", ma_method = "ic", as_ad_obj = FALSE)
 }
 }

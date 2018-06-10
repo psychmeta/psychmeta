@@ -12,8 +12,8 @@ library(psychmeta)
 #  library(psychmeta)
 
 ## ---- echo=FALSE---------------------------------------------------------
-# First 10 observations from the the database of Gonzalez-MulÃ©, Mount, and Oh (2014; JAP)
-head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source", 
+# First 10 observations from the the database of Gonzalez-Mulé, Mount, and Oh (2014; JAP)
+head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source",
                                 "rxxi", "ryyi", "ux")])
 
 ## ---- include=FALSE------------------------------------------------------
@@ -22,7 +22,7 @@ dat_matrix <- data.frame(var_names = c("X", "Y", "Z"),
                          mean = c(4, 5, 3),
                          sd = c(2.4, 2.6, 2),
                          rel = c(.8, .7, .85),
-                         reshape_vec2mat(cov = c(.3, .4, .5), 
+                         reshape_vec2mat(cov = c(.3, .4, .5),
                                          var_names = c("X", "Y", "Z")))
 rownames(dat_matrix) <- NULL
 
@@ -57,8 +57,8 @@ var_names <- c("X", "Y", "Z")
 es_design = matrix(NA, 3, 3)            # Matrix containing the column names
 es_design[lower.tri(es_design)] <-      # for the intercorrelations among variables
   c("rxyi_X_Y", "rxyi_X_Z", "rxyi_Y_Z") # in the lower triangle of the matrix
-rownames(es_design) <- 
-  colnames(es_design) <- 
+rownames(es_design) <-
+  colnames(es_design) <-
   var_names
 n_design <- "ni"                        # Sample size column name or es_design-like
                                         # matrix
@@ -93,8 +93,8 @@ reshape_wide2long(common_vars = common_vars,
 #  convert_es(es = 1.47, input_es = "lor",     output_es = "d", n1 = 100, n2 = 100)
 
 ## ---- eval=TRUE----------------------------------------------------------
-convert_es(es = c(.4, .3, .25), 
-           input_es = "r", output_es = "d", 
+convert_es(es = c(.4, .3, .25),
+           input_es = "r", output_es = "d",
            n1 = c(50, 110, 65), n2 = c(50, 70, 65)
            )$meta_input
 
@@ -322,11 +322,11 @@ convert_es(es = c(.4, .3, .25),
 #       data = data_r_meas_multi)
 
 ## ---- eval=TRUE, echo=TRUE-----------------------------------------------
-(gonzalezmule <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, 
+(gonzalezmule <- ma_r(ma_method = "ic", rxyi = rxyi, n = n,
                      construct_x = "GMA",
                      construct_y = "OCB",
                      rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
-                     moderators = c("Rating source", "Type", "Published"), 
+                     moderators = c("Rating source", "Type", "Published"),
                      moderator_type = "hierarchical",
                      control = control_psychmeta(hs_override = TRUE),
                      data = data_r_gonzalezmule_2014))
@@ -476,7 +476,7 @@ ma_obj_print$funnel$`analysis id: 1`$barebones
 #  
 #               # The location of your .bib file (normally should be in the same directory
 #               # as the analysis script).
-#               bib = system.file("sample_bibliography.bib", package="psychmeta"),
+#               bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
 #  
 #               # Your citation style. Must be the style ID for a style hosted at
 #               # http://zotero.org/styles/
@@ -493,7 +493,7 @@ ma_obj_print$funnel$`analysis id: 1`$barebones
 ## ---- eval=FALSE---------------------------------------------------------
 #  generate_bib(ma_obj,
 #  
-#               bib = system.file("sample_bibliography.bib",
+#               bib = system.file("templates/sample_bibliography.bib",
 #                                 package="psychmeta"),
 #  
 #               analyses = list(construct_pair = list(c("X", "Y")))
