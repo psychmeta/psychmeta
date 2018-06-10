@@ -46,6 +46,7 @@ A list containing the RefManageR BibEntry object. Additionally, a reference list
 This function generates a list of studies contributing to a meta-analysis
 }
 \examples{
+\dontrun{
 ## Run a meta-analysis using ma_r() and include a citekey argument to provide
 ## citation information for each source contributing to the meta-analyses.
 ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
@@ -57,6 +58,7 @@ ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
 ## reference information for each of the citekeys included in the meta-analysis database.
 generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
              file = "sample bibliography", output_dir = tempdir(), output_format = "word")
+}
 }
 \seealso{
 Other output functions: \code{\link{metabulate_rmd_helper}},

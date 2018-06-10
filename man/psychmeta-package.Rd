@@ -51,7 +51,7 @@ Tables of meta-analytic results can be written as rich text files using the \cod
 \seealso{
 Useful links:
 \itemize{
-  \item Report bugs at \url{https://github.com/jadahlke/psychmeta/issues}
+  \item Report bugs at \url{https://github.com/psychmeta/psychmeta/issues}
 }
 
 }
