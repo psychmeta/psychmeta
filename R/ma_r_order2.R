@@ -29,21 +29,21 @@
 #'                    sample_id = NULL, moderators = NULL,
 #'                    construct_x = NULL, construct_y = NULL,
 #'                    data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
-#' out$meta_tables[[1]]
+#' summary(out)
 #' 
 #' ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
 #'                    sample_id = NULL, moderators = NULL, construct_x = Predictor,
 #'                    data = data_r_oh_2009)
-#' out$meta_tables[[1]]
+#' summary(out)
 #' 
 #' ## Analysis of the average validity of the Big Five traits as predictors of
 #' ## job performance by Eastern Asian country
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
 #'                    sample_id = NULL, moderators = "Country", data = data_r_oh_2009)
-#' out$meta_tables[[1]]
+#' summary(out)
 ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
                         construct_x = NULL, construct_y = NULL, data = NULL, control = control_psychmeta(), ...){

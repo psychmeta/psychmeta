@@ -1,15 +1,30 @@
+Changes in Version 2.1.1 (2018-06-10)
+=====================================
+- Updates and bug fixes for the metabulate() function. Fixed issues with file-writing protocols. Increased support for unicode characters on Windows systems. Added arguments to control whether table headers are rendered in bolded font (bold_headers) and whether redundant construct-pair labels are collapsed in meta-analysis tables (collapse_construct_labels). 
+
+- Updated the “summary” attributes of artifact-distribution objects for greater consistency between interactive and Taylor-series objects. 
+
+- Added third-order sample sizes (i.e., the number of meta-analyses meta-analyzed; denoted as “L”) to the output from second-order meta-analyses.
+
+- Added get_stuff() function that serves as a wrapper for other functions in the “get_stuff” family of functions. 
+
+
 Changes in Version 2.1.0 (2018-06-01)
 =====================================
 - Updated "metabulate" function based on RMarkdown. The metabulate function can now output to Word, PDF, HTML, Markdown, ODT, and plain text and accepts arguments to include a bibliography in the same output as results tables. Output can be rendered directly into the selected format or placed into a larger RMarkdown document. The function also includes improvements to the typesetting of numeric results and column headings (e.g., ρ̅ instead of Mean<sub>ρ</sub>).
+
 - New "num_format" function to format numbers to a specified number of digits and allowing control of the characters used for decimal points, thousands and decimal digit group separators, leading zeros, and positive and negative signs. It's useful to avoid unpleasant surprises during publisher typesetting of tables.
+
 
 Changes in Version 2.0.2 (2018-05-30)
 =====================================
 Hotfix for handling NULL moderator objects in dependency resolution procedure.
 
+
 Changes in Version 2.0.1 (2018-05-29)
 =====================================
 Hotfix for missing object in the dependency resolution procedure when no moderators are present.
+
 
 Changes in Version 2.0.0 (2018-05-28)
 =====================================
