@@ -1319,9 +1319,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
         }
 
         if(!bold_headers){
+             var_labels <- names(col_names)
              col_names <- stringr::str_replace_all(col_names, pattern = "symbfup", replacement = "symup")
              col_names <- stringr::str_replace_all(col_names, pattern = "symbfit", replacement = "symit")
              col_names <- stringr::str_replace_all(col_names, pattern = "[*][*]", replacement = "")
+             names(col_names) <- var_labels
         }
 
         footnote <- if(output_format == "text") {
