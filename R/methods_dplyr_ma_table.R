@@ -126,6 +126,15 @@ arrange_if.ma_table <- function(.tbl, .predicate, .funs = list(), ...){
 #### grouping ####
 #' @export
 #' @keywords internal
+#' @method ungroup ma_table
+ungroup.ma_table <- function (x, ...){
+     x <- reattribute(x, NextMethod())
+     class(x) <- class(x)[class(x) != "grouped_df"]
+     x
+}
+
+#' @export
+#' @keywords internal
 #' @method group_by ma_table
 group_by.ma_table <- function (.data, ..., add = FALSE){
      reattribute(.data, NextMethod())
@@ -133,11 +142,23 @@ group_by.ma_table <- function (.data, ..., add = FALSE){
 
 #' @export
 #' @keywords internal
-#' @method ungroup ma_table
-ungroup.ma_table <- function (x, ...){
-     x <- reattribute(x, NextMethod())
-     class(x) <- class(x)[class(x) != "grouped_df"]
-     x
+#' @method group_by_all ma_table
+group_by_all.ma_table <- function(.tbl, .funs = list(), ...){
+     reattribute(.tbl, NextMethod())
+}
+
+#' @export
+#' @keywords internal
+#' @method group_by_at ma_table
+group_by_at.ma_table <- function(.tbl, .vars, .funs = list(), ..., .add = FALSE){
+     reattribute(.tbl, NextMethod())
+}
+
+#' @export
+#' @keywords internal
+#' @method group_by_if ma_table
+group_by_if.ma_table <- function(.tbl, .predicate, .funs = list(), ..., .add = FALSE){
+     reattribute(.tbl, NextMethod())
 }
 
 

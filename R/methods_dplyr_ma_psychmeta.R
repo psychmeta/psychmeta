@@ -196,6 +196,15 @@ arrange_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
 #### grouping ####
 #' @export
 #' @keywords internal
+#' @method ungroup ma_psychmeta
+ungroup.ma_psychmeta <- function (x, ...){
+     x <- reattribute(x, NextMethod())
+     class(x) <- class(x)[class(x) != "grouped_df"]
+     x
+}
+
+#' @export
+#' @keywords internal
 #' @method group_by ma_psychmeta
 group_by.ma_psychmeta <- function (.data, ..., add = FALSE){
      reattribute(.data, NextMethod())
@@ -203,11 +212,23 @@ group_by.ma_psychmeta <- function (.data, ..., add = FALSE){
 
 #' @export
 #' @keywords internal
-#' @method ungroup ma_psychmeta
-ungroup.ma_psychmeta <- function (x, ...){
-     x <- reattribute(x, NextMethod())
-     class(x) <- class(x)[class(x) != "grouped_df"]
-     x
+#' @method group_by_all ma_psychmeta
+group_by_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
+     reattribute(.tbl, NextMethod())
+}
+
+#' @export
+#' @keywords internal
+#' @method group_by_at ma_psychmeta
+group_by_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ..., .add = FALSE){
+     reattribute(.tbl, NextMethod())
+}
+
+#' @export
+#' @keywords internal
+#' @method group_by_if ma_psychmeta
+group_by_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ..., .add = FALSE){
+     reattribute(.tbl, NextMethod())
 }
 
 
