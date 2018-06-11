@@ -130,7 +130,6 @@ get_stuff <- function(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "fo
                   ...)
      
      if(what %in% c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg")) args$follow_up <- NULL
-     print(args)
      
      do.call(what = paste0("get_", what), args = args)
 }
