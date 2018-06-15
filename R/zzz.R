@@ -66,7 +66,7 @@
               if(use_symbols) version_message <- paste0(cli::symbol$cross, " ", version_message)
               packageStartupMessage(crayon::red(version_message))
               packageStartupMessage("No worries, it's easy to obtain the latest version - just run the following command: \n")
-              packageStartupMessage('                       update.packages("psychmeta")')
+              packageStartupMessage('                       install.packages("psychmeta")')
          }else if(vcheck$best_version == "Current"){
               version_message <- "Yay! Your copy of psychmeta is up to date!"
               if(use_symbols) version_message <- paste0(cli::symbol$tick, " ", version_message)
