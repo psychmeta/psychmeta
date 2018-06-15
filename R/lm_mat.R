@@ -186,11 +186,11 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
 
           if(se_beta_method == "normal") {
                if(cov.is.cor == TRUE) {
-                    capture.output(se_beta <- fungible::seBetaCor(R = as.matrix(S[x_col,x_col]), rxy = as.matrix(S[x_col,y_col]),
-                                                               Nobs = n, alpha = .05, covmat = 'normal')$se.Beta, file = "NUL")
+                    invisible(capture.output(se_beta <- fungible::seBetaCor(R = as.matrix(S[x_col,x_col]), rxy = as.matrix(S[x_col,y_col]),
+                                                               Nobs = n, alpha = .05, covmat = 'normal')$se.Beta))
                } else {
-                    capture.output(se_beta <- fungible::seBeta(cov.x = as.matrix(S[x_col,x_col]), cov.xy = as.matrix(S[x_col,y_col]), var.y = S[y_col,y_col],
-                                                               Nobs = n, alpha = .05, estimator = 'normal')$SEs, file = "NUL")
+                    invisible(capture.output(se_beta <- fungible::seBeta(cov.x = as.matrix(S[x_col,x_col]), cov.xy = as.matrix(S[x_col,y_col]), var.y = S[y_col,y_col],
+                                                               Nobs = n, alpha = .05, estimator = 'normal')$SEs))
                }
           }
 
