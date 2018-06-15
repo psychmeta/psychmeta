@@ -6,7 +6,7 @@
 #' @param n Sample size to be used in significance testing
 #' @param ... Additional arguments.
 #' @param se_beta_method Method to use to estimate the standard errors of standardized regression (beta) coefficients.
-#' Current options include "lm" (estimate standard errors using conventional regression formulas) and "normal" (use the Jones-Waller normal-theory approach from the \code{fungible::seBeta()} function)
+#' Current options include "lm" (estimate standard errors using conventional regression formulas) and "normal" (use the Jones-Waller normal-theory approach from the \code{fungible::seBeta()} and \code{fungible::seBetaCor()} functions)
 #'
 #' @return An object with the class "lm_mat" that can be used with summary, print, predict, and anova methods.
 #' @export
@@ -89,10 +89,10 @@
 #' confint(object = lm_out2)
 #' confint(object = matreg_out2)
 #' confint(object = summary(matreg_out2))
-lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf, 
+lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
                    se_beta_method = c("lm", "normal"), ...){
      se_beta_method <- match.arg(se_beta_method, c("lm", "normal"))
-     
+
      if(length(se_beta_method) > 1){
           warning("se_beta_method argument must be a scalar: First value used")
           se_beta_method <- c(unlist(se_beta_method))[1]
@@ -150,6 +150,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
      if(any(grepl(x = x_col, pattern = "[*]")))
           stop("Interactions cannot be computed from variables in covariance matrices: Please include interactions as variables in the covariance matrix", call. = F)
      x_col <- unique(x_col[x_col %in% rownames(S)])
+     cov.is.cor = all(zapsmall(diag(cov_mat[c(y_col, x_col),c(y_col, x_col)])) == 1)
 
      R <- cov2cor(S[c(y_col, x_col), c(y_col, x_col)])
      Sxx_inv <- solve(S[x_col,x_col])
@@ -183,9 +184,16 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
 
           se_reg <- as.numeric(sqrt(1 - R2adj) * var_vec[y_col]^.5)
 
-          if(se_beta_method == "normal")
-               invisible(capture.output(se_beta <- fungible::seBeta(cov.x = as.matrix(S[x_col,x_col]), cov.xy = as.matrix(S[x_col,y_col]), var.y = S[y_col,y_col],
-                                                                    Nobs = n, alpha = .05, estimator = 'normal')$SEs))
+          if(se_beta_method == "normal") {
+               if(cov.is.cor == TRUE) {
+                    capture.output(se_beta <- fungible::seBetaCor(R = as.matrix(S[x_col,x_col]), rxy = as.matrix(S[x_col,y_col]),
+                                                               Nobs = n, alpha = .05, covmat = 'normal')$se.Beta, file = "NUL")
+               } else {
+                    capture.output(se_beta <- fungible::seBeta(cov.x = as.matrix(S[x_col,x_col]), cov.xy = as.matrix(S[x_col,y_col]), var.y = S[y_col,y_col],
+                                                               Nobs = n, alpha = .05, estimator = 'normal')$SEs, file = "NUL")
+               }
+          }
+
      }else{
           R2adj <- R2
           cov.unscaled <- NULL
@@ -250,7 +258,8 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
                           ftest = c(value = F_ratio, df1 = df1, df2 = df2, n = n, p = p_F),
                           coefficients.std = beta_mat,
                           composite = c(mean = comp_mean, var = comp_var),
-                          cov.is.cor = all(zapsmall(diag(cov_mat[c(y_col, x_col),c(y_col, x_col)])) == 1))
+                          cov.is.cor = cov.is.cor,
+                          se_beta_method = se_beta_method)
      class(summary_info) <- "summary.lm_mat"
 
      out <- list(coefficients = setNames(b_mat[,"Estimate"], rownames(b_mat)),
