@@ -150,7 +150,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
      if(any(grepl(x = x_col, pattern = "[*]")))
           stop("Interactions cannot be computed from variables in covariance matrices: Please include interactions as variables in the covariance matrix", call. = F)
      x_col <- unique(x_col[x_col %in% rownames(S)])
-     cov.is.cor = all(zapsmall(diag(cov_mat[c(y_col, x_col),c(y_col, x_col)])) == 1)
+     cov_is_cor = all(zapsmall(diag(cov_mat[c(y_col, x_col),c(y_col, x_col)])) == 1)
 
      R <- cov2cor(S[c(y_col, x_col), c(y_col, x_col)])
      Sxx_inv <- solve(S[x_col,x_col])
@@ -185,7 +185,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
           se_reg <- as.numeric(sqrt(1 - R2adj) * var_vec[y_col]^.5)
 
           if(se_beta_method == "normal") {
-               if(cov.is.cor == TRUE) {
+               if(cov_is_cor == TRUE) {
                     invisible(capture.output(se_beta <- fungible::seBetaCor(R = as.matrix(S[x_col,x_col]), rxy = as.matrix(S[x_col,y_col]),
                                                                Nobs = n, alpha = .05, covmat = 'normal')$se.Beta))
                } else {
@@ -258,7 +258,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
                           ftest = c(value = F_ratio, df1 = df1, df2 = df2, n = n, p = p_F),
                           coefficients.std = beta_mat,
                           composite = c(mean = comp_mean, var = comp_var),
-                          cov.is.cor = cov.is.cor,
+                          cov.is.cor = cov_is_cor,
                           se_beta_method = se_beta_method)
      class(summary_info) <- "summary.lm_mat"
 
