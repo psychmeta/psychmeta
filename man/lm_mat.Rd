@@ -29,7 +29,7 @@ lm_matrix(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
 \item{n}{Sample size to be used in significance testing}
 
 \item{se_beta_method}{Method to use to estimate the standard errors of standardized regression (beta) coefficients.
-Current options include "lm" (estimate standard errors using conventional regression formulas) and "normal" (use the Jones-Waller normal-theory approach from the \code{fungible::seBeta()} function)}
+Current options include "lm" (estimate standard errors using conventional regression formulas) and "normal" (use the Jones-Waller normal-theory approach from the \code{fungible::seBeta()} and \code{fungible::seBetaCor()} functions)}
 
 \item{...}{Additional arguments.}
 }
