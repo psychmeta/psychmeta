@@ -144,7 +144,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(deparse(substitute(citekey))[1] != "NULL")
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
-          if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators)) != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
+          if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators))[1] != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
 
