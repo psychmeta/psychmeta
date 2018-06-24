@@ -10,17 +10,17 @@
 #' @param x A vector, matrix, or data.frame of numbers to format
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "\U2007") if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "\u2007") if a column contains any absolute values greater than 1 and suppressed otherwise.
 #' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
-#' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "\U2212").
-#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "\U2007") if a column contains any negative numbers and suppressed otherwise.
-#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\U202F").
+#' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "\u2212").
+#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "\u2007") if a column contains any negative numbers and suppressed otherwise.
+#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\u202f").
 #' @param big.interval See \code{big.mark} above; defaults to 3.
-#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\U202F").
+#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\u202f").
 #' @param small.interval See \code{small.mark} above; defaults to 3.
-#' @param na.mark Character to replace \code{NA} and \code{NaN} values. Defaults to em-dash (\code{U+2014}: "\U2014"))
-#' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\U2212").
-#' @param inf.mark A length 2 vector containing characters to replace \code{Inf} and \code{-Inf}. Defaults to c("+\U221e", "\U2212\U221e").
+#' @param na.mark Character to replace \code{NA} and \code{NaN} values. Defaults to em-dash (\code{U+2014}: "\u2014"))
+#' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\u2212").
+#' @param inf.mark A length 2 vector containing characters to replace \code{Inf} and \code{-Inf}. Defaults to c("+\u221e", "\u2212\u221e").
 #'
 #' @export
 #' @examples
@@ -449,6 +449,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
                                    pos.sign = pos.sign, drop0integer = drop0integer,
                                    big.mark = big.mark, big.interval = big.interval,
                                    small.mark = small.mark, small.interval = small.interval,
+                                   na.mark = na.mark, inf.mark = inf.mark, lgl.mark = lgl.mark,
                                    conf_format = conf_format, cred_format = cred_format,
                                    verbose = verbose, unicode = unicode,
                                    conf_level = conf_level, cred_level = cred_level)
@@ -957,6 +958,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                         decimal.mark = getOption("OutDec"), leading0 = "figure",
                         neg.sign = "\u2212", pos.sign = "figure", drop0integer = TRUE,
                         big.mark = "\u202F", big.interval = 3L, small.mark = "\u202F",
+                        na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
+                        inf.mark = c("\u2007\u221e", "\u2212\u221e"),
                         small.interval = 3L, conf_format = "parentheses",
                         cred_format = "parentheses", verbose = FALSE,
                         unicode = unicode, conf_level = .95, cred_level = .80) {
