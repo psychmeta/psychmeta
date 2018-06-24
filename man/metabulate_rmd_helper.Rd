@@ -77,3 +77,4 @@ metabulate_rmd_helper(latex = FALSE)
 Other output functions: \code{\link{generate_bib}},
   \code{\link{metabulate}}
 }
+\concept{output functions}

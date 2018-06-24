@@ -13,7 +13,8 @@ metabulate(ma_obj, file = NULL, output_dir = getwd(),
   decimal.mark = getOption("OutDec"), leading0 = "conditional",
   drop0integer = FALSE, neg.sign = "minus", pos.sign = "figure",
   big.mark = "thinspace", big.interval = 3L, small.mark = "thinspace",
-  small.interval = 3L, conf_format = "parentheses",
+  small.interval = 3L, na.mark = "—", lgl.mark = c("+", "-"),
+  inf.mark = c("+8", "-8"), conf_format = "parentheses",
   cred_format = "parentheses", symbol_es = "ES",
   caption = "Results of meta-analyses", header = NULL, verbose = FALSE,
   unicode = NULL, bib = NULL, title.bib = NULL, style = "apa",
@@ -52,25 +53,7 @@ metabulate(ma_obj, file = NULL, output_dir = getwd(),
 
 \item{bold_headers}{Logical. Should column headers be bolded (default: \code{TRUE})?}
 
-\item{digits}{The number of decimal digits desired (used strictly; default: 2)}
-
-\item{decimal.mark}{The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})}
-
-\item{leading0}{How to print leading zeros on decimals. See \code{\link{format_num}} for details.}
-
-\item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
-
-\item{neg.sign}{Character to use as negative sign. See \code{\link{format_num}} for details.}
-
-\item{pos.sign}{Character to use as positive sign. See \code{\link{format_num}} for details.}
-
-\item{big.mark}{Character to separate groups of large digits. See \code{\link{format_num}} for details.}
-
-\item{big.interval}{See \code{big.mark} above; defaults to 3.}
-
-\item{small.mark}{Character to sparate groups of decimal digits. See \code{\link{format_num}} for details.}
-
-\item{small.interval}{See \code{small.mark} above; defaults to 3.}
+\item{digits, decimal.mark, leading0, drop0integer, neg.sign, pos.sign, big.mark, big.interval, small.mark, small.interval, na.mark, lgl.mark, inf.mark}{Number formatting arguments. See \code{\link{format_num}} for details.}
 
 \item{conf_format}{How should confidence intervals be formatted? Options are:
 \itemize{
@@ -175,3 +158,4 @@ metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdi
 Other output functions: \code{\link{generate_bib}},
   \code{\link{metabulate_rmd_helper}}
 }
+\concept{output functions}
