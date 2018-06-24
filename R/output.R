@@ -1,20 +1,26 @@
 #' Format numbers for presentation
 #'
-#' A function to format decimal digits, leading zeros, and sign characters.
+#' A function to format numbers and logical values as characters for display purposes.
+#' Includes control over formatting of decimal digits, leading zeros, sign characters,
+#' and characters to replace logical, NA, NaN, and Inf values. Factors are converted
+#' to strings. Strings are returned verbatim.
 #'
 #' @encoding UTF-8
 #'
 #' @param x A vector, matrix, or data.frame of numbers to format
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "<U+2007>") if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "\u2007") if a column contains any absolute values greater than 1 and suppressed otherwise.
 #' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
-#' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "<U+2212>").
-#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "<U+2007>") if a column contains any negative numbers and suppressed otherwise.
-#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "<U+202F>").
+#' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "\u2212").
+#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "\u2007") if a column contains any negative numbers and suppressed otherwise.
+#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\u202F").
 #' @param big.interval See \code{big.mark} above; defaults to 3.
-#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "<U+202F>").
+#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\u202F").
 #' @param small.interval See \code{small.mark} above; defaults to 3.
+#' @param na.mark Character to replace \code{NA} and \code{NaN} values. Defaults to em-dash (\code{U+2014}: "\u2014"))
+#' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\u2212").
+#' @param inf.mark A length 2 vector containing characters to replace \code{Inf} and \code{-Inf}. Defaults to c("\u2007\u221e", "\u2212\u221e").
 #'
 #' @export
 #' @examples
@@ -41,46 +47,75 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                        leading0 = "conditional", drop0integer = FALSE,
                        neg.sign = "minus", pos.sign = "figure",
                        big.mark = "thinspace", big.interval = 3L,
-                       small.mark = "thinspace", small.interval = 3L) {
+                       small.mark = "thinspace", small.interval = 3L,
+                       na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
+                       inf.mark = c("\u2007\u221e", "\u2212\u221e") ){
 
-        is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {abs(x - round(x)) < tol}
-        all_equal_vector <- function(x, tol = .Machine$double.eps^0.5) {diff(range(x)) < tol}
+        is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {if(is.numeric(x)) abs(x - round(x)) < tol else FALSE}
+
+        # Input checking
+        if(length(lgl.mark) == 1) lgl.mark <- c(lgl.mark, lgl.mark)
+        if(length(inf.mark) == 1) inf.mark <- c(inf.mark, inf.mark)
 
         if(is.null(dim(x))) {
                 x_type <- "vector"
-                x <- as.data.frame(x)
+                x <- as.data.frame(x, stringsAsFactors = FALSE)
         } else if("tbl_df" %in% class(x)) {
                 x_type <- "tibble"
-                x <- as.data.frame(x)
+                x <- as.data.frame(x, stringsAsFactors = FALSE)
         } else if("matrix" %in% class(x)) {
                 x_type <- "matrix"
-                x <- as.data.frame(x)
+                x <- as.data.frame(x, stringsAsFactors = FALSE)
         } else x_type <- "other"
 
-        which_integers <- is.wholenumber(x)
+        # Classify inputs
+        which_logical  <- purrr::modify(x, is.logical) %>% as.matrix()
+        which_integers <- as.matrix(purrr::modify(x, is.wholenumber))
+        which_integers[is.na(which_integers)] <- FALSE
+        which_infinite <- purrr::modify(x, is.infinite) %>% as.matrix()
+        which_numeric <-
+                purrr::modify(x, ~ is.numeric(.x) & !is.na(.x)) &
+                !which_infinite &
+                !which_integers %>% as.matrix()
 
         if(neg.sign == "minus") neg.sign <- "\u2212"
         if(big.mark == "thinspace") big.mark <- "\u202F"
         if(small.mark == "thinspace") small.mark <- "\u202F"
 
         if(pos.sign == FALSE) flag <- "" else flag <- "+"
+
+        # Initial formatting for each type of data
         out <- x
+        out[is.na(out)] <- na.mark
+        ### Convert characters, factors, date/times, and and other unsupported
+        ### types to character
+        out <- purrr::modify_if(out, ~ !is.numeric(.x) & !is.logical(.x) & !is.complex(.x), as.character)
+        out[which_logical & x == TRUE] <- lgl.mark[1]
+        out[which_logical & x == FALSE] <- lgl.mark[2]
+        out[which_infinite & x == Inf] <- inf.mark[1]
+        out[which_infinite & x == -Inf] <- inf.mark[2]
 
-        # Initial formatting of numbers
+        out <- purrr::modify_if(out, is.complex,
+                         ~ format(.x, trim = TRUE, digits = digits, nsmall = digits,
+                                  scientific = FALSE, big.mark = big.mark,
+                                  big.interval = big.interval, small.mark = small.mark,
+                                  small.interval = small.interval,
+                                  decimal.mark = decimal.mark, drop0trailing = FALSE))
 
-        out[which_integers] <- x[which_integers] %>%
+        out[which_integers] <- as.integer(x[which_integers]) %>%
                 formatC(digits = digits, format = "f", flag = flag,
                         decimal.mark = decimal.mark,
                         big.mark = big.mark, big.interval = big.interval,
                         small.mark = small.mark, small.interval = small.interval,
                         drop0trailing = drop0integer)
 
-        out[!which_integers] <- x[!which_integers] %>%
+        out[which_numeric] <- as.double(x[which_numeric]) %>%
                 formatC(digits = digits, format = "f", flag = flag,
                         decimal.mark = decimal.mark,
                         big.mark = big.mark, big.interval = big.interval,
                         small.mark = small.mark, small.interval = small.interval,
                         drop0trailing = FALSE)
+
 
         # Clean up unicode big.mark and small.mark
         out[] <- mutate_all(out,
@@ -95,19 +130,22 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
         # Clean up leading zeros
         switch(leading0,
                "TRUE" = {},
-               "FALSE" = out[] <- sapply(out, function(x) stringr::str_replace_all(x, paste0("^(-?)0", decimal.mark), paste0("\\1", decimal.mark))),
+               "FALSE" = out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark))),
                conditional = {
-                       out <- mutate_if(out, apply(x, 2, function(i) {!any(abs(i) >= 1)}),
+                       out <- mutate_if(out,
+                                        sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
                },
                figure = {
-                       out <- mutate_if(out, apply(x, 2, function(i) {any(abs(i) >= 1)}),
+                       out <- mutate_if(out,
+                                        sapply(x, function(i) {is.numeric(i) & any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1\u2007", decimal.mark)))
-                       out <- mutate_if(out, apply(x, 2, function(i) {!any(abs(i) >= 1)}),
+                       out <- mutate_if(out,
+                                        sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
                },
                # else =
-               {out[] <- sapply(out, function(x) stringr::str_replace_all(x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", leading0, decimal.mark)))}
+               {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", leading0, decimal.mark)))}
         )
 
         # Clean up positive signs
@@ -115,13 +153,15 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                "TRUE" = {},
                "FALSE" = {},
                figure = {
-                       out <- mutate_if(out, apply(x, 2, function(i) {!any(i < 0)}),
+                       out <- mutate_if(out,
+                                        sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) i < 0, na.rm = TRUE)}),
                                         function(i) stringr::str_replace_all(i, "^\\+", ""))
-                       out <- mutate_if(out, apply(x, 2, function(i) {any(i < 0)}),
+                       out <- mutate_if(out,
+                                        sapply(x, function(i) {is.numeric(i) & any(if(is.numeric(i)) i < 0, na.rm = TRUE)}),
                                         function(i) stringr::str_replace_all(i, "^\\+", "\u2007"))
                },
                # else =
-               {out[] <- sapply(out, function(i) stringr::str_replace_all(i, "^\\+", pos.sign))}
+               {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, "^\\+", pos.sign))}
         )
 
         # Clean up negative signs
@@ -130,7 +170,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                "FALSE" = {},
                "-" = {},
                # else =
-               {out[] <- sapply(out, function(x) stringr::str_replace_all(x, "^-", neg.sign))}
+               {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, "^-", neg.sign))}
         )
 
         if(x_type == "tibble") {
@@ -241,16 +281,7 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' @param correction_type Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
 #' @param collapse_construct_labels  Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).
 #' @param bold_headers Logical. Should column headers be bolded (default: \code{TRUE})?
-#' @param digits The number of decimal digits desired (used strictly; default: 2)
-#' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. See \code{\link{format_num}} for details.
-#' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
-#' @param neg.sign Character to use as negative sign. See \code{\link{format_num}} for details.
-#' @param pos.sign Character to use as positive sign. See \code{\link{format_num}} for details.
-#' @param big.mark Character to separate groups of large digits. See \code{\link{format_num}} for details.
-#' @param big.interval See \code{big.mark} above; defaults to 3.
-#' @param small.mark Character to sparate groups of decimal digits. See \code{\link{format_num}} for details.
-#' @param small.interval See \code{small.mark} above; defaults to 3.
+#' @param digits,decimal.mark,leading0,drop0integer,neg.sign,pos.sign,big.mark,big.interval,small.mark,small.interval,na.mark,lgl.mark,inf.mark Number formatting arguments. See \code{\link{format_num}} for details.
 #' @param conf_format How should confidence intervals be formatted? Options are:
 #' \itemize{
 #' \item{\code{parentheses}}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
@@ -352,6 +383,8 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
                        neg.sign = "minus", pos.sign = "figure",
                        big.mark = "thinspace", big.interval = 3L,
                        small.mark = "thinspace", small.interval = 3L,
+                       na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
+                       inf.mark = c("\u2007\u221e", "\u2212\u221e"),
                        conf_format = "parentheses", cred_format = "parentheses",
                        symbol_es = "ES", caption = "Results of meta-analyses",
                        header = NULL, verbose = FALSE, unicode = NULL,
@@ -1042,7 +1075,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                         format_num(ma_table[1:nrow(ma_table), col_sampsize], digits = 0L, decimal.mark = decimal.mark,
                                    leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
                                    drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                                   small.mark = small.mark, small.interval = small.interval)
+                                   small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
+                                   inf.mark = inf.mark, lgl.mark = lgl.mark)
 
                 numeric_columns <- c(col_m_bb, col_se_bb, col_sd_bb, col_var_bb, col_m_cor, col_se_cor, col_sd_cor, col_var_cor, col_conf, col_cred)
 
@@ -1050,7 +1084,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                         format_num(ma_table[1:nrow(ma_table), numeric_columns], digits = digits, decimal.mark = decimal.mark,
                                    leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
                                    drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                                   small.mark = small.mark, small.interval = small.interval)
+                                   small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
+                                   inf.mark = inf.mark, lgl.mark = lgl.mark)
 
                 # Format the interval columns
                 if(show_conf == TRUE) {
