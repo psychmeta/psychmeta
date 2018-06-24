@@ -20,7 +20,7 @@
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.
-#' @param construct_x,construct_y Vector of construct names for construct initially designated as "X" or as "Y".
+#' @param construct_x,construct_y Vector of construct names for constructs initially designated as "X" or as "Y".
 #' @param measure_x,measure_y Vector of names for measures associated with constructs initially designated as "X" or as "Y".
 #' @param construct_order Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and

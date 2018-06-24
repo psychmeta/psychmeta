@@ -73,7 +73,7 @@ When ma_method is "ad", select one of the following methods for correcting artif
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.}
 
-\item{construct_x, construct_y}{Vector of construct names for construct initially designated as "X" or as "Y".}
+\item{construct_x, construct_y}{Vector of construct names for constructs initially designated as "X" or as "Y".}
 
 \item{measure_x, measure_y}{Vector of names for measures associated with constructs initially designated as "X" or as "Y".}
 
