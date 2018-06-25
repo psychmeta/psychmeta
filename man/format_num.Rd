@@ -9,7 +9,7 @@ format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
   leading0 = "conditional", drop0integer = FALSE, neg.sign = "minus",
   pos.sign = "figure", big.mark = "thinspace", big.interval = 3L,
   small.mark = "thinspace", small.interval = 3L, na.mark = "—",
-  lgl.mark = c("+", "-"), inf.mark = c("+8", "-8"))
+  lgl.mark = c("+", "−"), inf.mark = c("+∞", "−∞"))
 }
 \arguments{
 \item{x}{A vector, matrix, or data.frame of numbers to format}
