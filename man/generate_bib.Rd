@@ -64,4 +64,3 @@ generate_bib(ma_obj, bib = system.file("templates/sample_bibliography.bib", pack
 Other output functions: \code{\link{metabulate_rmd_helper}},
   \code{\link{metabulate}}
 }
-\concept{output functions}
