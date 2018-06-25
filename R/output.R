@@ -45,9 +45,9 @@
 #' format_num(x = 10000, big.mark = ",")
 format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                        leading0 = "conditional", drop0integer = FALSE,
-                       neg.sign = "minus", pos.sign = "figure",
-                       big.mark = "thinspace", big.interval = 3L,
-                       small.mark = "thinspace", small.interval = 3L,
+                       neg.sign = "\u2212", pos.sign = "figure",
+                       big.mark = "\u202F", big.interval = 3L,
+                       small.mark = "\u202F", small.interval = 3L,
                        na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
                        inf.mark = c("+\u221e", "\u2212\u221e") ){
 
@@ -77,10 +77,6 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                 purrr::modify(x, ~ is.numeric(.x) & !is.na(.x)) &
                 !which_infinite &
                 !which_integers %>% as.matrix()
-
-        if(neg.sign == "minus") neg.sign <- "\u2212"
-        if(big.mark == "thinspace") big.mark <- "\u202F"
-        if(small.mark == "thinspace") small.mark <- "\u202F"
 
         if(pos.sign == FALSE) flag <- "" else flag <- "+"
 
@@ -380,9 +376,9 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
                        collapse_construct_labels  = TRUE, bold_headers = TRUE,
                        digits = 2L, decimal.mark = getOption("OutDec"),
                        leading0 = "conditional", drop0integer = FALSE,
-                       neg.sign = "minus", pos.sign = "figure",
-                       big.mark = "thinspace", big.interval = 3L,
-                       small.mark = "thinspace", small.interval = 3L,
+                       neg.sign = "\u2212", pos.sign = "figure",
+                       big.mark = "\u202F", big.interval = 3L,
+                       small.mark = "\u202F", small.interval = 3L,
                        na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
                        inf.mark = c("+\u221e", "\u2212\u221e"),
                        conf_format = "parentheses", cred_format = "parentheses",
