@@ -158,4 +158,3 @@ metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdi
 Other output functions: \code{\link{generate_bib}},
   \code{\link{metabulate_rmd_helper}}
 }
-\concept{output functions}

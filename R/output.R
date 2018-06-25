@@ -993,6 +993,12 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
         .arrange_format_columns <- function(ma_table, collapse_construct_labels) {
                 x <- colnames(ma_table)
 
+                if("construct_x" %in% x)    ma_table[["construct_x"]] <- as.character(ma_table[["construct_x"]])
+                if("group_contrast" %in% x) ma_table[["group_contrast"]] <- as.character(ma_table[["group_contrast"]])
+                if("construct_y" %in% x)    ma_table[["construct_y"]] <- as.character(ma_table[["construct_y"]])
+                if("group1" %in% x)         ma_table[["group1"]] <- as.character(ma_table[["group1"]])
+                if("group2" %in% x)         ma_table[["group2"]] <- as.character(ma_table[["group2"]])
+                
                 if(collapse_construct_labels & nrow(ma_table) > 1 & "pair_id" %in% x){
                         pair_ids <- unlist(ma_table[["pair_id"]])
                         delete_id <- FALSE
@@ -1000,6 +1006,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                         if("construct_x" %in% x)    ma_table[["construct_x"]][delete_id] <- ""
                         if("group_contrast" %in% x) ma_table[["group_contrast"]][delete_id] <- ""
                         if("construct_y" %in% x)    ma_table[["construct_y"]][delete_id] <- ""
+                        if("group1" %in% x)         ma_table[["group1"]][delete_id] <- ""
+                        if("group2" %in% x)         ma_table[["group2"]][delete_id] <- ""
                         rm(pair_ids, delete_id)
                 }
 
@@ -1165,6 +1173,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                 if(.support_unicode(unicode)) {
                         c(
                                 group_contrast    = "Group Contrast",
+                                group1            = "Group 1",
+                                group2            = "Group 2",
                                 construct_x       = "Construct X",
                                 construct_y       = "Construct Y",
                                 k                 = "k",
@@ -1227,6 +1237,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                 } else {
                         c(
                                 group_contrast    = "Group Contrast",
+                                group1            = "Group 1",
+                                group2            = "Group 2",
                                 construct_x       = "Construct X",
                                 construct_y       = "Construct Y",
                                 k                 = "k",
@@ -1290,6 +1302,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
         } else {
                 c(
                         group_contrast    = "**Group Contrast**",
+                        group1            = "**Group 1**",
+                        group2            = "**Group 2**",
                         construct_x       = "**Construct X**",
                         construct_y       = "**Construct Y**",
                         k                 = "**_k_**",
