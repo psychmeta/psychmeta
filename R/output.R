@@ -10,17 +10,17 @@
 #' @param x A vector, matrix, or data.frame of numbers to format
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\code{U+2007}: "\u2007") if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise.
 #' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
-#' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\code{U+2212}: "\u2212").
-#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\code{U+2007}: "\u2007") if a column contains any negative numbers and suppressed otherwise.
-#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\u202f").
+#' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\href{https://unicode-table.com/en/2212/}{\code{U+2212}}).
+#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any negative numbers and suppressed otherwise.
+#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://unicode-table.com/en/202f/}{\code{U+202F}}).
 #' @param big.interval See \code{big.mark} above; defaults to 3.
-#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\code{U+202F}: "\u202f").
+#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://unicode-table.com/en/202f/}{\code{U+202F}}).
 #' @param small.interval See \code{small.mark} above; defaults to 3.
-#' @param na.mark Character to replace \code{NA} and \code{NaN} values. Defaults to em-dash (\code{U+2014}: "\u2014"))
-#' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\u2212").
-#' @param inf.mark A length 2 vector containing characters to replace \code{Inf} and \code{-Inf}. Defaults to c("+\u221e", "\u2212\u221e").
+#' @param na.mark Character to replace \code{NA} and \code{NaN} values. Defaults to em-dash (\href{https://unicode-table.com/en/2014/}{\code{U+2014}}))
+#' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\href{https://unicode-table.com/en/2212/}{\code{U+2212}}").
+#' @param inf.mark A length 2 vector containing characters to replace \code{Inf} and \code{-Inf}. Defaults to c("+\href{https://unicode-table.com/en/221e/}{\code{U+221e}}", "\href{https://unicode-table.com/en/2212/}{\code{U+2212}}\href{https://unicode-table.com/en/221e/}{\code{U+221e}}").
 #'
 #' @export
 #' @examples
@@ -296,7 +296,7 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses. If provided and file is not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
 #' @param title.bib The title to give to the bibliography (see \code{bib} above). If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param style What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
+#' @param style What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list (see \code{bib} above).
 #' @param save_build_files Should the RMarkdown and BibLaTeX (if any) files used to generate the output be saved (default: \code{FALSE})?
 #' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
@@ -483,7 +483,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @param ma_obj A psychmeta meta-analysis object with \code{citekeys} supplied.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses.
 #' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param style What style should references be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
+#' @param style What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list.
 #' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions}} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
 #' @param output_dir The filepath for the output file. Defaults to the current working directory.
