@@ -144,16 +144,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
      if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
      es_data <- cbind(sample_id = sample_id, es_data)
-     if(!is.null(group2)){
-          es_data <- cbind(group2 = group2, es_data)
-     }else{
-          es_data <- cbind(group2 = NA, es_data)
-     }
-     if(!is.null(group1)){
-          es_data <- cbind(group1 = group1, es_data)
-     }else{
-          es_data <- cbind(group1 = NA, es_data)
-     }
+
      if(!is.null(construct_y)){
           es_data <- cbind(construct_y = construct_y, es_data)
      }else{
@@ -165,10 +156,21 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           es_data <- cbind(construct_x = NA, es_data)
      }
      
+     if(!is.null(group2)){
+          es_data <- cbind(group2 = group2, es_data)
+     }else{
+          es_data <- cbind(group2 = NA, es_data)
+     }
+     if(!is.null(group1)){
+          es_data <- cbind(group1 = group1, es_data)
+     }else{
+          es_data <- cbind(group1 = NA, es_data)
+     }
+     
      if(!is.null(construct_x)| !is.null(construct_y) |!is.null(group1) | !is.null(group2)){
           es_data <- cbind(es_data, moderators)
           
-          out <- es_data %>% group_by(.data$construct_x, .data$construct_y, .data$group1, .data$group2) %>%
+          out <- es_data %>% group_by(.data$group1, .data$group2, .data$construct_x, .data$construct_y) %>%
                do(ma_wrapper(es_data = .data[,!(colnames(.data) %in% moderator_names$all)], es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
                              moderator_matrix = as.data.frame(.data)[,moderator_names$all], moderator_type = moderator_type, cat_moderators = cat_moderators,
 
