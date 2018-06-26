@@ -12,7 +12,7 @@
 The `psychmeta` package provides tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Currently, the package supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and *d* values. Please refer to the overview tutorial vignette for an introduction to `psychmeta`'s functions and workflows.
 
 ## Authors
-`psychmeta` was written by [Jeffrey A. Dahlke](http://www.jeffreydahlke.com/) and [Brenton M. Wiernik](http://wiernik.org/).
+`psychmeta` was written by [Jeffrey A. Dahlke](https://www.jeffreydahlke.com/) and [Brenton M. Wiernik](https://wiernik.org/).
 
 ## Installation
 The official [CRAN release](https://cran.r-project.org/package=psychmeta) of `psychmeta` can be installed with the following code:
@@ -27,7 +27,7 @@ devtools::install_github("psychmeta/psychmeta")
 ```
 
 ## Citing `psychmeta`
-To cite `psychmeta` in your resarch, please refer to the package's citation information using the `citation()` function.
+To cite `psychmeta` in your research, please refer to the package's citation information using the `citation()` function.
 ```r
 citation("psychmeta")
 ```

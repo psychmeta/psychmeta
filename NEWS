@@ -1,3 +1,12 @@
+Changes in Version 2.1.2 (2018-06-26)
+=====================================
+- Added grouping variables and construct variables to ma_generic(). This helps to streamline meta-analyses of generic effect sizes that involve multiple group-wise contrasts and/or multiple constructs. 
+
+- Bug fixes for format_num() and metabulate() to allow missing values in formatted numeric strings.
+
+- Updated lm_mat()to use fungible::seBetaCor to estimate standard errors when se_beta_method is "normal" and cov_mat is a correlation matrix. 
+
+
 Changes in Version 2.1.1 (2018-06-10)
 =====================================
 - Updates and bug fixes for the metabulate() function. Fixed issues with file-writing protocols. Increased support for unicode characters on Windows systems. Added arguments to control whether table headers are rendered in bolded font (bold_headers) and whether redundant construct-pair labels are collapsed in meta-analysis tables (collapse_construct_labels). 
