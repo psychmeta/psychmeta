@@ -7,8 +7,8 @@
 \usage{
 format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
   leading0 = "conditional", drop0integer = FALSE, neg.sign = "\u2212",
-  pos.sign = "figure", big.mark = "\u202F", big.interval = 3L,
-  small.mark = "\u202F", small.interval = 3L, na.mark = "—",
+  pos.sign = "figure", big.mark = "\u202f", big.interval = 3L,
+  small.mark = "\u202f", small.interval = 3L, na.mark = "\u2014",
   lgl.mark = c("+", "\u2212"), inf.mark = c("+\u221e", "\u2212\u221e"))
 }
 \arguments{
