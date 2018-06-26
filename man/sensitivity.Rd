@@ -3,11 +3,8 @@
 %   R/sensitivity_cumulative.R, R/sensitivity_leave1out.R
 \name{sensitivity}
 \alias{sensitivity}
-\alias{sensitivity}
 \alias{sensitivity_bootstrap}
-\alias{sensitivity}
 \alias{sensitivity_cumulative}
-\alias{sensitivity}
 \alias{sensitivity_leave1out}
 \title{Sensitivity analyses for meta-analyses}
 \usage{
