@@ -1,4 +1,4 @@
-Changes in Version 2.1.2 (2018-06-25)
+Changes in Version 2.1.2 (2018-06-26)
 =====================================
 - Added grouping variables and construct variables to ma_generic(). This helps to streamline meta-analyses of generic effect sizes that involve multiple group-wise contrasts and/or multiple constructs. 
 
