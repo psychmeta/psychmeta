@@ -1,3 +1,10 @@
+Changes in Version 2.1.3 (2018-06-27)
+=====================================
+- Changed unicode entities to HTML entities for increased support across locales. 
+
+- Bug fix for artifact imputation without a moderator. 
+
+
 Changes in Version 2.1.2 (2018-06-26)
 =====================================
 - Added grouping variables and construct variables to ma_generic(). This helps to streamline meta-analyses of generic effect sizes that involve multiple group-wise contrasts and/or multiple constructs. 
