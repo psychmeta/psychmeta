@@ -124,18 +124,18 @@ metabulate_rmd_helper()
 ## Then, add the formatted table to your document using your preferred table
 ## formatting functions:
 
-#### Using just the \\link{knitr} package:
+#### Using just the 'knitr' package:
 knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
 cat("\\n", attr(ma_table[[1]], "footnote"))
 
-#### Using \\link{knitr} plus the \\link{kableExtra} package:
+#### Using 'knitr' plus the 'kableExtra' package:
 knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
                   caption = attr(ma_table[[1]], "caption")) \%>\%
        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) \%>\%
        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
 
 # !!! Note: On Windows, R currently can only handle Unicode characters if kables
-# are printed at top-level (e.g., in an if() statement, in a for() loop,
+# are printed at top-level (e.g., not in an if() statement, in a for() loop,
 # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 # kable() as a top-level function (as above).
 
