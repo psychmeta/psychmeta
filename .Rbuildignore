@@ -1,7 +1,7 @@
-## Ignore travis config file
 ^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^icon/*$
 ^draft_R/*$
 ^clean-man.sh$
+^clean-man.R$

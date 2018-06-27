@@ -11,10 +11,10 @@ metabulate(ma_obj, file = NULL, output_dir = getwd(),
   case_sensitive = TRUE, ma_method = "ad", correction_type = "ts",
   collapse_construct_labels = TRUE, bold_headers = TRUE, digits = 2L,
   decimal.mark = getOption("OutDec"), leading0 = "conditional",
-  drop0integer = FALSE, neg.sign = "\u2212", pos.sign = "figure",
-  big.mark = "\u202f", big.interval = 3L, small.mark = "\u202f",
-  small.interval = 3L, na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
-  inf.mark = c("+\u221e", "\u2212\u221e"), conf_format = "parentheses",
+  drop0integer = FALSE, neg.sign = "&minus;", pos.sign = "figure",
+  big.mark = "&#8239;", big.interval = 3L, small.mark = "&#8239;",
+  small.interval = 3L, na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
+  inf.mark = c("+&infin;", "&minus;&infin;"), conf_format = "parentheses",
   cred_format = "parentheses", symbol_es = "ES",
   caption = "Results of meta-analyses", header = NULL, verbose = FALSE,
   unicode = NULL, bib = NULL, title.bib = NULL, style = "apa",
@@ -124,18 +124,18 @@ metabulate_rmd_helper()
 ## Then, add the formatted table to your document using your preferred table
 ## formatting functions:
 
-#### Using just the \\link{knitr} package:
+#### Using just the 'knitr' package:
 knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
 cat("\\n", attr(ma_table[[1]], "footnote"))
 
-#### Using \\link{knitr} plus the \\link{kableExtra} package:
+#### Using 'knitr' plus the 'kableExtra' package:
 knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
                   caption = attr(ma_table[[1]], "caption")) \%>\%
        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) \%>\%
        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
 
 # !!! Note: On Windows, R currently can only handle Unicode characters if kables
-# are printed at top-level (e.g., in an if() statement, in a for() loop,
+# are printed at top-level (e.g., not in an if() statement, in a for() loop,
 # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 # kable() as a top-level function (as above).
 
