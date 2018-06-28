@@ -180,7 +180,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
           se_beta <- (1 - R2_adj_mat)^.5 * hat_mat / (n - 1)^.5
           se_b <- se_beta * sqrt(var_vec[y_col] / var_vec[x_col])
           t <- beta / se_beta
-          p_t <- pt(q = t, df = n - length(x_col) - 1, lower.tail = FALSE) * 2
+          p_t <- pt(q = abs(t), df = n - length(x_col) - 1, lower.tail = FALSE) * 2
 
           se_reg <- as.numeric(sqrt(1 - R2adj) * var_vec[y_col]^.5)
 
