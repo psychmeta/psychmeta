@@ -246,7 +246,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
      
      summary_info <- list(call = match.call(),
                           terms = terms,
-                          residuals = qnorm(seq(0, 1, .25), mean = 0, sd = se_reg),
+                          residuals = qnorm(c(.0001, .25, .5, .75, .9999), mean = 0, sd = se_reg),
                           coefficients = b_mat,
                           aliased = FALSE,
                           sigma = se_reg,
