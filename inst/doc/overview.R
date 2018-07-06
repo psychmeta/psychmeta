@@ -12,7 +12,7 @@ library(psychmeta)
 #  library(psychmeta)
 
 ## ---- echo=FALSE---------------------------------------------------------
-# First 10 observations from the the database of Gonzalez-Mulé, Mount, and Oh (2014; JAP)
+# First 10 observations from the the database of Gonzalez-MulÃ©, Mount, and Oh (2014; JAP)
 head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source",
                                 "rxxi", "ryyi", "ux")])
 

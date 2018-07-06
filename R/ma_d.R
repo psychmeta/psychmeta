@@ -414,7 +414,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      }else{
           group_id <- as.character(group_id)
-          if(!is.null(group_order)) group_order <- sort(unique(group_id))
+          if(is.null(group_order)) group_order <- sort(unique(group_id))
           swap_order <- NULL
      }
 

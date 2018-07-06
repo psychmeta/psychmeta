@@ -5,6 +5,7 @@
 \title{Bare-bones meta-analysis of generic effect sizes}
 \usage{
 ma_generic(es, n, var_e, sample_id = NULL, citekey = NULL,
+  construct_x = NULL, construct_y = NULL, group1 = NULL, group2 = NULL,
   wt_type = c("sample_size", "inv_var", "DL", "HE", "HS", "SJ", "ML", "REML",
   "EB", "PM"), moderators = NULL, cat_moderators = TRUE,
   moderator_type = c("simple", "hierarchical", "none"), data = NULL,
@@ -21,6 +22,10 @@ ma_generic(es, n, var_e, sample_id = NULL, citekey = NULL,
 
 \item{citekey}{Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.}
+
+\item{construct_x, construct_y}{Vector of construct names for constructs designated as "X" and as "Y".}
+
+\item{group1, group2}{Vector of groups' names associated with effect sizes that represent pairwise contrasts.}
 
 \item{wt_type}{Type of weight to use in the meta-analysis: native options are "sample_size", and "inv_var" (inverse error variance).
 Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"

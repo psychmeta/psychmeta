@@ -11,9 +11,10 @@ metabulate(ma_obj, file = NULL, output_dir = getwd(),
   case_sensitive = TRUE, ma_method = "ad", correction_type = "ts",
   collapse_construct_labels = TRUE, bold_headers = TRUE, digits = 2L,
   decimal.mark = getOption("OutDec"), leading0 = "conditional",
-  drop0integer = FALSE, neg.sign = "minus", pos.sign = "figure",
-  big.mark = "thinspace", big.interval = 3L, small.mark = "thinspace",
-  small.interval = 3L, conf_format = "parentheses",
+  drop0integer = FALSE, neg.sign = "&minus;", pos.sign = "figure",
+  big.mark = "&#8239;", big.interval = 3L, small.mark = "&#8239;",
+  small.interval = 3L, na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
+  inf.mark = c("+&infin;", "&minus;&infin;"), conf_format = "parentheses",
   cred_format = "parentheses", symbol_es = "ES",
   caption = "Results of meta-analyses", header = NULL, verbose = FALSE,
   unicode = NULL, bib = NULL, title.bib = NULL, style = "apa",
@@ -52,25 +53,7 @@ metabulate(ma_obj, file = NULL, output_dir = getwd(),
 
 \item{bold_headers}{Logical. Should column headers be bolded (default: \code{TRUE})?}
 
-\item{digits}{The number of decimal digits desired (used strictly; default: 2)}
-
-\item{decimal.mark}{The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})}
-
-\item{leading0}{How to print leading zeros on decimals. See \code{\link{format_num}} for details.}
-
-\item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
-
-\item{neg.sign}{Character to use as negative sign. See \code{\link{format_num}} for details.}
-
-\item{pos.sign}{Character to use as positive sign. See \code{\link{format_num}} for details.}
-
-\item{big.mark}{Character to separate groups of large digits. See \code{\link{format_num}} for details.}
-
-\item{big.interval}{See \code{big.mark} above; defaults to 3.}
-
-\item{small.mark}{Character to sparate groups of decimal digits. See \code{\link{format_num}} for details.}
-
-\item{small.interval}{See \code{small.mark} above; defaults to 3.}
+\item{digits, decimal.mark, leading0, drop0integer, neg.sign, pos.sign, big.mark, big.interval, small.mark, small.interval, na.mark, lgl.mark, inf.mark}{Number formatting arguments. See \code{\link{format_num}} for details.}
 
 \item{conf_format}{How should confidence intervals be formatted? Options are:
 \itemize{
@@ -95,7 +78,7 @@ metabulate(ma_obj, file = NULL, output_dir = getwd(),
 
 \item{title.bib}{The title to give to the bibliography (see \code{bib} above). If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
 
-\item{style}{What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \url{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \url{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
+\item{style}{What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
 
 \item{additional_citekeys}{Additional citekeys to include in the reference list (see \code{bib} above).}
 
@@ -141,18 +124,18 @@ metabulate_rmd_helper()
 ## Then, add the formatted table to your document using your preferred table
 ## formatting functions:
 
-#### Using just the \\link{knitr} package:
+#### Using just the 'knitr' package:
 knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
 cat("\\n", attr(ma_table[[1]], "footnote"))
 
-#### Using \\link{knitr} plus the \\link{kableExtra} package:
+#### Using 'knitr' plus the 'kableExtra' package:
 knitr::kable(ma_table[[1]], "latex", booktabs = TRUE,
                   caption = attr(ma_table[[1]], "caption")) \%>\%
        kableExtra::kable_styling(latex_options = c("striped", "hold_position")) \%>\%
        kableExtra::footnote(general = attr(ma_table[[1]], "footnote")
 
 # !!! Note: On Windows, R currently can only handle Unicode characters if kables
-# are printed at top-level (e.g., in an if() statement, in a for() loop,
+# are printed at top-level (e.g., not in an if() statement, in a for() loop,
 # or in lapply() or map() ). To correctly print Unicode metabulate tables, call
 # kable() as a top-level function (as above).
 
@@ -175,3 +158,4 @@ metabulate(ma_obj = ma_obj, file = "meta tables generic es", output_dir = tempdi
 Other output functions: \code{\link{generate_bib}},
   \code{\link{metabulate_rmd_helper}}
 }
+\concept{output functions}

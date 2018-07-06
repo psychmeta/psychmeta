@@ -8,6 +8,8 @@
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
 #' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' When \code{TRUE}, program will use sample-size weights, error variances estimated from the mean effect size, maximum likelihood variances, and normal-distribution confidence and credibility intervals.
+#' @param construct_x,construct_y Vector of construct names for constructs designated as "X" and as "Y".
+#' @param group1,group2 Vector of groups' names associated with effect sizes that represent pairwise contrasts. 
 #' @param wt_type Type of weight to use in the meta-analysis: native options are "sample_size", and "inv_var" (inverse error variance).
 #' Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see metafor documentation for details about the metafor methods).
@@ -32,6 +34,8 @@
 #' ma_obj
 #' summary(ma_obj)
 ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, 
+                       construct_x = NULL, construct_y = NULL,
+                       group1 = NULL, group2 = NULL,
                        wt_type = c("sample_size", "inv_var", 
                                    "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
                        moderators = NULL, cat_moderators = TRUE,
@@ -83,7 +87,17 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
 
           if(deparse(substitute(citekey))[1] != "NULL")
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
-
+          
+          if(deparse(substitute(construct_x))[1] != "NULL")
+               construct_x <- match_variables(call = call_full[[match("construct_x",  names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
+          if(deparse(substitute(construct_y))[1] != "NULL")
+               construct_y <- match_variables(call = call_full[[match("construct_y",  names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+          
+          if(deparse(substitute(group1))[1] != "NULL")
+               group1 <- match_variables(call = call_full[[match("group1",  names(call_full))]], arg = group1, arg_name = "group1", data = data)
+          if(deparse(substitute(group2))[1] != "NULL")
+               group2 <- match_variables(call = call_full[[match("group2",  names(call_full))]], arg = group2, arg_name = "group2", data = data)
+          
           if(deparse(substitute(moderators))[1] != "NULL")
                moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
      }
@@ -131,14 +145,61 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
      es_data <- cbind(sample_id = sample_id, es_data)
 
-     out <- ma_wrapper(es_data = es_data, es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
-                       moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = cat_moderators,
-
-                       ma_arg_list = list(conf_level = conf_level, cred_level = cred_level,
-                                          conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
-                       presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
-                       moderator_levels = moderator_levels, moderator_names = moderator_names)
+     if(!is.null(construct_y)){
+          es_data <- cbind(construct_y = construct_y, es_data)
+     }else{
+          es_data <- cbind(construct_y = NA, es_data)
+     }
+     if(!is.null(construct_x)){
+          es_data <- cbind(construct_x = construct_x, es_data)
+     }else{
+          es_data <- cbind(construct_x = NA, es_data)
+     }
      
+     if(!is.null(group2)){
+          es_data <- cbind(group2 = group2, es_data)
+     }else{
+          es_data <- cbind(group2 = NA, es_data)
+     }
+     if(!is.null(group1)){
+          es_data <- cbind(group1 = group1, es_data)
+     }else{
+          es_data <- cbind(group1 = NA, es_data)
+     }
+     
+     if(!is.null(construct_x)| !is.null(construct_y) |!is.null(group1) | !is.null(group2)){
+          es_data <- cbind(es_data, moderators)
+          
+          out <- es_data %>% group_by(.data$group1, .data$group2, .data$construct_x, .data$construct_y) %>%
+               do(ma_wrapper(es_data = .data[,!(colnames(.data) %in% moderator_names$all)], es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
+                             moderator_matrix = as.data.frame(.data)[,moderator_names$all], moderator_type = moderator_type, cat_moderators = cat_moderators,
+
+                             ma_arg_list = list(conf_level = conf_level, cred_level = cred_level,
+                                                conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
+                             presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
+                             moderator_levels = moderator_levels, moderator_names = moderator_names) )
+
+          out <- ungroup(out)
+          analysis_combs <- apply(out[,c("group1", "group2", "construct_x", "construct_y")], 1, function(x){
+               paste(x, collapse = " ")
+          })
+          out <- bind_cols(pair_id = as.numeric(factor(analysis_combs, levels = unique(analysis_combs))), out)
+          
+          if(is.null(group2)) out$group2 <- NULL
+          if(is.null(group1)) out$group1 <- NULL
+          if(is.null(construct_y)) out$construct_y <- NULL
+          if(is.null(construct_x)) out$construct_x <- NULL
+         
+     }else{
+          out <- ma_wrapper(es_data = es_data, es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
+                            moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = cat_moderators,
+                            
+                            ma_arg_list = list(conf_level = conf_level, cred_level = cred_level,
+                                               conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
+                            presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
+                            moderator_levels = moderator_levels, moderator_names = moderator_names) 
+     }
+
      out <- bind_cols(analysis_id = 1:nrow(out), out)
      attributes(out) <- append(attributes(out), list(call_history = list(call), 
                                                      inputs = inputs, 
