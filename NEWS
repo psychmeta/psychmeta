@@ -1,6 +1,11 @@
+Changes in Version 2.1.5 (2018-07-09)
+=====================================
+- Bug fix for printing the residual summary from lm_mat so that console output will show a properly scaled vector of theoretical residual quantiles.
+
+
 Changes in Version 2.1.4 (2018-06-28)
 =====================================
--Bug fix for defining the p values of negative coefficients in lm_mat.
+- Bug fix for defining the p values of negative coefficients in lm_mat.
 
 
 Changes in Version 2.1.3 (2018-06-27)
