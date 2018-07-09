@@ -92,7 +92,7 @@
 lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
                    se_beta_method = c("lm", "normal"), ...){
      se_beta_method <- match.arg(se_beta_method, c("lm", "normal"))
-     
+
      if(length(se_beta_method) > 1){
           warning("se_beta_method argument must be a scalar: First value used")
           se_beta_method <- c(unlist(se_beta_method))[1]
@@ -151,7 +151,6 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
           stop("Interactions cannot be computed from variables in covariance matrices: Please include interactions as variables in the covariance matrix", call. = F)
      x_col <- unique(x_col[x_col %in% rownames(S)])
      cov.is.cor = all(zapsmall(diag(cov_mat[c(y_col, x_col),c(y_col, x_col)])) == 1)
-     
      R <- cov2cor(S[c(y_col, x_col), c(y_col, x_col)])
      Sxx_inv <- solve(S[x_col,x_col])
      Rxx_inv <- solve(R[-1,-1])
@@ -183,17 +182,17 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
           p_t <- pt(q = abs(t), df = n - length(x_col) - 1, lower.tail = FALSE) * 2
           
           se_reg <- as.numeric(sqrt(1 - R2adj) * var_vec[y_col]^.5)
-          
+
           if(se_beta_method == "normal") {
                if(cov.is.cor == TRUE) {
                     invisible(capture.output(se_beta <- fungible::seBetaCor(R = as.matrix(S[x_col,x_col]), rxy = as.matrix(S[x_col,y_col]),
-                                                                            Nobs = n, alpha = .05, covmat = 'normal')$se.Beta))
+                                                               Nobs = n, alpha = .05, covmat = 'normal')$se.Beta))
                } else {
                     invisible(capture.output(se_beta <- fungible::seBeta(cov.x = as.matrix(S[x_col,x_col]), cov.xy = as.matrix(S[x_col,y_col]), var.y = S[y_col,y_col],
-                                                                         Nobs = n, alpha = .05, estimator = 'normal')$SEs))
+                                                               Nobs = n, alpha = .05, estimator = 'normal')$SEs))
                }
           }
-          
+
      }else{
           R2adj <- R2
           cov.unscaled <- NULL
