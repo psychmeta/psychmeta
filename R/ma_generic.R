@@ -168,12 +168,15 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      }
      
      if(!is.null(construct_x)| !is.null(construct_y) |!is.null(group1) | !is.null(group2)){
-          es_data <- cbind(es_data, moderators)
-          
-          out <- es_data %>% group_by(.data$group1, .data$group2, .data$construct_x, .data$construct_y) %>%
-               do(ma_wrapper(es_data = .data[,!(colnames(.data) %in% moderator_names$all)], es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
-                             moderator_matrix = as.data.frame(.data)[,moderator_names$all], moderator_type = moderator_type, cat_moderators = cat_moderators,
+          if(!is.null(moderators))
+               es_data <- cbind(es_data, moderators)
 
+          out <- es_data %>% group_by(.data$group1, .data$group2, .data$construct_x, .data$construct_y) %>%
+               do(ma_wrapper(es_data = if(is.null(moderator_names$all)){.data}else{.data[,!(colnames(.data) %in% moderator_names$all)]}, 
+                             es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
+                             moderator_matrix = if(is.null(moderator_names$all)){NULL}else{as.data.frame(.data)[,moderator_names$all]}, 
+                             moderator_type = moderator_type, cat_moderators = cat_moderators,
+                             
                              ma_arg_list = list(conf_level = conf_level, cred_level = cred_level,
                                                 conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
                              presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
