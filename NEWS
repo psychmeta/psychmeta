@@ -1,6 +1,6 @@
 Changes in Version 2.1.6 (2018-07-12)
 =====================================
-- Bug fix for analyses that include construct names and/or group names, but no moderators.
+- Bug fix for ma_generic() analyses that include construct names and/or group names, but no moderators.
 
 
 Changes in Version 2.1.5 (2018-07-09)
