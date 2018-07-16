@@ -15,7 +15,6 @@
 #' @importFrom stats pf
 #' @importFrom stats pt
 #' @importFrom stats weights
-#' @importFrom fungible seBeta
 #' @importFrom utils capture.output
 #'
 #' @examples
@@ -186,11 +185,11 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
           
           if(se_beta_method == "normal") {
                if(cov.is.cor == TRUE) {
-                    invisible(capture.output(se_beta <- fungible::seBetaCor(R = as.matrix(S[x_col,x_col]), rxy = as.matrix(S[x_col,y_col]),
-                                                                            Nobs = n, alpha = .05, covmat = 'normal')$se.Beta))
+                    invisible(capture.output(se_beta <- seBetaCor(R = as.matrix(S[x_col,x_col]), rxy = as.matrix(S[x_col,y_col]),
+                                                                  Nobs = n, alpha = .05, covmat = 'normal')$se.Beta))
                } else {
-                    invisible(capture.output(se_beta <- fungible::seBeta(cov.x = as.matrix(S[x_col,x_col]), cov.xy = as.matrix(S[x_col,y_col]), var.y = S[y_col,y_col],
-                                                                         Nobs = n, alpha = .05, estimator = 'normal')$SEs))
+                    invisible(capture.output(se_beta <- seBeta(cov.x = as.matrix(S[x_col,x_col]), cov.xy = as.matrix(S[x_col,y_col]), var.y = S[y_col,y_col],
+                                                               Nobs = n, alpha = .05, estimator = 'normal')$SEs))
                }
           }
           
@@ -325,3 +324,355 @@ lm_matrix <- lm_mat
      
      x
 }
+
+## Function from package 'fungible' version 1.5 by Niels G. Waller (archived and removed from CRAN)
+seBetaCor <- function(R, rxy, Nobs, alpha = .05, digits = 3, 
+                      covmat = 'normal') { 
+     
+     #~~~~~~~~~~~~~~~~~~~~~~~~ Internal Functions ~~~~~~~~~~~~~~~~~~~~~~~~# 	
+     # Dp: Duplicator Matrix	 
+     Dp <- function(p) {
+          M <- matrix(nrow = p, ncol = p)
+          M[ lower.tri(M, diag = T) ] <- seq( p*(p + 1)/2 )
+          M[ upper.tri(M, diag = F) ] <- t(M)[ upper.tri(M, diag = F) ]
+          D <- outer(c(M), unique(c(M)),
+                     FUN = function(x, y) as.numeric(x == y) )
+          D
+     }
+     
+     # row.remove: Removes rows from a symmetric transition matrix 
+     # to create a correlation transition matrix  
+     # (see Browne & Shapiro, (1986); Nel, 1985).
+     
+     row.remove <- function(p) {
+          p1 <- p2 <- p
+          rows <- rep(1,p)
+          for(i in 2:p) {
+               rows[i] <- rows[i] + p1
+               p1 <- p1 + (p2-1)
+               p2 <- p2 - 1
+          }
+          rows
+     }
+     
+     # cor.covariance: Create a covariance matrix among predictor- 
+     # and predictor/criterion-correlations assuming multivariate
+     # normality (see Nel, 1985).  
+     
+     cor.covariance <- function(R, Nobs) {
+          
+          # Symmetric patterned matrix (Nel, p. 142)
+          Ms <- function(p) {
+               M <- matrix(c( rep( c( rep( c(1, rep(0, times = p*p +
+                                                         (p - 1) )), times = p - 1), 1,
+                                      rep(0, times = p) ), times = p - 1),
+                              rep( c( 1, rep(0, times = p*p + (p - 1)) ),
+                                   times = p - 1 ), 1 ), nrow = p^2)
+               (M + diag(p^2))/2   
+          }
+          
+          # Diagonal patterned matrix (Nel, p. 142).
+          Md <- function(p) {
+               pl <- seq(1,(p^2),by=(p+1))
+               dg <- rep(0,p^2)
+               dg[pl] <- 1
+               diag(dg)
+          }
+          
+          # Nel's (1985, p. 143) Psi matrix.
+          Psi <- function(R) {
+               p <- ncol(R)
+               id <- diag(p)
+               .5*(4*Ms(p) %*% (R %x% R) %*% Ms(p) - 2*(R %x% R)
+                   %*% Md(p) %*% (id %x% R + R %x% id) -
+                        2*(id %x% R + R %x% id) %*% Md(p) %*% (R %x% R) +
+                        (id %x% R + R %x% id) %*% Md(p) %*% (R %x% R) %*%
+                        Md(p) %*% (id %x% R + R %x% id))
+          }
+          
+          p <- ncol(R)
+          # Create symmetric transition matrix
+          Kp <- solve(t(Dp(p)) %*% Dp(p)) %*% t(Dp(p))
+          
+          # Create correlation transition matrix
+          Kpc <- Kp[-row.remove(p),] 
+          
+          (Kpc %*% Psi(R) %*% t(Kpc))/Nobs # The desired cov matrix
+     }  # End cor.covariance
+     #~~~~~~~~~~~~~~~~~~~~~~ End Internal Functions ~~~~~~~~~~~~~~~~~~~~~~#
+     
+     R <- as.matrix(R)
+     
+     p <- ncol(R)
+     Rinv <- solve(R)
+     
+     if(p == 1) {
+          beta.cov <- ((1 - rxy^2)^2)/(Nobs - 3)
+          ses <- sqrt(beta.cov)
+     } else {
+          
+          # Covarianc matrix of predictor and predictor-criterion correlations
+          sR <- rbind(cbind(R, rxy),c(rxy, 1))
+          
+          if('matrix' %in% class(covmat)) Sigma <- covmat
+          else Sigma <- cor.covariance(sR, Nobs)
+          
+          # Create symmetric transition matrix (see Nel, 1985)
+          Kp <- solve(t(Dp(p)) %*% Dp(p)) %*% t(Dp(p))
+          
+          # Create correlation transition matrix (see Browne & Shapiro, 1986).
+          Kpc <- as.matrix(Kp[-row.remove(p),] )
+          if(ncol(Kpc) == 1) Kpc <- t(Kpc)
+          
+          # Derivatives of beta wrt predictor correlations (Rxx)  
+          db.drxx <- -2 * ( ( t( rxy ) %*% Rinv) %x% Rinv ) %*% t(Kpc)
+          
+          # Derivatives of beta wrt predictor-criterion correlations (rxy)
+          db.drxy <- Rinv
+          
+          # Concatenate derivatives
+          jacob <- cbind(db.drxx,db.drxy)
+          
+          # Reorder derivatives to match the order of covariances and 
+          # variances in Sigma
+          
+          rxx.nms <- matrix(0,p,p)
+          rxy.nms <- c(rep(0,p+1))
+          for(i in 1:p) for(j in 1:p) rxx.nms[i,j] <- paste("rx",i,"rx",j,sep='')
+          for(i in 1:p+1) rxy.nms[i] <- paste("rx",i,"y",sep='')
+          
+          nm.mat <- rbind(cbind(rxx.nms,rxy.nms[-(p+1)]),rxy.nms)
+          old.ord <- nm.mat[lower.tri(nm.mat)]
+          new.ord <- c(rxx.nms[lower.tri(rxx.nms)],rxy.nms)
+          
+          jacobian <- jacob[,match(old.ord,new.ord)]  
+          
+          # Create covariance matrix of standardized regression coefficients 
+          # using the (Nobs-3) correction suggested by Yuan and Chan (2011)  
+          
+          beta.cov <- jacobian %*% Sigma %*% t(jacobian) * Nobs/(Nobs-3)
+          beta.nms <- NULL   
+          for(i in 1:p) beta.nms[i] <- paste("beta",i,sep='')
+          rownames(beta.cov) <- colnames(beta.cov) <- beta.nms
+          
+          ses <- sqrt(diag(beta.cov))
+          
+     }
+     
+     CIs <- as.data.frame(matrix(0, p, 3))
+     colnames(CIs) <- c("lbound", "estimate", "ubound")
+     for(i in 1:p) rownames(CIs)[i] <- paste("beta_", i, sep='')
+     
+     tc <- qt(alpha / 2, Nobs - p - 1, lower.tail = FALSE)
+     beta <- Rinv %*% rxy
+     
+     for(i in 1:p) {
+          CIs[i,] <- c(beta[i] - tc * ses[i], beta[i], beta[i] + tc * ses[i])
+     }
+     
+     cat("\n", 100 * (1 - alpha),
+         "% CIs for Standardized Regression Coefficients: \n\n",sep='')
+     
+     print(round(CIs,digits))
+     invisible(list(cov.Beta=beta.cov,se.Beta=ses,alpha=alpha,CI.beta=CIs)) 
+}	
+
+
+## Function from package 'fungible' version 1.5 by Niels G. Waller (archived and removed from CRAN)
+seBeta <- function(X = NULL, y = NULL,
+                   cov.x = NULL, cov.xy = NULL,
+                   var.y = NULL, Nobs = NULL,
+                   alpha = .05, estimator = 'ADF',
+                   digits = 3) {
+     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~Internal Functions~~~~~~~~~~~~~~~~~~~~~~~~~~#
+     # Computes the ADF covariance matrix of covariances
+     adfCOV <- function(X, y) {
+          
+          dev <- scale(cbind(X,y),scale=FALSE)   
+          nvar <- ncol(dev)   
+          N <- nrow(dev)
+          
+          # number of unique elements in a covariance matrix
+          ue <- nvar*(nvar + 1)/2
+          
+          # container for indices
+          s <- vector(length=ue, mode="character")
+          z <- 0
+          for(i in 1:nvar){
+               for(j in i:nvar){
+                    z <- z + 1
+                    s[z] <- paste(i, j, sep="")
+               }
+          }
+          
+          # compute all combinations of elements in s
+          v <- expand.grid(s, s)
+          
+          # concatenate index pairs
+          V <- paste(v[,1], v[,2], sep="")
+          
+          # separate indices into columns
+          id.mat <- matrix(0,nrow=ue^2,4)
+          for(i in 1:4) id.mat[,i] <- as.numeric(sapply(V, substr, i, i))
+          
+          # fill a matrix, M, with sequence 1:ue^2 by row; 
+          # use M to locate positions of indices in id.mat
+          M <- matrix(1:ue^2, ue, ue, byrow=TRUE)
+          
+          # select rows of index pairs
+          r <- M[lower.tri(M, diag=TRUE)]
+          ids <- id.mat[r,]
+          adfCovMat <- matrix(0,ue,ue)
+          covs <- matrix(0,nrow(ids),1)
+          
+          # compute ADF covariance matrix using Browne (1984) Eqn 3.8
+          for(i in 1:nrow(ids)) {
+               
+               w_ij <- crossprod(dev[,ids[i,1]],dev[,ids[i,2]])/N
+               w_ik <- crossprod(dev[,ids[i,1]],dev[,ids[i,3]])/N
+               w_il <- crossprod(dev[,ids[i,1]],dev[,ids[i,4]])/N
+               w_jk <- crossprod(dev[,ids[i,2]],dev[,ids[i,3]])/N
+               w_jl <- crossprod(dev[,ids[i,2]],dev[,ids[i,4]])/N
+               w_kl <- crossprod(dev[,ids[i,3]],dev[,ids[i,4]])/N
+               
+               w_ijkl <- (t(dev[,ids[i,1]]*dev[,ids[i,2]])%*%
+                               (dev[,ids[i,3]]*dev[,ids[i,4]])/N)         
+               
+               covs[i] <- (N*(N-1)*(1/((N-2)*(N-3)))*(w_ijkl - w_ij*w_kl) -
+                                N*(1/((N-2)*(N-3)))*(w_ik*w_jl + w_il*w_jk - (2/(N-1))*w_ij*w_kl))
+          }	
+          
+          # create ADF Covariance Matrix
+          adfCovMat[lower.tri(adfCovMat,diag=T)] <- covs
+          vars <- diag(adfCovMat)
+          adfCovMat <- adfCovMat + t(adfCovMat) - diag(vars)
+          
+          adfCovMat
+     } #end adfCOV
+     
+     # vech function
+     vech <- function(x) t(x[!upper.tri(x)])
+     
+     # Transition or Duplicator Matrix
+     Dn <- function(x){
+          mat <- diag(x)
+          index <- seq(x * (x+1) / 2)
+          mat[lower.tri(mat, TRUE)] <- index
+          mat[upper.tri(mat)] <- t(mat)[upper.tri(mat)]
+          outer(c(mat), index, function(x, y ) ifelse(x == y, 1, 0))
+     } 
+     
+     ## Modified DIAG function will not return an identity matrix
+     ## We use this to account for single predictor models
+     
+     DIAG <- function (x = 1, nrow, ncol) {
+          if(length(x) == 1) x <- as.matrix(x)
+          if(is.matrix(x)) return(diag(x)) else return(diag(x, nrow, ncol))
+     }
+     
+     #~~~~~~~~~~~~~~~~~~~~~~~~~~End Define Internal Functions~~~~~~~~~~~~~~~#
+     #~~~~~~~~~~~~~~~~~~~~~~~~~~~ Error Checking ~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+     
+     if((is.null(X) | is.null(y)) & estimator == 'ADF') stop("\nYou need to supply both X and y for ADF Estimation\n") 
+     
+     if(is.null(X) & !is.null(y))
+          stop("\n y is not defined\n Need to specify both X and y\n")
+     if(!is.null(X) & is.null(y))
+          stop("\n X is not defined\n Need to specify both X and y\n")
+     if(is.null(X) & is.null(y)) {
+          if(is.null(cov.x) | is.null(cov.xy) | is.null(var.y) | is.null(Nobs))
+               stop("\nYou need to specify covariances and sample size\n")
+          scov <- rbind(cbind(cov.x, cov.xy), c(cov.xy, var.y))
+          N <- Nobs
+          p <- nrow(cov.x)
+          
+     } else {
+          # if a vector is supplied it will be turned into a matrix
+          X <- as.matrix(X); y <- as.matrix(y)
+          scov <- cov(cbind(X,y))
+          N <- length(y)
+          p <- ncol(X)
+     }
+     
+     if(estimator == 'ADF') {
+          cov.cov <- adfCOV(X,y)
+     } else {  
+          # create normal-theory covariance matrix of covariances
+          # See Browne (1984) Eqn 4.6 
+          Kp.lft <- solve(t(Dn(p + 1)) %*% Dn(p + 1)) %*% t(Dn(p + 1))
+          cov.cov <- 2 * Kp.lft %*% (scov %x% scov) %*% t(Kp.lft)
+     } 
+     
+     param <- c(vech(scov))
+     ncovs <- length(param)
+     
+     # find vector element numbers for variances of X
+     if(p == 1) {
+          v.x.pl <- 1 
+     } else {
+          v.x.pl <- c(1, rep(0, p - 1))
+          for(i in 2:p) v.x.pl[i] <- v.x.pl[i - 1] + p - (i - 2)
+     }
+     
+     # store covariances and variances 
+     cx  <- scov[1:p, 1:p]
+     cxy <- scov[1:p, p+1]
+     vy  <- scov[p+1, p+1]
+     sx <- sqrt(DIAG(cx))
+     sy <- sqrt(vy)
+     bu <- solve(cx) %*% cxy
+     ncx <- length(vech(cx))
+     
+     # compute derivatives of standardized regression 
+     # coefficients using Yuan and Chan (2011) Equation 13    
+     db <- matrix(0, p, ncovs)
+     V <- matrix(0, p, ncx)
+     V[as.matrix(cbind(1:p, v.x.pl))] <- 1
+     
+     db[, 1:ncx] <- (DIAG(c(solve(DIAG(2 * sx * sy)) %*% bu)) %*% V -
+                          DIAG(sx / sy) %*% (t(bu) %x% solve(cx)) %*% Dn(p))
+     
+     db[, (ncx+1):(ncx+p)] <- DIAG(sx / sy) %*% solve(cx)
+     db[,ncovs] <- -DIAG(sx / (2 * sy^3)) %*% bu 
+     
+     # re-order derivatives 
+     cx.nms <- matrix(0, p, p)
+     cxy.nms <- c(rep(0, p), "var_y")
+     
+     for(i in 1:p) for(j in 1:p) cx.nms[i, j] <- paste("cov_x", i, "x", j, sep='')
+     for(i in 1:p) cxy.nms[i] <- paste("cov_x", i, "y", sep='') 
+     
+     old.ord <- c(vech(cx.nms), cxy.nms)
+     new.ord <- vech(rbind(cbind(cx.nms, cxy.nms[1:p]), c(cxy.nms)))
+     
+     db <- db[, match(new.ord, old.ord)]
+     
+     # compute covariance matrix of standardized   
+     # regression coefficients using the Delta Method
+     
+     if(p == 1) DEL.cmat <- t(db) %*% cov.cov %*% db / N
+     else       DEL.cmat <- db %*% cov.cov %*% t(db) / N
+     
+     b.nms <- NULL
+     
+     for(i in 1:p) b.nms[i] <- paste("beta_", i, sep='')
+     rownames(DEL.cmat) <- colnames(DEL.cmat) <- b.nms
+     
+     # compute standard errors and confidence intervals
+     DELse <- sqrt(DIAG(DEL.cmat))
+     CIs <- as.data.frame(matrix(0, p, 3))
+     colnames(CIs) <- c("lbound", "estimate", "ubound")
+     for(i in 1:p) rownames(CIs)[i] <- paste("beta_", i, sep='')
+     
+     tc <- qt(alpha / 2, N - p - 1, lower.tail = F)
+     beta <- DIAG(sx) %*% bu * sy^-1
+     for(i in 1:p) {
+          CIs[i,] <- c(beta[i] - tc * DELse[i], beta[i], beta[i] + tc * DELse[i])
+     }
+     cat("\n", 100 * (1 - alpha),
+         "% CIs for Standardized Regression Coefficients:\n\n", sep='')
+     print(round(CIs,digits))
+     
+     invisible(list(cov.mat = DEL.cmat, SEs = DELse, alpha = alpha,
+                    CIs = CIs, estimator = estimator))
+} 

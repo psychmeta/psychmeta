@@ -1,8 +1,8 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 2.1.6
-Date: 2018-07-12
+Version: 2.1.7
+Date: 2018-07-16
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "dahlk068@umn.edu"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
@@ -20,7 +20,7 @@ LazyData: true
 VignetteBuilder: knitr
 Imports: dplyr, stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
          ggplot2, metafor, nor1mix, progress, tidyr, stringi,
-         fungible, stringr, rlang, RCurl, xml2, purrr, data.table,
+         stringr, rlang, RCurl, xml2, purrr, data.table,
          RefManageR, rmarkdown, knitr, cli, crayon
 RoxygenNote: 6.0.1.9000
 NeedsCompilation: no

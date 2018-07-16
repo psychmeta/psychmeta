@@ -124,15 +124,15 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                                                                  small.mark)))
 
         # Clean up leading zeros
-        switch(leading0,
+        switch(as.character(leading0),
                "TRUE" = {},
                "FALSE" = out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark))),
-               conditional = {
+               "conditional" = {
                        out <- dplyr::mutate_if(out,
                                                sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
                                                function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
                },
-               figure = {
+               "figure" = {
                        out <- dplyr::mutate_if(out,
                                                sapply(x, function(i) {is.numeric(i) & any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
                                                function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1&#8199;", decimal.mark)))
@@ -141,14 +141,14 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                                                function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
                },
                # else =
-               {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", leading0, decimal.mark)))}
+               {out[] <- {}}
         )
 
         # Clean up positive signs
         switch(pos.sign,
                "TRUE" = {},
                "FALSE" = {},
-               figure = {
+               "figure" = {
                        out <- dplyr::mutate_if(out,
                                                sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) i < 0, na.rm = TRUE)}),
                                                function(i) stringr::str_replace_all(i, "^\\+", ""))
@@ -168,7 +168,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                # else =
                {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, "^-", neg.sign))}
         )
-
+        
         if(x_type == "tibble") {
                 out <- as_tibble(out, validate = FALSE)
         } else if(x_type == "vector") {
@@ -1084,9 +1084,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                    drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
                                    small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
                                    inf.mark = inf.mark, lgl.mark = lgl.mark)
-
-                numeric_columns <- c(col_m_bb, col_se_bb, col_sd_bb, col_var_bb, col_m_cor, col_se_cor, col_sd_cor, col_var_cor, col_conf, col_cred)
-
+                
+                numeric_columns <- c(col_se_bb, col_sd_bb, col_var_bb, col_se_cor, col_sd_cor, col_var_cor)
                 ma_table[1:nrow(ma_table), numeric_columns] <-
                         format_num(ma_table[1:nrow(ma_table), numeric_columns], digits = digits, decimal.mark = decimal.mark,
                                    leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
@@ -1094,6 +1093,14 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                    small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
                                    inf.mark = inf.mark, lgl.mark = lgl.mark)
 
+                numeric_columns <- c(col_m_bb, col_m_cor, col_conf, col_cred)
+                ma_table[,numeric_columns][1:length(ma_table[,numeric_columns])] <-
+                     format_num(unlist(ma_table[,numeric_columns]), digits = digits, decimal.mark = decimal.mark,
+                                leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
+                                inf.mark = inf.mark, lgl.mark = lgl.mark)
+                
                 # Format the interval columns
                 if(show_conf == TRUE) {
                         switch(conf_format,

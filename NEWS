@@ -1,3 +1,10 @@
+Changes in Version 2.1.7 (2018-07-16)
+=====================================
+- Removed package 'fungible' as a dependency, as 'fungible' was archived and removed from CRAN on 2018-07-15.
+
+- Bug fixes and improvements to format_num() and metabulate() for handling leading zeros.
+
+
 Changes in Version 2.1.6 (2018-07-12)
 =====================================
 - Bug fix for ma_generic() analyses that include construct names and/or group names, but no moderators.
