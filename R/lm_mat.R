@@ -118,6 +118,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
                stop("The row names and column names of cov_mat must match", call. = F)
      }
      
+     n <- as.numeric(n)
      if(!is.infinite(n)){
           if (length(n) > 1) stop("n must be a scalar", call. = FALSE)
           if (!is.numeric(n)) stop("n must be numeric", call. = FALSE)
