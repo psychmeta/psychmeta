@@ -62,8 +62,8 @@ clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator
      if(!is.null(moderator_matrix)){
           if(is.null(dim(moderator_matrix))) moderator_matrix <- data.frame(Moderator = moderator_matrix)
 
-          if(length(es_vec)==1){
-               if(nrow(moderator_matrix) != nrow(es_vec)){
+          if(length(es_vec) == 1){
+               if(nrow(moderator_matrix) != length(es_vec)){
                     stop("moderator_matrix must contain as many cases as there are effect sizes in the meta-analysis", call. = FALSE)
                }
           } else {

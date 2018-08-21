@@ -1,3 +1,10 @@
+Changes in Version 2.1.8 (2018-08-21)
+=====================================
+- Updated and corrected the text displayed in table notes produced by the metabulate() function. 
+
+- Bug fix for handling meta-analyses with only one effect size. 
+
+
 Changes in Version 2.1.7 (2018-07-16)
 =====================================
 - Removed package 'fungible' as a dependency, as 'fungible' was archived and removed from CRAN on 2018-07-15.
