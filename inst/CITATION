@@ -1,11 +1,12 @@
 citHeader("To cite ‘psychmeta’ in publications, use:")
 
 citEntry(entry = "Article",
-  title        = "{psychmeta}: An {R} Package for Psychometric Meta-Analysis",
+  title        = "{psychmeta}: An R Package for Psychometric Meta-Analysis",
   author       = c(person("Jeffrey A.", "Dahlke"),
               person("Brenton M.", "Wiernik")),
   journal      = "Applied Psychological Measurement",
   year         = "in press",
+  # doi	       = "10.1177/0146621618795933",
 
   textVersion  =
-  paste("Dahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for psychometric meta-analysis. Applied Psychological Measurement."))
+  paste("Dahlke, J. A., & Wiernik, B. M. (in press). psychmeta: An R package for psychometric meta-analysis. Applied Psychological Measurement. doi: 10.1177/0146621618795933"))

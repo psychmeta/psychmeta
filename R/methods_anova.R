@@ -17,6 +17,7 @@ anova.summary.lm_mat <- function(...){
      lm_list <- lm_list[summary_class]
      
      n_obs <- unlist(lapply(lm_list, function(x) x[["ftest"]]["n"]))
+     if(!all(n_obs[1] == n_obs)) stop("models were not all fitted to the same size of dataset", call. = FALSE)
      
      if(any(is.infinite(n_obs))){
           NULL

@@ -240,27 +240,3 @@ unmix_matrix <- function(sigma_mat, mu_mat, p_vec, N = Inf, group_names = NULL, 
           means_centered = centered_mu_out)
 }
 
-
-
-if(FALSE){
-     sigma_mat = reshape_vec2mat(.5, order = 2)
-     mu_mat = rbind(c(0, 0), c(.5, 1))
-     p_vec =  c(.3, .7)
-     N = 100
-
-     out <- unmix_matrix(sigma_mat = sigma_mat,
-                         mu_mat = mu_mat,
-                         p_vec =  p_vec, N = N)
-
-     dat <- NULL
-     for(i in 1:2){
-          dat <- rbind(dat, cbind(group = i,
-                                  data.frame(MASS::mvrnorm(n = round(p_vec[i] * N),
-                                                           mu = out$means_raw[i,],
-                                                           Sigma = out$cov_group_unbiased[[i]],
-                                                           empirical = TRUE))))
-     }
-     cov(dat)
-
-
-}
