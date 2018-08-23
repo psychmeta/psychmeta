@@ -1549,15 +1549,15 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           })
           
           if(ma_method == "ad"){
-               .correction_method <- unlist(map(out, function(x) x$correction_method))
-               .correct_rxx <- unlist(map(out, function(x) x$correct_rxx))
-               .correct_ryy <- unlist(map(out, function(x) x$correct_ryy))
-               .correct_rr_x <- unlist(map(out, function(x) x$correct_rr_x))
-               .correct_rr_y <- unlist(map(out, function(x) x$correct_rr_y))
-               .indirect_rr_x <- unlist(map(out, function(x) x$indirect_rr_x))
-               .indirect_rr_y <- unlist(map(out, function(x) x$indirect_rr_y))
-               .sign_rxz <- unlist(map(out, function(x) x$sign_rxz))
-               .sign_ryz <- unlist(map(out, function(x) x$sign_ryz))
+               .correction_method <- unlist(map(out, function(x) rep(x$correction_method, nrow(x$ma_obj))))
+               .correct_rxx <- unlist(map(out, function(x) rep(x$correct_rxx, nrow(x$ma_obj))))
+               .correct_ryy <- unlist(map(out, function(x) rep(x$correct_ryy, nrow(x$ma_obj))))
+               .correct_rr_x <- unlist(map(out, function(x) rep(x$correct_rr_x, nrow(x$ma_obj))))
+               .correct_rr_y <- unlist(map(out, function(x) rep(x$correct_rr_y, nrow(x$ma_obj))))
+               .indirect_rr_x <- unlist(map(out, function(x) rep(x$indirect_rr_x, nrow(x$ma_obj))))
+               .indirect_rr_y <- unlist(map(out, function(x) rep(x$indirect_rr_y, nrow(x$ma_obj))))
+               .sign_rxz <- unlist(map(out, function(x) rep(x$sign_rxz, nrow(x$ma_obj))))
+               .sign_ryz <- unlist(map(out, function(x) rep(x$sign_ryz, nrow(x$ma_obj))))
                out <- map(out, function(x) x$ma_obj)
           }
           

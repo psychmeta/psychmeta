@@ -1,3 +1,10 @@
+Changes in Version 2.1.9 (2018-08-22)
+=====================================
+- Increased the stability of artifact-distribution meta-analyses with moderators computed using the ma_r() function. 
+
+- Bug fix for the get_ad() function to appropriately handle artifact-distribution objects that contain no artifact information. 
+
+
 Changes in Version 2.1.8 (2018-08-21)
 =====================================
 - Updated and corrected the text displayed in table notes produced by the metabulate() function. 

@@ -345,23 +345,38 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                if(inputs_only){
                     ad_x <- map(ad_x, function(x){
                          .att <- attributes(x)
-                         .att$summary_raw[.att$ad_contents_raw,]
-                    })
+                         if(.att$ad_contents_raw[1] == "NULL"){
+                              .att$summary[FALSE,]
+                         }else{
+                              .att$summary[.att$ad_contents_raw,]
+                         }                    })
 
                     ad_y <- map(ad_y, function(x){
                          .att <- attributes(x)
-                         .att$summary_raw[.att$ad_contents_raw,]
+                         if(.att$ad_contents_raw[1] == "NULL"){
+                              .att$summary[FALSE,]
+                         }else{
+                              .att$summary[.att$ad_contents_raw,]
+                         }                        
                     })
 
                }else{
                     ad_x <- map(ad_x, function(x){
                          .att <- attributes(x)
-                         .att$summary[.att$ad_contents,]
+                         if(.att$ad_contents[1] == "NULL"){
+                              .att$summary[FALSE,]
+                         }else{
+                              .att$summary[.att$ad_contents,]
+                         }
                     })
 
                     ad_y <- map(ad_y, function(x){
                          .att <- attributes(x)
-                         .att$summary[.att$ad_contents,]
+                         if(.att$ad_contents[1] == "NULL"){
+                              .att$summary[FALSE,]
+                         }else{
+                              .att$summary[.att$ad_contents,]
+                         }
                     })
                }
 
@@ -369,12 +384,32 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                class(.ma_obj) <- class(.ma_obj)[class(.ma_obj) != "ma_psychmeta"]
                .ma_obj <- .ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)]
 
-               for(i in 1:length(ad_x)) ad_x[[i]] <- cbind(artifact = rownames(ad_x[[i]]), description = NA, .ma_obj[i,], ad_x[[i]])
-               for(i in 1:length(ad_y)) ad_y[[i]] <- cbind(artifact = rownames(ad_x[[i]]), description = NA, .ma_obj[i,], ad_y[[i]])
+               # ad_x <- ad_x[unlist(map(ad_x, nrow)) > 0]
+               # ad_y <- ad_y[unlist(map(ad_y, nrow)) > 0]
 
+               for(i in 1:length(ad_x)){
+                    if(nrow(ad_x[[i]]) > 0){
+                         ad_x[[i]] <- cbind(artifact = rownames(ad_x[[i]]), description = NA, .ma_obj[i,], ad_x[[i]])
+                    }else{
+                         .ad_x <- c("artifact", "description", colnames(.ma_obj), colnames(ad_x))
+                         ad_x[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_x))), .ad_x)
+                    }
+               }
+               
+               for(i in 1:length(ad_y)){
+                    if(nrow(ad_y[[i]]) > 0){
+                         ad_y[[i]] <- cbind(artifact = rownames(ad_y[[i]]), description = NA, .ma_obj[i,], ad_y[[i]])
+                    }else{
+                         .ad_y <- c("artifact", "description", colnames(.ma_obj), colnames(ad_x))
+                         ad_y[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_y))), .ad_y)
+                    }
+               }
+               
                ad_x <- as_tibble(data.table::rbindlist(ad_x))
                ad_y <- as_tibble(data.table::rbindlist(ad_y))
-
+               ad_x$artifact <- as.character(ad_x$artifact)
+               ad_y$artifact <- as.character(ad_y$artifact)
+               
                ad_x$description <- dplyr::recode(ad_x$artifact,
                                                  qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
                                                  qxa_drr = "Applicant measurement quality (corrected for direct range restriction)",
