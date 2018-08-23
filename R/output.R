@@ -681,8 +681,9 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                                  return(ma_table)
                                             },
                                             simplify = FALSE, USE.NAMES = TRUE)
+                      meta_tables <- meta_tables[!is.null(meta_tables)]
                       class(meta_tables) <- "metabulate"
-                      return(meta_tables[!is.null(meta_tables)])
+                      return(meta_tables)
                  }
 
                       # TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to

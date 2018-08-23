@@ -1033,5 +1033,12 @@ print.metabulate <- function(x, ...){
 
 }
 
+#' @export
+#' @exportClass metabulate_table
+#' @method print metabulate_table
+print.metabulate_table <- function(x, ...){
+        print(as.data.frame(x))
+}
+
 
 
