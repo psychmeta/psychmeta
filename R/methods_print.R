@@ -619,12 +619,14 @@ print.get_ad <- function(x, ..., digits = 3){
      cat("To view specific results, use the '$' operator to search this list object. \n")
 
      includes <- "\nThis object includes artifact distributions from the following meta-analytic methods:"
-     if("ic" %in% names(x)){
-          includes <- c(includes, "\n- ic (distributions generated during individual-correction meta-analsyis)")
+     .names <- names(x)
+     .names <- .names[!unlist(map(x, is.null))]
+     if("ic" %in% .names){
+          includes <- c(includes, "\n- ic (distributions generated during individual-correction meta-analysis)")
           if("tsa" %in% names(x$ic)) includes <- c(includes, "\n     - tsa (Taylor-series approximation distributions)")
           if("int" %in% names(x$ic)) includes <- c(includes, "\n     - int (Interactive distributions)")
      }
-     if("ic" %in% names(x)) includes <- c(includes, "\n- ad (distributions used to make artifact-distribution corrections)")
+     if("ad" %in% .names) includes <- c(includes, "\n- ad (distributions used to make artifact-distribution corrections)")
 
      cat(includes)
 
