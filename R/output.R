@@ -226,7 +226,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #'   \item{\code{symbfup}}{}
 #' }
 #'
-#' If you define your own LaTeX, Office, OpenDocument macros for these commands,
+#' If you define your own LaTeX, Office, or OpenDocument macros for these commands,
 #' set \code{word_proc} to \code{FALSE}.
 #'
 #'
@@ -332,13 +332,14 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' ## leave file == NULL and output_format to anything but "text":
 #' ma_table <- metabulate(ma_obj = ma_r_obj, file = NULL, output_format = "rmd")
 #'
-#' ## Use the metabulate_rmd_helper() function to ensure all symbols render properly:
+#' ## Use the metabulate_rmd_helper() function to ensure all symbols render properly.
+#' Insert the following code as 'as-is' output:
 #' metabulate_rmd_helper()
 #'
 #' ## Then, add the formatted table to your document using your preferred table
 #' ## formatting functions:
 #'
-#' #### Using just the 'knitr' package:
+#' #### Using just the 'knitr' package, include the following as 'as-is' output:
 #' knitr::kable(ma_table[[1]], caption = attr(ma_table[[1]], "caption"))
 #' cat("\n", attr(ma_table[[1]], "footnote"))
 #'

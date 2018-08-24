@@ -61,7 +61,7 @@ formats such as PowerPoint), the following LaTeX math commands are defined:
   \item{\code{symbfup}}{}
 }
 
-If you define your own LaTeX, Office, OpenDocument macros for these commands,
+If you define your own LaTeX, Office, or OpenDocument macros for these commands,
 set \code{word_proc} to \code{FALSE}.
 }
 
