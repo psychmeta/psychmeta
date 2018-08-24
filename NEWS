@@ -1,3 +1,10 @@
+Changes in Version 2.1.10 (2018-08-24)
+=====================================
+- Bug fix for using output of metabulate() in Rmarkdown documents. 
+
+- Bug fix for meta-analyses of effect sizes that have been averaged or composited. 
+
+
 Changes in Version 2.1.9 (2018-08-22)
 =====================================
 - Increased the stability of artifact-distribution meta-analyses with moderators computed using the ma_r() function. 
