@@ -1,3 +1,10 @@
+Changes in Version 2.1.11 (2018-08-30)
+=====================================
+- Bug fix for create_ad() with interactive method when all sample sizes are NA.
+ 
+- Bug fix for ma_r_ad() with individual artifact distributions supplied. 
+
+
 Changes in Version 2.1.10 (2018-08-24)
 =====================================
 - Bug fix for using output of metabulate() in Rmarkdown documents. 

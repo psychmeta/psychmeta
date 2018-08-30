@@ -264,6 +264,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      ut_mean <- art_mean(art_vec = ut, wt_vec = wt_ut)
 
      if(!is.null(rxxa)){
+          if(!is.null(n_rxxa)) if(all(is.na(n_rxxa))) n_rxxa <- NULL
           if(!is.null(n_rxxa)){
                mean_n_rxxa <- mean(n_rxxa, na.rm = TRUE)
                
@@ -351,6 +352,7 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
      }
 
      if(!is.null(rxxi)){
+          if(!is.null(n_rxxi)) if(all(is.na(n_rxxi))) n_rxxi <- NULL
           if(!is.null(n_rxxi)){
                mean_n_rxxi <- mean(n_rxxi, na.rm = TRUE)
                
@@ -437,6 +439,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           var_e_qxi <- var_e_qxi_c <- var_e_qxi_m <- NULL
      }
 
+     if(!is.null(ni_ux)) if(all(is.na(ni_ux))) ni_ux <- NULL
+     if(!is.null(na_ux)) if(all(is.na(na_ux))) na_ux <- NULL
      if(!is.null(ni_ux)){
           if(is.null(na_ux)) na_ux <- rep(NA, length(ni_ux))
           if(is.null(dep_sds_ux_obs)) dep_sds_ux_obs <- rep(FALSE, length(dep_sds_ux_obs))
@@ -449,6 +453,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           var_e_ux <- NA
      }
 
+     if(!is.null(ni_ut)) if(all(is.na(ni_ut))) ni_ut <- NULL
+     if(!is.null(na_ut)) if(all(is.na(na_ut))) na_ut <- NULL
      if(!is.null(ni_ut)){
           if(is.null(na_ut)) na_ut <- rep(NA, length(ni_ut))
           if(is.null(dep_sds_ut_obs)) dep_sds_ut_obs <- rep(FALSE, length(dep_sds_ut_obs))

@@ -4,10 +4,12 @@
 \alias{screen_ad_int}
 \title{Screen to detect invalid interactive artifact distribution objects}
 \usage{
-screen_ad_int(x)
+screen_ad_int(x, obj_name = "x")
 }
 \arguments{
 \item{x}{Object to test for congruence with expected properties of interactive artifact distribution objects.}
+
+\item{obj_name}{Object name for x.}
 }
 \value{
 Does not return a value; will trigger a warning if ad_obj_tsa is not a valid artifact distribution.

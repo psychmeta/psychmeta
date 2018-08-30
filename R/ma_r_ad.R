@@ -69,6 +69,20 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
           }
      }
      
+     if("ad_int" %in% class(ad_obj_x) | "ad_tsa" %in% class(ad_obj_x)){
+          if("ad_int" %in% class(ad_obj_x)) screen_ad_int(ad_obj_x, obj_name = "ad_obj_x")
+          if("ad_tsa" %in% class(ad_obj_x)) screen_ad_tsa(ad_obj_x, obj_name = "ad_obj_x")
+          ma_obj$ad_x <- rep(list(ad_obj_x), nrow(ma_obj))
+          ad_obj_x <- NULL
+     }
+     
+     if("ad_int" %in% class(ad_obj_y) | "ad_tsa" %in% class(ad_obj_y)){
+          if("ad_int" %in% class(ad_obj_y)) screen_ad_int(ad_obj_y, obj_name = "ad_obj_y")
+          if("ad_tsa" %in% class(ad_obj_y)) screen_ad_tsa(ad_obj_y, obj_name = "ad_obj_y")
+          ma_obj$ad_y <- rep(list(ad_obj_y), nrow(ma_obj))
+          ad_obj_y <- NULL
+     }
+     
      ma_obj <- manage_ad_objs(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y)
      
      null_adx <- is.null(ad_obj_x) & !("ad_x" %in% colnames(ma_obj))
@@ -665,7 +679,7 @@ gather_ma_ad <- function(x){
                          stop("To use correction_method 'meas', correct_rxx and/or correct_ryy must be TRUE", call. = FALSE)
                     
                     if(length(invalid_meas) > 0)
-                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_meas, collapse = ", "))
+                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_meas, collapse = ", "), call. = FALSE)
                }
                
                if(any(correction_method == c("uvdrr", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", "rb2Adj"))){
@@ -678,7 +692,7 @@ gather_ma_ad <- function(x){
                               stop("To apply correction_method '", correction_method, "' to variable X, indirect_rr_x must be FALSE", call. = FALSE)
                          
                          if(length(invalid_uvdrr_x) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_x, collapse = ", "))
+                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_x, collapse = ", "), call. = FALSE)
                     }
                     
                     if(correct_rr_y){
@@ -686,7 +700,7 @@ gather_ma_ad <- function(x){
                               stop("To apply correction_method '", correction_method, "' to variable Y, indirect_rr_y must be FALSE", call. = FALSE)
                          
                          if(length(invalid_uvdrr_y) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_y, collapse = ", "))
+                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvdrr_y, collapse = ", "), call. = FALSE)
                     }
                }
                
@@ -700,7 +714,7 @@ gather_ma_ad <- function(x){
                               stop("To apply correction_method '", correction_method, "' to variable X, indirect_rr_x must be TRUE", call. = FALSE)
                          
                          if(length(invalid_uvirr_x) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_x, collapse = ", "))
+                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_x, collapse = ", "), call. = FALSE)
                     }
                     
                     if(correct_rr_y){
@@ -708,7 +722,7 @@ gather_ma_ad <- function(x){
                               stop("To apply correction_method '", correction_method, "' to variable Y, indirect_rr_y must be TRUE", call. = FALSE)
                          
                          if(length(invalid_uvirr_y) > 0)
-                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_y, collapse = ", "))
+                              stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_uvirr_y, collapse = ", "), call. = FALSE)
                     }
                }
                
@@ -720,7 +734,7 @@ gather_ma_ad <- function(x){
                          stop("To use correction_method '", correction_method, "', both indirect_rr_x AND indirect_rr_y must be FALSE", call. = FALSE)
                     
                     if(length(invalid_bvdrr) > 0)
-                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvdrr, collapse = ", "))
+                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvdrr, collapse = ", "), call. = FALSE)
                }
                
                if(correction_method == "bvirr"){
@@ -731,7 +745,7 @@ gather_ma_ad <- function(x){
                          stop("To use correction_method '", correction_method, "', both indirect_rr_x AND indirect_rr_y must be TRUE", call. = FALSE)
                     
                     if(length(invalid_bvirr) > 0)
-                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvirr, collapse = ", "))
+                         stop("The following artifact distributions are necessary for the requested corrections, but do not contain valid artifact information: ", paste(invalid_bvirr, collapse = ", "), call. = FALSE)
                }
           }
      }
