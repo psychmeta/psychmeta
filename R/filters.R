@@ -189,6 +189,7 @@ filter_u <- function(u_vec, wt_vec){
 #' Screen to detect invalid interactive artifact distribution objects
 #'
 #' @param x Object to test for congruence with expected properties of interactive artifact distribution objects.
+#' @param obj_name Object name for x.
 #'
 #' @return Does not return a value; will trigger a warning if ad_obj_tsa is not a valid artifact distribution.
 #'
@@ -210,20 +211,20 @@ filter_u <- function(u_vec, wt_vec){
 #' screen_ad_int(x = ad_obj_tsa)
 #' screen_ad_int(x = data.frame(Value = 1, Weight = 1))
 #' }
-screen_ad_int <- function(x){
+screen_ad_int <- function(x, obj_name = "x"){
      class_vec <- class(x)
      if(!is.null(class_vec)){
           if(all("ad_int" %in% class_vec)){
                ad_contents <- paste(attributes(x)[["ad_contents"]], collapse = " + ")
           }else{
-               stop("x is not an interactive artifact distribution object", call. = FALSE)
+               stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
           }
      }else{
-          stop("x is not an interactive artifact distribution object", call. = FALSE)
+          stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
      }
      if(is.data.frame(x)){
           if(!("Distribution" %in% colnames(x)))
-               stop("x is not an interactive artifact distribution object", call. = FALSE)
+               stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
 
           nomenclature <- (grepl(x = ad_contents, pattern = "Null") |
                                 grepl(x = ad_contents, pattern = "qxi_irr") | grepl(x = ad_contents, pattern = "qxi_drr") |
@@ -239,16 +240,16 @@ screen_ad_int <- function(x){
                if(all(lapply(x$Distribution, class) == "data.frame")){
                     if(all(lapply(x$Distribution, ncol) == 2)){
                          if(!all(unlist(lapply(x$Distribution, function(x) all(colnames(x) == c("Value", "Weight")))))){
-                              stop("x is not an interactive artifact distribution object", call. = FALSE)
+                              stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
                          }
                     }else{
-                         stop("x is not an interactive artifact distribution object", call. = FALSE)
+                         stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
                     }
                }else{
-                    stop("x is not an interactive artifact distribution object", call. = FALSE)
+                    stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
                }
           }else{
-               stop("x is not an interactive artifact distribution object", call. = FALSE)
+               stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
           }
      }
 }
@@ -257,6 +258,7 @@ screen_ad_int <- function(x){
 #' Screen to detect invalid Taylor series artifact distribution objects
 #'
 #' @param x Object to test for congruence with expected properties of Taylor series artifact distribution objects.
+#' @param obj_name Object name for x.
 #'
 #' @return Does not return a value; will trigger a warning if ad_obj_tsa is not a valid artifact distribution.
 #'
@@ -277,21 +279,21 @@ screen_ad_int <- function(x){
 #' ## screen_ad_tsa(x = ad_obj_tsa)
 #' ## screen_ad_tsa(x = ad_obj_int)
 #' ## screen_ad_tsa(x = data.frame(Value = 1, Weight = 1))
-screen_ad_tsa <- function(x){
+screen_ad_tsa <- function(x, obj_name = "x"){
      class_vec <- class(x)
      if(!is.null(class_vec)){
           if(all("ad_tsa" %in% class_vec)){
                ad_contents <- paste(attributes(x)[["ad_contents"]], collapse = " + ")
           }else{
-               stop("x is not a Taylor series artifact distribution object", call. = FALSE)
+               stop(obj_name, " is not a Taylor series artifact distribution object", call. = FALSE)
           }
      }else{
-          stop("x is not a Taylor series artifact distribution object", call. = FALSE)
+          stop(obj_name, " is not a Taylor series artifact distribution object", call. = FALSE)
      }
 
      if(is.matrix(x)){
           if(ncol(x) != 3){
-               stop("x is not a Taylor series artifact distribution object", call. = FALSE)
+               stop(obj_name, " is not a Taylor series artifact distribution object", call. = FALSE)
           }else{
                nomenclature <- (grepl(x = ad_contents, pattern = "NULL") |
                                      grepl(x = ad_contents, pattern = "qxi_irr") | grepl(x = ad_contents, pattern = "qxi_drr") |
@@ -304,7 +306,7 @@ screen_ad_tsa <- function(x){
                     all(colnames(x) %in% c("mean", "var", "var_res"))
           }
           if(!nomenclature){
-               stop("x is not a Taylor series artifact distribution object", call. = FALSE)
+               stop(obj_name, " is not a Taylor series artifact distribution object", call. = FALSE)
           }
      }
 }

@@ -70,15 +70,15 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      }
      
      if("ad_int" %in% class(ad_obj_x) | "ad_tsa" %in% class(ad_obj_x)){
-          if("ad_int" %in% class(ad_obj_x)) screen_ad_int(ad_obj_x)
-          if("ad_tsa" %in% class(ad_obj_x)) screen_ad_tsa(ad_obj_x)
+          if("ad_int" %in% class(ad_obj_x)) screen_ad_int(ad_obj_x, obj_name = "ad_obj_x")
+          if("ad_tsa" %in% class(ad_obj_x)) screen_ad_tsa(ad_obj_x, obj_name = "ad_obj_x")
           ma_obj$ad_x <- rep(list(ad_obj_x), nrow(ma_obj))
           ad_obj_x <- NULL
      }
      
      if("ad_int" %in% class(ad_obj_y) | "ad_tsa" %in% class(ad_obj_y)){
-          if("ad_int" %in% class(ad_obj_y)) screen_ad_int(ad_obj_y)
-          if("ad_tsa" %in% class(ad_obj_y)) screen_ad_tsa(ad_obj_y)
+          if("ad_int" %in% class(ad_obj_y)) screen_ad_int(ad_obj_y, obj_name = "ad_obj_y")
+          if("ad_tsa" %in% class(ad_obj_y)) screen_ad_tsa(ad_obj_y, obj_name = "ad_obj_y")
           ma_obj$ad_y <- rep(list(ad_obj_y), nrow(ma_obj))
           ad_obj_y <- NULL
      }
