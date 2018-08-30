@@ -342,7 +342,6 @@ join_maobj_adobj <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL){
      ma_obj   
 }
 
-
 reshape_ad2tibble <- function(ma_obj, ad_obj){
      
      constructs <- NULL
