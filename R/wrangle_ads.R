@@ -168,6 +168,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
           ad_obj
      }else{
           if(any(c("ad_x_primary", "ad_x_harvested", "ad_x_supplemental") %in% colnames(ad_obj)))
+               
                ad_obj$ad_x <- map(as.list(1:nrow(ad_obj)), function(i){
                     x <- ad_obj[i,]
                     
@@ -193,8 +194,7 @@ join_adobjs <- function(ad_type = c("tsa", "int"), primary_ads = NULL, harvested
                          .ad_supplemental <- attributes(.ad_supplemental)$inputs
                     
                     .ad_info <- consolidate_ads(.ad_primary, .ad_harvested, .ad_supplemental)
-                    lapply(.ad_info, length)
-                    
+
                     if(ad_type == "tsa"){
                          out <- do.call(create_ad_tsa, .ad_info)
                     }else{
@@ -552,8 +552,14 @@ consolidate_ads <- function(...){
           if(inputs$as_list) inputs <- as.list(...)
      }
 
-
      inputs <- filter_listnonnull(inputs)
+     
+     rel_type_vec <- c("rxxi_type", "qxi_dist_type", "rxxi_dist_type", 
+                       "rxxa_type", "qxa_dist_type", "rxxa_dist_type")
+     for(i in 1:length(inputs)){
+          .rel_type_vec <- rel_type_vec[rel_type_vec %in% names(inputs[[i]])]
+          for(j in .rel_type_vec) inputs[[i]][[j]] <- as.character(inputs[[i]][[j]])
+     }
 
      iter <- 0
      inputs_adobj <- list()

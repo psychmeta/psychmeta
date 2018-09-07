@@ -1,3 +1,8 @@
+Changes in Version 2.1.12 (2018-09-07)
+=====================================
+- Bug fix for managing reliability types that have been incidentally converted from characters into factors.
+
+
 Changes in Version 2.1.11 (2018-08-30)
 =====================================
 - Bug fix for create_ad() with interactive method when all sample sizes are NA.
