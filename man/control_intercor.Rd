@@ -6,8 +6,9 @@
 \usage{
 control_intercor(rxyi = NULL, n = NULL, sample_id = NULL,
   construct_x = NULL, construct_y = NULL, construct_names = NULL,
-  intercor_vec = NULL, intercor_scalar = 0.5, dx = NULL, dy = NULL,
-  p = 0.5, partial_intercor = FALSE, data = NULL, ...)
+  facet_x = NULL, facet_y = NULL, intercor_vec = NULL,
+  intercor_scalar = 0.5, dx = NULL, dy = NULL, p = 0.5,
+  partial_intercor = FALSE, data = NULL, ...)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations.}
@@ -16,11 +17,11 @@ control_intercor(rxyi = NULL, n = NULL, sample_id = NULL,
 
 \item{sample_id}{Vector of identification labels for samples/studies in the meta-analysis.}
 
-\item{construct_x}{Vector of construct names for construct designated as X.}
-
-\item{construct_y}{Vector of construct names for construct designated as Y.}
+\item{construct_x, construct_y}{Vector of construct names for constructs designated as "X" or "Y".}
 
 \item{construct_names}{Vector of all construct names to be included in the meta-analysis.}
+
+\item{facet_x, facet_y}{Vector of facet names for constructs designated as "X" or "Y".}
 
 \item{intercor_vec}{Named vector of pre-specified intercorrelations among measures of constructs in the meta-analysis.}
 

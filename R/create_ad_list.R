@@ -181,10 +181,17 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      
      if(!moderated_ads) moderators <- NULL
      
+     if(is.null(sample_id)) sample_id <- as.character(sample_id)
      null_construct_x <- is.null(construct_x)
      null_construct_y <- is.null(construct_y)
      if(null_construct_x) construct_x <- "X"
      if(null_construct_y) construct_y <- "Y"
+     construct_x <- as.character(construct_x)
+     construct_y <- as.character(construct_y)
+     if(!is.null(measure_x)) measure_x <- as.character(measure_x)
+     if(!is.null(measure_y)) measure_y <- as.character(measure_y)
+     rxx_type <- as.character(rxx_type)
+     ryy_type <- as.character(ryy_type)
      
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){

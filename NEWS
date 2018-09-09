@@ -1,5 +1,10 @@
 Changes in Version 2.1.12 (2018-09-07)
 =====================================
+- Added support for separately compositing measures of constructs and the constructs' facets. Arguments for 'facet_x' and 'facet_y' have been added to ma_r() and ma_d() so that more comprehensive output tables can be generated. 
+
+
+Changes in Version 2.1.12 (2018-09-07)
+=====================================
 - Bug fix for managing reliability types that have been incidentally converted from characters into factors.
 
 

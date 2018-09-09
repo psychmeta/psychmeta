@@ -26,8 +26,9 @@
 #' @param group1,group2 Vector of group identification labels (e.g., Treatment1, Treatment2, Control)
 #' @param group_order Optional vector indicating the order in which (1) \code{group1} and \code{group2} values or (2) \code{group_ids} should be arranged.
 #' If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.
-#' @param construct_y Vector of construct names for construct initially designated as Y.
-#' @param measure_y Vector of names for measures associated with constructs initially designated as "Y".
+#' @param construct_y Vector of construct names for construct designated as "Y".
+#' @param facet_y Vector of facet names for constructs designated as "Y".
+#' @param measure_y Vector of names for measures associated with constructs designated as "Y".
 #' @param construct_order Vector indicating the order in which Y variables should be arranged.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
@@ -247,7 +248,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  ad_type = c("tsa", "int"), 
                  correction_method = "auto",
                  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
-                 construct_y = NULL, measure_y = NULL, construct_order = NULL,
+                 construct_y = NULL, facet_y = NULL, measure_y = NULL, construct_order = NULL,
                  wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
                              "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
                  correct_bias = TRUE,
@@ -322,10 +323,13 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
           if(deparse(substitute(group2))[1] != "NULL")
                group2 <- match_variables(call = call_full[[match("group2", names(call_full))]], arg = group2, data = data)
-
+          
           if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
-
+          
+          if(deparse(substitute(facet_y))[1] != "NULL")
+               facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, data = data)
+          
           if(deparse(substitute(measure_y))[1] != "NULL")
                measure_y <- match_variables(call = call_full[[match("measure_y",  names(call_full))]], arg = measure_y, data = data)
 
@@ -521,6 +525,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
                  construct_x = group_id, construct_y = construct_y,
                  construct_order = c(group_order, construct_order), 
+                 facet_x = NULL, facet_y = facet_y,
                  measure_x = NULL, measure_y = measure_y,
                  wt_type = wt_type, correct_bias = correct_bias,
                  correct_rel = correct_rel, correct_rxx = correct_rGg, correct_ryy = correct_ryy,

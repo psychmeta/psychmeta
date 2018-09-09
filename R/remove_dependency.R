@@ -239,6 +239,12 @@
                     if(is.na(intercor_x)) intercor_x <- intercor[construct_x[i][1]]
                     if(is.na(intercor_y)) intercor_y <- intercor[construct_y[i][1]]
                     
+                    if(is.na(intercor_x)) intercor_x <- intercor[paste(sample_id[i][1], str_split(string = construct_x[i][1], pattern = ":")[[1]][1])]
+                    if(is.na(intercor_y)) intercor_y <- intercor[paste(sample_id[i][1], str_split(string = construct_y[i][1], pattern = ":")[[1]][1])]
+                    
+                    if(is.na(intercor_x)) intercor_x <- intercor[str_split(string = construct_x[i][1], pattern = ":")[[1]][1]]
+                    if(is.na(intercor_y)) intercor_y <- intercor[str_split(string = construct_y[i][1], pattern = ":")[[1]][1]]
+                    
                     if(is.na(intercor_x) & is.na(intercor_y)){
                          warning("Valid same-construct intercorrelations for constructs '", as.character(construct_x[i][1]), 
                                  "' and '", as.character(construct_y[i][1]),
