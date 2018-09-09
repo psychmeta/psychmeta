@@ -6,10 +6,9 @@
 #' @param ad_type Type of artifact distributions to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.
 #' @param n Vector or column name of sample sizes.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
-#' @param construct_x Vector of construct names for construct initially designated as X.
-#' @param construct_y Vector of construct names for construct initially designated as Y.
-#' @param measure_x Vector of names for measures associated with constructs initially designated as "X".
-#' @param measure_y Vector of names for measures associated with constructs initially designated as "Y".
+#' @param construct_x,construct_y Vector of construct names for constructs initially designated as "X" or "Y".
+#' @param facet_x,facet_y Vector of facet names for constructs initially designated as "X" or "Y".
+#' @param measure_x,measure_y Vector of names for measures associated with constructs initially designated as "X" or "Y".
 #' @param rxx Vector or column name of reliability estimates for X.
 #' @param rxx_restricted Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param ryy Vector or column name of reliability estimates for Y.
@@ -77,8 +76,8 @@
 #'                                              moderated_ads = TRUE))
 create_ad_tibble <- function(ad_type = c("tsa", "int"), 
                              n = NULL, sample_id = NULL,
-                             construct_x = NULL, measure_x = NULL,
-                             construct_y = NULL, measure_y = NULL,
+                             construct_x = NULL, facet_x = NULL, measure_x = NULL,
+                             construct_y = NULL, facet_y = NULL, measure_y = NULL,
                              rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
                              ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                              ux = NULL, ux_observed = TRUE,
@@ -132,6 +131,12 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
           
           if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+          
+          if(deparse(substitute(facet_x))[1] != "NULL")
+               facet_x <- match_variables(call = call_full[[match("facet_x", names(call_full))]], arg = facet_x, arg_name = "facet_x", data = data)
+          
+          if(deparse(substitute(facet_y))[1] != "NULL")
+               facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, arg_name = "facet_y", data = data)
           
           if(deparse(substitute(measure_x))[1] != "NULL")
                measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, arg_name = "measure_x", data = data)
@@ -237,8 +242,8 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      }
      
      full_data <- list(sample_id = sample_id, n = n,
-                       construct_x = construct_x, measure_x = measure_x,
-                       construct_y = construct_y, measure_y = measure_y,
+                       construct_x = construct_x, facet_x = facet_x, measure_x = measure_x,
+                       construct_y = construct_y, facet_y = facet_y, measure_y = measure_y,
                        rxx = rxx, rxx_restricted = rxx_restricted, rxx_type = rxx_type, k_items_x = k_items_x,
                        ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y, 
                        ux = ux, ux_observed = ux_observed,
@@ -251,8 +256,18 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      for(i in names(full_data)) if(is.null(full_data[[i]])) full_data[[i]] <- rep(NA, .n)
      if(any(is.na(full_data$measure_x))) full_data$measure_x[is.na(full_data$measure_x)] <- "No measure specified"
      if(any(is.na(full_data$measure_y))) full_data$measure_y[is.na(full_data$measure_y)] <- "No measure specified"
-     full_data <- as.data.frame(full_data)
+     if(is.null(full_data$facet_x)) full_data$facet_x <- NA
+     if(is.null(full_data$facet_y)) full_data$facet_y <- NA
+     full_data <- data.frame(full_data, stringsAsFactors = FALSE)
      if(is.null(sample_id)) full_data$sample_id <- 1:nrow(full_data)
+     
+     valid_intercor <- !is.na(full_data$facet_x) | !is.na(full_data$facet_y)
+     if(any(valid_intercor)){
+          .full_data <- full_data[valid_intercor,]
+          .full_data$construct_x[!is.na(.full_data$facet_x)] <- paste0(.full_data$construct_x[!is.na(.full_data$facet_x)], ": ", .full_data$facet_x[!is.na(.full_data$facet_x)])
+          .full_data$construct_y[!is.na(.full_data$facet_y)] <- paste0(.full_data$construct_y[!is.na(.full_data$facet_y)], ": ", .full_data$facet_y[!is.na(.full_data$facet_y)])
+          full_data <- rbind(full_data, .full_data)
+     }
      
      additional_args <- NULL
      additional_args <- list(...)
