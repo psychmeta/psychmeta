@@ -8,6 +8,8 @@
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
 #' @param construct_x,construct_y Vector of construct names for constructs initially designated as "X" or "Y".
 #' @param facet_x,facet_y Vector of facet names for constructs initially designated as "X" or "Y".
+#' Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+#' To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets. 
 #' @param measure_x,measure_y Vector of names for measures associated with constructs initially designated as "X" or "Y".
 #' @param rxx Vector or column name of reliability estimates for X.
 #' @param rxx_restricted Logical vector or column name determining whether each element of rxx is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
@@ -263,10 +265,20 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      
      valid_intercor <- !is.na(full_data$facet_x) | !is.na(full_data$facet_y)
      if(any(valid_intercor)){
-          .full_data <- full_data[valid_intercor,]
+          global_info <- identify_global(sample_id = full_data$sample_id,
+                                         construct_x = full_data$construct_x, construct_y = full_data$construct_y,
+                                         facet_x = full_data$facet_x, facet_y = full_data$facet_y,
+                                         measure_x = full_data$measure_x, measure_y = full_data$measure_y)
+          retain <- global_info$retain
+          global_x <- tolower(full_data$facet_x) %in% c("overall", "global", "total")
+          global_y <- tolower(full_data$facet_y) %in% c("overall", "global", "total")
+          global_x[is.na(global_x)] <- global_y[is.na(global_y)] <- FALSE
+          valid_facet <- valid_facet & !(global_x | global_y)
+          
+          .full_data <- as_tibble(full_data)[valid_intercor,]
           .full_data$construct_x[!is.na(.full_data$facet_x)] <- paste0(.full_data$construct_x[!is.na(.full_data$facet_x)], ": ", .full_data$facet_x[!is.na(.full_data$facet_x)])
           .full_data$construct_y[!is.na(.full_data$facet_y)] <- paste0(.full_data$construct_y[!is.na(.full_data$facet_y)], ": ", .full_data$facet_y[!is.na(.full_data$facet_y)])
-          full_data <- rbind(full_data, .full_data)
+          full_data <- data.frame(rbind(as_tibble(full_data)[retain,], .full_data))
      }
      
      additional_args <- NULL

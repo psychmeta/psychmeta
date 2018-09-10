@@ -21,7 +21,9 @@
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.
 #' @param construct_x,construct_y Vector of construct names for constructs initially designated as "X" or as "Y".
-#' @param facet_x,facet_y Vector of facet names for constructs initially designated as "X" or as "Y".
+#' @param facet_x,facet_y Vector of facet names for constructs initially designated as "X" or as "Y". 
+#' Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+#' To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets. 
 #' @param measure_x,measure_y Vector of names for measures associated with constructs initially designated as "X" or as "Y".
 #' @param construct_order Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
@@ -1088,38 +1090,47 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                .valid_facet <- !is.na(.facet_x) | !is.na(.facet_y)
 
                if(any(.valid_facet)){
-                    .sample_id <- c(.sample_id, .sample_id[.valid_facet])
-                    .n <- c(.n, .n[.valid_facet])
+                    global_info <- identify_global(sample_id = .sample_id[.valid_facet],
+                                                   construct_x = .construct_x[.valid_facet], 
+                                                   construct_y = .construct_y[.valid_facet],
+                                                   facet_x = .facet_x[.valid_facet], 
+                                                   facet_y = .facet_y[.valid_facet],
+                                                   measure_x = .measure_x[.valid_facet],
+                                                   measure_y = .measure_y[.valid_facet])
+                    retain <- global_info$retain
+
+                    .sample_id <- c(.sample_id[retain], .sample_id[.valid_facet])
+                    .n <- c(.n[retain], .n[.valid_facet])
                     
                     ..construct_x <- .construct_x[.valid_facet]
                     ..facet_x <- .facet_x[.valid_facet]
                     ..construct_x[!is.na(..facet_x)] <- paste0(..construct_x[!is.na(..facet_x)], ": ", ..facet_x[!is.na(..facet_x)])
-                    .construct_x <- c(.construct_x, ..construct_x)
-                    .measure_x <- c(.measure_x, .measure_x[.valid_facet])
+                    .construct_x <- c(.construct_x[retain], ..construct_x)
+                    .measure_x <- c(.measure_x[retain], .measure_x[.valid_facet])
                     
                     ..construct_y <- .construct_y[.valid_facet]
                     ..facet_y <- .facet_y[.valid_facet]
                     ..construct_y[!is.na(..facet_y)] <- paste0(..construct_y[!is.na(..facet_y)], ": ", ..facet_y[!is.na(..facet_y)])
-                    .construct_y <- c(.construct_y, ..construct_y)
-                    .measure_y <- c(.measure_y, .measure_y[.valid_facet])
+                    .construct_y <- c(.construct_y[retain], ..construct_y)
+                    .measure_y <- c(.measure_y[retain], .measure_y[.valid_facet])
                     
-                    .rxx <- c(.rxx, .rxx[.valid_facet])
-                    .rxx_restricted <- c(.rxx_restricted, .rxx_restricted[.valid_facet])
-                    .rxx_type <- c(.rxx_type, .rxx_type[.valid_facet])
-                    .k_items_x <- c(.k_items_x, .k_items_x[.valid_facet])
+                    .rxx <- c(.rxx[retain], .rxx[.valid_facet])
+                    .rxx_restricted <- c(.rxx_restricted[retain], .rxx_restricted[.valid_facet])
+                    .rxx_type <- c(.rxx_type[retain], .rxx_type[.valid_facet])
+                    .k_items_x <- c(.k_items_x[retain], .k_items_x[.valid_facet])
                     
-                    .ryy <- c(.ryy, .ryy[.valid_facet])
-                    .ryy_restricted <- c(.ryy_restricted, .ryy_restricted[.valid_facet])
-                    .ryy_type <- c(.ryy_type, .ryy_type[.valid_facet])
-                    .k_items_y <- c(.k_items_y, .k_items_y[.valid_facet]) 
+                    .ryy <- c(.ryy[retain], .ryy[.valid_facet])
+                    .ryy_restricted <- c(.ryy_restricted[retain], .ryy_restricted[.valid_facet])
+                    .ryy_type <- c(.ryy_type[retain], .ryy_type[.valid_facet])
+                    .k_items_y <- c(.k_items_y[retain], .k_items_y[.valid_facet]) 
                     
-                    .ux <- c(.ux, .ux[.valid_facet])
-                    .ux_observed <- c(.ux_observed, .ux_observed[.valid_facet])
+                    .ux <- c(.ux[retain], .ux[.valid_facet])
+                    .ux_observed <- c(.ux_observed[retain], .ux_observed[.valid_facet])
                     
-                    .uy <- c(.uy, .uy[.valid_facet])
-                    .uy_observed <- c(.uy_observed, .uy_observed[.valid_facet])
+                    .uy <- c(.uy[retain], .uy[.valid_facet])
+                    .uy_observed <- c(.uy_observed[retain], .uy_observed[.valid_facet])
                     
-                    .moderators <- rbind(.moderators, .moderators[.valid_facet,])    
+                    .moderators <- data.frame(rbind(as_tibble(.moderators)[retain,], as_tibble(.moderators)[.valid_facet,]))  
                }
           }
           
@@ -1285,10 +1296,20 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      construct_order_orig <- construct_order
      valid_facet <- !is.na(facet_x) | !is.na(facet_y)
      if(any(valid_facet)){
-          sample_id <- c(sample_id, sample_id[valid_facet])
-          es_data <- rbind(es_data, es_data[valid_facet,])
-          data_x <- rbind(data_x, data_x[valid_facet,])
-          data_y <- rbind(data_y, data_y[valid_facet,])
+          global_info <- identify_global(sample_id = sample_id,
+                                         construct_x = construct_x, construct_y = construct_y,
+                                         facet_x = facet_x, facet_y = facet_y,
+                                         measure_x = measure_x, measure_y = measure_y)
+          retain <- global_info$retain
+          global_x <- tolower(facet_x) %in% c("overall", "global", "total")
+          global_y <- tolower(facet_y) %in% c("overall", "global", "total")
+          global_x[is.na(global_x)] <- global_y[is.na(global_y)] <- FALSE
+          valid_facet <- valid_facet & !(global_x | global_y)
+
+          sample_id <- c(sample_id[retain], sample_id[valid_facet])
+          es_data <- rbind(es_data[retain,], es_data[valid_facet,])
+          data_x <- rbind(data_x[retain,], data_x[valid_facet,])
+          data_y <- rbind(data_y[retain,], data_y[valid_facet,])
           
           construct_x_orig <- construct_x
           construct_y_orig <- construct_y
@@ -1296,41 +1317,34 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           facet_y_orig <- facet_y
           
           .construct_x <- construct_x[valid_facet]
-          ..construct_x <- .construct_x
           .facet_x <- facet_x[valid_facet]
           .construct_x[!is.na(.facet_x)] <- paste0(.construct_x[!is.na(.facet_x)], ": ", .facet_x[!is.na(.facet_x)])
-          construct_x <- c(construct_x, .construct_x)
-          facet_x <- c(facet_x, .facet_x)
-          measure_x <- c(measure_x, measure_x[valid_facet])
+          construct_x <- c(construct_x[retain], .construct_x)
+          facet_x <- c(facet_x[retain], .facet_x)
+          measure_x <- c(measure_x[retain], measure_x[valid_facet])
           
           .construct_y <- construct_y[valid_facet]
-          ..construct_y <- .construct_y
           .facet_y <- facet_y[valid_facet]
           .construct_y[!is.na(.facet_y)] <- paste0(.construct_y[!is.na(.facet_y)], ": ", .facet_y[!is.na(.facet_y)])
-          construct_y <- c(construct_y, .construct_y)
-          facet_y <- c(facet_y, .facet_y)
-          measure_y <- c(measure_y, measure_y[valid_facet])
+          construct_y <- c(construct_y[retain], .construct_y)
+          facet_y <- c(facet_y[retain], .facet_y)
+          measure_y <- c(measure_y[retain], measure_y[valid_facet])
           
-          if(!is.null(moderators)){
-               .moderators <- as.data.frame(moderators[valid_facet,])
-               colnames(.moderators) <- colnames(moderators)
-               moderators <- rbind(moderators, .moderators)
-          }
-          if(!is.null(complete_moderators)){
-               .complete_moderators <- as.data.frame(complete_moderators[valid_facet,])
-               colnames(.complete_moderators) <- colnames(complete_moderators)
-               complete_moderators <- rbind(complete_moderators, .complete_moderators)
-          }
-          if(!is.null(categorical_moderators)){
-               .categorical_moderators <- as.data.frame(categorical_moderators[valid_facet,])
-               colnames(.categorical_moderators) <- colnames(categorical_moderators)
-               categorical_moderators <- rbind(categorical_moderators, .categorical_moderators)
-          }
-          if(!is.null(continuous_moderators)){
-               .continuous_moderators <- as.data.frame(continuous_moderators[valid_facet,])
-               colnames(.continuous_moderators) <- colnames(continuous_moderators)
-               continuous_moderators <- rbind(continuous_moderators, .continuous_moderators)
-          }
+          if(!is.null(moderators))
+               moderators <- as.data.frame(rbind(as_tibble(moderators)[retain,],
+                                                 as_tibble(moderators)[valid_facet,]))
+          
+          if(!is.null(complete_moderators))
+               complete_moderators <- as.data.frame(rbind(as_tibble(complete_moderators)[retain,],
+                                                 as_tibble(complete_moderators)[valid_facet,]))
+          
+          if(!is.null(categorical_moderators))
+               categorical_moderators <- as.data.frame(rbind(as_tibble(categorical_moderators)[retain,],
+                                                 as_tibble(categorical_moderators)[valid_facet,]))
+          
+          if(!is.null(continuous_moderators))
+               continuous_moderators <- as.data.frame(rbind(as_tibble(continuous_moderators)[retain,],
+                                                 as_tibble(continuous_moderators)[valid_facet,]))
           
           .construct_vec <- c(construct_x_orig, construct_y_orig)
           .facet_vec <- c(facet_x_orig, facet_y_orig)
@@ -1805,21 +1819,24 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
      
      if(!is.null(.construct_order)){
+          for(i in names(.construct_order)) .construct_order[[i]] <- .construct_order[[i]][!(tolower(.construct_order[[i]]) %in% c("global", "overall", "total"))]
+          
           construct_order_mat <- NULL
           for(i in construct_order_orig){
                for(j in construct_order_orig){
-                    .construct_order_mat <- as.matrix(expand.grid(paste0(j, ": ", .construct_order[[j]]), 
-                                                                  paste0(i, ": ", .construct_order[[i]]))[,2:1])
-                    construct_order_mat <- rbind(construct_order_mat, c(i, j), .construct_order_mat)
+                    .construct_order_mat <- as.matrix(expand.grid(c(j, unique(paste0(j, ": ", .construct_order[[j]]))), 
+                                                                  c(i, unique(paste0(i, ": ", .construct_order[[i]]))))[,2:1])
+                    construct_order_mat <- rbind(construct_order_mat, .construct_order_mat)
                }    
           }
           
           pair_order <- paste(as.character(out[["construct_x"]]), as.character(out[["construct_y"]]))
-          pair_order <- factor(pair_order, levels = paste(construct_order_mat[,1], construct_order_mat[,2]))
+          pair_order <- factor(pair_order, levels = unique(paste(construct_order_mat[,1], construct_order_mat[,2])))
           .attributes <- attributes(out)
           out <- out[order(pair_order),]
           out$analysis_id <- 1:nrow(out)
           attributes(out) <- .attributes
+          out$pair_id <- as.numeric(factor(as.character(pair_order), levels = unique(as.character(pair_order))))
      }
 
      attributes(out) <- append(attributes(out), list(warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())))

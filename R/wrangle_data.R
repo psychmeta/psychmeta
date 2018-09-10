@@ -296,23 +296,6 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
      if(!is.null(construct_mat)) temp_mat <- cbind(construct_dat, temp_mat)
      temp_mat <- as.data.frame(temp_mat)
 
-     ## Organize the matrix - first by moderator levels, then by constructs
-     if(!is.null(moderators)){
-          orig_names <- colnames(moderators)
-          temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
-          colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
-          temp_mat <- arrange_(temp_mat, .dots = temp_names)
-          colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
-     }
-     if(!is.null(construct_dat)){
-          orig_names <- colnames(construct_dat)
-          temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
-          colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
-          temp_mat <- arrange_(temp_mat, .dots = temp_names)
-          temp_mat <- arrange_(temp_mat, .dots = colnames(construct_dat))
-          colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
-     }
-
      ## Pull out the re-organized data
      es_data <- temp_mat[,colnames(es_data)]
      if(!is.null(construct_dat)){
@@ -377,7 +360,7 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
      }
 
      moderators_cleaned <- clean_moderators(moderator_matrix = moderators, cat_moderators = cat_moderators, es_vec = es_data[,1], moderator_levels = moderator_levels)
-
+     
      ## Return the reorganized data
      list(es_data = es_data,
           sample_id = sample_id,
@@ -394,4 +377,47 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
           categorical_moderators = moderators_cleaned$cat_moderator_matrix)
 }
 
+
+identify_global <- function(sample_id,
+                            construct_x, construct_y,
+                            facet_x, facet_y,
+                            measure_x, measure_y){
+     
+     valid_facet <- !is.na(facet_x) | !is.na(facet_y)
+     
+     global_labels <- c("overall", "global", "total")
+     global_x <- tolower(facet_x) %in% global_labels
+     global_y <- tolower(facet_y) %in% global_labels
+     global_both <- global_x & global_y
+     global_either <- global_x | global_y
+     global_one <- global_either & !global_both
+     global <- global_either
+     
+     if(is.null(measure_x)) measure_x <- rep(NA, length(construct_x))
+     .measure_x <- measure_x[global_x]
+     .measure_x[is.na(.measure_x)] <- "No measure specified"
+     measure_x[global_x] <- .measure_x    
+     
+     if(is.null(measure_y)) measure_y <- rep(NA, length(construct_y))
+     .measure_y <- measure_y[global_y]
+     .measure_y[is.na(.measure_y)] <- "No measure specified"
+     measure_y[global_y] <- .measure_y
+     
+     construct_mat <- t(apply(cbind(construct_x, construct_y), 1, sort))
+     sample_construct_pairs <- paste(sample_id, construct_mat[,1], construct_mat[,2])
+     
+     pairs_both <- sample_construct_pairs[global_both]
+     pairs_either <- sample_construct_pairs[global_either]
+     pairs_one <- sample_construct_pairs[global_one]
+     
+     .pairs_one <- pairs_one[pairs_one %in% pairs_both]
+     global[sample_construct_pairs %in% .pairs_one & global_one] <- FALSE
+     
+     pairs_global <- sample_construct_pairs[global]
+     eliminate <- rep(FALSE, length(global))
+     eliminate[sample_construct_pairs %in% pairs_global & !global_either] <- TRUE
+     
+     list(global = global, 
+          retain = !eliminate)
+}
 

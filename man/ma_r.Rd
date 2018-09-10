@@ -75,7 +75,9 @@ be used when interative artifact distributions are provided). See "Details" of \
 
 \item{construct_x, construct_y}{Vector of construct names for constructs initially designated as "X" or as "Y".}
 
-\item{facet_x, facet_y}{Vector of facet names for constructs initially designated as "X" or as "Y".}
+\item{facet_x, facet_y}{Vector of facet names for constructs initially designated as "X" or as "Y". 
+Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets.}
 
 \item{measure_x, measure_y}{Vector of names for measures associated with constructs initially designated as "X" or as "Y".}
 

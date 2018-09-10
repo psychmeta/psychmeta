@@ -28,6 +28,8 @@
 #' If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.
 #' @param construct_y Vector of construct names for construct designated as "Y".
 #' @param facet_y Vector of facet names for constructs designated as "Y".
+#' Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+#' To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets. 
 #' @param measure_y Vector of names for measures associated with constructs designated as "Y".
 #' @param construct_order Vector indicating the order in which Y variables should be arranged.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
