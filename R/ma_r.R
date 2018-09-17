@@ -1359,7 +1359,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           .construct_order1 <- .construct_order2 <- .construct_order
           for(i in construct_order_orig){
                .construct_order1[[i]] <- rep(i, length(.construct_order1[[i]]) + 1)
-               .construct_order2[[i]] <- c(i, paste0(i, ": ", .construct_order2[[i]]))
+               if(length(.construct_order2[[i]]) > 0){
+                    .construct_order2[[i]] <- c(i, paste0(i, ": ", .construct_order2[[i]]))
+               }else{
+                    .construct_order2[[i]] <- i
+               }
           }
           .construct_order1 <- unlist(.construct_order1)
           .construct_order2 <- unlist(.construct_order2)
