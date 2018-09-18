@@ -188,10 +188,10 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                                                                   measure_x = measure_x[disagreement],
                                                                   measure_y = measure_y[disagreement])
                               
-                              data_x$ux <- u_reconciled$art_vec_x
-                              data_y$uy <- u_reconciled$art_vec_y
-                              data_x$ux_observed <- u_reconciled$logic_vec_x
-                              data_y$uy_observed <- u_reconciled$logic_vec_y
+                              data_x$ux[disagreement] <- u_reconciled$art_vec_x
+                              data_y$uy[disagreement] <- u_reconciled$art_vec_y
+                              data_x$ux_observed[disagreement] <- u_reconciled$logic_vec_x
+                              data_y$uy_observed[disagreement] <- u_reconciled$logic_vec_y
                          }
                     }
                }
