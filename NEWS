@@ -1,6 +1,8 @@
-Changes in Version 2.1.12 (2018-09-07)
+Changes in Version 2.2.0 (2018-09-18)
 =====================================
-- Added support for separately compositing measures of constructs and the constructs' facets. Arguments for 'facet_x' and 'facet_y' have been added to ma_r() and ma_d() so that more comprehensive output tables can be generated. 
+- Added support for separately compositing measures of constructs and the constructs' facets. Arguments for 'facet_x' and 'facet_y' have been added to ma_r() and ma_d() so that more comprehensive output tables can be generated.
+
+- Stability fixes for data management within the ma_r() function.
 
 
 Changes in Version 2.1.12 (2018-09-07)
