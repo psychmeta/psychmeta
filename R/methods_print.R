@@ -296,7 +296,7 @@ print.simdat_r_database <- function(x, ..., digits = 3){
 #' @exportClass simdat_d_sample
 #' @method print simdat_d_sample
 print.simdat_d_sample <- function(x, ..., digits = 3){
-     if(is.null(x$data) & is.null(x$overall_results$observed$ni1) & is.null(x$overall_results$observed$ni2)){
+     if(is.null(x$data) & !all(c("ni1", "ni2") %in% colnames(x$overall_results$observed))){
           type <- "(Parameters)"
      }else{
           type <- "(Statistics)"

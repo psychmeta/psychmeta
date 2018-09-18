@@ -11,20 +11,20 @@
 ma_r(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
   ma_method = c("bb", "ic", "ad"), ad_type = c("tsa", "int"),
   correction_method = "auto", construct_x = NULL, construct_y = NULL,
-  measure_x = NULL, measure_y = NULL, construct_order = NULL,
-  wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE",
-  "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
-  correct_rel = NULL, correct_rxx = TRUE, correct_ryy = TRUE,
-  correct_rr = NULL, correct_rr_x = TRUE, correct_rr_y = TRUE,
-  indirect_rr = NULL, indirect_rr_x = TRUE, indirect_rr_y = TRUE,
-  rxx = NULL, rxx_restricted = TRUE, rxx_type = "alpha",
-  k_items_x = NULL, ryy = NULL, ryy_restricted = TRUE,
-  ryy_type = "alpha", k_items_y = NULL, ux = NULL, ux_observed = TRUE,
-  uy = NULL, uy_observed = TRUE, sign_rz = NULL, sign_rxz = 1,
-  sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = c("simple", "hierarchical", "none"),
-  supplemental_ads = NULL, data = NULL, control = control_psychmeta(),
-  ...)
+  facet_x = NULL, facet_y = NULL, measure_x = NULL, measure_y = NULL,
+  construct_order = NULL, wt_type = c("sample_size", "inv_var_mean",
+  "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
+  correct_bias = TRUE, correct_rel = NULL, correct_rxx = TRUE,
+  correct_ryy = TRUE, correct_rr = NULL, correct_rr_x = TRUE,
+  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_x = TRUE,
+  indirect_rr_y = TRUE, rxx = NULL, rxx_restricted = TRUE,
+  rxx_type = "alpha", k_items_x = NULL, ryy = NULL,
+  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
+  ux = NULL, ux_observed = TRUE, uy = NULL, uy_observed = TRUE,
+  sign_rz = NULL, sign_rxz = 1, sign_ryz = 1, moderators = NULL,
+  cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
+  "none"), supplemental_ads = NULL, data = NULL,
+  control = control_psychmeta(), ...)
 
 ma_r_ad(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
   correction_method = "auto", use_ic_ads = c("tsa", "int"),
@@ -74,6 +74,10 @@ When ma_method is "ad", select one of the following methods for correcting artif
 be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.}
 
 \item{construct_x, construct_y}{Vector of construct names for constructs initially designated as "X" or as "Y".}
+
+\item{facet_x, facet_y}{Vector of facet names for constructs initially designated as "X" or as "Y". 
+Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets.}
 
 \item{measure_x, measure_y}{Vector of names for measures associated with constructs initially designated as "X" or as "Y".}
 

@@ -11,7 +11,7 @@
 ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
   treat_as_r = FALSE, ma_method = c("bb", "ic", "ad"), ad_type = c("tsa",
   "int"), correction_method = "auto", group_id = NULL, group1 = NULL,
-  group2 = NULL, group_order = NULL, construct_y = NULL,
+  group2 = NULL, group_order = NULL, construct_y = NULL, facet_y = NULL,
   measure_y = NULL, construct_order = NULL, wt_type = c("sample_size",
   "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
   "PM"), correct_bias = TRUE, correct_rel = NULL, correct_rGg = FALSE,
@@ -84,9 +84,13 @@ If \code{group_id} is not \code{NULL}, the values supplied to the \code{group_or
 \item{group_order}{Optional vector indicating the order in which (1) \code{group1} and \code{group2} values or (2) \code{group_ids} should be arranged.
 If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.}
 
-\item{construct_y}{Vector of construct names for construct initially designated as Y.}
+\item{construct_y}{Vector of construct names for construct designated as "Y".}
 
-\item{measure_y}{Vector of names for measures associated with constructs initially designated as "Y".}
+\item{facet_y}{Vector of facet names for constructs designated as "Y".
+Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets.}
+
+\item{measure_y}{Vector of names for measures associated with constructs designated as "Y".}
 
 \item{construct_order}{Vector indicating the order in which Y variables should be arranged.}
 

@@ -6,7 +6,8 @@
 #' @param mean_vec Vector of sample means.
 #' @param var_vec Vector of sample variances.
 #' @param n_vec Vector of sample sizes.
-#' @param unbiased Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).
+#' @param unbiased Logical scalar determining whether variance should be unbiased (TRUE; default) or maximum-likelihood (FALSE).
+#' @param na.rm Logical scalar determining whether to remove missing values prior to computing output (TRUE) or not (FALSE; default)
 #'
 #' @return The mean, pooled sample (within-sample) variance, variance of sample means (between-groups), and mixture (total sample) variance of the mixture sample data.
 #' @export
@@ -37,7 +38,13 @@
 #'
 #' @examples
 #' mix_dist(mean_vec = c(-.5, 0, .5), var_vec = c(.9, 1, 1.1), n_vec = c(100, 100, 100))
-mix_dist <- function(mean_vec, var_vec, n_vec, unbiased = TRUE){
+mix_dist <- function(mean_vec, var_vec, n_vec, unbiased = TRUE, na.rm = FALSE){
+     if(na.rm){
+          keep_id <- !is.na(mean_vec) & !is.na(var_vec) & !is.na(n_vec)
+          mean_vec <- mean_vec[keep_id]
+          var_vec <- var_vec[keep_id]
+          n_vec <- n_vec[keep_id]
+     }
      mean_mixture <- sum(mean_vec * n_vec) / sum(n_vec)
      if(unbiased){
           var_pooled <- sum(var_vec * (n_vec - 1)) / (sum(n_vec) - 1)

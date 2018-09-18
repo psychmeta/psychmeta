@@ -3,8 +3,8 @@
 #' @param rxyi Vector or column name of observed correlations.
 #' @param n Vector or column name of sample sizes.  
 #' @param sample_id Vector of identification labels for samples/studies in the meta-analysis.
-#' @param construct_x Vector of construct names for construct designated as X.
-#' @param construct_y Vector of construct names for construct designated as Y.
+#' @param construct_x,construct_y Vector of construct names for constructs designated as "X" or "Y".
+#' @param facet_x,facet_y Vector of facet names for constructs designated as "X" or "Y".
 #' @param construct_names Vector of all construct names to be included in the meta-analysis. 
 #' @param intercor_vec Named vector of pre-specified intercorrelations among measures of constructs in the meta-analysis. 
 #' @param intercor_scalar Generic scalar intercorrelation that can stand in for unobserved or unspecified values. 
@@ -46,6 +46,7 @@
 #'                  intercor_vec = intercor_vec, intercor_scalar = intercor_scalar, data = dat)
 control_intercor <- function(rxyi = NULL, n = NULL, sample_id = NULL, 
                              construct_x = NULL, construct_y = NULL, construct_names = NULL, 
+                             facet_x = NULL, facet_y = NULL, 
                              intercor_vec = NULL, intercor_scalar = .5, 
                              dx = NULL, dy = NULL, p = .5, partial_intercor = FALSE, data = NULL, ...){
      
@@ -83,6 +84,12 @@ control_intercor <- function(rxyi = NULL, n = NULL, sample_id = NULL,
           if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
           
+          if(deparse(substitute(facet_x))[1] != "NULL")
+               facet_x <- match_variables(call = call_full[[match("facet_x", names(call_full))]], arg = facet_x, arg_name = "facet_x", data = data) 
+          
+          if(deparse(substitute(facet_y))[1] != "NULL")
+               facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, arg_name = "facet_y", data = data)
+          
           if(deparse(substitute(partial_intercor))[1] != "NULL")
                partial_intercor <- match_variables(call = call_full[[match("partial_intercor", names(call_full))]], arg = partial_intercor, arg_name = "partial_intercor", data = data) 
           
@@ -113,8 +120,32 @@ control_intercor <- function(rxyi = NULL, n = NULL, sample_id = NULL,
           }
           
           sample_id <- as.character(sample_id)
+          
           construct_x <- as.character(construct_x)
           construct_y <- as.character(construct_y)
+          
+          if(!is.null(rxyi)){
+               if(is.null(construct_x)) construct_x <- rep("X", length(rxyi))
+               if(is.null(construct_y)) construct_y <- rep("Y", length(rxyi))
+               
+               if(is.null(facet_x)) facet_x <- rep(NA, length(rxyi))
+               if(is.null(facet_y)) facet_y <- rep(NA, length(rxyi))
+               valid_facet <- !is.na(facet_x) | !is.na(facet_y)
+               
+               rxyi <- c(rxyi, rxyi[valid_facet])
+               if(!is.null(n)) n <- c(n, n[valid_facet])
+               if(!is.null(sample_id)) sample_id <- c(sample_id, sample_id[valid_facet])
+               
+               .construct_x <- construct_x[valid_facet]
+               .facet_x <- facet_x[valid_facet]
+               .construct_x[!is.na(.facet_x)] <- paste0(.construct_x[!is.na(.facet_x)], ": ", .facet_x[!is.na(.facet_x)])
+               construct_x <- c(construct_x, .construct_x)
+               
+               .construct_y <- construct_y[valid_facet]
+               .facet_y <- facet_y[valid_facet]
+               .construct_y[!is.na(.facet_y)] <- paste0(.construct_y[!is.na(.facet_y)], ": ", .facet_y[!is.na(.facet_y)])
+               construct_y <- c(construct_y, .construct_y)
+          }
           
           .construct_names <- unique(c(construct_x, construct_y))
           construct_names <- unique(c(construct_names, .construct_names))

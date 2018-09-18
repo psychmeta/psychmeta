@@ -167,6 +167,22 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           es_data <- cbind(group1 = NA, es_data)
      }
      
+     infinite_value <- is.infinite(es_data$es) | is.infinite(es_data$n) | is.infinite(es_data$var_e)
+     infinite_value[is.na(infinite_value)] <- FALSE
+     if(any(infinite_value))
+          stop("Effect sizes, sample sizes, and error variances must be finite: Please remove infinite values", call. = FALSE)
+     
+     valid_es <- !is.na(es_data$es) & !is.na(es_data$n) & !is.na(es_data$var_e)
+     if(all(!valid_es)) stop("No valid sets of effect sizes, sample sizes, and error variances were provided", call. = FALSE)
+     if(sum(!valid_es) > 0)
+          if(sum(!valid_es) == 1){
+               warning(sum(!valid_es), " invalid set of effect sizes, sample sizes, and error variances detected: Offending entry has been removed", call. = FALSE)
+          }else{
+               warning(sum(!valid_es), " invalid sets of effect sizes, sample sizes, and error variances detected: Offending entries have been removed", call. = FALSE)
+          }
+     es_data <- as_tibble(es_data)[valid_es,]
+     if(!is.null(moderators)) moderators <- as_tibble(moderators)[valid_es,]
+          
      if(!is.null(construct_x)| !is.null(construct_y) |!is.null(group1) | !is.null(group2)){
           if(!is.null(moderators))
                es_data <- cbind(es_data, moderators)

@@ -250,8 +250,11 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           for(i in select_ids)
                select_vec <- select_vec & obs_scores_a[,i] >= cut_vec[i]
      }
-
-     alpha_a <- .alpha_items(item_dat = obs_scores_a[,], item_index = item_index)
+     true_scores_a <- as_tibble(true_scores_a)
+     error_scores_a <- as_tibble(error_scores_a)
+     obs_scores_a <- as_tibble(obs_scores_a)
+     
+     alpha_a <- .alpha_items(item_dat = obs_scores_a, item_index = item_index)
      alpha_i <- .alpha_items(item_dat = obs_scores_a[select_vec,], item_index = item_index)
 
      if(show_items){

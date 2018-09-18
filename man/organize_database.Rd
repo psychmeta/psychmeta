@@ -5,8 +5,9 @@
 \title{Organize a database of multi-construct or moderated information}
 \usage{
 organize_database(es_data, sample_id = NULL, citekey = NULL,
-  construct_x = NULL, construct_y = NULL, data_x = NULL, data_y = NULL,
-  moderators = NULL, use_as_x = NULL, use_as_y = NULL,
+  construct_x = NULL, construct_y = NULL, facet_x = NULL,
+  facet_y = NULL, measure_x = NULL, measure_y = NULL, data_x = NULL,
+  data_y = NULL, moderators = NULL, use_as_x = NULL, use_as_y = NULL,
   construct_order = NULL, cat_moderators = TRUE, moderator_levels = NULL)
 }
 \arguments{
@@ -19,6 +20,10 @@ organize_database(es_data, sample_id = NULL, citekey = NULL,
 \item{construct_x}{Vector of construct names for construct initially designated as X.}
 
 \item{construct_y}{Vector of construct names for construct initially designated as Y.}
+
+\item{facet_x}{Vector of facet names for construct initially designated as X.}
+
+\item{facet_y}{Vector of facet names for construct initially designated as Y.}
 
 \item{data_x}{Additional data (e.g., artifact information) specific to the variables originally designated as X.}
 
