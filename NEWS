@@ -4,6 +4,8 @@ Changes in Version 2.2.0 (2018-09-18)
 
 - Stability fixes for data management within the ma_r() function.
 
+- Added checks for missing and infinite values to the ma_generic() function.
+
 
 Changes in Version 2.1.12 (2018-09-07)
 =====================================

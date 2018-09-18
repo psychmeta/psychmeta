@@ -4,7 +4,7 @@
 \alias{mix_dist}
 \title{Descriptive statistics for a mixture distribution}
 \usage{
-mix_dist(mean_vec, var_vec, n_vec, unbiased = TRUE)
+mix_dist(mean_vec, var_vec, n_vec, unbiased = TRUE, na.rm = FALSE)
 }
 \arguments{
 \item{mean_vec}{Vector of sample means.}
@@ -13,7 +13,9 @@ mix_dist(mean_vec, var_vec, n_vec, unbiased = TRUE)
 
 \item{n_vec}{Vector of sample sizes.}
 
-\item{unbiased}{Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).}
+\item{unbiased}{Logical scalar determining whether variance should be unbiased (TRUE; default) or maximum-likelihood (FALSE).}
+
+\item{na.rm}{Logical scalar determining whether to remove missing values prior to computing output (TRUE) or not (FALSE; default)}
 }
 \value{
 The mean, pooled sample (within-sample) variance, variance of sample means (between-groups), and mixture (total sample) variance of the mixture sample data.
