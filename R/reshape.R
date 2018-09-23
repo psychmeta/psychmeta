@@ -238,11 +238,16 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design, n_design, oth
                     x <- var_names[j]
                     y <- var_names[i]
 
-                    new_data_ij <- data[,c(common_vars, n_design[y,x], es_design[y,x], other_design[x,], other_design[y,])]
-                    colnames(new_data_ij) <- colnames_ij
-                    new_data_ij <- cbind(new_data_ij, x_name = x, y_name = y)
-
-                    new_data <- suppressWarnings(bind_rows(new_data, new_data_ij))
+                    if(!is.na(es_design[y, x])) {
+                         new_data_ij <- data[, c(common_vars, n_design[y,
+                                                                       x], es_design[y, x], other_design[x, ], other_design[y,
+                                                                                                                            ])]
+                         colnames(new_data_ij) <- colnames_ij
+                         new_data_ij <- cbind(new_data_ij, x_name = x,
+                                              y_name = y)
+                         new_data <- suppressWarnings(bind_rows(new_data,
+                                                                new_data_ij))
+                    }
                }
           }
      }
