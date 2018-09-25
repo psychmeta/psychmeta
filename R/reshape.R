@@ -177,83 +177,168 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 #' ## Reshape the data to "long" format
 #' reshape_wide2long(data = data, common_vars = common_vars, es_design = es_design,
 #'                            n_design = n_design, other_design = other_design)
-reshape_wide2long <- function(data, common_vars = NULL, es_design, n_design, other_design = NULL, es_name = "rxyi"){
+reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_design = NULL, other_design = NULL, es_name = "rxyi", missing_col_action = c("warn", "ignore", "stop")) {
 
-     if(!is.matrix(es_design)) stop("'es_design' must be a matrix", call. = FALSE)
+     missing_col_action <- match.arg(missing_col_action)
 
-     es_cnames <- colnames(es_design)
-     es_rnames <- rownames(es_design)
+     if(all(is.null(es_design), is.null(other_design))) {
+          stop("Either 'es_design' or 'other_design' must be provided", call. = FALSE)
+     }
 
-     if(!all(es_cnames %in% es_rnames) | !all(es_rnames %in% es_cnames))
-          stop("Rownames and column names of 'es_design' must contain the same elements", call. = FALSE)
+     if(is.null(es_design)) {
+          es_cnames <- es_rnames <- NULL
+     } else {
+          if(!is.matrix(es_design)) stop("'es_design' must be a matrix", call. = FALSE)
 
-     if(!is.null(other_design)){
-          if(!is.matrix(other_design)) stop("'other_design' must be a matrix", call. = FALSE)
+          es_cnames <- colnames(es_design)
+          es_rnames <- rownames(es_design)
+
+          if(!all(es_cnames %in% es_rnames) | !all(es_rnames %in% es_cnames)) {
+               stop("Row names and column names of 'es_design' must contain the same elements", call. = FALSE)
+          }
+     }
+
+     if(is.null(n_design)) {
+          n_cnames <- n_rnames <- NULL
+     } else {
+          if(length(n_design) == 1){
+               n_scalar <- c(n_design)
+               n_design <- es_design
+               n_design[lower.tri(n_design)] <- n_scalar
+          }else{
+               if(!is.matrix(n_design)) {
+                    stop("'n_design' must be a matrix if it has more than 1 element", call. = FALSE)
+               }
+               n_cnames <- colnames(n_design)
+               n_rnames <- rownames(n_design)
+               if(!all(n_cnames %in% n_rnames) | !all(n_rnames %in% n_cnames)) {
+                    stop("Row names and column names of 'n_design' must contain the same elements", call. = FALSE)
+               }
+               if(!all(n_cnames %in% es_cnames) | !all(es_cnames %in% n_cnames)) {
+                    stop("Column names of 'es_design' 'n_design' must contain the same elements", call. = FALSE)
+               }
+               if(!all(n_rnames %in% es_rnames) | !all(es_rnames %in% n_rnames)) {
+                    stop("Row names of 'es_design' 'n_design' must contain the same elements", call. = FALSE)
+               }
+          }
+     }
+
+
+     if(!is.null(other_design)) {
+          if(!is.matrix(other_design)) {
+               stop("'other_design' must be a matrix", call. = FALSE)
+          }
           other_rnames <- rownames(other_design)
           other_cnames <- colnames(other_design)
-          if(!all(es_rnames %in% other_rnames))
-               stop("Variables represented in 'es_design' must be present in the rows of 'other_design'", call. = FALSE)
-          .colnames <- colnames(other_design)
-          other_design <- as.matrix(other_design[es_rnames,])
-          colnames(other_design) <- .colnames
-     }else{
+          if(!is.null(es_design)) {
+               if(!all(es_rnames %in% other_rnames)) {
+                    other_supp_rnames <- es_rnames[!es_rnames %in% other_rnames]
+                    other_supp <- matrix(NA, length(other_supp_rnames), ncol(other_design))
+                    rownames(other_supp) <- other_supp_rnames
+                    other_design <- rbind(other_design, other_supp)
+               }
+               if(!all(other_rnames %in% es_rnames)) {
+                    es_supp_rnames <- other_rnames[!other_rnames %in% es_rnames]
+                    es_rsupp <- matrix(NA, length(es_supp_names), ncol(es_design))
+                    rownames(es_rsupp) <- es_supp_rnames
+                    es_design <- rbind(es_design, es_rsupp)
+                    n_design <- rbind(n_design, es_rsupp)
+                    es_csupp <- matrix(NA, nrow(es_design), length(es_supp_rnames))
+                    colnames(es_csupp) <- es_supp_rnames
+                    es_design <- cbind(es_design, es_csupp)
+                    n_design <- cbind(n_design, es_csupp)
+               }
+
+               .colnames <- colnames(other_design)
+               other_design <- as.matrix(other_design[rownames(es_design),])
+               colnames(other_design) <- .colnames
+               var_names <- rownames(es_design)
+
+          } else {
+               # es_design <- n_design <- matrix(NA, length(other_rnames), length(other_rnames))
+               var_names <-
+                    # rownames(es_design) <- colnames(es_design) <-
+                    # rownames(n_design) <- colnames(n_design) <-
+                    other_rnames
+          }
+
+     } else {
+          other_design <- matrix(rep(NA, length(es_cnames)))
           other_rnames <- NULL
           other_cnames <- NULL
+          var_names <- rownames(other_design) <- es_rnames
      }
 
-     if(length(n_design) == 1){
-          n_scalar <- c(n_design)
-          n_design <- es_design
-          n_design[lower.tri(n_design)] <- n_scalar
-     }else{
-          if(!is.matrix(n_design)) stop("'n_design' must be a matrix if it has more than 1 element", call. = FALSE)
-          n_cnames <- colnames(n_design)
-          n_rnames <- rownames(n_design)
-          if(!all(es_cnames %in% es_rnames) | !all(es_rnames %in% es_cnames))
-               stop("Rownames and column names of 'es_design' must contain the same elements", call. = FALSE)
-          if(!is.null(other_rnames))
-               if(!all(es_rnames %in% other_rnames))
-                    stop("Variables represented in 'n_design' must be identical to the variables in 'es_design'", call. = FALSE)
+     # unique_refs <- levels(factor(c(es_design, other_design)))
+     unique_refs <- as.character(unique(na.omit(c(es_design, other_design))))
+
+     if(!all(unique_refs %in% colnames(data))) {
+          switch(missing_col_action,
+                 stop = {stop("One or more non-NA elements in 'es_design' or 'other_design' are not valid columns in 'data'", call. = FALSE)},
+                 warn = {warning("One or more non-NA elements in 'es_design' or 'other_design' are not valid columns in 'data'. These variables have been dropped", call. = FALSE)}
+          )
+          es_design[!es_design %in% colnames(data)] <- NA
+          other_design[!other_design %in% colnames(data)] <- NA
+
      }
 
-     unique_refs <- levels(factor(c(es_design, other_design)))
 
-     if(!all(unique_refs %in% colnames(data)))
-          stop("All non-NA elements in 'es_design' and 'other_design' must be valid columns in 'data'", call. = FALSE)
 
-     var_names <- es_cnames
+     if(is.null(es_design)) {
+          new_data <- data.frame(matrix(NA, 0, length(common_vars) + length(other_cnames) + 1))
+          colnames(new_data) <- c(common_vars, other_cnames, "x_name")
+          colnames_i <- c(common_vars, other_cnames)
 
-     new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)))
-     colnames(new_data) <- c(common_vars, "n", es_name, "x_name", "y_name",
-                             if(length(other_cnames) > 0){paste0(other_cnames, "_x")}else{NULL},
-                             if(length(other_cnames) > 0){paste0(other_cnames, "_y")}else{NULL})
-     colnames_ij <- c(common_vars, "n", es_name,
-                      if(length(other_cnames) > 0){paste0(other_cnames, "_x")}else{NULL},
-                      if(length(other_cnames) > 0){paste0(other_cnames, "_y")}else{NULL})
+          for(i in 1:length(var_names)) {
+               x <- var_names[i]
 
-     es_data <- n_data <- other_data <- NULL
-     for(i in 1:length(var_names)){
-          for(j in 1:length(var_names)){
-               if(i > j){
-                    x <- var_names[j]
-                    y <- var_names[i]
+               if(!all(is.na(other_design[x, ]))) {
+                    new_data_i  <- data[, c(common_vars,
+                                            na.omit(other_design[x, ])
+                    )
+                    ]
+                    colnames(new_data_i) <- colnames_i
+                    new_data_i <- cbind(new_data_i, x_name = x, stringsAsFactors = FALSE)
+                    new_data <- bind_rows(new_data, new_data_i)
 
-                    if(!is.na(es_design[y, x])) {
-                         new_data_ij <- data[, c(common_vars, n_design[y,
-                                                                       x], es_design[y, x], other_design[x, ], other_design[y,
-                                                                                                                            ])]
-                         colnames(new_data_ij) <- colnames_ij
-                         new_data_ij <- cbind(new_data_ij, x_name = x,
-                                              y_name = y)
-                         new_data <- suppressWarnings(bind_rows(new_data,
-                                                                new_data_ij))
+               }
+          }
+
+     } else {
+          new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)))
+          colnames(new_data) <- c(common_vars,
+                                  "n", es_name, "x_name", "y_name",
+                                  if(length(other_cnames) > 0) {c(paste0(other_cnames, "_x"), paste0(other_cnames, "_y"))} else {NULL}
+          )
+          colnames_ij <- c(common_vars, if(!is.null(es_design)) {c("n", es_name)},
+                           if(length(other_cnames) > 0) {c(paste0(other_cnames, "_x"), paste0(other_cnames, "_y"))} else {NULL})
+
+          for(i in 1:length(var_names)) {
+               for(j in 1:length(var_names)) {
+                    if(i > j){
+                         x <- var_names[j]
+                         y <- var_names[i]
+
+                         if(!is.na(es_design[y, x])) {
+                              new_data_ij <- data[, c(common_vars,
+                                                      na.omit(n_design[y, x]),
+                                                      na.omit(es_design[y, x]),
+                                                      na.omit(other_design[x, ]),
+                                                      na.omit(other_design[y, ])
+                              )
+                              ]
+                              colnames(new_data_ij) <- colnames_ij
+                              new_data_ij <- cbind(new_data_ij, x_name = x, y_name = y, stringsAsFactors = FALSE)
+                              new_data <- bind_rows(new_data, new_data_ij)
+
+                         }
                     }
                }
           }
      }
+
      new_data
 }
-
 
 
 #' Assemble a variance-covariance matrix
