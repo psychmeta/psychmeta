@@ -14,9 +14,9 @@
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
 #' @param citekey Optional vector of bibliographic citation keys for samples/studies in the meta-analysis (if multiple citekeys pertain to a given effect size, combine them into a single string entry with comma delimiters (e.g., "citkey1,citekey2").
 #' @param ma_method Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).
-#' @param ad_type For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".
-#' @param correction_method Character scalar or a square matrix with the collective levels of \code{construct_x} and \code{construct_y} as row names and column names.
-#' When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+#' @param ad_type For when ma_method is "ad". Dpecifies the type of artifact distribution to use: "int" or "tsa".
+#' @param correction_method For when ma_method is "ad". Character scalar or a square matrix with the collective levels of \code{construct_x} and \code{construct_y} as row names and column names.
+#' Select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 #' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.

@@ -67,10 +67,10 @@ ma_r_ic(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
 \item{ma_method}{Method to be used to compute the meta-analysis: "bb" (barebones), "ic" (individual correction), or "ad" (artifact distribution).}
 
-\item{ad_type}{For when ma_method is "ad", specifies the type of artifact distribution to use: "int" or "tsa".}
+\item{ad_type}{For when ma_method is "ad". Dpecifies the type of artifact distribution to use: "int" or "tsa".}
 
-\item{correction_method}{Character scalar or a square matrix with the collective levels of \code{construct_x} and \code{construct_y} as row names and column names.
-When ma_method is "ad", select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
+\item{correction_method}{For when ma_method is "ad". Character scalar or a square matrix with the collective levels of \code{construct_x} and \code{construct_y} as row names and column names.
+Select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
 be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.}
