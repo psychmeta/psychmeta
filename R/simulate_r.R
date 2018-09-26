@@ -1129,8 +1129,6 @@ simulate_r_database <- function(k, n_params, rho_params,
      dat_params <- data.frame(matrix(NA, length(param_list) * nrow(.params), ncol(.params)))
      colnames(dat_stats) <- colnames(.stats)
      colnames(dat_params) <- colnames(.params)
-     length(.stats)
-     length(.params)
 
      progbar <- progress::progress_bar$new(format = " Simulating correlation database [:bar] :percent est. time remaining: :eta",
                                            total = length(param_list), clear = FALSE, width = options()$width)
