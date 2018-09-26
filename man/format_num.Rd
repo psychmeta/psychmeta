@@ -6,10 +6,11 @@
 \title{Format numbers for presentation}
 \usage{
 format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
-  leading0 = "conditional", drop0integer = FALSE, neg.sign = "&minus;",
-  pos.sign = "figure", big.mark = "&#8239;", big.interval = 3L,
-  small.mark = "&#8239;", small.interval = 3L, na.mark = "&mdash;",
-  lgl.mark = c("+", "&minus;"), inf.mark = c("+&infin;", "&minus;&infin;"))
+  leading0 = "conditional", drop0integer = FALSE,
+  neg.sign = "&minus;", pos.sign = "figure", big.mark = "&#8239;",
+  big.interval = 3L, small.mark = "&#8239;", small.interval = 3L,
+  na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
+  inf.mark = c("+&infin;", "&minus;&infin;"))
 }
 \arguments{
 \item{x}{A vector, matrix, or data.frame of numbers to format}

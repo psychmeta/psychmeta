@@ -4,11 +4,12 @@
 \alias{generate_bib}
 \title{Generate a list of references included in meta-analyses}
 \usage{
-generate_bib(ma_obj = NULL, bib = NULL, title.bib = NULL, style = "apa",
-  additional_citekeys = NULL, file = NULL, output_dir = getwd(),
-  output_format = c("word", "html", "pdf", "text", "odt", "rmd", "biblatex",
-  "citekeys"), analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, save_build_files = FALSE, header = list(), ...)
+generate_bib(ma_obj = NULL, bib = NULL, title.bib = NULL,
+  style = "apa", additional_citekeys = NULL, file = NULL,
+  output_dir = getwd(), output_format = c("word", "html", "pdf",
+  "text", "odt", "rmd", "biblatex", "citekeys"), analyses = "all",
+  match = c("all", "any"), case_sensitive = TRUE,
+  save_build_files = FALSE, header = list(), ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object with \code{citekeys} supplied.}

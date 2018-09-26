@@ -11,7 +11,8 @@
 \alias{estimate_var_tsa_rb2}
 \title{Taylor Series Approximation of effect-size variances corrected for psychometric artifacts}
 \usage{
-estimate_var_tsa_meas(mean_rtp, var = 0, mean_qx = 1, mean_qy = 1, ...)
+estimate_var_tsa_meas(mean_rtp, var = 0, mean_qx = 1, mean_qy = 1,
+  ...)
 
 estimate_var_tsa_uvdrr(mean_rtpa, var = 0, mean_ux = 1, mean_qxa = 1,
   mean_qyi = 1, ...)

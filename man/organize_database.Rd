@@ -6,9 +6,10 @@
 \usage{
 organize_database(es_data, sample_id = NULL, citekey = NULL,
   construct_x = NULL, construct_y = NULL, facet_x = NULL,
-  facet_y = NULL, measure_x = NULL, measure_y = NULL, data_x = NULL,
-  data_y = NULL, moderators = NULL, use_as_x = NULL, use_as_y = NULL,
-  construct_order = NULL, cat_moderators = TRUE, moderator_levels = NULL)
+  facet_y = NULL, measure_x = NULL, measure_y = NULL,
+  data_x = NULL, data_y = NULL, moderators = NULL, use_as_x = NULL,
+  use_as_y = NULL, construct_order = NULL, cat_moderators = TRUE,
+  moderator_levels = NULL)
 }
 \arguments{
 \item{es_data}{Matrix of effect-size data to be used in meta-analyses.}

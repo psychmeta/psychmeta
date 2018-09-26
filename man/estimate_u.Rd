@@ -5,8 +5,8 @@
 \title{Estimate u ratios from available artifact information}
 \usage{
 estimate_u(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL,
-  rxxa = NULL, item_ki = NULL, item_ka = NULL, n = NULL, meani = NULL,
-  sr = NULL, rxya_est = NULL, data = NULL)
+  rxxa = NULL, item_ki = NULL, item_ka = NULL, n = NULL,
+  meani = NULL, sr = NULL, rxya_est = NULL, data = NULL)
 }
 \arguments{
 \item{measure_id}{Vector of measure identifiers.}

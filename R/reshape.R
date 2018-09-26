@@ -135,9 +135,12 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 #' @param other_design A matrix with variable names on the rows and names of long-format variables to create on the columns. Elements of this
 #' matrix must be column names of \code{data}.
 #' @param es_name Name of the effect size represented in \code{data}.
+#' @param missing_col_action Character scalar indicating how missing columns should be handled. Options are: "warn", "ignore", and "stop"
 #'
 #' @return A long-format database
 #' @export
+#' 
+#' @importFrom stats na.omit
 #'
 #' @examples
 #' n_params = c(mean = 150, sd = 20)
@@ -239,7 +242,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
                }
                if(!all(other_rnames %in% es_rnames)) {
                     es_supp_rnames <- other_rnames[!other_rnames %in% es_rnames]
-                    es_rsupp <- matrix(NA, length(es_supp_names), ncol(es_design))
+                    es_rsupp <- matrix(NA, length(es_supp_rnames), ncol(es_design))
                     rownames(es_rsupp) <- es_supp_rnames
                     es_design <- rbind(es_design, es_rsupp)
                     n_design <- rbind(n_design, es_rsupp)

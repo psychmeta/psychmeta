@@ -5,8 +5,9 @@
 \title{Wrapper function to compute meta-analytic results for all analyses.}
 \usage{
 ma_wrapper(es_data, es_type = "r", ma_type = "bb", ma_fun,
-  moderator_matrix = NULL, moderator_type = "all", cat_moderators = TRUE,
-  construct_x = NULL, construct_y = NULL, ma_arg_list, ...)
+  moderator_matrix = NULL, moderator_type = "all",
+  cat_moderators = TRUE, construct_x = NULL, construct_y = NULL,
+  ma_arg_list, ...)
 }
 \arguments{
 \item{es_data}{Matrix of effect-size data.}

@@ -4,12 +4,13 @@
 \alias{correct_r}
 \title{Correct correlations for range restriction and/or measurement error}
 \usage{
-correct_r(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y",
-  "bvdrr", "bvirr"), rxyi, ux = 1, uy = 1, rxx = 1, ryy = 1,
-  ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE,
-  rxx_type = "alpha", k_items_x = NA, ryy_restricted = TRUE,
-  ryy_type = "alpha", k_items_y = NA, sign_rxz = 1, sign_ryz = 1,
-  n = NULL, conf_level = 0.95, correct_bias = FALSE)
+correct_r(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x",
+  "uvirr_y", "bvdrr", "bvirr"), rxyi, ux = 1, uy = 1, rxx = 1,
+  ryy = 1, ux_observed = TRUE, uy_observed = TRUE,
+  rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
+  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
+  sign_rxz = 1, sign_ryz = 1, n = NULL, conf_level = 0.95,
+  correct_bias = FALSE)
 }
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"}

@@ -6,19 +6,21 @@
 \usage{
 metabulate(ma_obj, file = NULL, output_dir = getwd(),
   output_format = c("word", "html", "pdf", "odt", "text", "rmd"),
-  show_msd = TRUE, show_conf = TRUE, show_cred = TRUE, show_se = FALSE,
-  show_var = FALSE, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ma_method = "ad", correction_type = "ts",
-  collapse_construct_labels = TRUE, bold_headers = TRUE, digits = 2L,
+  show_msd = TRUE, show_conf = TRUE, show_cred = TRUE,
+  show_se = FALSE, show_var = FALSE, analyses = "all",
+  match = c("all", "any"), case_sensitive = TRUE, ma_method = "ad",
+  correction_type = "ts", collapse_construct_labels = TRUE,
+  bold_headers = TRUE, digits = 2L,
   decimal.mark = getOption("OutDec"), leading0 = "conditional",
   drop0integer = FALSE, neg.sign = "&minus;", pos.sign = "figure",
   big.mark = "&#8239;", big.interval = 3L, small.mark = "&#8239;",
-  small.interval = 3L, na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
-  inf.mark = c("+&infin;", "&minus;&infin;"), conf_format = "parentheses",
-  cred_format = "parentheses", symbol_es = "ES",
-  caption = "Results of meta-analyses", header = NULL, verbose = FALSE,
-  unicode = NULL, bib = NULL, title.bib = NULL, style = "apa",
-  additional_citekeys = NULL, save_build_files = FALSE, ...)
+  small.interval = 3L, na.mark = "&mdash;", lgl.mark = c("+",
+  "&minus;"), inf.mark = c("+&infin;", "&minus;&infin;"),
+  conf_format = "parentheses", cred_format = "parentheses",
+  symbol_es = "ES", caption = "Results of meta-analyses",
+  header = NULL, verbose = FALSE, unicode = NULL, bib = NULL,
+  title.bib = NULL, style = "apa", additional_citekeys = NULL,
+  save_build_files = FALSE, ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}

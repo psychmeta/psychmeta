@@ -4,7 +4,8 @@
 \alias{var_error_alpha}
 \title{Analytic estimate of the sampling variance of alpha}
 \usage{
-var_error_alpha(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases)
+var_error_alpha(item_mat = NULL, alpha = NULL, k_items = NULL,
+  n_cases)
 }
 \arguments{
 \item{item_mat}{Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both alpha and k_items.

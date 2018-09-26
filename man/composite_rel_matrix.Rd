@@ -4,7 +4,8 @@
 \alias{composite_rel_matrix}
 \title{Matrix formula to estimate the reliability of a weighted or unweighted composite variable}
 \usage{
-composite_rel_matrix(rel_vec, r_mat, sd_vec, wt_vec = rep(1, length(rel_vec)))
+composite_rel_matrix(rel_vec, r_mat, sd_vec, wt_vec = rep(1,
+  length(rel_vec)))
 }
 \arguments{
 \item{rel_vec}{Vector of reliabilities associated with variables in the composite to be formed.}

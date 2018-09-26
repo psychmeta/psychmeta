@@ -4,8 +4,9 @@
 \alias{reshape_wide2long}
 \title{Reshape database from wide format to long format}
 \usage{
-reshape_wide2long(data, common_vars = NULL, es_design, n_design,
-  other_design = NULL, es_name = "rxyi")
+reshape_wide2long(data, common_vars = NULL, es_design = NULL,
+  n_design = NULL, other_design = NULL, es_name = "rxyi",
+  missing_col_action = c("warn", "ignore", "stop"))
 }
 \arguments{
 \item{data}{Database of data for use in a meta-analysis in "wide" format.}
@@ -20,6 +21,8 @@ reshape_wide2long(data, common_vars = NULL, es_design, n_design,
 matrix must be column names of \code{data}.}
 
 \item{es_name}{Name of the effect size represented in \code{data}.}
+
+\item{missing_col_action}{Character scalar indicating how missing columns should be handled. Options are: "warn", "ignore", and "stop"}
 }
 \value{
 A long-format database
