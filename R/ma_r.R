@@ -1448,8 +1448,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           indep_data <- as_tibble(rbind(full_data_mod[!duplicate_samples,], collapsed_data))
           indep_data <- indep_data[order(indep_data$analysis_id),]
 
-          if(ma_method == "ad") indep_data[indep_data$analysis_id != 1, c("rxx", "ryy", "ux", "uy")] <- NA
-
+          if(!moderated_ads)
+               if(ma_method == "ad") indep_data[indep_data$analysis_id != 1, c("rxx", "ryy", "ux", "uy")] <- NA
+          
           sample_id   <- indep_data$sample_id
           citekey     <- as.data.frame(indep_data)$citekey
           es_data     <- indep_data[,str_es_data]
@@ -1506,7 +1507,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                         control = control_psychmeta(var_unbiased = var_unbiased,
                                                                     pairwise_ads = pairwise_ads,
                                                                     moderated_ads = moderated_ads, 
-                                                                    check_dependence = FALSE),
+                                                                    check_dependence = TRUE, 
+                                                                    collapse_method = "average"),
                                         moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz,
                                         cat_moderators = cat_moderators,
                                         moderator_type = moderator_type,
@@ -1782,7 +1784,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                              control = control_psychmeta(var_unbiased = var_unbiased,
                                                                          pairwise_ads = pairwise_ads,
                                                                          moderated_ads = moderated_ads, 
-                                                                         check_dependence = FALSE),
+                                                                         check_dependence = TRUE, 
+                                                                         collapse_method = "average"),
                                              moderators = .psychmeta_reserved_internal_mod_aabbccddxxyyzz,
                                              cat_moderators = cat_moderators,
                                              moderator_type = moderator_type,
