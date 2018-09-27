@@ -1439,7 +1439,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                as.data.frame(cbind(as_tibble(duplicates)[i, c("analysis_id", "analysis_type", str_moderators)][1,], out))
           })
           
-          collapsed_data <- data.frame(data.table::rbindlist(collapsed_data_list))
+          collapsed_data <- as.data.frame(data.table::rbindlist(collapsed_data_list))
           colnames(collapsed_data)[colnames(collapsed_data) == "es"] <- "rxyi"
           collapsed_data <- collapsed_data[,colnames(full_data_mod)]
 

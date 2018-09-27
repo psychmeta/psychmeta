@@ -57,15 +57,18 @@ match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
 }
 
 
-clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, moderator_levels = NULL, moderator_names = NULL){
+clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, 
+                             moderator_levels = NULL, moderator_names = NULL, 
+                             presorted = FALSE){
      .moderator_names <- moderator_names
      if(!is.null(moderator_matrix)){
           if(is.null(dim(moderator_matrix))) moderator_matrix <- data.frame(Moderator = moderator_matrix)
           es_vec <- unlist(es_vec)
           
-          if(nrow(moderator_matrix) != length(es_vec)){
-               stop("moderator_matrix must contain as many cases as there are effect sizes in the meta-analysis", call. = FALSE)
-          }
+          if(!presorted)
+               if(nrow(moderator_matrix) != length(es_vec))
+                    stop("moderator_matrix must contain as many cases as there are effect sizes in the meta-analysis", call. = FALSE)
+               
 
           moderator_names <- colnames(moderator_matrix)
           if(is.null(moderator_names)){

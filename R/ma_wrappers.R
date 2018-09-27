@@ -297,7 +297,8 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
 
           moderators <- clean_moderators(moderator_matrix = moderator_matrix,
                                          cat_moderators = cat_moderators,
-                                         es_vec = es_data[presorted_data$analysis_id == 1,es_colname])
+                                         es_vec = es_data[presorted_data$analysis_id == 1,es_colname], 
+                                         presorted = TRUE)
           
           moderator_matrix <- moderators$moderator_matrix
           cat_moderator_matrix <- moderators$cat_moderator_matrix
