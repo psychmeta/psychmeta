@@ -189,8 +189,8 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           CI <- confidence(d, se=sqrt(V.d), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
-          conf_int <- data.frame(d=d.ci, n_total=n, n1=n1, n2=n2, CI)
+          meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.d)
+          conf_int <- data.frame(d=d.ci, n_total=n, n1=n1, n2=n2, var_e = V.d, se = V.d^.5, CI)
      }
 
      if(output_es == "r"){
@@ -217,8 +217,8 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           CI <- confidence(r, se=sqrt(V.r), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(r = r, n_effective=n_effective)
-          conf_int <- data.frame(r=r.ci, n_effective=n, CI)
+          meta_input <- data.frame(r = r, n_effective=n_effective, var_e = V.r)
+          conf_int <- data.frame(r=r.ci, n_effective=n, var_e = V.r, se = V.r^.5, CI)
      }
 
      if(output_es %in% c("A", "auc", "cles") ){
@@ -252,8 +252,9 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           CI <- confidence(A, se=sqrt(V.A), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
-          conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, CI)
+          meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.A)
+          conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, var_e = V.A, se = V.A^.5, CI)
+          
      }
 
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
@@ -286,7 +287,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           stop("Error: Sample size or df not supplied.", call.=FALSE)
      }else{
           if(any(es < 0 | es > 1)){
-               stop("Value supplied for p is not a probability", call.=FALSE)
+               stop("Value supplied for p is not a probability.", call.=FALSE)
           }
      }
 }
@@ -296,7 +297,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           stop("Error: Sample size or df not supplied.", call. = FALSE)
      } else {
           if(any(es < 0)){
-               stop("Value supplied for F is negative", call. = FALSE)
+               stop("Value supplied for F is negative.", call. = FALSE)
           }else{
                if(!is.null(df1)){
                     if(df1 != 1){
@@ -309,7 +310,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_pF <- function(es, n1, n2, df1, df2){
      if(any(es < 0 | es > 1)) {
-          stop("Value supplied for p is not a probability", call. = FALSE)
+          stop("Value supplied for p is not a probability.", call. = FALSE)
      } else {
           if(is.null(c(n1, n2, df2))){
                stop("Error: Sample size or df not supplied.", call. = FALSE)
@@ -325,7 +326,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_chisq <- function(es, df1){
      if(any(es < 0)){
-          stop("Value supplied for chi squared is negative", call. = FALSE)
+          stop("Value supplied for chi squared is negative.", call. = FALSE)
      }else{
           if(!is.null(df1)){
                if(df1 != 1){
@@ -337,7 +338,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_pchisq <- function(es, df1){
      if(any(es < 0 | es > 1)){
-          stop("Value supplied for p is not a probability", call. = FALSE)
+          stop("Value supplied for p is not a probability.", call. = FALSE)
      }else{
           if(!is.null(df1)){
                if(df1 != 1){
@@ -349,16 +350,16 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_or <- function(es){
      if(any(es < 0)){
-          stop("Value supplied for odds ratio is negative", call. = FALSE)
+          stop("Value supplied for odds ratio is negative.", call. = FALSE)
      }
 }
 
 .screen_auc <- function(es){
      if(any(es < 0, es > 1)){
-          stop("Value supplied for A/AUC/CLES is not a probability", call. = FALSE)
+          stop("Value supplied for A/AUC/CLES is not a probability.", call. = FALSE)
      }else{
           if(any(es == 0, es == 1)){
-          stop("Value supplied for A/AUC/CLES produces an infinite d value", call. = FALSE)
+          stop("Value supplied for A/AUC/CLES produces an infinite d value.", call. = FALSE)
           }
      }
 }
@@ -491,7 +492,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      r <- sqrt(chisq / n)
      if(any(abs(r) > 1))
-          stop("Impossible values supplied for chi squared and n", call.=FALSE)
+          stop("Impossible values supplied for chi squared and n.", call.=FALSE)
      return(r)
 }
 
@@ -551,7 +552,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      if(any(abs(r) > 1))
-          stop("Value supplied for r is not a correlation", call.=FALSE)
+          stop("Value supplied for r is not a correlation.", call.=FALSE)
      a   <- 1 / (p * (1-p))
      return((sqrt(a) * r) / sqrt(1 - r^2))
 }
