@@ -90,7 +90,12 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      if(input_es == "chisq")                  .screen_chisq(es, df1)
      if(input_es == "p.chisq")                .screen_pchisq(es, df1)
      if(input_es == "or")                     .screen_or(es)
-     if(input_es %in% c("A", "auc", "cles"))  .screen_auc(es)
+     if(input_es %in% c("A", "auc", "cles"))  {
+          input_es <- "auc"
+          .screen_auc(es)
+     }
+
+     if(output_es %in% c("A", "cles"))        output_es <- "auc"
 
      x <- list(es = es, n1=n1, n2=n2, df1=df1, df2=df2, sd1=sd1, sd2=sd2)
      # Compute sample sizes and df as needed
@@ -110,7 +115,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           if(output_es == "r")
                if(input_es %in% c("d", "or", "lor"))
                     warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
-          if(output_es %in% c("d", "A", "auc", "cles"))
+          if(output_es %in% c("d", "auc"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
                     warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
      }else if(!is.null(n2)) {
@@ -123,7 +128,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           if(output_es == "r")
                if(input_es %in% c("d", "or", "lor"))
                     warning("Assumed equal groups.", call.=FALSE)
-          if(output_es %in% c("d", "A", "auc", "cles"))
+          if(output_es %in% c("d", "auc"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
                     warning("Assumed equal groups.", call.=FALSE)
      }
@@ -144,11 +149,11 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      # Assume SDs as needed
      if(is.null(sd1) & is.null(sd2)){
           x$sd1 <- x$sd2 <- 1
-          if(output_es %in% c("A", "auc", "cles"))
+          if(output_es == "auc")
                warning("Group SDs = 1 assumed.", call.=FALSE)
      }else if(is.null(sd2)){
           x$sd2 <- x$sd1
-          if(output_es %in% c("A", "auc", "cles"))
+          if(output_es == "auc")
                warning("Equal group SDs assumed.", call.=FALSE)
      }
 
@@ -254,7 +259,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           names(original_es)[1] <- input_es
           meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.A)
           conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, var_e = V.A, se = V.A^.5, CI)
-          
+
      }
 
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
@@ -381,12 +386,12 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      d
 }
 
-"convert_es.q_A_to_A" <- function(A, x = NULL) {
+"convert_es.q_auc_to_auc" <- function(auc, x = NULL) {
      if(!is.null(x)){
-          A <- x$es
+          auc <- x$es
      }
 
-     A
+     auc
 }
 
 "convert_es.q_delta_to_d" <- function(d, x = NULL) {
@@ -821,20 +826,3 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      return(convert_es.q_d_to_auc(d, p, sd1, sd2))
 }
 
-"convert_es.q_A_to_d"         <- "convert_es.q_cles_to_d"       <- "convert_es.q_auc_to_d"
-"convert_es.q_A_to_r"         <- "convert_es.q_cles_to_r"       <- "convert_es.q_auc_to_r"
-"convert_es.q_r_to_A"         <- "convert_es.q_r_to_cles"       <- "convert_es.q_r_to_auc"
-"convert_es.q_delta_to_A"     <- "convert_es.q_delta_to_cles"   <- "convert_es.q_delta_to_auc"
-"convert_es.q_g_to_A"         <- "convert_es.q_g_to_cles"       <- "convert_es.q_g_to_auc"
-"convert_es.q_t_to_A"         <- "convert_es.q_t_to_cles"       <- "convert_es.q_t_to_auc"
-"convert_es.p_t_to_A"         <- "convert_es.p_t_to_cles"       <- "convert_es.p_t_to_auc"
-"convert_es.q_F_to_A"         <- "convert_es.q_F_to_cles"       <- "convert_es.q_F_to_auc"
-"convert_es.p_F_to_A"         <- "convert_es.p_F_to_cles"       <- "convert_es.p_F_to_auc"
-"convert_es.q_chisq_to_A"     <- "convert_es.q_chisq_to_cles"   <- "convert_es.q_chisq_to_auc"
-"convert_es.p_chisq_to_A"     <- "convert_es.p_chisq_to_cles"   <- "convert_es.p_chisq_to_auc"
-"convert_es.q_or_to_A"        <- "convert_es.q_or_to_cles"      <- "convert_es.q_or_to_auc"
-"convert_es.q_lor_to_A"       <- "convert_es.q_lor_to_cles"     <- "convert_es.q_lor_to_auc"
-"convert_es.q_Fisherz_to_A"   <- "convert_es.q_Fisherz_to_cles" <- "convert_es.q_Fisherz_to_auc"
-"covert_es.q_A_to_auc"        <- "covert_es.q_A_to_cles"        <- "covert_es.q_A_to_A"
-"covert_es.q_auc_to_auc"      <- "covert_es.q_auc_to_cles"      <- "covert_es.q_auc_to_A"        <- "covert_es.q_A_to_A"
-"covert_es.q_cles_to_auc"     <- "covert_es.q_cles_to_cles"     <- "covert_es.q_cles_to_A"       <- "covert_es.q_A_to_A"
