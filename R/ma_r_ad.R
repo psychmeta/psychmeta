@@ -9,6 +9,9 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
                     sign_rxz = 1, sign_ryz = 1, 
                     control = control_psychmeta(), ...){
      
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
@@ -21,7 +24,7 @@ ma_r_ad <- function(ma_obj, ad_obj_x = NULL, ad_obj_y = NULL,
      estimate_pa <- control$estimate_pa
      
      suppress_message <- list(...)$suppress_message
-     if(is.null(suppress_message)) suppress_message <- FALSE
+     if(is.null(suppress_message)) suppress_message <- !psychmeta.show_progress
      
      ma_metric <- attributes(ma_obj)$ma_metric
      convert_metric <- ifelse(any(ma_metric == "r_as_d" | ma_metric == "d_as_d"), TRUE, FALSE)

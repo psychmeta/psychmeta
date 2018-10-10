@@ -513,6 +513,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
                  supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
 
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
@@ -561,7 +566,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      additional_args <- list(...)
      inputs <- append(inputs, additional_args)
      
-     if(is.null(inputs$es_d)) cat(" **** Running ma_r: Meta-analysis of correlations **** \n")
+     if(psychmeta.show_progress)
+          if(is.null(inputs$es_d)) cat(" **** Running ma_r: Meta-analysis of correlations **** \n")
 
      use_as_x <- inputs$use_as_x
      use_as_y <- inputs$use_as_y
@@ -1430,7 +1436,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
                                       total = length(unique(duplicates$analysis_id)), clear = FALSE, width = options()$width)
           collapsed_data_list <- by(1:length(duplicates$analysis_id), duplicates$analysis_id, function(i){
-               progbar$tick()
+               if(psychmeta.show_progress)
+                    progbar$tick()
                out <- .remove_dependency(sample_id = "sample_id", citekey = "citekey", es_data = str_es_data,
                                          data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
                                          intercor=intercor, partial_intercor = FALSE, construct_x = "construct_x", construct_y = "construct_y",
@@ -1527,7 +1534,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                          supplemental_ads = supplemental_ads)
           
           out <- by(1:length(construct_pair), construct_pair, function(i){
-               progbar$tick()
+               if(psychmeta.show_progress)
+                    progbar$tick()
 
                mod_names <- colnames(complete_moderators)
                data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
@@ -1639,7 +1647,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(ma_method == "bb" | ma_method == "ad"){
           
           out <- by(1:length(construct_pair), construct_pair, function(i){
-               progbar$tick()
+               if(psychmeta.show_progress)
+                    progbar$tick()
                
                mod_names <- colnames(complete_moderators)
                if(ma_method == "ad"){
@@ -1853,6 +1862,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      out <- namelists.ma_psychmeta(ma_obj = out)
 
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
+     
      return(out)
 }
 

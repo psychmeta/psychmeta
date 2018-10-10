@@ -24,6 +24,12 @@
 ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
                         construct_x = NULL, construct_y = NULL, data = NULL, control = control_psychmeta(), ...){
+     
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      call <- match.call()
      warn_obj1 <- record_warnings()
      ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
@@ -192,6 +198,9 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
      out <- namelists.ma_psychmeta(ma_obj = out)
      
      class(out) <- c("ma_psychmeta", class(out))
+     
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
      
      out
 }

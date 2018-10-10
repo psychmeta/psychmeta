@@ -114,10 +114,10 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           }
           if(output_es == "r")
                if(input_es %in% c("d", "or", "lor"))
-                    warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
+                    message("Sample sizes not supplied. Assumed equal group sizes.")
           if(output_es %in% c("d", "auc"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
-                    warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
+                    message("Sample sizes not supplied. Assumed equal group sizes.")
      }else if(!is.null(n2)) {
           x$n <- n1 + n2
           x$p <- n1 / x$n
@@ -127,10 +127,10 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           x$p   <- .5
           if(output_es == "r")
                if(input_es %in% c("d", "or", "lor"))
-                    warning("Assumed equal groups.", call.=FALSE)
+                    message("Assumed equal group sizes.")
           if(output_es %in% c("d", "auc"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
-                    warning("Assumed equal groups.", call.=FALSE)
+                    message("Assumed equal group sizes.")
      }
      subset_id <- is.na(x$n) & !is.na(x$n1)
      x$n[subset_id] <- x$n1[subset_id]
@@ -150,11 +150,11 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      if(is.null(sd1) & is.null(sd2)){
           x$sd1 <- x$sd2 <- 1
           if(output_es == "auc")
-               warning("Group SDs = 1 assumed.", call.=FALSE)
+               message("Group SDs = 1 assumed.")
      }else if(is.null(sd2)){
           x$sd2 <- x$sd1
           if(output_es == "auc")
-               warning("Equal group SDs assumed.", call.=FALSE)
+               message("Equal group SDs assumed.")
      }
 
      if(grepl(x = input_es, pattern = "p.")){
@@ -464,7 +464,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
      t <- qt(p.t, df1, lower.tail = FALSE)
-     warning("t values computed from p values. Check effect direction coding.", call.=FALSE)
+     message("t values computed from p values. Check effect direction coding.")
      return( convert_es.q_t_to_r(t, df1) )
 }
 
@@ -485,7 +485,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      F <- qf(p.F, 1, df2, lower.tail = FALSE)
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      return( convert_es.q_F_to_r(F, df2) )
 }
 
@@ -507,7 +507,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           n <- x$n
      }
 
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      chisq <- qchisq(p.chisq, 1)
      return( convert_es.q_chisq_to_r(chisq, n) )
 }
@@ -583,7 +583,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
      t <- qt(p.t, df1, lower.tail = FALSE)
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      return( convert_es.q_t_to_d(t, df1, p) )
 }
 
@@ -596,7 +596,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      a <- 1 / (p * (1-p))
      n <- df2 + 2
-     warning("F values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("F values converted to effect sizes. Check effect direction coding.")
      return( sqrt(F * a / n) )
 }
 
@@ -608,7 +608,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      F <- qf(p.F, 1, df2, lower.tail = FALSE)
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      return( convert_es.q_F_to_d(F, df2, p) )
 }
 

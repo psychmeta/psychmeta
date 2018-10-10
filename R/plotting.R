@@ -37,6 +37,9 @@
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
 
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
 
@@ -80,7 +83,8 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_obj$funnel <- .out
 
      if(flag_summary) ma_obj <- summary(ma_obj)
-     message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
+     if(psychmeta.show_progress)
+          message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
 
      ma_obj
 }
@@ -137,6 +141,9 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                         conf_level = .95, conf_method = "t",
                         x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference"){
 
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
 
@@ -247,7 +254,8 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      rm(out_pair, out_analysis)
 
      if(flag_summary) ma_obj <- summary(ma_obj)
-     message("Forest plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
+     if(psychmeta.show_progress)
+          message("Forest plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
 
      ma_obj
 }

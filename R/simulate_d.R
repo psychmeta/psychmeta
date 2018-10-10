@@ -1170,6 +1170,12 @@ simulate_d_database <- function(k, n_params, rho_params,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
                                 group_names = NULL, var_names = NULL, composite_names = NULL, diffs_as_obs = FALSE,
                                 show_applicant = FALSE, keep_vars = NULL, decimals = 2, max_iter = 100, ...){
+     
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      inputs <- as.list(environment())
      call <- match.call()
 
@@ -1418,7 +1424,8 @@ simulate_d_database <- function(k, n_params, rho_params,
                                            total = length(param_list), clear = FALSE, width = options()$width)
      sim_dat_stats <- sim_dat_params <- list()
      for(i in 1:length(param_list)){
-          progbar$tick()
+          if(psychmeta.show_progress)
+               progbar$tick()
           x <- param_list[[i]]
 
           out_stats <- .simulate_d_sample_stats(n_vec = x[["n_vec"]], rho_mat_list = x[["rho_list"]],
@@ -1480,6 +1487,10 @@ simulate_d_database <- function(k, n_params, rho_params,
                  statistics = as_tibble(dat_stats),
                  parameters = as_tibble(dat_params))
      class(out) <- "simdat_d_database"
+     
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
+     
      out
 }
 

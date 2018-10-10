@@ -9,6 +9,12 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                                       moderators = NULL, cat_moderators = TRUE, 
                                       moderator_type = c("simple", "hierarchical", "none"), 
                                       data = NULL, control = control_psychmeta(), ...){
+     
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      warn_obj1 <- record_warnings()
      call <- match.call()
 
@@ -133,6 +139,9 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      }
      
      class(out) <- c("ma_psychmeta", class(out))
+     
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
      
      return(out)
 }

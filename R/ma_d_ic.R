@@ -14,6 +14,11 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
                     moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"), 
                     supplemental_ads_y = NULL, data = NULL, control = control_psychmeta(), ...){
      
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      call <- match.call()
 
      wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
@@ -167,6 +172,9 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
      attributes(out)$call_history <- list(call)
      
      out <- convert_ma(ma_obj = out, record_call = FALSE)
+     
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
      
      return(out)
 }

@@ -860,6 +860,12 @@ simulate_r_database <- function(k, n_params, rho_params,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL, var_names = NULL, composite_names = NULL,
                                 n_as_ni = FALSE, show_applicant = FALSE, keep_vars = NULL, decimals = 2,
                                 format = "long", max_iter = 100, ...){
+     
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      inputs <- as.list(environment())
      call <- match.call()
 
@@ -1133,7 +1139,8 @@ simulate_r_database <- function(k, n_params, rho_params,
      progbar <- progress::progress_bar$new(format = " Simulating correlation database [:bar] :percent est. time remaining: :eta",
                                            total = length(param_list), clear = FALSE, width = options()$width)
      for(i in 1:length(param_list)){
-          progbar$tick()
+          if(psychmeta.show_progress)
+               progbar$tick()
           x <- param_list[[i]]
           if(noalpha){
                sim_dat_stats <- .simulate_r_sample_stats_noalpha(n = x[["n"]], rho_mat = x[["rho_mat"]],
@@ -1217,6 +1224,10 @@ simulate_r_database <- function(k, n_params, rho_params,
                  parameters = as_tibble(dat_params))
      
      class(out) <- c("simdat_r_database", format)
+     
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
+     
      out
 }
 
