@@ -1,5 +1,7 @@
 Changes in Version 2.2.1 (2018-10-02)
 =====================================
+- Added option to suppress progress readouts. Use options(psychmeta.show_progress = FALSE) to suppress progress indicators.
+
 - Increased support for common wide database formats in the reshape_wide2long() function.
 
 - Bug fixes for resolving dependency in effect sizes in meta-analyses with moderators.
