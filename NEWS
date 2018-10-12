@@ -1,8 +1,10 @@
-Changes in Version 2.2.1 (2018-10-02)
+Changes in Version 2.2.1 (2018-10-12)
 =====================================
-- Added option to suppress progress readouts. Use options(psychmeta.show_progress = FALSE) to suppress progress indicators.
+- Added option to suppress progress indicators in the console. Use options(psychmeta.show_progress = FALSE) to suppress progress indicators.
 
 - Increased support for common wide database formats in the reshape_wide2long() function.
+
+- Bug fixes for managing dependent observations in artifact distributions created within ma_r() and ma_d(). 
 
 - Bug fixes for resolving dependency in effect sizes in meta-analyses with moderators.
 
