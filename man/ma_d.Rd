@@ -8,22 +8,24 @@
 \alias{ma_d_ic}
 \title{Meta-analysis of \emph{d} values}
 \usage{
-ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL,
-  treat_as_r = FALSE, ma_method = c("bb", "ic", "ad"), ad_type = c("tsa",
-  "int"), correction_method = "auto", group_id = NULL, group1 = NULL,
-  group2 = NULL, group_order = NULL, construct_y = NULL, facet_y = NULL,
-  measure_y = NULL, construct_order = NULL, wt_type = c("sample_size",
-  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
-  "PM"), correct_bias = TRUE, correct_rel = NULL, correct_rGg = FALSE,
-  correct_ryy = TRUE, correct_rr = NULL, correct_rr_g = TRUE,
-  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_g = TRUE,
-  indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
+ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
+  citekey = NULL, treat_as_r = FALSE, ma_method = c("bb", "ic",
+  "ad"), ad_type = c("tsa", "int"), correction_method = "auto",
+  group_id = NULL, group1 = NULL, group2 = NULL,
+  group_order = NULL, construct_y = NULL, facet_y = NULL,
+  measure_y = NULL, construct_order = NULL,
+  wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL",
+  "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
+  correct_rel = NULL, correct_rGg = FALSE, correct_ryy = TRUE,
+  correct_rr = NULL, correct_rr_g = TRUE, correct_rr_y = TRUE,
+  indirect_rr = NULL, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
+  rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
   ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
   uy = NULL, uy_observed = TRUE, sign_rz = NULL, sign_rgz = 1,
   sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
   moderator_type = c("simple", "hierarchical", "none"),
-  supplemental_ads = NULL, data = NULL, control = control_psychmeta(),
-  ...)
+  supplemental_ads = NULL, data = NULL,
+  control = control_psychmeta(), ...)
 
 ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
   correction_method = "auto", use_ic_ads = c("tsa", "int"),
@@ -31,23 +33,25 @@ ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
   correct_rr_y = TRUE, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
   sign_rgz = 1, sign_ryz = 1, control = control_psychmeta(), ...)
 
-ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL,
-  citekey = NULL, wt_type = c("sample_size", "inv_var_mean",
-  "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
-  correct_bias = FALSE, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = c("simple", "hierarchical", "none"), data = NULL,
-  control = control_psychmeta(), ...)
+ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL,
+  sample_id = NULL, citekey = NULL, wt_type = c("sample_size",
+  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML",
+  "EB", "PM"), correct_bias = FALSE, moderators = NULL,
+  cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
+  "none"), data = NULL, control = control_psychmeta(), ...)
 
 ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   citekey = NULL, treat_as_r = FALSE, wt_type = c("sample_size",
-  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
-  "PM"), correct_bias = TRUE, correct_rGg = FALSE, correct_ryy = TRUE,
-  correct_rr_g = FALSE, correct_rr_y = TRUE, indirect_rr_g = TRUE,
-  indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
-  uy = NULL, uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1,
-  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple",
-  "hierarchical", "none"), supplemental_ads_y = NULL, data = NULL,
+  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML",
+  "EB", "PM"), correct_bias = TRUE, correct_rGg = FALSE,
+  correct_ryy = TRUE, correct_rr_g = FALSE, correct_rr_y = TRUE,
+  indirect_rr_g = TRUE, indirect_rr_y = TRUE, rGg = NULL,
+  pi = NULL, pa = NULL, ryy = NULL, ryy_restricted = TRUE,
+  ryy_type = "alpha", k_items_y = NULL, uy = NULL,
+  uy_observed = TRUE, sign_rgz = 1, sign_ryz = 1,
+  moderators = NULL, cat_moderators = TRUE,
+  moderator_type = c("simple", "hierarchical", "none"),
+  supplemental_ads_y = NULL, data = NULL,
   control = control_psychmeta(), ...)
 }
 \arguments{

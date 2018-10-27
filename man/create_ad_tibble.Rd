@@ -5,12 +5,13 @@
 \alias{create_ad_list}
 \title{Create a tibble of artifact distributions by construct}
 \usage{
-create_ad_tibble(ad_type = c("tsa", "int"), n = NULL, sample_id = NULL,
-  construct_x = NULL, facet_x = NULL, measure_x = NULL,
-  construct_y = NULL, facet_y = NULL, measure_y = NULL, rxx = NULL,
-  rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA, ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA, ux = NULL,
-  ux_observed = TRUE, uy = NULL, uy_observed = TRUE,
+create_ad_tibble(ad_type = c("tsa", "int"), n = NULL,
+  sample_id = NULL, construct_x = NULL, facet_x = NULL,
+  measure_x = NULL, construct_y = NULL, facet_y = NULL,
+  measure_y = NULL, rxx = NULL, rxx_restricted = TRUE,
+  rxx_type = "alpha", k_items_x = NA, ryy = NULL,
+  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
+  ux = NULL, ux_observed = TRUE, uy = NULL, uy_observed = TRUE,
   estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE,
   estimate_ut = TRUE, moderators = NULL, cat_moderators = TRUE,
   moderator_type = c("simple", "hierarchical", "none"),
@@ -20,14 +21,14 @@ create_ad_tibble(ad_type = c("tsa", "int"), n = NULL, sample_id = NULL,
 create_ad_list(ad_type = c("tsa", "int"), n = NULL, sample_id = NULL,
   construct_x = NULL, facet_x = NULL, measure_x = NULL,
   construct_y = NULL, facet_y = NULL, measure_y = NULL, rxx = NULL,
-  rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA, ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA, ux = NULL,
-  ux_observed = TRUE, uy = NULL, uy_observed = TRUE,
-  estimate_rxxa = TRUE, estimate_rxxi = TRUE, estimate_ux = TRUE,
-  estimate_ut = TRUE, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = c("simple", "hierarchical", "none"),
-  construct_order = NULL, supplemental_ads = NULL, data = NULL,
-  control = control_psychmeta(), ...)
+  rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
+  ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+  k_items_y = NA, ux = NULL, ux_observed = TRUE, uy = NULL,
+  uy_observed = TRUE, estimate_rxxa = TRUE, estimate_rxxi = TRUE,
+  estimate_ux = TRUE, estimate_ut = TRUE, moderators = NULL,
+  cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
+  "none"), construct_order = NULL, supplemental_ads = NULL,
+  data = NULL, control = control_psychmeta(), ...)
 }
 \arguments{
 \item{ad_type}{Type of artifact distributions to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.}

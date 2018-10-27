@@ -4,8 +4,8 @@
 \alias{compute_dmod_npar}
 \title{Function for computing non-parametric \eqn{d_{Mod}}{d_Mod} effect sizes for a single focal group}
 \usage{
-compute_dmod_npar(referent_int, referent_slope, focal_int, focal_slope, focal_x,
-  referent_sd_y)
+compute_dmod_npar(referent_int, referent_slope, focal_int, focal_slope,
+  focal_x, referent_sd_y)
 }
 \arguments{
 \item{referent_int}{Referent group's intercept.}

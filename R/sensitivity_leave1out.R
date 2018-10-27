@@ -2,6 +2,9 @@
 #' @rdname sensitivity
 sensitivity_leave1out <- function(ma_obj, ...){
      
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
@@ -36,7 +39,8 @@ sensitivity_leave1out <- function(ma_obj, ...){
                                            total = nrow(ma_obj),
                                            clear = FALSE, width = options()$width)
      out_list <- apply(ma_obj, 1, function(ma_obj_i){
-          progbar$tick()
+          if(psychmeta.show_progress)
+               progbar$tick()
           
           escalc <- ma_obj_i$escalc
           meta_tables <- ma_obj_i$meta_tables
@@ -384,7 +388,8 @@ sensitivity_leave1out <- function(ma_obj, ...){
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      
      if(flag_summary) ma_obj <- summary(ma_obj)
-     message("leave-1-out meta-analyses have been added to 'ma_obj' - use get_leave1out() to retrieve them.")
+     if(psychmeta.show_progress)
+          message("leave-1-out meta-analyses have been added to 'ma_obj' - use get_leave1out() to retrieve them.")
      
      ma_obj
 }

@@ -4,10 +4,10 @@
 \alias{simulate_d_sample}
 \title{Simulate a sample of psychometric d value data with measurement error, direct range restriction, and/or indirect range restriction}
 \usage{
-simulate_d_sample(n_vec, rho_mat_list, mu_mat, sigma_mat = 1, rel_mat = 1,
-  sr_vec = 1, k_items_vec = 1, wt_mat = NULL, sr_composites = NULL,
-  group_names = NULL, var_names = NULL, composite_names = NULL,
-  diffs_as_obs = FALSE)
+simulate_d_sample(n_vec, rho_mat_list, mu_mat, sigma_mat = 1,
+  rel_mat = 1, sr_vec = 1, k_items_vec = 1, wt_mat = NULL,
+  sr_composites = NULL, group_names = NULL, var_names = NULL,
+  composite_names = NULL, diffs_as_obs = FALSE)
 }
 \arguments{
 \item{n_vec}{Vector of sample sizes (or a vector of proportions, if parameters are to be estimated).}

@@ -11,31 +11,32 @@
 \alias{estimate_var_rho_tsa_rb2}
 \title{Taylor Series Approximation of variance of \eqn{\rho} corrected for psychometric artifacts}
 \usage{
-estimate_var_rho_tsa_meas(mean_rtp, var_rxy, var_e, mean_qx = 1, var_qx = 0,
-  mean_qy = 1, var_qy = 0, ...)
+estimate_var_rho_tsa_meas(mean_rtp, var_rxy, var_e, mean_qx = 1,
+  var_qx = 0, mean_qy = 1, var_qy = 0, ...)
 
 estimate_var_rho_tsa_uvdrr(mean_rtpa, var_rxyi, var_e, mean_ux = 1,
-  var_ux = 0, mean_qxa = 1, var_qxa = 0, mean_qyi = 1, var_qyi = 0,
-  ...)
+  var_ux = 0, mean_qxa = 1, var_qxa = 0, mean_qyi = 1,
+  var_qyi = 0, ...)
 
 estimate_var_rho_tsa_bvdrr(mean_rtpa, var_rxyi, var_e = 0, mean_ux = 1,
   var_ux = 0, mean_uy = 1, var_uy = 0, mean_qxa = 1, var_qxa = 0,
   mean_qya = 1, var_qya = 0, ...)
 
 estimate_var_rho_tsa_uvirr(mean_rtpa, var_rxyi, var_e, mean_ut = 1,
-  var_ut = 0, mean_qxa = 1, var_qxa = 0, mean_qyi = 1, var_qyi = 0,
-  ...)
+  var_ut = 0, mean_qxa = 1, var_qxa = 0, mean_qyi = 1,
+  var_qyi = 0, ...)
 
 estimate_var_rho_tsa_bvirr(mean_rtpa, var_rxyi, var_e = 0, mean_ux = 1,
   var_ux = 0, mean_uy = 1, var_uy = 0, mean_qxa = 1, var_qxa = 0,
   mean_qya = 1, var_qya = 0, sign_rxz = 1, sign_ryz = 1, ...)
 
 estimate_var_rho_tsa_rb1(mean_rtpa, var_rxyi, var_e, mean_ux = 1,
-  var_ux = 0, mean_rxx = 1, var_rxx = 0, mean_ryy = 1, var_ryy = 0,
-  ...)
+  var_ux = 0, mean_rxx = 1, var_rxx = 0, mean_ryy = 1,
+  var_ryy = 0, ...)
 
 estimate_var_rho_tsa_rb2(mean_rtpa, var_rxyi, var_e, mean_ux = 1,
-  var_ux = 0, mean_qx = 1, var_qx = 0, mean_qy = 1, var_qy = 0, ...)
+  var_ux = 0, mean_qx = 1, var_qx = 0, mean_qy = 1, var_qy = 0,
+  ...)
 }
 \arguments{
 \item{mean_rtp}{Mean corrected correlation.}

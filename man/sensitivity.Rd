@@ -8,15 +8,16 @@
 \alias{sensitivity_leave1out}
 \title{Sensitivity analyses for meta-analyses}
 \usage{
-sensitivity(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative = TRUE,
-  sort_method = c("weight", "n", "inv_var"), boot_iter = 1000,
-  boot_conf_level = 0.95, boot_ci_type = c("bca", "norm", "basic", "stud",
-  "perc"), ...)
+sensitivity(ma_obj, leave1out = TRUE, bootstrap = TRUE,
+  cumulative = TRUE, sort_method = c("weight", "n", "inv_var"),
+  boot_iter = 1000, boot_conf_level = 0.95, boot_ci_type = c("bca",
+  "norm", "basic", "stud", "perc"), ...)
 
 sensitivity_bootstrap(ma_obj, boot_iter = 1000, boot_conf_level = 0.95,
   boot_ci_type = c("bca", "norm", "basic", "stud", "perc"), ...)
 
-sensitivity_cumulative(ma_obj, sort_method = c("weight", "n", "inv_var"), ...)
+sensitivity_cumulative(ma_obj, sort_method = c("weight", "n", "inv_var"),
+  ...)
 
 sensitivity_leave1out(ma_obj, ...)
 }

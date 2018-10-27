@@ -5,8 +5,9 @@
 \title{Organization of moderator data for use in meta-analyses}
 \usage{
 organize_moderators(moderator_matrix, es_data, construct_x = NULL,
-  construct_y = NULL, construct_order = NULL, moderator_levels = NULL,
-  moderator_type = "hierarchical", moderator_names = NULL, ...)
+  construct_y = NULL, construct_order = NULL,
+  moderator_levels = NULL, moderator_type = "hierarchical",
+  moderator_names = NULL, ...)
 }
 \arguments{
 \item{moderator_matrix}{Matrix (or vector) of moderator variables.}

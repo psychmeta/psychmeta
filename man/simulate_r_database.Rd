@@ -5,11 +5,12 @@
 \title{Simulate correlation databases of primary studies}
 \usage{
 simulate_r_database(k, n_params, rho_params, mu_params = 0,
-  sigma_params = 1, rel_params = 1, sr_params = 1, k_items_params = 1,
-  wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
-  var_names = NULL, composite_names = NULL, n_as_ni = FALSE,
-  show_applicant = FALSE, keep_vars = NULL, decimals = 2,
-  format = "long", max_iter = 100, ...)
+  sigma_params = 1, rel_params = 1, sr_params = 1,
+  k_items_params = 1, wt_params = NULL, allow_neg_wt = FALSE,
+  sr_composite_params = NULL, var_names = NULL,
+  composite_names = NULL, n_as_ni = FALSE, show_applicant = FALSE,
+  keep_vars = NULL, decimals = 2, format = "long", max_iter = 100,
+  ...)
 }
 \arguments{
 \item{k}{Number of studies to simulate.}

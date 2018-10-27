@@ -15,6 +15,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     supplemental_ads_x = NULL, supplemental_ads_y = NULL,
                     data = NULL, control = control_psychmeta(), ...){
 
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      call <- match.call()
      warn_obj1 <- record_warnings()
 
@@ -902,6 +907,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      class(out) <- c("ma_psychmeta", class(out))
 
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
+     
      return(out)
                          }
 

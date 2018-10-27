@@ -3,6 +3,9 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                                      construct_x, construct_y, measure_x, measure_y, 
                                      categorical_moderators, impute_method){
      
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     
      if(ma_method != "bb" & !is.null(sample_id)){
           
           missing_rel <- ((is.na(data_x$rxx) | is.na(data_x$rxx_restricted)) & data_x$correct_rxx) | 
@@ -10,7 +13,8 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
           
           if(any(!missing_rel))
                if(impute_artifacts & ma_method == "ic" & any(missing_rel)){
-                    cat(" Cleaning and imputing reliability information \n")
+                    if(psychmeta.show_progress)
+                         cat(" Cleaning and imputing reliability information \n")
                     
                     sample_id <- as.character(sample_id)
                     .sample_id <- unique(sample_id[missing_rel])
@@ -83,7 +87,8 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                               .disagreement_y <- .id_vec_y %in% disagreement_names
                               disagreement <- .disagreement_x | .disagreement_y
                               
-                              cat(" Cleaning reliability information \n")
+                              if(psychmeta.show_progress)
+                                   cat(" Cleaning reliability information \n")
                               rel_reconciled <- reconcile_artifacts(logic_vec_x = data_x$rxx_restricted[disagreement],
                                                                     logic_vec_y = data_y$ryy_restricted[disagreement],
                                                                     sample_id = sample_id[disagreement],
@@ -107,7 +112,8 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
           
           if(any(!missing_u))
                if(impute_artifacts & ma_method == "ic" & any(missing_u)){
-                    cat(" Cleaning and imputing range-restriction information \n")
+                    if(psychmeta.show_progress)
+                         cat(" Cleaning and imputing range-restriction information \n")
                     
                     sample_id <- as.character(sample_id)
                     .sample_id <- unique(sample_id[missing_u])
@@ -177,7 +183,8 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                               .disagreement_y <- .id_vec_y %in% disagreement_names
                               disagreement <- .disagreement_x | .disagreement_y
                               
-                              cat(" Cleaning range-restriction information \n")
+                              if(psychmeta.show_progress)
+                                   cat(" Cleaning range-restriction information \n")
                               u_reconciled <- reconcile_artifacts(logic_vec_x = data_x$ux_observed[disagreement],
                                                                   logic_vec_y = data_y$uy_observed[disagreement],
                                                                   sample_id = sample_id[disagreement],

@@ -3,6 +3,9 @@
 sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .95,
                                   boot_ci_type = c("bca", "norm","basic", "stud", "perc"), ...){
 
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
@@ -49,7 +52,8 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                                            total = nrow(ma_obj),
                                            clear = FALSE, width = options()$width)
      out_list <- apply(ma_obj, 1, function(ma_obj_i){
-          progbar$tick()
+          if(psychmeta.show_progress)
+               progbar$tick()
 
           meta_tables <- ma_obj_i$meta_tables
           escalc <- ma_obj_i$escalc
@@ -284,7 +288,8 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
      if(record_call) attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 
      if(flag_summary) ma_obj <- summary(ma_obj)
-     message("Bootstrapped meta-analyses have been added to 'ma_obj' - use get_bootstrap() to retrieve them.")
+     if(psychmeta.show_progress)
+          message("Bootstrapped meta-analyses have been added to 'ma_obj' - use get_bootstrap() to retrieve them.")
 
      ma_obj
 }

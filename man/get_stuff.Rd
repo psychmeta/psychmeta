@@ -16,15 +16,15 @@
 \alias{get_plots}
 \title{Extract results from a psychmeta meta-analysis object}
 \usage{
-get_stuff(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "followup",
-  "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", "matrix",
-  "plots"), analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ma_method = c("bb", "ic", "ad"),
+get_stuff(ma_obj, what = c("metatab", "escalc", "metafor", "ad",
+  "followup", "heterogeneity", "leave1out", "cumulative", "bootstrap",
+  "metareg", "matrix", "plots"), analyses = "all", match = c("all",
+  "any"), case_sensitive = TRUE, ma_method = c("bb", "ic", "ad"),
   correction_type = c("ts", "vgx", "vgy"), moderators = FALSE,
   as_ad_obj = TRUE, inputs_only = FALSE, ad_type = c("tsa", "int"),
   follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap",
-  "metareg"), plot_types = c("funnel", "forest", "leave1out", "cumulative"),
-  ...)
+  "metareg"), plot_types = c("funnel", "forest", "leave1out",
+  "cumulative"), ...)
 
 get_escalc(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, moderators = FALSE, ...)
@@ -37,8 +37,9 @@ get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
   correction_type = c("ts", "vgx", "vgy"), ...)
 
 get_ad(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ma_method = c("ad", "ic"), ad_type = c("tsa",
-  "int"), as_ad_obj = FALSE, inputs_only = FALSE, ...)
+  case_sensitive = TRUE, ma_method = c("ad", "ic"),
+  ad_type = c("tsa", "int"), as_ad_obj = FALSE, inputs_only = FALSE,
+  ...)
 
 get_followup(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, follow_up = c("heterogeneity", "leave1out",
@@ -63,8 +64,8 @@ get_matrix(ma_obj, analyses = "all", match = c("all", "any"),
   case_sensitive = TRUE, ...)
 
 get_plots(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, plot_types = c("funnel", "forest", "leave1out",
-  "cumulative"), ...)
+  case_sensitive = TRUE, plot_types = c("funnel", "forest",
+  "leave1out", "cumulative"), ...)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}

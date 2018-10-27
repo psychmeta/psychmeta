@@ -4,11 +4,11 @@
 \alias{convert_es}
 \title{Convert effect sizes and compute confidence intervals}
 \usage{
-convert_es(es, input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F",
-  "chisq", "p.chisq", "or", "lor", "Fisherz", "A", "auc", "cles"),
+convert_es(es, input_es = c("r", "d", "delta", "g", "t", "p.t", "F",
+  "p.F", "chisq", "p.chisq", "or", "lor", "Fisherz", "A", "auc", "cles"),
   output_es = c("r", "d", "A", "auc", "cles"), n1 = NULL, n2 = NULL,
-  df1 = NULL, df2 = NULL, sd1 = NULL, sd2 = NULL, correct_bias = TRUE,
-  conf_level = 0.95)
+  df1 = NULL, df2 = NULL, sd1 = NULL, sd2 = NULL,
+  correct_bias = TRUE, conf_level = 0.95)
 }
 \arguments{
 \item{es}{Vector of effect sizes to convert.}

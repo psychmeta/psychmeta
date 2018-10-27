@@ -90,7 +90,12 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      if(input_es == "chisq")                  .screen_chisq(es, df1)
      if(input_es == "p.chisq")                .screen_pchisq(es, df1)
      if(input_es == "or")                     .screen_or(es)
-     if(input_es %in% c("A", "auc", "cles"))  .screen_auc(es)
+     if(input_es %in% c("A", "auc", "cles"))  {
+          input_es <- "auc"
+          .screen_auc(es)
+     }
+
+     if(output_es %in% c("A", "cles"))        output_es <- "auc"
 
      x <- list(es = es, n1=n1, n2=n2, df1=df1, df2=df2, sd1=sd1, sd2=sd2)
      # Compute sample sizes and df as needed
@@ -109,10 +114,10 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           }
           if(output_es == "r")
                if(input_es %in% c("d", "or", "lor"))
-                    warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
-          if(output_es %in% c("d", "A", "auc", "cles"))
+                    message("Sample sizes not supplied. Assumed equal group sizes.")
+          if(output_es %in% c("d", "auc"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
-                    warning("Sample sizes not supplied. Assumed equal groups.", call.=FALSE)
+                    message("Sample sizes not supplied. Assumed equal group sizes.")
      }else if(!is.null(n2)) {
           x$n <- n1 + n2
           x$p <- n1 / x$n
@@ -122,10 +127,10 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           x$p   <- .5
           if(output_es == "r")
                if(input_es %in% c("d", "or", "lor"))
-                    warning("Assumed equal groups.", call.=FALSE)
-          if(output_es %in% c("d", "A", "auc", "cles"))
+                    message("Assumed equal group sizes.")
+          if(output_es %in% c("d", "auc"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
-                    warning("Assumed equal groups.", call.=FALSE)
+                    message("Assumed equal group sizes.")
      }
      subset_id <- is.na(x$n) & !is.na(x$n1)
      x$n[subset_id] <- x$n1[subset_id]
@@ -144,12 +149,12 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      # Assume SDs as needed
      if(is.null(sd1) & is.null(sd2)){
           x$sd1 <- x$sd2 <- 1
-          if(output_es %in% c("A", "auc", "cles"))
-               warning("Group SDs = 1 assumed.", call.=FALSE)
+          if(output_es == "auc")
+               message("Group SDs = 1 assumed.")
      }else if(is.null(sd2)){
           x$sd2 <- x$sd1
-          if(output_es %in% c("A", "auc", "cles"))
-               warning("Equal group SDs assumed.", call.=FALSE)
+          if(output_es == "auc")
+               message("Equal group SDs assumed.")
      }
 
      if(grepl(x = input_es, pattern = "p.")){
@@ -189,8 +194,8 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           CI <- confidence(d, se=sqrt(V.d), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
-          conf_int <- data.frame(d=d.ci, n_total=n, n1=n1, n2=n2, CI)
+          meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.d)
+          conf_int <- data.frame(d=d.ci, n_total=n, n1=n1, n2=n2, var_e = V.d, se = V.d^.5, CI)
      }
 
      if(output_es == "r"){
@@ -217,8 +222,8 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           CI <- confidence(r, se=sqrt(V.r), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(r = r, n_effective=n_effective)
-          conf_int <- data.frame(r=r.ci, n_effective=n, CI)
+          meta_input <- data.frame(r = r, n_effective=n_effective, var_e = V.r)
+          conf_int <- data.frame(r=r.ci, n_effective=n, var_e = V.r, se = V.r^.5, CI)
      }
 
      if(output_es %in% c("A", "auc", "cles") ){
@@ -252,8 +257,9 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           CI <- confidence(A, se=sqrt(V.A), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2)
-          conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, CI)
+          meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.A)
+          conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, var_e = V.A, se = V.A^.5, CI)
+
      }
 
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
@@ -286,7 +292,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           stop("Error: Sample size or df not supplied.", call.=FALSE)
      }else{
           if(any(es < 0 | es > 1)){
-               stop("Value supplied for p is not a probability", call.=FALSE)
+               stop("Value supplied for p is not a probability.", call.=FALSE)
           }
      }
 }
@@ -296,7 +302,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           stop("Error: Sample size or df not supplied.", call. = FALSE)
      } else {
           if(any(es < 0)){
-               stop("Value supplied for F is negative", call. = FALSE)
+               stop("Value supplied for F is negative.", call. = FALSE)
           }else{
                if(!is.null(df1)){
                     if(df1 != 1){
@@ -309,7 +315,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_pF <- function(es, n1, n2, df1, df2){
      if(any(es < 0 | es > 1)) {
-          stop("Value supplied for p is not a probability", call. = FALSE)
+          stop("Value supplied for p is not a probability.", call. = FALSE)
      } else {
           if(is.null(c(n1, n2, df2))){
                stop("Error: Sample size or df not supplied.", call. = FALSE)
@@ -325,7 +331,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_chisq <- function(es, df1){
      if(any(es < 0)){
-          stop("Value supplied for chi squared is negative", call. = FALSE)
+          stop("Value supplied for chi squared is negative.", call. = FALSE)
      }else{
           if(!is.null(df1)){
                if(df1 != 1){
@@ -337,7 +343,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_pchisq <- function(es, df1){
      if(any(es < 0 | es > 1)){
-          stop("Value supplied for p is not a probability", call. = FALSE)
+          stop("Value supplied for p is not a probability.", call. = FALSE)
      }else{
           if(!is.null(df1)){
                if(df1 != 1){
@@ -349,16 +355,16 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 .screen_or <- function(es){
      if(any(es < 0)){
-          stop("Value supplied for odds ratio is negative", call. = FALSE)
+          stop("Value supplied for odds ratio is negative.", call. = FALSE)
      }
 }
 
 .screen_auc <- function(es){
      if(any(es < 0, es > 1)){
-          stop("Value supplied for A/AUC/CLES is not a probability", call. = FALSE)
+          stop("Value supplied for A/AUC/CLES is not a probability.", call. = FALSE)
      }else{
           if(any(es == 0, es == 1)){
-          stop("Value supplied for A/AUC/CLES produces an infinite d value", call. = FALSE)
+          stop("Value supplied for A/AUC/CLES produces an infinite d value.", call. = FALSE)
           }
      }
 }
@@ -380,12 +386,12 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      d
 }
 
-"convert_es.q_A_to_A" <- function(A, x = NULL) {
+"convert_es.q_auc_to_auc" <- function(auc, x = NULL) {
      if(!is.null(x)){
-          A <- x$es
+          auc <- x$es
      }
 
-     A
+     auc
 }
 
 "convert_es.q_delta_to_d" <- function(d, x = NULL) {
@@ -458,7 +464,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
      t <- qt(p.t, df1, lower.tail = FALSE)
-     warning("t values computed from p values. Check effect direction coding.", call.=FALSE)
+     message("t values computed from p values. Check effect direction coding.")
      return( convert_es.q_t_to_r(t, df1) )
 }
 
@@ -479,7 +485,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      F <- qf(p.F, 1, df2, lower.tail = FALSE)
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      return( convert_es.q_F_to_r(F, df2) )
 }
 
@@ -491,7 +497,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      r <- sqrt(chisq / n)
      if(any(abs(r) > 1))
-          stop("Impossible values supplied for chi squared and n", call.=FALSE)
+          stop("Impossible values supplied for chi squared and n.", call.=FALSE)
      return(r)
 }
 
@@ -501,7 +507,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           n <- x$n
      }
 
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      chisq <- qchisq(p.chisq, 1)
      return( convert_es.q_chisq_to_r(chisq, n) )
 }
@@ -551,7 +557,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      if(any(abs(r) > 1))
-          stop("Value supplied for r is not a correlation", call.=FALSE)
+          stop("Value supplied for r is not a correlation.", call.=FALSE)
      a   <- 1 / (p * (1-p))
      return((sqrt(a) * r) / sqrt(1 - r^2))
 }
@@ -577,7 +583,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
      t <- qt(p.t, df1, lower.tail = FALSE)
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      return( convert_es.q_t_to_d(t, df1, p) )
 }
 
@@ -590,7 +596,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      a <- 1 / (p * (1-p))
      n <- df2 + 2
-     warning("F values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("F values converted to effect sizes. Check effect direction coding.")
      return( sqrt(F * a / n) )
 }
 
@@ -602,7 +608,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      F <- qf(p.F, 1, df2, lower.tail = FALSE)
-     warning("p values converted to effect sizes. Check effect direction coding.", call.=FALSE)
+     message("p values converted to effect sizes. Check effect direction coding.")
      return( convert_es.q_F_to_d(F, df2, p) )
 }
 
@@ -820,20 +826,3 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      return(convert_es.q_d_to_auc(d, p, sd1, sd2))
 }
 
-"convert_es.q_A_to_d"         <- "convert_es.q_cles_to_d"       <- "convert_es.q_auc_to_d"
-"convert_es.q_A_to_r"         <- "convert_es.q_cles_to_r"       <- "convert_es.q_auc_to_r"
-"convert_es.q_r_to_A"         <- "convert_es.q_r_to_cles"       <- "convert_es.q_r_to_auc"
-"convert_es.q_delta_to_A"     <- "convert_es.q_delta_to_cles"   <- "convert_es.q_delta_to_auc"
-"convert_es.q_g_to_A"         <- "convert_es.q_g_to_cles"       <- "convert_es.q_g_to_auc"
-"convert_es.q_t_to_A"         <- "convert_es.q_t_to_cles"       <- "convert_es.q_t_to_auc"
-"convert_es.p_t_to_A"         <- "convert_es.p_t_to_cles"       <- "convert_es.p_t_to_auc"
-"convert_es.q_F_to_A"         <- "convert_es.q_F_to_cles"       <- "convert_es.q_F_to_auc"
-"convert_es.p_F_to_A"         <- "convert_es.p_F_to_cles"       <- "convert_es.p_F_to_auc"
-"convert_es.q_chisq_to_A"     <- "convert_es.q_chisq_to_cles"   <- "convert_es.q_chisq_to_auc"
-"convert_es.p_chisq_to_A"     <- "convert_es.p_chisq_to_cles"   <- "convert_es.p_chisq_to_auc"
-"convert_es.q_or_to_A"        <- "convert_es.q_or_to_cles"      <- "convert_es.q_or_to_auc"
-"convert_es.q_lor_to_A"       <- "convert_es.q_lor_to_cles"     <- "convert_es.q_lor_to_auc"
-"convert_es.q_Fisherz_to_A"   <- "convert_es.q_Fisherz_to_cles" <- "convert_es.q_Fisherz_to_auc"
-"covert_es.q_A_to_auc"        <- "covert_es.q_A_to_cles"        <- "covert_es.q_A_to_A"
-"covert_es.q_auc_to_auc"      <- "covert_es.q_auc_to_cles"      <- "covert_es.q_auc_to_A"        <- "covert_es.q_A_to_A"
-"covert_es.q_cles_to_auc"     <- "covert_es.q_cles_to_cles"     <- "covert_es.q_cles_to_A"       <- "covert_es.q_A_to_A"

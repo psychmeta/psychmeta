@@ -264,6 +264,11 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
                  supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
 
+     .dplyr.show_progress <- options()$dplyr.show_progress
+     .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     options(dplyr.show_progress = psychmeta.show_progress)
+     
      ##### Get inputs #####
      call <- match.call()
      
@@ -288,7 +293,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      treat_as_d <- list(...)$treat_as_d
      if(is.null(treat_as_d)) treat_as_d <- !treat_as_r
      
-     cat(" **** Running ma_d: Meta-analysis of d values **** \n")
+     if(psychmeta.show_progress)
+          cat(" **** Running ma_d: Meta-analysis of d values **** \n")
 
      sign_rgz <- scalar_arg_warning(arg = sign_rgz, arg_name = "sign_rgz")
      sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
@@ -549,6 +555,9 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      if(attributes(out)$ma_metric %in% c("d_as_r", "r_as_r"))
           out <- convert_ma(ma_obj = out, record_call = FALSE)
+     
+     options(psychmeta.show_progress = .psychmeta.show_progress)
+     options(dplyr.show_progress = .dplyr.show_progress)
      
      return(out)
 }

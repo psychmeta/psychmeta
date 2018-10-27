@@ -75,6 +75,9 @@
 #' ma_obj$heterogeneity[[1]]$artifact_distribution$latentGroup_latentY
 heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
@@ -93,11 +96,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      progbar <- progress::progress_bar$new(format = " Computing heterogeneity analyses [:bar] :percent est. time remaining: :eta",
                                            total = nrow(ma_obj),
                                            clear = FALSE, width = options()$width)
-     ma_obj_i <- ma_obj[1,]
-     escalc <- ma_obj_i$escalc[[1]]
-     meta_tables <- ma_obj_i$meta_tables[[1]]
      out_list <- apply(ma_obj, 1, function(ma_obj_i){
-          progbar$tick()
+          if(psychmeta.show_progress)
+               progbar$tick()
           
           escalc <- ma_obj_i$escalc
           meta_tables <- ma_obj_i$meta_tables
@@ -289,7 +290,8 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL, conf_level = .95, ...){
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
 
      if(flag_summary) ma_obj <- summary(ma_obj)
-     message("Heterogeneity analyses have been added to 'ma_obj' - use get_heterogeneity() to retrieve them.")
+     if(psychmeta.show_progress)
+          message("Heterogeneity analyses have been added to 'ma_obj' - use get_heterogeneity() to retrieve them.")
      
      ma_obj
 }

@@ -4,7 +4,8 @@
 \alias{correct_glass_bias}
 \title{Correct for small-sample bias in Glass' \eqn{\Delta}{delta} values}
 \usage{
-correct_glass_bias(delta, nc, ne, use_pooled_sd = rep(FALSE, length(delta)))
+correct_glass_bias(delta, nc, ne, use_pooled_sd = rep(FALSE,
+  length(delta)))
 }
 \arguments{
 \item{delta}{Vector of Glass' \eqn{\Delta}{delta} values.}

@@ -50,6 +50,9 @@
 #' ma_obj$metareg[[1]]$individual_correction$latentGroup_latentY$`Main Effects`
 metareg <- function(ma_obj, formula_list = NULL, ...){
 
+     psychmeta.show_progress <- options()$psychmeta.show_progress
+     if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
+     
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
      
@@ -155,7 +158,8 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
      attributes(ma_obj)$call_history <- append(attributes(ma_obj)$call_history, list(match.call()))
      if(flag_summary) ma_obj <- summary(ma_obj)
-     message("Meta-regressions have been added to 'ma_obj' - use get_metareg() to retrieve them.")
+     if(psychmeta.show_progress)
+          message("Meta-regressions have been added to 'ma_obj' - use get_metareg() to retrieve them.")
 
      ma_obj
 }

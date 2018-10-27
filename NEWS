@@ -1,3 +1,16 @@
+Changes in Version 2.2.1 (2018-10-12)
+=====================================
+- Added option to suppress progress indicators in the console. Use options(psychmeta.show_progress = FALSE) to suppress progress indicators.
+
+- Increased support for common wide database formats in the reshape_wide2long() function.
+
+- Bug fixes for managing dependent observations in artifact distributions created within ma_r() and ma_d(). 
+
+- Bug fixes for resolving dependency in effect sizes in meta-analyses with moderators.
+
+- Added error-variance estimates to the output of convert_es() for increased compatibility with the ma_generic() function.
+
+
 Changes in Version 2.2.0 (2018-09-18)
 =====================================
 - Added support for separately compositing measures of constructs and the constructs' facets. Arguments for 'facet_x' and 'facet_y' have been added to ma_r() and ma_d() so that more comprehensive output tables can be generated.

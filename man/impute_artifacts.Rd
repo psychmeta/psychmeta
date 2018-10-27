@@ -4,9 +4,10 @@
 \alias{impute_artifacts}
 \title{Impute missing and impossible artifact values}
 \usage{
-impute_artifacts(sample_id = NULL, construct_id = NULL, measure_id = NULL,
-  art_vec, cat_moderator_matrix, impute_method = "bootstrap_mod",
-  art_type = "rel", n_vec = rep(1, length(art_vec)))
+impute_artifacts(sample_id = NULL, construct_id = NULL,
+  measure_id = NULL, art_vec, cat_moderator_matrix,
+  impute_method = "bootstrap_mod", art_type = "rel", n_vec = rep(1,
+  length(art_vec)))
 }
 \arguments{
 \item{sample_id}{Study ID value.}
