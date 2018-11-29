@@ -175,7 +175,7 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
           n[!is.na(n2)] <- n[!is.na(n2)] + n2[!is.na(n2)]
           n1[is.na(n2)] <- n2[is.na(n2)] <- n[is.na(n2)] / 2
           pi <- n1 / n
-          pi[is.na(pi)] <- .5
+          pi[pi == 1] <- .5
      }
 
      if(!is.null(pi)){
@@ -197,15 +197,15 @@ correct_d <- function(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "u
      }
 
      if(is.null(pa) & !is.null(pi)){
-          if(correction == "uvdrr" | correction == "uvirr"){
+          if(correction == "uvdrr_y" | correction == "uvirr_y"){
                uy_temp <- uy
                if(length(uy_observed) == 1) uy_observed <- rep(uy_observed, length(d))
                if(length(ryy_restricted) == 1) ryy_restricted <- rep(ryy_restricted, length(d))
-               if(correction == "uvdrr"){
+               if(correction == "uvdrr_y"){
                     uy_temp[!uy_observed] <- estimate_ux(ut = uy_temp[!uy_observed], rxx = ryy[!uy_observed], rxx_restricted = ryy_restricted[!uy_observed])
                     rxpi <- rxyi
                }
-               if(correction == "uvirr"){
+               if(correction == "uvirr_y"){
                     ryyi_temp <- ryy
                     uy_temp[uy_observed] <- estimate_ut(ux = uy_temp[uy_observed], rxx = ryy[uy_observed], rxx_restricted = ryy_restricted[uy_observed])
                     ryyi_temp[ryy_restricted] <- estimate_rxxa(rxxi = ryy[ryy_restricted], ux = uy[ryy_restricted], ux_observed = uy_observed[ryy_restricted], indirect_rr = TRUE)

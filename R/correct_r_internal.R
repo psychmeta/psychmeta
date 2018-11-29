@@ -108,8 +108,8 @@
      ux_prime <- ux
      uy_prime <- uy
 
-     ux_prime[ux_prime > 1 / ux_prime] <- 1 / ux_prime[ux_prime > 1 / ux_prime]
-     uy_prime[uy_prime > 1 / uy_prime] <- 1 / uy[uy_prime > 1 / uy_prime]
+     ux_prime[ux > 1 / ux] <- 1 / ux[ux > 1 / ux]
+     uy_prime[uy > 1 / uy] <- 1 / uy[uy > 1 / uy]
 
      sign_x <- sign(ux - 1)
      sign_y <- sign(uy - 1)
