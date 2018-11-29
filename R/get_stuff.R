@@ -405,8 +405,8 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                     }
                }
                
-               ad_x <- as_tibble(data.table::rbindlist(ad_x))
-               ad_y <- as_tibble(data.table::rbindlist(ad_y))
+               ad_x <- as_tibble(data.table::rbindlist(ad_x), .name_repair = "minimal")
+               ad_y <- as_tibble(data.table::rbindlist(ad_y), .name_repair = "minimal")
                ad_x$artifact <- as.character(ad_x$artifact)
                ad_y$artifact <- as.character(ad_y$artifact)
                
@@ -755,7 +755,7 @@ compile_metatab <- function(ma_obj, ma_method = c("bb", "ic", "ad"), correction_
 
      }
 
-     out <- as_tibble(out)
+     out <- as_tibble(out, .name_repair = "minimal")
      attributes(out) <- append(attributes(out), list(ma_type = ma_type,
                                                      ma_method = ma_method,
                                                      correction_type = correction_type,

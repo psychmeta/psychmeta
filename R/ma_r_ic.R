@@ -150,7 +150,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators))[1] != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
+               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data, .name_repair = "minimal"), as_array = TRUE)
      }
 
      if(length(moderators) > 0){
@@ -165,12 +165,12 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
 
           if(any(cat_moderators)){
-               moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
+               moderator_levels <- lapply(as_tibble(moderators, .name_repair = "minimal")[,cat_moderators], function(x){
                     lvls <- levels(x)
                     if(is.null(lvls)) lvls <- levels(factor(x))
                     lvls
                })
-               names(moderator_levels) <- colnames(as_tibble(moderators)[,cat_moderators])
+               names(moderator_levels) <- colnames(as_tibble(moderators, .name_repair = "minimal")[,cat_moderators])
           }else{
                moderator_levels <- NULL
           }
@@ -224,7 +224,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           
           if(!is.null(moderators)){
                if(!is.null(moderators)) colnames(moderators) <- moderator_names$all
-               .moderators <- as.data.frame(as_tibble(moderators)[!valid_r,])
+               .moderators <- as.data.frame(as_tibble(moderators, .name_repair = "minimal")[!valid_r,])
           }else{
                .moderators <- NULL
           }
@@ -281,7 +281,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
-     if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators)[valid_r,])
+     if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators, .name_repair = "minimal")[valid_r,])
      if(!is.null(sample_id)) sample_id <- sample_id[valid_r]
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 

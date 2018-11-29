@@ -663,8 +663,8 @@ simulate_r_database_noalpha <- function(k, n_params, rho_params,
      }
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = as_tibble(dat_stats),
-                 parameters = as_tibble(dat_params))
+                 statistics = as_tibble(dat_stats, .name_repair = "minimal"),
+                 parameters = as_tibble(dat_params, .name_repair = "minimal"))
      class(out) <- c("simdat_r_database", format)
      out
 }

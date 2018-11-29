@@ -1029,9 +1029,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
 
      ad_out <- do.call(est_summaries, args = arglist)
      .attributes <- attributes(ad_out)
-     out <- tibble(Artifact = names(ad_out))
-     out$Distribution <- ad_out
-
+     out <- tibble(Artifact = names(ad_out), Distribution = ad_out)
+     
      out_raw <- do.call(est_summaries, args = arglist_raw)
 
      attributes(out) <- append(attributes(out),

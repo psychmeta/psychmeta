@@ -217,7 +217,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
                     if(is.null(lvls)) lvls <- levels(factor(x))
                     lvls
                })
-               names(moderator_levels) <- colnames(as_tibble(moderators)[,cat_moderators])
+               names(moderator_levels) <- colnames(as_tibble(moderators, .name_repair = "minimal")[,cat_moderators])
           }else{
                moderator_levels <- NULL
           }
@@ -275,10 +275,10 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
           global_x[is.na(global_x)] <- global_y[is.na(global_y)] <- FALSE
           valid_facet <- valid_facet & !(global_x | global_y)
           
-          .full_data <- as_tibble(full_data)[valid_intercor,]
+          .full_data <- as_tibble(full_data, .name_repair = "minimal")[valid_intercor,]
           .full_data$construct_x[!is.na(.full_data$facet_x)] <- paste0(.full_data$construct_x[!is.na(.full_data$facet_x)], ": ", .full_data$facet_x[!is.na(.full_data$facet_x)])
           .full_data$construct_y[!is.na(.full_data$facet_y)] <- paste0(.full_data$construct_y[!is.na(.full_data$facet_y)], ": ", .full_data$facet_y[!is.na(.full_data$facet_y)])
-          full_data <- data.frame(rbind(as_tibble(full_data)[retain,], .full_data))
+          full_data <- data.frame(rbind(as_tibble(full_data, .name_repair = "minimal")[retain,], .full_data))
      }
      
      additional_args <- NULL

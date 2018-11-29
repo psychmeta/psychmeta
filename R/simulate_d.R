@@ -91,9 +91,9 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
                                           show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }
 
-     out$overall_results$observed <- as_tibble(out$overall_results$observed)
-     out$overall_results$true <- as_tibble(out$overall_results$true)
-     out$overall_results$error <- as_tibble(out$overall_results$error)
+     out$overall_results$observed <- as_tibble(out$overall_results$observed, .name_repair = "minimal")
+     out$overall_results$true <- as_tibble(out$overall_results$true, .name_repair = "minimal")
+     out$overall_results$error <- as_tibble(out$overall_results$error, .name_repair = "minimal")
      
      class(out) <- "simdat_d_sample"
      out
@@ -1484,8 +1484,8 @@ simulate_d_database <- function(k, n_params, rho_params,
      dat_params[,numeric_vars_params] <- round(as.matrix(dat_params[,numeric_vars_params]), decimals)
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = as_tibble(dat_stats),
-                 parameters = as_tibble(dat_params))
+                 statistics = as_tibble(dat_stats, .name_repair = "minimal"),
+                 parameters = as_tibble(dat_params, .name_repair = "minimal"))
      class(out) <- "simdat_d_database"
      
      options(psychmeta.show_progress = .psychmeta.show_progress)
@@ -1644,8 +1644,8 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
      if(!any(class(data_obj) == "sparsified"))
           class(data_obj) <- c(class(data_obj), "sparsified")
 
-     data_obj$statistics <- as_tibble(data_obj$statistics)
-     data_obj$parameters <- as_tibble(data_obj$parameters)
+     data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
+     data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
      
      data_obj
 }
@@ -1694,8 +1694,8 @@ merge_simdat_d <- function(...){
      if(!any(class(data_obj) == "merged"))
           class(data_obj) <- c(class(data_obj), "merged")
 
-     data_obj$statistics <- as_tibble(data_obj$statistics)
-     data_obj$parameters <- as_tibble(data_obj$parameters)
+     data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
+     data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
      
      data_obj
 }

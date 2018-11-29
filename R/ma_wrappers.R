@@ -117,7 +117,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                moderator_matrix_new <- matrix("All Levels", nrow(moderator_matrix), ncol(moderator_matrix))
 
                colnames(moderator_matrix_new) <- moderator_vars
-               moderator_matrix_new <- as_tibble(moderator_matrix_new)
+               moderator_matrix_new <- as_tibble(moderator_matrix_new, .name_repair = "minimal")
                cbind(analysis_type = "Overall", cbind(moderator_matrix_new, es_data))
           }
      }
@@ -141,7 +141,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                moderator_matrix_new <- rbind(moderator_matrix_new, moderator_matrix_i)
                es_data_new <- rbind(es_data_new, es_data)
           }
-          moderator_matrix_new <- as_tibble(moderator_matrix_new)
+          moderator_matrix_new <- as_tibble(moderator_matrix_new, .name_repair = "minimal")
 
           colnames(moderator_matrix_new) <- moderator_vars
           cbind(analysis_type = "Simple Moderator", cbind(moderator_matrix_new, es_data_new))
@@ -158,7 +158,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                colnames(moderator_matrix) <- moderator_vars
           }
           if(ncol(moderator_matrix) > 1){
-               moderator_matrix <- as_tibble(moderator_matrix)
+               moderator_matrix <- as_tibble(moderator_matrix, .name_repair = "minimal")
 
                cbind(analysis_type = "Fully Hierarchical Moderator", cbind(moderator_matrix, es_data))
           }else{
@@ -197,7 +197,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                     moderator_matrix_new <- rbind(moderator_matrix_new, hierachical_list[[i]])
                     es_data_new <- rbind(es_data_new, es_data)
                }
-               moderator_matrix_new <- as_tibble(moderator_matrix_new)
+               moderator_matrix_new <- as_tibble(moderator_matrix_new, .name_repair = "minimal")
 
                cbind(analysis_type = "Partial Hierarchical Moderator", cbind(moderator_matrix_new, es_data_new))
           }else{

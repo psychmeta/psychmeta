@@ -55,7 +55,7 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as_tibble(data)
+          data <- as_tibble(data, .name_repair = "minimal")
           var_names <- match_variables(call = call_full[[match("var_names", names(call_full))]], arg = var_names, arg_name = "var_names", data = data)
           cor_data <- match_variables(call = call_full[[match("cor_data", names(call_full))]], arg = cor_data, arg_name = "cor_data", data = data, as_array = TRUE)
           if(deparse(substitute(common_data))[1] != "NULL")

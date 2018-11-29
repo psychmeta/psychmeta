@@ -106,9 +106,9 @@ simulate_psych_items <- function(n, k_vec, R_scales, rel_vec,
           colnames(items_true) <- colnames(items_error) <- colnames(true_out$S_items)
           items_obs <- items_true + items_error
 
-          items_obs <- as_tibble(items_obs)
-          items_true <- as_tibble(items_true)
-          items_error <- as_tibble(items_error)
+          items_obs <- as_tibble(items_obs, .name_repair = "minimal")
+          items_true <- as_tibble(items_true, .name_repair = "minimal")
+          items_error <- as_tibble(items_error, .name_repair = "minimal")
 
           scales_obs <- simplify2array(lapply(true_out$item_index, function(x) apply(items_obs[,x], 1, sum)))
           scales_true <- simplify2array(lapply(true_out$item_index, function(x) apply(items_true[,x], 1, sum)))
