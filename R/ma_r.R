@@ -678,7 +678,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
+               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data, .name_repair = "minimal"), as_array = TRUE)
 
           if(deparse(substitute(correct_rr_x))[1] != "NULL")
                correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x", names(call_full))]], arg = correct_rr_x, arg_name = "correct_rr_x", data = data)
@@ -705,12 +705,12 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0){NULL}else{x})
 
           if(any(cat_moderators)){
-               moderator_levels <- lapply(as_tibble(moderators)[,cat_moderators], function(x){
+               moderator_levels <- lapply(as_tibble(moderators, .name_repair = "minimal")[,cat_moderators], function(x){
                     lvls <- levels(x)
                     if(is.null(lvls)) lvls <- levels(factor(x))
                     lvls
                })
-               names(moderator_levels) <- colnames(as_tibble(moderators)[,cat_moderators])
+               names(moderator_levels) <- colnames(as_tibble(moderators, .name_repair = "minimal")[,cat_moderators])
           }else{
                moderator_levels <- NULL
           }
@@ -1084,7 +1084,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }
           
           if(!is.null(moderators)){
-               .moderators <- as.data.frame(as_tibble(moderators)[!valid_r,][.valid_r_xy,])
+               .moderators <- as.data.frame(as_tibble(moderators, .name_repair = "minimal")[!valid_r,][.valid_r_xy,])
           }else{
                .moderators <- NULL
           }
@@ -1136,7 +1136,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     .uy <- c(.uy[retain], .uy[.valid_facet])
                     .uy_observed <- c(.uy_observed[retain], .uy_observed[.valid_facet])
                     
-                    .moderators <- data.frame(rbind(as_tibble(.moderators)[retain,], as_tibble(.moderators)[.valid_facet,]))  
+                    .moderators <- data.frame(rbind(as_tibble(.moderators, .name_repair = "minimal")[retain,], as_tibble(.moderators, .name_repair = "minimal")[.valid_facet,]))  
                }
           }
           
@@ -1204,7 +1204,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
-     if(!is.null(moderators)) moderators <- as.data.frame(as_tibble(moderators)[valid_r,])
+     if(!is.null(moderators)) moderators <- as.data.frame(as_tibble(moderators, .name_repair = "minimal")[valid_r,])
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
      ##### Organize database #####
@@ -1281,7 +1281,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(!is.null(complete_moderators)) colnames(complete_moderators) <- moderator_names$all
      if(!is.null(categorical_moderators)) colnames(categorical_moderators) <- moderator_names$cat
      if(any(!cat_moderators)){
-          continuous_moderators <- data.frame(as_tibble(cleaned_data$complete_moderators)[,!cat_moderators])
+          continuous_moderators <- data.frame(as_tibble(cleaned_data$complete_moderators, .name_repair = "minimal")[,!cat_moderators])
           if(!is.null(continuous_moderators)) colnames(continuous_moderators) <- moderator_names$noncat
      }else{
           continuous_moderators <- NULL
@@ -1300,7 +1300,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      .construct_order <- NULL
      construct_order_orig <- construct_order
-     valid_facet <- !is.na(facet_x) | !is.na(facet_y)
+     valid_facet_x <- !is.na(facet_x)
+     valid_facet_y <- !is.na(facet_y)
+     valid_facet <- valid_facet_x | valid_facet_y
      if(any(valid_facet)){
           global_info <- identify_global(sample_id = sample_id,
                                          construct_x = construct_x, construct_y = construct_y,
@@ -1311,56 +1313,89 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           global_y <- tolower(facet_y) %in% c("overall", "global", "total")
           global_x[is.na(global_x)] <- global_y[is.na(global_y)] <- FALSE
           valid_facet <- valid_facet & !(global_x | global_y)
-
-          sample_id <- c(sample_id[retain], sample_id[valid_facet], sample_id[valid_facet], sample_id[valid_facet])
-          es_data <- rbind(es_data[retain,], es_data[valid_facet,], es_data[valid_facet,], es_data[valid_facet,])
-          data_x <- rbind(data_x[retain,], data_x[valid_facet,], data_x[valid_facet,], data_x[valid_facet,])
-          data_y <- rbind(data_y[retain,], data_y[valid_facet,], data_y[valid_facet,], data_y[valid_facet,])
+          valid_facet_x <- valid_facet_x & !global_x
+          valid_facet_y <- valid_facet_y & !global_y
+          
+          use_for_arts <- c(rep(TRUE, sum(retain)), 
+                            rep(FALSE, sum(valid_facet_y)), 
+                            rep(FALSE, sum(valid_facet_x)), 
+                            rep(TRUE, sum(valid_facet)))
+          
+          sample_id <- c(sample_id[retain],
+                         sample_id[valid_facet_y], 
+                         sample_id[valid_facet_x],
+                         sample_id[valid_facet])
+          es_data <- rbind(es_data[retain,], 
+                           es_data[valid_facet_y,], 
+                           es_data[valid_facet_x,], 
+                           es_data[valid_facet,])
+          data_x <- rbind(data_x[retain,],
+                          data_x[valid_facet_y,],
+                          data_x[valid_facet_x,], 
+                          data_x[valid_facet,])
+          data_y <- rbind(data_y[retain,], 
+                          data_y[valid_facet_y,],
+                          data_y[valid_facet_x,], 
+                          data_y[valid_facet,])
           
           construct_x_orig <- construct_x
           construct_y_orig <- construct_y
           facet_x_orig <- facet_x
           facet_y_orig <- facet_y
           
-          .construct_x <- ..construct_x <- construct_x[valid_facet]
-          .facet_x <- facet_x[valid_facet]
-          ..facet_x <- rep(NA, sum(valid_facet))
+          .construct_x <- construct_x
           .construct_x[!is.na(.facet_x)] <- paste0(.construct_x[!is.na(.facet_x)], ": ", .facet_x[!is.na(.facet_x)])
-          construct_x <- c(construct_x[retain], ..construct_x, .construct_x, .construct_x)
-          facet_x <- c(facet_x[retain], ..facet_x, .facet_x, .facet_x)
-          measure_x <- c(measure_x[retain], measure_x[valid_facet], measure_x[valid_facet], measure_x[valid_facet])
+          construct_x <- c(construct_x[retain], 
+                           construct_x[valid_facet_y],
+                           .construct_x[valid_facet_x],
+                           .construct_x[valid_facet])
+          facet_x <- c(facet_x[retain], 
+                       facet_x[valid_facet_y],
+                       facet_x[valid_facet_x], 
+                       facet_x[valid_facet])
+          measure_x <- c(measure_x[retain], 
+                         measure_x[valid_facet_y],
+                         measure_x[valid_facet_x],
+                         measure_x[valid_facet])
           
-          .construct_y <- ..construct_y <- construct_y[valid_facet]
-          .facet_y <- facet_y[valid_facet]
-          ..facet_y <- rep(NA, sum(valid_facet))
+          .construct_y <- construct_y
           .construct_y[!is.na(.facet_y)] <- paste0(.construct_y[!is.na(.facet_y)], ": ", .facet_y[!is.na(.facet_y)])
-          construct_y <- c(construct_y[retain], .construct_y, ..construct_y, .construct_y)
-          facet_y <- c(facet_y[retain], .facet_y, ..facet_y, .facet_y)
-          measure_y <- c(measure_y[retain], measure_y[valid_facet], measure_y[valid_facet], measure_y[valid_facet])
+          construct_y <- c(construct_y[retain], 
+                           .construct_y[valid_facet_y],
+                           construct_y[valid_facet_x],
+                           .construct_y[valid_facet])
+          facet_y <- c(facet_y[retain], 
+                       facet_y[valid_facet_y],
+                       facet_y[valid_facet_x], 
+                       facet_y[valid_facet])
+          measure_y <- c(measure_y[retain], 
+                         measure_y[valid_facet_y],
+                         measure_y[valid_facet_x],
+                         measure_y[valid_facet])
           
           if(!is.null(moderators))
-               moderators <- as.data.frame(rbind(as_tibble(moderators)[retain,],
-                                                 as_tibble(moderators)[valid_facet,],
-                                                 as_tibble(moderators)[valid_facet,],
-                                                 as_tibble(moderators)[valid_facet,]))
+               moderators <- as.data.frame(rbind(as_tibble(moderators, .name_repair = "minimal")[retain,],
+                                                 as_tibble(moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                 as_tibble(moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                 as_tibble(moderators, .name_repair = "minimal")[valid_facet,]))
           
           if(!is.null(complete_moderators))
-               complete_moderators <- as.data.frame(rbind(as_tibble(complete_moderators)[retain,],
-                                                          as_tibble(complete_moderators)[valid_facet,],
-                                                          as_tibble(complete_moderators)[valid_facet,],
-                                                          as_tibble(complete_moderators)[valid_facet,]))
+               complete_moderators <- as.data.frame(rbind(as_tibble(complete_moderators, .name_repair = "minimal")[retain,],
+                                                          as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                          as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                          as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet,]))
           
           if(!is.null(categorical_moderators))
-               categorical_moderators <- as.data.frame(rbind(as_tibble(categorical_moderators)[retain,],
-                                                             as_tibble(categorical_moderators)[valid_facet,],
-                                                             as_tibble(categorical_moderators)[valid_facet,],
-                                                             as_tibble(categorical_moderators)[valid_facet,]))
+               categorical_moderators <- as.data.frame(rbind(as_tibble(categorical_moderators, .name_repair = "minimal")[retain,],
+                                                             as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                             as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                             as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet,]))
           
           if(!is.null(continuous_moderators))
-               continuous_moderators <- as.data.frame(rbind(as_tibble(continuous_moderators)[retain,],
-                                                            as_tibble(continuous_moderators)[valid_facet,],
-                                                            as_tibble(continuous_moderators)[valid_facet,],
-                                                            as_tibble(continuous_moderators)[valid_facet,]))
+               continuous_moderators <- as.data.frame(rbind(as_tibble(continuous_moderators, .name_repair = "minimal")[retain,],
+                                                            as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                            as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                            as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet,]))
           
           .construct_vec <- c(construct_x_orig, construct_y_orig)
           .facet_vec <- c(facet_x_orig, facet_y_orig)
@@ -1385,6 +1420,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           .construct_order2 <- unlist(.construct_order2)
           correction_method <- correction_method[.construct_order1,.construct_order1]
           rownames(correction_method) <- colnames(correction_method) <- .construct_order2
+     }else{
+          use_for_arts <- rep(TRUE, length(construct_x))
      }
      
      study_construct_pair <- paste(sample_id, construct_x, construct_y)
@@ -1422,6 +1459,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           
           analysis_id_variables <- full_data_mod$id_variables
           full_data_mod <- full_data_mod$data
+          full_data_mod$use_for_arts <- use_for_arts
 
           sample_id_mod <- paste(full_data_mod$analysis_id, full_data_mod$sample_id, full_data_mod$construct_x, full_data_mod$construct_y)
           duplicate_samples <- duplicated(sample_id_mod) | duplicated(sample_id_mod, fromLast=TRUE)
@@ -1453,7 +1491,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                          intercor=intercor, partial_intercor = FALSE, construct_x = "construct_x", construct_y = "construct_y",
                                          measure_x = "measure_x", measure_y = "measure_y", moderator_names = moderator_names_temp, 
                                          es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
-               as.data.frame(cbind(as_tibble(duplicates)[i, c("analysis_id", "analysis_type", str_moderators)][1,], out))
+               as.data.frame(cbind(as_tibble(duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", str_moderators)][1,], out))
           })
           
           collapsed_data <- as.data.frame(data.table::rbindlist(collapsed_data_list))
@@ -1462,7 +1500,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           full_data_mod$composited <- FALSE
           collapsed_data$composited <- TRUE
-          indep_data <- as_tibble(rbind(full_data_mod[!duplicate_samples,], collapsed_data))
+          indep_data <- as_tibble(rbind(full_data_mod[!duplicate_samples,], collapsed_data), .name_repair = "minimal")
           indep_data <- indep_data[order(indep_data$analysis_id),]
 
           if(!moderated_ads)
@@ -1471,6 +1509,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           sample_id   <- indep_data$sample_id
           citekey     <- as.data.frame(indep_data)$citekey
           es_data     <- indep_data[,str_es_data]
+          use_for_arts <- indep_data$use_for_arts
           if(!is.null(construct_x)) construct_x <- as.character(indep_data$construct_x)
           if(!is.null(construct_y)) construct_y <- as.character(indep_data$construct_y)
           if(!is.null(data_x)) data_x <- indep_data[,str_data_x]
@@ -1481,7 +1520,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           analysis_type <- as.character(indep_data$analysis_type)
 
           if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
-          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, analysis_type=analysis_type, categorical_moderators))
+          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, analysis_type=analysis_type, categorical_moderators), .name_repair = "minimal")
 
           if(!is.null(moderator_names[["cat"]])){
                moderator_ids <- (length(analysis_id_variables) - length(moderator_names[["cat"]]) + 1):length(analysis_id_variables)
@@ -1512,8 +1551,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      if(ma_method == "ic"){
           .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- complete_moderators
-          if(!is.null(.psychmeta_reserved_internal_mod_aabbccddxxyyzz))
+          if(!is.null(.psychmeta_reserved_internal_mod_aabbccddxxyyzz)){
+               .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- as_tibble(complete_moderators)[use_for_arts,]
                colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
+          }
           
           ad_obj_list <- create_ad_list(n = "n", sample_id = "sample_id",
                                         construct_x = "construct_x", construct_y = "construct_y", 
@@ -1530,7 +1571,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                         cat_moderators = cat_moderators,
                                         moderator_type = moderator_type,
                                         construct_order = construct_order,
-                                        data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y), 
+                                        data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y)[use_for_arts,], 
                                         control_only = TRUE, process_ads = FALSE, ...)
           
           ad_obj_list_tsa <- join_adobjs(ad_type = "tsa",
@@ -1622,7 +1663,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
          
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
           
-          out <- as_tibble(data.table::rbindlist(out))
+          out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
           
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa, ad_obj_y = ad_obj_list_tsa)
           out <- out %>% rename(ad_x_tsa = "ad_x", ad_y_tsa = "ad_y")
@@ -1761,7 +1802,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }
           
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
-          out <- as_tibble(data.table::rbindlist(out))
+          out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
           
           if(es_d & treat_as_d){
                out$analysis_id <- NULL
@@ -1790,8 +1831,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           
           if(ma_method == "ad"){
                .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- complete_moderators
-               if(!is.null(complete_moderators))
+               if(!is.null(complete_moderators)){
+                    .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- as_tibble(complete_moderators)[use_for_arts,]
                     colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
+               }
                
                ad_obj_list <- create_ad_list(ad_type = ad_type,
                                              n = "n", sample_id = "sample_id",
@@ -1809,7 +1852,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                              cat_moderators = cat_moderators,
                                              moderator_type = moderator_type,
                                              construct_order = construct_order,
-                                             data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y), 
+                                             data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y)[use_for_arts,], 
                                              control_only = TRUE, process_ads = FALSE, ...)
                
                ad_obj_list <- join_adobjs(ad_type = ad_type, 

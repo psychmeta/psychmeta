@@ -22,9 +22,9 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                                           show_applicant = TRUE, diffs_as_obs = args$diffs_as_obs)
      }
 
-     out$overall_results$observed <- as_tibble(out$overall_results$observed)
-     out$overall_results$true <- as_tibble(out$overall_results$true)
-     out$overall_results$error <- as_tibble(out$overall_results$error)
+     out$overall_results$observed <- as_tibble(out$overall_results$observed, .name_repair = "minimal")
+     out$overall_results$true <- as_tibble(out$overall_results$true, .name_repair = "minimal")
+     out$overall_results$error <- as_tibble(out$overall_results$error, .name_repair = "minimal")
      
      out
 }
@@ -1026,8 +1026,8 @@ simulate_d_database_noalpha <- function(k, n_params, rho_params,
      dat_params[,-c(1:which(colnames(dat_stats) == "y_name"))] <- round(dat_params[,-c(1:which(colnames(dat_stats) == "y_name"))], decimals)
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = as_tibble(dat_stats),
-                 parameters = as_tibble(dat_params))
+                 statistics = as_tibble(dat_stats, .name_repair = "minimal"),
+                 parameters = as_tibble(dat_params, .name_repair = "minimal"))
      class(out) <- "simdat_d_database"
      out
 }

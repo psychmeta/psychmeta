@@ -170,7 +170,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
      )
 
      if(x_type == "tibble") {
-          out <- as_tibble(out, validate = FALSE)
+          out <- as_tibble(out, .name_repair = "minimal")
      } else if(x_type == "vector") {
           out <- unlist(out)
      } else if(x_type == "matrix") {

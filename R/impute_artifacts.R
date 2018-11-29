@@ -5,7 +5,7 @@
      if(!any(impute_method %in% valid_options))
           stop("'impute_method' must be one of the following impute_methods: ", paste(valid_options, collapse = ", "), call. = FALSE)
 
-     if(!is.null(cat_moderator_matrix)) cat_moderator_matrix <- as_tibble(cat_moderator_matrix)
+     if(!is.null(cat_moderator_matrix)) cat_moderator_matrix <- as_tibble(cat_moderator_matrix, .name_repair = "minimal")
 
      art_vec_imputed <- art_vec
      if(length(art_vec) != 0){
@@ -328,7 +328,7 @@ impute_artifact_2col <- function(logic_vec_x, logic_vec_y,
      ## First imputation process
      ## Organize data for imputation for studies with "TRUE" logical arguments
      if(any(c(logic_vec_x, logic_vec_y))){
-          cat_moderator_matrix <- as_tibble(cat_moderator_matrix)
+          cat_moderator_matrix <- as_tibble(cat_moderator_matrix, .name_repair = "minimal")
           index_x <- 1:sum(logic_vec_x)
           index_y <- (sum(logic_vec_x) + 1):(sum(logic_vec_x) + sum(logic_vec_y))
 
@@ -359,7 +359,7 @@ impute_artifact_2col <- function(logic_vec_x, logic_vec_y,
      ## Second imputation process
      ## Organize data for imputation for studies with "FALSE" logical arguments
      if(any(!c(logic_vec_x, logic_vec_y))){
-          cat_moderator_matrix <- as_tibble(cat_moderator_matrix)
+          cat_moderator_matrix <- as_tibble(cat_moderator_matrix, .name_repair = "minimal")
           index_x <- 1:sum(!logic_vec_x)
           index_y <- (sum(!logic_vec_x) + 1):(sum(!logic_vec_x) + sum(!logic_vec_y))
 

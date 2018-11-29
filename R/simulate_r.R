@@ -250,9 +250,9 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
           for(i in select_ids)
                select_vec <- select_vec & obs_scores_a[,i] >= cut_vec[i]
      }
-     true_scores_a <- as_tibble(true_scores_a)
-     error_scores_a <- as_tibble(error_scores_a)
-     obs_scores_a <- as_tibble(obs_scores_a)
+     true_scores_a <- as_tibble(true_scores_a, .name_repair = "minimal")
+     error_scores_a <- as_tibble(error_scores_a, .name_repair = "minimal")
+     obs_scores_a <- as_tibble(obs_scores_a, .name_repair = "minimal")
      
      alpha_a <- .alpha_items(item_dat = obs_scores_a, item_index = item_index)
      alpha_i <- .alpha_items(item_dat = obs_scores_a[select_vec,], item_index = item_index)
@@ -1220,8 +1220,8 @@ simulate_r_database <- function(k, n_params, rho_params,
      }
 
      out <- list(call_history = list(call), inputs = inputs,
-                 statistics = as_tibble(dat_stats),
-                 parameters = as_tibble(dat_params))
+                 statistics = as_tibble(dat_stats, .name_repair = "minimal"),
+                 parameters = as_tibble(dat_params, .name_repair = "minimal"))
      
      class(out) <- c("simdat_r_database", format)
      
@@ -1839,8 +1839,8 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
      if(!any(class(data_obj) == "sparsified"))
           class(data_obj) <- c(class(data_obj), "sparsified")
 
-     data_obj$statistics <- as_tibble(data_obj$statistics)
-     data_obj$parameters <- as_tibble(data_obj$parameters)
+     data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
+     data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
      
      data_obj
 }
@@ -1908,8 +1908,8 @@ merge_simdat_r <- function(...){
      if(!any(class(data_obj) == "merged"))
           class(data_obj) <- c(class(data_obj), "merged")
 
-     data_obj$statistics <- as_tibble(data_obj$statistics)
-     data_obj$parameters <- as_tibble(data_obj$parameters)
+     data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
+     data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
      
      data_obj
 }

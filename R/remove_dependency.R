@@ -121,7 +121,7 @@
           }
           
           if(length(moderator_names$all) > 0){
-               moderators <- as.data.frame(as_tibble(data)[,moderator_names$all])
+               moderators <- as.data.frame(as_tibble(data, .name_repair = "minimal")[,moderator_names$all])
           }else{
                moderators <- NULL
           }
@@ -155,8 +155,8 @@
           }
           
           if(!is.null(moderators)){
-               moderators_comp_i <- (as_tibble(moderators)[i,])
-               moderators_comp <- (as_tibble(moderators)[1,])
+               moderators_comp_i <- as_tibble(moderators, .name_repair = "minimal")[i,]
+               moderators_comp <- as_tibble(moderators, .name_repair = "minimal")[1,]
                
                if(!is.null(moderator_names$cat))
                     moderators_comp[,moderator_names$cat] <-
