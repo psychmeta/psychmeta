@@ -164,7 +164,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
      var_vec <- setNames(diag(S), rownames(S))
      if(!is.infinite(n)){
           .mean_vec <- c(1, mean_vec[x_col])
-          cov.unscaled <- solve((t(t(.mean_vec)) %*% t(.mean_vec) * n + rbind(0, cbind(0, S[x_col,x_col])) * (n - 1)))# / (n - 1))
+          cov.unscaled <- solve((t(t(.mean_vec)) %*% t(.mean_vec) * n + rbind(0, cbind(0, S[x_col,x_col])) * (n - 1)))
           dimnames(cov.unscaled) <- list(c("(Intercept)", x_col),
                                          c("(Intercept)", x_col))
           
