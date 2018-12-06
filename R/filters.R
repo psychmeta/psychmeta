@@ -226,7 +226,7 @@ screen_ad_int <- function(x, obj_name = "x"){
           if(!("Distribution" %in% colnames(x)))
                stop(obj_name, " is not an interactive artifact distribution object", call. = FALSE)
 
-          nomenclature <- (grepl(x = ad_contents, pattern = "Null") |
+          nomenclature <- (grepl(x = ad_contents, pattern = "NULL") |
                                 grepl(x = ad_contents, pattern = "qxi_irr") | grepl(x = ad_contents, pattern = "qxi_drr") |
                                 grepl(x = ad_contents, pattern = "qxa_irr") | grepl(x = ad_contents, pattern = "qxa_drr") |
                                 grepl(x = ad_contents, pattern = "rxxi_irr") | grepl(x = ad_contents, pattern = "rxxi_drr") |
