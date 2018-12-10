@@ -1491,6 +1491,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                          intercor=intercor, partial_intercor = FALSE, construct_x = "construct_x", construct_y = "construct_y",
                                          measure_x = "measure_x", measure_y = "measure_y", moderator_names = moderator_names_temp, 
                                          es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
+               out$use_for_arts <- duplicates$use_for_arts[1]
                as.data.frame(cbind(as_tibble(duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", str_moderators)][1,], out))
           })
           
