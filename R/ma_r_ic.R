@@ -680,43 +680,31 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                             ux = ux_vec[do_bvdrr], uy = uy_vec[do_bvdrr])
 
      ## Validity generalization with X as the predictor
-     rxpa_vec <- rtya_vec <- rtpa_vec
-     rxpa_vec[do_meas] <- rtpa_vec[do_meas] * sqrt(rxxi_vec[do_meas])
-
+     .rxxa_vec <- rep(1, length(rxyi))
+     .rxxa_vec[do_meas] <- rxxi_vec[do_meas]
      subset_vec <- do_uvdrr_x | do_uvirr_x | do_bvirr | do_bvdrr
-     rxpa_vec[subset_vec] <- rtpa_vec[subset_vec] * sqrt(rxxa_vec[subset_vec])
-
-     rxxa_vec_uvirr_x <- estimate_ryya(ryyi = rxxi_vec[do_uvirr_y], rxyi = rxyi[do_uvirr_y], ux = up_vec[do_uvirr_y])
-     rxpa_vec[do_uvirr_y] <- rtpa_vec[do_uvirr_y] * sqrt(rxxa_vec_uvirr_x)
-
-     rxxa_vec_uvdrr_x <- estimate_ryya(ryyi = rxxi_vec[do_uvdrr_y], rxyi = rxyi[do_uvdrr_y], ux = uy_vec[do_uvdrr_y])
-     rxpa_vec[do_uvdrr_y] <- rtpa_vec[do_uvdrr_y] * sqrt(rxxa_vec_uvdrr_x)
-
+     .rxxa_vec[subset_vec] <- rxxa_vec[subset_vec]
+     .rxxa_vec[do_uvdrr_y] <- estimate_ryya(ryyi = rxxi_vec[do_uvdrr_y], rxyi = rxyi[do_uvdrr_y], ux = uy_vec[do_uvdrr_y])
+     .rxxa_vec[do_uvirr_y] <- estimate_ryya(ryyi = rxxi_vec[do_uvirr_y], rxyi = rxyi[do_uvirr_y], ux = up_vec[do_uvirr_y])
 
      ## Validity generalization with Y as the predictor
-     rtya_vec[do_meas] <- rtpa_vec[do_meas] * sqrt(ryyi_vec[do_meas])
-
+     .ryya_vec <- rep(1, length(rxyi))
+     .ryya_vec[do_meas] <- ryyi_vec[do_meas]
      subset_vec <- do_uvdrr_y | do_uvirr_y | do_bvirr | do_bvdrr
-     rtya_vec[subset_vec] <- rtpa_vec[subset_vec] * sqrt(ryya_vec[subset_vec])
-
-     ryya_vec_uvirr_x <- estimate_ryya(ryyi = ryyi_vec[do_uvirr_x], rxyi = rxyi[do_uvirr_x], ux = ut_vec[do_uvirr_x])
-     rtya_vec[do_uvirr_x] <- rtpa_vec[do_uvirr_x] * sqrt(ryya_vec_uvirr_x)
-
-     ryya_vec_uvdrr_x <- estimate_ryya(ryyi = ryyi_vec[do_uvdrr_x], rxyi = rxyi[do_uvdrr_x], ux = ux_vec[do_uvdrr_x])
-     rtya_vec[do_uvdrr_x] <- rtpa_vec[do_uvdrr_x] * sqrt(ryya_vec_uvdrr_x)
-
-
+     .ryya_vec[subset_vec] <- ryya_vec[subset_vec]
+     .ryya_vec[do_uvirr_x] <- estimate_ryya(ryyi = ryyi_vec[do_uvirr_x], rxyi = rxyi[do_uvirr_x], ux = ut_vec[do_uvirr_x])
+     .ryya_vec[do_uvdrr_x] <- estimate_ryya(ryyi = ryyi_vec[do_uvdrr_x], rxyi = rxyi[do_uvdrr_x], ux = ux_vec[do_uvdrr_x])
+     
      ## Determine attenuation factors for conventional corrections
-     a_vec <- A_vec_tp <- A_vec_xp <- A_vec_ty <- rep(1, length(rxyi))
+     a_vec <- A_vec <- rep(1, length(rxyi))
 
+     A_vec[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rtpa_vec[!do_bvirr])
+     
      a_vec[do_uvdrr_x] <- .refine_var_rr(ux = ux_vec[do_uvdrr_x], rxyi = rxyi[do_uvdrr_x], indirect_rr = FALSE, ux_observed = TRUE, rxx_restricted = FALSE)
      a_vec[do_uvirr_x] <- .refine_var_rr(ux = ut_vec[do_uvirr_x], rxyi = rxyi[do_uvirr_x], indirect_rr = TRUE, ux_observed = FALSE, rxx_restricted = FALSE)
      a_vec[do_uvdrr_y] <- .refine_var_rr(ux = uy_vec[do_uvdrr_y], rxyi = rxyi[do_uvdrr_y], indirect_rr = FALSE, ux_observed = TRUE, rxx_restricted = FALSE)
      a_vec[do_uvirr_y] <- .refine_var_rr(ux = up_vec[do_uvirr_y], rxyi = rxyi[do_uvirr_y], indirect_rr = TRUE, ux_observed = FALSE, rxx_restricted = FALSE)
 
-     A_vec_tp[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rtpa_vec[!do_bvirr])
-     A_vec_xp[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rxpa_vec[!do_bvirr])
-     A_vec_ty[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rtya_vec[!do_bvirr])
 
      ## Determine pseudo attenuation factors for additive corrections
      if(any(do_bvirr)){
@@ -743,7 +731,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           ## Determine pseudo attenuation factors for the indirect bivariate correction
           ## (bivariate corrections are additive functions, which prevents the traditional attenuation factor from having a meaningful interpretation)
           var_e_bvirr <- var_error_r(r = mean_rxyi, n = n[do_bvirr])
-          A_vec_tp[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
+          A_vec[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
                                                                      var_e = var_e_bvirr,
                                                                      ni = n[do_bvirr],
                                                                      ux = ux_vec[do_bvirr],
@@ -754,33 +742,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                      qy_type = ryy_type[do_bvirr], k_items_y = k_items_y[do_bvirr],
                                                                      mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
                                                                      sign_rxz = sign_rxz, sign_ryz = sign_ryz))
-
-          A_vec_xp[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
-                                                                     var_e = var_e_bvirr,
-                                                                     ni = n[do_bvirr],
-                                                                     ux = ux_vec[do_bvirr],
-                                                                     uy = uy_vec[do_bvirr],
-                                                                     qx = 1, qx_restricted = FALSE,
-                                                                     qy = ryy_tsa[do_bvirr]^.5, qy_restricted = ryy_restricted_tsa[do_bvirr],
-                                                                     qy_type = ryy_type[do_bvirr], k_items_y = k_items_y[do_bvirr],
-                                                                     mean_rxyi = mean_rxyi, mean_qxa = 1, mean_qya = mean_qya, mean_ux = mean_ux, mean_uy = mean_uy,
-                                                                     sign_rxz = sign_rxz, sign_ryz = sign_ryz))
-
-          A_vec_ty[do_bvirr] <- sqrt(var_e_bvirr / var_error_r_bvirr(rxyi = rxyi[do_bvirr],
-                                                                     var_e = var_e_bvirr,
-                                                                     ni = n[do_bvirr],
-                                                                     ux = ux_vec[do_bvirr],
-                                                                     uy = uy_vec[do_bvirr],
-                                                                     qx = rxx_tsa[do_bvirr]^.5, qx_restricted = rxx_restricted_tsa[do_bvirr],
-                                                                     qx_type = rxx_type[do_bvirr], k_items_x = k_items_x[do_bvirr],
-                                                                     qy = 1, qy_restricted = FALSE,
-                                                                     mean_rxyi = mean_rxyi, mean_qxa = mean_qxa, mean_qya = 1, mean_ux = mean_ux, mean_uy = mean_uy,
-                                                                     sign_rxz = sign_rxz, sign_ryz = sign_ryz))
      }
 
 
      ## If a compound attenuation factor is missing, it means division by zero has occured and that the missing values should be set to unity
-     A_vec_tp[is.na(A_vec_tp)] <- A_vec_xp[is.na(A_vec_xp)] <- A_vec_ty[is.na(A_vec_ty)] <- 1
+     A_vec[is.na(A_vec)] <- 1
 
      correction_type <- rep("None", length(rxyi))
      correction_type[do_meas] <- "Measurement error only"
@@ -795,8 +761,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      correction_data <- data.frame(rxy = rxyi,
                                    rtp = rtpa_vec,
-                                   rxp = rxpa_vec,
-                                   rty = rtya_vec,
                                    ux = ux_vec, ut = ut_vec,
                                    uy = uy_vec, up = up_vec,
                                    rxxi = rxxi_vec, rxxa = rxxa_vec,
@@ -814,12 +778,10 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      es_data <- data.frame(rxyi = rxyi_orig,
                            n = n,
                            rtpa = rtpa_vec,
-                           rxpa = rxpa_vec,
-                           rtya = rtya_vec,
-                           A_tp = A_vec_tp,
-                           A_xp = A_vec_xp,
-                           A_ty = A_vec_ty,
+                           A = A_vec,
                            a = a_vec,
+                           rxxa_est = .rxxa_vec,
+                           ryya_est = .ryya_vec,
                            correction_type = correction_type)
      if(is.null(sample_id)){
           sample_id <- paste0("Sample #", 1:nrow(es_data))
@@ -847,7 +809,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                }
                if(any(do_meas | correction_type == "None")) pa[do_meas | correction_type == "None"] <- pi[do_meas | correction_type == "None"]
           }
-
      }
      es_data$d <- d
      es_data$n1 <- n1
@@ -968,6 +929,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      a_vec <- data$a
      correction_type <- data$correction_type
+     rxxa_est <- data$rxxa_est
+     ryya_est <- data$ryya_est
      sample_id <- data$sample_id
      if(any(colnames(data) == "citekey")){
           citekey <- data$citekey
@@ -982,42 +945,43 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
 
      wt_source <- check_wt_type(wt_type = wt_type)
+     
+     rtpa_vec <- data$rtpa
+     A_vec_tp <- data$A
+     var_e_tp_vec <- var_e_xy_vec / A_vec_tp^2 * a_vec^2
+     
+     if(wt_source == "psychmeta"){
+          wt_vec_tp <- out$escalc$barebones[,"weight"] * A_vec_tp^2
+     }
+     if(wt_source == "metafor"){
+          wt_vec_tp <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = rtpa_vec, vi = var_e_tp_vec,
+                                                                        control = list(maxiter = 1000, stepadj = .5), method = wt_type)))
+     }
+     
+     mean_rtpa <- wt_mean(x = rtpa_vec, wt = wt_vec_tp)
+     var_rtpa <- wt_var(x = rtpa_vec, wt = wt_vec_tp, unbiased = var_unbiased)
+     var_e_tp_a <- wt_mean(x = var_e_tp_vec, wt = wt_vec_tp)
+     var_rho_tp_a <- var_rtpa - var_e_tp_a
+     
+     sd_rtpa <- var_rtpa^.5
+     sd_e_tp_a <- var_e_tp_a^.5
+     sd_rho_tp_a <- var_rho_tp_a^.5
+     sd_rho_tp_a[is.na(sd_rho_tp_a)] <- 0
+     
+     if(k == 1){
+          var_rtpa <- sd_rtpa <- NA
+          var_rho_tp_a <- sd_rho_tp_a <- NA
+          se_rtpa <- sd_e_tp_a
+          ci_tp_a <- confidence(mean = mean_rtpa, sd = var_e_tp_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
+     }else{
+          se_rtpa <- sd_rtpa / sqrt(k)
+          ci_tp_a <- confidence(mean = mean_rtpa, sd = var_rtpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
+     }
+     cv_tp_a <- credibility(mean = mean_rtpa, sd = var_rho_tp_a^.5, cred_level = cred_level, k = k, cred_method = cred_method)
+     ci_tp_a <- setNames(c(ci_tp_a), colnames(ci_tp_a))
+     cv_tp_a <- setNames(c(cv_tp_a), colnames(cv_tp_a))
+     
      if(type == "ts" | type == "all"){
-          rtpa_vec <- data$rtpa
-          A_vec_tp <- data$A_tp
-          var_e_tp_vec <- var_e_xy_vec / A_vec_tp^2 * a_vec^2
-
-          if(wt_source == "psychmeta"){
-               wt_vec_tp <- out$escalc$barebones[,"weight"] * A_vec_tp^2
-          }
-          if(wt_source == "metafor"){
-               wt_vec_tp <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = rtpa_vec, vi = var_e_tp_vec,
-                                                                             control = list(maxiter = 1000, stepadj = .5), method = wt_type)))
-          }
-
-          mean_rtpa <- wt_mean(x = rtpa_vec, wt = wt_vec_tp)
-          var_rtpa <- wt_var(x = rtpa_vec, wt = wt_vec_tp, unbiased = var_unbiased)
-          var_e_tp_a <- wt_mean(x = var_e_tp_vec, wt = wt_vec_tp)
-          var_rho_tp_a <- var_rtpa - var_e_tp_a
-
-          sd_rtpa <- var_rtpa^.5
-          sd_e_tp_a <- var_e_tp_a^.5
-          sd_rho_tp_a <- var_rho_tp_a^.5
-          sd_rho_tp_a[is.na(sd_rho_tp_a)] <- 0
-
-          if(k == 1){
-               var_rtpa <- sd_rtpa <- NA
-               var_rho_tp_a <- sd_rho_tp_a <- NA
-               se_rtpa <- sd_e_tp_a
-               ci_tp_a <- confidence(mean = mean_rtpa, sd = var_e_tp_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
-          }else{
-               se_rtpa <- sd_rtpa / sqrt(k)
-               ci_tp_a <- confidence(mean = mean_rtpa, sd = var_rtpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
-          }
-          cv_tp_a <- credibility(mean = mean_rtpa, sd = var_rho_tp_a^.5, cred_level = cred_level, k = k, cred_method = cred_method)
-          ci_tp_a <- setNames(c(ci_tp_a), colnames(ci_tp_a))
-          cv_tp_a <- setNames(c(cv_tp_a), colnames(cv_tp_a))
-
           if(run_lean){
                escalc_tp <- NULL
           }else{
@@ -1028,15 +992,17 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                        weight = wt_vec_tp,
                                        residual = rtpa_vec - mean_rtpa,
                                        A = A_vec_tp,
-                                       a = a_vec)
+                                       a = a_vec, 
+                                       rxxa_est = rxxa_est, 
+                                       ryya_est = ryya_est)
                escalc_tp$pi <- data$pi
                escalc_tp$pa <- data$pa
-
+               
                if(!is.null(citekey)) escalc_tp <- cbind(citekey = citekey, escalc_tp)
                if(!is.null(sample_id)) escalc_tp <- cbind(sample_id = sample_id, escalc_tp)
                class(escalc_tp) <- c("escalc", "data.frame")
-          }
-
+          }    
+          
           meta <- data.frame(t(c(k = k, N = N,
                                  unlist(select(out$meta$barebones, .data$mean_r:.data$sd_res)),
                                  mean_rho = mean_rtpa,
@@ -1048,48 +1014,34 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  sd_e_c = sd_e_tp_a,
                                  sd_rho = sd_rho_tp_a,
                                  ci_tp_a, cv_tp_a)))
-
+          
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
-
+          
           out$meta$individual_correction$true_score <- meta
           out$escalc$individual_correction$true_score <- escalc_tp
      }
+     
      if(type == "vgx" | type == "all"){
-          rxpa_vec <- data$rxpa
-          A_vec_xp <- data$A_xp
-          var_e_xp_vec <- var_e_xy_vec / A_vec_xp^2 * a_vec^2
+          mean_rxxa <- wt_mean(rxxa_est, wt_vec_tp)
+          
+          rxpa_vec <- data$rtpa * sqrt(mean_rxxa)
+          A_vec_xp <- A_vec_tp / sqrt(mean_rxxa)
+          var_e_xp_vec <- var_e_tp_vec * sqrt(mean_rxxa)
+          wt_vec_xp <- wt_vec_tp / sqrt(mean_rxxa)
 
-          if(wt_source == "psychmeta"){
-               wt_vec_xp <- out$escalc$barebones[,"weight"] * A_vec_xp^2
-          }
-          if(wt_source == "metafor"){
-               wt_vec_xp <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = rxpa_vec, vi = var_e_xp_vec,
-                                                                             control = list(maxiter = 1000, stepadj = .5), method = wt_type)))
-          }
-
-          mean_rxpa <- wt_mean(x = rxpa_vec, wt = wt_vec_xp)
-          var_rxpa <- wt_var(x = rxpa_vec, wt = wt_vec_xp, unbiased = var_unbiased)
-          var_e_xp_a <- wt_mean(x = var_e_xp_vec, wt = wt_vec_xp)
+          mean_rxpa <- mean_rtpa * sqrt(mean_rxxa)
+          ci_xp_a <- ci_tp_a * sqrt(mean_rxxa)
+          cv_xp_a <- cv_tp_a * sqrt(mean_rxxa)
+          var_rxpa <- var_rtpa * mean_rxxa
+          var_e_xp_a <- var_e_tp_a * mean_rxxa
           var_rho_xp_a <- var_rxpa - var_e_xp_a
 
+          se_rxpa <- se_rtpa * sqrt(mean_rxxa)
           sd_rxpa <- var_rxpa^.5
           sd_e_xp_a <- var_e_xp_a^.5
           sd_rho_xp_a <- var_rho_xp_a^.5
           sd_rho_xp_a[is.na(sd_rho_xp_a)] <- 0
-
-          if(k == 1){
-               var_rxpa <- sd_rxpa <- NA
-               var_rho_xp_a <- sd_rho_xp_a <- NA
-               se_rxpa <- sd_e_xp_a
-               ci_xp_a <- confidence(mean = mean_rxpa, sd = var_e_xp_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
-          }else{
-               se_rxpa <- sd_rxpa / sqrt(k)
-               ci_xp_a <- confidence(mean = mean_rxpa, sd = var_rxpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
-          }
-          cv_xp_a <- credibility(mean = mean_rxpa, sd = var_rho_xp_a^.5, cred_level = cred_level, k = k, cred_method = cred_method)
-          ci_xp_a <- setNames(c(ci_xp_a), colnames(ci_xp_a))
-          cv_xp_a <- setNames(c(cv_xp_a), colnames(cv_xp_a))
 
           if(run_lean){
                escalc_xp <- NULL
@@ -1129,40 +1081,26 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           out$escalc$individual_correction$validity_generalization_x <- escalc_xp
      }
      if(type == "vgy" | type == "all"){
-          rtya_vec <- data$rtya
-          A_vec_ty <- data$A_ty
-          var_e_ty_vec <- var_e_xy_vec / A_vec_ty^2 * a_vec^2
-
-          if(wt_source == "psychmeta"){
-               wt_vec_ty <- out$escalc$barebones[,"weight"] * A_vec_ty^2
-          }
-          if(wt_source == "metafor"){
-               wt_vec_ty <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = rtya_vec, vi = var_e_ty_vec,
-                                                                             control = list(maxiter = 1000, stepadj = .5), method = wt_type)))
-          }
-          mean_rtya <- wt_mean(x = rtya_vec, wt = wt_vec_ty)
-          var_rtya <- wt_var(x = rtya_vec, wt = wt_vec_ty, unbiased = var_unbiased)
-          var_e_ty_a <- wt_mean(x = var_e_ty_vec, wt = wt_vec_ty)
+          mean_ryya <- wt_mean(ryya_est, wt_vec_tp)
+          
+          rtya_vec <- data$rtpa * sqrt(mean_ryya)
+          A_vec_ty <- A_vec_tp / sqrt(mean_ryya)
+          var_e_ty_vec <- var_e_tp_vec * sqrt(mean_ryya)
+          wt_vec_ty <- wt_vec_tp / sqrt(mean_ryya)
+          
+          mean_rtya <- mean_rtpa * sqrt(mean_ryya)
+          ci_ty_a <- ci_tp_a * sqrt(mean_ryya)
+          cv_ty_a <- cv_tp_a * sqrt(mean_ryya)
+          var_rtya <- var_rtpa * mean_ryya
+          var_e_ty_a <- var_e_tp_a * mean_ryya
           var_rho_ty_a <- var_rtya - var_e_ty_a
-
+          
+          se_rtya <- se_rtpa * sqrt(mean_ryya)
           sd_rtya <- var_rtya^.5
           sd_e_ty_a <- var_e_ty_a^.5
           sd_rho_ty_a <- var_rho_ty_a^.5
           sd_rho_ty_a[is.na(sd_rho_ty_a)] <- 0
-
-          if(k == 1){
-               var_rtya <- sd_rtya <- NA
-               var_rho_ty_a <- sd_rho_ty_a <- NA
-               se_rtya <- sd_e_ty_a
-               ci_ty_a <- confidence(mean = mean_rtya, sd = var_e_ty_a^.5, k = 1, conf_level = conf_level, conf_method = "norm")
-          }else{
-               se_rtya <- sd_rtya / sqrt(k)
-               ci_ty_a <- confidence(mean = mean_rtya, sd = var_rtya^.5, k = k, conf_level = conf_level, conf_method = conf_method)
-          }
-          cv_ty_a <- credibility(mean = mean_rtya, sd = var_rho_ty_a^.5, cred_level = cred_level, k = k, cred_method = cred_method)
-          ci_ty_a <- setNames(c(ci_ty_a), colnames(ci_ty_a))
-          cv_ty_a <- setNames(c(cv_ty_a), colnames(cv_ty_a))
-
+          
           if(run_lean){
                escalc_ty <- NULL
           }else{
