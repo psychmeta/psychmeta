@@ -95,23 +95,14 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
           
           if(any(ma_methods == "ic")){
                rtpa <- escalc$individual_correction$true_score$yi
-               rxpa <- escalc$individual_correction$validity_generalization_x$yi
-               rtya <- escalc$individual_correction$validity_generalization_y$yi
-               
                vi_tp <- escalc$individual_correction$true_score$vi
-               vi_xp <- escalc$individual_correction$validity_generalization_x$vi
-               vi_ty <- escalc$individual_correction$validity_generalization_y$vi
-               
                A_tp <- escalc$individual_correction$true_score$A
-               A_xp <- escalc$individual_correction$validity_generalization_x$A
-               A_ty <- escalc$individual_correction$validity_generalization_y$A
-               
                wt_tp <- escalc$individual_correction$true_score$weight
-               wt_xp <- escalc$individual_correction$validity_generalization_x$weight
-               wt_ty <- escalc$individual_correction$validity_generalization_y$weight
-               
                a <- escalc$individual_correction$true_score$a
                correction_type <- escalc$individual_correction$true_score$correction_type
+               
+               rxxa_est = escalc$individual_correction$true_score$rxxa_est
+               ryya_est = escalc$individual_correction$true_score$ryya_est
           }
           
           if(d_metric){
@@ -166,13 +157,12 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                es_data$n = n
                
                es_data$rtpa = rtpa
-               es_data$rxpa = rxpa
-               es_data$rtya = rtya
-               es_data$A_tp = A_tp
-               es_data$A_xp = A_xp
-               es_data$A_ty = A_ty
+               es_data$A = A_tp
                es_data$a = a
                es_data$correction_type = correction_type
+               
+               es_data$rxxa_est = rxxa_est
+               es_data$ryya_est = ryya_est
           }
           
           if(any(ma_methods == "ad")){
@@ -184,57 +174,33 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
           if(any(ma_methods == "ic") | any(ma_methods == "ad")){
                if(any(ma_methods == "ic")){
                     
+                    rep_list <- .separate_repmat(rep_mat = .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_r_ic_boot, ma_arg_list = ma_arg_list), analysis="cumulative")
+                    
+                    bb_table <- rep_list$barebones
+                    ts_table <- rep_list$true_score
+                    vgx_table <- rep_list$validity_generalization_x
+                    vgy_table <- rep_list$validity_generalization_y
+                    
                     bb_mat <- meta_tables$barebones
+                    ts_mat <- meta_tables$individual_correction$true_score
+                    vgx_mat <- meta_tables$individual_correction$validity_generalization_x
+                    vgy_mat <- meta_tables$individual_correction$validity_generalization_y
                     
                     if(es_type == "es"){
                          es_data$vi <- vi_xy
                          es_data$weight <- wt_xy
-                         bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
-                    }
-                    
-                    if(es_type == "r"){
-                         es_data$vi <- vi_xy
-                         es_data$weight <- wt_xy
-                         bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_r_bb_boot, ma_arg_list = ma_arg_list)
-                         
-                         if(d_metric){
-                              bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                         conf_method = conf_method, cred_method = cred_method)
-                              bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
-                                                                            conf_method = conf_method, cred_method = cred_method))
-                         }
+                         bb_table <- .ma_cumulative(data = es_data, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
                     }
                     
                     if(es_type == "d"){
                          es_data$vi <- vi
                          es_data$weight <- wt
-                         bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
-                         
-                         if(convert_back){
-                              bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
-                                                         conf_method = conf_method, cred_method = cred_method)
-                              bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
-                                                                            conf_method = conf_method, cred_method = cred_method))
-                         }
+                         bb_table <- .ma_cumulative(data = es_data, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
                     }
                     
-                    es_data$vi <- vi_tp
-                    es_data$weight <- wt_tp
-                    ts_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_r_icts_boot, ma_arg_list = ma_arg_list)
-                    
-                    es_data$vi <- vi_xp
-                    es_data$weight <- wt_xp
-                    vgx_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_r_icvgx_boot, ma_arg_list = ma_arg_list)
-                    
-                    es_data$vi <- vi_ty
-                    es_data$weight <- wt_ty
-                    vgy_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_r_icvgy_boot, ma_arg_list = ma_arg_list)
-                    
-                    ts_mat <- meta_tables$individual_correction$true_score
-                    vgx_mat <- meta_tables$individual_correction$validity_generalization_x
-                    vgy_mat <- meta_tables$individual_correction$validity_generalization_y
-                    
                     if(convert_back){
+                         bb_mat <- .convert_metatab(ma_table = bb_mat, p_vec = rep(p, nrow(bb_mat)), conf_level = conf_level, cred_level = cred_level,
+                                                    conf_method = conf_method, cred_method = cred_method)
                          ts_mat <- .convert_metatab(ma_table = ts_mat, p_vec = rep(p, nrow(ts_mat)), conf_level = conf_level, cred_level = cred_level,
                                                     conf_method = conf_method, cred_method = cred_method)
                          vgx_mat <- .convert_metatab(ma_table = vgx_mat, p_vec = rep(p, nrow(vgx_mat)), conf_level = conf_level, cred_level = cred_level,
@@ -242,6 +208,8 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                          vgy_mat <- .convert_metatab(ma_table = vgy_mat, p_vec = rep(p, nrow(vgy_mat)), conf_level = conf_level, cred_level = cred_level,
                                                      conf_method = conf_method, cred_method = cred_method)
                          
+                         bb_table <- suppressWarnings(.convert_metatab(ma_table = bb_table, p_vec = rep(p, nrow(bb_table)), conf_level = conf_level, cred_level = cred_level,
+                                                                       conf_method = conf_method, cred_method = cred_method))
                          ts_table <- suppressWarnings(.convert_metatab(ma_table = ts_table, p_vec = rep(p, nrow(ts_table)), conf_level = conf_level, cred_level = cred_level,
                                                                        conf_method = conf_method, cred_method = cred_method))
                          vgx_table <- suppressWarnings(.convert_metatab(ma_table = vgx_table, p_vec = rep(p, nrow(vgx_table)), conf_level = conf_level, cred_level = cred_level,
@@ -311,10 +279,10 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                                                                         conf_method = conf_method, cred_method = cred_method))
                     }
                     
-                    bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "leave1out")
-                    ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "leave1out")
-                    vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "leave1out")
-                    vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "leave1out")
+                    bb_plots <- .plot_forest_meta(ma_mat = bb_table, ma_vec = bb_mat, analysis = "cumulative")
+                    ts_plots <- .plot_forest_meta(ma_mat = ts_table, ma_vec = ts_mat, analysis = "cumulative")
+                    vgx_plots <- .plot_forest_meta(ma_mat = vgx_table, ma_vec = vgx_mat, analysis = "cumulative")
+                    vgy_plots <- .plot_forest_meta(ma_mat = vgy_table, ma_vec = vgy_mat, analysis = "cumulative")
                     
                     out_bb <- list(data = bb_table, 
                                    plots = bb_plots)

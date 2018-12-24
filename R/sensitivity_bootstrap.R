@@ -106,23 +106,14 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
           
           if(any(ma_methods == "ic")){
                rtpa <- escalc$individual_correction$true_score$yi
-               rxpa <- escalc$individual_correction$validity_generalization_x$yi
-               rtya <- escalc$individual_correction$validity_generalization_y$yi
-               
                vi_tp <- escalc$individual_correction$true_score$vi
-               vi_xp <- escalc$individual_correction$validity_generalization_x$vi
-               vi_ty <- escalc$individual_correction$validity_generalization_y$vi
-               
                A_tp <- escalc$individual_correction$true_score$A
-               A_xp <- escalc$individual_correction$validity_generalization_x$A
-               A_ty <- escalc$individual_correction$validity_generalization_y$A
-               
                wt_tp <- escalc$individual_correction$true_score$weight
-               wt_xp <- escalc$individual_correction$validity_generalization_x$weight
-               wt_ty <- escalc$individual_correction$validity_generalization_y$weight
-               
                a <- escalc$individual_correction$true_score$a
                correction_type <- escalc$individual_correction$true_score$correction_type
+               
+               rxxa_est = escalc$individual_correction$true_score$rxxa_est
+               ryya_est = escalc$individual_correction$true_score$ryya_est
           }
           
           if(d_metric){
@@ -176,14 +167,13 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                     es_data$n = n
                     
                     es_data$rtpa = rtpa
-                    es_data$rxpa = rxpa
-                    es_data$rtya = rtya
-                    es_data$A_tp = A_tp
-                    es_data$A_xp = A_xp
-                    es_data$A_ty = A_ty
+                    es_data$A = A_tp
                     es_data$a = a
                     es_data$correction_type = correction_type
                     es_data$n_adj <- n_adj
+                    
+                    es_data$rxxa_est = rxxa_est
+                    es_data$ryya_est = ryya_est
                }
                
                if(any(ma_methods == "ad")){
