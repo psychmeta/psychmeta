@@ -245,6 +245,10 @@ var_error_d <- function(d, n1, n2 = NA, correct_bias = TRUE){
      if(is.data.frame(n1)) n1 <- as.matrix(n1)
      if(is.data.frame(n2)) n2 <- as.matrix(n2)
 
+     if(length(d) == 1 & length(n1) > 1) {
+          d <- rep(d, length(n1))
+     }
+
      n <- n1
      n[!is.na(n2)] <- n[!is.na(n2)] + n2[!is.na(n2)]
 
@@ -329,6 +333,10 @@ var_error_g <- function(g, n1, n2 = NA){
 
      J <- (1 - 3 / (4 * (n - 2 - 1)))
      d <- g / J
+
+     if(length(d) == 1 & length(n1) > 1) {
+          d <- rep(d, length(n1))
+     }
 
      var_e <- (4 / n) * (1 + d^2 / 8)
      var_e[!is.na(n2)] <- (n1[!is.na(n2)] + n2[!is.na(n2)]) / (n1[!is.na(n2)] * n2[!is.na(n2)]) +
