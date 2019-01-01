@@ -172,7 +172,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
      attributes(out)$call_history <- list(call)
      
      out <- convert_ma(ma_obj = out, record_call = FALSE)
-     
+
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
      
