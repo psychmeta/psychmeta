@@ -203,7 +203,6 @@ ungroup.ma_psychmeta <- function (x, ...){
      x_att$group <- NULL
      x_att$class <- x_att$class[x_att$class != "grouped_df"]
      attributes(x) <- x_att
-     # class(x) <- class(x)[class(x) != "grouped_df"]
      x
 }
 
