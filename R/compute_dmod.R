@@ -41,6 +41,7 @@
 #' \emph{Organizational Research Methods}, https://doi.org/10.1177/1094428116644505.
 #'
 #' @examples
+#' \dontrun{
 #' # Example for computing \eqn{d_{Mod_{Signed}}}{d_Mod_Signed}
 #' .integrate_dmod(referent_int = -.05, referent_slope = .5,
 #'               focal_int = -.05, focal_slope = .3,
@@ -54,6 +55,7 @@
 #'               focal_mean_x = -.5, focal_sd_x = 1,
 #'               referent_sd_y = 1, focal_min_x = -Inf, focal_max_x = Inf,
 #'               signed = FALSE)
+#' }
 .integrate_dmod <- function(referent_int, referent_slope,
                             focal_int, focal_slope,
                             focal_mean_x, focal_sd_x,

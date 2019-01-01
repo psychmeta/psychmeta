@@ -50,10 +50,10 @@ convert_ma <- function(ma_obj, ...){
      }else{
           record_call <- TRUE
      }
-     
+          
      ma_obj <- ma_obj %>% group_by(.data$analysis_id) %>%
           do(.convert_ma(ma_obj_i = .data, ma_obj = ma_obj, ma_metric = ma_metric, ma_methods = ma_methods))
-
+     
      if(ma_metric == "r_as_r") .ma_metric <- "r_as_d"
      if(ma_metric == "d_as_r") .ma_metric <- "d_as_d"
 

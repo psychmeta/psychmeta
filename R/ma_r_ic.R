@@ -1163,7 +1163,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @keywords internal
 #'
 #' @examples
+#' \dontrun{
 #' .estimate_attenuation(r_observed = .3, r_corrected = .5)
+#' }
 .estimate_attenuation <- function(r_observed, r_corrected){
      r_observed / r_corrected
 }
@@ -1191,8 +1193,10 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @keywords internal
 #'
 #' @examples
+#' \dontrun{
 #' .refine_var_rr(rxyi = .3, ux = .8, rxx = .8, indirect_rr = TRUE,
 #'          ux_observed = TRUE, rxx_restricted = TRUE)
+#' }
 .refine_var_rr <- function(rxyi, ux, rxx = NULL, indirect_rr = rep(TRUE, length(rxyi)),
                            ux_observed = rep(TRUE, length(rxyi)), rxx_restricted = rep(TRUE, length(rxyi))){
      ux[indirect_rr & ux_observed] <- estimate_ut(ux = ux[indirect_rr & ux_observed], rxx = rxx[indirect_rr & ux_observed], rxx_restricted = rxx_restricted[indirect_rr & ux_observed])
