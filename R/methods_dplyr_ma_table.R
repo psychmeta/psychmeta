@@ -129,7 +129,10 @@ arrange_if.ma_table <- function(.tbl, .predicate, .funs = list(), ...){
 #' @method ungroup ma_table
 ungroup.ma_table <- function (x, ...){
      x <- reattribute(x, NextMethod())
-     class(x) <- class(x)[class(x) != "grouped_df"]
+     x_att <- attributes(x)
+     x_att$group <- NULL
+     x_att$class <- x_att$class[x_att$class != "grouped_df"]
+     attributes(x) <- x_att
      x
 }
 
