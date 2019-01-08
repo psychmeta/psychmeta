@@ -1,3 +1,22 @@
+Changes in Version 2.3.0 (2019-01-08)
+=====================================
+- Individual-correction validity generalization meta-analyses have been corrected to remove variation due to between-sample reliability differences prior to adding back measurement error.
+
+- Improved compatibility with dplyr and tibble packages.
+
+- Bug fixes for `var_error_d` and `var_error_g` to accommodate inputs of differing lengths.
+
+- Bug fix for cumulative meta-analyses.
+
+- Bug fix for handling null interactive ADs
+
+- Bug fix for meta-analyzing correlations between global constructs and facets.
+
+- Bug fix for estimating correction-implied subgroup proportions in correct_d.
+
+- Bug fix for using correct_d when n2 is left unspecified.
+
+
 Changes in Version 2.2.1 (2018-10-12)
 =====================================
 - Added option to suppress progress indicators in the console. Use options(psychmeta.show_progress = FALSE) to suppress progress indicators.
