@@ -95,7 +95,7 @@ wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE, df_type = c("coun
 #' @param as_cor Logical scalar that determines whether the covariances should be standardized (TRUE) or unstandardized (FALSE).
 #' @param use Method for handling missing values. "everything" uses all values and does not account for missingness, "listwise" uses only complete cases, and "pairwise" uses pairwise deletion.
 #' @param unbiased Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).
-#' @param df_type Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases ("count"; default) or sums of weights ("sum_wts").
+#' @param df_type Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases (n - 1; "count"; default) or squared sums of weights (1 - sum(w^2); "sum_wts").
 #'
 #' @return Scalar, vector, or matrix of covariances.
 #' @export
@@ -109,118 +109,93 @@ wt_var <- function(x, wt = rep(1, length(x)), unbiased = TRUE, df_type = c("coun
 #'        wt = c(1, 2, 2, 1), as_cor = FALSE, use = "listwise")
 #' wt_cov(x = cbind(c(1, 0, 2, NA), c(1, 2, 3, 3)),
 #'        wt = c(1, 2, 2, 1), as_cor = TRUE, use = "listwise")
-wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE, 
+wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE,
                    use = c("everything", "listwise", "pairwise"),
                    unbiased = TRUE, df_type = c("count", "sum_wts")){
-     
-     use <- match.arg(arg = use, choices = c("everything", "listwise", "pairwise"))
-     df_type <- match.arg(arg = df_type, choices = c("count", "sum_wts"))
-     
-     if(is.null(x)){
-          if(is.null(y)){
-               stop("x and y cannot both be NULL")
-          }else{
-               x <- y
-               y <- NULL
-          }
-     }
-     x <- as.matrix(x)
-     dim_names <- colnames(x)
-     if(is.null(wt)) wt <- rep(1, nrow(x))
 
-     if(use != "everything"){
-          if(use == "listwise"){
-               use_x <- apply(!is.na(x), 1, all) & !is.na(wt)
-               x[!use_x,] <- wt[!use_x] <- NA
-          }else{
-               use_x <- TRUE
-          }
-     }else{
-          use_x <- TRUE
-     }
+  use <- match.arg(arg = use, choices = c("everything", "listwise", "pairwise"))
+  df_type <- match.arg(arg = df_type, choices = c("count", "sum_wts"))
 
-     if(use != "everything"){
-          mean_x <- apply(x, 2, function(x) wt_mean(x = x, wt = wt))
-     }else{
-          mean_x <- (wt %*% x) / sum(wt)
-     }
+  if(is.null(x)){
+    if(is.null(y)){
+      stop("x and y cannot both be NULL")
+    }else{
+      x <- y
+      y <- NULL
+    }
+  }
+  x <- as.matrix(x)
+  if(is.null(wt)) wt <- rep(1 / nrow(x), nrow(x))
 
-     x <- t(t(x) - drop(mean_x))
-     if(as_cor){
-          D <- diag(ncol(x))
-          if(use != "everything"){
-               diag(D) <- apply(x, 2, function(x) wt_var(x = x, wt = wt, unbiased = unbiased))^.5
-          }else{
-               diag(D) <- 1 / ((wt %*% x^2) / sum(wt))^.5
-          }
-          x <- x %*% D
-     }
+  if(use != "everything"){
+    if(use == "listwise"){
+      use_x <- apply(!is.na(x), 1, all) & !is.na(wt)
+      x[!use_x,] <- wt[!use_x] <- NA
+    }else{
+      use_x <- TRUE
+    }
+  }else{
+    use_x <- TRUE
+  }
 
-     if(is.null(y)){
-          y <- x
-          dim_names <- list(dim_names, dim_names)
-     }else{
-          y <- as.matrix(y)
-          dim_names <- list(dim_names, colnames(y))
+  if(use != "everything"){
+    mean_x <- apply(x, 2, function(x) wt_mean(x = x, wt = wt))
+  }else{
+    mean_x <- (wt %*% x) / sum(wt)
+  }
 
-          if(use != "everything"){
-               if(use == "complete"){
-                    use_y <- apply(!is.na(y), 1, all) & !is.na(wt)
-                    y[!use_y,] <- NA
-               }
-          }
-          if(use != "everything"){
-               mean_y <- apply(y, 2, function(x) wt_mean(x = x, wt = wt))
-          }else{
-               mean_y <- (wt %*% y) / sum(wt)
-          }
+  x <- t(t(x) - drop(mean_x))
 
-          y <- t(t(y) - drop(mean_y))
-          if(as_cor) {
-               D <- diag(ncol(y))
-               if(use != "everything"){
-                    diag(D) <- apply(y, 2, function(x) wt_var(x = x, wt = wt, unbiased = unbiased)^.5)
-               }else{
-                    diag(D) <- 1 / ((wt %*% y^2) / sum(wt))^.5
-               }
-               y <- y %*% D
-          }
-     }
+  if(is.null(y)){
+    y <- x
+  }else{
+    y <- as.matrix(y)
 
-     if(use == "everything"){
-          out <- t(y) %*% (x * drop(wt)) / sum(wt)
-     }else{
-          out <- matrix(NA, nrow = ncol(y), ncol = ncol(x))
-          for(i in 1:nrow(out)){
-               for(j in 1:ncol(out)){
-                    out[i,j] <- wt_mean(x = y[,i] * x[,j], wt = wt)
-                  
-                    if(as_cor){
-                         out[i,j] <- out[i,j] / sqrt(wt_var(x = x[,j], wt = wt, unbiased = unbiased) *
-                                                          wt_var(x = y[,i], wt = wt, unbiased = unbiased))
-                    }
-               }  
-          }
-     }
+    if(use != "everything"){
+      if(use == "complete"){
+        use_y <- apply(!is.na(y), 1, all) & !is.na(wt)
+        y[!use_y,] <- NA
+      }
+    }
+    if(use != "everything"){
+      mean_y <- apply(y, 2, function(x) wt_mean(x = x, wt = wt))
+    }else{
+      mean_y <- (wt %*% y) / sum(wt)
+    }
 
-     if(!as_cor & unbiased){
-          if(df_type == "count"){
-               n <- t(!is.na(y)) %*% !is.na(x)
-          }else if(df_type == "sum_wts"){
-               wt_mat_x <- matrix(1, nrow = nrow(x), ncol = ncol(x))
-               wt_mat_y <- matrix(wt, nrow = nrow(x), ncol = ncol(x))
-               wt_mat_x[is.na(wt_mat_x)] <- wt_mat_y[is.na(wt_mat_y)] <- 0    
-               n <- t(wt_mat_y) %*% wt_mat_x
-          }
-          out <- out * n/(n-1)
-     }
-     if(length(out) == 1){
-          c(out)
-     }else{
-          dimnames(out) <- dim_names
-          out
-     }
+    y <- t(t(y) - drop(mean_y))
+  }
+
+  if(use == "everything"){
+    out <- t(y) %*% (x * drop(wt)) / sum(wt)
+  }else{
+    out <- matrix(NA, nrow = ncol(y), ncol = ncol(x))
+    for(i in 1:nrow(out)){
+      for(j in 1:ncol(out)){
+        out[i,j] <- wt_mean(x = y[,i] * x[,j], wt = wt)
+      }
+    }
+  }
+
+  if (unbiased) {
+    if (df_type == "count") {
+      n <- t(!is.na(y)) %*% !is.na(x)
+      out <- out * n / (n - 1)
+    } else if (df_type == "sum_wts") {
+      wt_mat_x <- matrix(wt, nrow = nrow(x), ncol = ncol(x))
+      wt_mat_y <- matrix(wt, nrow = nrow(x), ncol = ncol(x))
+      wt_mat_x[is.na(wt_mat_x)] <- wt_mat_y[is.na(wt_mat_y)] <- 0
+      out <- out / (1 - t(wt_mat_y) %*% wt_mat_x)
+    }
+  }
+  rownames(out) <- colnames(x)
+  colnames(out) <- colnames(y)
+  if (as_cor) out <- cov2cor(out)
+  if (length(out) == 1) {
+    drop(out)
+  } else out
 }
+
 
 #' @rdname wt_cov
 #' @export
