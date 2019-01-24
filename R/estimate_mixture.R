@@ -47,16 +47,24 @@ mix_dist <- function(mean_vec, var_vec, n_vec, unbiased = TRUE, na.rm = FALSE){
      }
      mean_mixture <- sum(mean_vec * n_vec) / sum(n_vec)
      if(unbiased){
-          var_pooled <- sum(var_vec * (n_vec - 1)) / (sum(n_vec) - 1)
-          var_means <- sum((mean_vec - mean_mixture)^2 * n_vec) / (sum(n_vec) - 1)
+          ssw <- sum(var_vec * (n_vec - 1))
+          var_pooled <- ssw / (sum(n_vec) - length(n_vec))
+          var_within <- ssw / (sum(n_vec) - 1)
+          ssb <- sum((mean_vec - mean_mixture)^2 * n_vec)
+          var_means <- ssb / (length(n_vec) - 1)
+          var_between <- ssb / (sum(n_vec) - 1)
      }else{
-          var_pooled <- sum(var_vec * n_vec) / sum(n_vec)
-          var_means <- sum((mean_vec - mean_mixture)^2 * n_vec) / sum(n_vec)
+          var_pooled <- var_within <- sum(var_vec * n_vec) / sum(n_vec)
+          ssb <- sum((mean_vec - mean_mixture)^2 * n_vec)
+          var_means <- ssb / length(n_vec)
+          var_between <- ssb / sum(n_vec)
      }
      c(`grand mean` = mean_mixture,
-       `within-group (pooled) variance` = as.numeric(var_pooled),
-       `between-group variance` = as.numeric(var_means),
-       `mixture (total) variance` = as.numeric(var_pooled + var_means))
+       `pooled variance (MSW)` = as.numeric(var_pooled),
+       `variance of means (MSB)` = as.numeric(var_means),
+       `within-group variance` = as.numeric(var_within),
+       `between-group variance` = as.numeric(var_between),
+       `mixture (total) variance` = as.numeric(var_within + var_between))
 }
 
 
