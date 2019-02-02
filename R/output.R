@@ -22,6 +22,14 @@
 #' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\href{https://unicode-table.com/en/2212/}{\code{U+2212}}").
 #' @param inf.mark A length 2 vector containing characters to replace \code{Inf} and \code{-Inf}. Defaults to c("+\href{https://unicode-table.com/en/221e/}{\code{U+221e}}", "\href{https://unicode-table.com/en/2212/}{\code{U+2212}}\href{https://unicode-table.com/en/221e/}{\code{U+221e}}").
 #'
+#' @usage format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
+#'               leading0 = "conditional", drop0integer = FALSE,
+#'               neg.sign = "\u2212", pos.sign = "figure",
+#'               big.mark = "\u202F", big.interval = 3L,
+#'               small.mark = "\u202F", small.interval = 3L,
+#'               na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
+#'               inf.mark = c("+\u221E", "\u2212\u221E") )
+#'
 #' @export
 #' @examples
 #' # format_num() converts numeric values to characters with the specified formatting options.

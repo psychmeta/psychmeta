@@ -24,7 +24,7 @@ wt_cor(x, y = NULL, wt = NULL, use = "everything")
 
 \item{unbiased}{Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).}
 
-\item{df_type}{Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases ("count"; default) or sums of weights ("sum_wts").}
+\item{df_type}{Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases (n - 1; "count"; default) or squared sums of weights (1 - sum(w^2); "sum_wts").}
 }
 \value{
 Scalar, vector, or matrix of covariances.
