@@ -1199,10 +1199,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 }
 
 
-#' Internal list of strings with formatted variable names for output
-#'
-#' @keywords Internal
-#'
+# Internal list of strings with formatted variable names for output
 .formatted_strings <- function(output_format, es_type, symbol_es = "ES", conf_level = .95, cred_level = .80, corrections = NULL,
                                show_msd = TRUE, show_se = FALSE, show_var = FALSE, verbose = FALSE, show_conf = TRUE, show_cred = TRUE,
                                unicode = NULL, bold_headers = TRUE) {

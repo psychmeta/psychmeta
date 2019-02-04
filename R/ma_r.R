@@ -1661,7 +1661,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                
                out
           })
-         
+          
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
           
           out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")

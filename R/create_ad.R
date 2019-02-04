@@ -207,7 +207,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           rxxa <- rxxa[filtered_rxxa]
           wt_rxxa <- wt_rxxa[filtered_rxxa]
           rxxa_type <- rxxa_type[filtered_rxxa]
-          if(length(rxxa) == 0) rxxa <- n_rxxa <- wt_rxxa <- rxxa_type <- NULL
+          if(!is.null(k_items_rxxa)) k_items_rxxa <- k_items_rxxa[filtered_rxxa]
+          if(length(rxxa) == 0) rxxa <- n_rxxa <- wt_rxxa <- rxxa_type <- k_items_rxxa <- NULL
      }
 
      if(!is.null(rxxi)){
@@ -218,7 +219,8 @@ create_ad_int <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi,
           rxxi <- rxxi[filtered_rxxi]
           wt_rxxi <- wt_rxxi[filtered_rxxi]
           rxxi_type <- rxxi_type[filtered_rxxi]
-          if(length(rxxi) == 0) rxxi <- n_rxxi <- wt_rxxi <- rxxi_type <- NULL
+          if(!is.null(k_items_rxxi)) k_items_rxxi <- k_items_rxxi[filtered_rxxi]
+          if(length(rxxi) == 0) rxxi <- n_rxxi <- wt_rxxi <- rxxi_type <- k_items_rxxi <- NULL
      }
 
      if(!is.null(ux)){
@@ -1265,6 +1267,8 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
                if(!is.null(na_vec)) na_vec <- na_vec[valid_art]
                art_vec <- art_vec[valid_art]
                wt_vec <- wt_vec[valid_art]
+               if(!is.null(art_type)) art_type <- art_type[valid_art]
+               if(!is.null(k_items)) k_items <- k_items[valid_art]
 
                if(art == "q") art_desc_obs <- t(wt_dist(x = art_vec^.5, wt = wt_vec, unbiased = var_unbiased))
                if(art == "rel") art_desc_obs <- t(wt_dist(x = art_vec, wt = wt_vec, unbiased = var_unbiased))
