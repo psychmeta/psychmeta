@@ -915,7 +915,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           var_e_xy_vec <- convert_vard_to_varr(d = out$escalc$barebones[,"d"], var = out$escalc$barebones[,"var_e_raw"], p = data$pi)
           out$escalc$barebones$vi <- convert_vard_to_varr(d = out$escalc$barebones$yi, var = out$escalc$barebones$vi, p = data$pi)
           out$escalc$barebones$yi <- convert_es.q_d_to_r(d = out$escalc$barebones$yi, p = data$pi)
-          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = data$n_adj), 
+          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = out$escalc$barebones$weight), 
                                                  conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
      }else{
           out <- .ma_r_bb(data = data, ma_arg_list = ma_arg_list)

@@ -36,7 +36,7 @@ ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
 ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL,
   sample_id = NULL, citekey = NULL, wt_type = c("sample_size",
   "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML",
-  "EB", "PM"), correct_bias = FALSE, moderators = NULL,
+  "EB", "PM"), correct_bias = TRUE, moderators = NULL,
   cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
   "none"), data = NULL, control = control_psychmeta(), ...)
 

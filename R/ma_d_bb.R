@@ -5,7 +5,7 @@
 ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL, citekey = NULL,
                                       wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
                                                   "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
-                                      correct_bias = FALSE,
+                                      correct_bias = TRUE,
                                       moderators = NULL, cat_moderators = TRUE, 
                                       moderator_type = c("simple", "hierarchical", "none"), 
                                       data = NULL, control = control_psychmeta(), ...){
@@ -223,6 +223,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      if(correct_bias){
           mean_d <- correct_d_bias(d = mean_d, n = mean(n_vec))
           d <- correct_d_bias(d = d, n = n_vec)
+          mean_d <- wt_mean(x = d, wt = wt_vec)
      }
      var_e <- wt_mean(x = var_e_vec, wt = wt_vec)
 
