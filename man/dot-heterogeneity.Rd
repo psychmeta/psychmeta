@@ -5,8 +5,8 @@
 \title{Computation of heterogeneity indices from meta-analytic results}
 \usage{
 .heterogeneity(mean_es, var_es, var_e, var_art = NA, var_pre = NA,
-  wt_vec, N, k, es_vec, es_failsafe = NULL, conf_level = 0.95,
-  es_type = "es")
+  wt_vec, N, k, es_vec, vare_vec = NULL, es_failsafe = NULL,
+  conf_level = 0.95, es_type = "es", wt_type)
 }
 \arguments{
 \item{mean_es}{The mean effect size.}
@@ -27,11 +27,15 @@
 
 \item{es_vec}{The vector of effect sizes used in the meta-analysis.}
 
+\item{vare_vec}{The vector of sampling-error variances used in the meta-analysis.}
+
 \item{es_failsafe}{Failsafe value of the effect size for use in file-drawer analyses.}
 
 \item{conf_level}{Confidence level to define the width of the confidence interval (default = .95).}
 
 \item{es_type}{Name of effect-size type.}
+
+\item{wt_type}{Weighting method.}
 }
 \value{
 A list of heterogeneity statistics.

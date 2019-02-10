@@ -426,12 +426,22 @@ print.ma_heterogeneity <- function(x, ..., digits = 3){
      cat("\n")
      cat("Q statistic: ", round2char(x$Q[1], digits = digits), " (p = ", round2char(x$Q[3], digits = digits), ", df = ", x$Q[2], ") \n", sep = "")
 
-     conf_level <- gsub(x = gsub(x = names(x$tau[2]), pattern = "CI_", replacement = ""), pattern = "_LL", replacement = "")
-     cat("\n")
-     cat("tau: ", round2char(x$tau[1], digits = digits), ", ", conf_level, "% CI = [", round2char(x$tau[2], digits = digits), ", ", round2char(x$tau[3], digits = digits), "] \n", sep = "")
+     if(attributes(x)$wt_source == "psychmeta"){
+          conf_level <- gsub(x = gsub(x = names(x$tau[2]), pattern = "CI_", replacement = ""), pattern = "_LL", replacement = "")
+          cat("\n")
+          cat("tau: ", round2char(x$tau[1], digits = digits), ", ", conf_level, "% CI = [", round2char(x$tau[2], digits = digits), ", ", round2char(x$tau[3], digits = digits), "] \n", sep = "")
+          
+          cat("\n")
+          cat("tau^2: ", round2char(x$tau_squared[1], digits = digits), ", ", conf_level, "% CI = [", round2char(x$tau_squared[2], digits = digits), ", ", round2char(x$tau_squared[3], digits = digits), "] \n", sep = "")          
+     }else{
+          conf_level <- gsub(x = gsub(x = names(x$tau[2]), pattern = "CI_", replacement = ""), pattern = "_LL", replacement = "")
+          cat("\n")
+          cat("tau: ", round2char(x$tau[1], digits = digits), ", ", "SE = ", round2char(x$tau[2], digits = digits), " \n", sep = "")
+          
+          cat("\n")
+          cat("tau^2: ", round2char(x$tau_squared[1], digits = digits), ", ", "SE = ", round2char(x$tau_squared[2], digits = digits), " \n", sep = "")
+     }
 
-     cat("\n")
-     cat("tau^2: ", round2char(x$tau_squared[1], digits = digits), ", ", conf_level, "% CI = [", round2char(x$tau_squared[2], digits = digits), ", ", round2char(x$tau_squared[3], digits = digits), "] \n", sep = "")
 }
 
 

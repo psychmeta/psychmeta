@@ -197,7 +197,8 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           if(wt_type == "sample_size") wt_vec <- n_adj
           if(wt_type == "inv_var_mean") wt_vec <- 1 / var_error_d(d = rep(0, length(d)), n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
           if(wt_type == "inv_var_sample") wt_vec <- 1 / var_error_d(d = d, n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
-          if((wt_type == "inv_var_mean" | wt_type == "inv_var_mean") & correct_bias) wt_vec <- wt_vec * (1 + 0.75/(n_vec - 3))^2
+          # if((wt_type == "inv_var_mean" | wt_type == "inv_var_sample") & correct_bias) wt_vec <- wt_vec * (1 + 0.75/(n_vec - 3))^2
+          if(correct_bias) wt_vec <- wt_vec * (1 + 0.75/(n_vec - 3))^2
      }
      if(wt_source == "metafor"){
           if(error_type == "mean"){
@@ -221,7 +222,6 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 
      ## Correct for small-sample bias
      if(correct_bias){
-          mean_d <- correct_d_bias(d = mean_d, n = mean(n_vec))
           d <- correct_d_bias(d = d, n = n_vec)
           mean_d <- wt_mean(x = d, wt = wt_vec)
      }

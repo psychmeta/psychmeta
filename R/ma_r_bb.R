@@ -210,10 +210,9 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      if(wt_source == "psychmeta"){
           if(wt_type == "sample_size") wt_vec <- n_adj
           if(wt_type == "inv_var_mean") wt_vec <- n_adj - 1
-          if(wt_type == "inv_var_sample"){
-               wt_vec <- 1 / var_error_r(r = r, n = n_adj, correct_bias = FALSE)
-               if(correct_bias) wt_vec <- wt_vec * .bias_factor_r(n = n)^2
-          }
+          if(wt_type == "inv_var_sample") wt_vec <- 1 / var_error_r(r = r, n = n_adj, correct_bias = FALSE)
+          # if((wt_type == "inv_var_mean" | wt_type == "inv_var_sample") & correct_bias) wt_vec <- wt_vec * .bias_factor_r(n = n)^2
+          if(correct_bias) wt_vec <- wt_vec * .bias_factor_r(n = n)^2
      }
      if(wt_source == "metafor"){
           if(error_type == "mean") var_e_vec <- var_error_r(r = wt_mean(x = r, wt = n_adj), n = n_adj, correct_bias = correct_bias)
