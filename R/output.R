@@ -115,11 +115,11 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
      # Clean up unicode big.mark and small.mark
      out[] <- dplyr::mutate_all(out,
-                                funs(stringr::str_replace_all(.data$.,
+                                funs(stringr::str_replace_all(.,
                                                               paste0("(",paste(rev(strsplit(sub(" ", big.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", big.mark, " "),")"),
                                                               big.mark)))
      out[] <- dplyr::mutate_all(out,
-                                funs(stringr::str_replace_all(.data$.,
+                                funs(stringr::str_replace_all(.,
                                                               paste0("(",paste(rev(strsplit(sub(" ", small.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", small.mark, " "),")"),
                                                               small.mark)))
 
@@ -675,7 +675,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                       meta_tables <- sapply(names(meta_tables),
                                             function(x) {
                                                  ma_table <- mutate_all(meta_tables[[x]],
-                                                                        funs(stringr::str_replace_all(.data$.,
+                                                                        funs(stringr::str_replace_all(.,
                                                                                                       "&#8199;",
                                                                                                       "&#8199;\\\\phantom{&minus;}")))
                                                  attributes(ma_table) <- attributes(meta_tables[[x]])
@@ -722,7 +722,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                meta_tables <- sapply(names(meta_tables),
                                      function(x) {
                                           ma_table <- mutate_all(meta_tables[[x]],
-                                                                 funs(stringr::str_replace_all(.data$.,
+                                                                 funs(stringr::str_replace_all(.,
                                                                                                "&#8199;",
                                                                                                "&#8199;\\\\phantom{&minus;}")))
                                           attributes(ma_table) <- attributes(meta_tables[[x]])

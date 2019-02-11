@@ -63,11 +63,11 @@ num_format <- function(x, digits = 2L, decimal.mark = getOption("OutDec"), leadi
 
         # Clean up unicode big.mark and small.mark
         out[] <- mutate_all(out,
-                            funs(str_replace(.data$.,
+                            funs(str_replace(.,
                                              paste0("(",paste(rev(strsplit(sub(" ", big.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", big.mark, " "),")"),
                                              big.mark)))
         out[] <- mutate_all(out,
-                            funs(str_replace(.data$.,
+                            funs(str_replace(.,
                                              paste0("(",paste(rev(strsplit(sub(" ", small.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", small.mark, " "),")"),
                                              small.mark)))
 

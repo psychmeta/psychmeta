@@ -107,3 +107,6 @@ psychmeta_news <- function(){
      news(package = "psychmeta")
 }
 
+#' @importFrom utils globalVariables
+globalVariables(c("."))
+
