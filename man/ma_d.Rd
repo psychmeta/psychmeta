@@ -14,17 +14,17 @@ ma_d(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
   group_id = NULL, group1 = NULL, group2 = NULL,
   group_order = NULL, construct_y = NULL, facet_y = NULL,
   measure_y = NULL, construct_order = NULL,
-  wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", "DL",
-  "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), correct_bias = TRUE,
-  correct_rel = NULL, correct_rGg = FALSE, correct_ryy = TRUE,
-  correct_rr = NULL, correct_rr_g = TRUE, correct_rr_y = TRUE,
-  indirect_rr = NULL, indirect_rr_g = TRUE, indirect_rr_y = TRUE,
-  rGg = NULL, pi = NULL, pa = NULL, ryy = NULL,
-  ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NULL,
-  uy = NULL, uy_observed = TRUE, sign_rz = NULL, sign_rgz = 1,
-  sign_ryz = 1, moderators = NULL, cat_moderators = TRUE,
-  moderator_type = c("simple", "hierarchical", "none"),
-  supplemental_ads = NULL, data = NULL,
+  wt_type = c("n_effective", "sample_size", "inv_var_mean",
+  "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
+  correct_bias = TRUE, correct_rel = NULL, correct_rGg = FALSE,
+  correct_ryy = TRUE, correct_rr = NULL, correct_rr_g = TRUE,
+  correct_rr_y = TRUE, indirect_rr = NULL, indirect_rr_g = TRUE,
+  indirect_rr_y = TRUE, rGg = NULL, pi = NULL, pa = NULL,
+  ryy = NULL, ryy_restricted = TRUE, ryy_type = "alpha",
+  k_items_y = NULL, uy = NULL, uy_observed = TRUE, sign_rz = NULL,
+  sign_rgz = 1, sign_ryz = 1, moderators = NULL,
+  cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
+  "none"), supplemental_ads = NULL, data = NULL,
   control = control_psychmeta(), ...)
 
 ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
@@ -34,16 +34,16 @@ ma_d_ad(ma_obj, ad_obj_g = NULL, ad_obj_y = NULL,
   sign_rgz = 1, sign_ryz = 1, control = control_psychmeta(), ...)
 
 ma_d_bb(d, n1, n2 = rep(NA, length(d)), n_adj = NULL,
-  sample_id = NULL, citekey = NULL, wt_type = c("sample_size",
-  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML",
-  "EB", "PM"), correct_bias = FALSE, moderators = NULL,
+  sample_id = NULL, citekey = NULL, wt_type = c("n_effective",
+  "sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ",
+  "ML", "REML", "EB", "PM"), correct_bias = TRUE, moderators = NULL,
   cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
   "none"), data = NULL, control = control_psychmeta(), ...)
 
 ma_d_ic(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL,
-  citekey = NULL, treat_as_r = FALSE, wt_type = c("sample_size",
-  "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ", "ML", "REML",
-  "EB", "PM"), correct_bias = TRUE, correct_rGg = FALSE,
+  citekey = NULL, treat_as_r = FALSE, wt_type = c("n_effective",
+  "sample_size", "inv_var_mean", "inv_var_sample", "DL", "HE", "HS", "SJ",
+  "ML", "REML", "EB", "PM"), correct_bias = TRUE, correct_rGg = FALSE,
   correct_ryy = TRUE, correct_rr_g = FALSE, correct_rr_y = TRUE,
   indirect_rr_g = TRUE, indirect_rr_y = TRUE, rGg = NULL,
   pi = NULL, pa = NULL, ryy = NULL, ryy_restricted = TRUE,
@@ -98,7 +98,7 @@ To avoid double-compositing, any observation with one of these reserved names wi
 
 \item{construct_order}{Vector indicating the order in which Y variables should be arranged.}
 
-\item{wt_type}{Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
+\item{wt_type}{Type of weight to use in the meta-analysis: options are "n_effective" (effective sample size), "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).}
 

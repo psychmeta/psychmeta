@@ -188,8 +188,8 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
 
           V.d <- rep(NA, length(d.ci))
-          V.d[is.na(n2)] <- var_error_d(d=d.ci[is.na(n2)], n1=n[is.na(n2)], correct_bias=correct_bias)
-          V.d[!is.na(n2)] <- var_error_d(d=d.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)], correct_bias=correct_bias)
+          V.d[is.na(n2)] <- var_error_d(d=d.ci[is.na(n2)], n1=n[is.na(n2)], correct_bias=FALSE)
+          V.d[!is.na(n2)] <- var_error_d(d=d.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)], correct_bias=FALSE)
 
           CI <- confidence(d, se=sqrt(V.d), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
@@ -218,7 +218,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
                n_effective <- n
           }
 
-          V.r <- var_error_r(r.ci, n, correct_bias)
+          V.r <- var_error_r(r.ci, n, correct_bias = FALSE)
           CI <- confidence(r, se=sqrt(V.r), conf_level=conf_level, conf_method = "norm")
           original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
           names(original_es)[1] <- input_es

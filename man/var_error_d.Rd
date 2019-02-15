@@ -31,9 +31,7 @@ When groups 1 and 2 are of equal size, this reduces to
 
 \deqn{var_{e}=\left(\frac{n-1}{n-3}\right)\left(\frac{4}{n}\right)\left(1+\frac{d^{2}}{8}\right)}{var_e = ((n - 1) / (n - 3)) * (4 / n) * (1 + d^2 / 8)}
 
-The estimated error variance can be divided by the following term to correct for small-sample bias:
-
-\deqn{bias\;factor=\left(1+\frac{.75}{n-3}\right)^{2}}{(1 + .75 / (n - 3))^2}
+This can be corrected for bias by first correcting the \emph{d} value (see \code{\link{correct_d_bias}}) prior to estimating the error variance.
 }
 \examples{
 var_error_d(d = 1, n1 = 30, n2 = 30, correct_bias = TRUE)

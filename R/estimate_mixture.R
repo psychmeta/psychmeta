@@ -1,7 +1,7 @@
 #' @title Descriptive statistics for a mixture distribution
 #'
 #' @description
-#' Compute descriptive statistics for a mixture distribution. This function returns the grand mean, the pooled sample (within-sample) variance, variance of sample means (between-groups), and mixture (total sample) variance of the mixture sample data.
+#' Compute descriptive statistics for a mixture distribution. This function returns the grand mean, the pooled sample variance (mean square within), variance of sample means (mean square between), portions of the total variance that are within and between groups, and mixture (total sample) variance of the mixture sample data.
 #'
 #' @param mean_vec Vector of sample means.
 #' @param var_vec Vector of sample variances.
@@ -21,15 +21,17 @@
 #'
 #'
 #' Maximum-likelihood mixture variances are computed as:
-#'
-#' \deqn{var_{BG_{ML}}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_wg_ml = sum(var_vec * n_vec) / sum(n_vec)}
-#' \deqn{var_{WG_{ML}}=\frac{\Sigma_{i=1}^{k}v_{i}n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_bg_ml = sum((mean_vec - mean_mixture)^2 * n_vec) / sum(n_vec)}
+#' \deqn{var_{pooled_{ML}}=MSW_{ML}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_pooled_ml = MSW_ml = sum(var_vec * n_vec) / sum(n_vec)}
+#' \deqn{var_{means_{ML}}=MSB_{ML}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{k}}{var_means_ml = MSB_ml = sum(var_vec * n_vec) / sum(n_vec)}
+#' \deqn{var_{BG_{ML}}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_bg_ml = sum((mean_vec - mean_mixture)^2 * n_vec) / sum(n_vec)}
+#' \deqn{var_{WG_{ML}}=\frac{\Sigma_{i=1}^{k}v_{i}n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_wg_ml = sum(var_vec * n_vec) / sum(n_vec)}
 #' \deqn{var_{mix_{ML}}=var_{BG_{ML}}+var_{WG_{ML}}}{var_mix_ml = var_bg_ml + var_wg_ml}
 #'
 #' where \eqn{v_{i}}{var_vec} represents the sample variances.
 #'
 #' Unbiased mixture variances are computed as:
-#'
+#' \deqn{var_{pooled_{Unbiased}}=MSW_{Unbiased}=\frac{\Sigma_{i=1}^{k}v_{i}\left(n_{i}-1\right)}{\left(\Sigma_{i=1}^{k}n_{i}\right)-k}}{var_pooled_unbiased = MSW_unbiased = sum(var_vec * (n_vec - 1)) / (sum(n_vec) - k)}
+#' \deqn{var_{means_{Unbiased}}=MSB_{Unbiased}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{k-1}}{var_means_unbiased = MSB_unbiased = sum((mean_vec - mean_mixture)^2 * n_vec) / (k - 1)}
 #' \deqn{var_{BG_{Unbiased}}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\left(\Sigma_{i=1}^{k}n_{i}\right)-1}}{var_bg_unbiased = sum((mean_vec - mean_mixture)^2 * n_vec) / (sum(n_vec) - 1)}
 #' \deqn{var_{WG_{Unbiased}}=\frac{\Sigma_{i=1}^{k}v_{i}\left(n_{i}-1\right)}{\left(\Sigma_{i=1}^{k}n_{i}\right)-1}}{var_wg_unbiased = sum(var_vec * (n_vec - 1)) / (sum(n_vec) - 1)}
 #' \deqn{var_{mix_{Unbiased}}=var_{BG_{Unbiased}}+var_{WG_{Unbiased}}}{var_mix_unbiased = var_bg_unbiased + var_wg_unbiased}
@@ -47,16 +49,24 @@ mix_dist <- function(mean_vec, var_vec, n_vec, unbiased = TRUE, na.rm = FALSE){
      }
      mean_mixture <- sum(mean_vec * n_vec) / sum(n_vec)
      if(unbiased){
-          var_pooled <- sum(var_vec * (n_vec - 1)) / (sum(n_vec) - 1)
-          var_means <- sum((mean_vec - mean_mixture)^2 * n_vec) / (sum(n_vec) - 1)
+          ssw <- sum(var_vec * (n_vec - 1))
+          var_pooled <- ssw / (sum(n_vec) - length(n_vec))
+          var_within <- ssw / (sum(n_vec) - 1)
+          ssb <- sum((mean_vec - mean_mixture)^2 * n_vec)
+          var_means <- ssb / (length(n_vec) - 1)
+          var_between <- ssb / (sum(n_vec) - 1)
      }else{
-          var_pooled <- sum(var_vec * n_vec) / sum(n_vec)
-          var_means <- sum((mean_vec - mean_mixture)^2 * n_vec) / sum(n_vec)
+          var_pooled <- var_within <- sum(var_vec * n_vec) / sum(n_vec)
+          ssb <- sum((mean_vec - mean_mixture)^2 * n_vec)
+          var_means <- ssb / length(n_vec)
+          var_between <- ssb / sum(n_vec)
      }
      c(`grand mean` = mean_mixture,
-       `within-group (pooled) variance` = as.numeric(var_pooled),
-       `between-group variance` = as.numeric(var_means),
-       `mixture (total) variance` = as.numeric(var_pooled + var_means))
+       `pooled variance (MSW)` = as.numeric(var_pooled),
+       `variance of means (MSB)` = as.numeric(var_means),
+       `within-group variance` = as.numeric(var_within),
+       `between-group variance` = as.numeric(var_between),
+       `mixture (total) variance` = as.numeric(var_within + var_between))
 }
 
 

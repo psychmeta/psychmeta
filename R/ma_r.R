@@ -522,9 +522,22 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
      
+     additional_args <- list(...)
+     if(!is.null(additional_args$treat_as_d)){
+          treat_as_d <- additional_args$treat_as_d
+     }else{
+          treat_as_d <- FALSE
+     }
+     
      ma_method <- match.arg(ma_method, choices = c("bb", "ic", "ad"))
-     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
-                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     if(treat_as_d){
+          wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
+                                                    "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     }else{
+          wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                                    "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     }
+
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
      
@@ -563,7 +576,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      
      inputs <- list(wt_type = wt_type, error_type = error_type, pairwise_ads = pairwise_ads, moderated_ads = moderated_ads, correct_bias = correct_bias, 
                     conf_level = conf_level, cred_level = cred_level, cred_method = cred_method, conf_method = conf_method, var_unbiased = var_unbiased)
-     additional_args <- list(...)
      inputs <- append(inputs, additional_args)
      
      if(psychmeta.show_progress)
@@ -575,11 +587,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           es_d <- inputs$es_d
      }else{
           es_d <- FALSE
-     }
-     if(!is.null(inputs$treat_as_d)){
-          treat_as_d <- inputs$treat_as_d
-     }else{
-          treat_as_d <- FALSE
      }
      d <- inputs$d_orig
      n1 <- inputs$n1_d
@@ -1661,7 +1668,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                
                out
           })
-         
+          
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
           
           out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")

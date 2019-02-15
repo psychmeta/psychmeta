@@ -136,7 +136,9 @@ convert_meta <- convert_ma
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }
 
-               ma_obj_i$meta_tables[[1]]$barebones <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$barebones, p_vec = pi_vec, conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
+               ma_obj_i$meta_tables[[1]]$barebones <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$barebones, 
+                                                                       p_vec = pi_vec, conf_level = conf_level, cred_level = cred_level, 
+                                                                       conf_method = conf_method, cred_method = cred_method)
           }
 
           if(any(ma_methods == "ad")){

@@ -1,3 +1,18 @@
+Changes in Version 2.3.1 (2019-02-15)
+=====================================
+- Increased support for heterogeneity analyses conducted using weights imported from the metafor package.
+
+- Updated estimates for small-sample-bias corrected error variances to be computed from the bias-corrected effect size rather than applying a post-hoc linear variance adjustment.
+
+- Changed default weighting method for d values to "n_effective." This method is superior to sample-size weights because it accounts for both total sample size and deviations from equal subgroup representation. 
+
+- Updated compatibility with dplyr version 0.8.0. 
+
+- Updated the labeling of output from the mix_dist function. 
+
+- Assorted bug fixes affecting mean d value estimates (from the ma_d and ma_d_ic functions), artifact distributions, and weighted correlations and covariances. 
+
+
 Changes in Version 2.3.0 (2019-01-08)
 =====================================
 - Individual-correction validity generalization meta-analyses have been corrected to remove variation due to between-sample reliability differences prior to adding back measurement error.
