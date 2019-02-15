@@ -265,12 +265,12 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
      if(is.null(p)){
           key_mat <- .melt_mat_groups(key_mat = key_mat, x = n, stat_name = "n", groups_on_cols = FALSE)
           overall <- t(apply(key_mat[,-(1:3)], 1, function(x) mix_dist(mean_vec = x[c("mean1", "mean2")],
-                                                                       var_vec = x[c("sd1", "sd2")]^2, n_vec = x[c("n1", "n2")], unbiased = TRUE)))[,-3]
+                                                                       var_vec = x[c("sd1", "sd2")]^2, n_vec = x[c("n1", "n2")], unbiased = TRUE)))[,c(1, 4, 6)]
           key_mat$p <- key_mat$n1 / (key_mat$n1 + key_mat$n2)
      }else{
           key_mat <- .melt_mat_groups(key_mat = key_mat, x = p, stat_name = "p", groups_on_cols = FALSE)
           overall <- t(apply(key_mat[,-(1:3)], 1, function(x) mix_dist(mean_vec = x[c("mean1", "mean2")],
-                                                                       var_vec = x[c("sd1", "sd2")]^2, n_vec = x[c("p1", "p2")], unbiased = FALSE)))[,-3]
+                                                                       var_vec = x[c("sd1", "sd2")]^2, n_vec = x[c("p1", "p2")], unbiased = FALSE)))[,c(1, 4, 6)]
           key_mat$p <- key_mat$p1
           key_mat$p1 <- key_mat$p2 <- NULL
      }

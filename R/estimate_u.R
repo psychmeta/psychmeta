@@ -270,10 +270,10 @@ estimate_u <- function(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL, r
                u_sd <- sdi / sda
           }else{
                if(sda[1] == "average" & !is.null(sdi) & !is.null(meani) & !is.null(n))
-                    u_sd <- sdi / as.numeric(mix_dist(mean_vec = meani, var_vec = sdi^2, n_vec = n, unbiased = TRUE)[2])^.5
+                    u_sd <- sdi / as.numeric(mix_dist(mean_vec = meani, var_vec = sdi^2, n_vec = n, unbiased = TRUE)[4])^.5
 
                if(sda[1] == "mixture" & !is.null(sdi) & !is.null(meani) & !is.null(n))
-                    u_sd <- sdi / as.numeric(mix_dist(mean_vec = meani, var_vec = sdi^2, n_vec = n, unbiased = TRUE)[4])^.5
+                    u_sd <- sdi / as.numeric(mix_dist(mean_vec = meani, var_vec = sdi^2, n_vec = n, unbiased = TRUE)[6])^.5
           }
      }
 

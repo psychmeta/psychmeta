@@ -4,21 +4,24 @@
 \alias{limits_tau}
 \title{Confidence limits of tau}
 \usage{
-limits_tau(Q, df, C, conf_level = 0.95)
+limits_tau(var_es, var_pre, k, conf_level = 0.95)
 }
 \arguments{
+\item{conf_level}{Confidence level}
+
 \item{Q}{The Q statistic from the meta-analysis.}
 
 \item{df}{The degrees of freedom associated with the Q statistic.}
 
 \item{C}{The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))}
-
-\item{conf_level}{Confidence level}
 }
 \value{
 The confidence limits of tau
 }
 \description{
-Confidence limits of tau
+Calculated based on a chi-squared approximation for the distribution of the observed `var_es`.
+Note that this interval does not incorporate uncertainty in artifact estimates,
+so the interval will be conservative when applied to individual-correction or
+artifact distribution meta-analyses.
 }
 \keyword{internal}

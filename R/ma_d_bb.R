@@ -3,9 +3,9 @@
 #' @import dplyr
 #' @aliases ma_d_barebones
 ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NULL, sample_id = NULL, citekey = NULL,
-                                      wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                      wt_type = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
                                                   "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
-                                      correct_bias = FALSE,
+                                      correct_bias = TRUE,
                                       moderators = NULL, cat_moderators = TRUE, 
                                       moderator_type = c("simple", "hierarchical", "none"), 
                                       data = NULL, control = control_psychmeta(), ...){
@@ -18,7 +18,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      warn_obj1 <- record_warnings()
      call <- match.call()
 
-     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+     wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      
@@ -192,22 +192,23 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      n2_i <- n2
      n1_i[use_n1_only] <- n2_i[use_n1_only] <- n_adj[use_n1_only] / 2
 
+     .d <- d
+     if(correct_bias) d <- correct_d_bias(d = d, n = n_vec)
+     
      wt_source <- check_wt_type(wt_type = wt_type)
      if(wt_source == "psychmeta"){
+          if(wt_type == "n_effective") wt_vec <- n1_i * n2_i / (n1_i + n2_i)
           if(wt_type == "sample_size") wt_vec <- n_adj
           if(wt_type == "inv_var_mean") wt_vec <- 1 / var_error_d(d = rep(0, length(d)), n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
           if(wt_type == "inv_var_sample") wt_vec <- 1 / var_error_d(d = d, n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
-          if((wt_type == "inv_var_mean" | wt_type == "inv_var_mean") & correct_bias) wt_vec <- wt_vec * (1 + 0.75/(n_vec - 3))^2
      }
      if(wt_source == "metafor"){
           if(error_type == "mean"){
                var_e_vec <- var_error_d(d = 0, n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
-               if(correct_bias) var_e_vec <- var_e_vec / (1 + 0.75/(n_vec - 3))^2
                var_e_vec <- var_error_d(d = wt_mean(x = d, wt = 1 / var_e_vec), n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
           }
           if(error_type == "sample") var_e_vec <- var_error_d(d = d, n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
-          if(correct_bias) var_e_vec <- var_e_vec / (1 + 0.75/(n_vec - 3))^2
-          wt_vec <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = if(correct_bias){correct_d_bias(d = d, n = n_vec)}else{d},
+          wt_vec <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = d,
                                                                      vi = var_e_vec,
                                                                      control = list(maxiter = 1000, stepadj = .5), method = wt_type)))
      }
@@ -216,25 +217,16 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      mean_d <- wt_mean(x = d, wt = wt_vec)
 
      ## Estimate sampling error
-     if(error_type == "mean") var_e_vec <- var_error_d(d = rep(mean_d, length(d)), n1 = n1_i, n2 = n2_i, correct_bias = correct_bias)
-     if(error_type == "sample") var_e_vec <- var_error_d(d = d, n1 = n1_i, n2 = n2_i, correct_bias = correct_bias)
-
-     ## Correct for small-sample bias
-     if(correct_bias){
-          mean_d <- correct_d_bias(d = mean_d, n = mean(n_vec))
-          d <- correct_d_bias(d = d, n = n_vec)
-     }
+     if(error_type == "mean") var_e_vec <- var_error_d(d = rep(mean_d, length(d)), n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
+     if(error_type == "sample") var_e_vec <- var_error_d(d = d, n1 = n1_i, n2 = n2_i, correct_bias = FALSE)
      var_e <- wt_mean(x = var_e_vec, wt = wt_vec)
 
      ## Create escalc object
      if(run_lean){
           escalc_obj <- NULL
      }else{
-          vi <- var_e_vec
-          if(correct_bias) var_e_vec <- var_e_vec * (1 + 0.75/(n_vec - 3))^2
-
-          escalc_obj <- data.frame(yi = d, vi = vi,
-                                   d = if(correct_bias){d * (1 + 0.75 / (n_vec - 3))}else{d},
+          escalc_obj <- data.frame(yi = d, vi = var_e_vec,
+                                   d = .d,
                                    n1 = n1, n2 = n2, n = n_vec, n_adj = n_adj,
                                    n1_split = n1_i, n2_split = n2_i)
           escalc_obj$pi <- data$pi
@@ -249,7 +241,6 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                escalc_obj$pa <- data$pa
           }
           escalc_obj$pa <- data$pa
-          escalc_obj$var_e_raw <- var_e_vec
           escalc_obj$weight <- wt_vec
           escalc_obj$residual <- d - mean_d
 

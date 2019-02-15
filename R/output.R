@@ -10,10 +10,10 @@
 #' @param x A vector, matrix, or data.frame of numbers to format
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise.
+#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).
 #' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\href{https://unicode-table.com/en/2212/}{\code{U+2212}}).
-#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any negative numbers and suppressed otherwise.
+#' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any negative numbers and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).
 #' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://unicode-table.com/en/202f/}{\code{U+202F}}).
 #' @param big.interval See \code{big.mark} above; defaults to 3.
 #' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://unicode-table.com/en/202f/}{\code{U+202F}}).
@@ -21,6 +21,14 @@
 #' @param na.mark Character to replace \code{NA} and \code{NaN} values. Defaults to em-dash (\href{https://unicode-table.com/en/2014/}{\code{U+2014}}))
 #' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\href{https://unicode-table.com/en/2212/}{\code{U+2212}}").
 #' @param inf.mark A length 2 vector containing characters to replace \code{Inf} and \code{-Inf}. Defaults to c("+\href{https://unicode-table.com/en/221e/}{\code{U+221e}}", "\href{https://unicode-table.com/en/2212/}{\code{U+2212}}\href{https://unicode-table.com/en/221e/}{\code{U+221e}}").
+#'
+#' @usage format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
+#'               leading0 = "conditional", drop0integer = FALSE,
+#'               neg.sign = "\u2212", pos.sign = "figure",
+#'               big.mark = "\u202F", big.interval = 3L,
+#'               small.mark = "\u202F", small.interval = 3L,
+#'               na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
+#'               inf.mark = c("+\u221E", "\u2212\u221E") )
 #'
 #' @export
 #' @examples
@@ -45,25 +53,28 @@
 #' format_num(x = 10000, big.mark = ",")
 format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
                        leading0 = "conditional", drop0integer = FALSE,
-                       neg.sign = "&minus;", pos.sign = "figure",
-                       big.mark = "&#8239;", big.interval = 3L,
-                       small.mark = "&#8239;", small.interval = 3L,
-                       na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
-                       inf.mark = c("+&infin;", "&minus;&infin;") ){
+                       neg.sign = "\u2212", pos.sign = "figure",
+                       big.mark = "\u202F", big.interval = 3L,
+                       small.mark = "\u202F", small.interval = 3L,
+                       na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
+                       inf.mark = c("+\u221E", "\u2212\u221E") ) {
 
-     is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  {if(is.numeric(x)) abs(x - round(x)) < tol else FALSE}
+     is.wholenumber <-
+             function(x, tol = .Machine$double.eps^0.5)  {
+                     if (is.numeric(x)) abs(x - round(x)) < tol else FALSE
+             }
 
      # Input checking
-     if(length(lgl.mark) == 1) lgl.mark <- c(lgl.mark, lgl.mark)
-     if(length(inf.mark) == 1) inf.mark <- c(inf.mark, inf.mark)
+     if (length(lgl.mark) == 1) lgl.mark <- c(lgl.mark, lgl.mark)
+     if (length(inf.mark) == 1) inf.mark <- c(inf.mark, inf.mark)
 
-     if(is.null(dim(x))) {
+     if (is.null(dim(x))) {
           x_type <- "vector"
           x <- as.data.frame(x, stringsAsFactors = FALSE)
-     } else if("tbl_df" %in% class(x)) {
+     } else if ("tbl_df" %in% class(x)) {
           x_type <- "tibble"
           x <- as.data.frame(x, stringsAsFactors = FALSE)
-     } else if("matrix" %in% class(x)) {
+     } else if ("matrix" %in% class(x)) {
           x_type <- "matrix"
           x <- as.data.frame(x, stringsAsFactors = FALSE)
      } else x_type <- "other"
@@ -78,7 +89,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
           !which_infinite &
           !which_integers %>% as.matrix()
 
-     if(pos.sign == FALSE) flag <- "" else flag <- "+"
+     if (pos.sign == FALSE) flag <- "" else flag <- "+"
 
      # Initial formatting for each type of data
      out <- x
@@ -114,14 +125,16 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
 
      # Clean up unicode big.mark and small.mark
-     out[] <- dplyr::mutate_all(out,
-                                funs(stringr::str_replace_all(.data$.,
-                                                              paste0("(",paste(rev(strsplit(sub(" ", big.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", big.mark, " "),")"),
-                                                              big.mark)))
-     out[] <- dplyr::mutate_all(out,
-                                funs(stringr::str_replace_all(.data$.,
-                                                              paste0("(",paste(rev(strsplit(sub(" ", small.mark, " "),"")[[1]]), collapse=""),"|",sub(" ", small.mark, " "),")"),
-                                                              small.mark)))
+     out[] <- apply(out, 2,
+                    stringr::str_replace_all,
+                    pattern = paste0("(",paste(rev(strsplit(sub(" ", big.mark, " "),"")[[1]]), collapse = ""),"|", sub(" ", big.mark, " "),")"),
+                    replacement = big.mark
+                    )
+     out[] <- apply(out, 2,
+                    stringr::str_replace_all,
+                    pattern = paste0("(",paste(rev(strsplit(sub(" ", small.mark, " "),"")[[1]]), collapse = ""),"|", sub(" ", small.mark, " "),")"),
+                    replacement = small.mark
+                    )
 
      # Clean up leading zeros
      switch(as.character(leading0),
@@ -129,16 +142,24 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
             "FALSE" = out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark))),
             "conditional" = {
                  out <- dplyr::mutate_if(out,
-                                         sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
+                                         sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
                                          function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
             },
             "figure" = {
                  out <- dplyr::mutate_if(out,
-                                         sapply(x, function(i) {is.numeric(i) & any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
-                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1&#8199;", decimal.mark)))
+                                         sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
+                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1\u2007", decimal.mark)))
                  out <- dplyr::mutate_if(out,
-                                         sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
+                                         sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
                                          function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
+            },
+            "figure_html" = {
+                    out <- dplyr::mutate_if(out,
+                                            sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
+                                            function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1&#8199;", decimal.mark)))
+                    out <- dplyr::mutate_if(out,
+                                            sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
+                                            function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
             },
             # else =
             {out[] <- {}}
@@ -150,11 +171,19 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
             "FALSE" = {},
             "figure" = {
                  out <- dplyr::mutate_if(out,
-                                         sapply(x, function(i) {is.numeric(i) & !any(if(is.numeric(i)) i < 0, na.rm = TRUE)}),
+                                         sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
                                          function(i) stringr::str_replace_all(i, "^\\+", ""))
                  out <- dplyr::mutate_if(out,
-                                         sapply(x, function(i) {is.numeric(i) & any(if(is.numeric(i)) i < 0, na.rm = TRUE)}),
-                                         function(i) stringr::str_replace_all(i, "^\\+", "&#8199;"))
+                                         sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
+                                         function(i) stringr::str_replace_all(i, "^\\+", "\u2007"))
+            },
+            "figure_html" = {
+                    out <- dplyr::mutate_if(out,
+                                            sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
+                                            function(i) stringr::str_replace_all(i, "^\\+", ""))
+                    out <- dplyr::mutate_if(out,
+                                            sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
+                                            function(i) stringr::str_replace_all(i, "^\\+", "&#8199;"))
             },
             # else =
             {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, "^\\+", pos.sign))}
@@ -169,11 +198,11 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
             {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, "^-", neg.sign))}
      )
 
-     if(x_type == "tibble") {
+     if (x_type == "tibble") {
           out <- as_tibble(out, .name_repair = "minimal")
-     } else if(x_type == "vector") {
+     } else if (x_type == "vector") {
           out <- unlist(out)
-     } else if(x_type == "matrix") {
+     } else if (x_type == "matrix") {
           out <- as.matrix(out)
      }
 
@@ -377,12 +406,12 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
                        collapse_construct_labels  = TRUE, bold_headers = TRUE,
                        digits = 2L, decimal.mark = getOption("OutDec"),
                        leading0 = "conditional", drop0integer = FALSE,
-                       neg.sign = "&minus;", pos.sign = "figure",
+                       neg.sign = "&minus;", pos.sign = "figure_html",
                        big.mark = "&#8239;", big.interval = 3L,
                        small.mark = "&#8239;", small.interval = 3L,
                        na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
                        inf.mark = c("+&infin;", "&minus;&infin;"),
-                       conf_format = "parentheses", cred_format = "parentheses",
+                       conf_format = "brackets", cred_format = "brackets",
                        symbol_es = "ES", caption = "Results of meta-analyses",
                        header = NULL, verbose = FALSE, unicode = NULL,
                        bib = NULL, title.bib = NULL, style = "apa", additional_citekeys = NULL,
@@ -670,18 +699,18 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                  },
 
                  # else =
-                 {     if(!is.null(meta_tables)) {
+                 {    if (!is.null(meta_tables)) {
                       # Prevent LaTeX from removing figure space characters
-                      meta_tables <- sapply(names(meta_tables),
-                                            function(x) {
-                                                 ma_table <- mutate_all(meta_tables[[x]],
-                                                                        funs(stringr::str_replace_all(.data$.,
-                                                                                                      "&#8199;",
-                                                                                                      "&#8199;\\\\phantom{&minus;}")))
-                                                 attributes(ma_table) <- attributes(meta_tables[[x]])
-                                                 return(ma_table)
-                                            },
-                                            simplify = FALSE, USE.NAMES = TRUE)
+                      for (i in 1:length(meta_tables)) {
+                              meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
+                                                          stringr::str_replace_all,
+                                                          pattern = "&#8199;",
+                                                          replacement = "&#8199;\\\\phantom{+}")
+                              meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
+                                                          stringr::str_replace_all,
+                                                          pattern = "\u2007",
+                                                          replacement = "\u2007\\\\phantom{+}")
+                      }
                       meta_tables <- meta_tables[!is.null(meta_tables)]
                       class(meta_tables) <- "metabulate"
                       return(meta_tables)
@@ -689,7 +718,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
                       # TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
                       # the same metadata block as citations and style below.
-                      if(!is.null(bib)) {
+                      if (!is.null(bib)) {
                            # Write the bibliography file
                            # Ignore save_build_files
                            bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
@@ -699,14 +728,14 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                            sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s",
                                    bib_file)
 
-                           if(is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
+                           if (is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
 
                            cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
                                title.bib,
                                "\n\n---\n"
                            )
 
-                           if(!is.null(style)) sprintf("csl: %s\n", style )
+                           if (!is.null(style)) sprintf("csl: %s\n", style )
                            sprintf('nocite: |\n  %s\n---\n', citations)
 
                            invisible(bib[citekeys])
@@ -719,16 +748,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           if(output_format == "rmd") save_build_files <- TRUE
           # Prevent LaTeX from removing figure space characters
           if(output_format != "text" & !is.null(meta_tables)) {
-               meta_tables <- sapply(names(meta_tables),
-                                     function(x) {
-                                          ma_table <- mutate_all(meta_tables[[x]],
-                                                                 funs(stringr::str_replace_all(.data$.,
-                                                                                               "&#8199;",
-                                                                                               "&#8199;\\\\phantom{&minus;}")))
-                                          attributes(ma_table) <- attributes(meta_tables[[x]])
-                                          return(ma_table)
-                                     },
-                                     simplify = FALSE, USE.NAMES = TRUE)
+                for (i in 1:length(meta_tables)) {
+                        meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
+                                                    stringr::str_replace_all,
+                                                    pattern = "&#8199;",
+                                                    replacement = "&#8199;\\\\phantom{+}")
+                        meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
+                                                    stringr::str_replace_all,
+                                                    pattern = "\u2007",
+                                                    replacement = "\u2007\\\\phantom{+}")
+                }
                class(meta_tables) <- "metabulate"
           }
 
@@ -956,13 +985,12 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                         decimal.mark = getOption("OutDec"), leading0 = "figure",
                         neg.sign = "&minus;", pos.sign = "figure", drop0integer = TRUE,
                         big.mark = "&#8239;", big.interval = 3L, small.mark = "&#8239;",
-                        na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
+                        small.interval = 3L, na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
                         inf.mark = c("&#8199;&infin;", "&minus;&infin;"),
-                        small.interval = 3L, conf_format = "parentheses",
-                        cred_format = "parentheses", verbose = FALSE,
-                        unicode = unicode, conf_level = .95, cred_level = .80) {
+                        conf_format = "parentheses", cred_format = "parentheses",
+                        verbose = FALSE, unicode = unicode, conf_level = .95, cred_level = .80) {
 
-     if(es_type == "r") {
+     if (es_type == "r") {
           meta_tables <- list(bb = meta_tables$barebones,
                               ic_ts  = meta_tables$individual_correction$true_score,
                               ic_vgx = meta_tables$individual_correction$validity_generalization_x,
@@ -971,7 +999,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                               ad_vgx = meta_tables$artifact_distribution$validity_generalization_x,
                               ad_vgy = meta_tables$artifact_distribution$validity_generalization_y
           )[ma_type]
-     } else if(es_type == "d") {
+     } else if (es_type == "d") {
           meta_tables <- list(bb = meta_tables$barebones,
                               ic_ts  = meta_tables$individual_correction$latentGroup_latentY,
                               ic_vgx = meta_tables$individual_correction$observedGroup_latentY,
@@ -989,19 +1017,19 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           initial_names <- initial_names[!initial_names %in% c("analysis_id", "pair_id", "analysis_type")]
           length(initial_names)
      }))
-     length_moderators <- max(sapply(meta_tables, function(x) (which(colnames(x) == "k") -1) - which(colnames(x) == "analysis_type") ))
+     length_moderators <- max(sapply(meta_tables, function(x) (which(colnames(x) == "k") - 1) - which(colnames(x) == "analysis_type") ))
 
      # Select, rearrange, and format columns of meta_tables
      .arrange_format_columns <- function(ma_table, collapse_construct_labels) {
           x <- colnames(ma_table)
 
-          if("construct_x" %in% x)    ma_table[["construct_x"]] <- as.character(ma_table[["construct_x"]])
-          if("group_contrast" %in% x) ma_table[["group_contrast"]] <- as.character(ma_table[["group_contrast"]])
-          if("construct_y" %in% x)    ma_table[["construct_y"]] <- as.character(ma_table[["construct_y"]])
-          if("group1" %in% x)         ma_table[["group1"]] <- as.character(ma_table[["group1"]])
-          if("group2" %in% x)         ma_table[["group2"]] <- as.character(ma_table[["group2"]])
+          if ("construct_x" %in% x)    ma_table[["construct_x"]] <- as.character(ma_table[["construct_x"]])
+          if ("group_contrast" %in% x) ma_table[["group_contrast"]] <- as.character(ma_table[["group_contrast"]])
+          if ("construct_y" %in% x)    ma_table[["construct_y"]] <- as.character(ma_table[["construct_y"]])
+          if ("group1" %in% x)         ma_table[["group1"]] <- as.character(ma_table[["group1"]])
+          if ("group2" %in% x)         ma_table[["group2"]] <- as.character(ma_table[["group2"]])
 
-          if(collapse_construct_labels & nrow(ma_table) > 1 & "pair_id" %in% x){
+          if (collapse_construct_labels & nrow(ma_table) > 1 & "pair_id" %in% x){
                pair_ids <- unlist(ma_table[["pair_id"]])
                delete_id <- FALSE
                for(i in 2:length(pair_ids)) delete_id[i] <- pair_ids[i] == pair_ids[i-1]
@@ -1104,7 +1132,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                           inf.mark = inf.mark, lgl.mark = lgl.mark)
 
           # Format the interval columns
-          if(show_conf == TRUE) {
+          if (show_conf == TRUE) {
                switch(conf_format,
                       parentheses = {ma_table <- rename(select(mutate(ma_table, ci_lower = paste0("(", .data$ci_lower, ", ", .data$ci_upper, ")")),
                                                                -.data$ci_upper), conf_int = .data$ci_lower)},
@@ -1112,7 +1140,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                                             -.data$ci_upper), conf_int = .data$ci_lower)},
                )
           }
-          if(show_cred == TRUE) {
+          if (show_cred == TRUE) {
                switch(cred_format,
                       parentheses = {ma_table <- rename(select(mutate(ma_table, cv_lower = paste0("(", .data$cv_lower, ", ", .data$cv_upper, ")")),
                                                                -.data$cv_upper), cred_int = .data$cv_lower)},
@@ -1131,7 +1159,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
           ma_table <- rename(ma_table, !!formatted_names[formatted_names %in% colnames(ma_table)])
 
-          if(bold_headers & output_format != "text" & length_moderators > 0) {
+          if (bold_headers & output_format != "text" & length_moderators > 0) {
                colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)] <-
                     paste0("**", colnames(ma_table)[(length_initial + 1):(length_initial + length_moderators)], "**")
           }
@@ -1145,7 +1173,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                .arrange_format_columns(collapse_construct_labels = collapse_construct_labels) %>%
                .rename_columns(formatted_strings, output_format, length_initial, length_moderators, bold_headers = bold_headers)
           attr(ma_table, "footnote") <- formatted_strings$footnote[[ma_table_name]]
-          if(length(caption) > 1) attr(ma_table, "caption") <- caption[[ma_table_name]] else attr(ma_table, "caption") <- caption
+          if (length(caption) > 1) attr(ma_table, "caption") <- caption[[ma_table_name]] else attr(ma_table, "caption") <- caption
           attr(ma_table, "align") <- c(rep("l", length_initial + length_moderators), rep("r", 2), rep("c", ncol(ma_table) - length_initial - length_moderators - 2))
           ma_table
      }
@@ -1171,16 +1199,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 }
 
 
-#' Internal list of strings with formatted variable names for output
-#'
-#' @keywords Internal
-#'
+# Internal list of strings with formatted variable names for output
 .formatted_strings <- function(output_format, es_type, symbol_es = "ES", conf_level = .95, cred_level = .80, corrections = NULL,
                                show_msd = TRUE, show_se = FALSE, show_var = FALSE, verbose = FALSE, show_conf = TRUE, show_cred = TRUE,
                                unicode = NULL, bold_headers = TRUE) {
 
-     col_names <- if(output_format == "text") {
-          if(.support_unicode(unicode)) {
+     col_names <- if (output_format == "text") {
+          if (.support_unicode(unicode)) {
                c(
                     group_contrast    = "Group Contrast",
                     group1            = "Group 1",

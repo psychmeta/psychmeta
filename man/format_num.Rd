@@ -6,11 +6,12 @@
 \title{Format numbers for presentation}
 \usage{
 format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
-  leading0 = "conditional", drop0integer = FALSE,
-  neg.sign = "&minus;", pos.sign = "figure", big.mark = "&#8239;",
-  big.interval = 3L, small.mark = "&#8239;", small.interval = 3L,
-  na.mark = "&mdash;", lgl.mark = c("+", "&minus;"),
-  inf.mark = c("+&infin;", "&minus;&infin;"))
+              leading0 = "conditional", drop0integer = FALSE,
+              neg.sign = "\u2212", pos.sign = "figure",
+              big.mark = "\u202F", big.interval = 3L,
+              small.mark = "\u202F", small.interval = 3L,
+              na.mark = "\u2014", lgl.mark = c("+", "\u2212"),
+              inf.mark = c("+\u221E", "\u2212\u221E") )
 }
 \arguments{
 \item{x}{A vector, matrix, or data.frame of numbers to format}
@@ -19,13 +20,13 @@ format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
 \item{decimal.mark}{The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})}
 
-\item{leading0}{How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise.}
+\item{leading0}{How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).}
 
 \item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
 
 \item{neg.sign}{Character to use as negative sign. Defaults to minus-sign (\href{https://unicode-table.com/en/2212/}{\code{U+2212}}).}
 
-\item{pos.sign}{Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any negative numbers and suppressed otherwise.}
+\item{pos.sign}{Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\href{https://unicode-table.com/en/2007/}{\code{U+2007}}) if a column contains any negative numbers and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).}
 
 \item{big.mark}{Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://unicode-table.com/en/202f/}{\code{U+202F}}).}
 
