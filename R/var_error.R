@@ -17,9 +17,8 @@
 #'
 #' \deqn{var_{e}=\frac{(1-r^{2})^{2}}{n-1}}{var_e = (1 - r^2)^2 / (n - 1)}
 #'
-#' which can be corrected for bias by dividing the sampling variance by the bias factor:
+#' This can be corrected for bias by first correcting the correlation (see \code{\link{correct_r_bias}}) prior to estimating the error variance.
 #'
-#' \deqn{bias\;factor=(\frac{2n-2}{2n-1})^{2}}{bias_factor = (1 + .75 / (n - 3))^2}
 #'
 #' @examples
 #' var_error_r(r = .3, n = 30, correct_bias = TRUE)
@@ -28,9 +27,9 @@ var_error_r <- function(r, n, correct_bias = TRUE){
      if(length(r) > 1 & length(n) > 1)
           if(length(r) != length(n))
                stop("Lengths of r and n differ")
-     var_e <- (1 - r^2)^2 / (n - 1)
-     if(correct_bias) var_e <- var_e / ((2 * n - 2) / (2 * n - 1))^2
-     var_e
+     
+     if(correct_bias) r <- correct_r_bias(r = r, n = n)
+     (1 - r^2)^2 / (n - 1)
 }
 
 
@@ -233,9 +232,7 @@ var_error_q <- function(q, n, rel_type = "alpha", k_items = NULL){
 #'
 #' \deqn{var_{e}=\left(\frac{n-1}{n-3}\right)\left(\frac{4}{n}\right)\left(1+\frac{d^{2}}{8}\right)}{var_e = ((n - 1) / (n - 3)) * (4 / n) * (1 + d^2 / 8)}
 #'
-#' The estimated error variance can be divided by the following term to correct for small-sample bias:
-#'
-#' \deqn{bias\;factor=\left(1+\frac{.75}{n-3}\right)^{2}}{(1 + .75 / (n - 3))^2}
+#' This can be corrected for bias by first correcting the \emph{d} value (see \code{\link{correct_d_bias}}) prior to estimating the error variance.
 #'
 #' @examples
 #' var_error_d(d = 1, n1 = 30, n2 = 30, correct_bias = TRUE)
@@ -252,12 +249,12 @@ var_error_d <- function(d, n1, n2 = NA, correct_bias = TRUE){
      n <- n1
      n[!is.na(n2)] <- n[!is.na(n2)] + n2[!is.na(n2)]
 
+     if(correct_bias) d <- correct_d_bias(d = d, n = n)
+     
      var_e <- (4 / n) * (1 + d^2 / 8)
      var_e[!is.na(n2)] <- (n1[!is.na(n2)] + n2[!is.na(n2)]) / (n1[!is.na(n2)] * n2[!is.na(n2)]) +
           d[!is.na(n2)]^2 / (2 * (n1[!is.na(n2)] + n2[!is.na(n2)]))
-
      var_e <- ((n - 1) / (n - 3)) * var_e
-     if(correct_bias) var_e <- var_e / (1 + .75 / (n - 3))^2
 
      if(!is.null(dim(var_e)))
           if(ncol(var_e) == 1){

@@ -32,7 +32,7 @@
 #' To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets. 
 #' @param measure_y Vector of names for measures associated with constructs designated as "Y".
 #' @param construct_order Vector indicating the order in which Y variables should be arranged.
-#' @param wt_type Type of weight to use in the meta-analysis: options are "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
+#' @param wt_type Type of weight to use in the meta-analysis: options are "n_effective" (effective sample size), "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
 #' "inv_var_sample" (inverse variance computed using sample-specific effect sizes). Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
@@ -251,7 +251,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                  correction_method = "auto",
                  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
                  construct_y = NULL, facet_y = NULL, measure_y = NULL, construct_order = NULL,
-                 wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                 wt_type = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
                              "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
                  correct_bias = TRUE,
                  correct_rel = NULL, correct_rGg = FALSE, correct_ryy = TRUE,
@@ -273,7 +273,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      call <- match.call()
      
      ma_method <- match.arg(ma_method, choices = c("bb", "ic", "ad"))
-     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+     wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))

@@ -4,20 +4,22 @@
 \alias{.heterogeneity}
 \title{Computation of heterogeneity indices from meta-analytic results}
 \usage{
-.heterogeneity(mean_es, var_es, var_e, var_art = NA, var_pre = NA,
-  wt_vec, N, k, es_vec, vare_vec = NULL, es_failsafe = NULL,
-  conf_level = 0.95, es_type = "es", wt_type)
+.heterogeneity(mean_es, var_es, var_pre, var_res, var_e = NA,
+  var_art = NA, wt_vec, N, k, es_vec, vare_vec, es_failsafe = NULL,
+  conf_level = 0.95, es_type = "es", wt_type, ma_method)
 }
 \arguments{
 \item{mean_es}{The mean effect size.}
 
 \item{var_es}{The observed variances of effect sizes.}
 
-\item{var_e}{The predicted error variance in effect sizes.}
+\item{var_pre}{The total predicted variance of effect sizes due to sampling error and other artifacts.}
 
-\item{var_art}{The variance of effect sizes predicted from artifacts.}
+\item{var_res}{The estimated residual variance of effect sizes.}
 
-\item{var_pre}{The total amount of artifactual variance predicted from artifacts and statistical error,}
+\item{var_e}{The predicted variance of effect sizes due to sampling error.}
+
+\item{var_art}{The predicted variance of effect sizes predicted from other artifacts.}
 
 \item{wt_vec}{The vector of weights used in the meta-analysis.}
 
@@ -36,6 +38,8 @@
 \item{es_type}{Name of effect-size type.}
 
 \item{wt_type}{Weighting method.}
+
+\item{ma_method}{What artifact correction method is used. Options are "bb", "ic", and "ad".}
 }
 \value{
 A list of heterogeneity statistics.

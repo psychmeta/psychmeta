@@ -1,7 +1,7 @@
 #' @rdname ma_d
 #' @export
 ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_r = FALSE, 
-                    wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                    wt_type = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
                                 "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
                     correct_bias = TRUE,
                     correct_rGg = FALSE, correct_ryy = TRUE,
@@ -21,7 +21,7 @@ ma_d_ic <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = 
      
      call <- match.call()
 
-     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+     wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      

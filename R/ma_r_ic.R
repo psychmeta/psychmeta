@@ -23,8 +23,19 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      call <- match.call()
      warn_obj1 <- record_warnings()
 
-     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample",
-                                               "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     additional_args <- list(...)
+     if(!is.null(additional_args$treat_as_d)){
+          treat_as_d <- additional_args$treat_as_d
+     }else{
+          treat_as_d <- FALSE
+     }
+     if(treat_as_d){
+          wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
+                                                    "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     }else{
+          wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+                                                    "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
+     }
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
 
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
@@ -74,11 +85,6 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           es_d <- additional_args$es_d
      }else{
           es_d <- FALSE
-     }
-     if(!is.null(additional_args$treat_as_d)){
-          treat_as_d <- additional_args$treat_as_d
-     }else{
-          treat_as_d <- FALSE
      }
      d <- inputs$d_orig
      n1 <- inputs$n1_d
@@ -912,14 +918,14 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      if(es_d & treat_as_d){
           out <- .ma_d_bb(data = data, ma_arg_list = ma_arg_list)
-          var_e_xy_vec <- convert_vard_to_varr(d = out$escalc$barebones[,"d"], var = out$escalc$barebones[,"var_e_raw"], p = data$pi)
+          var_e_xy_vec <- convert_vard_to_varr(d = out$escalc$barebones[,"yi"], var = out$escalc$barebones[,"vi"], p = data$pi)
           out$escalc$barebones$vi <- convert_vard_to_varr(d = out$escalc$barebones$yi, var = out$escalc$barebones$vi, p = data$pi)
           out$escalc$barebones$yi <- convert_es.q_d_to_r(d = out$escalc$barebones$yi, p = data$pi)
           out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = out$escalc$barebones$weight), 
                                                  conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
      }else{
           out <- .ma_r_bb(data = data, ma_arg_list = ma_arg_list)
-          var_e_xy_vec <- out$escalc$barebones[,"var_e_raw"]
+          var_e_xy_vec <- out$escalc$barebones[,"vi"]
      }
 
      k <- as.numeric(out$meta$barebones[,"k"])

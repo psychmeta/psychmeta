@@ -489,7 +489,7 @@ check_wt_type <- function(wt_type, generic = FALSE){
      if(generic){
           psychmeta_wt_options <- c("sample_size", "inv_var")
      }else{
-          psychmeta_wt_options <- c("sample_size", "inv_var_mean", "inv_var_sample")
+          psychmeta_wt_options <- c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample")
      }
      metafor_wt_options <- c("DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM")
 

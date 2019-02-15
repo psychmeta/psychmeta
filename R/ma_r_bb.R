@@ -202,22 +202,20 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      cred_method <- ma_arg_list$cred_method
      var_unbiased <- ma_arg_list$var_unbiased
 
-     .bias_factor_r <- function(n){
-          (2 * n - 2) / (2 * n - 1)
-     }
-
+     .r <- r
+     if(correct_bias) r <- correct_r_bias(r = r, n = n)
+     
      wt_source <- check_wt_type(wt_type = wt_type)
      if(wt_source == "psychmeta"){
+          if(wt_type == "n_effective") wt_vec <- n_adj
           if(wt_type == "sample_size") wt_vec <- n_adj
           if(wt_type == "inv_var_mean") wt_vec <- n_adj - 1
           if(wt_type == "inv_var_sample") wt_vec <- 1 / var_error_r(r = r, n = n_adj, correct_bias = FALSE)
-          # if((wt_type == "inv_var_mean" | wt_type == "inv_var_sample") & correct_bias) wt_vec <- wt_vec * .bias_factor_r(n = n)^2
-          if(correct_bias) wt_vec <- wt_vec * .bias_factor_r(n = n)^2
      }
      if(wt_source == "metafor"){
-          if(error_type == "mean") var_e_vec <- var_error_r(r = wt_mean(x = r, wt = n_adj), n = n_adj, correct_bias = correct_bias)
-          if(error_type == "sample") var_e_vec <- var_error_r(r = r, n = n_adj, correct_bias = correct_bias)
-          wt_vec <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = if(correct_bias){correct_r_bias(r = r, n = n_adj)}else{r},
+          if(error_type == "mean") var_e_vec <- var_error_r(r = wt_mean(x = r, wt = n_adj), n = n_adj, correct_bias = FALSE)
+          if(error_type == "sample") var_e_vec <- var_error_r(r = r, n = n_adj, correct_bias = FALSE)
+          wt_vec <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = r,
                                                                      vi = var_e_vec,
                                                                      control = list(maxiter = 1000, stepadj = .5), method = wt_type)))
      }
@@ -225,28 +223,18 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      ## Estimate the weighted mean r value
      mean_r_xy <- wt_mean(x = r, wt = wt_vec)
 
-     # ## Estimate sampling error
+     ## Estimate sampling error
      if(error_type == "mean") var_e_vec <- var_error_r(r = mean_r_xy, n = n_adj, correct_bias = FALSE)
      if(error_type == "sample") var_e_vec <- var_error_r(r = r, n = n_adj, correct_bias = FALSE)
-     if(correct_bias) var_e_vec <- var_e_vec / .bias_factor_r(n = n)^2
      var_e <- wt_mean(x = var_e_vec, wt = wt_vec)
-
-     ## Correct for small-sample bias
-     if(correct_bias){
-          r <- correct_r_bias(r = r, n = n)
-          mean_r_xy <- wt_mean(x = r, wt = wt_vec)
-     }
-
+     
      ## Create escalc object
      if(run_lean){
           escalc_obj <- NULL
      }else{
-          vi <- var_e_vec
-          if(correct_bias) var_e_vec <- var_e_vec * .bias_factor_r(n = n)^2
-
-          escalc_obj <- data.frame(yi = r, vi = vi,
-                                   rxy = if(correct_bias){r * .bias_factor_r(n = n)}else{r}, n = n, n_adj = n_adj,
-                                   var_e_raw = var_e_vec,
+          escalc_obj <- data.frame(yi = r, vi = var_e_vec,
+                                   rxy = .r,
+                                   n = n, n_adj = n_adj,
                                    weight = wt_vec,
                                    residual = r - mean_r_xy)
           if("pi" %in% colnames(data)) escalc_obj$pi <- data$pi
