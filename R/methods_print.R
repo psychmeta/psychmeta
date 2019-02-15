@@ -403,7 +403,7 @@ print.dmod <- function(x, ..., digits = 3){
 print.ma_heterogeneity <- function(x, ..., digits = 3){
      es_type <- x$es_type
      ma_method <- attributes(x)$ma_method
-     conf_level <- attributes(x)$conf_level
+     conf_level <- attributes(x)$conf_level * 100
      sd_label <- switch(ma_method,
                         bb = "sd_res",
                         switch(es_type,
@@ -417,33 +417,32 @@ print.ma_heterogeneity <- function(x, ..., digits = 3){
                                 d = "var_delta",
                                 "var_res_c"))
 
-     cat("Heterogeneity results for", es_type, "\n")
-     cat("---------------------------------------- \n")
+     cat("\nHeterogeneity results for", es_type, "\n")
+     cat(rep("-", nchar(paste("Heterogeneity results for", es_type))), "\n", sep = "")
 
      cat("\n")
-     cat("Accounted for a total of ", round2char(x$percent_var_accounted["total"], digits = digits), "% of variance. \n", sep = "")
-     cat((paste0("   Due to sampling error:  ", round2char(x$percent_var_accounted["sampling_error"], digits = digits), "%"))[!is.na(x$percent_var_accounted["sampling_error"])])
-     cat((paste0("   Due to other artifacts: ", round2char(x$percent_var_accounted["artifacts"], digits = digits), "%"))[!is.na(x$percent_var_accounted["artifacts"])])
+     cat("Accounted for a total of ", round2char(x$percent_var_accounted["total"], digits = digits), "% of variance", "\n", sep = "")
+     cat((paste0("   Due to sampling error:  ", round2char(x$percent_var_accounted["sampling_error"], digits = digits), "%\n"))[!is.na(x$percent_var_accounted["sampling_error"])])
+     cat((paste0("   Due to other artifacts: ", round2char(x$percent_var_accounted["artifacts"], digits = digits), "%\n"))[!is.na(x$percent_var_accounted["artifacts"])])
 
      cat("\n")
      cat("Correlation between ", es_type, " values and artifactual perturbations: ",  round2char(x$`cor(es, perturbations)`["total"], digits = digits), "\n", sep = "")
-     cat((paste0("   Between ", es_type, " values and sampling error values: ", round2char(x$`cor(es, perturbations)`["sampling_error"], digits = digits)))[!is.na(x$`cor(es, perturbations)`["sampling_error"])])
-     cat((paste0("   Between ", es_type, " values and other artifact values: ", round2char(x$`cor(es, perturbations)`["artifacts"], digits = digits)))[!is.na(x$`cor(es, perturbations)`["artifacts"])])
+     cat((paste0("   Between ", es_type, " values and sampling error values: ", round2char(x$`cor(es, perturbations)`["sampling_error"], digits = digits), "\n"))[!is.na(x$`cor(es, perturbations)`["sampling_error"])])
+     cat((paste0("   Between ", es_type, " values and other artifact values: ", round2char(x$`cor(es, perturbations)`["artifacts"], digits = digits), "\n"))[!is.na(x$`cor(es, perturbations)`["artifacts"])])
 
      cat("\n")
      cat("The reliability of observed effect sizes is: ", round2char(x$rel_es_obs), "\n", sep = "")
 
-     cat("\n")
+     cat("\n\n")
      cat("Random effects variance estimates")
      cat("\n---------------------------------\n")
 
-     cat("\n")
      cat("Hunter-Schmidt method:")
      cat("\n")
-     cat("  ", sd_label, " (tau): ", round2char(x$HS_method$tau[1], digits = digits),
+     cat("  ", sd_label, "  (tau):   ", round2char(x$HS_method$tau[1], digits = digits),
          ", SE = ", round2char(x$HS_method$tau[2], digits = digits), ", ",
-         conf_level, "% CI = [", round2char(x$HS_method$tau[3], digits = digits),
-         ", ", round2char(x$HS_method$tau[4], digits = digits), "] \n", sep = "")
+         conf_level, "% CI = [", round2char(x$HS_method$tau[3], digits = digits, na_replace = "NA"),
+         ", ", round2char(x$HS_method$tau[4], digits = digits, na_replace = "NA"), "] \n", sep = "")
      cat("  ", var_label, " (tau^2): ", round2char(x$HS_method$tau_squared[1], digits = digits),
          ", SE = ", round2char(x$HS_method$tau_squared[2], digits = digits), ", ",
          conf_level, "% CI = [", round2char(x$HS_method$tau_squared[3], digits = digits),
@@ -451,109 +450,88 @@ print.ma_heterogeneity <- function(x, ..., digits = 3){
 
      cat("\n")
      cat("  Q statistic: ", round2char(x$HS_method$Q[1], digits = digits), " (df = ",
-         round2char(x$HS_method$Q[2], digits = digits), "p = ",
+         round2char(x$HS_method$Q[2], digits = 0), ", p = ",
          round2char(x$HS_method$Q[3], digits = digits), ") \n", sep = "")
      cat("  H: ", round2char(x$HS_method$H, digits = digits),
          "   H^2: ", round2char(x$HS_method$H_squared, digits = digits),
          "   I^2: ", round2char(x$HS_method$I_squared, digits = digits),  "\n", sep = "")
 
+     if (attributes(x)$wt_source == "metafor") {
+             wt_type <- attributes(x)$wt_type
+             if (exists(paste(wt_type, "method", sep = "_"), x)) {
+                     metafor <- get(paste(wt_type, "method", sep = "_"), x)
+
+                     cat("\n")
+                     cat(wt_type, "method:")
+                     cat("\n")
+                     cat("  ", sd_label, "  (tau):   ", round2char(metafor$tau[1], digits = digits),
+                         ", SE = ", round2char(metafor$tau[2], digits = digits), ", ",
+                         conf_level, "% CI = [", round2char(metafor$tau[3], digits = digits, na_replace = "NA"),
+                         ", ", round2char(metafor$tau[4], digits = digits, na_replace = "NA"), "] \n", sep = "")
+                     cat("  ", var_label, " (tau^2): ", round2char(metafor$tau_squared[1], digits = digits),
+                         ", SE = ", round2char(metafor$tau_squared[2], digits = digits), ", ",
+                         conf_level, "% CI = [", round2char(metafor$tau_squared[3], digits = digits),
+                         ", ", round2char(metafor$tau_squared[4], digits = digits), "] \n", sep = "")
+
+                     cat("\n")
+                     cat("  Q statistic: ", round2char(metafor$Q[1], digits = digits), " (df = ",
+                         round2char(metafor$Q[2], digits = 0), ", p = ",
+                         round2char(metafor$Q[3], digits = digits), ") \n", sep = "")
+                     cat("  H: ", round2char(metafor$H, digits = digits),
+                         "   H^2: ", round2char(metafor$H_squared, digits = digits),
+                         "   I^2: ", round2char(metafor$I_squared, digits = digits),  "\n", sep = "")
+             }
+
+     }
+
      if (!is.null(x$DL_method)) {
              cat("\n")
              cat("DerSimonian-Laird method:")
              cat("\n")
-             cat(sd_label, " (tau): ", round2char(x$DL_method$tau[1], digits = digits),
-                 ", SE = ", round2char(x$DL_method$tau[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(x$DL_method$tau[3], digits = digits),
-                 ", ", round2char(x$DL_method$tau[4], digits = digits), "] \n", sep = "")
-             cat(var_label, " (tau^2): ", round2char(x$DL_method$tau_squared[1], digits = digits),
-                 ", SE = ", round2char(x$DL_method$tau_squared[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(x$DL_method$tau_squared[3], digits = digits),
-                 ", ", round2char(x$DL_method$tau_squared[4], digits = digits), "] \n", sep = "")
+             cat("  ", sd_label, "  (tau):   ", round2char(x$DL_method$tau[1], digits = digits), "\n", sep = "")
+             cat("  ", var_label, " (tau^2): ", round2char(x$DL_method$tau_squared[1], digits = digits), "\n", sep = "")
 
              cat("\n")
-             cat("Q statistic: ", round2char(x$DL_method$Q[1], digits = digits), " (df = ",
-                 round2char(x$DL_method$Q[2], digits = digits), "p = ",
-                 round2char(x$DL_method$Q[3], digits = digits), ") \n", sep = "")
-             cat("H: ", round2char(x$DL_method$H, digits = digits),
+             cat("  Q statistic: ", round2char(x$DL_method$Q[1], digits = digits), "\n", sep = "")
+             cat("  H: ", round2char(x$DL_method$H, digits = digits),
                  "   H^2: ", round2char(x$DL_method$H_squared, digits = digits),
                  "   I^2: ", round2char(x$DL_method$I_squared, digits = digits),  "\n", sep = "")
      }
 
      if (!is.null(x$outlier_robust_mean)) {
              cat("\n")
-             cat("Outlier-robus method (absolute deviation from mean):")
+             cat("Outlier-robust method (absolute deviation from mean):")
              cat("\n")
-             cat(sd_label, " (tau_r): ", round2char(x$outlier_robust_mean$tau_r[1], digits = digits),
-                 ", SE = ", round2char(x$outlier_robust_mean$tau_r[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(x$outlier_robust_mean$tau_r[3], digits = digits),
-                 ", ", round2char(x$outlier_robust_mean$tau_r[4], digits = digits), "] \n", sep = "")
-             cat(var_label, " (tau_r^2): ", round2char(x$outlier_robust_mean$tau_squared_r[1], digits = digits),
-                 ", SE = ", round2char(x$outlier_robust_mean$tau_squared_r[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(x$outlier_robust_mean$tau_squared_r[3], digits = digits),
-                 ", ", round2char(x$outlier_robust_mean$tau_squared_r[4], digits = digits), "] \n", sep = "")
+             cat("  ", sd_label, "  (tau_r):   ", round2char(x$outlier_robust_mean$tau_r[1], digits = digits), "\n", sep = "")
+             cat("  ", var_label, " (tau_r^2): ", round2char(x$outlier_robust_mean$tau_squared_r[1], digits = digits), "\n", sep = "")
 
              cat("\n")
-             cat("Q_r statistic: ", round2char(x$outlier_robust_mean$Q_r[1], digits = digits), " (df = ",
-                 round2char(x$outlier_robust_mean$Q_r[2], digits = digits), "p = ",
-                 round2char(x$outlier_robust_mean$Q_r[3], digits = digits), ") \n", sep = "")
-             cat("H_r: ", round2char(x$outlier_robust_mean$H_r, digits = digits),
+             cat("  Q_r statistic: ", round2char(x$outlier_robust_mean$Q_r[1], digits = digits), "\n", sep = "")
+             cat("  H_r: ", round2char(x$outlier_robust_mean$H_r, digits = digits),
                  "   H_r^2: ", round2char(x$outlier_robust_mean$H_squared_r, digits = digits),
                  "   I_r^2: ", round2char(x$outlier_robust_mean$I_squared_r, digits = digits),  "\n", sep = "")
      }
 
      if (!is.null(x$outlier_robust_median)) {
              cat("\n")
-             cat("Outlier-robus method (absolute deviation from median):")
+             cat("Outlier-robust method (absolute deviation from median):")
              cat("\n")
-             cat(sd_label, " (tau_m): ", round2char(x$outlier_robust_median$tau_m[1], digits = digits),
-                 ", SE = ", round2char(x$outlier_robust_median$tau_m[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(x$outlier_robust_median$tau_m[3], digits = digits),
-                 ", ", round2char(x$outlier_robust_median$tau_m[4], digits = digits), "] \n", sep = "")
-             cat(var_label, " (tau_m^2): ", round2char(x$outlier_robust_median$tau_squared_m[1], digits = digits),
-                 ", SE = ", round2char(x$outlier_robust_median$tau_squared_m[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(x$outlier_robust_median$tau_squared_m[3], digits = digits),
-                 ", ", round2char(x$outlier_robust_median$tau_squared_m[4], digits = digits), "] \n", sep = "")
+             cat("  ", sd_label, "  (tau_m):   ", round2char(x$outlier_robust_median$tau_m[1], digits = digits), "\n", sep = "")
+             cat("  ", var_label, " (tau_m^2): ", round2char(x$outlier_robust_median$tau_squared_m[1], digits = digits), "\n", sep = "")
 
              cat("\n")
-             cat("Q_m statistic: ", round2char(x$outlier_robust_median$Q_m[1], digits = digits), " (df = ",
-                 round2char(x$outlier_robust_median$Q_m[2], digits = digits), "p = ",
-                 round2char(x$outlier_robust_median$Q_m[3], digits = digits), ") \n", sep = "")
-             cat("H_m: ", round2char(x$outlier_robust_median$H_m, digits = digits),
+             cat("  Q_m statistic: ", round2char(x$outlier_robust_median$Q_m[1], digits = digits), "\n", sep = "")
+             cat("  H_m: ", round2char(x$outlier_robust_median$H_m, digits = digits),
                  "   H_m^2: ", round2char(x$outlier_robust_median$H_squared_m, digits = digits),
                  "   I_m^2: ", round2char(x$outlier_robust_median$I_squared_m, digits = digits),  "\n", sep = "")
      }
 
-     if (attributes(x)$wt_source == "metafor") {
-             wt_type <- attributes(x)$wt_type
-             metafor <- get(paste(wt_type, "method", sep = "_"), x)
-
-             cat("\n")
-             cat(wt_type, "method:")
-             cat("\n")
-             cat("  ", sd_label, " (tau): ", round2char(metafor$tau[1], digits = digits),
-                 ", SE = ", round2char(metafor$tau[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(metafor$tau[3], digits = digits),
-                 ", ", round2char(metafor$tau[4], digits = digits), "] \n", sep = "")
-             cat("  ", var_label, " (tau^2): ", round2char(metafor$tau_squared[1], digits = digits),
-                 ", SE = ", round2char(metafor$tau_squared[2], digits = digits), ", ",
-                 conf_level, "% CI = [", round2char(metafor$tau_squared[3], digits = digits),
-                 ", ", round2char(metafor$tau_squared[4], digits = digits), "] \n", sep = "")
-
-             cat("\n")
-             cat("  Q statistic: ", round2char(metafor$Q[1], digits = digits), " (df = ",
-                 round2char(metafor$Q[2], digits = digits), "p = ",
-                 round2char(metafor$Q[3], digits = digits), ") \n", sep = "")
-             cat("  H: ", round2char(metafor$H, digits = digits),
-                 "   H^2: ", round2char(metafor$H_squared, digits = digits),
-                 "   I^2: ", round2char(metafor$I_squared, digits = digits),  "\n", sep = "")
-
-             if (ma_method == "ad") warning("metafor heterogeneity methods are not accurate when artifact distribution methods are used.")
-     }
-
      if (!is.null(x$file_drawer)) {
-             cat("\n")
+             cat("\n\n")
              cat("Failsafe k is ", ceiling(x$file_drawer[2]), " and failsafe N is ", ceiling(x$file_drawer[3]), " for failsafe ", es_type, " of ", round2char(x$file_drawer[1], digits = digits), ".\n", sep = "")
      }
+
+     cat("\n")
 
 }
 

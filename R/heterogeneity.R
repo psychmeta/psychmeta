@@ -278,6 +278,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           k = as.numeric(meta_ad_ts$k),
                                           wt_vec = as.numeric(data_bb$weight),
                                           es_vec = as.numeric(data_bb$yi),
+                                          vare_vec = as.numeric(data_bb$vi /
+                                                                        (meta_ad_ts$mean_r /
+                                                                                 meta_ad_ts$mean_rho)^2),
                                           conf_level = conf_level,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
@@ -294,6 +297,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           k = as.numeric(meta_ad_vgx$k),
                                           wt_vec = as.numeric(data_bb$weight),
                                           es_vec = as.numeric(data_bb$yi),
+                                          vare_vec = as.numeric(data_bb$vi /
+                                                                        (meta_ad_vgx$mean_r /
+                                                                                 meta_ad_vgx$mean_rho)^2),
                                           conf_level = conf_level,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
@@ -310,6 +316,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           k = as.numeric(meta_ad_vgy$k),
                                           wt_vec = as.numeric(data_bb$weight),
                                           es_vec = as.numeric(data_bb$yi),
+                                          vare_vec = as.numeric(data_bb$vi /
+                                                                        (meta_ad_vgy$mean_r /
+                                                                                 meta_ad_vgy$mean_rho)^2),
                                           conf_level = conf_level,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
@@ -328,6 +337,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           k = as.numeric(meta_ad_ts$k),
                                           wt_vec = as.numeric(data_bb$weight),
                                           es_vec = as.numeric(data_bb$yi),
+                                          vare_vec = as.numeric(data_bb$vi /
+                                                                        (meta_ad_ts$mean_d /
+                                                                                 meta_ad_ts$mean_delta)^2),
                                           conf_level = conf_level,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
@@ -344,6 +356,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           k = as.numeric(meta_ad_vgx$k),
                                           wt_vec = as.numeric(data_bb$weight),
                                           es_vec = as.numeric(data_bb$yi),
+                                          vare_vec = as.numeric(data_bb$vi /
+                                                                        (meta_ad_vgx$mean_d /
+                                                                                 meta_ad_vgx$mean_delta)^2),
                                           conf_level = conf_level,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
@@ -360,6 +375,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           k = as.numeric(meta_ad_vgy$k),
                                           wt_vec = as.numeric(data_bb$weight),
                                           es_vec = as.numeric(data_bb$yi),
+                                          vare_vec = as.numeric(data_bb$vi /
+                                                                        (meta_ad_vgy$mean_d /
+                                                                                 meta_ad_vgy$mean_delta)^2),
                                           conf_level = conf_level,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
@@ -412,7 +430,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @keywords internal
 .heterogeneity <- function(mean_es, var_es, var_pre, var_res,
                            var_e = NA, var_art = NA,
-                           wt_vec, N, k, es_vec, vare_vec = NULL,
+                           wt_vec, N, k, es_vec, vare_vec,
                            es_failsafe = NULL, conf_level = .95, es_type = "es",
                            wt_type, ma_method) {
 
@@ -464,11 +482,12 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 
      ## Tau
      tau_squared <- var_res
-     P <- diag(wt_vec) -
-       diag(wt_vec) %*% rep(1, k) %*%
-       tcrossprod(qr.solve(sqrt(wt_vec), diag(k))) %*%
-       crossprod(rep(1, k), diag(wt_vec))
-     tau_squared_se <- sqrt(1/sum(wt_vec)^2 *
+     wi <- 1 / vare_vec
+     P <- diag(wi) -
+       diag(wi) %*% rep(1, k) %*%
+       tcrossprod(qr.solve(sqrt(wi), diag(k))) %*%
+       crossprod(rep(1, k), diag(wi))
+     tau_squared_se <- sqrt(1/sum(wi)^2 *
                               (2 * df +
                                  4 * max(tau_squared, 0) * sum(diag(P)) +
                                  2 * max(tau_squared, 0)^2 * sum(P * P))
@@ -534,40 +553,38 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
          Q_m = Q_m
        )
 
-     } else DL_method <- outlier_robust_mean <- outlier_robust_median <- NA
+       if (wt_source == "metafor") {
+               rma_out <- metafor::rma.uni(yi = es_vec,
+                                           vi = vare_vec,
+                                           weights = wt_vec,
+                                           method = wt_type)
+               rma_ci <- metafor::confint.rma.uni(object = rma_out, level = conf_level)$random
+               tau_squared_ci_metafor <- rma_ci["tau^2", c("ci.lb", "ci.ub")]
+               tau_ci_metafor  <- rma_ci["tau", c("ci.lb", "ci.ub")]
+               names(tau_squared_ci_metafor) <-
+                       names(tau_ci_metafor) <-
+                       paste("CI", round(conf_level * 100), c("LL", "UL"), sep = "_")
 
-     if (wt_source == "metafor" & !is.null(vare_vec)) {
-       rma_out <- metafor::rma.uni(yi = es_vec,
-                                   vi = vare_vec,
-                                   weights = wt_vec,
-                                   method = wt_type)
-       rma_ci <- metafor::confint.rma.uni(object = rma_out, level = conf_level)
-       tau_squared_ci_metafor <- rma_ci["tau^2",]
-       tau_ci_metafor  <- rma_ci["tau",]
-       names(tau_squared_ci_metafor) <-
-         names(tau_ci_metafor) <-
-         paste("CI", round(conf_level * 100), c("LL", "UL"), sep = "_")
+               Q_metafor <- c(Q = rma_out$QE, df = df, p = rma_out$QEp)
+               H_squared_metafor <- rma_out$H2
+               I_squared_metafor <- rma_out$I2
+               tau_squared_metafor <- c(tau_squared = rma_out$tau2,
+                                        se = rma_out$se.tau2,
+                                        tau_squared_ci_metafor)
+               tau_metafor <- c(tau = sqrt(rma_out$tau2),
+                                se = .5 * rma_out$se.tau2 / sqrt(rma_out$tau2),
+                                tau_ci_metafor)
 
-       Q_metafor <- c(Q = rma_out$QE, df = df, p = rma_out$QEp)
-       H_squared_metafor <- rma_out$H2
-       I_squared_metafor <- rma_out$I2
-       tau_metafor_squared <- c(tau_squared = rma_out$tau2,
-                                se = rma_out$se.tau2,
-                                tau_squared_ci_metafor)
-       tau_metafor <- c(tau = sqrt(rma_out$tau2),
-                        se = .5 * rma_out$se.tau / sqrt(rma_out$tau2),
-                        tau_ci_metafor)
-
-       metafor_method <- list(
-         tau = tau_metafor,
-         tau_squared = tau_metafor_squared,
-         H = sqrt(H_squared_metafor),
-         H_squared = H_squared_metafor,
-         I_squared = I_squared_metafor,
-         Q = Q_metafor
-       )
-
-     } else metafor_method <- NA
+               metafor_method <- list(
+                       tau = tau_metafor,
+                       tau_squared = tau_squared_metafor,
+                       H = sqrt(H_squared_metafor),
+                       H_squared = H_squared_metafor,
+                       I_squared = I_squared_metafor,
+                       Q = Q_metafor
+               )
+       } else metafor_method <- NA
+     } else DL_method <- outlier_robust_mean <- outlier_robust_median <- metafor_method <- NA
 
      out <- list(es_type = es_type,
                  percent_var_accounted = percent_var_accounted[!is.na(percent_var_accounted)],
@@ -669,6 +686,7 @@ limits_tau2 <- function(var_es, var_pre, k, conf_level = .95) {
      ci_var_es <- c(var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = FALSE),
                     var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = TRUE))
      ci_var_res <- ci_var_es - var_pre
+     ci_var_res[ci_var_res < 0] <- 0
      names(ci_var_res) <- paste("CI", round(conf_level * 100), c("LL", "UL"), sep = "_")
      return(ci_var_res)
 
@@ -704,9 +722,5 @@ limits_tau2 <- function(var_es, var_pre, k, conf_level = .95) {
 #'
 #' @keywords internal
 limits_tau <- function(var_es, var_pre, k, conf_level = .95) {
-        ci_var_res <- limits_tau2(var_es = var_es, var_pre = var_pre, k = k, conf_level = conf_level)
-        ci_sd_res <- ci_var_res
-        ci_sd_res[1] <- ifelse(ci_var_res[1] < 0, NA, sqrt(ci_var_res[1]))
-        ci_sd_res[2] <- ifelse(ci_var_res[2] < 0, NA, sqrt(ci_var_res[2]))
-        return(ci_sd_res)
+        sqrt(limits_tau2(var_es = var_es, var_pre = var_pre, k = k, conf_level = conf_level))
 }
