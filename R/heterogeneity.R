@@ -27,6 +27,7 @@
 #'      \item{\code{file_drawer}}{Fail-safe \emph{N} and \emph{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
 #'
 #' @export
+#' @md
 #'
 #' @references
 #' Becker, B. J. (2005).
@@ -591,7 +592,11 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 
      out <- out[lapply(out, length) > 0]
 
-     attributes(out) <- append(attributes(out), list(wt_source = wt_source, ma_method = ma_method, conf_level = conf_level))
+     attributes(out) <- append(attributes(out),
+                               list(wt_source = wt_source,
+                                    ma_method = ma_method,
+                                    wt_type = wt_type,
+                                    conf_level = conf_level))
 
      class(out) <- "ma_heterogeneity"
      out
@@ -644,7 +649,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
      return(tau_squared_m)
 }
 
-#' Confidence limits of tau
+#' Confidence limits of tau-squared
 #'
 #' Calculated based on a chi-squared approximation for the distribution of the observed `var_es`.
 #' Note that this interval does not incorporate uncertainty in artifact estimates,
@@ -656,7 +661,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @param C The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))
 #' @param conf_level Confidence level
 #'
-#' @return The confidence limits of tau
+#' @return The confidence limits of tau-squared
 #'
 #' @keywords internal
 limits_tau2 <- function(var_es, var_pre, k, conf_level = .95) {
@@ -683,4 +688,25 @@ limits_tau2 <- function(var_es, var_pre, k, conf_level = .95) {
      # return(sqrt(ci_tau2))
 }
 
-
+#' Confidence limits of tau
+#'
+#' Calculated based on a chi-squared approximation for the distribution of the observed `var_es`.
+#' Note that this interval does not incorporate uncertainty in artifact estimates,
+#' so the interval will be conservative when applied to individual-correction or
+#' artifact distribution meta-analyses.
+#'
+#' @param Q The Q statistic from the meta-analysis.
+#' @param df The degrees of freedom associated with the Q statistic.
+#' @param C The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))
+#' @param conf_level Confidence level
+#'
+#' @return The confidence limits of tau
+#'
+#' @keywords internal
+limits_tau <- function(var_es, var_pre, k, conf_level = .95) {
+        ci_var_res <- limits_tau2(var_es = var_es, var_pre = var_pre, k = k, conf_level = conf_level)
+        ci_sd_res <- ci_var_res
+        ci_sd_res[1] <- ifelse(ci_var_res[1] < 0, NA, sqrt(ci_var_res[1]))
+        ci_sd_res[2] <- ifelse(ci_var_res[2] < 0, NA, sqrt(ci_var_res[2]))
+        return(ci_sd_res)
+}

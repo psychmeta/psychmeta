@@ -523,17 +523,31 @@ print.ma_heterogeneity <- function(x, ..., digits = 3){
                  "   I_m^2: ", round2char(x$outlier_robust_median$I_squared_m, digits = digits),  "\n", sep = "")
      }
 
+     if (attributes(x)$wt_source == "metafor") {
+             wt_type <- attributes(x)$wt_type
+             metafor <- get(paste(wt_type, "method", sep = "_"), x)
 
+             cat("\n")
+             cat(wt_type, "method:")
+             cat("\n")
+             cat("  ", sd_label, " (tau): ", round2char(metafor$tau[1], digits = digits),
+                 ", SE = ", round2char(metafor$tau[2], digits = digits), ", ",
+                 conf_level, "% CI = [", round2char(metafor$tau[3], digits = digits),
+                 ", ", round2char(metafor$tau[4], digits = digits), "] \n", sep = "")
+             cat("  ", var_label, " (tau^2): ", round2char(metafor$tau_squared[1], digits = digits),
+                 ", SE = ", round2char(metafor$tau_squared[2], digits = digits), ", ",
+                 conf_level, "% CI = [", round2char(metafor$tau_squared[3], digits = digits),
+                 ", ", round2char(metafor$tau_squared[4], digits = digits), "] \n", sep = "")
 
-     if (attributes(x)$wt_source == "psychmeta") {
+             cat("\n")
+             cat("  Q statistic: ", round2char(metafor$Q[1], digits = digits), " (df = ",
+                 round2char(metafor$Q[2], digits = digits), "p = ",
+                 round2char(metafor$Q[3], digits = digits), ") \n", sep = "")
+             cat("  H: ", round2char(metafor$H, digits = digits),
+                 "   H^2: ", round2char(metafor$H_squared, digits = digits),
+                 "   I^2: ", round2char(metafor$I_squared, digits = digits),  "\n", sep = "")
 
-     } else {
-          conf_level <- gsub(x = gsub(x = names(x$tau[2]), pattern = "CI_", replacement = ""), pattern = "_LL", replacement = "")
-          cat("\n")
-          cat("tau: ", round2char(x$tau[1], digits = digits), ", ", "SE = ", round2char(x$tau[2], digits = digits), " \n", sep = "")
-
-          cat("\n")
-          cat("tau^2: ", round2char(x$tau_squared[1], digits = digits), ", ", "SE = ", round2char(x$tau_squared[2], digits = digits), " \n", sep = "")
+             if (ma_method == "ad") warning("metafor heterogeneity methods are not accurate when artifact distribution methods are used.")
      }
 
      if (!is.null(x$file_drawer)) {
