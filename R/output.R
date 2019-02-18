@@ -274,15 +274,20 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
                                   word_proc = TRUE) {
 
-     if(knitr::is_latex_output() & latex == TRUE) {
+     if (!requireNamespace("knitr", quietly = TRUE)) {
+             stop("Package 'knitr' is not installed. 'knitr' is required for 'metabulate_rmd_helper'.",
+                  call. = FALSE)
+     }
+
+     if (knitr::is_latex_output() & latex == TRUE) {
           cat("\n\n---\nheader-includes:\n  - \\usepackage{unicode-math}\n---\n\n")
      }
 
-     if(knitr::is_html_output() & html == TRUE) {
+     if (knitr::is_html_output() & html == TRUE) {
           cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfit}{\\boldsymbol}\\newcommand{\\symbfup}{\\boldsymbol}\\newcommand{\\symit}{}\n\n')
      }
 
-     if(!knitr::is_latex_output() & !knitr::is_html_output() & word_proc == TRUE ) {
+     if (!knitr::is_latex_output() & !knitr::is_html_output() & word_proc == TRUE ) {
           cat('\\newcommand{\\symup}{\\mathrm}\\newcommand{\\symbfup}{\\mathbfup}\\newcommand{\\symbfit}{\\mathbfit}\\newcommand{\\symit}{}\n\n')
      }
 
@@ -332,10 +337,6 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #'
 #' @return Formatted tables of meta-analytic output.
 #' @export
-#'
-#' @importFrom rmarkdown render
-#' @importFrom dplyr case_when
-#' @importFrom stringi stri_write_lines
 #'
 #' @family output functions
 #'
@@ -430,6 +431,29 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
      conf_format <- match.arg(conf_format, c("parentheses", "brackets", "columns"))
      cred_format <- match.arg(cred_format, c("parentheses", "brackets", "columns"))
 
+     if (!output_format %in% c("text", "rmd") & !is.null(file)) {
+             if (!requireNamespace("rmarkdown", quiety = TRUE)) {
+                     stop(sprintf("Package 'rmarkdown' is not installed. \n'rmarkdown' is required to output to %s. \nPlease install 'rmarkdown'.",
+                                  output_format),
+                          call. = FALSE)
+             }
+     }
+
+     if (output_format != "text" & !is.null(file)) {
+             if (!requireNamespace("knitr", quiety = TRUE)) {
+                     stop(sprintf("Package 'knitr' is not installed. \n'knitr' is required to output to %s. \nPlease install 'knitr'.",
+                                  output_format),
+                          call. = FALSE)
+             }
+     }
+
+     if (!is.null(bib)) {
+             if (!requireNamespace("RefManageR", quietly = TRUE)) {
+                     stop("Package 'RefManageR' not installed. 'RefManageR' is required to generate bibliographies. \nInstall 'RefManageR' or set 'bib = NULL'.",
+                          .call = FALSE)
+             }
+     }
+
      # Get the requested meta-analyses
      ma_obj <- filter_ma(ma_obj = ma_obj,
                          analyses = analyses,
@@ -442,14 +466,14 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
      ma_metric <- ma_obj$ma_metric
      if(ma_metric %in% c("r_order2", "d_order2")) stop("metabulate does not currently support second-order meta-analyses.", call=FALSE)
      ma_methods <- ma_obj$ma_methods
-     es_type <- case_when(
+     es_type <- dplyr::case_when(
           ma_metric %in% c("r_as_r", "d_as_r") ~ "r",
           ma_metric %in% c("r_as_d", "d_as_d") ~ "d",
           TRUE ~ "generic"
      )
      ma_method <- ma_method[ma_method %in% ma_methods]
      if(length(ma_method) == 0) {
-          ma_method <- case_when(
+          ma_method <- dplyr::case_when(
                "ad" %in% ma_methods ~ "ad",
                "ic" %in% ma_methods ~ "ic",
                TRUE ~ "bb"
@@ -525,14 +549,6 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #'
 #' @export
 #'
-#' @importFrom rmarkdown render
-#' @importFrom dplyr case_when
-#' @importFrom RefManageR PrintBibliography
-#' @importFrom RefManageR WriteBib
-#' @importFrom RefManageR ReadBib
-#' @importFrom RCurl url.exists
-#' @importFrom RefManageR BibOptions
-#'
 #' @family output functions
 #'
 #' @examples
@@ -556,14 +572,27 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                          save_build_files = FALSE, header=list(), ...){
 
+     if (!requireNamespace("RefManageR", quietly = TRUE)) {
+          stop("Package 'RefManageR' not installed. 'RefManageR' is required to generate bibliographies.",
+               call. = FALSE)
+     }
+
      output_format <- tolower(output_format)
      output_format <- tryCatch(match.arg(output_format),
                                error = function(e) {
-                                    if(length(output_format) > 1) {
-                                         stop("Multiple output formats specified. Please specify a single output format.", call. = FALSE)
-                                    } else output_format})
+                                         if (length(output_format) > 1) {
+                                            stop("Multiple output formats specified. Please specify a single output format.", call. = FALSE)
+                                       } else output_format})
 
-     if("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
+     if (!output_format %in% c("text", "rmd", "biblatex", "citekeys") & !is.null(file)) {
+          if (!requireNamespace("rmarkdown", quiety = TRUE)) {
+               stop(sprintf("Package 'rmarkdown' is not installed. \n'rmarkdown' is required to output to %s. \nPlease install 'rmarkdown'.",
+                            output_format),
+                    call. = FALSE)
+          }
+     }
+
+     if ("summary.ma_psychmeta" %in% class(ma_obj)) ma_obj <- ma_obj$ma_obj
 
      # Get the requested meta-analyses
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive)
@@ -592,7 +621,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                  if(!is.null(file)) {
                       print(bib[citekeys], .opts = list(style = "Biblatex"))
                  } else {
-                      suppressMessages(WriteBib(bib[citekeys], file = file))
+                      suppressMessages(RefManageR::WriteBib(bib[citekeys], file = file))
                  }
             },
             # else =
@@ -622,21 +651,21 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
      citations <- paste0("@", citekeys, collapse=", ")
 
      # Set BibOptions to accept entries with missing data
-     Bib_check.entries_original <- BibOptions()[["check.entries"]]
-     BibOptions(check.entries = FALSE)
+     Bib_check.entries_original <- RefManageR::BibOptions()[["check.entries"]]
+     RefManageR::BibOptions(check.entries = FALSE)
 
      # Read in .bib file
-     bib <- ReadBib(bib)
+     bib <- RefManageR::ReadBib(bib)
 
      # Reset BibOptions to original
-     BibOptions(check.entries = Bib_check.entries_original)
+     RefManageR::BibOptions(check.entries = Bib_check.entries_original)
 
      return(list(bib = bib, citekeys = citekeys, citations = citations))
 
 }
 
 .filename_check <- function(file, output_format){
-     case_when(
+     dplyr::case_when(
           output_format == "pdf"      ~ if(!grepl("\\.pdf$",  file, ignore.case = TRUE)) {paste0(file, ".pdf")}  else {file},
           output_format == "html"     ~ if(!grepl("\\.html$", file, ignore.case = TRUE)) {paste0(file, ".html")} else {file},
           output_format == "word"     ~ if(!grepl("\\.docx$", file, ignore.case = TRUE)) {paste0(file, ".docx")} else {file},
@@ -681,8 +710,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           switch(output_format,
 
                  text = {if(!is.null(meta_tables)) {
-                      print(meta_tables)
-                 }
+                           print(meta_tables)
+                         }
 
                       if(!is.null(bib)) {
                            if(is.null(title.bib)) title.bib <- "Sources Contributing to Meta-Analyses"
@@ -691,7 +720,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                rep("=", nchar(title.bib)), "\n\n", sep = ""
                            )
                            # TODO: Replace this with a call to citation.js to use CSL styles
-                           print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
+                           RefManageR::NoCite(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
+                           RefManageR::PrintBibliography(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
                       }
 
                       invisible(meta_tables[!is.null(meta_tables)])
@@ -722,8 +752,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                            # Write the bibliography file
                            # Ignore save_build_files
                            bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
-                           suppressMessages(WriteBib(bib[citekeys],
-                                                     file = bib_file))
+                           suppressMessages(RefManageR::WriteBib(bib[citekeys],
+                                                                 file = bib_file))
 
                            sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s",
                                    bib_file)
@@ -781,7 +811,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                  text = {if(!is.null(bib)) {
                       sink("NUL")
                       # TODO: Replace this with a call to citation.js to use CSL styles
-                      bibliography <- print(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
+                      RefManageR::NoCite(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
+                      bibliography <- RefManageR::PrintBibliography(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
                       sink()
                  } else bibliography <- NULL
 
@@ -823,7 +854,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                "\\newpage"[!is.null(meta_tables) & !is.null(bib)],
 
                                paste0(title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
-                               bibliography[!is.null(bib)]
+                               print(bibliography[!is.null(bib)], .opts = list(style = "text", bib.style = "authoryear"))
                  )
 
                  stringi::stri_write_lines(document, file, sep="")
@@ -847,25 +878,25 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                            if(save_build_files) {
                                 bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
                            } else bib_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
-                           suppressMessages(WriteBib(bib[citekeys],
-                                                     file = bib_file))
+                           suppressMessages(RefManageR::WriteBib(bib[citekeys],
+                                                                 file = bib_file))
 
                            header$bibliography <- if(.Platform$`OS.type` == "windows") {
                                 gsub("\\\\", "/", bib_file)
                            } else bib_file
 
 
-                           if(!is.null(style)) {
-                                if(attr(style, "source") %in% c("url", "Zotero")) {
-                                     if(url.exists(style)) {
-                                          header$csl <- style
-                                     } else {
-                                          message(sprintf("Caution: Style not found at %s\n         Check the %s or specify a local CSL style file.\n         References formatted using to the Chicago Manual of Style.",
-                                                          style,
-                                                          if(attr(style, "source") == "url") "URL" else "style name"))
-                                     }
+                           if (!is.null(style)) {
+                                if (attr(style, "source") %in% c("url", "Zotero")) {
+                                        if (RCurl::url.exists(style)) {
+                                                header$csl <- style
+                                        } else {
+                                                message(sprintf("Caution: Style not found at %s\n         Check the %s or specify a local CSL style file.\n         References formatted using to the Chicago Manual of Style.",
+                                                                style,
+                                                                if (attr(style, "source") == "url") "URL" else "style name"))
+                                        }
                                 } else {
-                                     if(file.exists(style)) {
+                                     if (file.exists(style)) {
                                           header$csl <- style
                                      } else {
                                           message(sprintf("Caution: Style not found at %s\n         Check the file path or specify a CSL style name from the Zotero Style Repository (https://zotero.org/styles).\n         References formatted using to the Chicago Manual of Style.",
@@ -876,13 +907,13 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                       }
 
                       # Save meta_tables to an RData workspace for later loading by Rmarkdown
-                      if(!is.null(meta_tables)) {
-                           if(save_build_files) {
+                      if (!is.null(meta_tables)) {
+                           if (save_build_files) {
                                 rdata_file <- file.path(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
                            } else rdata_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
                            save(meta_tables, file = rdata_file)
 
-                           rdata_file <- if(.Platform$`OS.type` == "windows") {
+                           rdata_file <- if (.Platform$`OS.type` == "windows") {
                                 gsub("\\\\", "/", rdata_file)
                            } else rdata_file
 

@@ -4,24 +4,30 @@
 \alias{limits_tau2}
 \title{Confidence limits of tau-squared}
 \usage{
-limits_tau2(var_es, var_pre, k, conf_level = 0.95)
+limits_tau2(var_es, var_pre, k, method = c("profile_var_es", "profile_Q",
+  "normal_logQ"), conf_level = 0.95, var_unbiased = TRUE)
 }
 \arguments{
-\item{conf_level}{Confidence level}
+\item{var_es}{The observed variance of effect sizes.}
 
-\item{Q}{The Q statistic from the meta-analysis.}
+\item{var_pre}{The predicted variance of effect sizes due to artifacts.}
 
-\item{df}{The degrees of freedom associated with the Q statistic.}
+\item{k}{The number of studies in a meta-analysis.}
 
-\item{C}{The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))}
+\item{method}{Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.}
+
+\item{conf_level}{Confidence level.}
+
+\item{var_unbiased}{Are variances computed using the unbiased (\code{TRUE}) or maximum likelihood (\code{FALSE}) estimator?}
 }
 \value{
 The confidence limits of tau-squared
 }
 \description{
-Calculated based on a chi-squared approximation for the distribution of the observed `var_es`.
 Note that this interval does not incorporate uncertainty in artifact estimates,
-so the interval will be conservative when applied to individual-correction or
-artifact distribution meta-analyses.
+so the interval will be somewhat conservative when applied to individual-correction or
+artifact-distribution meta-analyses.
 }
-\keyword{internal}
+\examples{
+limits_tau2(var_es = 0.008372902, var_pre = 0.004778935, k = 20)
+}
