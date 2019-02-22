@@ -286,6 +286,8 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
      if(nrow(es_data) == 0){
           tibble(analysis_type = "Overall", meta_tables = list(NULL), escalc = list(NULL))[0,]
      }else{
+          es_data <- bind_cols(original_order = 1:nrow(es_data), es_data)
+          
           additional_args <- list(...)
           presorted_data <- additional_args$presorted_data
           id_variables <- additional_args$analysis_id_variables
@@ -310,6 +312,7 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                               cat_moderators = cat_moderators,
                                               es_vec = es_data[,1],
                                               moderator_levels = moderator_levels)
+               
                moderator_matrix <- moderators$moderator_matrix
                cat_moderator_matrix <- moderators$cat_moderator_matrix
                
@@ -339,6 +342,11 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           
           data <- moderator_info$data
           
+          if(!is.null(moderators$moderator_matrix))
+               moderators$moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$moderator_matrix), moderators$moderator_matrix)
+          if(!is.null(moderators$cat_moderator_matrix))
+               moderators$cat_moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$cat_moderator_matrix), moderators$cat_moderator_matrix)
+          
           analysis_id_variables <- moderator_info$id_variables
           if(moderator_type == "none"){
                moderator_matrix <- cat_moderator_matrix <- NULL
@@ -357,28 +365,6 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           
           results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
           results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
-          
-          if(!is.null(moderators$moderator_matrix))
-               moderators$moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$moderator_matrix), moderators$moderator_matrix)
-          if(!is.null(moderators$cat_moderator_matrix))
-               moderators$cat_moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$cat_moderator_matrix), moderators$cat_moderator_matrix)
-          
-          results_df$escalc <- map(results_df$escalc, function(x1){
-               map(x1, function(x2){
-                    if(length(x2) == 0){
-                         NULL
-                    }else{
-                         if(is.data.frame(x2)){
-                              bind_cols(original_order = 1:nrow(x2), x2)
-                         }else{
-                              map(x2, function(x3){
-                                   bind_cols(original_order = 1:nrow(x3), x3)
-                              })  
-                         }
-                    }
-               })
-          })
-          
           results_df$escalc[[1]] <- append(results_df$escalc[[1]], list(moderator_info = moderators))
           
           results_df$ma_out <- NULL
