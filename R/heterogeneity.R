@@ -28,6 +28,10 @@
 #'
 #' @export
 #' @md
+#' 
+#' @note 
+#' If weighting methods from the \pkg{metafor} package are used, results from \pkg{metafor}'s \code{rma()} function are also computed. 
+#' Results from robust \pkg{metafor} methods are not provided for artifact distribution meta-analyses
 #'
 #' @references
 #' Becker, B. J. (2005).

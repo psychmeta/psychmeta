@@ -487,7 +487,7 @@ interval_warning <- function(interval, interval_name = NULL, default){
 #' @keywords internal
 check_wt_type <- function(wt_type, generic = FALSE){
      if(generic){
-          psychmeta_wt_options <- c("sample_size", "inv_var")
+          psychmeta_wt_options <- c("sample_size", "inv_var", "custom", "manual")
      }else{
           psychmeta_wt_options <- c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample")
      }
