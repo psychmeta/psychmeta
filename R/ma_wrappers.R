@@ -366,8 +366,32 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
           results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
           results_df$escalc[[1]] <- append(results_df$escalc[[1]], list(moderator_info = moderators))
-          
           results_df$ma_out <- NULL
+          
+          results_df$escalc <- map(results_df$escalc, function(x1){
+               map(x1, function(x2){
+                    if(length(x2) == 0){
+                         NULL
+                    }else{
+                         if(is.data.frame(x2)){
+                              if(any(colnames(x2) == "original_order")){
+                                   x2 %>% arrange(.data$original_order)
+                              }else{
+                                   x2
+                              }
+                         }else{
+                              map(x2, function(x3){
+                                   if(any(colnames(x3) == "original_order")){
+                                        x3 %>% arrange(.data$original_order)
+                                   }else{
+                                        x3
+                                   }
+                              })
+
+                         }
+                    }
+               })
+          })
           
           if(es_type == "r" & ma_type == "ic"){
                for(i in 1:nrow(results_df)){
