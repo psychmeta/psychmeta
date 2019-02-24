@@ -5,7 +5,9 @@
 \title{Supplemental heterogeneity statistics for meta-analyses}
 \usage{
 heterogeneity(ma_obj, es_failsafe = NULL,
-  conf_level = attributes(ma_obj)$inputs$conf_level, ...)
+  conf_level = attributes(ma_obj)$inputs$conf_level,
+  var_res_ci_method = c("profile_var_es", "profile_Q", "normal_logQ"),
+  ...)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object.}
@@ -13,6 +15,8 @@ heterogeneity(ma_obj, es_failsafe = NULL,
 \item{es_failsafe}{Failsafe effect-size value for file-drawer analyses.}
 
 \item{conf_level}{Confidence level to define the width of confidence intervals (default is \code{conf_level} specified in \code{ma_obj}).}
+
+\item{var_res_ci_method}{Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.}
 
 \item{...}{Additional arguments.}
 }
@@ -30,7 +34,12 @@ ma_obj with heterogeneity statistics added. Included statistics include:
 \item{\code{tau}}{\eqn{\sqrt{\tau^{2}}}{sqrt(\tau-squared)}, analogous to the Hunter-Schmidt \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
 \item{\code{Q_r}, \code{H_r_squared}, \code{H_r}, \code{I_r_squared}, \code{tau_r_squared}, \code{tau_r}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted mean effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
 \item{\code{Q_m}, \code{H_m_squared}, \code{H_m}, \code{I_m_squared}, \code{tau_m_squared}, \code{tau_m}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted median effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
-\item{\code{file_drawer}}{Fail-safe \emph{N} and \emph{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
+\item{\code{file_drawer}}{Fail-safe \emph{N} and \emph{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}\preformatted{ Results are reported using computation methods described by Schmidt and Hunter.
+ For barebones and indivdiual-correction meta-analyses, results are also
+ reported using computation methods described by DerSimonian and Laird,
+ outlier-robust computation methods, and, if weights from \pkg{metafor}
+ are used, heterogeneity results from \pkg{metafor}.
+}
 }
 \description{
 This function computes a variety of supplemental statistics for meta-analyses. The statistics here are included for interested users. It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default \code{ma_obj} output (Wiernik et al., 2017).

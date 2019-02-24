@@ -9,6 +9,7 @@
 #' @param ma_obj Meta-analysis object.
 #' @param es_failsafe Failsafe effect-size value for file-drawer analyses.
 #' @param conf_level Confidence level to define the width of confidence intervals (default is `conf_level` specified in `ma_obj`).
+#' @param var_res_ci_method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
 #' @param ... Additional arguments.
 #'
 #' @return ma_obj with heterogeneity statistics added. Included statistics include:
@@ -26,12 +27,14 @@
 #'      \item{\code{Q_m}, \code{H_m_squared}, \code{H_m}, \code{I_m_squared}, \code{tau_m_squared}, \code{tau_m}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted median effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
 #'      \item{\code{file_drawer}}{Fail-safe \emph{N} and \emph{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
 #'
+#'      Results are reported using computation methods described by Schmidt and Hunter.
+#'      For barebones and indivdiual-correction meta-analyses, results are also
+#'      reported using computation methods described by DerSimonian and Laird,
+#'      outlier-robust computation methods, and, if weights from \pkg{metafor}
+#'      are used, heterogeneity results from \pkg{metafor}.
+#'
 #' @export
 #' @md
-#' 
-#' @note 
-#' If weighting methods from the \pkg{metafor} package are used, results from \pkg{metafor}'s \code{rma()} function are also computed. 
-#' Results from robust \pkg{metafor} methods are not provided for artifact distribution meta-analyses
 #'
 #' @references
 #' Becker, B. J. (2005).
@@ -80,6 +83,7 @@
 #' ma_obj$heterogeneity[[1]]$artifact_distribution$latentGroup_latentY
 heterogeneity <- function(ma_obj, es_failsafe = NULL,
                           conf_level = attributes(ma_obj)$inputs$conf_level,
+                          var_res_ci_method = c("profile_var_es", "profile_Q", "normal_logQ"),
                           ...) {
 
      psychmeta.show_progress <- options()$psychmeta.show_progress
@@ -95,6 +99,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
      es_type <- NULL
      ma_metric <- attributes(ma_obj)$ma_metric
      ma_methods <- attributes(ma_obj)$ma_methods
+     var_unbiased <- attributes(ma_obj)$inputs$var_unbiased
 
      if (any(ma_metric == "generic")) es_type <- "es"
      if (any(ma_metric == "r_as_r" | ma_metric == "d_as_r")) es_type <- "r"
@@ -158,7 +163,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                      es_failsafe = es_failsafe,
                                      es_type = es_type,
                                      wt_type = wt_type,
-                                     ma_method = "bb")
+                                     ma_method = "bb",
+                                     var_unbiased = var_unbiased,
+                                     var_res_ci_method = var_res_ci_method)
                }
 
                if ("ic" %in% ma_methods) {
@@ -181,7 +188,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ic")
+                                          ma_method = "ic",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$individual_correction$validity_generalization_x <-
                            .heterogeneity(mean_es = as.numeric(meta_ic_vgx$mean_rho),
                                           var_es = as.numeric(meta_ic_vgx$var_r_c),
@@ -196,7 +205,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ic")
+                                          ma_method = "ic",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$individual_correction$validity_generalization_y <-
                            .heterogeneity(mean_es = as.numeric(meta_ic_vgy$mean_rho),
                                           var_es = as.numeric(meta_ic_vgy$var_r_c),
@@ -211,7 +222,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ic")
+                                          ma_method = "ic",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                     }
                     if (es_type == "d") {
                          data_ts <- escalc$individual_correction$latentGroup_latentY
@@ -232,7 +245,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ic")
+                                          ma_method = "ic",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$individual_correction$observedGroup_latentY <-
                            .heterogeneity(mean_es = as.numeric(meta_ic_vgx$mean_delta),
                                           var_es = as.numeric(meta_ic_vgx$var_d_c),
@@ -247,7 +262,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ic")
+                                          ma_method = "ic",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$individual_correction$latentGroup_observedY <-
                            .heterogeneity(mean_es = as.numeric(meta_ic_vgy$mean_delta),
                                           var_es = as.numeric(meta_ic_vgy$var_d_c),
@@ -262,7 +279,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ic")
+                                          ma_method = "ic",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                     }
                }
 
@@ -289,7 +308,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ad")
+                                          ma_method = "ad",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$artifact_distribution$validity_generalization_x <-
                            .heterogeneity(mean_es = as.numeric(meta_ad_vgx$mean_rho),
                                           var_es = as.numeric(meta_ad_vgx$var_r_c),
@@ -308,7 +329,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ad")
+                                          ma_method = "ad",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$artifact_distribution$validity_generalization_y <-
                            .heterogeneity(mean_es = as.numeric(meta_ad_vgy$mean_rho),
                                           var_es = as.numeric(meta_ad_vgy$var_r_c),
@@ -327,7 +350,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ad")
+                                          ma_method = "ad",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                     }
                     if (es_type == "d") {
                          out_list$artifact_distribution$latentGroup_latentY <-
@@ -348,7 +373,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ad")
+                                          ma_method = "ad",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$artifact_distribution$observedGroup_latentY <-
                            .heterogeneity(mean_es = as.numeric(meta_ad_vgx$mean_delta),
                                           var_es = as.numeric(meta_ad_vgx$var_d_c),
@@ -367,7 +394,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ad")
+                                          ma_method = "ad",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                          out_list$artifact_distribution$latentGroup_observedY <-
                            .heterogeneity(mean_es = as.numeric(meta_ad_vgy$mean_delta),
                                           var_es = as.numeric(meta_ad_vgy$var_d_c),
@@ -386,7 +415,9 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                           es_failsafe = es_failsafe,
                                           es_type = es_type,
                                           wt_type = wt_type,
-                                          ma_method = "ad")
+                                          ma_method = "ad",
+                                          var_unbiased = var_unbiased,
+                                          var_res_ci_method = var_res_ci_method)
                     }
                }
           }
@@ -425,6 +456,8 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @param es_type Name of effect-size type.
 #' @param wt_type Weighting method.
 #' @param ma_method What artifact correction method is used. Options are "bb", "ic", and "ad".
+#' @param var_unbiased Are variances calculated using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
+#' @param var_res_ci_method Method to use to estimate a confidence interval for `var_res`. See \link{heterogeneity} for details.
 #'
 #' @return A list of heterogeneity statistics.
 #'
@@ -436,7 +469,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                            var_e = NA, var_art = NA,
                            wt_vec, N, k, es_vec, vare_vec,
                            es_failsafe = NULL, conf_level = .95, es_type = "es",
-                           wt_type, ma_method) {
+                           wt_type, ma_method, var_unbiased, var_res_ci_method) {
 
      wt_source <- check_wt_type(wt_type = wt_type)
      df <- as.numeric(k - 1)
@@ -481,7 +514,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
      I_squared <- rel_es_obs * 100
 
      ## Q
-     Q <- df * H_squared
+     Q <- H_squared * ifelse(var_unbiased == TRUE, df, k)
      p_Q <- pchisq(q = Q, df = df, lower.tail = FALSE)
 
      ## Tau
@@ -496,10 +529,11 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
                                  4 * max(tau_squared, 0) * sum(diag(P)) +
                                  2 * max(tau_squared, 0)^2 * sum(P * P))
                             )
-     tau_squared_ci <- limits_tau2(var_es = var_es, var_pre = var_pre, k = k, conf_level = conf_level)
-     tau_ci <- tau_squared_ci
-     tau_ci[tau_ci < 0] <- NA
-     tau_ci <- sqrt(tau_ci)
+     tau_squared_ci <- limits_tau2(var_es = var_es, var_pre = var_pre, k = k,
+                                   conf_level = conf_level,
+                                   var_unbiased = var_unbiased,
+                                   method = var_res_ci_method)
+     tau_ci <- sqrt(tau_squared_ci)
      HS_method <- list(
        tau = c(tau = sqrt(tau_squared), se = .5 * tau_squared_se / sqrt(tau_squared), tau_ci),
        tau_squared = c(tau_squared = tau_squared, se = tau_squared_se, tau_squared_ci),
@@ -672,59 +706,80 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 
 #' Confidence limits of tau-squared
 #'
-#' Calculated based on a chi-squared approximation for the distribution of the observed `var_es`.
 #' Note that this interval does not incorporate uncertainty in artifact estimates,
-#' so the interval will be conservative when applied to individual-correction or
-#' artifact distribution meta-analyses.
+#' so the interval will be somewhat conservative when applied to individual-correction or
+#' artifact-distribution meta-analyses.
 #'
-#' @param Q The Q statistic from the meta-analysis.
-#' @param df The degrees of freedom associated with the Q statistic.
-#' @param C The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))
-#' @param conf_level Confidence level
+#' @param var_es The observed variance of effect sizes.
+#' @param var_pre The predicted variance of effect sizes due to artifacts.
+#' @param k The number of studies in a meta-analysis.
+#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param conf_level Confidence level.
+#' @param var_unbiased Are variances computed using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
 #'
 #' @return The confidence limits of tau-squared
+#' @md
 #'
-#' @keywords internal
-limits_tau2 <- function(var_es, var_pre, k, conf_level = .95) {
+#' @export
+#'
+#' @examples
+#' limits_tau2(var_es = 0.008372902, var_pre = 0.004778935, k = 20)
+limits_tau2 <- function(var_es, var_pre, k, method = c("profile_var_es", "profile_Q", "normal_logQ"), conf_level = .95, var_unbiased = TRUE) {
      df <- k - 1
-     ci_var_es <- c(var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = FALSE),
-                    var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = TRUE))
-     ci_var_res <- ci_var_es - var_pre
+     method <- match.arg(method)
+     if (method == "profile_Q") {
+             if (requireNamespace("MBESS", quietly = TRUE)) {
+                   Q <- (var_es / var_pre) * ifelse(var_unbiased == TRUE, df, k)
+                   ci_Q <- unlist(MBESS::conf.limits.nc.chisq(Chi.Square = Q,
+                                                              df = df,
+                                                              conf.level = conf_level)[c("Lower.Limit", "Upper.Limit")])
+                   ci_var_res <- ci_Q * var_pre / ifelse(var_unbiased == TRUE, df, k) - var_pre
+             } else {
+                   warning("Package 'MBESS' is required to calculate 'profile_Q' confidence intervals. 'profile_var_es' intervals calculated instead.")
+                   method <- "profile_var_es"
+             }
+     }
+     if (method == "profile_var_es") {
+             ci_var_es <- c(var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = FALSE),
+                            var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = TRUE))
+             ci_var_res <- ci_var_es - var_pre
+     } else if (method == "normal_log") {
+             Q <- (var_es / var_pre) * ifelse(var_unbiased == TRUE, df, k)
+             se_log_Q <- rep(NA, length(Q))
+             se_log_Q[Q > df]  <- ((log(Q) - log(df)) / (sqrt(2 * Q) - sqrt(2 * df - 1)))[Q > df]
+             se_log_Q[Q <= df] <- (2 * sqrt((1 / (2 * (df - 1))) * (1 - (1 / (3 * (df - 1)^2)))))[Q <= df]
+
+             ci_log_Q <- log(Q) + c(-1, 1) * qnorm((1 - conf_level) / 2, lower.tail = FALSE) * se_log_Q
+             ci_Q <- exp(ci_log_Q)
+             ci_var_es <- ci_Q * var_pre / ifelse(var_unbiased == TRUE, df, k) - var_pre
+     }
+
      ci_var_res[ci_var_res < 0] <- 0
      names(ci_var_res) <- paste("CI", round(conf_level * 100), c("LL", "UL"), sep = "_")
      return(ci_var_res)
 
-     ## Alternative method based on Normal-approximation of log(Q) (Higgins & Thompson, 2002, Equation A2)
-     ## (Likely too narrow unless df is very large)
-     # Q <- k * var_es / var_pre
-     # df <- k - 1
-     # se_log_Q <- rep(NA, length(Q))
-     # se_log_Q[Q > df]  <- ((log(Q) - log(df)) / (sqrt(2 * Q) - sqrt(2 * df - 1)))[Q > df]
-     # se_log_Q[Q <= df] <- (2 * sqrt((1 / (2 * (df - 1))) * (1 - (1 / (3 * (df - 1)^2)))))[Q <= df]
-     #
-     # ci_log_Q <- log(Q) + c(-1, 1) * qnorm((1 - conf_level) / 2, lower.tail = FALSE) * se_log_Q
-     # ci_Q <- exp(ci_log_Q)
-     # ci_tau2 <- (ci_Q - k) * var_pre / k
-     # ci_tau2[ci_tau2 < 0] <- 0
-     # names(ci_tau2) <- paste("CI", round(conf_level * 100), c("LL", "UL"), sep = "_")
-     # return(sqrt(ci_tau2))
 }
 
 #' Confidence limits of tau
 #'
-#' Calculated based on a chi-squared approximation for the distribution of the observed `var_es`.
 #' Note that this interval does not incorporate uncertainty in artifact estimates,
-#' so the interval will be conservative when applied to individual-correction or
-#' artifact distribution meta-analyses.
+#' so the interval will be somewhat conservative when applied to individual-correction or
+#' artifact-distribution meta-analyses.
 #'
-#' @param Q The Q statistic from the meta-analysis.
-#' @param df The degrees of freedom associated with the Q statistic.
-#' @param C The statistic computed as: sum(weights) - (sum(weights^2) / sum(weights))
-#' @param conf_level Confidence level
+#' @param var_es The observed variance of effect sizes.
+#' @param var_pre The predicted variance of effect sizes due to artifacts.
+#' @param k The number of studies in a meta-analysis.
+#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param conf_level Confidence level.
+#' @param var_unbiased Are variances computed using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
 #'
 #' @return The confidence limits of tau
+#' @md
 #'
-#' @keywords internal
-limits_tau <- function(var_es, var_pre, k, conf_level = .95) {
-        sqrt(limits_tau2(var_es = var_es, var_pre = var_pre, k = k, conf_level = conf_level))
+#' @export
+#'
+#' @examples
+#' limits_tau(var_es = 0.008372902, var_pre = 0.004778935, k = 20)
+limits_tau <- function(var_es, var_pre, k, method = c("profile_var_es", "profile_Q", "normal_logQ"), conf_level = .95, var_unbiased = TRUE) {
+        sqrt(limits_tau2(var_es = var_es, var_pre = var_pre, k = k, method = method, conf_level = conf_level, var_unbiased = var_unbiased))
 }
