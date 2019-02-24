@@ -44,10 +44,6 @@ ma_obj with heterogeneity statistics added. Included statistics include:
 \description{
 This function computes a variety of supplemental statistics for meta-analyses. The statistics here are included for interested users. It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default \code{ma_obj} output (Wiernik et al., 2017).
 }
-\note{
-If weighting methods from the \pkg{metafor} package are used, results from \pkg{metafor}'s \code{rma()} function are also computed.
-Results from robust \pkg{metafor} methods are not provided for artifact distribution meta-analyses
-}
 \examples{
 ## Correlations
 ma_obj <- ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux,
