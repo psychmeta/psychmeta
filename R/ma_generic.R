@@ -69,7 +69,6 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      }
 
      moderator_type <- scalar_arg_warning(arg = moderator_type, arg_name = "moderator_type")
-     wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
      conf_method <- scalar_arg_warning(arg = conf_method, arg_name = "conf_method")
      cred_method <- scalar_arg_warning(arg = cred_method, arg_name = "cred_method")
      conf_level <- interval_warning(interval = conf_level, interval_name = "conf_level", default = .95)
@@ -117,7 +116,8 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var",
                                                     "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      }
-
+     wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
+     
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
                moderators <- as.data.frame(moderators)
