@@ -220,7 +220,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #'
 #' @section PDF and LaTeX output:
 #' If \code{latex} is \code{TRUE} and you render to PDF, LaTeX, or other output
-#' formats requiring LaTeX (e.g., \code{beamer_presentation}, see \code{\link[knitr]{is_latex_output}}),
+#' formats requiring LaTeX (e.g., \code{beamer_presentation}, see \code{\link[knitr:output_type]{knitr::is_latex_output}}),
 #' a YAML metadata block with a \code{header-includes} argument calling the required
 #' \code{unicode-math} LaTeX package is printed.
 #'
@@ -234,7 +234,8 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #'
 #' @section HTML output:
 #' If \code{html} is \code{TRUE} and you render to HTML (or related formats, see
-#' \code{\link[knitr]{is_html_output}}, the following LaTeX math commands are defined:
+#' \code{\link[knitr:output_type]{knitr::is_html_output}}, the following LaTeX
+#' math commands are defined:
 #' \itemize{
 #'   \item{\code{symit}}{}
 #'   \item{\code{symup}}{}
