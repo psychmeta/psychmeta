@@ -768,7 +768,7 @@ print.ma_psychmeta <- function(x, ..., digits = 3){
      class(x) <- c("tbl_df", "tbl", "data.frame")
      print(x)
 
-     cat("\nTo extract results, try summary() or the get_stuff functions (run ?get_stuff for help)")
+     cat("\nTo extract results, try summary() or the get_stuff functions (run ?get_stuff for help). \n")
 }
 
 

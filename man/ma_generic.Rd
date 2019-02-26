@@ -9,7 +9,8 @@ ma_generic(es, n, var_e, sample_id = NULL, citekey = NULL,
   group2 = NULL, wt_type = c("sample_size", "inv_var", "DL", "HE",
   "HS", "SJ", "ML", "REML", "EB", "PM"), moderators = NULL,
   cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
-  "none"), data = NULL, control = control_psychmeta(), ...)
+  "none"), data = NULL, control = control_psychmeta(),
+  weights = NULL, ...)
 }
 \arguments{
 \item{es}{Vector or column name of observed effect sizes.}
@@ -27,7 +28,7 @@ When \code{TRUE}, program will use sample-size weights, error variances estimate
 
 \item{group1, group2}{Vector of groups' names associated with effect sizes that represent pairwise contrasts.}
 
-\item{wt_type}{Type of weight to use in the meta-analysis: native options are "sample_size", and "inv_var" (inverse error variance).
+\item{wt_type}{Type of weight to use in the meta-analysis: native options are "sample_size" and "inv_var" (inverse error variance).
 Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML", "EB", and "PM"
 (see metafor documentation for details about the metafor methods).}
 
@@ -40,6 +41,8 @@ Supported options borrowed from metafor are "DL", "HE", "HS", "SJ", "ML", "REML"
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
 \item{control}{Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.}
+
+\item{weights}{Optional vector of weights to be used. When \code{weights} is non-NULL, these weights override the argument supplied to \code{wt_type}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

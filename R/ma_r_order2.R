@@ -262,7 +262,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      do_ad <- ma_arg_list$do_ad
      
      if((type == "all" | type == "bb") & do_bb){
-          out_bb <- .ma_r_order2_bb(k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
+          out_bb <- .ma_r_order2_bb(data = data, k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method,
                                     var_unbiased = var_unbiased, run_lean = run_lean, ma_metric = ma_metric)
@@ -271,7 +271,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      }
      
      if((type == "all" | type == "ic") & do_ic){
-          out_ic <- .ma_r_order2_ic(k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
+          out_ic <- .ma_r_order2_ic(data = data, k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method, 
                                     var_unbiased = var_unbiased, run_lean = run_lean, ma_metric = ma_metric)
@@ -280,7 +280,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      }
      
      if((type == "all" | type == "ad") & do_ad){
-          out_ad <- .ma_r_order2_ad(k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
+          out_ad <- .ma_r_order2_ad(data = data, k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
                                     conf_level = conf_level, cred_level = cred_level,
                                     cred_method = cred_method, conf_method = conf_method, 
                                     var_unbiased = var_unbiased, run_lean = run_lean, ma_metric = ma_metric)
@@ -297,7 +297,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 }
 
 
-.ma_r_order2_bb <- function(k_vec = NULL, N_vec = NULL, r_vec = NULL, var_r_vec = NULL,
+.ma_r_order2_bb <- function(data = NULL, k_vec = NULL, N_vec = NULL, r_vec = NULL, var_r_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE, ma_metric = "r"){
 
@@ -329,6 +329,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                dat <- data.frame(yi = r_vec, vi = var_e_vec, d = r_vec, var_d = var_r_vec, 
                                  k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r)
           }
+          if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
      }
 
@@ -390,7 +391,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 
 
 
-.ma_r_order2_ic <- function(k_vec = NULL, N_vec = NULL, rho_vec = NULL, var_r_c_vec = NULL,
+.ma_r_order2_ic <- function(data = NULL, k_vec = NULL, N_vec = NULL, rho_vec = NULL, var_r_c_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE, ma_metric = "r"){
 
@@ -422,6 +423,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, var_d_c = var_r_c_vec, 
                                  k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
           }
+          if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
      }
 
@@ -483,7 +485,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 
 
 
-.ma_r_order2_ad <- function(k_vec = NULL, N_vec = NULL, r_vec = NULL, rho_vec = NULL, var_r_vec = NULL,
+.ma_r_order2_ad <- function(data = NULL, k_vec = NULL, N_vec = NULL, r_vec = NULL, rho_vec = NULL, var_r_vec = NULL,
                             conf_level = .95, cred_level = .8,
                             conf_method = "t", cred_method = "t", var_unbiased = TRUE, run_lean = FALSE, ma_metric = "r"){
 
@@ -515,6 +517,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, 
                                  k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
           }
+          if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
      }
 

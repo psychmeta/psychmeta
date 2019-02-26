@@ -1,3 +1,14 @@
+Changes in Version 2.3.2 (2019-02-26)
+=====================================
+- Bug fix for using categorical moderators in meta-regressions. 
+
+- Bug fix for using moderators in ma_generic() when there are no construct or group-identification variables in the analysis. 
+
+- Added an optional "weights" argument to ma_generic(), which allows users to supply their own custom weights for effect sizes.
+
+- Added alternative methods for calculating confidence limits for tau-squared.
+
+
 Changes in Version 2.3.1 (2019-02-15)
 =====================================
 - Increased support for heterogeneity analyses conducted using weights imported from the metafor package.

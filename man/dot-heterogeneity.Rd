@@ -6,7 +6,8 @@
 \usage{
 .heterogeneity(mean_es, var_es, var_pre, var_res, var_e = NA,
   var_art = NA, wt_vec, N, k, es_vec, vare_vec, es_failsafe = NULL,
-  conf_level = 0.95, es_type = "es", wt_type, ma_method)
+  conf_level = 0.95, es_type = "es", wt_type, ma_method, var_unbiased,
+  var_res_ci_method)
 }
 \arguments{
 \item{mean_es}{The mean effect size.}
@@ -40,6 +41,10 @@
 \item{wt_type}{Weighting method.}
 
 \item{ma_method}{What artifact correction method is used. Options are "bb", "ic", and "ad".}
+
+\item{var_unbiased}{Are variances calculated using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?}
+
+\item{var_res_ci_method}{Method to use to estimate a confidence interval for `var_res`. See \link{heterogeneity} for details.}
 }
 \value{
 A list of heterogeneity statistics.

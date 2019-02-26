@@ -117,7 +117,7 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                          data_vgx <- full_join(moderator_matrix, escalc$individual_correction$observedGroup_latentY, by = "original_order")
                          data_vgy <- full_join(moderator_matrix, escalc$individual_correction$latentGroup_observedY, by = "original_order")
                     }
-
+                 
                     metareg_ts  <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_ts))
                     metareg_vgx <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_vgx))
                     metareg_vgy <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_vgy))
