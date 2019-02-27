@@ -433,7 +433,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
      cred_format <- match.arg(cred_format, c("parentheses", "brackets", "columns"))
 
      if (!output_format %in% c("text", "rmd") & !is.null(file)) {
-             if (!requireNamespace("rmarkdown", quiety = TRUE)) {
+             if (!requireNamespace("rmarkdown", quietly = TRUE)) {
                      stop(sprintf("Package 'rmarkdown' is not installed. \n'rmarkdown' is required to output to %s. \nPlease install 'rmarkdown'.",
                                   output_format),
                           call. = FALSE)
@@ -441,7 +441,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
      }
 
      if (output_format != "text" & !is.null(file)) {
-             if (!requireNamespace("knitr", quiety = TRUE)) {
+             if (!requireNamespace("knitr", quietly = TRUE)) {
                      stop(sprintf("Package 'knitr' is not installed. \n'knitr' is required to output to %s. \nPlease install 'knitr'.",
                                   output_format),
                           call. = FALSE)
@@ -586,7 +586,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                        } else output_format})
 
      if (!output_format %in% c("text", "rmd", "biblatex", "citekeys") & !is.null(file)) {
-          if (!requireNamespace("rmarkdown", quiety = TRUE)) {
+          if (!requireNamespace("rmarkdown", quietly = TRUE)) {
                stop(sprintf("Package 'rmarkdown' is not installed. \n'rmarkdown' is required to output to %s. \nPlease install 'rmarkdown'.",
                             output_format),
                     call. = FALSE)
