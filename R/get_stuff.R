@@ -384,9 +384,6 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                class(.ma_obj) <- class(.ma_obj)[class(.ma_obj) != "ma_psychmeta"]
                .ma_obj <- .ma_obj[,1:(which(colnames(ma_obj) == "meta_tables") - 1)]
 
-               # ad_x <- ad_x[unlist(map(ad_x, nrow)) > 0]
-               # ad_y <- ad_y[unlist(map(ad_y, nrow)) > 0]
-
                for(i in 1:length(ad_x)){
                     if(nrow(ad_x[[i]]) > 0){
                          ad_x[[i]] <- cbind(artifact = rownames(ad_x[[i]]), description = NA, .ma_obj[i,], ad_x[[i]])
@@ -405,38 +402,48 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                     }
                }
                
-               ad_x <- as_tibble(data.table::rbindlist(ad_x), .name_repair = "minimal")
-               ad_y <- as_tibble(data.table::rbindlist(ad_y), .name_repair = "minimal")
-               ad_x$artifact <- as.character(ad_x$artifact)
-               ad_y$artifact <- as.character(ad_y$artifact)
+               ad_x <- ad_x[unlist(map(ad_x, nrow)) > 0]
+               ad_y <- ad_y[unlist(map(ad_y, nrow)) > 0]
                
-               ad_x$description <- dplyr::recode(ad_x$artifact,
-                                                 qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
-                                                 qxa_drr = "Applicant measurement quality (corrected for direct range restriction)",
-                                                 qxi_irr = "Incumbent measurement quality (indirectly range restricted)",
-                                                 qxi_drr = "Incumbent measurement quality (directly range restricted)",
-
-                                                 rxxa_irr = "Applicant reliability (corrected for indirect range restriction)",
-                                                 rxxa_drr = "Applicant reliability (corrected for direct range restriction)",
-                                                 rxxi_irr = "Incumbent reliability (indirectly range restricted)",
-                                                 rxxi_drr = "Incumbent reliability (directly range restricted)",
-
-                                                 ux = "Observed-score u-ratio",
-                                                 ut = "True-score u-ratio")
-
-               ad_y$description <- dplyr::recode(ad_y$artifact,
-                                                 qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
-                                                 qxa_drr = "Applicant measurement quality (corrected for direct range restriction)",
-                                                 qxi_irr = "Incumbent measurement quality (indirectly range restricted)",
-                                                 qxi_drr = "Incumbent measurement quality (directly range restricted)",
-
-                                                 rxxa_irr = "Applicant reliability (corrected for indirect range restriction)",
-                                                 rxxa_drr = "Applicant reliability (corrected for direct range restriction)",
-                                                 rxxi_irr = "Incumbent reliability (indirectly range restricted)",
-                                                 rxxi_drr = "Incumbent reliability (directly range restricted)",
-
-                                                 ux = "Observed-score u-ratio",
-                                                 ut = "True-score u-ratio")
+               if(length(ad_x) > 0){
+                    ad_x <- as_tibble(data.table::rbindlist(ad_x), .name_repair = "minimal")
+                    ad_x$artifact <- as.character(ad_x$artifact)
+                    ad_x$description <- dplyr::recode(ad_x$artifact,
+                                                      qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
+                                                      qxa_drr = "Applicant measurement quality (corrected for direct range restriction)",
+                                                      qxi_irr = "Incumbent measurement quality (indirectly range restricted)",
+                                                      qxi_drr = "Incumbent measurement quality (directly range restricted)",
+                                                      
+                                                      rxxa_irr = "Applicant reliability (corrected for indirect range restriction)",
+                                                      rxxa_drr = "Applicant reliability (corrected for direct range restriction)",
+                                                      rxxi_irr = "Incumbent reliability (indirectly range restricted)",
+                                                      rxxi_drr = "Incumbent reliability (directly range restricted)",
+                                                      
+                                                      ux = "Observed-score u-ratio",
+                                                      ut = "True-score u-ratio")
+               }else{
+                    ad_x <- NULL
+               }
+               
+               if(length(ad_y) > 0){
+                    ad_y <- as_tibble(data.table::rbindlist(ad_y), .name_repair = "minimal")
+                    ad_y$artifact <- as.character(ad_y$artifact)
+                    ad_y$description <- dplyr::recode(ad_y$artifact,
+                                                      qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
+                                                      qxa_drr = "Applicant measurement quality (corrected for direct range restriction)",
+                                                      qxi_irr = "Incumbent measurement quality (indirectly range restricted)",
+                                                      qxi_drr = "Incumbent measurement quality (directly range restricted)",
+                                                      
+                                                      rxxa_irr = "Applicant reliability (corrected for indirect range restriction)",
+                                                      rxxa_drr = "Applicant reliability (corrected for direct range restriction)",
+                                                      rxxi_irr = "Incumbent reliability (indirectly range restricted)",
+                                                      rxxi_drr = "Incumbent reliability (directly range restricted)",
+                                                      
+                                                      ux = "Observed-score u-ratio",
+                                                      ut = "True-score u-ratio")
+               }else{
+                    ad_y <- NULL
+               }
 
           }
 
