@@ -58,7 +58,11 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                               if(all(is.na(x))){
                                    FALSE
                               }else{
-                                   any(x != x[1])
+                                   if(any(is.na(x))){
+                                        all(is.na(x))
+                                   }else{
+                                        any(x != x[1])
+                                   }
                               }
                          })
                          
@@ -75,12 +79,16 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                               if(all(is.na(x))){
                                    FALSE
                               }else{
-                                   any(x != x[1])
+                                   if(any(is.na(x))){
+                                        all(is.na(x))
+                                   }else{
+                                        any(x != x[1])
+                                   }
                               }
                          })
-                         
+
                          disagreement <- c(disagreement_x, disagreement_y)
-                         
+
                          if(any(disagreement)){
                               disagreement_names <- names(disagreement[disagreement])
                               .disagreement_x <- .id_vec_x %in% disagreement_names
