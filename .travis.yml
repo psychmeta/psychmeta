@@ -1,9 +1,9 @@
 language: r
 cache: packages
-before_install: R -e 'source("https://install-github.me/r-lib/remotes")'
 addons:
   apt:
     packages:
     - libcurl4-openssl-dev
     - libxml2-dev
     - libgsl0-dev
+before_install: R -e 'source("https://install-github.me/r-lib/remotes")'
