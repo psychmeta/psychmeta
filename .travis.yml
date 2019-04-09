@@ -6,4 +6,7 @@ addons:
     - libcurl4-openssl-dev
     - libxml2-dev
     - libgsl0-dev
+jobs:
+  include:
+  - r: devel
 before_install: R -e 'source("https://install-github.me/r-lib/remotes")'
