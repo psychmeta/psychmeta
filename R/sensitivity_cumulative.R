@@ -189,13 +189,13 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
                     if(es_type == "es"){
                          es_data$vi <- vi_xy
                          es_data$weight <- wt_xy
-                         bb_table <- .ma_cumulative(data = es_data, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
+                         bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_generic_boot, ma_arg_list = ma_arg_list)
                     }
                     
                     if(es_type == "d"){
                          es_data$vi <- vi
                          es_data$weight <- wt
-                         bb_table <- .ma_cumulative(data = es_data, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
+                         bb_table <- .ma_cumulative(data = es_data, sort_method = sort_method, ma_fun_boot = .ma_d_bb_boot, ma_arg_list = ma_arg_list)
                     }
                     
                     if(convert_back){

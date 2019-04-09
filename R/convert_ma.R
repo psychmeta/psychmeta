@@ -504,6 +504,13 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
      .attributes <- attributes(ma_table)
      .class <- class(ma_table)
      ma_table <- as.data.frame(ma_table)
+     if(colnames(ma_table)[1] != "k"){
+          col1 <- ma_table[,1]
+          col1_name <- colnames(ma_table)[1]
+          ma_table <- ma_table[,-1]
+     }else{
+          col1 <- NULL
+     }
 
      col_ids <- .identify_ma_cols(col_names = colnames(ma_table))
 
@@ -621,6 +628,12 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
           .attributes$ma_type <- gsub(x = col_ids$method, pattern = "d_", replacement = "r_")
      }
 
+     if(!is.null(col1)){
+          .colnames <- c(col1_name, colnames(ma_table))
+          ma_table <- cbind(col1, ma_table)
+          .attributes$names <- .colnames
+     }
+     
      ma_table <- fix_df(ma_table)
      attributes(ma_table) <- .attributes
      class(ma_table) <- .class
