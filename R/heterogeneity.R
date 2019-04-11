@@ -728,16 +728,6 @@ limits_tau2 <- function(var_es, var_pre, k, method = c("profile_var_es", "profil
      df <- k - 1
      method <- match.arg(method)
      if (method == "profile_Q") {
-             # if (requireNamespace("MBESS", quietly = TRUE)) {
-             #       Q <- (var_es / var_pre) * ifelse(var_unbiased == TRUE, df, k)
-             #       ci_Q <- unlist(MBESS::conf.limits.nc.chisq(Chi.Square = Q,
-             #                                                  df = df,
-             #                                                  conf.level = conf_level)[c("Lower.Limit", "Upper.Limit")])
-             #       ci_var_res <- ci_Q * var_pre / ifelse(var_unbiased == TRUE, df, k) - var_pre
-             # } else {
-             #       warning("Package 'MBESS' is required to calculate 'profile_Q' confidence intervals. 'profile_var_es' intervals calculated instead.")
-             #       method <- "profile_var_es"
-             # }
           Q <- (var_es / var_pre) * ifelse(var_unbiased == TRUE, df, k)
           ci_Q <- unlist(conf.limits.nc.chisq(Chi.Square = Q,
                                               df = df,
