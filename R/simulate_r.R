@@ -1369,9 +1369,13 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
 #' .rbeta(n = 10, mean = .8, sd, .2)
 #' }
 .rbeta <- function(n, mean, sd){
-     alpha <- mean * ((mean * (1 - mean)) / sd^2 - 1)
-     beta <- (1 - mean) * alpha / mean
-     rbeta(n = n, shape1 = alpha, shape2 = beta)
+  if(sd == 0){
+    rep(mean, n)
+  }else{
+    alpha <- mean * ((mean * (1 - mean)) / sd^2 - 1)
+    beta <- (1 - mean) * alpha / mean
+    rbeta(n = n, shape1 = alpha, shape2 = beta) 
+  }
 }
 
 
