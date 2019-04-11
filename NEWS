@@ -1,3 +1,16 @@
+Changes in Version 2.3.3 (2019-04-11)
+=====================================
+- Bug fix for the metabulate() function's use of R Markdown. 
+
+- Bug fix for retrieving artifact distributions with the get_ad() function.
+
+- Bug fix to accommodate truly missing artifacts in the artifact-imputation procedure.
+
+- Bug fix for leave-one-out and cumulative meta-analyses for d values. 
+
+- Update to sample from beta distributions with SD = 0 in simulate_r_database and simulate_d_database.
+
+
 Changes in Version 2.3.2 (2019-02-26)
 =====================================
 - Bug fix for using categorical moderators in meta-regressions. 
