@@ -1215,7 +1215,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
      ##### Organize database #####
-     es_data <- data_frame(rxyi = rxyi, n = n)
+     es_data <- tibble(rxyi = rxyi, n = n)
      es_data$n_adj <- n_adj
 
      if(es_d & !is.null(d)){
