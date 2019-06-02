@@ -60,20 +60,20 @@ anova.summary.lm_mat <- function(...){
      }
 }
 
-#' Wald-type tests for moderators in psychmeta meta-analyses
+#' @name anova.ma_psychmeta
+#' @rdname anova.ma_psychmeta
 #'
+#' @title Wald-type tests for moderators in psychmeta meta-analyses
+#'
+#' @description
 #' This function computes Wald-type pairwise comparisons for each level of
 #' categorical moderators for an `ma_psychmeta` object, as well as an ombnibus
 #' one-way ANOVA test (equal variance not assumed).
 #'
 #' Currently, samples across moderator levels are assumed to be indepdent.
 #'
-#' @param ma_obj A psychmeta meta-analysis object.
-#' @param analyses Which analyses to to test moderators for? Can be either
-#' `"all"` to test moderators for all meta-analyses in the object (default) or a
-#' list containing one or more of the arguments `construct`, `construct_pair`,
-#' `pair_id`, `k_min`, and `N_min`. See [filter_ma()] for details. Note that
-#' `analysis_id` should not be used. If `k_min` is not supplied, it is set to 2.
+#' @param object A psychmeta meta-analysis object.
+#' @param analyses Which analyses to to test moderators for? Can be either `"all"` to test moderators for all meta-analyses in the object (default) or a list containing one or more of the arguments `construct`, `construct_pair`, `pair_id`, `k_min`, and `N_min`. See [filter_ma()] for details. Note that `analysis_id` should not be used. If `k_min` is not supplied, it is set to 2.
 #' @param moderators A character vector of moderators to test. If `NULL`, all categorical moderators are tested.
 #' @param L A named list with with elements specifying set of linear contrasts for each variable in `moderators`. (Not yet implemented.)
 #' @param ma_obj2 A second psychmeta meta-analysis object to compare to `ma_obj` (Not yet implemented.)
@@ -82,22 +82,25 @@ anova.summary.lm_mat <- function(...){
 #' @param conf_level Confidence level to define the width of confidence intervals (defaults to value set when `ma_obj` was fit)
 #' @param ... Additional arguments.
 #'
-#' @return An object of class `anova.ma_psychmeta`. A tibble with a row for each
-#' construct pair in `ma_obj` and a column for each moderator tested. Cells
-#' lists of contrasts tested.
+#' @return An object of class `anova.ma_psychmeta`. A tibble with a row for each construct pair in `ma_obj` and a column for each moderator tested. Cells lists of contrasts tested.
 #'
 #' @export
 #' @md
-#' @method anova summary.lm_mat
+#' @exportClass ma_psychmeta
+#' @method anova ma_psychmeta
 #'
 #' @note Currently, only simple (single) categorical moderators (one-way ANOVA) are supported.
 #'
 #' @examples
-anova.ma_psychmeta <- function(ma_obj, analyses = "all",
+#' ma_obj <- ma_r(rxyi, n, construct_x = x_name, construct_y = y_name,
+#' moderators = moderator, data = data_r_meas_multi)
+#'
+#' anova(ma_obj)
+anova.ma_psychmeta <- function(object, ..., analyses = "all",
                                moderators = NULL, L = NULL, ma_obj2 = NULL,
                                ma_method = c("bb", "ic", "ad"),
                                correction_type = c("ts", "vgx", "vgy"),
-                               conf_level = NULL, ...) {
+                               conf_level = NULL) {
 
         ma_method = match.arg(ma_method)
         correction_type = match.arg(correction_type)
@@ -108,15 +111,15 @@ anova.ma_psychmeta <- function(ma_obj, analyses = "all",
                 analyses$k_min <- 2
         }
 
-        metatab <- get_metatab(ma_obj, analyses = analyses, ma_method = ma_method,
+        metatab <- get_metatab(object, analyses = analyses, ma_method = ma_method,
                                correction_type = correction_type) %>%
                 as_tibble() %>%
-                filter(analysis_type %in% c("Overall", "Simple Moderator"))
+                filter(.data$analysis_type %in% c("Overall", "Simple Moderator"))
 
         if (is.null(moderators)) moderators <-
                 metatab %>%
-                select(analysis_type:k) %>%
-                select(-1, -ncol(.)) %>%
+                select(.data$analysis_type:.data$k) %>%
+                select(-1, -.data$k) %>%
                 colnames()
 
         if (length(moderators) == 0) stop("'ma_obj' contains no moderators or no moderators selected")
@@ -135,28 +138,29 @@ anova.ma_psychmeta <- function(ma_obj, analyses = "all",
 
         }
 
-        moderator_tabs <- map(moderators, ~ filter(metatab, get(.x) != "All Levels") %>%
+        moderator_tabs <- purrr::map(moderators, ~ filter(metatab, get(.x) != "All Levels") %>%
                                       select(1:5, .x, k:ncol(metatab)))
         names(moderator_tabs) <- moderators
 
-        anova_tab <- map_dfr(moderator_tabs,
+        anova_tab <- purrr::map_dfr(moderator_tabs,
                              ~ .x %>%
                                      select(1:5,
                                             mod = colnames(.x)[6],
-                                            k,
+                                            .data$k,
                                             mean = mean_lab,
                                             se = se_lab) %>%
                                      mutate(v = se^2, w = 1 / v) %>%
                                      group_by_at(2:4) %>%
                                      nest() %>%
-                                     mutate(anova = map(data, .anova.ma_psychmeta, conf_level)) %>%
-                                     select(-data),
+                                     mutate(anova = purrr::map(.data$data, .anova.ma_psychmeta, conf_level)) %>%
+                                     select(-.data$data),
                              .id = "moderator"
-                ) %>% filter(!is.na(anova)) %>%
-                mutate(omnibus = map(anova, ~ .[[1]]),
-                       contrasts = map(anova, ~ .[[2]])
+                ) %>% filter(!is.na(.data$anova)) %>%
+                mutate(omnibus = purrr::map(.data$anova, ~ .x$omnibus),
+                       contrasts = purrr::map(.data$anova, ~ .x$contrasts)
                 ) %>%
-                select(2:4, 1, omnibus, contrasts) %>% unnest(cols = c(omnibus, contrasts))
+                select(2:4, 1, .data$omnibus, .data$contrasts) %>%
+                tidyr::unnest(cols = c("omnibus", "contrasts"))
 
         class(anova_tab) <- c("anova.ma_psychmeta", class(anova_tab))
 
@@ -173,9 +177,9 @@ anova.ma_psychmeta <- function(ma_obj, analyses = "all",
         sortedPairs <- t(apply(cbind(as.factor(levels[,1]), as.factor(levels[,2])), 1, sort))
         exclude <- duplicated(sortedPairs) | (levels[,1] == levels[,2])
 
-        levels <- levels[!exclude, ]
+        levels <- filter(dplyr::as_tibble(levels), !exclude)
 
-        sum_ma <- map2_dfr(levels[,1], levels[,2], ~ {
+        sum_ma <- purrr::map2_dfr(levels[,1], levels[,2], ~ {
                 x <- filter(ma, mod == .x)
                 y <- filter(ma, mod == .y)
                 xm <- x$mean
@@ -189,7 +193,7 @@ anova.ma_psychmeta <- function(ma_obj, analyses = "all",
                               mean_1 = xm, mean_2 = ym,
                               diff = D, CI_LL = D - MOE, CI_UL = D + MOE)
         })
-        sum_ma <- sum_ma %>% filter(level_1 != level_2)
+        sum_ma <- sum_ma %>% filter(.data$level_1 != .data$level_2)
         if (nrow(sum_ma) == 0) return(NA)
         colnames(sum_ma) <- c("level_1", "level_2", "mean_1", "mean_2", "diff",
                               paste0("CI_LL_", round(conf_level * 100)),
@@ -209,6 +213,6 @@ anova.ma_psychmeta <- function(ma_obj, analyses = "all",
                                     df_num = rep(NA, nrow(sum_ma) - 1),
                                     df_denom = rep(NA, nrow(sum_ma) - 1)))
 
-        list(omnimbus = omnibus, contrasts = sum_ma)
+        list(omnibus = omnibus, contrasts = sum_ma)
 
 }

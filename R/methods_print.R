@@ -1145,7 +1145,7 @@ print.metabulate_table <- function(x, ...){
 #' @export
 #' @exportClass anova.ma_psychmeta
 #' @method print anova.ma_psychmeta
-print.anova.ma_psychmeta <- function(x, n = NULL) {
+print.anova.ma_psychmeta <- function(x, ..., n = NULL) {
         tab <- x
         class(tab) <- c("tbl_df", "tbl", "data.frame")
         print(tab,  n = n)
