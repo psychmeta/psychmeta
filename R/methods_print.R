@@ -730,6 +730,7 @@ print.get_ad <- function(x, ..., digits = 3){
      if("ad" %in% .names) includes <- c(includes, "\n- ad (distributions used to make artifact-distribution corrections)")
 
      cat(includes)
+     invisible(x)
 
 }
 
@@ -738,7 +739,7 @@ print.get_ad <- function(x, ..., digits = 3){
 #' @keywords internal
 #' @exportClass ma_psychmeta
 #' @method print ma_psychmeta
-print.ma_psychmeta <- function(x, ..., digits = 3){
+print.ma_psychmeta <- function(x, ..., n = NULL){
      ma_method <- attributes(x)$ma_method
      correction_type <- attributes(x)$correction_type
      ma_metric <- attributes(x)$ma_metric
@@ -764,9 +765,9 @@ print.ma_psychmeta <- function(x, ..., digits = 3){
           cat(title_text, " \n")
           cat("---------------------------------------------------------------------- \n")
      }
-     x <- ungroup(x)
-     class(x) <- c("tbl_df", "tbl", "data.frame")
-     print(x)
+     tab <- ungroup(x)
+     class(tab) <- c("tbl_df", "tbl", "data.frame")
+     print(tab, n = n)
 
      cat("\nTo extract results, try summary() or the get_stuff functions (run ?get_stuff for help). \n")
 }
@@ -1141,5 +1142,13 @@ print.metabulate_table <- function(x, ...){
         print(as.data.frame(x))
 }
 
-
+#' @export
+#' @exportClass anova.ma_psychmeta
+#' @method print anova.ma_psychmeta
+print.anova.ma_psychmeta <- function(x, n = NULL) {
+        tab <- x
+        class(tab) <- c("tbl_df", "tbl", "data.frame")
+        print(tab,  n = n)
+        invisible(x)
+}
 

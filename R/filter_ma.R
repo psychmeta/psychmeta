@@ -1,18 +1,18 @@
 #' @title  Filter meta-analyses
-#' 
-#' @description 
+#'
+#' @description
 #' Filter \code{psychmeta} meta-analysis objects based on specified criteria.
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
-#' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
+#' @param analyses Which analyses to extract? Can be either \code{"all"} to extract all meta-analyses in the object (default) or a list containing one or more of the following arguments:
 #' \itemize{
 #' \item{construct:}{ A list or vector of construct names to search for.}
 #' \item{construct_pair:}{ A list of vectors of construct pairs to search for. \cr
-#' (e.g., \code{list(c("X", "Y"), c("X", "Z"))}).}
+#' (e.g., \code{list(c("X", "Y"), c("X", "Z"))} ).}
 #' \item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
 #' \item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
 #' \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-#' \item{N_minv}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
+#' \item{N_min:}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 #' }
 #' @param match Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
@@ -36,13 +36,13 @@
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="any")
 #' filter_ma(ma_obj, analyses=list(construct="X", k_min=21), match="all")
 filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensitive = TRUE, ...){
-     
+
      traffic_from_get <- list(...)$traffic_from_get
      if(is.null(traffic_from_get)) traffic_from_get <- FALSE
-     
+
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj) & !traffic_from_get
      ma_obj <- screen_ma(ma_obj = ma_obj)
-     
+
      match <- match.arg(match, c("all", "any"))
      case_sensitive <- scalar_arg_warning(arg = case_sensitive, arg_name = "case_sensitive")
 
@@ -79,7 +79,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
           construct_x <- NULL
           construct_y <- NULL
      }
-     
+
      if(mode(analyses) != "list"){
           if(analyses == "all" ){
                construct_ids <- NULL
@@ -96,7 +96,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                     keep_meta <- construct_x %in% analyses[["construct"]] | construct_y %in% analyses[["construct"]]
                }
           }
-          
+
           if(!is.null(analyses[["construct_pair"]])){
 
                construct_pair_ids <-
@@ -112,7 +112,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                }
           }
      }
-     
+
      if(!is.null(analyses[["k_min"]])){
 
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$k >= analyses[["k_min"]]))
@@ -122,7 +122,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                keep_meta <- keep_meta & .keep_meta
           }
      }
-     
+
      if(!is.null(analyses[["N_min"]])){
 
           .keep_meta <- unlist(map(ma_obj$meta_tables, function(x) x$barebones$N >= analyses[["N_min"]]))
@@ -132,7 +132,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
                keep_meta <- keep_meta & .keep_meta
           }
      }
-     
+
      if(!is.null(analyses$analysis_id)){
 
           .keep_meta <- ma_obj[["analysis_id"]] %in% analyses[["analysis_id"]]
@@ -155,7 +155,7 @@ filter_ma <- function(ma_obj, analyses="all", match=c("all", "any"), case_sensit
 
      ma_obj <- ma_obj[keep_meta,]
      if(flag_summary) ma_obj <- summary(ma_obj)
-     
+
      return(ma_obj)
 }
 
@@ -172,10 +172,10 @@ namelists.ma_psychmeta <- function(ma_obj){
 
 
 screen_ma <- function(ma_obj){
-     
+
      if("summary.ma_psychmeta" %in% class(ma_obj))
           ma_obj <- ma_obj$ma_obj
-     
+
      correct_class <- "ma_psychmeta" %in% class(ma_obj)
      correct_attributes <- all(c("ma_metric", "ma_methods") %in% names(attributes(ma_obj)))
 
