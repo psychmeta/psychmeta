@@ -10,3 +10,5 @@
 *.RData
 *.Rhistory
 *.Rapp.history
+doc
+Meta

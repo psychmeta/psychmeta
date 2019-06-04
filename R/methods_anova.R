@@ -76,13 +76,13 @@ anova.summary.lm_mat <- function(...){
 #' @param analyses Which analyses to to test moderators for? Can be either `"all"` to test moderators for all meta-analyses in the object (default) or a list containing one or more of the arguments `construct`, `construct_pair`, `pair_id`, `k_min`, and `N_min`. See [filter_ma()] for details. Note that `analysis_id` should not be used. If `k_min` is not supplied, it is set to 2.
 #' @param moderators A character vector of moderators to test. If `NULL`, all categorical moderators are tested.
 #' @param L A named list with with elements specifying set of linear contrasts for each variable in `moderators`. (Not yet implemented.)
-#' @param ma_obj2 A second psychmeta meta-analysis object to compare to `ma_obj` (Not yet implemented.)
+#' @param ma_obj2 A second psychmeta meta-analysis object to compare to `object` (Not yet implemented.)
 #' @param ma_method Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"
 #' @param correction_type Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"
-#' @param conf_level Confidence level to define the width of confidence intervals (defaults to value set when `ma_obj` was fit)
+#' @param conf_level Confidence level to define the width of confidence intervals (defaults to value set when `object` was fit)
 #' @param ... Additional arguments.
 #'
-#' @return An object of class `anova.ma_psychmeta`. A tibble with a row for each construct pair in `ma_obj` and a column for each moderator tested. Cells lists of contrasts tested.
+#' @return An object of class `anova.ma_psychmeta`. A tibble with a row for each construct pair in `object` and a column for each moderator tested. Cells lists of contrasts tested.
 #'
 #' @export
 #' @md
@@ -122,9 +122,9 @@ anova.ma_psychmeta <- function(object, ..., analyses = "all",
                 select(-1, -.data$k) %>%
                 colnames()
 
-        if (length(moderators) == 0) stop("'ma_obj' contains no moderators or no moderators selected")
+        if (length(moderators) == 0) stop("'object' contains no moderators or no moderators selected")
 
-        if (is.null(conf_level)) conf_level <- attributes(ma_obj)$inputs$conf_level
+        if (is.null(conf_level)) conf_level <- attributes(object)$inputs$conf_level
 
         if ("var_e_c" %in% colnames(metatab)) {
                 corrected <- TRUE

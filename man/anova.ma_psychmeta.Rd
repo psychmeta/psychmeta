@@ -20,16 +20,16 @@
 
 \item{L}{A named list with with elements specifying set of linear contrasts for each variable in \code{moderators}. (Not yet implemented.)}
 
-\item{ma_obj2}{A second psychmeta meta-analysis object to compare to \code{ma_obj} (Not yet implemented.)}
+\item{ma_obj2}{A second psychmeta meta-analysis object to compare to \code{object} (Not yet implemented.)}
 
 \item{ma_method}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
 
 \item{correction_type}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
 
-\item{conf_level}{Confidence level to define the width of confidence intervals (defaults to value set when \code{ma_obj} was fit)}
+\item{conf_level}{Confidence level to define the width of confidence intervals (defaults to value set when \code{object} was fit)}
 }
 \value{
-An object of class \code{anova.ma_psychmeta}. A tibble with a row for each construct pair in \code{ma_obj} and a column for each moderator tested. Cells lists of contrasts tested.
+An object of class \code{anova.ma_psychmeta}. A tibble with a row for each construct pair in \code{object} and a column for each moderator tested. Cells lists of contrasts tested.
 }
 \description{
 This function computes Wald-type pairwise comparisons for each level of
