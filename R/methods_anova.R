@@ -179,7 +179,7 @@ anova.ma_psychmeta <- function(object, ..., analyses = "all",
 
         levels <- filter(dplyr::as_tibble(levels), !exclude)
 
-        sum_ma <- purrr::map2_dfr(levels[,1], levels[,2], ~ {
+        sum_ma <- purrr::map2_dfr(levels[[1]], levels[[2]], ~ {
                 x <- filter(ma, mod == .x)
                 y <- filter(ma, mod == .y)
                 xm <- x$mean
