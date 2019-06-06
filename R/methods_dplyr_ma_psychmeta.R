@@ -1,27 +1,25 @@
-#' @export
-#' @keywords internal
+#### filter ####
 #' @importFrom dplyr filter
-#' @method filter ma_psychmeta
 filter.ma_psychmeta <- function(.data, ...){
      reattribute(.data, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr filter_all
 #' @method filter_all ma_psychmeta
 filter_all.ma_psychmeta <- function(.tbl, vars_predicate){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr filter_at
 #' @method filter_at ma_psychmeta
 filter_at.ma_psychmeta <- function(.tbl, .vars, .vars_predicate){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr filter_if
 #' @method filter_if ma_psychmeta
 filter_if.ma_psychmeta <- function(.tbl, predicate, .vars_predicate){
      reattribute(.tbl, NextMethod())
@@ -30,9 +28,7 @@ filter_if.ma_psychmeta <- function(.tbl, predicate, .vars_predicate){
 
 
 #### select ####
-#' @export
-#' @keywords internal
-#' @method select ma_psychmeta
+#' @importFrom dplyr select
 select.ma_psychmeta <- function(.data, ...){
      .data <- reattribute(.data, NextMethod())
 
@@ -45,7 +41,7 @@ select.ma_psychmeta <- function(.data, ...){
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr select_all
 #' @method select_all ma_psychmeta
 select_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
      .data <- reattribute(.data, NextMethod())
@@ -59,7 +55,7 @@ select_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr select_at
 #' @method select_at ma_psychmeta
 select_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
      .tbl <- reattribute(.tbl, NextMethod())
@@ -73,7 +69,7 @@ select_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr select_if
 #' @method select_if ma_psychmeta
 select_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
      .tbl <- reattribute(.tbl, NextMethod())
@@ -89,9 +85,7 @@ select_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
 
 
 #### rename ####
-#' @export
-#' @keywords internal
-#' @method rename ma_psychmeta
+#' @importFrom dplyr rename
 rename.ma_psychmeta <- function(.data, ...){
      .data <- reattribute(.data, NextMethod())
 
@@ -104,7 +98,7 @@ rename.ma_psychmeta <- function(.data, ...){
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr rename_all
 #' @method rename_all ma_psychmeta
 rename_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
      .data <- reattribute(.data, NextMethod())
@@ -118,7 +112,7 @@ rename_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr rename_at
 #' @method rename_at ma_psychmeta
 rename_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
      .tbl <- reattribute(.tbl, NextMethod())
@@ -132,7 +126,7 @@ rename_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr rename_if
 #' @method rename_if ma_psychmeta
 rename_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
      .tbl <- reattribute(.tbl, NextMethod())
@@ -148,29 +142,27 @@ rename_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
 
 
 #### arrange ####
-#' @export
-#' @keywords internal
-#' @method arrange ma_psychmeta
+#' @importFrom dplyr arrange
 arrange.ma_psychmeta <- function(.data, ...){
      reattribute(.data, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr arrange_all
 #' @method arrange_all ma_psychmeta
 arrange_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr arrange_at
 #' @method arrange_at ma_psychmeta
 arrange_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr arrange_if
 #' @method arrange_if ma_psychmeta
 arrange_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
      reattribute(.tbl, NextMethod())
@@ -180,7 +172,7 @@ arrange_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ...){
 
 #### grouping ####
 #' @export
-#' @keywords internal
+#' @importFrom dplyr ungroup
 #' @method ungroup ma_psychmeta
 ungroup.ma_psychmeta <- function (x, ...){
      x <- reattribute(x, NextMethod())
@@ -192,28 +184,28 @@ ungroup.ma_psychmeta <- function (x, ...){
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr group_by
 #' @method group_by ma_psychmeta
 group_by.ma_psychmeta <- function (.data, ..., add = FALSE){
      reattribute(.data, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr group_by_all
 #' @method group_by_all ma_psychmeta
 group_by_all.ma_psychmeta <- function(.tbl, .funs = list(), ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr group_by_at
 #' @method group_by_at ma_psychmeta
 group_by_at.ma_psychmeta <- function(.tbl, .vars, .funs = list(), ..., .add = FALSE){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr group_by_if
 #' @method group_by_if ma_psychmeta
 group_by_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ..., .add = FALSE){
      reattribute(.tbl, NextMethod())
@@ -222,29 +214,27 @@ group_by_if.ma_psychmeta <- function(.tbl, .predicate, .funs = list(), ..., .add
 
 
 #### mutate ####
-#' @export
-#' @keywords internal
-#' @method mutate ma_psychmeta
+#' @importFrom dplyr mutate
 mutate.ma_psychmeta <- function(.data, ...){
      reattribute(.data, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr mutate_all
 #' @method mutate_all ma_psychmeta
 mutate_all.ma_psychmeta <- function(.tbl, .funs, ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr mutate_at
 #' @method mutate_at ma_psychmeta
 mutate_at.ma_psychmeta <- function(.tbl, .vars, .funs, ..., .cols = NULL){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr mutate_if
 #' @method mutate_if ma_psychmeta
 mutate_if.ma_psychmeta <- function(.tbl, .predicate, .funs, ...){
      reattribute(.tbl, NextMethod())
@@ -254,28 +244,28 @@ mutate_if.ma_psychmeta <- function(.tbl, .predicate, .funs, ...){
 
 #### transmute ####
 #' @export
-#' @keywords internal
+#' @importFrom dplyr transmute
 #' @method transmute ma_psychmeta
 transmute.ma_psychmeta <- function(.data, ...){
      NextMethod()
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr transmute_all
 #' @method transmute_all ma_psychmeta
 transmute_all.ma_psychmeta <- function(.tbl, .funs, ...){
      NextMethod()
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr transmute_at
 #' @method transmute_at ma_psychmeta
 transmute_at.ma_psychmeta <- function(.tbl, .vars, .funs, ..., .cols = NULL){
      NextMethod()
 }
 
 #' @export
-#' @keywords internal
+#' @importFrom dplyr transmute_if
 #' @method transmute_if ma_psychmeta
 transmute_if.ma_psychmeta <- function(.tbl, .predicate, .funs, ...){
      NextMethod()
@@ -285,10 +275,8 @@ transmute_if.ma_psychmeta <- function(.tbl, .predicate, .funs, ...){
 
 #### subset ####
 #' @export
-#' @keywords internal
-#' @method subset ma_psychmeta
 subset.ma_psychmeta <- function (x, subset, select, drop = FALSE, ...){
-     x <- reattribute(x, NextMethod())
+     x <- reattribute(x, subset(as.data.frame(x), subset, select, drop, ...))
 
      needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc")
      correct_cols <- needed_cols %in% colnames(x)
@@ -298,8 +286,6 @@ subset.ma_psychmeta <- function (x, subset, select, drop = FALSE, ...){
 }
 
 #' @export
-#' @keywords internal
-#' @method [ ma_psychmeta
 `[.ma_psychmeta` <- function(x, i = rep(TRUE, nrow(x)), j = rep(TRUE, ncol(x)), drop = if (missing(i)) TRUE else ncol(x) == 1){
      x <- reattribute(x, NextMethod())
 

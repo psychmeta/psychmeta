@@ -1,13 +1,9 @@
 #' @export
-#' @keywords internal
-#' @method anova lm_mat
 anova.lm_mat <- function(...){
      do.call("anova.summary.lm_mat", args = list(...))
 }
 
 #' @export
-#' @keywords internal
-#' @method anova summary.lm_mat
 anova.summary.lm_mat <- function(...){
      lm_list <- list(...)
 
@@ -86,8 +82,6 @@ anova.summary.lm_mat <- function(...){
 #'
 #' @export
 #' @md
-#' @exportClass ma_psychmeta
-#' @method anova ma_psychmeta
 #'
 #' @note Currently, only simple (single) categorical moderators (one-way ANOVA) are supported.
 #'

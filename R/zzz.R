@@ -1,3 +1,24 @@
+## Register S3 methods for dplyr verbs to avoid having to export generics
+.onLoad <- function(libname, pkgname) {
+  register_s3_method("dplyr", "arrange", "ma_psychmeta")
+  register_s3_method("dplyr", "arrange", "ma_table")
+
+  register_s3_method("dplyr", "filter", "ma_psychmeta")
+  register_s3_method("dplyr", "filter", "ma_table")
+
+  register_s3_method("dplyr", "mutate", "ma_psychmeta")
+  register_s3_method("dplyr", "mutate", "ma_table")
+
+  register_s3_method("dplyr", "rename", "ma_psychmeta")
+  register_s3_method("dplyr", "rename", "ma_table")
+
+  register_s3_method("dplyr", "select", "ma_psychmeta")
+  register_s3_method("dplyr", "select", "ma_table")
+
+
+  invisible()
+}
+
 ## Messages to be displayed when the user loads psychmeta:
 #' @importFrom rlang .data
 .onAttach <- function(libname, pkgname) {
@@ -105,5 +126,30 @@
 #' psychmeta_news()
 psychmeta_news <- function(){
      news(package = "psychmeta")
+}
+
+register_s3_method <- function(pkg, generic, class, fun = NULL) {
+  stopifnot(is.character(pkg), length(pkg) == 1)
+  envir <- asNamespace(pkg)
+
+  stopifnot(is.character(generic), length(generic) == 1)
+  stopifnot(is.character(class), length(class) == 1)
+  if (is.null(fun)) {
+    fun <- get(paste0(generic, ".", class), envir = parent.frame())
+  }
+  stopifnot(is.function(fun))
+
+
+  if (pkg %in% loadedNamespaces()) {
+    registerS3method(generic, class, fun, envir = envir)
+  }
+
+  # Always register hook in case package is later unloaded & reloaded
+  setHook(
+    packageEvent(pkg, "onLoad"),
+    function(...) {
+      registerS3method(generic, class, fun, envir = envir)
+    }
+  )
 }
 
