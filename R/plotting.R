@@ -292,32 +292,32 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      dfCI = data.frame(ll90, ul90, ll95, ul95, ll99, ul99, se.seq, null)
 
      #Make contour-enhanced funnel plot
-     ce.fp = ggplot(data = dat, aes_(x = substitute(se)))+#Map se to x
+     ce.fp = ggplot2::ggplot(data = dat, ggplot2::aes_(x = substitute(se))) + # Map se to x
           #Add data-points to the scatterplot
-          geom_point(aes_(y = substitute(yi)), shape = 16, alpha = .75) +
+          ggplot2::geom_point(ggplot2::aes_(y = substitute(yi)), shape = 16, alpha = .75) +
           #Give the x- and y- axes informative labels
-          xlab('Standard Error') + ylab('Effect Size')+
+          ggplot2::xlab('Standard Error') + ggplot2::ylab('Effect Size')+
           #Add effect size horizontal line (which will be flipped vertical)
-          geom_segment(aes(x = min(se.seq), y = null, xend = max(se.seq), yend = null), linetype='solid', data=dfCI) +
+          ggplot2::geom_segment(ggplot2::aes(x = min(se.seq), y = null, xend = max(se.seq), yend = null), linetype='solid', data=dfCI) +
           #Add lines for 90% CI around null at different levels of se
-          geom_line(aes(x = se.seq, y = ll90), linetype = 'solid', data = dfCI) +
-          geom_line(aes(x = se.seq, y = ul90), linetype = 'solid', data = dfCI) +
+          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ll90), linetype = 'solid', data = dfCI) +
+          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ul90), linetype = 'solid', data = dfCI) +
           #Add lines for 95% CI around null at different levels of se
-          geom_line(aes(x = se.seq, y = ll95), linetype = 'dashed', data = dfCI) +
-          geom_line(aes(x = se.seq, y = ul95), linetype = 'dashed', data = dfCI) +
+          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ll95), linetype = 'dashed', data = dfCI) +
+          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ul95), linetype = 'dashed', data = dfCI) +
           #Ribbons for 90%-95% levels
-          geom_ribbon(data = dfCI, aes(x = se.seq, ymin = ll90, ymax = ll95), alpha = .20)+
-          geom_ribbon(data = dfCI, aes(x = se.seq, ymin = ul90, ymax = ul95), alpha = .20)+
+          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ll90, ymax = ll95), alpha = .20)+
+          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ul90, ymax = ul95), alpha = .20)+
           #Ribbon for 95%-99% levels
-          geom_ribbon(data = dfCI, aes(x = se.seq, ymin = ll95, ymax = ll99), alpha = .40)+
-          geom_ribbon(data = dfCI, aes(x = se.seq, ymin = ul95, ymax = ul99), alpha = .40)+
+          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ll95, ymax = ll99), alpha = .40)+
+          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ul95, ymax = ul99), alpha = .40)+
           #Add lines for 99% CI around null at different levels of se
-          geom_line(aes(x = se.seq, y = ll99), linetype = 'dotted', data = dfCI) +
-          geom_line(aes(x = se.seq, y = ul99), linetype = 'dotted', data = dfCI) +
+          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ll99), linetype = 'dotted', data = dfCI) +
+          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ul99), linetype = 'dotted', data = dfCI) +
           #Reverse the x-axis ordering (se)
-          scale_x_reverse()+
+          ggplot2::scale_x_reverse()+
           #And now we flip the axes so that SE is on y- and Zr is on x-
-          coord_flip()+
+          ggplot2::coord_flip()+
           #Apply APA-format theme
           theme_apa
 
@@ -432,7 +432,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 
      if(length(escalc_list) > 1){
           dat <- filter(dat, setting != "Overall")
-          .facet_grid <- facet_grid(setting~., scales= 'free', space='free')
+          .facet_grid <- ggplot2::facet_grid(setting~., scales= 'free', space='free')
      }else{
           .facet_grid <- NULL
      }
@@ -451,22 +451,22 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      }
 
      if(is.null(x_limits)){
-          .scale_x_continuous <- scale_x_continuous(limits = NULL, name = x_lab)
+          .scale_x_continuous <- ggplot2::scale_x_continuous(limits = NULL, name = x_lab)
      }else{
           if(is.null(x_breaks)){
-               .scale_x_continuous <- scale_x_continuous(limits = x_limits, name = x_lab)
+               .scale_x_continuous <- ggplot2::scale_x_continuous(limits = x_limits, name = x_lab)
           }else{
-               .scale_x_continuous <- scale_x_continuous(limits = x_limits, breaks = x_breaks, name = x_lab)
+               .scale_x_continuous <- ggplot2::scale_x_continuous(limits = x_limits, breaks = x_breaks, name = x_lab)
           }
      }
 
-     ggplot(plot_dat, aes_(y = ~cite, x = ~yi, xmin = ~lowerci, xmax = ~upperci, shape = ~tester)) +
-          geom_point(color = 'black') +
-          geom_point(data=dat %>% filter(.data$tester=='Summary'), color='black', shape=18, size=4) +
-          geom_errorbarh(height=.1) +
+     ggplot2::ggplot(plot_dat, ggplot2::aes_(y = ~cite, x = ~yi, xmin = ~lowerci, xmax = ~upperci, shape = ~tester)) +
+          ggplot2::geom_point(color = 'black') +
+          ggplot2::geom_point(data=dat %>% filter(.data$tester=='Summary'), color='black', shape=18, size=4) +
+          ggplot2::geom_errorbarh(height=.1) +
           .scale_x_continuous +
-          ylab(y_lab) +
-          geom_vline(xintercept=0, color='black', linetype='dashed') +
+          ggplot2::ylab(y_lab) +
+          ggplot2::geom_vline(xintercept=0, color='black', linetype='dashed') +
           .facet_grid +
           theme_apa_nolegend
 }
@@ -474,26 +474,26 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 
 ## APA theme by John Sakaluk
 theme_apa <-
-     theme_bw()+
-     theme(panel.grid.major = element_blank(),
-           panel.grid.minor = element_blank(),
-           panel.background = element_blank(),
-           panel.border = element_blank(),
-           # text=element_text(family="Arial"),
-           legend.title=element_blank(),
-           legend.position= "right",
-           axis.line.x = element_line(color="black"),
-           axis.line.y = element_line(color="black"))
+     ggplot2::theme_bw() +
+     ggplot2::theme(
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          panel.border = ggplot2::element_blank(),
+          legend.title = ggplot2::element_blank(),
+          legend.position = "right",
+          axis.line.x = ggplot2::element_line(color="black"),
+          axis.line.y = ggplot2::element_line(color="black"))
 
 ## APA theme by John Sakaluk without plot legends
 theme_apa_nolegend <-
-     theme_bw()+
-     theme(panel.grid.major = element_blank(),
-           panel.grid.minor = element_blank(),
-           panel.background = element_blank(),
-           panel.border = element_blank(),
-           # text=element_text(family="Arial"),
-           legend.title=element_blank(),
-           legend.position= "none",
-           axis.line.x = element_line(color="black"),
-           axis.line.y = element_line(color="black"))
+     ggplot2::theme_bw() +
+     ggplot2::theme(
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          panel.border = ggplot2::element_blank(),
+          legend.title = ggplot2::element_blank(),
+          legend.position= "none",
+          axis.line.x = ggplot2::element_line(color="black"),
+          axis.line.y = ggplot2::element_line(color="black"))

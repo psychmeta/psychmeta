@@ -108,7 +108,6 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #' @param ma_vec An optional vector of overall meta-analytic results to use as reference points on the plots.
 #' @param analysis Type of analysis to be plotted: leave-one-out or cumulative.
 #'
-#' @import ggplot2
 #'
 #' @return A list of forest plots
 #' @keywords internal
@@ -234,24 +233,24 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           }
      }
 
-     fp.mean <- ggplot(data=plot.df,aes(x=label, y=mean.value, ymin=lower.cr, ymax=upper.cr)) +
-          geom_pointrange(shape=46) +                         # produce credibility interval line
-          geom_point(aes(y=mean.value), size=1) +             # produce mean.value point
-          geom_point(aes(y=lower.ci), shape = 108, size=3) +  # lower ci point
-          geom_point(aes(y=upper.ci), shape = 108, size=3) +  # upper ci point
-          geom_hline(yintercept=0, lty=2) +                   # add a dotted line at x=0 after coordinate flip
-          geom_hline(yintercept=grand_mean, lty=1) +
-          coord_flip() +                                      # flip coordinates (puts labels on y axis)
-          xlab("Sample") + ylab(mean_ylab) +
-          theme_bw()                                          # use a white background
+     fp.mean <- ggplot2::ggplot(data=plot.df, ggplot2::aes(x=label, y=mean.value, ymin=lower.cr, ymax=upper.cr)) +
+          ggplot2::geom_pointrange(shape=46) +                         # produce credibility interval line
+          ggplot2::geom_point(ggplot2::aes(y=mean.value), size=1) +             # produce mean.value point
+          ggplot2::geom_point(ggplot2::aes(y=lower.ci), shape = 108, size=3) +  # lower ci point
+          ggplot2::geom_point(ggplot2::aes(y=upper.ci), shape = 108, size=3) +  # upper ci point
+          ggplot2::geom_hline(yintercept=0, lty=2) +                   # add a dotted line at x=0 after coordinate flip
+          ggplot2::geom_hline(yintercept=grand_mean, lty=1) +
+          ggplot2::coord_flip() +                                      # flip coordinates (puts labels on y axis)
+          ggplot2::xlab("Sample") + ggplot2::ylab(mean_ylab) +
+          ggplot2::theme_bw()                                          # use a white background
 
-     fp.sd <- ggplot(data=plot.df, aes(x=label, y=sd.value, group=1) ) +
-          geom_point() + geom_line() +
-          geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=0 after flip
-          geom_hline(yintercept=grand_sd, lty=1) +
-          coord_flip() +                     # flip coordinates (puts labels on y axis)
-          xlab("Sample") + ylab(sd_ylab) +
-          theme_bw()                         # use a white background
+     fp.sd <- ggplot2::ggplot(data=plot.df, ggplot2::aes(x=label, y=sd.value, group=1) ) +
+          ggplot2::geom_point() + ggplot2::geom_line() +
+          ggplot2::geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=0 after flip
+          ggplot2::geom_hline(yintercept=grand_sd, lty=1) +
+          ggplot2::coord_flip() +                     # flip coordinates (puts labels on y axis)
+          ggplot2::xlab("Sample") + ggplot2::ylab(sd_ylab) +
+          ggplot2::theme_bw()                         # use a white background
 
      return(list(mean_plot = fp.mean, sd_plot = fp.sd))
 }
