@@ -266,9 +266,9 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
           se_r <- sd_r / sqrt(k)
           ci <- confidence(mean = mean_r_xy, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)
      }
-     cv <- credibility(mean = mean_r_xy, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
+     cr <- credibility(mean = mean_r_xy, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      ci <- setNames(c(ci), colnames(ci))
-     cv <- setNames(c(cv), colnames(cv))
+     cr <- setNames(c(cr), colnames(cr))
 
      barebones <- data.frame(t(c(k = k,
                                  N = N,
@@ -280,7 +280,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                  se_r = se_r,
                                  sd_e = sd_e,
                                  sd_res = sd_res,
-                                 ci, cv)))
+                                 ci, cr)))
      
      class(barebones) <- c("ma_table", class(barebones))
      attributes(barebones) <- append(attributes(barebones), list(ma_type = "r_bb"))

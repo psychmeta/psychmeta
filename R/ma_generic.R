@@ -336,9 +336,9 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           se_es <- sd_es / sqrt(k)
           ci <- confidence(mean = mean_es, sd = sd_es, k = k, conf_level = conf_level, conf_method = conf_method)
      }
-     cv <- credibility(mean = mean_es, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
+     cr <- credibility(mean = mean_es, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      ci <- setNames(c(ci), colnames(ci))
-     cv <- setNames(c(cv), colnames(cv))
+     cr <- setNames(c(cr), colnames(cr))
 
      list(meta = list(barebones = data.frame(t(c(k = k,
                                                  N = N,
@@ -350,7 +350,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                                                  se_es = se_es,
                                                  sd_e = sd_e,
                                                  sd_res = sd_res,
-                                                 ci, cv)))),
+                                                 ci, cr)))),
           escalc = list(barebones = escalc_obj))
 
 }

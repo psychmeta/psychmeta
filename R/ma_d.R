@@ -101,8 +101,8 @@
 #' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
 #' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
 #' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
-#' \item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
 #' }
 #'
 #' Components of output tables for individual-correction meta-analyses:
@@ -132,8 +132,8 @@
 #' \item{\code{sd_delta}}{\cr Square root of \code{var_delta}.}
 #' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
 #' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
-#' \item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
 #' }
 #'
 #' Components of output tables for artifact-distribution meta-analyses:
@@ -171,8 +171,8 @@
 #' \item{\code{sd_delta}}{\cr Square root of \code{var_delta}.}
 #' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
 #' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CV_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
-#' \item{\code{CV_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
 #' }
 #'
 #' @export

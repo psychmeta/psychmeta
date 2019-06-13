@@ -983,9 +983,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           se_rtpa <- sd_rtpa / sqrt(k)
           ci_tp_a <- confidence(mean = mean_rtpa, sd = var_rtpa^.5, k = k, conf_level = conf_level, conf_method = conf_method)
      }
-     cv_tp_a <- credibility(mean = mean_rtpa, sd = var_rho_tp_a^.5, cred_level = cred_level, k = k, cred_method = cred_method)
+     cr_tp_a <- credibility(mean = mean_rtpa, sd = var_rho_tp_a^.5, cred_level = cred_level, k = k, cred_method = cred_method)
      ci_tp_a <- setNames(c(ci_tp_a), colnames(ci_tp_a))
-     cv_tp_a <- setNames(c(cv_tp_a), colnames(cv_tp_a))
+     cr_tp_a <- setNames(c(cr_tp_a), colnames(cr_tp_a))
      
      if(type == "ts" | type == "all"){
           if(run_lean){
@@ -1020,7 +1020,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  se_r_c = se_rtpa,
                                  sd_e_c = sd_e_tp_a,
                                  sd_rho = sd_rho_tp_a,
-                                 ci_tp_a, cv_tp_a)))
+                                 ci_tp_a, cr_tp_a)))
           
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
@@ -1039,7 +1039,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           mean_rxpa <- mean_rtpa * sqrt(mean_rxxa)
           ci_xp_a <- ci_tp_a * sqrt(mean_rxxa)
-          cv_xp_a <- cv_tp_a * sqrt(mean_rxxa)
+          cr_xp_a <- cr_tp_a * sqrt(mean_rxxa)
           var_rxpa <- var_rtpa * mean_rxxa
           var_e_xp_a <- var_e_tp_a * mean_rxxa
           var_rho_xp_a <- var_rxpa - var_e_xp_a
@@ -1080,7 +1080,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  se_r_c = se_rxpa,
                                  sd_e_c = sd_e_xp_a,
                                  sd_rho = sd_rho_xp_a,
-                                 ci_xp_a, cv_xp_a)))
+                                 ci_xp_a, cr_xp_a)))
 
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
@@ -1098,7 +1098,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           
           mean_rtya <- mean_rtpa * sqrt(mean_ryya)
           ci_ty_a <- ci_tp_a * sqrt(mean_ryya)
-          cv_ty_a <- cv_tp_a * sqrt(mean_ryya)
+          cr_ty_a <- cr_tp_a * sqrt(mean_ryya)
           var_rtya <- var_rtpa * mean_ryya
           var_e_ty_a <- var_e_tp_a * mean_ryya
           var_rho_ty_a <- var_rtya - var_e_ty_a
@@ -1139,7 +1139,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  se_r_c = se_rtya,
                                  sd_e_c = sd_e_ty_a,
                                  sd_rho = sd_rho_ty_a,
-                                 ci_ty_a, cv_ty_a)))
+                                 ci_ty_a, cr_ty_a)))
 
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))

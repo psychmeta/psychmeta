@@ -181,17 +181,17 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      cill <- grep(x = colnames(ma_mat), pattern = "CI_LL")
      ciul <- grep(x = colnames(ma_mat), pattern = "CI_UL")
 
-     cvll <- grep(x = colnames(ma_mat), pattern = "CV_LL")
-     cvul <- grep(x = colnames(ma_mat), pattern = "CV_UL")
+     crll <- grep(x = colnames(ma_mat), pattern = "CR_LL")
+     crul <- grep(x = colnames(ma_mat), pattern = "CR_UL")
 
      conf_level <- gsub(x = colnames(ma_mat)[cill], pattern = "CI_LL_", replacement = "")
-     cred_level <- gsub(x = colnames(ma_mat)[cvll], pattern = "CV_LL_", replacement = "")
+     cred_level <- gsub(x = colnames(ma_mat)[crll], pattern = "CR_LL_", replacement = "")
 
      lower.ci <- ma_mat[,cill]
      upper.ci <- ma_mat[,ciul]
      ci.width <- upper.ci - lower.ci
-     lower.cr <- ma_mat[,cvll]
-     upper.cr <- ma_mat[,cvul]
+     lower.cr <- ma_mat[,crll]
+     upper.cr <- ma_mat[,crul]
 
      lower.cr[is.na(lower.cr)] <- mean.value[is.na(lower.cr)]
      upper.cr[is.na(upper.cr)] <- mean.value[is.na(upper.cr)]
@@ -209,26 +209,26 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 
 
      if(es_type == "es"){
-          mean_ylab <- bquote("Mean Effect Size"~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+          mean_ylab <- bquote("Mean Effect Size"~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
           sd_ylab <- "Residual SD of Effect Sizes"
      }
 
      if(es_type == "r"){
           if("mean_rho" %in% colnames(ma_mat)){
-               mean_ylab <- bquote("Mean"~rho~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~rho~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(SD[italic(rho)])
           }else{
-               mean_ylab <- bquote("Mean"~italic(r)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~italic(r)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(Residual~SD~of~italic(r))
           }
      }
 
      if(es_type == "d"){
           if("mean_delta" %in% colnames(ma_mat)){
-               mean_ylab <- bquote("Mean"~delta~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~delta~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(SD[italic(delta)])
           }else{
-               mean_ylab <- bquote("Mean"~italic(d)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~italic(d)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(Residual~SD~of~italic(d))
           }
      }

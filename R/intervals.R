@@ -77,7 +77,7 @@ confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method
 #' @export
 #'
 #' @details
-#' \deqn{CV=mean_{es}\pm quantile\times SD_{es}}{CV = mean_es +/- quantile * SD_es}
+#' \deqn{CR=mean_{es}\pm quantile\times SD_{es}}{CR = mean_es +/- quantile * SD_es}
 #'
 #' @examples
 #' credibility(mean = .3, sd = .15, cred_level = .8)
@@ -105,7 +105,7 @@ credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = c("t"
      cred_interval_ll <- mean - cred_quantile * sd
      cred_interval_ul <- mean + cred_quantile * sd
      cred_interval <- cbind(cred_interval_ll, cred_interval_ul)
-     colnames(cred_interval) <- paste("CV", c("LL", "UL"), round(cred_level * 100), sep = "_")
+     colnames(cred_interval) <- paste("CR", c("LL", "UL"), round(cred_level * 100), sep = "_")
      cred_interval
 }
 

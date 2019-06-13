@@ -891,7 +891,7 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
 
      .colnames <- colnames(x)
      leading_cols <- 1:max(which(.colnames == "N"))
-     trailing_cols <- which(grepl(x = .colnames, pattern = "CI_LL_") | grepl(x = .colnames, pattern = "CI_UL_") | grepl(x = .colnames, pattern = "CV_LL_") | grepl(x = .colnames, pattern = "CV_UL_"))
+     trailing_cols <- which(grepl(x = .colnames, pattern = "CI_LL_") | grepl(x = .colnames, pattern = "CI_UL_") | grepl(x = .colnames, pattern = "CR_LL_") | grepl(x = .colnames, pattern = "CR_UL_"))
      trailing_cols <- trailing_cols[trailing_cols > max(leading_cols)]
 
      if(verbose){

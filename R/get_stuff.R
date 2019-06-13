@@ -612,8 +612,8 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                          for(l in which(grepl(x = .names, pattern = "mean_r") |
                                         grepl(x = .names, pattern = "CI_LL_") |
                                         grepl(x = .names, pattern = "CI_UL_") |
-                                        grepl(x = .names, pattern = "CV_LL_") |
-                                        grepl(x = .names, pattern = "CV_UL_")))
+                                        grepl(x = .names, pattern = "CR_LL_") |
+                                        grepl(x = .names, pattern = "CR_UL_")))
                               .out_list[[l]] <- .rmat
 
                          for(x in constructs){
@@ -638,8 +638,8 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                              grepl(x = .names, pattern = "mean_rho") |
                                              grepl(x = .names, pattern = "CI_LL_") |
                                              grepl(x = .names, pattern = "CI_UL_") |
-                                             grepl(x = .names, pattern = "CV_LL_") |
-                                             grepl(x = .names, pattern = "CV_UL_")))
+                                             grepl(x = .names, pattern = "CR_LL_") |
+                                             grepl(x = .names, pattern = "CR_UL_")))
                                    .out_list[[l]] <- .rmat
 
                               for(x in constructs){
