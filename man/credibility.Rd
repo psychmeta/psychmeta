@@ -25,7 +25,7 @@ A matrix of credibility intervals of the specified width.
 Function to construct a credibility interval around a mean effect size.
 }
 \details{
-\deqn{CV=mean_{es}\pm quantile\times SD_{es}}{CV = mean_es +/- quantile * SD_es}
+\deqn{CR=mean_{es}\pm quantile\times SD_{es}}{CR = mean_es +/- quantile * SD_es}
 }
 \examples{
 credibility(mean = .3, sd = .15, cred_level = .8)
