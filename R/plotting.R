@@ -1,15 +1,19 @@
 #' Create funnel plots
 #'
+#' This function creates funnel plots for meta-analyses (plots of effect size versus . Both traditional funnel plots and
+#'
 #' @param ma_obj Meta-analysis object.
-#' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
-#' \itemize{
-#' \item{construct}{A list or vector of construct names to search for.}
-#' \item{construct_pair}{A list of vectors of construct pairs to search for (e.g., \code{list(c("Construct A", "Construct B"), c("Construct A", "Construct C"))}).}
-#' \item{pair_id}{A list or vector of numeric construct Pair IDs.}
-#' \item{analysis_id}{A list or vector of analysis IDs (combinations of moderator levels).}
-#' \item{k_min}{A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-#' \item{N_min}{A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
-#' }
+#' @param se_type Method to calculate standard errors (y-axis). Options are `"auto"` (default) to use the same method as used to estimate the meta-analysis models, `"mean"` to calculate SEs using the mean effect size and indivdiual sample sizes, or `"sample"`` to use the SE calculated using the sample effect sizes and sample sizes.
+#' @param conf_level Confidence regions levels to be plotted (default: 95% and 99%).
+#' @param conf_linetype Line types for confidence region boundaries. Length should be either 1 or equal to the length of conf_level.
+#' @param conf_col Colors for confidence regions. Set to `NA` for transparent. Length should be either 1 or equal to to the length of conf_level.
+#' @param conf_alpha Transparency level for confidence regions. Length should be either 1 or equal to to the length of conf_level.
+#' @param null_effect Null effect to be plotted for contour-enhanced funnel plots. If `NA`, not shown. If `NULL`, set to the null value for the effect size metric (0 for correlations and d values).
+#' @param null_conf_level Null-effect confidence regions levels to be plotted (default: 90%, 95%, 99%).
+#' @param null_conf_linetype Line types for null-effect confidence region boundaries. Length should be either 1 or equal to the length of null_conf_level.
+#' @param null_conf_col Colors for null-effect confidence regions. Set to `NA` for transparent. Length should be either 1 or equal to the length of null_conf_level.
+#' @param null_conf_alpha Transparency level for null-effect confidence regions. Length should be either 1 or equal to the length of null_conf_level.
+#' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing arguments for [filter_ma].
 #' @param match Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param show_filtered Logical scalar that determines whether the meta-analysis object given in the output should be the modified input object (\code{FALSE}, default) or the filtered object (\code{TRUE}).
@@ -37,13 +41,38 @@
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 2))
 #' plot_funnel(ma_obj = ma_obj, analyses = list(pair_id = 1, analysis_id = 1), show_filtered = TRUE)
 #' }
-plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
+plot_funnel <- function(ma_obj,
+                        conf_level = c(.95, .99),
+                        conf_linetype = c("dashed", "dotted"),
+                        conf_color = NA, conf_alpha = 1.0,
+                        null_effect = NA,
+                        null_conf_level = c(.90, .95, .99),
+                        null_conf_linetype = c("solid", "dashed", "dotted"),
+                        null_conf_color = "black", null_conf_alpha = c(.10, .20, .40),
+                        analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
 
      psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
-     
+
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
+     se_type <- match.arg(se_type)
+     ma_metric <- attributes(ma_obj)$ma_metric
+
+     if (!(length(conf_linetype) == 1 | length(conf_linetype) == length(conf_level))) stop("length(conf_linetype) must be 1 or equal to length(conf_level).")
+     if (!(length(conf_color) == 1 | length(conf_color) == length(conf_level))) stop("length(conf_color) must be 1 or equal to length(conf_level).")
+     if (!(length(conf_alpha) == 1 | length(conf_alpha) == length(conf_level))) stop("length(conf_alpha) must be 1 or equal to length(conf_level).")
+
+     if (is.null(null_effect)) {
+       if (ma_metric %in% c("d_as_r", "r_as_r", "r_as_d", "d_as_d")) {
+         null_effect <- 0
+       } else stop("For ma_generic models, null_effect must be a specific value or NA.")
+     }
+     if (!is.na(null_effect)) {
+       if (!(length(null_conf_linetype) == 1 | length(null_conf_linetype) == length(null_conf_level))) stop("length(null_conf_linetype) must be 1 or equal to length(null_conf_level).")
+       if (!(length(null_conf_color) == 1 | length(null_conf_color) == length(null_conf_level))) stop("length(null_conf_color) must be 1 or equal to length(null_conf_level).")
+       if (!(length(null_conf_alpha) == 1 | length(null_conf_alpha) == length(null_conf_level))) stop("length(null_conf_alpha) must be 1 or equal to length(null_conf_level).")
+     }
 
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
      escalc_list <- get_escalc(ma_obj = ma_obj_filtered)
@@ -52,8 +81,39 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ma_methods <- attributes(ma_obj)$ma_methods
 
      if("bb" %in% ma_methods){
-          barebones <- map(escalc_list, function(x) x$barebones)
-          barebones <- lapply(barebones, function(x) .plot_funnel(x))
+          barebones <- lapply(escalc_list, function(x) x$barebones)
+          if (se_type == "mean") {
+            mean_es <- wt_mean(barebones$yi, barebones$weight)
+            if (ma_metric %in% c("d_as_r", "d_as_d")) {
+              barebones$vi <- var_error_d(d  = mean_es,
+                                          n1 = barebones$n1_split,
+                                          n2 = barebones$n2_split,
+                                          correct_bias = FALSE)
+            } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
+              barebones$vi <- var_error_r(r = mean_es,
+                                          n = barebones$n,
+                                          correct_bias = FALSE)
+            } else warning("se_type == 'mean' not supported for generic meta-analyses.")
+          } else if (se_type == "sample") {
+            if (ma_metric %in% c("d_as_r", "d_as_d")) {
+              barebones$vi <- var_error_d(d  = barebones$yi,
+                                          n1 = barebones$n1_split,
+                                          n2 = barebones$n2_split,
+                                          correct_bias = FALSE)
+            } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
+              barebones$vi <- var_error_r(r = barebones$yi,
+                                          n = barebones$n,
+                                          correct_bias = FALSE)
+            }
+          }
+          barebones <- lapply(barebones, .plot_funnel, se_type = se_type,
+                              conf_level = conf_level, conf_linetype = conf_linetype,
+                              conf_color = conf_color, conf_alpha = conf_alpha,
+                              null_effect = null_effect,
+                              null_conf_level = null_conf_level,
+                              null_conf_linetype = null_conf_linetype,
+                              null_conf_color = null_conf_color,
+                              null_conf_alpha = null_conf_alpha)
      }else{
           barebones <- NULL
      }
@@ -61,12 +121,74 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      out <- map(escalc_list, function(x){
           map(x, function(.x){
                if(is.data.frame(.x)){
-                    .plot_funnel(.x)
+                 if (se_type == "mean") {
+                   mean_es <- wt_mean(.x$yi, .x$weight)
+                   if (ma_metric %in% c("d_as_r", "d_as_d")) {
+                     .x$vi <- var_error_d(d  = mean_es,
+                                          n1 = .x$n1_split,
+                                          n2 = .x$n2_split,
+                                          correct_bias = FALSE)
+                   } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
+                     .x$vi <- var_error_r(r = mean_es,
+                                          n = .x$n,
+                                          correct_bias = FALSE)
+                   } else warning("se_type == 'mean' not supported for generic meta-analyses.")
+                 } else if (se_type == "sample") {
+                   if (ma_metric %in% c("d_as_r", "d_as_d")) {
+                     .x$vi <- var_error_d(d  = .x$yi,
+                                          n1 = .x$n1_split,
+                                          n2 = .x$n2_split,
+                                          correct_bias = FALSE)
+                   } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
+                     .x$vi <- var_error_r(r = .x$yi,
+                                          n = .x$n,
+                                          correct_bias = FALSE)
+                   }
+                 }
+                    .plot_funnel(.x, se_type = se_type,
+                                 conf_level = conf_level, conf_linetype = conf_linetype,
+                                 conf_color = conf_color, conf_alpha = conf_alpha,
+                                 null_effect = null_effect,
+                                 null_conf_level = null_conf_level,
+                                 null_conf_linetype = null_conf_linetype,
+                                 null_conf_color = null_conf_color,
+                                 null_conf_alpha = null_conf_alpha)
                }else{
                     if(!is.null(.x)){
                          map(.x, function(.x1){
                               if(is.data.frame(.x1)){
-                                   .plot_funnel(.x1)
+                                if (se_type == "mean") {
+                                  mean_es <- wt_mean(.x1$yi, .x1$weight)
+                                  if (ma_metric %in% c("d_as_r", "d_as_d")) {
+                                    .x1$vi <- var_error_d(d  = mean_es,
+                                                         n1 = .x1$n1_split,
+                                                         n2 = .x1$n2_split,
+                                                         correct_bias = FALSE)
+                                  } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
+                                    .x1$vi <- var_error_r(r = mean_es,
+                                                         n = .x1$n,
+                                                         correct_bias = FALSE)
+                                  } else warning("se_type == 'mean' not supported for generic meta-analyses.")  .x$vi <- NA
+                                } else if (se_type == "sample") {
+                                  if (ma_metric %in% c("d_as_r", "d_as_d")) {
+                                    .x1$vi <- var_error_d(d  = .x1$yi,
+                                                          n1 = .x1$n1_split,
+                                                          n2 = .x1$n2_split,
+                                                          correct_bias = FALSE)
+                                  } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
+                                    .x1$vi <- var_error_r(r = .x1$yi,
+                                                          n = .x$n,
+                                                          correct_bias = FALSE)
+                                  }
+                                }
+                                   .plot_funnel(.x1, se_type = se_type,
+                                                conf_level = conf_level, conf_linetype = conf_linetype,
+                                                conf_color = conf_color, conf_alpha = conf_alpha,
+                                                null_effect = null_effect,
+                                                null_conf_level = null_conf_level,
+                                                null_conf_linetype = null_conf_linetype,
+                                                null_conf_color = null_conf_color,
+                                                null_conf_alpha = null_conf_alpha)
                               }else{
                                    NULL
                               }
@@ -89,6 +211,33 @@ plot_funnel <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           message("Funnel plots have been added to 'ma_obj' - use get_plots() to retrieve them.")
 
      ma_obj
+}
+
+#' @rdname plot_funnel
+#' @export
+plot_cefp <- function(ma_obj,
+                        se_type = "sample",
+                        conf_level = NA,
+                        conf_linetype = NA,
+                        conf_color = NA, conf_alpha = 1.0,
+                        null_effect = NULL,
+                        null_conf_level = c(.90, .95, .99),
+                        null_conf_linetype = c("solid", "dashed", "dotted"),
+                        null_conf_color = "black", null_conf_alpha = c(.00, .20, .40),
+                        analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
+
+  plot_funnel(ma_obj = ma_obj,
+              se_type = se_type,
+              conf_level = conf_level, conf_linetype = conf_linetype,
+              conf_color = conf_color, conf_alpha = conf_alpha,
+              null_effect = null_effect,
+              null_conf_level = null_conf_level,
+              null_conf_linetype = null_conf_linetype,
+              null_conf_color = null_conf_color,
+              null_conf_alpha = null_conf_alpha,
+              anlyses = analyses, match = match, case_sensitive = case_sensitive,
+              show_filtered = show_filtered)
+
 }
 
 
@@ -147,7 +296,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 
      psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
-     
+
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
 
@@ -272,61 +421,165 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #'
 #' @return A funnel plot.
 #'
-#' @author John Sakaluk
+#' @author John Sakaluk and Brenton Wiernik
 #'
 #' @keywords internal
-.plot_funnel <- function(x){
-     #Extract se and yi from metafor object and store in dat
-     dat = data.frame(yi = x$yi, se = sqrt(x$vi))
+.plot_funnel <- function(x,
+                         conf_level = c(.95, .99),
+                         conf_linetype = c("dashed", "dotted"),
+                         conf_color = NA, conf_alpha = 1.0,
+                         null_effect = NA,
+                         null_conf_level = c(.90, .95, .99),
+                         null_conf_linetype = c("solid", "dashed", "dotted"),
+                         null_conf_color = "black", null_conf_alpha = c(.00, .20, .40)){
 
+     se_type <- match.arg(se_type)
+
+     # Extract se and yi from metafor object and store in dat
+     dat <- data.frame(yi = x$yi, se = sqrt(x$vi))
      mean_es <- wt_mean(x = x$yi, wt = x$weight)
-     #Seq from 0-max se, and define 90-99%CIs for null; store in dfCI
-     se.seq=seq(0, max(dat$se), 0.001)
-     ll90 = mean_es - (qnorm(1 - (.10/2))*se.seq)
-     ul90 = mean_es + (qnorm(1 - (.10/2))*se.seq)
-     ll95 = mean_es - (qnorm(1 - (.05/2))*se.seq)
-     ul95 = mean_es + (qnorm(1 - (.05/2))*se.seq)
-     ll99 = mean_es - (qnorm(1 - (.01/2))*se.seq)
-     ul99 = mean_es + (qnorm(1 - (.01/2))*se.seq)
-     null = rep(mean_es , length(se.seq))
-     dfCI = data.frame(ll90, ul90, ll95, ul95, ll99, ul99, se.seq, null)
 
-     #Make contour-enhanced funnel plot
-     ce.fp = ggplot2::ggplot(data = dat, ggplot2::aes_(x = substitute(se))) + # Map se to x
-          #Add data-points to the scatterplot
-          ggplot2::geom_point(ggplot2::aes_(y = substitute(yi)), shape = 16, alpha = .75) +
-          #Give the x- and y- axes informative labels
-          ggplot2::xlab('Standard Error') + ggplot2::ylab('Effect Size')+
-          #Add effect size horizontal line (which will be flipped vertical)
-          ggplot2::geom_segment(ggplot2::aes(x = min(se.seq), y = null, xend = max(se.seq), yend = null), linetype='solid', data=dfCI) +
-          #Add lines for 90% CI around null at different levels of se
-          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ll90), linetype = 'solid', data = dfCI) +
-          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ul90), linetype = 'solid', data = dfCI) +
-          #Add lines for 95% CI around null at different levels of se
-          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ll95), linetype = 'dashed', data = dfCI) +
-          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ul95), linetype = 'dashed', data = dfCI) +
-          #Ribbons for 90%-95% levels
-          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ll90, ymax = ll95), alpha = .20)+
-          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ul90, ymax = ul95), alpha = .20)+
-          #Ribbon for 95%-99% levels
-          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ll95, ymax = ll99), alpha = .40)+
-          ggplot2::geom_ribbon(data = dfCI, ggplot2::aes(x = se.seq, ymin = ul95, ymax = ul99), alpha = .40)+
-          #Add lines for 99% CI around null at different levels of se
-          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ll99), linetype = 'dotted', data = dfCI) +
-          ggplot2::geom_line(ggplot2::aes(x = se.seq, y = ul99), linetype = 'dotted', data = dfCI) +
-          #Reverse the x-axis ordering (se)
-          ggplot2::scale_x_reverse()+
-          #And now we flip the axes so that SE is on y- and Zr is on x-
-          ggplot2::coord_flip()+
-          #Apply APA-format theme
-          theme_apa
+     # Seq from 0 to max(se), and define CIs for mean_es; store in df_CI
+     seq_se <- seq(0, max(dat$se), 0.001)
+     seq_mean <- rep(mean_es, length(seq_se))
 
-     ce.fp
-     return(ce.fp)
+     names(conf_level) <- conf_level
+     df_CI <- as.data.frame(
+       sapply(conf_level,
+                    function(l) list(l = seq_mean - (qnorm(.5 + l/2) * seq_se),
+                                     u = seq_mean + (qnorm(.5 + l/2) * seq_se)
+                                     ),
+                    simplify = FALSE)
+     )[,c(seq(1, 2 * length(conf_level) - 1, by = 2), seq(2, 2 * length(conf_level), by = 2))]
+
+     param_CI <- rbind(conf_level, conf_linetype, conf_color, conf_alpha)
+
+     # Create a funnel plot
+     fp <- ggplot2::ggplot(data = dat, ggplot2::aes_(x = substitute(se))) + # Map se to x
+
+       # Add data-points to the scatterplot
+       ggplot2::geom_point(ggplot2::aes_(y = substitute(yi)), shape = 16, alpha = .75) +
+
+       # Give the x- and y- axes informative labels
+       ggplot2::xlab('Standard Error') + ggplot2::ylab('Effect Size') +
+
+       # Add effect size horizontal line (which will be flipped vertical)
+       ggplot2::geom_segment(ggplot2::aes(x = min(seq_se),    y = seq_mean,
+                                          xend = max(seq_se), yend = seq_mean),
+                             linetype = 'solid') +
+
+       # Add ribbons for CIs around null at different levels of se
+       ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                         ymin = seq_mean,
+                                         ymax = df_CI[, 1]),
+                            color = param_CI["color", 1],
+                            alpha = param_CI["alpha", 1]) +
+       ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                         ymin = seq_mean,
+                                         ymax = df_CI[, 1 + ncol(df_CI)/2]),
+                            color = param_CI["color", 1],
+                            alpha = param_CI["alpha", 1]) +
+       lapply(2:(ncol(df_CI)/2),
+              function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                          ymin = df_CI[, i-1],
+                                          ymax = df_CI[, i]),
+                                      color = param_CI["color", i],
+                                      alpha = param_CI["alpha", i])
+         ) +
+       lapply(2:(ncol(df_CI)/2) + (ncol(df_CI)/2),
+              function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                          ymin = df_CI[, i-1],
+                                          ymax = df_CI[, i]),
+                                      color = param_CI["color", i],
+                                      alpha = param_CI["alpha", i])
+       ) +
+
+       # Add lines for CIs around null at different levels of se
+       lapply(1:(ncol(df_CI)/2),
+              function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
+                                        y = df_CI[, i]),
+                                    linetype = param_CI["linetype", i])
+       ) +
+       lapply(1:(ncol(df_CI)/2) + (ncol(df_CI)/2),
+              function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
+                                        y = df_CI[, i]),
+                                    linetype = param_CI["linetype", i])
+       )
+
+
+     # Add null_effect funnel (for contour-enhanced funnel plots)
+     if (!is.na(null_effect)) {
+
+
+       # Seq from 0 to max(se), and define 90-99%CIs for null; store in null_dfCI
+       seq_null <- rep(null_effect, length(seq_se))
+
+       df_CI_null <- as.data.frame(
+         sapply(null_conf_level,
+                function(l) list(l = seq_null - (qnorm(.5 + l/2) * seq_se),
+                                 u = seq_null + (qnorm(.5 + l/2) * seq_se)
+                ),
+                simplify = FALSE)
+       )[,c(seq(1, 2 * length(null_conf_level) - 1, by = 2), seq(2, 2 * length(null_conf_level), by = 2))]
+
+       if (length(null_conf_linetype == 1)) null_conf_linetype <- rep(null_conf_linetype, length(null_conf_level))
+       if (length(null_conf_color == 1)) null_conf_color <- c(NA, rep(null_conf_color, length(null_conf_level)))
+       if (length(null_conf_alpha == 1)) null_conf_alpha <- c(NA, rep(null_conf_alpha, length(null_conf_level)))
+       param_CI_null <- rbind(null_conf_level, null_conf_linetype, null_conf_color, null_conf_alpha)
+
+       fp <- fp +
+
+         # Add ribbons for CIs around null at different levels of se
+         ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                           ymin = null_effect,
+                                           ymax = df_CI_null[, 1]),
+                              color = param_CI_null["color", 1],
+                              alpha = param_CI_null["alpha", 1]) +
+         ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                           ymin = null_effect,
+                                           ymax = df_CI_null[, 1 + ncol(df_CI_null)/2]),
+                              color = param_CI_null["color", 1],
+                              alpha = param_CI_null["alpha", 1]) +
+         lapply(2:(ncol(df_CI_null)/2),
+                function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                                              ymin = df_CI_null[, i-1],
+                                                              ymax = df_CI_null[, i]),
+                                                 color = param_CI_null["color", i],
+                                                 alpha = param_CI_null["alpha", i])
+         ) +
+         lapply(2:(ncol(df_CI_null)/2) + (ncol(df_CI_null)/2),
+                function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
+                                                              ymin = df_CI_null[, i-1],
+                                                              ymax = df_CI_null[, i]),
+                                                 color = param_CI_null["color", i],
+                                                 alpha = param_CI_null["alpha", i])
+         ) +
+
+         # Add lines for CIs around null at different levels of se
+         lapply(1:(ncol(df_CI_null)/2),
+                function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
+                                                            y = df_CI_null[, i]),
+                                               linetype = param_CI_null["linetype", i])
+         ) +
+         lapply(1:(ncol(df_CI_null)/2) + (ncol(df_CI_null)/2),
+                function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
+                                                            y = df_CI_null[, i]),
+                                               linetype = param_CI_null["linetype", i])
+         )
+     }
+
+     fp <- fp +
+       #Reverse the x-axis ordering (se)
+       ggplot2::scale_x_reverse() +
+
+       #And now we flip the axes so that SE is on y- and Zr is on x-
+       ggplot2::coord_flip() +
+
+       #Apply APA-format theme
+       theme_apa
+
+     return(fp)
 }
-
-
-
 
 .plot_forest <- function(ma_obj, ma_method = "bb", correction_type = "ts",  ma_metric = "r_as_r",
                          pair_id = NULL, ma_facetname = "Summary", facet_levels = NULL,
