@@ -15,6 +15,7 @@
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
 #' @param construct_x Vector or column name of construct names for X.
 #' @param construct_y Vector or column name of construct names for Y.
+#' @param construct_order Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
@@ -23,7 +24,8 @@
 #' @export
 ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, ma_type = c("bb", "ic", "ad"),
                         sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple",
-                        construct_x = NULL, construct_y = NULL, data = NULL, control = control_psychmeta(), ...){
+                        construct_x = NULL, construct_y = NULL, construct_order = NULL,
+                        data = NULL, control = control_psychmeta(), ...){
 
      .dplyr.show_progress <- options()$dplyr.show_progress
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
@@ -86,6 +88,9 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
 
           if(deparse(substitute(construct_y)) != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+
+          if(deparse(substitute(construct_order)) != "NULL")
+            construct_order <- match_variables(call = call_full[[match("construct_order", names(call_full))]], arg = construct_order, arg_name = "construct_order", data = data)
      }
 
      if(!is.null(moderators)){
