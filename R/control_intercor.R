@@ -25,7 +25,8 @@
 #' construct_y <- c(rep("X", 9), rep("Y", 9), rep("Z", 9))
 #' dat <- data.frame(rxyi = rxyi, 
 #'                   construct_x = construct_x, 
-#'                   construct_y = construct_y)
+#'                   construct_y = construct_y, 
+#'                   stringsAsFactors = FALSE)
 #' dat <- rbind(cbind(sample_id = "Sample 1", dat), 
 #'              cbind(sample_id = "Sample 2", dat), 
 #'              cbind(sample_id = "Sample 3", dat))
@@ -58,7 +59,7 @@ control_intercor <- function(rxyi = NULL, n = NULL, sample_id = NULL,
      }
      
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
           
           if(deparse(substitute(rxyi))[1] != "NULL")
                rxyi <- match_variables(call = call_full[[match("rxyi", names(call_full))]], arg = rxyi, arg_name = "rxyi", data = data) 

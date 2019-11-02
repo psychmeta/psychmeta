@@ -76,7 +76,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
 
           k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, arg_name = "k", data = data)
 
@@ -124,7 +124,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           })
           names(moderator_levels) <- colnames(moderators)
 
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -147,9 +147,9 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                }else{
                     if(v != "construct_x" & v != "construct_y"){
                          if(is.null(dat)){
-                              dat <- data.frame(inputs[[v]])
+                              dat <- data.frame(inputs[[v]], stringsAsFactors = FALSE)
                          }else{
-                              dat <- data.frame(dat, inputs[[v]])
+                              dat <- data.frame(dat, inputs[[v]], stringsAsFactors = FALSE)
                          }
                          colnames(dat)[ncol(dat)] <- v
                     }
@@ -324,10 +324,10 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      }else{
           if(ma_metric == "r"){
                dat <- data.frame(yi = r_vec, vi = var_e_vec, r = r_vec, var_r = var_r_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r)
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r, stringsAsFactors = FALSE)
           }else if(ma_metric == "d"){
                dat <- data.frame(yi = r_vec, vi = var_e_vec, d = r_vec, var_d = var_r_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r)
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r, stringsAsFactors = FALSE)
           }
           if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
@@ -361,7 +361,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_r = rel_r,
-                                    `cor(r, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(r, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_bb_order2"))
      }else if(ma_metric == "d"){
@@ -380,7 +380,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_d = rel_r,
-                                    `cor(d, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(d, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "d_bb_order2"))
      }
@@ -418,10 +418,10 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      }else{
           if(ma_metric == "r"){
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, rho = rho_vec, var_r_c = var_r_c_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }else if(ma_metric == "d"){
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, var_d_c = var_r_c_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }
           if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
@@ -455,7 +455,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_rho = rel_rho,
-                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ad_order2"))
      }else if(ma_metric == "d"){
@@ -474,7 +474,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_delta = rel_rho,
-                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))  
+                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)  
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "d_ic_order2"))
      }
@@ -512,10 +512,10 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      }else{
           if(ma_metric == "r"){
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, rho = rho_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }else if(ma_metric == "d"){
                dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }
           if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
@@ -549,7 +549,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_rho = rel_rho,
-                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ad_order2"))
      }else if(ma_metric == "d"){
@@ -568,7 +568,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_delta = rel_rho,
-                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "d_ad_order2"))
      }

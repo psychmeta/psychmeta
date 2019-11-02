@@ -73,7 +73,7 @@
                                  sys_version = sys_version,
                                  out_of_date = out_of_date,
                                  ahead_of_cran = ahead_of_cran,
-                                 development = vcheck_devnum))
+                                 development = vcheck_devnum), stringsAsFactors = FALSE)
          }
 
          pkg_badge <- xml2::read_html("http://www.r-pkg.org/badges/version/psychmeta")

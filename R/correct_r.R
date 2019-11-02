@@ -175,7 +175,7 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
           r_c <- r / A
           var_e_c = var_e / A^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
-          data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj)
+          data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj, stringsAsFactors = FALSE)
      }else{
           r / A
      }
@@ -222,7 +222,7 @@ correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
           r_c <- r / (ax * ay)
           var_e_c = var_e / (ax * ay)^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
-          data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj)
+          data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj, stringsAsFactors = FALSE)
      }else{
           r / (ax * ay)
      }
@@ -262,7 +262,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
           a <- r / r_c
           var_e_c = var_e / a^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
-          data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj)
+          data.frame(r_corrected = r_c, var_e_corrected = var_e_c, n_adj = n_adj, stringsAsFactors = FALSE)
      }else{
           r_c
      }
@@ -448,7 +448,7 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
      if(!is.null(n)){
           var_e <- var_error_r(r = rxy, n = n, correct_bias = correct_bias)
           if(correct_bias) rxy <- correct_r_bias(r = rxy, n = n)
-          rxy <- data.frame(value = rxy, confidence_r(r = rxy, n = n, conf_level = conf_level))
+          rxy <- data.frame(value = rxy, confidence_r(r = rxy, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
      
      rxp <- rxy / sqrt(ryy)
@@ -459,9 +459,9 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
      if(any(is.na(ryy))) warning("Some ryy values were undefined: Interpret results accordingly", call. = FALSE)
      
      
-     artifacts <- data.frame(rxx = rxx, ryy = ryy)
+     artifacts <- data.frame(rxx = rxx, ryy = ryy, stringsAsFactors = FALSE)
      
-     corrections <- data.frame(rxy = rxy, rxp = rxp, rty = rty, rtp = rtp)
+     corrections <- data.frame(rxy = rxy, rxp = rxp, rty = rty, rtp = rtp, stringsAsFactors = FALSE)
      
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
      
@@ -516,7 +516,7 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
-          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level))
+          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
      
      rxpi <- rxyi / sqrt(ryy)
@@ -529,10 +529,10 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryy,
-                             ux = ux)
+                             ux = ux, stringsAsFactors = FALSE)
      
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
-                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa)
+                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
      
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
      
@@ -595,7 +595,7 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
-          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level))
+          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
      
      rxpi <- rxyi / sqrt(ryy)
@@ -608,10 +608,10 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryy,
-                             ux = ux, ut = ut)
+                             ux = ux, ut = ut, stringsAsFactors = FALSE)
      
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
-                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa)
+                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
      
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
      
@@ -680,7 +680,7 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
-          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level))
+          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
      
      rxpi <- rxyi / sqrt(ryyi)
@@ -693,10 +693,10 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
      
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryyi, ryya = ryya,
-                             ux = ux, uy = uy)
+                             ux = ux, uy = uy, stringsAsFactors = FALSE)
      
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
-                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa)
+                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
      
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
      
@@ -779,7 +779,7 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
-          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level))
+          rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
      
      rxpi <- rxyi / sqrt(ryyi)
@@ -792,10 +792,10 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
      
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryyi, ryya = ryya,
-                             ux = ux, uy = uy)
+                             ux = ux, uy = uy, stringsAsFactors = FALSE)
      
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
-                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa)
+                               rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
      
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
      

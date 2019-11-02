@@ -187,9 +187,9 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
                                           true = desc_mat_true,
                                           error = desc_mat_error),
 
-                      data = list(observed = data.frame(obs_scores_a, selected = select_vec),
-                                  true = data.frame(true_scores_a, selected = select_vec),
-                                  error = data.frame(error_scores_a, selected = select_vec))
+                      data = list(observed = data.frame(obs_scores_a, selected = select_vec, stringsAsFactors = FALSE),
+                                  true = data.frame(true_scores_a, selected = select_vec, stringsAsFactors = FALSE),
+                                  error = data.frame(error_scores_a, selected = select_vec, stringsAsFactors = FALSE))
           )
      }else{
           S_xy_a <- cov(obs_scores_a)
@@ -744,9 +744,9 @@ format_wide_noalpha <- function(x, param, var_names, show_applicant, decimals = 
      colnames(desc_mat) <- desc_names
 
      if(param){
-         data.frame(sample_id = 1:length(ni), ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat)
+         data.frame(sample_id = 1:length(ni), ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat, stringsAsFactors = FALSE)
      }else{
-          data.frame(sample_id = 1:length(ni), round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals))
+          data.frame(sample_id = 1:length(ni), round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals), stringsAsFactors = FALSE)
      }
 }
 
@@ -846,10 +846,10 @@ format_long_noalpha <- function(x, param, var_names, show_applicant, decimals = 
 
      if(param){
          data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name, ni = ni, na = na,
-                           rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2)
+                           rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2, stringsAsFactors = FALSE)
      }else{
          data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name,
-                           round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals))
+                           round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals), stringsAsFactors = FALSE)
      }
 }
 

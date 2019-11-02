@@ -52,9 +52,9 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                            true = group_list[[i]]$data$true[,-last_col],
                            error = group_list[[i]]$data$error[,-last_col])
 
-          obs_a <- rbind(obs_a, data.frame(group = group_names[i], dat_list[["obs"]]))
-          true_a <- rbind(true_a, data.frame(group = group_names[i], dat_list[["true"]]))
-          error_a <- rbind(error_a, data.frame(group = group_names[i], dat_list[["error"]]))
+          obs_a <- rbind(obs_a, data.frame(group = group_names[i], dat_list[["obs"]], stringsAsFactors = FALSE))
+          true_a <- rbind(true_a, data.frame(group = group_names[i], dat_list[["true"]], stringsAsFactors = FALSE))
+          error_a <- rbind(error_a, data.frame(group = group_names[i], dat_list[["error"]], stringsAsFactors = FALSE))
           rm(dat_list)
      }
      names(group_list) <- group_names
@@ -398,15 +398,15 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
      sr_overall <- unlist(lapply(group_list, function(x) as.numeric(x$sr)))
      p_dat <- data.frame(na = unlist(lapply(group_list, function(x) as.numeric(x$na))),
                          ni = unlist(lapply(group_list, function(x) as.numeric(x$ni))),
-                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall)
+                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall, stringsAsFactors = FALSE)
      p_dat <- rbind(p_dat, apply(p_dat, 2, sum))
      p_dat[nrow(p_dat), ncol(p_dat)] <- sum(p_vec * sr_overall)
-     p_dat <- data.frame(group = c(group_names, "overall"), p_dat)
+     p_dat <- data.frame(group = c(group_names, "overall"), p_dat, stringsAsFactors = FALSE)
      rownames(p_dat) <- NULL
 
-     observed = data.frame(out_obs)
-     true = data.frame(out_true)
-     error = data.frame(out_error)
+     observed = data.frame(out_obs, stringsAsFactors = FALSE)
+     true = data.frame(out_true, stringsAsFactors = FALSE)
+     error = data.frame(out_error, stringsAsFactors = FALSE)
      rownames(observed) <- rownames(true) <- rownames(error) <- NULL
 
      out <- list(proportions = p_dat,
@@ -414,9 +414,9 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
                  group_results = group_list,
                  S_complete_a = sa,
                  S_complete_i = si,
-                 data = list(observed = data.frame(obs_a, selected = select_vec),
-                             true = data.frame(true_a, selected = select_vec),
-                             error = data.frame(error_a, selected = select_vec)))
+                 data = list(observed = data.frame(obs_a, selected = select_vec, stringsAsFactors = FALSE),
+                             true = data.frame(true_a, selected = select_vec, stringsAsFactors = FALSE),
+                             error = data.frame(error_a, selected = select_vec, stringsAsFactors = FALSE)))
      class(out) <- "simdat_d_sample"
      out
 }
@@ -703,15 +703,15 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
      sr_overall <- unlist(lapply(group_list, function(x) as.numeric(x$sr)))
      p_dat <- data.frame(na = unlist(lapply(group_list, function(x) as.numeric(x$na))),
                          ni = unlist(lapply(group_list, function(x) as.numeric(x$ni))),
-                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall)
+                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall, stringsAsFactors = FALSE)
      p_dat <- rbind(p_dat, apply(p_dat, 2, sum))
      p_dat[nrow(p_dat), ncol(p_dat)] <- sum(p_vec * sr_overall)
-     p_dat <- data.frame(group = c(group_names, "overall"), p_dat)
+     p_dat <- data.frame(group = c(group_names, "overall"), p_dat, stringsAsFactors = FALSE)
      rownames(p_dat) <- NULL
 
-     observed = data.frame(out_obs)
-     true = data.frame(out_true)
-     error = data.frame(out_error)
+     observed = data.frame(out_obs, stringsAsFactors = FALSE)
+     true = data.frame(out_true, stringsAsFactors = FALSE)
+     error = data.frame(out_error, stringsAsFactors = FALSE)
      rownames(observed) <- rownames(true) <- rownames(error) <- NULL
 
      out <- list(proportions = p_dat,
@@ -998,8 +998,8 @@ simulate_d_database_noalpha <- function(k, n_params, rho_params,
 
      dat_stats <- dat_params <- NULL
      for(i in 1:length(sim_dat_stats)){
-          dat_stats <- rbind(dat_stats, data.frame(sample_id = i, sim_dat_stats[[i]]))
-          dat_params <- rbind(dat_params, data.frame(sample_id = i, sim_dat_params[[i]]))
+          dat_stats <- rbind(dat_stats, data.frame(sample_id = i, sim_dat_stats[[i]], stringsAsFactors = FALSE))
+          dat_params <- rbind(dat_params, data.frame(sample_id = i, sim_dat_params[[i]], stringsAsFactors = FALSE))
      }
      dat_stats <- dat_stats[dat_stats$y_name %in% var_names,]
      dat_params <- dat_params[dat_params$y_name %in% var_names,]

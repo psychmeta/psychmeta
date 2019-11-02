@@ -109,13 +109,13 @@ simulate_psych <- function(n, rho_mat,
                select_vec_true <- select_vec_true & true_scores_a[,i] >= sort(true_scores_a[,i], decreasing = TRUE)[n * sr_vec[i]]
                select_vec_error <- select_vec_error & error_scores_a[,i] >= sort(error_scores_a[,i], decreasing = TRUE)[n * sr_vec[i]]
           }
-          obs = data.frame(obs_scores_a, selected_obs = select_vec_obs, selected_true = select_vec_true, selected_error = select_vec_error)
-          true = data.frame(true_scores_a, selected_obs = select_vec_obs, selected_true = select_vec_true, selected_error = select_vec_error)
-          error = data.frame(error_scores_a, selected_obs = select_vec_obs, selected_true = select_vec_true, selected_error = select_vec_error)
+          obs = data.frame(obs_scores_a, selected_obs = select_vec_obs, selected_true = select_vec_true, selected_error = select_vec_error, stringsAsFactors = FALSE)
+          true = data.frame(true_scores_a, selected_obs = select_vec_obs, selected_true = select_vec_true, selected_error = select_vec_error, stringsAsFactors = FALSE)
+          error = data.frame(error_scores_a, selected_obs = select_vec_obs, selected_true = select_vec_true, selected_error = select_vec_error, stringsAsFactors = FALSE)
      }else{
-          obs = data.frame(obs_scores_a)
-          true = data.frame(true_scores_a)
-          error = data.frame(error_scores_a)
+          obs = data.frame(obs_scores_a, stringsAsFactors = FALSE)
+          true = data.frame(true_scores_a, stringsAsFactors = FALSE)
+          error = data.frame(error_scores_a, stringsAsFactors = FALSE)
      }
 
      if(length(single_items) > 1){

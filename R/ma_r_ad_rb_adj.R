@@ -44,8 +44,8 @@
      ad_obj_x <- prepare_ad_int(ad_obj = ad_obj_x, residual_ads = residual_ads, decimals = decimals)
      ad_obj_y <- prepare_ad_int(ad_obj = ad_obj_y, residual_ads = residual_ads, decimals = decimals)
 
-     if(!correct_rxx) ad_obj_x$qxa_irr <- ad_obj_x$qxi_irr <- ad_obj_x$qxa_drr <- ad_obj_x$qxi_drr <- data.frame(Value = 1, Weight = 1)
-     if(!correct_ryy) ad_obj_y$qxa_irr <- ad_obj_y$qxi_irr <- ad_obj_y$qxa_drr <- ad_obj_y$qxi_drr <- data.frame(Value = 1, Weight = 1)
+     if(!correct_rxx) ad_obj_x$qxa_irr <- ad_obj_x$qxi_irr <- ad_obj_x$qxa_drr <- ad_obj_x$qxi_drr <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
+     if(!correct_ryy) ad_obj_y$qxa_irr <- ad_obj_y$qxi_irr <- ad_obj_y$qxa_drr <- ad_obj_y$qxi_drr <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
 
      ## flip_xy switches the internal designations of x and y and switches them back at the end of the function
      if(flip_xy){

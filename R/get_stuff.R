@@ -389,7 +389,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                          ad_x[[i]] <- cbind(artifact = rownames(ad_x[[i]]), description = NA, .ma_obj[i,], ad_x[[i]])
                     }else{
                          .ad_x <- c("artifact", "description", colnames(.ma_obj), colnames(ad_x))
-                         ad_x[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_x))), .ad_x)
+                         ad_x[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_x)), stringsAsFactors = FALSE), .ad_x)
                     }
                }
 
@@ -398,7 +398,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                          ad_y[[i]] <- cbind(artifact = rownames(ad_y[[i]]), description = NA, .ma_obj[i,], ad_y[[i]])
                     }else{
                          .ad_y <- c("artifact", "description", colnames(.ma_obj), colnames(ad_x))
-                         ad_y[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_y))), .ad_y)
+                         ad_y[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_y)), stringsAsFactors = FALSE), .ad_y)
                     }
                }
 
@@ -585,7 +585,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
           }else{
                moderator_names <- colnames(ma_list$barebones)[(which(colnames(ma_list$barebones) == "analysis_type") + 1):(which(colnames(ma_list$barebones) == "k") - 1)]
 
-               moderator_mat <- as.data.frame(as.data.frame(ma_list$barebones)[,moderator_names])
+               moderator_mat <- as.data.frame(as.data.frame(ma_list$barebones, stringsAsFactors = FALSE)[,moderator_names], stringsAsFactors = FALSE)
                colnames(moderator_mat) <- moderator_names
 
                moderator_combs <- apply(moderator_mat, 1, function(x) paste0(moderator_names, ": ", x, collapse = ", "))

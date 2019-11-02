@@ -360,7 +360,7 @@ prepare_ad_int <- function(ad_obj, residual_ads = TRUE, decimals = Inf){
                mean_i <- wt_mean(x = ad_obj_i$Value, wt = ad_obj_i$Weight)
                sd_i <- attributes(ad_obj)$summary[i,"sd"]
                if(new_sd[i] == 0 | nrow(ad_obj_i) == 1){
-                    ad_obj_i <- data.frame(Value = mean_i, Weight = sum(ad_obj_i$Weight))
+                    ad_obj_i <- data.frame(Value = mean_i, Weight = sum(ad_obj_i$Weight), stringsAsFactors = FALSE)
                }else{
                     ad_obj_i$Value <- (ad_obj_i$Value - mean_i) / sd_i * new_sd[i] + mean_i
                }
@@ -395,7 +395,7 @@ prepare_ad_int <- function(ad_obj, residual_ads = TRUE, decimals = Inf){
 #' @keywords internal
 create_ad_array <- function(ad_list, name_vec = NULL){
      expand_grid_1 <- function(x1, name_vec = NULL){
-          out <- data.frame(x1)
+          out <- data.frame(x1, stringsAsFactors = FALSE)
           if(!is.null(name_vec)){
                colnames(out) <- name_vec
           }else{
@@ -442,7 +442,7 @@ create_ad_array <- function(ad_list, name_vec = NULL){
      if(length(x_list) == 2) id_array <- expand_grid_2(x1 = x_list[[1]], x2 = x_list[[2]], name_vec = name_vec)
      if(length(x_list) == 3) id_array <- expand_grid_3(x1 = x_list[[1]], x2 = x_list[[2]], x3 = x_list[[3]], name_vec = name_vec)
      if(length(x_list) == 4) id_array <- expand_grid_4(x1 = x_list[[1]], x2 = x_list[[2]], x3 = x_list[[3]], x4 = x_list[[4]], name_vec = name_vec)
-     art_array <- wt_array <- as.data.frame(id_array)
+     art_array <- wt_array <- as.data.frame(id_array, stringsAsFactors = FALSE)
      for(i in 1:ncol(id_array)){
           art_array[,i] <-  unlist(ad_list[[i]][,1])[id_array[,i]]
           wt_array[,i] <-  unlist(ad_list[[i]][,2])[id_array[,i]]

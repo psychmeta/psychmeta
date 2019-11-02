@@ -133,7 +133,7 @@ estimate_q_dist <- function(mean_rel, var_rel){
      mean_q <- mean_rel^.5
      var_q <- var_rel / (4 * mean_q^2)
      return(data.frame(mean = mean_q,
-                       var = var_q))
+                       var = var_q, stringsAsFactors = FALSE))
 }
 
 
@@ -156,7 +156,7 @@ estimate_rel_dist <- function(mean_q, var_q){
      mean_rel <- mean_q^2
      var_rel <- 4 * mean_q^2 * var_q
      return(data.frame(mean = mean_rel,
-                       var = var_rel))
+                       var = var_rel, stringsAsFactors = FALSE))
 }
 
 

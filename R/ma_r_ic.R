@@ -98,7 +98,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
 
           rxyi <- match_variables(call = call_full[[match("rxyi", names(call_full))]], arg = rxyi, arg_name = "rxyi", data = data)
           n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, arg_name = "n", data = data)
@@ -161,7 +161,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      if(length(moderators) > 0){
           if(is.null(dim(moderators))){
-               moderators <- as.data.frame(moderators)
+               moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
                colnames(moderators) <- "Moderator"
           }
 
@@ -181,7 +181,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                moderator_levels <- NULL
           }
 
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -230,7 +230,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           
           if(!is.null(moderators)){
                if(!is.null(moderators)) colnames(moderators) <- moderator_names$all
-               .moderators <- as.data.frame(as_tibble(moderators, .name_repair = "minimal")[!valid_r,])
+               .moderators <- as.data.frame(as_tibble(moderators, .name_repair = "minimal")[!valid_r,], stringsAsFactors = FALSE)
           }else{
                .moderators <- NULL
           }
@@ -287,7 +287,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxyi <- rxyi[valid_r]
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
-     if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators, .name_repair = "minimal")[valid_r,])
+     if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators, .name_repair = "minimal")[valid_r,], stringsAsFactors = FALSE)
      if(!is.null(sample_id)) sample_id <- sample_id[valid_r]
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
@@ -770,7 +770,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                    ux = ux_vec, ut = ut_vec,
                                    uy = uy_vec, up = up_vec,
                                    rxxi = rxxi_vec, rxxa = rxxa_vec,
-                                   ryyi = ryyi_vec, ryya = ryya_vec)
+                                   ryyi = ryyi_vec, ryya = ryya_vec, stringsAsFactors = FALSE)
 
      correction_data <- cbind(correction_type = correction_type, correction_data)
      if(is.null(presorted_data)){
@@ -788,7 +788,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                            a = a_vec,
                            rxxa_est = .rxxa_vec,
                            ryya_est = .ryya_vec,
-                           correction_type = correction_type)
+                           correction_type = correction_type, stringsAsFactors = FALSE)
      if(is.null(sample_id)){
           sample_id <- paste0("Sample #", 1:nrow(es_data))
      }else{
@@ -1000,7 +1000,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                        A = A_vec_tp,
                                        a = a_vec, 
                                        rxxa_est = rxxa_est, 
-                                       ryya_est = ryya_est)
+                                       ryya_est = ryya_est, stringsAsFactors = FALSE)
                escalc_tp$pi <- data$pi
                escalc_tp$pa <- data$pa
                
@@ -1020,7 +1020,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  se_r_c = se_rtpa,
                                  sd_e_c = sd_e_tp_a,
                                  sd_rho = sd_rho_tp_a,
-                                 ci_tp_a, cr_tp_a)))
+                                 ci_tp_a, cr_tp_a)), stringsAsFactors = FALSE)
           
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
@@ -1060,7 +1060,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                        weight = wt_vec_xp,
                                        residual = rxpa_vec - mean_rxpa,
                                        A = A_vec_xp,
-                                       a = a_vec)
+                                       a = a_vec, stringsAsFactors = FALSE)
 
                escalc_xp$pi <- data$pi
                escalc_xp$pa <- data$pa
@@ -1080,7 +1080,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  se_r_c = se_rxpa,
                                  sd_e_c = sd_e_xp_a,
                                  sd_rho = sd_rho_xp_a,
-                                 ci_xp_a, cr_xp_a)))
+                                 ci_xp_a, cr_xp_a)), stringsAsFactors = FALSE)
 
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
@@ -1119,7 +1119,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                        weight = wt_vec_ty,
                                        residual = rtya_vec - mean_rtya,
                                        A = A_vec_ty,
-                                       a = a_vec)
+                                       a = a_vec, stringsAsFactors = FALSE)
 
                escalc_ty$pi <- data$pi
                escalc_ty$pa <- data$pa
@@ -1139,7 +1139,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  se_r_c = se_rtya,
                                  sd_e_c = sd_e_ty_a,
                                  sd_rho = sd_rho_ty_a,
-                                 ci_ty_a, cr_ty_a)))
+                                 ci_ty_a, cr_ty_a)), stringsAsFactors = FALSE)
 
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))

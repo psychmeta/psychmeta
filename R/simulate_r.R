@@ -445,9 +445,9 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                           true = desc_mat_true,
                                           error = desc_mat_error),
 
-                      data = list(observed = data.frame(obs_scores_a, selected = select_vec),
-                                  true = data.frame(true_scores_a, selected = select_vec),
-                                  error = data.frame(error_scores_a, selected = select_vec))
+                      data = list(observed = data.frame(obs_scores_a, selected = select_vec, stringsAsFactors = FALSE),
+                                  true = data.frame(true_scores_a, selected = select_vec, stringsAsFactors = FALSE),
+                                  error = data.frame(error_scores_a, selected = select_vec, stringsAsFactors = FALSE))
           )
      }else{
           ## Compile matrices of descriptive statistics and artifacts
@@ -1131,8 +1131,8 @@ simulate_r_database <- function(k, n_params, rho_params,
 
      }
 
-     dat_stats <- data.frame(matrix(NA, length(param_list) * nrow(.stats), ncol(.stats)))
-     dat_params <- data.frame(matrix(NA, length(param_list) * nrow(.params), ncol(.params)))
+     dat_stats <- data.frame(matrix(NA, length(param_list) * nrow(.stats), ncol(.stats)), stringsAsFactors = FALSE)
+     dat_params <- data.frame(matrix(NA, length(param_list) * nrow(.params), ncol(.params)), stringsAsFactors = FALSE)
      colnames(dat_stats) <- colnames(.stats)
      colnames(dat_params) <- colnames(.params)
 
@@ -1388,7 +1388,7 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
 #'
 #' @keywords internal
 .descriptives_database <- function(dat, wt){
-     desc_mat <- data.frame(apply(dat, 2, function(x) wt_dist(x = x, wt = wt, unbiased = FALSE)))
+     desc_mat <- data.frame(apply(dat, 2, function(x) wt_dist(x = x, wt = wt, unbiased = FALSE)), stringsAsFactors = FALSE)
 
      if(nrow(dat) > 1){
           desc_mat <- rbind(desc_mat, desc_mat[2,] * nrow(dat) / (nrow(dat) - 1))
@@ -1524,9 +1524,9 @@ format_wide <- function(x, param, sample_id, var_names, show_applicant, decimals
      colnames(desc_mat) <- desc_names
 
      if(param){
-          data.frame(sample_id = sample_id, ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat)
+          data.frame(sample_id = sample_id, ni = ni, na = na, rho_mat_i, rho_mat_a, cor_mat_i, cor_mat_a, desc_mat, stringsAsFactors = FALSE)
      }else{
-          data.frame(sample_id = sample_id, round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals))
+          data.frame(sample_id = sample_id, round(cbind(ni = ni, na = na, cor_mat_i, cor_mat_a, desc_mat), decimals), stringsAsFactors = FALSE)
      }
 }
 
@@ -1676,10 +1676,10 @@ format_long <- function(x, param, sample_id, var_names, show_applicant, decimals
 
      if(param){
           data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name, ni = ni, na = na,
-                     rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2)
+                     rtpi = rho_vec_i, rtpa = rho_vec_a, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2, stringsAsFactors = FALSE)
      }else{
           data.frame(sample_id = sample_id, x_name = x_name, y_name = y_name,
-                     round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals))
+                     round(cbind(ni = ni, na = na, rxyi = cor_vec_i, rxya = cor_vec_a, desc_1, desc_2), decimals), stringsAsFactors = FALSE)
      }
 }
 

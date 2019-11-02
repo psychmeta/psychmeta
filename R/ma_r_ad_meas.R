@@ -45,7 +45,7 @@
           }
      }else{
           correct_x <- FALSE
-          qx_mat <- data.frame(Value = 1, Weight = 1)
+          qx_mat <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
           mean_qx <- 1
      }
 
@@ -58,7 +58,7 @@
                mean_qy <- wt_mean(x = ad_obj_y$qxi_irr$Value, wt = ad_obj_y$qxi_irr$Weight)
           }
      }else{
-          qy_mat <- data.frame(Value = 1, Weight = 1)
+          qy_mat <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
           mean_qy <- 1
      }
 

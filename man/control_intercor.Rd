@@ -51,7 +51,8 @@ construct_x <- rep(rep(c("X", "Y", "Z"), 3), 3)
 construct_y <- c(rep("X", 9), rep("Y", 9), rep("Z", 9))
 dat <- data.frame(rxyi = rxyi, 
                   construct_x = construct_x, 
-                  construct_y = construct_y)
+                  construct_y = construct_y, 
+                  stringsAsFactors = FALSE)
 dat <- rbind(cbind(sample_id = "Sample 1", dat), 
              cbind(sample_id = "Sample 2", dat), 
              cbind(sample_id = "Sample 3", dat))
