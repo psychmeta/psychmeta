@@ -265,15 +265,7 @@ plot_cefp <- function(ma_obj,
 #' Create forest plots
 #'
 #' @param ma_obj Meta-analysis object.
-#' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
-#' \itemize{
-#' \item{construct}{A list or vector of construct names to search for.}
-#' \item{construct_pair}{A list of vectors of construct pairs to search for (e.g., \code{list(c("Construct A", "Construct B"), c("Construct A", "Construct C"))}).}
-#' \item{pair_id}{A list or vector of numeric construct Pair IDs.}
-#' \item{analysis_id}{A list or vector of analysis IDs (combinations of moderator levels).}
-#' \item{k_min}{A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-#' \item{N_min}{A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
-#' }
+#' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing arguments for [filter_ma].
 #' @param match Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param show_filtered Logical scalar that determines whether the meta-analysis object given in the output should be the modified input object (\code{FALSE}, default) or the filtered object (\code{TRUE}).
