@@ -44,11 +44,6 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
           construct_mat_initial <- NULL
      }
 
-     if(!is.null(construct_order)){
-          if(!is.null(construct_x)) construct_mat_initial[,"construct_x"] <- factor(construct_mat_initial[,"construct_x"], levels = construct_order)
-          if(!is.null(construct_y)) construct_mat_initial[,"construct_y"] <- factor(construct_mat_initial[,"construct_y"], levels = construct_order)
-     }
-
      ## Build the temporary data matrix
      temp_mat <- es_data
      if(!is.null(moderator_matrix)){
@@ -62,7 +57,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      if(!is.null(construct_mat_initial)){
           if(!is.null(construct_order)){
                for(i in 1:ncol(construct_mat_initial)){
-                    construct_mat_initial[,i] <- factor(construct_mat_initial[,i], levels = construct_order[[i]])
+                    construct_mat_initial[,i] <- factor(construct_mat_initial[,i], levels = construct_order)
                }
           }
           temp_mat <- cbind(construct_mat_initial, temp_mat)
