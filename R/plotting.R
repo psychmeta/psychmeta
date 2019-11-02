@@ -19,6 +19,8 @@
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param show_filtered Logical scalar that determines whether the meta-analysis object given in the output should be the modified input object (\code{FALSE}, default) or the filtered object (\code{TRUE}).
 #'
+#' @md
+#'
 #' @return A list of funnel plots.
 #' @export
 #'
@@ -45,6 +47,11 @@
 plot_funnel <- function(ma_obj,
                         se_type = c("auto", "mean", "sample"),
                         label_es = NULL,
+                        point_shape = NULL,
+                        point_color = NULL,
+                        point_fill = NULL,
+                        point_size = NULL,
+                        point_stroke = NULL,
                         conf_level = c(.95, .99),
                         conf_linetype = c("dashed", "dotted"),
                         conf_fill = NA, conf_alpha = 1.0,
@@ -249,7 +256,7 @@ plot_cefp <- function(ma_obj,
               null_conf_linetype = null_conf_linetype,
               null_conf_fill = null_conf_fill,
               null_conf_alpha = null_conf_alpha,
-              anlyses = analyses, match = match, case_sensitive = case_sensitive,
+              analyses = analyses, match = match, case_sensitive = case_sensitive,
               show_filtered = show_filtered)
 
 }

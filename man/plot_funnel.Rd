@@ -2,23 +2,54 @@
 % Please edit documentation in R/plotting.R
 \name{plot_funnel}
 \alias{plot_funnel}
+\alias{plot_cefp}
 \title{Create funnel plots}
 \usage{
-plot_funnel(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, show_filtered = FALSE)
+plot_funnel(ma_obj, se_type = c("auto", "mean", "sample"),
+  label_es = NULL, point_shape = NULL, point_color = NULL,
+  point_fill = NULL, point_size = NULL, point_stroke = NULL,
+  conf_level = c(0.95, 0.99), conf_linetype = c("dashed", "dotted"),
+  conf_fill = NA, conf_alpha = 1, null_effect = NA,
+  null_conf_level = c(0.9, 0.95, 0.99), null_conf_linetype = c("solid",
+  "dashed", "dotted"), null_conf_fill = "black",
+  null_conf_alpha = c(0.1, 0.2, 0.4), analyses = "all",
+  match = c("all", "any"), case_sensitive = TRUE,
+  show_filtered = FALSE)
+
+plot_cefp(ma_obj, se_type = "sample", label_es = NULL,
+  conf_level = NA, conf_linetype = NA, conf_fill = NA,
+  conf_alpha = 1, null_effect = NULL, null_conf_level = c(0.9, 0.95,
+  0.99), null_conf_linetype = c("solid", "dashed", "dotted"),
+  null_conf_fill = "black", null_conf_alpha = c(0, 0.2, 0.4),
+  analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
+  show_filtered = FALSE)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object.}
 
-\item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
-\itemize{
-\item{construct}{A list or vector of construct names to search for.}
-\item{construct_pair}{A list of vectors of construct pairs to search for (e.g., \code{list(c("Construct A", "Construct B"), c("Construct A", "Construct C"))}).}
-\item{pair_id}{A list or vector of numeric construct Pair IDs.}
-\item{analysis_id}{A list or vector of analysis IDs (combinations of moderator levels).}
-\item{k_min}{A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-\item{N_min}{A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
-}}
+\item{se_type}{Method to calculate standard errors (y-axis). Options are \code{"auto"} (default) to use the same method as used to estimate the meta-analysis models, \code{"mean"} to calculate SEs using the mean effect size and indivdiual sample sizes, or `"sample"`` to use the SE calculated using the sample effect sizes and sample sizes.}
+
+\item{label_es}{Label for effect size (x-axis). Defaults to "Correlation (\emph{r})" for correlation meta-analyses, "Cohen’s \emph{d} (Hedges’s \emph{g})" for d value meta-analyses, and "Effect size" for generic meta-analyses.}
+
+\item{conf_level}{Confidence regions levels to be plotted (default: 95% and 99%).}
+
+\item{conf_linetype}{Line types for confidence region boundaries. Length should be either 1 or equal to the length of conf_level.}
+
+\item{conf_fill}{Colors for confidence regions. Set to \code{NA} for transparent. Length should be either 1 or equal to to the length of conf_level.}
+
+\item{conf_alpha}{Transparency level for confidence regions. Length should be either 1 or equal to to the length of conf_level.}
+
+\item{null_effect}{Null effect to be plotted for contour-enhanced funnel plots. If \code{NA}, not shown. If \code{NULL}, set to the null value for the effect size metric (0 for correlations and d values).}
+
+\item{null_conf_level}{Null-effect confidence regions levels to be plotted (default: 90%, 95%, 99%).}
+
+\item{null_conf_linetype}{Line types for null-effect confidence region boundaries. Length should be either 1 or equal to the length of null_conf_level.}
+
+\item{null_conf_fill}{Colors for null-effect confidence regions. Set to \code{NA} for transparent. Length should be either 1 or equal to the length of null_conf_level.}
+
+\item{null_conf_alpha}{Transparency level for null-effect confidence regions. Length should be either 1 or equal to the length of null_conf_level.}
+
+\item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing arguments for \link{filter_ma}.}
 
 \item{match}{Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?}
 
@@ -30,7 +61,7 @@ plot_funnel(ma_obj, analyses = "all", match = c("all", "any"),
 A list of funnel plots.
 }
 \description{
-Create funnel plots
+This function creates funnel plots for meta-analyses (plots of effect size versus . Both traditional funnel plots and
 }
 \examples{
 \dontrun{
