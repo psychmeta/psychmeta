@@ -22,14 +22,14 @@
 #' @return A nested tabular object of the class "ma_psychmeta".
 #' @export
 ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d_c = NULL, ma_type = c("bb", "ic", "ad"),
-                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
+                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple",
                         construct_x = NULL, construct_y = NULL, data = NULL, control = control_psychmeta(), ...){
-     
+
      .dplyr.show_progress <- options()$dplyr.show_progress
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
-     
+
      call <- match.call()
      warn_obj1 <- record_warnings()
      ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
@@ -42,7 +42,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
      cred_method <- control$cred_method
      var_unbiased <- control$var_unbiased
      hs_override <- control$hs_override
-     
+
      if(hs_override){
           conf_method <- cred_method <- "norm"
           var_unbiased <- FALSE
@@ -166,7 +166,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
 
      out <- ma_wrapper(es_data = dat, es_type = "d", ma_type = "d_order2", ma_fun = .ma_r_order2,
                        moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = TRUE,
-                       construct_x = construct_x, construct_y = construct_y,
+                       construct_x = construct_x, construct_y = construct_y, construct_order = construct_order,
 
                        ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad, ma_metric = "d")),
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
@@ -174,8 +174,8 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
      neg_var_r_order2 <- sum(unlist(map(out$meta_tables, function(x) x$barebones$var_d_bar < 0)), na.rm = TRUE)
      neg_var_rho_ic_order2 <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$var_delta_bar < 0)), na.rm = TRUE)
      neg_var_rho_ad_order2 <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$var_delta_bar < 0)), na.rm = TRUE)
-     
-     default_print <- 
+
+     default_print <-
           if(do_ic){
                "ic"
           }else if(do_ad){
@@ -183,12 +183,12 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
           }else if(do_bb){
                "bb"
           }
-     
+
      out <- bind_cols(analysis_id = 1:nrow(out), out)
-     attributes(out) <- append(attributes(out), list(call_history = list(call), 
-                                                     inputs = inputs, 
+     attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                     inputs = inputs,
                                                      ma_methods = c("bb", "ic", "ad")[c(do_bb, do_ic, do_ad)],
-                                                     ma_metric = "d_order2", 
+                                                     ma_metric = "d_order2",
                                                      default_print = default_print,
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                      fyi = record_fyis(es_metric = "d_order2",
@@ -196,12 +196,12 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
                                                                        neg_var_rho_ic_order2 = neg_var_rho_ic_order2,
                                                                        neg_var_rho_ad_order2 = neg_var_rho_ad_order2)))
      out <- namelists.ma_psychmeta(ma_obj = out)
-     
+
      class(out) <- c("ma_psychmeta", class(out))
-     
+
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-     
+
      out
 }
 

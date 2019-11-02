@@ -184,7 +184,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 
      out <- ma_wrapper(es_data = dat, es_type = "r", ma_type = "r_order2", ma_fun = .ma_r_order2,
                        moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = TRUE,
-                       construct_x = construct_x, construct_y = construct_y,
+                       construct_x = construct_x, construct_y = construct_y, construct_order = construct_order,
 
                        ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad, ma_metric = "r")),
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
