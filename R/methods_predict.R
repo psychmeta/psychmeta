@@ -85,7 +85,7 @@ predict.summary.lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
                     lower <- fit - qt((1 - level) / 2, df = df, lower.tail = F) * int.se
                     upper <- fit + qt((1 - level) / 2, df = df, lower.tail = F) * int.se
                     
-                    fit <- data.frame(fit = fit, lwr = lower, upr = upper)
+                    fit <- data.frame(fit = fit, lwr = lower, upr = upper, stringsAsFactors = FALSE)
                }
           }
      }

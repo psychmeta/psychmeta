@@ -2358,14 +2358,14 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 #' @keywords internal
 .create_ad_int <- function(art_vec, wt_vec = rep(1, length(art_vec)), decimals = Inf){
      if(is.null(art_vec) | is.null(wt_vec) | length(art_vec) == 0 | length(wt_vec) == 0){
-          data.frame(Value = 1, Weight = 1)
+          data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
      }else{
           if(all(is.na(art_vec))){
                data.frame(Value = 1, Weight = 1)
           }else{
                if(length(art_vec) != length(wt_vec)) stop("Lengths of art_vec and wt_vec differ")
-               art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec)
-               art_tab <- as.data.frame(ungroup(art_tab %>% group_by(.data$Value) %>% do(data.frame(Value = .data$Value[1], Weight = sum(.data$Weight)))))
+               art_tab <- data.frame(Value = round(art_vec, decimals), Weight = wt_vec, stringsAsFactors = FALSE)
+               art_tab <- as.data.frame(ungroup(art_tab %>% group_by(.data$Value) %>% do(data.frame(Value = .data$Value[1], Weight = sum(.data$Weight), stringsAsFactors = FALSE))), stringsAsFactors = FALSE)
                art_tab <- art_tab[!is.na(art_tab[,1]),]
                art_tab[,"Weight"] <- art_tab[,"Weight"] / sum(art_tab[,"Weight"])
                art_tab

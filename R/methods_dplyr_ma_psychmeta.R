@@ -276,7 +276,7 @@ transmute_if.ma_psychmeta <- function(.tbl, .predicate, .funs, ...){
 #### subset ####
 #' @export
 subset.ma_psychmeta <- function (x, subset, select, drop = FALSE, ...){
-     x <- reattribute(x, subset(as.data.frame(x), subset, select, drop, ...))
+     x <- reattribute(x, subset(as.data.frame(x, stringsAsFactors = FALSE), subset, select, drop, ...))
 
      needed_cols <- c("analysis_id", "analysis_type", "meta_tables", "escalc")
      correct_cols <- needed_cols %in% colnames(x)

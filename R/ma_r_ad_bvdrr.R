@@ -31,14 +31,14 @@
      if(correct_rxx){
           mean_qxa <- wt_mean(x = ad_obj_x$qxa_drr$Value, wt = ad_obj_x$qxa_drr$Weight)
      }else{
-          ad_obj_x$qxa_drr <- data.frame(Value = 1, Weight = 1)
+          ad_obj_x$qxa_drr <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
           mean_qxa <- 1
      }
 
      if(correct_ryy){
           mean_qya <- wt_mean(x = ad_obj_y$qxa_drr$Value, wt = ad_obj_y$qxa_drr$Weight)
      }else{
-          ad_obj_y$qxa_drr <- data.frame(Value = 1, Weight = 1)
+          ad_obj_y$qxa_drr <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
           mean_qya <- 1
      }
 

@@ -21,7 +21,7 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                     samples_for_imputation <- sample_id %in% .sample_id
                     
                     if(!is.null(categorical_moderators)){
-                         .categorical_moderators <- data.frame(as_tibble(categorical_moderators, .name_repair = "minimal")[samples_for_imputation,])
+                         .categorical_moderators <- data.frame(as_tibble(categorical_moderators, .name_repair = "minimal")[samples_for_imputation,], stringsAsFactors = FALSE)
                     }else{
                          .categorical_moderators <- NULL
                     }
@@ -128,7 +128,7 @@ impute_artifacts_wrapper <- function(impute_artifacts, clean_artifacts,
                     samples_for_imputation <- sample_id %in% .sample_id
                     
                     if(!is.null(categorical_moderators))
-                         .categorical_moderators <- data.frame(as_tibble(categorical_moderators, .name_repair = "minimal")[samples_for_imputation,])
+                         .categorical_moderators <- data.frame(as_tibble(categorical_moderators, .name_repair = "minimal")[samples_for_imputation,], stringsAsFactors = FALSE)
                     
                     u_imputed <- impute_artifact_2col(logic_vec_x = data_x$ux_observed[samples_for_imputation],
                                                       logic_vec_y = data_y$uy_observed[samples_for_imputation],

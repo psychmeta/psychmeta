@@ -64,7 +64,7 @@ estimate_u <- function(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL, r
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- data.frame(data)
+          data <- data.frame(data, stringsAsFactors = FALSE)
 
           if(deparse(substitute(measure_id)) != "NULL")
                measure_id <- match_variables(call = call_full[[match("measure_id",  names(call_full))]], arg = measure_id, arg_name = "measure_id", data = data)
@@ -103,7 +103,7 @@ estimate_u <- function(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL, r
      dat <- list(measure_id = measure_id, sdi = sdi, sda = sda, rxxi = rxxi, rxxa = rxxa,
                  item_ki = item_ki, item_ka = item_ka, n = n, meani = meani, sr = sr, rxya_est = rxya_est)
      for(i in names(dat)) if(is.null(dat[[i]])) dat[[i]] <- NULL
-     dat <- as.data.frame(dat)
+     dat <- as.data.frame(dat, stringsAsFactors = FALSE)
 
      sdi <- dat$sdi
      sda <- dat$sda
@@ -250,7 +250,7 @@ estimate_u <- function(measure_id = NULL, sdi = NULL, sda = NULL, rxxi = NULL, r
      dat <- list(sdi = sdi, sda = sda, rxxi = rxxi, rxxa = rxxa,
                  item_ki = item_ki, item_ka = item_ka, n = n, meani = meani, sr = sr, rxya_est = rxya_est)
      for(i in names(dat)) if(is.null(dat[[i]])) dat[[i]] <- NULL
-     dat <- as.data.frame(dat)
+     dat <- as.data.frame(dat, stringsAsFactors = FALSE)
 
      sdi <- dat$sdi
      sda <- dat$sda

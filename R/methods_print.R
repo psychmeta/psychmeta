@@ -571,7 +571,7 @@ print.ma_cumulative <- function(x, ..., digits = 3){
 print.ma_bootstrap <- function(x, ..., digits = 3){
      cat("Bootstrapped meta-analysis results \n")
      cat("---------------------------------------- \n")
-     print.data.frame(as.data.frame(x$boot_summary), digits = digits)
+     print.data.frame(as.data.frame(x$boot_summary, stringsAsFactors = FALSE), digits = digits)
      cat("\nSee list item 'boot_data' for meta-analysis results from each bootstrap iteration \n")
 }
 
@@ -1043,7 +1043,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                method_details$ic$Correction <- as.character(method_details$ic$Correction)
                if(nrow(method_details$ic) > 1 & all(method_details$ic$Correction == method_details$ic$Correction[1])){
-                    .method_details <- data.frame(analysis_id = "All", Correction = method_details$ic$Correction[1])
+                    .method_details <- data.frame(analysis_id = "All", Correction = method_details$ic$Correction[1], stringsAsFactors = FALSE)
                     print(.method_details)
                }else{
                     print(method_details$ic)
@@ -1139,7 +1139,7 @@ print.metabulate <- function(x, ...){
 #' @exportClass metabulate_table
 #' @method print metabulate_table
 print.metabulate_table <- function(x, ...){
-        print(as.data.frame(x))
+        print(as.data.frame(x, stringsAsFactors = FALSE))
 }
 
 #' @export

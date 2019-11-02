@@ -53,7 +53,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
 
           k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, arg_name = "k", data = data)
 
@@ -90,7 +90,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
 
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
-               moderators <- as.data.frame(moderators)
+               moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
                colnames(moderators) <- "Moderator"
           }
 
@@ -106,7 +106,7 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
           })
           names(moderator_levels) <- colnames(moderators)
 
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -129,9 +129,9 @@ ma_d_order2 <- function(k, N = NULL, d = NULL, delta = NULL, var_d = NULL, var_d
                }else{
                     if(v != "construct_x" & v != "construct_y"){
                          if(is.null(dat)){
-                              dat <- data.frame(inputs[[v]])
+                              dat <- data.frame(inputs[[v]], stringsAsFactors = FALSE)
                          }else{
-                              dat <- data.frame(dat, inputs[[v]])
+                              dat <- data.frame(dat, inputs[[v]], stringsAsFactors = FALSE)
                          }
                          colnames(dat)[ncol(dat)] <- v
                     }

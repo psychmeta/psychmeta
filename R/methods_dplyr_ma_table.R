@@ -191,7 +191,7 @@ transmute_if.ma_table <- function(.tbl, .predicate, .funs, ...){
 #### subset ####
 #' @export
 subset.ma_table <- function (x, subset, select, drop = FALSE, ...){
-     x <- reattribute(x, subset(as.data.frame(x), subset, select, drop, ...))
+     x <- reattribute(x, subset(as.data.frame(x, stringsAsFactors = FALSE), subset, select, drop, ...))
 }
 
 #' @export

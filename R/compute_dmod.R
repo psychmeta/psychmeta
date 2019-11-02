@@ -238,7 +238,7 @@ compute_dmod_npar <- function(referent_int, referent_slope,
      out <- as.data.frame(t(setNames(c(d_signed, d_unsigned, d_under, d_over, prop_under, prop_over,
                                        d_min, d_max, d_min_score[1], d_max_score[1]),
                                      c("d_signed", "d_unsigned", "d_under", "d_over", "prop_under", "prop_over",
-                                       "d_min", "d_max", "d_min_score", "d_max_score"))))
+                                       "d_min", "d_max", "d_min_score", "d_max_score"))), stringsAsFactors = FALSE)
 
      out <- list(call = call, inputs = inputs,
                  point_estimate = out)
@@ -519,7 +519,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
 
      outSummary <- cbind(d_signed, d_unsigned, dModDirectional, d_extremes)
      outSummary[apply(outSummary, 1, function(x) all(0 == zapsmall(x[1:4]))), 5:6] <- 0
-     outSummary <- cbind(focal_group = focal_names, as.data.frame(outSummary))
+     outSummary <- cbind(focal_group = focal_names, as.data.frame(outSummary, stringsAsFactors = FALSE))
      class(outSummary) <- "data.frame"
 
      out <- list(call = call, inputs = inputs, point_estimate = outSummary)
@@ -643,7 +643,7 @@ compute_dmod <- function(data, group, predictors, criterion,
                     bootstrap = bootstrap, boot_iter = boot_iter, stratify = stratify, empirical_ci = empirical_ci,
                     cross_validate_wts = cross_validate_wts)
 
-     if(!is.data.frame(data)) data <- as.data.frame(data)
+     if(!is.data.frame(data)) data <- as.data.frame(data, stringsAsFactors = FALSE)
      group <- match_variables(call = call[[match("group", names(call))]], arg = group, arg_name = "group", data = data)
      predictors <- match_variables(call = call[[match("predictors", names(call))]], arg = predictors, arg_name = "predictors", data = data)
      criterion <- match_variables(call = call[[match("criterion", names(call))]], arg = criterion, arg_name = "criterion", data = data)
@@ -659,7 +659,7 @@ compute_dmod <- function(data, group, predictors, criterion,
           }
      }
 
-     data <- data.frame(G = group, Y = unlist(criterion), predictors)
+     data <- data.frame(G = group, Y = unlist(criterion), predictors, stringsAsFactors = FALSE)
      xNames <- colnames(data)[-(1:2)]
 
      groupNames <- levels(factor(data[,"G"]))
@@ -690,7 +690,7 @@ compute_dmod <- function(data, group, predictors, criterion,
           varVecInvalidSd <- lapply(whichInvalidSd, function(x) x[length(x)])
           groupVecInvalidSd <- lapply(whichInvalidSd, function(x) paste(x[-length(x)], sep = "."))
 
-          print(data.frame(Group = unlist(groupVecInvalidSd), Variable = unlist(varVecInvalidSd)))
+          print(data.frame(Group = unlist(groupVecInvalidSd), Variable = unlist(varVecInvalidSd), stringsAsFactors = FALSE))
           stop("The variables associated with the groups listed above have no non-NA cases")
      }
 
@@ -700,7 +700,7 @@ compute_dmod <- function(data, group, predictors, criterion,
           varVecInvalidSd <- lapply(whichInvalidSd, function(x) x[length(x)])
           groupVecInvalidSd <- lapply(whichInvalidSd, function(x) paste(x[-length(x)], sep = "."))
 
-          print(data.frame(Group = unlist(groupVecInvalidSd), Variable = unlist(varVecInvalidSd)))
+          print(data.frame(Group = unlist(groupVecInvalidSd), Variable = unlist(varVecInvalidSd), stringsAsFactors = FALSE))
           stop("The variables associated with the groups listed above have variances of zero")
      }
 
@@ -739,9 +739,9 @@ compute_dmod <- function(data, group, predictors, criterion,
                     regModel <- lm(as.formula(paste("Y ~", paste(xNames, collapse = " + "))), data = data_i)$coeff
                data_i <- data.frame(cbind(data_i[,1:2],
                                          X = as.numeric(apply(as.matrix(data_i[,xNames]), 1,
-                                                              function(x) regModel[-1] %*% x))))
+                                                              function(x) regModel[-1] %*% x))), stringsAsFactors = FALSE)
           }else{
-               data_i <- data.frame(cbind(data_i[,1:2], X = unlist(data_i[,3])))
+               data_i <- data.frame(cbind(data_i[,1:2], X = unlist(data_i[,3])), stringsAsFactors = FALSE)
           }
 
           regList <- by(data_i, INDICES = data_i$G, function(x) lm(Y ~ X, data = x)$coeff)
@@ -779,11 +779,11 @@ compute_dmod <- function(data, group, predictors, criterion,
                                                referent_sd_y = ySdVec[referentId])$point_estimate
                    class(x_out) <- NULL
                    unlist(x_out)
-               })))
+               })), stringsAsFactors = FALSE)
                out <- cbind(focal_group = focal_id_vec, out)
           }
           class(out) <- NULL
-          as.data.frame(out)
+          as.data.frame(out, stringsAsFactors = FALSE)
      }
 
      if(bootstrap){
@@ -804,10 +804,10 @@ compute_dmod <- function(data, group, predictors, criterion,
           }
 
           colnames(bootstrap_mean) <- colnames(bootstrap_se) <- colnames(bootstrap_CI_LL) <- colnames(bootstrap_CI_UL) <- colnames(obsOut)[-1]
-          bootstrap_mean <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_mean))
-          bootstrap_se <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_se))
-          bootstrap_CI_LL <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_CI_LL))
-          bootstrap_CI_UL <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_CI_UL))
+          bootstrap_mean <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_mean, stringsAsFactors = FALSE))
+          bootstrap_se <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_se, stringsAsFactors = FALSE))
+          bootstrap_CI_LL <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_CI_LL, stringsAsFactors = FALSE))
+          bootstrap_CI_UL <- cbind(focal_group = obsOut[,1], as.data.frame(bootstrap_CI_UL, stringsAsFactors = FALSE))
 
           out <- list(point_estimate = obsOut, bootstrap_mean = bootstrap_mean, bootstrap_se = bootstrap_se,
                       bootstrap_CI_LL = bootstrap_CI_LL, bootstrap_CI_UL = bootstrap_CI_UL)

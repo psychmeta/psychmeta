@@ -782,7 +782,7 @@ gather_ma_ad <- function(x){
           }
           
           flip_xy <- ifelse(correct_rr_y & !correct_rr_x, TRUE, FALSE)
-          x <- list(barebones = as.data.frame(ma_r_obj$meta$barebones), ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
+          x <- list(barebones = as.data.frame(ma_r_obj$meta$barebones, stringsAsFactors = FALSE), ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
                     correct_rxx = correct_rxx, correct_ryy = correct_ryy, residual_ads = residual_ads,
                     indirect_rr_x = indirect_rr_x, indirect_rr_y = indirect_rr_y,
                     sign_rxz = sign_rxz, sign_ryz = sign_ryz, cred_level = ma_r_obj$inputs$cred_level,
@@ -826,7 +826,7 @@ gather_ma_ad <- function(x){
      
      out_bb <- .ma_r_bb(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)$meta$barebones
      ma_ad_dump <- ma_arg_list$ma_ad_dump
-     ma_ad_dump$barebones <- as.data.frame(out_bb)
+     ma_ad_dump$barebones <- as.data.frame(out_bb, stringsAsFactors = FALSE)
      
      .ma_r_ad_internal <- function(x) UseMethod(generic = "ma_r_ad", object = x)
      out <- gather_ma_ad(.ma_r_ad_internal(x = ma_ad_dump))

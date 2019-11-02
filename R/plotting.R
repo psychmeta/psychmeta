@@ -277,7 +277,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @keywords internal
 .plot_funnel <- function(x){
      #Extract se and yi from metafor object and store in dat
-     dat = data.frame(yi = x$yi, se = sqrt(x$vi))
+     dat = data.frame(yi = x$yi, se = sqrt(x$vi), stringsAsFactors = FALSE)
 
      mean_es <- wt_mean(x = x$yi, wt = x$weight)
      #Seq from 0-max se, and define 90-99%CIs for null; store in dfCI
@@ -289,7 +289,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      ll99 = mean_es - (qnorm(1 - (.01/2))*se.seq)
      ul99 = mean_es + (qnorm(1 - (.01/2))*se.seq)
      null = rep(mean_es , length(se.seq))
-     dfCI = data.frame(ll90, ul90, ll95, ul95, ll99, ul99, se.seq, null)
+     dfCI = data.frame(ll90, ul90, ll95, ul95, ll99, ul99, se.seq, null, stringsAsFactors = FALSE)
 
      #Make contour-enhanced funnel plot
      ce.fp = ggplot2::ggplot(data = dat, ggplot2::aes_(x = substitute(se))) + # Map se to x
@@ -354,7 +354,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 
      mat <- get_metatab(ma_obj, ma_method = .ma_method, correction_type = .correction_type)
 
-     .mat <- as_tibble(select(as.data.frame(mat), .data$analysis_type:.data$k))
+     .mat <- as_tibble(select(as.data.frame(mat, stringsAsFactors = FALSE), .data$analysis_type:.data$k))
      .mat <- .mat[,-c(1, ncol(.mat))]
      if(ncol(.mat) > 1) stop("Forest plots currently only support unmoderated or single-moderator meta-analysis")
 
@@ -390,7 +390,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      }
 
 
-     mat <- as.data.frame(mat)
+     mat <- as.data.frame(mat, stringsAsFactors = FALSE)
      conf_out <- confidence(mean = unlist(mat[,mean_es]),
                             sd = unlist(mat[,sd_es]),
                             k = unlist(mat[,"k"]),
@@ -399,7 +399,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      mat <- data.frame(tester = "Summary",
                        setting = ma_facetname,
                        cite = setting,
-                       yi = unlist(mat[,mean_es]))
+                       yi = unlist(mat[,mean_es]), stringsAsFactors = FALSE)
      colnames(mat) <- c("tester", "setting", "cite", "yi")
      mat <- cbind(mat, conf_out)
 
@@ -441,7 +441,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           mat$cite <- "Overall"
           mat$cite <- as.factor(mat$cite)
      }
-     plot_dat <- rbind(data.frame(dat[,colnames(mat)]), mat)
+     plot_dat <- rbind(data.frame(dat[,colnames(mat)], stringsAsFactors = FALSE), mat)
      plot_dat$setting <- factor(plot_dat$setting, levels = c(levels(dat$setting), ma_facetname))
      if(nrow(mat) == 1) plot_dat$cite <- factor(plot_dat$cite, levels = c(levels(mat$cite), levels(dat$cite)))
 

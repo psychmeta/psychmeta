@@ -45,7 +45,7 @@ anova.summary.lm_mat <- function(...){
           formula_vec <- paste0("Model ", 1:length(formula_vec), ": ", formula_vec)
 
 
-          anova_tab <- data.frame(Res.Df = res_df, RSS = rss, Df = df, SS = SS, F = f, p = p)
+          anova_tab <- data.frame(Res.Df = res_df, RSS = rss, Df = df, SS = SS, F = f, p = p, stringsAsFactors = FALSE)
           colnames(anova_tab) <- c("Res.Df", "RSS", "Df", "Sum of Sq", "F", "Pr(>F)")
           anova_tab[is.na(anova_tab)] <- anova_tab[1,c("F", "Pr(>F)")] <- NA
           attributes(anova_tab) <- append(attributes(anova_tab),

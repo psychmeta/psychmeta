@@ -39,7 +39,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      }
 
      if(!is.null(construct_x) | !is.null(construct_y)){
-          construct_mat_initial <- data.frame(cbind(construct_x = construct_x, construct_y = construct_y))
+          construct_mat_initial <- data.frame(cbind(construct_x = construct_x, construct_y = construct_y), stringsAsFactors = FALSE)
      }else{
           construct_mat_initial <- NULL
      }
@@ -67,7 +67,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
           }
           temp_mat <- cbind(construct_mat_initial, temp_mat)
      }
-     temp_mat <- as.data.frame(temp_mat)
+     temp_mat <- as.data.frame(temp_mat, stringsAsFactors = FALSE)
 
      ## Organize the matrix - first by moderator levels, then by constructs
      if(!is.null(moderator_matrix)){
@@ -96,7 +96,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      if(!is.null(moderator_matrix)){
           col_names <- colnames(moderator_matrix)
           moderator_matrix <- temp_mat[,colnames(moderator_matrix)]
-          moderator_matrix <- as.data.frame(moderator_matrix)
+          moderator_matrix <- as.data.frame(moderator_matrix, stringsAsFactors = FALSE)
           for(i in 1:ncol(moderator_matrix)) moderator_matrix[,i] <- as.character(moderator_matrix[,i])
           colnames(moderator_matrix) <- col_names
      }
@@ -322,12 +322,12 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                     .moderator_names <- NULL
                }
                if(!is.null(cat_moderator_matrix)){
-                    cat_moderator_matrix <- as.data.frame(cat_moderator_matrix)
+                    cat_moderator_matrix <- as.data.frame(cat_moderator_matrix, stringsAsFactors = FALSE)
                     colnames(cat_moderator_matrix) <- moderator_names$cat
                     moderators$cat_moderator_matrix <- cat_moderator_matrix
                }
                if(!is.null(moderator_matrix)){
-                    moderator_matrix <- as.data.frame(moderator_matrix)
+                    moderator_matrix <- as.data.frame(moderator_matrix, stringsAsFactors = FALSE)
                     colnames(moderator_matrix) <- moderator_names$all
                     moderators$moderator_matrix <- moderator_matrix
                }
@@ -396,7 +396,7 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           if(es_type == "r" & ma_type == "ic"){
                for(i in 1:nrow(results_df)){
                     method_details <- table(results_df$escalc[[i]]$individual_correction$true_score$correction_type)
-                    method_details <- data.frame(Correction = names(method_details), Frequency = as.numeric(method_details))
+                    method_details <- data.frame(Correction = names(method_details), Frequency = as.numeric(method_details), stringsAsFactors = FALSE)
                     
                     attributes(results_df$meta_tables[[i]]$individual_correction) <- append(attributes(results_df$meta_tables[[i]]$individual_correction),
                                                                                             list(method_details = method_details))

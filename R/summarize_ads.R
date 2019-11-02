@@ -106,8 +106,8 @@ summarize_ads <- function(ma_obj){
           if(pairwise_ads) .construct_pair <- paste0(c(pair_names, pair_names), ": ", construct_pair)
           for(i in 1:length(ad_list)){
                ad_list[[i]] <- ad_list[[i]][,c("k_total", "N_total", "mean", "sd", "sd_res")]
-               ad_list[[i]] <- data.frame(Variable = var_names[i], Artifact = rownames(ad_list[[i]]), ad_list[[i]])
-               if(pairwise_ads) ad_list[[i]] <- data.frame(Construct_Pair = .construct_pair[i], ad_list[[i]])
+               ad_list[[i]] <- data.frame(Variable = var_names[i], Artifact = rownames(ad_list[[i]]), ad_list[[i]], stringsAsFactors = FALSE)
+               if(pairwise_ads) ad_list[[i]] <- data.frame(Construct_Pair = .construct_pair[i], ad_list[[i]], stringsAsFactors = FALSE)
                ad_mat <- rbind(ad_mat, ad_list[[i]])
           }
 

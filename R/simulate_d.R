@@ -94,7 +94,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
      out$overall_results$observed <- as_tibble(out$overall_results$observed, .name_repair = "minimal")
      out$overall_results$true <- as_tibble(out$overall_results$true, .name_repair = "minimal")
      out$overall_results$error <- as_tibble(out$overall_results$error, .name_repair = "minimal")
-     
+
      class(out) <- "simdat_d_sample"
      out
 }
@@ -210,7 +210,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
 
      mat1 <- mat2 <- data.frame(group = rep(groups, ncol(x)),
                                 y_name = c(matrix(vars, nrow(x), ncol(x), T)),
-                                stat_name = c(unlist(x)))
+                                stat_name = c(unlist(x)), stringsAsFactors = FALSE)
 
      colnames(mat1)[1] <- "group1"
      colnames(mat2)[1] <- "group2"
@@ -225,7 +225,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
 
 
 .melt_mat_combined <- function(key_mat, x, stat_name){
-     mat <- data.frame(y_name = names(x), x = x)
+     mat <- data.frame(y_name = names(x), x = x, stringsAsFactors = FALSE)
      colnames(mat) <- c("y_name", stat_name)
      key_mat <- suppressWarnings(left_join(key_mat, mat, by = "y_name"))
      key_mat
@@ -254,7 +254,7 @@ simulate_d_sample <- function(n_vec, rho_mat_list, mu_mat,
 
      .key_mat <- matrix(groups, length(groups), length(groups), T)
      .key_mat <- data.frame(group1 = .key_mat[lower.tri(.key_mat)],
-                            group2 = t(.key_mat)[lower.tri(.key_mat)], stringsAsFactors = F)
+                            group2 = t(.key_mat)[lower.tri(.key_mat)], stringsAsFactors = FALSE)
 
      key_mat <- NULL
      for(i in vars) key_mat <- rbind(key_mat, cbind(.key_mat, y_name = i))
@@ -403,9 +403,9 @@ append_dmat <- function(di_mat, da_mat,
                                                k_items_vec = k_items_vec,
                                                var_names = var_names, composite_names = composite_names)
 
-          obs_a <- rbind(obs_a, data.frame(group = group_names[i], group_list[[i]]$obs_scores_a))
-          true_a <- rbind(true_a, data.frame(group = group_names[i], group_list[[i]]$true_scores_a))
-          error_a <- rbind(error_a, data.frame(group = group_names[i], group_list[[i]]$error_scores_a))
+          obs_a <- rbind(obs_a, data.frame(group = group_names[i], group_list[[i]]$obs_scores_a, stringsAsFactors = FALSE))
+          true_a <- rbind(true_a, data.frame(group = group_names[i], group_list[[i]]$true_scores_a, stringsAsFactors = FALSE))
+          error_a <- rbind(error_a, data.frame(group = group_names[i], group_list[[i]]$error_scores_a, stringsAsFactors = FALSE))
      }
 
      .sr_vec <- c(sr_vec, rep(1, sum(k_items_vec)), sr_composites)
@@ -433,7 +433,7 @@ append_dmat <- function(di_mat, da_mat,
                                                       show_items = TRUE, simdat_info = append(group_list[[i]],
                                                                                              list(cut_vec = cut_vec)))
 
-          items_a <- rbind(items_a, data.frame(group = group_names[i], group_list[[i]]$item_info$data$observed))
+          items_a <- rbind(items_a, data.frame(group = group_names[i], group_list[[i]]$item_info$data$observed, stringsAsFactors = FALSE))
           item_index <- group_list[[i]]$item_info$item_index
           group_list[[i]]$item_info <- NULL
      }
@@ -443,7 +443,7 @@ append_dmat <- function(di_mat, da_mat,
 
      .pool_dat <- function(dat){
           .dat_pool <- by(dat, dat[,1], function(x){
-               data.frame(cbind(group = x[,1], scale(x[,-1], scale = FALSE)))
+               data.frame(group = x[,1], scale(x[,-1], scale = FALSE), stringsAsFactors = FALSE)
           })
           out <- NULL
           for(i in 1:length(.dat_pool)) out <- rbind(out, .dat_pool[[i]])
@@ -710,10 +710,10 @@ append_dmat <- function(di_mat, da_mat,
      sr_overall <- unlist(lapply(group_list, function(x) as.numeric(x$sr)))
      p_dat <- data.frame(na = unlist(lapply(group_list, function(x) as.numeric(x$na))),
                          ni = unlist(lapply(group_list, function(x) as.numeric(x$ni))),
-                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall)
+                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall, stringsAsFactors = FALSE)
      p_dat <- rbind(p_dat, apply(p_dat, 2, sum))
      p_dat[nrow(p_dat), ncol(p_dat)] <- sum(p_vec * sr_overall)
-     p_dat <- data.frame(group = c(group_names, "overall"), p_dat)
+     p_dat <- data.frame(group = c(group_names, "overall"), p_dat, stringsAsFactors = FALSE)
      rownames(p_dat) <- NULL
 
      if(!is.null(keep_vars)){
@@ -727,9 +727,9 @@ append_dmat <- function(di_mat, da_mat,
                  group_results = lapply(group_list, function(x) .subset_sample_r(simdat = x, keep_vars = keep_vars)),
                  S_complete_a = sa,
                  S_complete_i = si,
-                 data = list(observed = data.frame(obs_a, selected = select_vec),
-                             true = data.frame(true_a, selected = select_vec),
-                             error = data.frame(error_a, selected = select_vec)))
+                 data = list(observed = data.frame(obs_a, selected = select_vec, stringsAsFactors = FALSE),
+                             true = data.frame(true_a, selected = select_vec, stringsAsFactors = FALSE),
+                             error = data.frame(error_a, selected = select_vec, stringsAsFactors = FALSE)))
      class(out) <- c("simdat_d_sample")
      out
 }
@@ -1069,10 +1069,10 @@ append_dmat <- function(di_mat, da_mat,
      sr_overall <- unlist(lapply(group_list, function(x) as.numeric(x$sr)))
      p_dat <- data.frame(na = unlist(lapply(group_list, function(x) as.numeric(x$na))),
                          ni = unlist(lapply(group_list, function(x) as.numeric(x$ni))),
-                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall)
+                         pa = p_vec, pi = p_vec * sr_overall / sum(p_vec * sr_overall), sr = sr_overall, stringsAsFactors = FALSE)
      p_dat <- rbind(p_dat, apply(p_dat, 2, sum))
      p_dat[nrow(p_dat), ncol(p_dat)] <- sum(p_vec * sr_overall)
-     p_dat <- data.frame(group = c(group_names, "overall"), p_dat)
+     p_dat <- data.frame(group = c(group_names, "overall"), p_dat, stringsAsFactors = FALSE)
      rownames(p_dat) <- NULL
 
      if(!is.null(keep_vars)){
@@ -1170,12 +1170,12 @@ simulate_d_database <- function(k, n_params, rho_params,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL,
                                 group_names = NULL, var_names = NULL, composite_names = NULL, diffs_as_obs = FALSE,
                                 show_applicant = FALSE, keep_vars = NULL, decimals = 2, max_iter = 100, ...){
-     
+
      .dplyr.show_progress <- options()$dplyr.show_progress
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
-     
+
      inputs <- as.list(environment())
      call <- match.call()
 
@@ -1456,8 +1456,8 @@ simulate_d_database <- function(k, n_params, rho_params,
 
      dat_stats <- dat_params <- NULL
      for(i in 1:length(sim_dat_stats)){
-          dat_stats <- rbind(dat_stats, data.frame(sample_id = i, sim_dat_stats[[i]]))
-          dat_params <- rbind(dat_params, data.frame(sample_id = i, sim_dat_params[[i]]))
+          dat_stats <- rbind(dat_stats, data.frame(sample_id = i, sim_dat_stats[[i]], stringsAsFactors = FALSE))
+          dat_params <- rbind(dat_params, data.frame(sample_id = i, sim_dat_params[[i]], stringsAsFactors = FALSE))
      }
      rownames(dat_stats) <- rownames(dat_params) <- NULL
      rm(sim_dat_stats, sim_dat_params)
@@ -1487,10 +1487,10 @@ simulate_d_database <- function(k, n_params, rho_params,
                  statistics = as_tibble(dat_stats, .name_repair = "minimal"),
                  parameters = as_tibble(dat_params, .name_repair = "minimal"))
      class(out) <- "simdat_d_database"
-     
+
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-     
+
      out
 }
 
@@ -1536,30 +1536,30 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                art_logic_param <- c(rep(sparify_u, 3), rep(sparify_rel, 36))
                art_names_stat <- c("uy_local", "uy1_local", "uy2_local",
                                    "uy_external", "uy1_external", "uy2_external",
-                                   
+
                                    "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
                                    "parallel_ryya_pooled", "parallel_ryya1_pooled", "parallel_ryya2_pooled",
                                    "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
                                    "raw_alpha_ya_pooled", "raw_alpha_ya1_pooled", "raw_alpha_ya2_pooled",
                                    "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
-                                   "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled", 
-                                   
+                                   "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled",
+
                                    "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
                                    "parallel_ryya_total", "parallel_ryya1_total", "parallel_ryya2_total",
                                    "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
                                    "raw_alpha_ya_total", "raw_alpha_ya1_total", "raw_alpha_ya2_total",
                                    "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total",
                                    "std_alpha_ya_total", "std_alpha_ya1_total", "std_alpha_ya2")[art_logic_stat]
-               
+
                art_names_param <- c("uy", "uy1", "uy2",
-                                    
+
                                     "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
                                     "parallel_ryya_pooled", "parallel_ryya1_pooled", "parallel_ryya2_pooled",
                                     "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
                                     "raw_alpha_ya_pooled", "raw_alpha_ya1_pooled", "raw_alpha_ya2_pooled",
                                     "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
-                                    "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled", 
-                                    
+                                    "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled",
+
                                     "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
                                     "parallel_ryya_total", "parallel_ryya1_total", "parallel_ryya2_total",
                                     "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
@@ -1571,21 +1571,21 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                art_logic_param <- c(rep(sparify_u, 3), rep(sparify_rel, 18))
                art_names_stat <- c("uy_local", "uy1_local", "uy2_local",
                                    "uy_external", "uy1_external", "uy2_external",
-                                   
+
                                    "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
                                    "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
-                                   "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled", 
-                                   
+                                   "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
+
                                    "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
                                    "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
                                    "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total")[art_logic_stat]
-               
+
                art_names_param <- c("uy", "uy1", "uy2",
-                                    
+
                                     "parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
                                     "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
-                                    "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled", 
-                                    
+                                    "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
+
                                     "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
                                     "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
                                     "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total")[art_logic_stat]
@@ -1613,8 +1613,8 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                                                         "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
                                                         "raw_alpha_ya_pooled", "raw_alpha_ya1_pooled", "raw_alpha_ya2_pooled",
                                                         "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
-                                                        "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled", 
-                                                        
+                                                        "std_alpha_ya_pooled", "std_alpha_ya1_pooled", "std_alpha_ya2_pooled",
+
                                                         "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
                                                         "parallel_ryya_total", "parallel_ryya1_total", "parallel_ryya2_total",
                                                         "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
@@ -1624,8 +1624,8 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
                     }else{
                          art_i_param <- art_i_stat <- c("parallel_ryyi_pooled", "parallel_ryyi1_pooled", "parallel_ryyi2_pooled",
                                                         "raw_alpha_yi_pooled", "raw_alpha_yi1_pooled", "raw_alpha_yi2_pooled",
-                                                        "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled", 
-                                                        
+                                                        "std_alpha_yi_pooled", "std_alpha_yi1_pooled", "std_alpha_yi2_pooled",
+
                                                         "parallel_ryyi_total", "parallel_ryyi1_total", "parallel_ryyi2_total",
                                                         "raw_alpha_yi_total", "raw_alpha_yi1_total", "raw_alpha_yi2_total",
                                                         "std_alpha_yi_total", "std_alpha_yi1_total", "std_alpha_yi2_total")
@@ -1646,7 +1646,7 @@ sparsify_simdat_d <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
 
      data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
      data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
-     
+
      data_obj
 }
 
@@ -1677,7 +1677,7 @@ merge_simdat_d <- function(...){
           }else{
                data_list[[i]]$statistics$sample_id <- data_list[[i]]$statistics$sample_id + data_obj$statistics$sample_id[length(data_obj$statistics$sample_id)]
                data_obj$statistics <- rbind(data_obj$statistics, cbind(i, data_list[[i]]$statistics))
-               
+
                data_list[[i]]$parameters$sample_id <- data_list[[i]]$parameters$sample_id + data_obj$parameters$sample_id[length(data_obj$parameters$sample_id)]
                data_obj$parameters <- rbind(data_obj$parameters, cbind(i, data_list[[i]]$parameters))
           }
@@ -1696,7 +1696,7 @@ merge_simdat_d <- function(...){
 
      data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
      data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
-     
+
      data_obj
 }
 

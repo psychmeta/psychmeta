@@ -120,7 +120,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      call_full <- as.call(append(as.list(call), formal_args))
      
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
           
           if(deparse(substitute(n))[1] != "NULL")
                n <- match_variables(call = call_full[[match("n", names(call_full))]], arg = n, arg_name = "n", data = data)
@@ -202,7 +202,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
-               moderators <- as.data.frame(moderators)
+               moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
                colnames(moderators) <- "Moderator"
           }
           
@@ -222,7 +222,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
                moderator_levels <- NULL
           }
           
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -278,7 +278,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
           .full_data <- as_tibble(full_data, .name_repair = "minimal")[valid_intercor,]
           .full_data$construct_x[!is.na(.full_data$facet_x)] <- paste0(.full_data$construct_x[!is.na(.full_data$facet_x)], ": ", .full_data$facet_x[!is.na(.full_data$facet_x)])
           .full_data$construct_y[!is.na(.full_data$facet_y)] <- paste0(.full_data$construct_y[!is.na(.full_data$facet_y)], ": ", .full_data$facet_y[!is.na(.full_data$facet_y)])
-          full_data <- data.frame(rbind(as_tibble(full_data, .name_repair = "minimal")[retain,], .full_data))
+          full_data <- data.frame(rbind(as_tibble(full_data, .name_repair = "minimal")[retain,], .full_data), stringsAsFactors = FALSE)
      }
      
      additional_args <- NULL
@@ -414,7 +414,7 @@ create_ad_list <- create_ad_tibble
                                      estimate_ux, estimate_ut, var_unbiased,
                                      process_ads, supplemental_ads, pairwise_ads = pairwise_ads, ad_type){
      
-     full_data <- as.data.frame(ungroup(full_data))
+     full_data <- as.data.frame(ungroup(full_data), stringsAsFactors = FALSE)
      sample_id <- full_data$sample_id
      construct_x <- full_data$construct_x
      construct_y <- full_data$construct_y
@@ -455,7 +455,7 @@ create_ad_list <- create_ad_tibble
                               out
                          })
                          
-                         .data <- as.data.frame(data.table::rbindlist(measure_averages))
+                         .data <- as.data.frame(data.table::rbindlist(measure_averages), stringsAsFactors = FALSE)
 
                          if(nrow(.data) > 1){
                               if(collapse_method == "composite"){
@@ -721,7 +721,7 @@ create_ad_list <- create_ad_tibble
                unique_x <- unique_y <- rep(TRUE, nrow(data_x))
           }
           
-          data <- data.frame(es_data, data_x, data_y)
+          data <- data.frame(es_data, data_x, data_y, stringsAsFactors = FALSE)
           ad_obj_list <- by(1:length(construct_pair), construct_pair, function(i){
                
                if(is.null(construct_x)) data$construct_x <- construct_x[i]
@@ -824,8 +824,8 @@ create_ad_list <- create_ad_tibble
           
           ad_obj_list_x <- ad_obj_list_y <- by(1:length(construct_pair), construct_x, function(i){
                
-               data <- data.frame(es_data[i,], data_x[i,], data_y[i,])
-               if(!is.null(construct_x)) data <- data.frame(data, construct_x = construct_x[i])
+               data <- data.frame(es_data[i,], data_x[i,], data_y[i,], stringsAsFactors = FALSE)
+               if(!is.null(construct_x)) data <- data.frame(data, construct_x = construct_x[i], stringsAsFactors = FALSE)
                
                n <- es_data$n[i][unique_x[i]]
                

@@ -192,10 +192,10 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           V.d[!is.na(n2)] <- var_error_d(d=d.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)], correct_bias=FALSE)
 
           CI <- confidence(d, se=sqrt(V.d), conf_level=conf_level, conf_method = "norm")
-          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
+          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2, stringsAsFactors = FALSE)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.d)
-          conf_int <- data.frame(d=d.ci, n_total=n, n1=n1, n2=n2, var_e = V.d, se = V.d^.5, CI)
+          meta_input <- data.frame(d = d, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.d, stringsAsFactors = FALSE)
+          conf_int <- data.frame(d=d.ci, n_total=n, n1=n1, n2=n2, var_e = V.d, se = V.d^.5, CI, stringsAsFactors = FALSE)
      }
 
      if(output_es == "r"){
@@ -220,10 +220,10 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
           V.r <- var_error_r(r.ci, n, correct_bias = FALSE)
           CI <- confidence(r, se=sqrt(V.r), conf_level=conf_level, conf_method = "norm")
-          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
+          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2, stringsAsFactors = FALSE)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(r = r, n_effective=n_effective, var_e = V.r)
-          conf_int <- data.frame(r=r.ci, n_effective=n, var_e = V.r, se = V.r^.5, CI)
+          meta_input <- data.frame(r = r, n_effective=n_effective, var_e = V.r, stringsAsFactors = FALSE)
+          conf_int <- data.frame(r=r.ci, n_effective=n, var_e = V.r, se = V.r^.5, CI, stringsAsFactors = FALSE)
      }
 
      if(output_es %in% c("A", "auc", "cles") ){
@@ -255,10 +255,10 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           V.A[!is.na(n2)] <- var_error_A(A=A.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)])
 
           CI <- confidence(A, se=sqrt(V.A), conf_level=conf_level, conf_method = "norm")
-          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2)
+          original_es   <- data.frame(V1 = es, n_total=n, n1=n1, n2=n2, stringsAsFactors = FALSE)
           names(original_es)[1] <- input_es
-          meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.A)
-          conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, var_e = V.A, se = V.A^.5, CI)
+          meta_input <- data.frame(A = A, n_effective = n_effective, n_total=n, n1=n1, n2=n2, var_e = V.A, stringsAsFactors = FALSE)
+          conf_int <- data.frame(A=A.ci, n_total=n, n1=n1, n2=n2, var_e = V.A, se = V.A^.5, CI, stringsAsFactors = FALSE)
 
      }
 

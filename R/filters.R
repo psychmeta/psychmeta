@@ -323,7 +323,7 @@ record_warnings <- function(){
           warning_out <- NULL
      }else{
           warning_out <- table(warning_out)
-          warning_out <- data.frame(Message = names(warning_out), Frequency = as.numeric(warning_out))
+          warning_out <- data.frame(Message = names(warning_out), Frequency = as.numeric(warning_out), stringsAsFactors = FALSE)
      }
      warning_out
 }
@@ -355,30 +355,30 @@ record_fyis <- function(es_metric = "r", fyi_messages = NULL, neg_var_res = 0, n
 
      if(!is.null(fyi_messages)){
           fyi_messages <- table(fyi_messages)
-          out <- data.frame(Message = names(fyi_messages), Frequency = as.numeric(fyi_messages))
+          out <- data.frame(Message = names(fyi_messages), Frequency = as.numeric(fyi_messages), stringsAsFactors = FALSE)
      }
 
      if(es_metric == "r"){
-          if(neg_var_res > 0) out <- rbind(out, data.frame(Message = "Some var_res values were negative: sd_res was set to zero", Frequency = neg_var_res))
-          if(neg_var_rtpa > 0) out <- rbind(out, data.frame(Message = "Some true-score var_rho values were negative: sd_rho was set to zero", Frequency = neg_var_rtpa))
-          if(neg_var_rxpa > 0) out <- rbind(out, data.frame(Message = "Some validity generalization var_rho values were negative with X as the predictor: sd_rho was set to zero", Frequency = neg_var_rxpa))
-          if(neg_var_rtya > 0) out <- rbind(out, data.frame(Message = "Some validity generalization var_rho values were negative with Y as the predictor: sd_rho was set to zero", Frequency = neg_var_rtya))
+          if(neg_var_res > 0) out <- rbind(out, data.frame(Message = "Some var_res values were negative: sd_res was set to zero", Frequency = neg_var_res, stringsAsFactors = FALSE))
+          if(neg_var_rtpa > 0) out <- rbind(out, data.frame(Message = "Some true-score var_rho values were negative: sd_rho was set to zero", Frequency = neg_var_rtpa, stringsAsFactors = FALSE))
+          if(neg_var_rxpa > 0) out <- rbind(out, data.frame(Message = "Some validity generalization var_rho values were negative with X as the predictor: sd_rho was set to zero", Frequency = neg_var_rxpa, stringsAsFactors = FALSE))
+          if(neg_var_rtya > 0) out <- rbind(out, data.frame(Message = "Some validity generalization var_rho values were negative with Y as the predictor: sd_rho was set to zero", Frequency = neg_var_rtya, stringsAsFactors = FALSE))
      }
      if(es_metric == "d"){
-          if(neg_var_res > 0) out <- rbind(out, data.frame(Message = "Some var_res values were negative: sd_res was set to zero", Frequency = neg_var_res))
-          if(neg_var_rtpa > 0) out <- rbind(out, data.frame(Message = "Some latent group, latent Y var_delta values were negative: sd_delta was set to zero", Frequency = neg_var_rtpa))
-          if(neg_var_rxpa > 0) out <- rbind(out, data.frame(Message = "Some observed group, latent Y var_delta values were negative with X as the predictor: sd_delta was set to zero", Frequency = neg_var_rxpa))
-          if(neg_var_rtya > 0) out <- rbind(out, data.frame(Message = "Some latent group, observed Y var_delta values were negative with Y as the predictor: sd_delta was set to zero", Frequency = neg_var_rtya))
+          if(neg_var_res > 0) out <- rbind(out, data.frame(Message = "Some var_res values were negative: sd_res was set to zero", Frequency = neg_var_res, stringsAsFactors = FALSE))
+          if(neg_var_rtpa > 0) out <- rbind(out, data.frame(Message = "Some latent group, latent Y var_delta values were negative: sd_delta was set to zero", Frequency = neg_var_rtpa, stringsAsFactors = FALSE))
+          if(neg_var_rxpa > 0) out <- rbind(out, data.frame(Message = "Some observed group, latent Y var_delta values were negative with X as the predictor: sd_delta was set to zero", Frequency = neg_var_rxpa, stringsAsFactors = FALSE))
+          if(neg_var_rtya > 0) out <- rbind(out, data.frame(Message = "Some latent group, observed Y var_delta values were negative with Y as the predictor: sd_delta was set to zero", Frequency = neg_var_rtya, stringsAsFactors = FALSE))
      }
      if(es_metric == "r_order2"){
-          if(neg_var_r_order2 > 0) out <- rbind(out, data.frame(Message = "Some var_r_bar values were negative: sd_r_bar was set to zero", Frequency = neg_var_r_order2))
-          if(neg_var_rho_ic_order2 > 0) out <- rbind(out, data.frame(Message = "Some individual-correction var_rho_bar values were negative: sd_rho_bar was set to zero", Frequency = neg_var_rho_ic_order2))
-          if(neg_var_rho_ad_order2 > 0) out <- rbind(out, data.frame(Message = "Some artifact-distribution var_rho_bar values were negative: sd_rho_bar was set to zero", Frequency = neg_var_rho_ad_order2))
+          if(neg_var_r_order2 > 0) out <- rbind(out, data.frame(Message = "Some var_r_bar values were negative: sd_r_bar was set to zero", Frequency = neg_var_r_order2, stringsAsFactors = FALSE))
+          if(neg_var_rho_ic_order2 > 0) out <- rbind(out, data.frame(Message = "Some individual-correction var_rho_bar values were negative: sd_rho_bar was set to zero", Frequency = neg_var_rho_ic_order2, stringsAsFactors = FALSE))
+          if(neg_var_rho_ad_order2 > 0) out <- rbind(out, data.frame(Message = "Some artifact-distribution var_rho_bar values were negative: sd_rho_bar was set to zero", Frequency = neg_var_rho_ad_order2, stringsAsFactors = FALSE))
      }
      if(es_metric == "d_order2"){
-          if(neg_var_d_order2 > 0) out <- rbind(out, data.frame(Message = "Some var_d_bar values were negative: sd_d_bar was set to zero", Frequency = neg_var_d_order2))
-          if(neg_var_delta_ic_order2 > 0) out <- rbind(out, data.frame(Message = "Some individual-correction var_delta_bar values were negative: sd_delta_bar was set to zero", Frequency = neg_var_delta_ic_order2))
-          if(neg_var_delta_ad_order2 > 0) out <- rbind(out, data.frame(Message = "Some artifact-distribution var_delta_bar values were negative: sd_delta_bar was set to zero", Frequency = neg_var_delta_ad_order2))
+          if(neg_var_d_order2 > 0) out <- rbind(out, data.frame(Message = "Some var_d_bar values were negative: sd_d_bar was set to zero", Frequency = neg_var_d_order2, stringsAsFactors = FALSE))
+          if(neg_var_delta_ic_order2 > 0) out <- rbind(out, data.frame(Message = "Some individual-correction var_delta_bar values were negative: sd_delta_bar was set to zero", Frequency = neg_var_delta_ic_order2, stringsAsFactors = FALSE))
+          if(neg_var_delta_ad_order2 > 0) out <- rbind(out, data.frame(Message = "Some artifact-distribution var_delta_bar values were negative: sd_delta_bar was set to zero", Frequency = neg_var_delta_ad_order2, stringsAsFactors = FALSE))
      }
      out
 }

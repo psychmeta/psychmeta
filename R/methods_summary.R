@@ -80,7 +80,7 @@ summary.ma_psychmeta <- function(object, ...){
      if("ad" %in% ma_methods & any(c("r_as_r", "r_as_d", "d_as_r", "d_as_d") %in% ma_metric)){
           if(length(correction_types_ic) > 0){
                method_details_ad <- suppressWarnings(bind_rows(apply(object, 1, function(x){
-                    cbind(analysis_id = x$analysis_id, data.frame(t(attributes(x$meta_tables$artifact_distribution)$method_details)))
+                    cbind(analysis_id = x$analysis_id, data.frame(t(attributes(x$meta_tables$artifact_distribution)$method_details), stringsAsFactors = FALSE))
                })))
                colnames(method_details_ad) <- c("analysis_id", "Artifact-distribution method", "Measurement-correction method", "Range-restriction correction method")
           }else{

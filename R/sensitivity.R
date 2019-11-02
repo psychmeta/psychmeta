@@ -196,7 +196,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      lower.cr[is.na(lower.cr)] <- mean.value[is.na(lower.cr)]
      upper.cr[is.na(upper.cr)] <- mean.value[is.na(upper.cr)]
 
-     plot.df <- data.frame(label, mean.value, sd.value, lower.ci, upper.ci, ci.width, lower.cr, upper.cr)
+     plot.df <- data.frame(label, mean.value, sd.value, lower.ci, upper.ci, ci.width, lower.cr, upper.cr, stringsAsFactors = FALSE)
 
      if(analysis == "cumulative"){
           plot.df[,1] <- factor(plot.df[,1], levels = rev(plot.df[,1]))
@@ -315,7 +315,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           for(i in rows){
                out <- rbind(out, suppressWarnings(fun(data = data, i = rows[-i], ma_arg_list = ma_arg_list)))
           }
-          as.data.frame(out)
+          as.data.frame(out, stringsAsFactors = FALSE)
      }
      cbind(study_left_out = data$sample_id, suppressWarnings(.leave1out(data = data, fun = ma_fun_boot, ma_arg_list = ma_arg_list)))
 }
@@ -351,7 +351,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           for(i in 1:k){
                out <- rbind(out, suppressWarnings(fun(data = data, i = 1:i, ma_arg_list = ma_arg_list)))
           }
-          as.data.frame(out)
+          as.data.frame(out, stringsAsFactors = FALSE)
      }
      cbind(study_added = data$sample_id, suppressWarnings(.cumulative(data = data, fun = ma_fun_boot, ma_arg_list = ma_arg_list)))
 }

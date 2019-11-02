@@ -66,8 +66,8 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
      if(!is.null(dim(var_names))) var_names <- unlist(var_names)
      var_names <- as.character(var_names)
 
-     common_data <- as.data.frame(common_data)
-     unique_data <- as.data.frame(unique_data)
+     common_data <- as.data.frame(common_data, stringsAsFactors = FALSE)
+     unique_data <- as.data.frame(unique_data, stringsAsFactors = FALSE)
 
      cor_data <- as.matrix(cor_data)
      if(!lower_tri) cor_data <- t(cor_data)
@@ -288,7 +288,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
 
 
      if(is.null(es_design)) {
-          # new_data <- data.frame(matrix(NA, 0, length(common_vars) + length(other_cnames) + 1))
+          # new_data <- data.frame(matrix(NA, 0, length(common_vars) + length(other_cnames) + 1), stringsAsFactors = FALSE)
           # colnames(new_data) <- c(common_vars, other_cnames, "x_name")
 
           new_data <- vector(mode = "list", length = length(var_names))
@@ -313,7 +313,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
           new_data <- data.table::rbindlist(new_data, fill = TRUE)
 
      } else {
-          # new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)))
+          # new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)), stringsAsFactors = FALSE)
           # colnames(new_data) <- c(common_vars,
           #                         "n", es_name, "x_name", "y_name",
           #                         if(length(other_cnames) > 0) {c(paste0(other_cnames, "_x"), paste0(other_cnames, "_y"))} else {NULL}
@@ -355,7 +355,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
      if (inherits(data, "tbl_df")) {
        new_data <- as_tibble(new_data)
      } else if (inherits(data, "data.frame")) {
-       new_data <- as.data.frame(new_data)
+       new_data <- as.data.frame(new_data, stringsAsFactors = FALSE)
      }
      new_data
 }
