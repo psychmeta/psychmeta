@@ -7,8 +7,8 @@
 ma_r_order2(k, N = NULL, r = NULL, rho = NULL, var_r = NULL,
   var_r_c = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
   citekey = NULL, moderators = NULL, moderator_type = "simple",
-  construct_x = NULL, construct_y = NULL, data = NULL,
-  control = control_psychmeta(), ...)
+  construct_x = NULL, construct_y = NULL, construct_order = NULL,
+  data = NULL, control = control_psychmeta(), ...)
 }
 \arguments{
 \item{k}{Vector or column name of meta-analyses' k values.}
@@ -36,6 +36,8 @@ ma_r_order2(k, N = NULL, r = NULL, rho = NULL, var_r = NULL,
 \item{construct_x}{Vector or column name of construct names for X.}
 
 \item{construct_y}{Vector or column name of construct names for Y.}
+
+\item{construct_order}{Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.}
 
 \item{data}{Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.}
 
