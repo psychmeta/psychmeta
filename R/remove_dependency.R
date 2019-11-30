@@ -76,11 +76,9 @@
 .consolidate_dependent_artifacts <- function(n, n_adj, p = rep(.5, length(es)), es, es_metric, rxx, ryy, ux, uy, rxx_restricted, ryy_restricted, ux_observed, uy_observed){
      ux_out <- .consolidate_dependent_u(ux = ux, rxx = rxx, n = n, ux_observed = ux_observed, rxx_restricted = rxx_restricted)
      uy_out <- .consolidate_dependent_u(ux = uy, rxx = ryy, n = n, ux_observed = uy_observed, rxx_restricted = ryy_restricted)
-
-     if(es_metric == "d"){
-          es <- convert_es.q_d_to_r(d = es, p = p)
-     }
-
+     
+     if(es_metric == "d") es <- convert_es.q_d_to_r(d = es, p = p)
+     
      rxx_out <- .colsolidate_dependent_rel(rxx = rxx, ux = ux_out$ux, uy = uy_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = rxx_restricted, ux_observed = ux_out$ux_observed)
      ryy_out <- .colsolidate_dependent_rel(rxx = ryy, ux = uy_out$ux, uy = ux_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = ryy_restricted, ux_observed = uy_out$ux_observed)
 
@@ -391,6 +389,11 @@
 
           n_comp <- wt_mean(x = es_data$n[i], wt = es_data$n_adj[i])
           n_adj_comp <- wt_mean(x = es_data$n_adj[i], wt = es_data$n_adj[i])
+          
+          if(abs(es_comp) > 1) 
+                  stop("The composite effect size for sample ID '", es_data$sample_id[i][1], "' is not possible.
+Please (a) supply alternative intercorrelations, (b) supply sample-specific intercorrelations, 
+(c) change the 'collapse_method' argument, or (d) manually consolidate the dependency among estimates.", call. = FALSE)
           
           if(all(c("d", "n1", "n2", "pi", "pa") %in% colnames(es_data))){
                n1_comp <- wt_mean(x = es_data$n1[i], wt = es_data$n_adj[i])
