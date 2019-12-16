@@ -1,3 +1,10 @@
+Changes in Version 2.3.4 (TBD)
+=====================================
+- Added an error message for impossible composites. An error message is now displayed when a sample's composite effect size is statistically impossible. Prior to this update, impossible effect sizes produced generic errors that did not provide users with useful feedback on the source of the problem.
+
+- Updated the URL used version checking to avoid error messages experienced by a subset of users. 
+
+
 Changes in Version 2.3.3 (2019-04-11)
 =====================================
 - Bug fix for the metabulate() function's use of R Markdown. 

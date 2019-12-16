@@ -30,8 +30,8 @@
     packageStartupMessage("\nFind info about psychmeta on the web at ", crayon::italic("psychmeta.com"), " and ", crayon::italic("twitter.com/psychmetaR"))
 
     # Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.
-    if(try(is.character(RCurl::getURL("http://www.r-pkg.org/badges/version/psychmeta")), silent = TRUE) == TRUE){
-
+    if(try(is.character(RCurl::getURL("https://r-pkg.org/badges/version/psychmeta")), silent = TRUE) == TRUE){
+      
          check_version <- function(cran_version, sys_version){
               cran_v_char <- cran_version
               cran_v_num <- as.numeric(stringr::str_split(cran_v_char, "[.]")[[1]])
