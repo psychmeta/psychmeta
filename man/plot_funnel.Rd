@@ -6,14 +6,12 @@
 \title{Create funnel plots}
 \usage{
 plot_funnel(ma_obj, se_type = c("auto", "mean", "sample"),
-  label_es = NULL, point_shape = NULL, point_color = NULL,
-  point_fill = NULL, point_size = NULL, point_stroke = NULL,
-  conf_level = c(0.95, 0.99), conf_linetype = c("dashed", "dotted"),
-  conf_fill = NA, conf_alpha = 1, null_effect = NA,
-  null_conf_level = c(0.9, 0.95, 0.99), null_conf_linetype = c("solid",
-  "dashed", "dotted"), null_conf_fill = "black",
-  null_conf_alpha = c(0.1, 0.2, 0.4), analyses = "all",
-  match = c("all", "any"), case_sensitive = TRUE,
+  label_es = NULL, conf_level = c(0.95, 0.99),
+  conf_linetype = c("dashed", "dotted"), conf_fill = NA,
+  conf_alpha = 1, null_effect = NA, null_conf_level = c(0.9, 0.95,
+  0.99), null_conf_linetype = c("solid", "dashed", "dotted"),
+  null_conf_fill = "black", null_conf_alpha = c(0.1, 0.2, 0.4),
+  analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
   show_filtered = FALSE)
 
 plot_cefp(ma_obj, se_type = "sample", label_es = NULL,
@@ -29,9 +27,9 @@ plot_cefp(ma_obj, se_type = "sample", label_es = NULL,
 
 \item{se_type}{Method to calculate standard errors (y-axis). Options are \code{"auto"} (default) to use the same method as used to estimate the meta-analysis models, \code{"mean"} to calculate SEs using the mean effect size and indivdiual sample sizes, or `"sample"`` to use the SE calculated using the sample effect sizes and sample sizes.}
 
-\item{label_es}{Label for effect size (x-axis). Defaults to "Correlation (\emph{r})" for correlation meta-analyses, "Cohen’s \emph{d} (Hedges’s \emph{g})" for d value meta-analyses, and "Effect size" for generic meta-analyses.}
+\item{label_es}{Label for effect size (x-axis). Defaults to "Correlation (\emph{r})" for correlation meta-analyses, "Cohen's \emph{d} (Hedges's \emph{g})" for d value meta-analyses, and "Effect size" for generic meta-analyses.}
 
-\item{conf_level}{Confidence regions levels to be plotted (default: 95% and 99%).}
+\item{conf_level}{Confidence regions levels to be plotted (default: .95, .99).}
 
 \item{conf_linetype}{Line types for confidence region boundaries. Length should be either 1 or equal to the length of conf_level.}
 
@@ -41,7 +39,7 @@ plot_cefp(ma_obj, se_type = "sample", label_es = NULL,
 
 \item{null_effect}{Null effect to be plotted for contour-enhanced funnel plots. If \code{NA}, not shown. If \code{NULL}, set to the null value for the effect size metric (0 for correlations and d values).}
 
-\item{null_conf_level}{Null-effect confidence regions levels to be plotted (default: 90%, 95%, 99%).}
+\item{null_conf_level}{Null-effect confidence regions levels to be plotted (default: .90, .95, .99).}
 
 \item{null_conf_linetype}{Line types for null-effect confidence region boundaries. Length should be either 1 or equal to the length of null_conf_level.}
 

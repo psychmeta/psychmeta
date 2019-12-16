@@ -4,13 +4,13 @@
 #'
 #' @param ma_obj Meta-analysis object.
 #' @param se_type Method to calculate standard errors (y-axis). Options are `"auto"` (default) to use the same method as used to estimate the meta-analysis models, `"mean"` to calculate SEs using the mean effect size and indivdiual sample sizes, or `"sample"`` to use the SE calculated using the sample effect sizes and sample sizes.
-#' @param label_es Label for effect size (x-axis). Defaults to "Correlation (*r*)" for correlation meta-analyses, "Cohen’s *d* (Hedges’s *g*)" for d value meta-analyses, and "Effect size" for generic meta-analyses.
-#' @param conf_level Confidence regions levels to be plotted (default: 95% and 99%).
+#' @param label_es Label for effect size (x-axis). Defaults to "Correlation (*r*)" for correlation meta-analyses, "Cohen's *d* (Hedges's *g*)" for d value meta-analyses, and "Effect size" for generic meta-analyses.
+#' @param conf_level Confidence regions levels to be plotted (default: .95, .99).
 #' @param conf_linetype Line types for confidence region boundaries. Length should be either 1 or equal to the length of conf_level.
 #' @param conf_fill Colors for confidence regions. Set to `NA` for transparent. Length should be either 1 or equal to to the length of conf_level.
 #' @param conf_alpha Transparency level for confidence regions. Length should be either 1 or equal to to the length of conf_level.
 #' @param null_effect Null effect to be plotted for contour-enhanced funnel plots. If `NA`, not shown. If `NULL`, set to the null value for the effect size metric (0 for correlations and d values).
-#' @param null_conf_level Null-effect confidence regions levels to be plotted (default: 90%, 95%, 99%).
+#' @param null_conf_level Null-effect confidence regions levels to be plotted (default: .90, .95, .99).
 #' @param null_conf_linetype Line types for null-effect confidence region boundaries. Length should be either 1 or equal to the length of null_conf_level.
 #' @param null_conf_fill Colors for null-effect confidence regions. Set to `NA` for transparent. Length should be either 1 or equal to the length of null_conf_level.
 #' @param null_conf_alpha Transparency level for null-effect confidence regions. Length should be either 1 or equal to the length of null_conf_level.
@@ -47,11 +47,6 @@
 plot_funnel <- function(ma_obj,
                         se_type = c("auto", "mean", "sample"),
                         label_es = NULL,
-                        point_shape = NULL,
-                        point_color = NULL,
-                        point_fill = NULL,
-                        point_size = NULL,
-                        point_stroke = NULL,
                         conf_level = c(.95, .99),
                         conf_linetype = c("dashed", "dotted"),
                         conf_fill = NA, conf_alpha = 1.0,
@@ -60,7 +55,13 @@ plot_funnel <- function(ma_obj,
                         null_conf_linetype = c("solid", "dashed", "dotted"),
                         null_conf_fill = "black", null_conf_alpha = c(.10, .20, .40),
                         analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
+
      # TODO: Add support for moderators controlling shape/color of points
+     # point_shape = NULL,
+     # point_color = NULL,
+     # point_fill = NULL,
+     # point_size = NULL,
+     # point_stroke = NULL,
 
      psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
@@ -72,7 +73,7 @@ plot_funnel <- function(ma_obj,
 
      if (is.null(label_es)) {
        if (ma_metric %in% c("d_as_r", "d_as_d")) {
-         label_es <- expression(paste("Cohen’s ", italic('d'), " (Hedges’s ", italic('g'), ")"))
+         label_es <- expression(paste("Cohen\u2019s ", italic('d'), " (Hedges\u2019s ", italic('g'), ")"))
        } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
          label_es <- expression(paste("Correlation (", italic('r'), ")"))
        } else label_es <- "Effect Size"
@@ -125,7 +126,7 @@ plot_funnel <- function(ma_obj,
                                           correct_bias = FALSE)
             }
           }
-          barebones <- lapply(barebones, .plot_funnel, se_type = se_type,
+          barebones <- lapply(barebones, .plot_funnel,
                               label_es = label_es, conf_level = conf_level,
                               conf_linetype = conf_linetype,
                               conf_fill = conf_fill, conf_alpha = conf_alpha,
@@ -165,7 +166,7 @@ plot_funnel <- function(ma_obj,
                                           correct_bias = FALSE)
                    }
                  }
-                    .plot_funnel(.x, se_type = se_type, label_es = label_es,
+                    .plot_funnel(.x, label_es = label_es,
                                  conf_level = conf_level, conf_linetype = conf_linetype,
                                  conf_fill = conf_fill, conf_alpha = conf_alpha,
                                  null_effect = null_effect,
@@ -197,11 +198,11 @@ plot_funnel <- function(ma_obj,
                                                           correct_bias = FALSE)
                                   } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
                                     .x1$vi <- var_error_r(r = .x1$yi,
-                                                          n = .x$n,
+                                                          n = .x1$n,
                                                           correct_bias = FALSE)
                                   }
                                 }
-                                   .plot_funnel(.x1, se_type = se_type, label_es = label_es,
+                                   .plot_funnel(.x1, label_es = label_es,
                                                 conf_level = conf_level, conf_linetype = conf_linetype,
                                                 conf_fill = conf_fill, conf_alpha = conf_alpha,
                                                 null_effect = null_effect,
@@ -236,16 +237,16 @@ plot_funnel <- function(ma_obj,
 #' @rdname plot_funnel
 #' @export
 plot_cefp <- function(ma_obj,
-                        se_type = "sample",
-                        label_es = NULL,
-                        conf_level = NA,
-                        conf_linetype = NA,
-                        conf_fill = NA, conf_alpha = 1.0,
-                        null_effect = NULL,
-                        null_conf_level = c(.90, .95, .99),
-                        null_conf_linetype = c("solid", "dashed", "dotted"),
-                        null_conf_fill = "black", null_conf_alpha = c(.00, .20, .40),
-                        analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
+                      se_type = "sample",
+                      label_es = NULL,
+                      conf_level = NA,
+                      conf_linetype = NA,
+                      conf_fill = NA, conf_alpha = 1.0,
+                      null_effect = NULL,
+                      null_conf_level = c(.90, .95, .99),
+                      null_conf_linetype = c("solid", "dashed", "dotted"),
+                      null_conf_fill = "black", null_conf_alpha = c(.00, .20, .40),
+                      analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE){
 
   plot_funnel(ma_obj = ma_obj,
               se_type = se_type,
@@ -438,17 +439,20 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #'
 #' @keywords internal
 .plot_funnel <- function(x,
-                         se_type = c("auto", "mean", "sample"),
                          label_es = "Effect Size",
                          conf_level = c(.95, .99),
                          conf_linetype = c("dashed", "dotted"),
-                         conf_fill = NA, conf_alpha = 1.0,
+                         conf_fill = NA,
+                         conf_alpha = 1.0,
                          null_effect = NA,
                          null_conf_level = c(.90, .95, .99),
                          null_conf_linetype = c("solid", "dashed", "dotted"),
-                         null_conf_fill = "black", null_conf_alpha = c(.00, .20, .40)){
+                         null_conf_fill = "black",
+                         null_conf_alpha = c(.00, .20, .40)){
 
-     se_type <- match.arg(se_type)
+     if (is.na(conf_level) || length(conf_level) < 1) {
+       stop("`conf_level` must have length >= 1", call. = FALSE)
+     }
 
      # Extract se and yi from metafor object and store in dat
      dat <- data.frame(yi = x$yi, se = sqrt(x$vi), stringsAsFactors = FALSE)
@@ -457,22 +461,46 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      # Seq from 0 to max(se), and define CIs for mean_es; store in df_CI
      seq_se <- seq(0, max(dat$se), 0.001)
 
+     # Confidence region parameters
      names(conf_level) <- conf_level
-     df_CI <- as.data.frame(
-       sapply(conf_level,
-                    function(l) list(l = mean_es - (qnorm(.5 + l/2) * seq_se),
-                                     u = mean_es + (qnorm(.5 + l/2) * seq_se)
-                                     ),
-                    simplify = FALSE)
-     )[,c(seq(1, 2 * length(conf_level) - 1, by = 2), seq(2, 2 * length(conf_level), by = 2))]
+     if (length(conf_linetype) == 1) {
+       conf_linetype <- rep(conf_linetype, length(conf_level))
+     }
+     if (length(conf_linetype) != length(conf_level)) {
+       stop("`conf_linetype` must have length equal to 1 or length(conf_level)", call. = FALSE)
+     }
+     if (length(conf_fill) == 1) {
+       conf_fill <- rep(conf_fill, length(conf_level))
+     }
+     if (length(conf_fill) != length(conf_level)) {
+       stop("`conf_fill` must have length equal to 1 or length(conf_level)", call. = FALSE)
+     }
+     if (length(conf_alpha) == 1) {
+       conf_alpha <- rep(conf_alpha, length(conf_level))
+     }
+     if (length(conf_alpha) != length(conf_level)) {
+       stop("`conf_alpha` must have length equal to 1 or length(conf_level)", call. = FALSE)
+     }
+     names(conf_level) <- names(conf_linetype) <- names(conf_fill) <- names(conf_alpha) <- conf_level
 
-     param_CI <- rbind(level = conf_level, linetype = conf_linetype, color = conf_fill, alpha = conf_alpha)
+
+     df_CI <- sapply(conf_level,
+                     function(l) list(ci = data.frame(
+                       l = mean_es - (qnorm(.5 + l/2) * seq_se),
+                       u = mean_es + (qnorm(.5 + l/2) * seq_se)
+                     )),
+                     simplify = FALSE)
+     param_CI <- mapply(list, level = conf_level,
+                        linetype = conf_linetype, color = conf_fill, alpha = conf_alpha, SIMPLIFY = FALSE)
+     param_CI <- mapply(append, param_CI, df_CI, SIMPLIFY = FALSE)
 
      # Create a funnel plot
-     fp <- ggplot2::ggplot(data = dat, ggplot2::aes_(x = substitute(se))) + # Map se to x
+     fp <- ggplot2::ggplot(data = dat,
+                           ggplot2::aes_(x = ~se)) + # Map se to x
 
        # Add data-points to the scatterplot
-       ggplot2::geom_point(ggplot2::aes_(y = substitute(yi)), shape = 16, alpha = .75) +
+       ggplot2::geom_point(ggplot2::aes_(y = ~yi),
+                           alpha = .75) +
 
        # Give the x- and y- axes informative labels
        ggplot2::xlab('Standard Error') + ggplot2::ylab(label_es) +
@@ -482,110 +510,148 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                                           xend = max(seq_se), yend = mean_es),
                              linetype = 'solid') +
 
-       # Add ribbons for CIs around null at different levels of se
-       ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                         ymin = mean_es,
-                                         ymax = df_CI[, 1]),
-                            fill = param_CI["color", 1],
-                            alpha = param_CI["alpha", 1],
-                            data = df_CI) +
-       ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                         ymin = mean_es,
-                                         ymax = df_CI[, 1 + ncol(df_CI)/2]),
-                            fill = param_CI["color", 1],
-                            alpha = param_CI["alpha", 1],
-                            data = df_CI) +
-       lapply(2:(ncol(df_CI)/2),
-              function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                          ymin = df_CI[, i-1],
-                                          ymax = df_CI[, i]),
-                                          fill = param_CI["color", i],
-                                          alpha = param_CI["alpha", i],
-                                          data = df_CI)
+       # Add ribbons for CIs around mean at different levels of se
+       ggplot2::geom_ribbon(
+         ggplot2::aes_(x = ~seq_se,
+                      ymin = mean_es,
+                      ymax = ~l
+                      ),
+         fill = param_CI[[1]]$color,
+         alpha = param_CI[[1]]$alpha,
+         data = param_CI[[1]]$ci
          ) +
-       lapply(2:(ncol(df_CI)/2),
-              function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                          ymin = df_CI[, i + (ncol(df_CI)/2) - 1],
-                                          ymax = df_CI[, i + (ncol(df_CI)/2)]),
-                                          fill = param_CI["color", i],
-                                          alpha = param_CI["alpha", i],
-                                          data = df_CI)
+       ggplot2::geom_ribbon(
+         ggplot2::aes_(x = ~seq_se,
+                      ymin = mean_es,
+                      ymax = ~u
+                      ),
+         fill = param_CI[[1]]$color,
+         alpha = param_CI[[1]]$alpha,
+         data = param_CI[[1]]$ci
+         ) +
+       lapply(2:length(param_CI),
+              function(i) ggplot2::geom_ribbon(
+                ggplot2::aes_(x = seq_se,
+                             ymin = param_CI[[i - 1]]$ci$l,
+                             ymax = param_CI[[i]]$ci$l
+                             ),
+                fill = param_CI[[i]]$color,
+                alpha = param_CI[[i]]$alpha,
+                data = param_CI[[i]]$ci
+                )
+       ) +
+       lapply(2:length(param_CI),
+              function(i) ggplot2::geom_ribbon(
+                ggplot2::aes_(x = seq_se,
+                             ymin = param_CI[[i - 1]]$ci$u,
+                             ymax = param_CI[[i]]$ci$u
+                ),
+                fill = param_CI[[i]]$color,
+                alpha = param_CI[[i]]$alpha,
+                data = param_CI[[i]]$ci
+              )
        ) +
 
        # Add lines for CIs around mean_es at different levels of se
-       lapply(1:(ncol(df_CI)/2),
-              function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
-                                        y = df_CI[, i]),
-                                    linetype = param_CI["linetype", i],
-                                    data = df_CI)
+       lapply(1:length(param_CI),
+              function(i) ggplot2::geom_line(
+                ggplot2::aes_(x = seq_se,
+                             y = ~l
+                ),
+                linetype = param_CI[[i]]$linetype,
+                data = param_CI[[i]]$ci
+              )
        ) +
-       lapply(1:(ncol(df_CI)/2),
-              function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
-                                        y = df_CI[, i + (ncol(df_CI)/2)]),
-                                    linetype = param_CI["linetype", i],
-                                    data = df_CI)
+       lapply(1:length(param_CI),
+              function(i) ggplot2::geom_line(
+                ggplot2::aes_(x = seq_se,
+                             y = ~u
+                ),
+                linetype = param_CI[[i]]$linetype,
+                data = param_CI[[i]]$ci
+              )
        )
 
 
      # Add null_effect funnel (for contour-enhanced funnel plots)
      if (!is.na(null_effect)) {
 
-       df_CI_null <- as.data.frame(
-         sapply(null_conf_level,
-                function(l) list(l = null_effect - (qnorm(.5 + l/2) * seq_se),
-                                 u = null_effect + (qnorm(.5 + l/2) * seq_se)
-                ),
-                simplify = FALSE)
-       )[,c(seq(1, 2 * length(null_conf_level) - 1, by = 2), seq(2, 2 * length(null_conf_level), by = 2))]
-
-       param_CI_null <- rbind(level = null_conf_level, linetype = null_conf_linetype,
-                              color = null_conf_fill, alpha = null_conf_alpha)
+       df_CI_null <- sapply(null_conf_level,
+                       function(l) list(ci = data.frame(
+                         l = null_effect - (qnorm(.5 + l/2) * seq_se),
+                         u = null_effect + (qnorm(.5 + l/2) * seq_se)
+                       )),
+                       simplify = FALSE)
+       param_CI_null <- mapply(list, level = null_conf_level,
+                          linetype = null_conf_linetype,
+                          color = null_conf_fill, alpha = null_conf_alpha,
+                          SIMPLIFY = FALSE)
+       param_CI_null <- mapply(append, param_CI_null, df_CI_null, SIMPLIFY = FALSE)
 
        fp <- fp +
 
          # Add ribbons for CIs around null at different levels of se
-         ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                           ymin = null_effect,
-                                           ymax = df_CI_null[, 1]),
-                              fill = param_CI_null["color", 1],
-                              alpha = param_CI_null["alpha", 1],
-                              data = df_CI_null) +
-         ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                           ymin = null_effect,
-                                           ymax = df_CI_null[, 1 + ncol(df_CI_null)/2]),
-                              fill = param_CI_null["color", 1],
-                              alpha = param_CI_null["alpha", 1],
-                              data = df_CI_null) +
-         lapply(2:(ncol(df_CI_null)/2),
-                function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                                              ymin = df_CI_null[, i-1],
-                                                              ymax = df_CI_null[, i]),
-                                                 fill = param_CI_null["color", i],
-                                                 alpha = param_CI_null["alpha", i],
-                                                 data = df_CI_null)
+         ggplot2::geom_ribbon(
+           ggplot2::aes_(x = seq_se,
+                        ymin = null_effect,
+                        ymax = ~l
+           ),
+           fill = param_CI_null[[1]]$color,
+           alpha = param_CI_null[[1]]$alpha,
+           data = param_CI_null[[1]]$ci
          ) +
-         lapply(2:(ncol(df_CI_null)/2),
-                function(i) ggplot2::geom_ribbon(ggplot2::aes(x = seq_se,
-                                                              ymin = df_CI_null[, i + (ncol(df_CI_null)/2) - 1],
-                                                              ymax = df_CI_null[, i + (ncol(df_CI_null)/2)]),
-                                                 fill = param_CI_null["color", i],
-                                                 alpha = param_CI_null["alpha", i],
-                                                 data = df_CI_null)
+         ggplot2::geom_ribbon(
+           ggplot2::aes_(x = seq_se,
+                        ymin = null_effect,
+                        ymax = ~u
+           ),
+           fill = param_CI_null[[1]]$color,
+           alpha = param_CI_null[[1]]$alpha,
+           data = param_CI_null[[1]]$ci
+         ) +
+         lapply(2:length(param_CI_null),
+                function(i) ggplot2::geom_ribbon(
+                  ggplot2::aes_(x = seq_se,
+                               ymin = param_CI_null[[i - 1]]$ci$l,
+                               ymax = param_CI_null[[i]]$ci$l
+                  ),
+                  fill = param_CI_null[[i]]$color,
+                  alpha = param_CI_null[[i]]$alpha,
+                  data = param_CI_null[[i]]$ci
+                )
+         ) +
+         lapply(2:length(param_CI_null),
+                function(i) ggplot2::geom_ribbon(
+                  ggplot2::aes_(x = seq_se,
+                               ymin = param_CI_null[[i - 1]]$ci$u,
+                               ymax = param_CI_null[[i]]$ci$u
+                  ),
+                  fill = param_CI_null[[i]]$color,
+                  alpha = param_CI_null[[i]]$alpha,
+                  data = param_CI_null[[i]]$ci
+                )
          ) +
 
          # Add lines for CIs around null at different levels of se
-         lapply(1:(ncol(df_CI_null)/2),
-                function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
-                                                            y = df_CI_null[, i]),
-                                               linetype = param_CI_null["linetype", i],
-                                               data = df_CI_null)
+         lapply(1:length(param_CI_null),
+                function(i) ggplot2::geom_line(
+                  ggplot2::aes_(x = seq_se,
+                               y = ~l
+                  ),
+                  linetype = param_CI_null[[i]]$linetype,
+                  data = param_CI_null[[i]]$ci
+                )
          ) +
-         lapply(1:(ncol(df_CI_null)/2),
-                function(i) ggplot2::geom_line(ggplot2::aes(x = seq_se,
-                                                            y = df_CI_null[, i + (ncol(df_CI_null)/2)]),
-                                               linetype = param_CI_null["linetype", i],
-                                               data = df_CI_null)
+         lapply(1:length(param_CI_null),
+                function(i) ggplot2::geom_line(
+                  ggplot2::aes_(x = seq_se,
+                               y = ~u
+                  ),
+                  linetype = param_CI_null[[i]]$linetype,
+                  data = param_CI_null[[i]]$ci
+                )
          )
+
      }
 
      fp <- fp +
