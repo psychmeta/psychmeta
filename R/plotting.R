@@ -88,6 +88,9 @@ plot_funnel <- function(ma_obj,
          null_effect <- 0
        } else stop("For ma_generic models, null_effect must be a specific value or NA.")
      }
+     if (length(null_effect) > 1) {
+       stop("Only one null_effect size may be specified.")
+     }
      if (!is.na(null_effect)) {
        if (!(length(null_conf_linetype) == 1 | length(null_conf_linetype) == length(null_conf_level))) stop("length(null_conf_linetype) must be 1 or equal to length(null_conf_level).")
        if (!(length(null_conf_fill) == 1 | length(null_conf_fill) == length(null_conf_level))) stop("length(null_conf_fill) must be 1 or equal to length(null_conf_level).")
@@ -450,8 +453,11 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                          null_conf_fill = "black",
                          null_conf_alpha = c(.00, .20, .40)){
 
-     if (is.na(conf_level) || length(conf_level) < 1) {
-       stop("`conf_level` must have length >= 1", call. = FALSE)
+     if (length(conf_level) < 1) {
+       stop("`conf_level` must have length >= 1.", call. = FALSE)
+     }
+     if (any(is.na(conf_level))) {
+       stop("conf_level values may not be NA.", call. = FALSE)
      }
 
      # Extract se and yi from metafor object and store in dat

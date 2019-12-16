@@ -80,7 +80,7 @@ confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method
 #' \deqn{CR=mean_{es}\pm quantile\times SD_{es}}{CR = mean_es +/- quantile * SD_es}
 #'
 #' @examples
-#' credibility(mean = .3, sd = .15, cred_level = .8)
+#' credibility(mean = .3, sd = .15, cred_level = .8, cred_method = "norm")
 #' credibility(mean = .3, sd = .15, cred_level = .8, k = 10)
 #' credibility(mean = c(.3, .5), sd = c(.15, .2), cred_level = .8, k = 10)
 credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = c("t", "norm")){
