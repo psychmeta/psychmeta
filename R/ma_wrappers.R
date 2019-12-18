@@ -44,11 +44,6 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
           construct_mat_initial <- NULL
      }
 
-     if(!is.null(construct_order)){
-          if(!is.null(construct_x)) construct_dat[,"construct_x"] <- factor(construct_dat[,"construct_x"], levels = construct_order)
-          if(!is.null(construct_y)) construct_dat[,"construct_y"] <- factor(construct_dat[,"construct_y"], levels = construct_order)
-     }
-
      ## Build the temporary data matrix
      temp_mat <- es_data
      if(!is.null(moderator_matrix)){
@@ -62,7 +57,7 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      if(!is.null(construct_mat_initial)){
           if(!is.null(construct_order)){
                for(i in 1:ncol(construct_mat_initial)){
-                    construct_mat_initial[,i] <- factor(construct_mat_initial[,i], levels = construct_order[[i]])
+                    construct_mat_initial[,i] <- factor(construct_mat_initial[,i], levels = construct_order)
                }
           }
           temp_mat <- cbind(construct_mat_initial, temp_mat)
@@ -287,24 +282,24 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           tibble(analysis_type = "Overall", meta_tables = list(NULL), escalc = list(NULL))[0,]
      }else{
           es_data <- bind_cols(original_order = 1:nrow(es_data), es_data)
-          
+
           additional_args <- list(...)
           presorted_data <- additional_args$presorted_data
           id_variables <- additional_args$analysis_id_variables
           moderator_levels <- additional_args$moderator_levels
           construct_order <- additional_args$construct_order
           moderator_names <- additional_args$moderator_names
-          
+
           if(!is.null(presorted_data)){
                moderator_info <- list(data = cbind(presorted_data, es_data), id_variables = id_variables)
-               
+
                es_colname <- colnames(es_data)[colnames(es_data) %in% c("d", "r", "rxyi")]
-               
+
                moderators <- clean_moderators(moderator_matrix = moderator_matrix,
                                               cat_moderators = cat_moderators,
-                                              es_vec = es_data[presorted_data$analysis_id == 1,es_colname], 
+                                              es_vec = es_data[presorted_data$analysis_id == 1,es_colname],
                                               presorted = TRUE)
-               
+
                moderator_matrix <- moderators$moderator_matrix
                cat_moderator_matrix <- moderators$cat_moderator_matrix
           }else{
@@ -312,10 +307,10 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                               cat_moderators = cat_moderators,
                                               es_vec = es_data[,1],
                                               moderator_levels = moderator_levels)
-               
+
                moderator_matrix <- moderators$moderator_matrix
                cat_moderator_matrix <- moderators$cat_moderator_matrix
-               
+
                if(!is.null(moderator_names)){
                     .moderator_names <- moderator_names[["cat"]]
                }else{
@@ -331,7 +326,7 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                     colnames(moderator_matrix) <- moderator_names$all
                     moderators$moderator_matrix <- moderator_matrix
                }
-               
+
                moderator_info <- organize_moderators(moderator_matrix = cat_moderator_matrix,
                                                      es_data = es_data,
                                                      moderator_type = moderator_type,
@@ -339,35 +334,35 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                                      construct_order = construct_order, moderator_levels = moderator_levels,
                                                      moderator_names = .moderator_names)
           }
-          
+
           data <- moderator_info$data
-          
+
           if(!is.null(moderators$moderator_matrix))
                moderators$moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$moderator_matrix), moderators$moderator_matrix)
           if(!is.null(moderators$cat_moderator_matrix))
                moderators$cat_moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$cat_moderator_matrix), moderators$cat_moderator_matrix)
-          
+
           analysis_id_variables <- moderator_info$id_variables
           if(moderator_type == "none"){
                moderator_matrix <- cat_moderator_matrix <- NULL
           }
-          
+
           moderator_tab <- data %>%
                group_by(.data$analysis_id) %>% do(.data[1,analysis_id_variables])
-          
-          results_df <- suppressWarnings(data %>% 
+
+          results_df <- suppressWarnings(data %>%
                                               group_by(.data$analysis_id) %>%
-                                              nest() %>% 
+                                              nest() %>%
                                               mutate(ma_out = map(data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
-          
+
           results_df <- suppressMessages(suppressWarnings(full_join(moderator_tab, results_df)))
           results_df$analysis_id <- results_df$data <- NULL
-          
+
           results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
           results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
           results_df$escalc[[1]] <- append(results_df$escalc[[1]], list(moderator_info = moderators))
           results_df$ma_out <- NULL
-          
+
           results_df$escalc <- map(results_df$escalc, function(x1){
                   map(x1, function(x2){
                           if(length(x2) == 0){
@@ -394,18 +389,18 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                           }
                   })
           })
-          
+
           if(es_type == "r" & ma_type == "ic"){
                for(i in 1:nrow(results_df)){
                     method_details <- table(results_df$escalc[[i]]$individual_correction$true_score$correction_type)
                     method_details <- data.frame(Correction = names(method_details), Frequency = as.numeric(method_details), stringsAsFactors = FALSE)
-                    
+
                     attributes(results_df$meta_tables[[i]]$individual_correction) <- append(attributes(results_df$meta_tables[[i]]$individual_correction),
                                                                                             list(method_details = method_details))
                }
           }
-          
+
           ungroup(results_df)
      }
-     
+
 }
