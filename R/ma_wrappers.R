@@ -369,28 +369,30 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           results_df$ma_out <- NULL
           
           results_df$escalc <- map(results_df$escalc, function(x1){
-               map(x1, function(x2){
-                    if(length(x2) == 0){
-                         NULL
-                    }else{
-                         if(is.data.frame(x2)){
-                              if(any(colnames(x2) == "original_order")){
-                                   x2 %>% arrange(.data$original_order)
-                              }else{
-                                   x2
-                              }
-                         }else{
-                              map(x2, function(x3){
-                                   if(any(colnames(x3) == "original_order")){
-                                        x3 %>% arrange(.data$original_order)
-                                   }else{
-                                        x3
-                                   }
-                              })
-
-                         }
-                    }
-               })
+                  map(x1, function(x2){
+                          if(length(x2) == 0){
+                                  NULL
+                          }else{
+                                  if(is.data.frame(x2)){
+                                          if(any(colnames(x2) == "original_order"))
+                                                  x2 <- x2 %>% arrange(.data$original_order)
+                                          class(x2) <- c("escalc", "data.frame")
+                                          x2
+                                  }else{
+                                          map(x2, function(x3){
+                                                  if(is.null(x3)){
+                                                          x3
+                                                  }else{
+                                                          if(any(colnames(x3) == "original_order"))
+                                                                  x3 <- x3 %>% arrange(.data$original_order)
+                                                          class(x3) <- c("escalc", "data.frame")
+                                                          x3
+                                                  }
+                                          })
+                                          
+                                  }
+                          }
+                  })
           })
           
           if(es_type == "r" & ma_type == "ic"){
