@@ -5,3 +5,5 @@
 ^draft_R/*$
 ^clean-man.sh$
 ^clean-man.R$
+^doc$
+^Meta$

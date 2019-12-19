@@ -15,6 +15,7 @@
 #' @param moderator_type Type of moderator analysis ("none", "simple", or "hierarchical").
 #' @param construct_x Vector or column name of construct names for X.
 #' @param construct_y Vector or column name of construct names for Y.
+#' @param construct_order Vector indicating the order in which variables should be arranged, with variables listed earlier in the vector being preferred for designation as X.
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
@@ -30,14 +31,14 @@
 #'                    construct_x = NULL, construct_y = NULL,
 #'                    data = dplyr::filter(data_r_oh_2009, Predictor == "Conscientiousness"))
 #' summary(out)
-#' 
+#'
 #' ## Analysis of the validity of the Big Five traits as predictors of job performance in East Asia
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
 #'                    var_r_c = NULL, ma_type = c("bb", "ad"),
 #'                    sample_id = NULL, moderators = NULL, construct_x = Predictor,
 #'                    data = data_r_oh_2009)
 #' summary(out)
-#' 
+#'
 #' ## Analysis of the average validity of the Big Five traits as predictors of
 #' ## job performance by Eastern Asian country
 #' out <- ma_r_order2(k = k, r = r_bar_i, rho = rho_bar_i, var_r = var_r,
@@ -45,14 +46,15 @@
 #'                    sample_id = NULL, moderators = "Country", data = data_r_oh_2009)
 #' summary(out)
 ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c = NULL, ma_type = c("bb", "ic", "ad"),
-                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple", 
-                        construct_x = NULL, construct_y = NULL, data = NULL, control = control_psychmeta(), ...){
+                        sample_id = NULL, citekey = NULL, moderators = NULL, moderator_type = "simple",
+                        construct_x = NULL, construct_y = NULL, construct_order = NULL,
+                        data = NULL, control = control_psychmeta(), ...){
 
      .dplyr.show_progress <- options()$dplyr.show_progress
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
-     
+
      call <- match.call()
      warn_obj1 <- record_warnings()
      ma_type <- match.arg(ma_type, c("bb", "ic", "ad"), several.ok = TRUE)
@@ -65,7 +67,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      cred_method <- control$cred_method
      var_unbiased <- control$var_unbiased
      hs_override <- control$hs_override
-     
+
      if(hs_override){
           conf_method <- cred_method <- "norm"
           var_unbiased <- FALSE
@@ -76,7 +78,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
 
           k <- match_variables(call = call_full[[match("k", names(call_full))]], arg = k, arg_name = "k", data = data)
 
@@ -109,6 +111,9 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 
           if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+
+          if(deparse(substitute(construct_order))[1] != "NULL")
+            construct_order <- match_variables(call = call_full[[match("construct_order", names(call_full))]], arg = construct_order, arg_name = "construct_order", data = data)
      }
 
      if(!is.null(moderators)){
@@ -124,7 +129,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           })
           names(moderator_levels) <- colnames(moderators)
 
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -147,9 +152,9 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                }else{
                     if(v != "construct_x" & v != "construct_y"){
                          if(is.null(dat)){
-                              dat <- data.frame(inputs[[v]])
+                              dat <- data.frame(inputs[[v]], stringsAsFactors = FALSE)
                          }else{
-                              dat <- data.frame(dat, inputs[[v]])
+                              dat <- data.frame(dat, inputs[[v]], stringsAsFactors = FALSE)
                          }
                          colnames(dat)[ncol(dat)] <- v
                     }
@@ -184,7 +189,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 
      out <- ma_wrapper(es_data = dat, es_type = "r", ma_type = "r_order2", ma_fun = .ma_r_order2,
                        moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = TRUE,
-                       construct_x = construct_x, construct_y = construct_y,
+                       construct_x = construct_x, construct_y = construct_y, construct_order = construct_order,
 
                        ma_arg_list = append(inputs, list(do_bb = do_bb, do_ic = do_ic, do_ad = do_ad, ma_metric = "r")),
                        moderator_levels = moderator_levels, moderator_names = moderator_names)
@@ -192,8 +197,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      neg_var_r_order2 <- sum(unlist(map(out$meta_tables, function(x) x$barebones$var_r_bar < 0)), na.rm = TRUE)
      neg_var_rho_ic_order2 <- sum(unlist(map(out$meta_tables, function(x) x$individual_correction$var_rho_bar < 0)), na.rm = TRUE)
      neg_var_rho_ad_order2 <- sum(unlist(map(out$meta_tables, function(x) x$artifact_distribution$var_rho_bar < 0)), na.rm = TRUE)
-     
-     default_print <- 
+
+     default_print <-
           if(do_ic){
                "ic"
           }else if(do_ad){
@@ -203,10 +208,10 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           }
 
      out <- bind_cols(analysis_id = 1:nrow(out), out)
-     attributes(out) <- append(attributes(out), list(call_history = list(call), 
-                                                     inputs = inputs, 
+     attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                     inputs = inputs,
                                                      ma_methods = c("bb", "ic", "ad")[c(do_bb, do_ic, do_ad)],
-                                                     ma_metric = "r_order2", 
+                                                     ma_metric = "r_order2",
                                                      default_print = default_print,
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
                                                      fyi = record_fyis(es_metric = "r_order2",
@@ -214,12 +219,12 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                                                        neg_var_rho_ic_order2 = neg_var_rho_ic_order2,
                                                                        neg_var_rho_ad_order2 = neg_var_rho_ad_order2)))
      out <- namelists.ma_psychmeta(ma_obj = out)
-     
+
      class(out) <- c("ma_psychmeta", class(out))
-     
+
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-     
+
      out
 }
 
@@ -234,14 +239,14 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #'
 #' @return A meta-analytic table and a data frame.
 .ma_r_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
-     
+
      conf_level <- ma_arg_list$conf_level
      cred_level <- ma_arg_list$cred_level
      conf_method <- ma_arg_list$conf_method
      cred_method <- ma_arg_list$cred_method
      var_unbiased <- ma_arg_list$var_unbiased
      ma_metric <- ma_arg_list$ma_metric
-     
+
      k <- data$k
      N <- data$N
      if(ma_metric == "r"){
@@ -256,11 +261,11 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           var_r_c <- data$var_d_c
 
      }
-     
+
      do_bb <- ma_arg_list$do_bb
      do_ic <- ma_arg_list$do_ic
      do_ad <- ma_arg_list$do_ad
-     
+
      if((type == "all" | type == "bb") & do_bb){
           out_bb <- .ma_r_order2_bb(data = data, k_vec = k, N_vec = N, r_vec = r, var_r_vec = var_r,
                                     conf_level = conf_level, cred_level = cred_level,
@@ -269,30 +274,30 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      }else{
           out_bb <- NULL
      }
-     
+
      if((type == "all" | type == "ic") & do_ic){
           out_ic <- .ma_r_order2_ic(data = data, k_vec = k, N_vec = N, rho_vec = rho, var_r_c_vec = var_r_c,
                                     conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, 
+                                    cred_method = cred_method, conf_method = conf_method,
                                     var_unbiased = var_unbiased, run_lean = run_lean, ma_metric = ma_metric)
      }else{
           out_ic <- NULL
      }
-     
+
      if((type == "all" | type == "ad") & do_ad){
           out_ad <- .ma_r_order2_ad(data = data, k_vec = k, N_vec = N, r_vec = r, rho_vec = rho, var_r_vec = var_r,
                                     conf_level = conf_level, cred_level = cred_level,
-                                    cred_method = cred_method, conf_method = conf_method, 
+                                    cred_method = cred_method, conf_method = conf_method,
                                     var_unbiased = var_unbiased, run_lean = run_lean, ma_metric = ma_metric)
      }else{
           out_ad <- NULL
      }
-     
-     list(meta = list(barebones = out_bb$meta, 
-                      individual_correction = out_ic$meta, 
+
+     list(meta = list(barebones = out_bb$meta,
+                      individual_correction = out_ic$meta,
                       artifact_distribution = out_ad$meta),
-          escalc = list(barebones = out_bb$escalc, 
-                        individual_correction = out_ic$escalc, 
+          escalc = list(barebones = out_bb$escalc,
+                        individual_correction = out_ic$escalc,
                         artifact_distribution = out_ad$escalc))
 }
 
@@ -323,11 +328,11 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           dat <- NULL
      }else{
           if(ma_metric == "r"){
-               dat <- data.frame(yi = r_vec, vi = var_e_vec, r = r_vec, var_r = var_r_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r)
+               dat <- data.frame(yi = r_vec, vi = var_e_vec, r = r_vec, var_r = var_r_vec,
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r, stringsAsFactors = FALSE)
           }else if(ma_metric == "d"){
-               dat <- data.frame(yi = r_vec, vi = var_e_vec, d = r_vec, var_d = var_r_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r)
+               dat <- data.frame(yi = r_vec, vi = var_e_vec, d = r_vec, var_d = var_r_vec,
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = r_vec - mean_r, stringsAsFactors = FALSE)
           }
           if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
@@ -346,45 +351,45 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      rel_r <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
      if(ma_metric == "r"){
-          meta <- as.data.frame(t(c(L = L, 
-                                    k = k, 
+          meta <- as.data.frame(t(c(L = L,
+                                    k = k,
                                     N = N,
-                                    mean_r_bar = mean_r, 
+                                    mean_r_bar = mean_r,
                                     var_r_bar = var_r,
-                                    var_e = var_e, 
+                                    var_e = var_e,
                                     var_r_bar_res = var_res,
-                                    sd_r_bar = sd_r, 
-                                    se_r_bar = se_r_bar, 
-                                    sd_e = sd_e, 
+                                    sd_r_bar = sd_r,
+                                    se_r_bar = se_r_bar,
+                                    sd_e = sd_e,
                                     sd_r_bar_res = sd_res,
-                                    conf_int, 
+                                    conf_int,
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_r = rel_r,
-                                    `cor(r, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(r, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_bb_order2"))
      }else if(ma_metric == "d"){
-          meta <- as.data.frame(t(c(L = L, 
-                                    k = k, 
+          meta <- as.data.frame(t(c(L = L,
+                                    k = k,
                                     N = N,
-                                    mean_d_bar = mean_r, 
+                                    mean_d_bar = mean_r,
                                     var_d_bar = var_r,
-                                    var_e = var_e, 
+                                    var_e = var_e,
                                     var_d_bar_res = var_res,
-                                    sd_d_bar = sd_r, 
-                                    se_d_bar = se_r_bar, 
-                                    sd_e = sd_e, 
+                                    sd_d_bar = sd_r,
+                                    se_d_bar = se_r_bar,
+                                    sd_e = sd_e,
                                     sd_d_bar_res = sd_res,
-                                    conf_int, 
+                                    conf_int,
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_d = rel_r,
-                                    `cor(d, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(d, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "d_bb_order2"))
      }
-     
+
      list(meta = meta,
           escalc = dat)
 }
@@ -417,11 +422,11 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           dat <- NULL
      }else{
           if(ma_metric == "r"){
-               dat <- data.frame(yi = rho_vec, vi = var_e_vec, rho = rho_vec, var_r_c = var_r_c_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+               dat <- data.frame(yi = rho_vec, vi = var_e_vec, rho = rho_vec, var_r_c = var_r_c_vec,
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }else if(ma_metric == "d"){
-               dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, var_d_c = var_r_c_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+               dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, var_d_c = var_r_c_vec,
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }
           if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
@@ -430,8 +435,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      L <- sum(!is.na(wt_vec))
      k <- sum(k_vec[!is.na(wt_vec) & !is.na(rho_vec)])
      N <- sum(N_vec[!is.na(wt_vec)])
-     conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
-     cred_int <- credibility(mean = var_r_c, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
+     conf_int <- confidence(mean = mean_rho, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
+     cred_int <- credibility(mean = mean_rho, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))
      cred_int <- setNames(c(cred_int), colnames(cred_int))
      se_rho_bar <- sd_r_c / sqrt(k)
@@ -440,45 +445,45 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      rel_rho <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
      if(ma_metric == "r"){
-          meta <- as.data.frame(t(c(L = L, 
-                                    k = k, 
+          meta <- as.data.frame(t(c(L = L,
+                                    k = k,
                                     N = N,
                                     mean_rho_bar = mean_rho,
-                                    var_rho_bar = var_r_c, 
-                                    var_e = var_e, 
+                                    var_rho_bar = var_r_c,
+                                    var_e = var_e,
                                     var_rho_bar_res = var_rho,
-                                    sd_rho_bar = sd_r_c, 
-                                    se_rho_bar = se_rho_bar, 
+                                    sd_rho_bar = sd_r_c,
+                                    se_rho_bar = se_rho_bar,
                                     sd_e = sd_e,
                                     sd_rho_bar_res = sd_rho,
-                                    conf_int, 
+                                    conf_int,
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_rho = rel_rho,
-                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ad_order2"))
      }else if(ma_metric == "d"){
-          meta <- as.data.frame(t(c(L = L, 
-                                    k = k, 
+          meta <- as.data.frame(t(c(L = L,
+                                    k = k,
                                     N = N,
                                     mean_delta_bar = mean_rho,
-                                    var_delta_bar = var_r_c, 
-                                    var_e = var_e, 
+                                    var_delta_bar = var_r_c,
+                                    var_e = var_e,
                                     var_delta_bar_res = var_rho,
-                                    sd_delta_bar = sd_r_c, 
-                                    se_delta_bar = se_rho_bar, 
+                                    sd_delta_bar = sd_r_c,
+                                    se_delta_bar = se_rho_bar,
                                     sd_e = sd_e,
                                     sd_delta_bar_res = sd_rho,
-                                    conf_int, 
+                                    conf_int,
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_delta = rel_rho,
-                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))  
+                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "d_ic_order2"))
      }
-     
+
      list(meta = meta,
           escalc = dat)
 }
@@ -511,11 +516,11 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
           dat <- NULL
      }else{
           if(ma_metric == "r"){
-               dat <- data.frame(yi = rho_vec, vi = var_e_vec, rho = rho_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+               dat <- data.frame(yi = rho_vec, vi = var_e_vec, rho = rho_vec,
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }else if(ma_metric == "d"){
-               dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec, 
-                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho)
+               dat <- data.frame(yi = rho_vec, vi = var_e_vec, delta = rho_vec,
+                                 k = k_vec, var_e = var_e_vec, weight = wt_vec, residual = rho_vec - mean_rho, stringsAsFactors = FALSE)
           }
           if(any(colnames(data) == "original_order")) dat <- cbind(original_order = data$original_order, dat)
           class(dat) <- c("escalc", "data.frame")
@@ -524,8 +529,8 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      L <- sum(!is.na(wt_vec))
      k <- sum(k_vec[!is.na(wt_vec)])
      N <- sum(N_vec[!is.na(wt_vec)])
-     conf_int <- confidence(mean = var_r_c, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
-     cred_int <- credibility(mean = var_r_c, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
+     conf_int <- confidence(mean = mean_rho, sd = sd_r_c, k = k, conf_level = conf_level, conf_method = conf_method)
+     cred_int <- credibility(mean = mean_rho, sd = sd_rho, cred_level = cred_level, k = k, cred_method = cred_method)
      conf_int <- setNames(c(conf_int), colnames(conf_int))
      cred_int <- setNames(c(cred_int), colnames(cred_int))
      se_rho_bar <- sd_r_c / sqrt(k)
@@ -534,45 +539,45 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      rel_rho <- 1 - ifelse(prop_var > 1, 1, prop_var)
 
      if(ma_metric == "r"){
-          meta <- as.data.frame(t(c(L = L, 
+          meta <- as.data.frame(t(c(L = L,
                                     k = k,
-                                    N = N, 
-                                    mean_rho_bar = mean_rho, 
-                                    var_rho_bar = var_r_c, 
-                                    var_e = var_e, 
+                                    N = N,
+                                    mean_rho_bar = mean_rho,
+                                    var_rho_bar = var_r_c,
+                                    var_e = var_e,
                                     var_rho_bar_res = var_rho,
                                     sd_rho_bar = sd_r_c,
-                                    se_rho_bar = se_rho_bar, 
-                                    sd_e = sd_e, 
+                                    se_rho_bar = se_rho_bar,
+                                    sd_e = sd_e,
                                     sd_rho_bar_res = sd_rho,
-                                    conf_int, 
+                                    conf_int,
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_rho = rel_rho,
-                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(rho, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ad_order2"))
      }else if(ma_metric == "d"){
-          meta <- as.data.frame(t(c(L = L, 
+          meta <- as.data.frame(t(c(L = L,
                                     k = k,
-                                    N = N, 
-                                    mean_delta_bar = mean_rho, 
-                                    var_delta_bar = var_r_c, 
-                                    var_e = var_e, 
+                                    N = N,
+                                    mean_delta_bar = mean_rho,
+                                    var_delta_bar = var_r_c,
+                                    var_e = var_e,
                                     var_delta_bar_res = var_rho,
                                     sd_delta_bar = sd_r_c,
-                                    se_delta_bar = se_rho_bar, 
-                                    sd_e = sd_e, 
+                                    se_delta_bar = se_rho_bar,
+                                    sd_e = sd_e,
                                     sd_delta_bar_res = sd_rho,
-                                    conf_int, 
+                                    conf_int,
                                     cred_int,
                                     percent_var = prop_var * 100,
                                     rel_delta = rel_rho,
-                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))))
+                                    `cor(delta, error)` = sqrt(ifelse(prop_var > 1, 1, prop_var)))), stringsAsFactors = FALSE)
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "d_ad_order2"))
      }
-     
+
      list(meta = meta,
           escalc = dat)
 }

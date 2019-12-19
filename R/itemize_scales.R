@@ -150,7 +150,7 @@ simulate_psych_items <- function(n, k_vec, R_scales, rel_vec,
 
 .alpha_items <- function(item_dat = NULL, S = NULL, R = NULL, item_index, item_wt = NULL){
      if(!is.null(item_dat)){
-          if(is.null(dim(item_dat))) item_dat <- data.frame(t(item_dat))
+          if(is.null(dim(item_dat))) item_dat <- data.frame(t(item_dat), stringsAsFactors = FALSE)
           S <- cov(item_dat)
           R <- cov2cor(S)
      }

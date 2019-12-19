@@ -1,3 +1,24 @@
+## Register S3 methods for dplyr verbs to avoid having to export generics
+.onLoad <- function(libname, pkgname) {
+  register_s3_method("dplyr", "arrange", "ma_psychmeta")
+  register_s3_method("dplyr", "arrange", "ma_table")
+
+  register_s3_method("dplyr", "filter", "ma_psychmeta")
+  register_s3_method("dplyr", "filter", "ma_table")
+
+  register_s3_method("dplyr", "mutate", "ma_psychmeta")
+  register_s3_method("dplyr", "mutate", "ma_table")
+
+  register_s3_method("dplyr", "rename", "ma_psychmeta")
+  register_s3_method("dplyr", "rename", "ma_table")
+
+  register_s3_method("dplyr", "select", "ma_psychmeta")
+  register_s3_method("dplyr", "select", "ma_table")
+
+
+  invisible()
+}
+
 ## Messages to be displayed when the user loads psychmeta:
 #' @importFrom rlang .data
 .onAttach <- function(libname, pkgname) {
@@ -9,7 +30,8 @@
     packageStartupMessage("\nFind info about psychmeta on the web at ", crayon::italic("psychmeta.com"), " and ", crayon::italic("twitter.com/psychmetaR"))
 
     # Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.
-    if(try(is.character(RCurl::getURL("http://www.r-pkg.org/badges/version/psychmeta")), silent = TRUE) == TRUE){
+    version_check <- try(RCurl::getURL("https://r-pkg.org/badges/version/psychmeta"), silent = TRUE)
+    if(!inherits(version_check, "try-error")) {
 
          check_version <- function(cran_version, sys_version){
               cran_v_char <- cran_version
@@ -52,10 +74,10 @@
                                  sys_version = sys_version,
                                  out_of_date = out_of_date,
                                  ahead_of_cran = ahead_of_cran,
-                                 development = vcheck_devnum))
+                                 development = vcheck_devnum), stringsAsFactors = FALSE)
          }
 
-         pkg_badge <- xml2::read_html("http://www.r-pkg.org/badges/version/psychmeta")
+         pkg_badge <- xml2::read_html(version_check)
          cran_v_char <- gsub(x = stringr::str_split(as.character(pkg_badge), "\n")[[1]][9], pattern = " ", replacement = "")
          vcheck <- check_version(cran_version = cran_v_char, sys_version = version)
 
@@ -105,5 +127,30 @@
 #' psychmeta_news()
 psychmeta_news <- function(){
      news(package = "psychmeta")
+}
+
+register_s3_method <- function(pkg, generic, class, fun = NULL) {
+  stopifnot(is.character(pkg), length(pkg) == 1)
+  envir <- asNamespace(pkg)
+
+  stopifnot(is.character(generic), length(generic) == 1)
+  stopifnot(is.character(class), length(class) == 1)
+  if (is.null(fun)) {
+    fun <- get(paste0(generic, ".", class), envir = parent.frame())
+  }
+  stopifnot(is.function(fun))
+
+
+  if (pkg %in% loadedNamespaces()) {
+    registerS3method(generic, class, fun, envir = envir)
+  }
+
+  # Always register hook in case package is later unloaded & reloaded
+  setHook(
+    packageEvent(pkg, "onLoad"),
+    function(...) {
+      registerS3method(generic, class, fun, envir = envir)
+    }
+  )
 }
 

@@ -25,9 +25,9 @@
 #' }
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
-#' @param what For the \code{get_stuff()} function only: Character scalar telling \code{get_stuff()} what to get. 
+#' @param what For the \code{get_stuff()} function only: Character scalar telling \code{get_stuff()} what to get.
 #' All suffixes from functions in the "get_" family can be passed as arguments to \code{what}:
-#' "metatab", "escalc", "metafor", "ad", "followup", "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", "matrix", "plots" 
+#' "metatab", "escalc", "metafor", "ad", "followup", "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", "matrix", "plots"
 #' @param moderators Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param follow_up Vector of follow-up analysis names (options are: "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg").
 #' @param plot_types Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative"; multiple allowed).
@@ -39,7 +39,7 @@
 #' \item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
 #' \item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
 #' \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-#' \item{N_minv}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
+#' \item{N_min:}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 #' }
 #' @param match Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
@@ -85,7 +85,7 @@
 #' get_plots(ma_obj)
 #' get_ad(ma_obj, ma_method = "ic", as_ad_obj = TRUE)
 #' get_ad(ma_obj, ma_method = "ic", as_ad_obj = FALSE)
-#' 
+#'
 #' ## Same extractions as above, but using get_stuff() and the "what" argument:
 #' get_stuff(ma_obj, what = "metatab")
 #' get_stuff(ma_obj, what = "matrix")
@@ -102,35 +102,35 @@
 
 #' @rdname get_stuff
 #' @export
-get_stuff <- function(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "followup", 
-                                       "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", 
-                                       "matrix", "plots"), 
+get_stuff <- function(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "followup",
+                                       "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg",
+                                       "matrix", "plots"),
                       analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
-                      ma_method = c("bb", "ic", "ad"), correction_type = c("ts", "vgx", "vgy"), 
-                      moderators = FALSE, as_ad_obj = TRUE, inputs_only = FALSE, ad_type = c("tsa", "int"), 
-                      follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"), 
+                      ma_method = c("bb", "ic", "ad"), correction_type = c("ts", "vgx", "vgy"),
+                      moderators = FALSE, as_ad_obj = TRUE, inputs_only = FALSE, ad_type = c("tsa", "int"),
+                      follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"),
                       plot_types = c("funnel", "forest", "leave1out", "cumulative"), ...){
-     
-     what <- match.arg(arg = what, choices = c("metatab", "escalc", "metafor", "ad", "followup", 
-                                               "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", 
+
+     what <- match.arg(arg = what, choices = c("metatab", "escalc", "metafor", "ad", "followup",
+                                               "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg",
                                                "matrix", "plots"))
-     
-     args <- list(ma_obj = ma_obj, 
-                  analyses = analyses, 
-                  match = match, 
+
+     args <- list(ma_obj = ma_obj,
+                  analyses = analyses,
+                  match = match,
                   case_sensitive = case_sensitive,
-                  ma_method = ma_method, 
-                  correction_type = correction_type, 
+                  ma_method = ma_method,
+                  correction_type = correction_type,
                   moderators = moderators,
-                  as_ad_obj = as_ad_obj, 
-                  inputs_only = inputs_only, 
-                  ad_type = ad_type, 
-                  follow_up = follow_up, 
-                  plot_types = plot_types, 
+                  as_ad_obj = as_ad_obj,
+                  inputs_only = inputs_only,
+                  ad_type = ad_type,
+                  follow_up = follow_up,
+                  plot_types = plot_types,
                   ...)
-     
+
      if(what %in% c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg")) args$follow_up <- NULL
-     
+
      do.call(what = paste0("get_", what), args = args)
 }
 
@@ -357,7 +357,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                               .att$summary[FALSE,]
                          }else{
                               .att$summary[.att$ad_contents_raw,]
-                         }                        
+                         }
                     })
 
                }else{
@@ -389,22 +389,22 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                          ad_x[[i]] <- cbind(artifact = rownames(ad_x[[i]]), description = NA, .ma_obj[i,], ad_x[[i]])
                     }else{
                          .ad_x <- c("artifact", "description", colnames(.ma_obj), colnames(ad_x))
-                         ad_x[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_x))), .ad_x)
+                         ad_x[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_x)), stringsAsFactors = FALSE), .ad_x)
                     }
                }
-               
+
                for(i in 1:length(ad_y)){
                     if(nrow(ad_y[[i]]) > 0){
                          ad_y[[i]] <- cbind(artifact = rownames(ad_y[[i]]), description = NA, .ma_obj[i,], ad_y[[i]])
                     }else{
                          .ad_y <- c("artifact", "description", colnames(.ma_obj), colnames(ad_x))
-                         ad_y[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_y))), .ad_y)
+                         ad_y[[i]] <- setNames(data.frame(matrix(NA, 0, length(.ad_y)), stringsAsFactors = FALSE), .ad_y)
                     }
                }
-               
+
                ad_x <- ad_x[unlist(map(ad_x, nrow)) > 0]
                ad_y <- ad_y[unlist(map(ad_y, nrow)) > 0]
-               
+
                if(length(ad_x) > 0){
                     ad_x <- as_tibble(data.table::rbindlist(ad_x), .name_repair = "minimal")
                     ad_x$artifact <- as.character(ad_x$artifact)
@@ -413,18 +413,18 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                                                       qxa_drr = "Applicant measurement quality (corrected for direct range restriction)",
                                                       qxi_irr = "Incumbent measurement quality (indirectly range restricted)",
                                                       qxi_drr = "Incumbent measurement quality (directly range restricted)",
-                                                      
+
                                                       rxxa_irr = "Applicant reliability (corrected for indirect range restriction)",
                                                       rxxa_drr = "Applicant reliability (corrected for direct range restriction)",
                                                       rxxi_irr = "Incumbent reliability (indirectly range restricted)",
                                                       rxxi_drr = "Incumbent reliability (directly range restricted)",
-                                                      
+
                                                       ux = "Observed-score u-ratio",
                                                       ut = "True-score u-ratio")
                }else{
                     ad_x <- NULL
                }
-               
+
                if(length(ad_y) > 0){
                     ad_y <- as_tibble(data.table::rbindlist(ad_y), .name_repair = "minimal")
                     ad_y$artifact <- as.character(ad_y$artifact)
@@ -433,12 +433,12 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                                                       qxa_drr = "Applicant measurement quality (corrected for direct range restriction)",
                                                       qxi_irr = "Incumbent measurement quality (indirectly range restricted)",
                                                       qxi_drr = "Incumbent measurement quality (directly range restricted)",
-                                                      
+
                                                       rxxa_irr = "Applicant reliability (corrected for indirect range restriction)",
                                                       rxxa_drr = "Applicant reliability (corrected for direct range restriction)",
                                                       rxxi_irr = "Incumbent reliability (indirectly range restricted)",
                                                       rxxi_drr = "Incumbent reliability (directly range restricted)",
-                                                      
+
                                                       ux = "Observed-score u-ratio",
                                                       ut = "True-score u-ratio")
                }else{
@@ -484,7 +484,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
 
 #' @rdname get_stuff
 #' @export
-get_followup <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, 
+get_followup <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
                          follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"), ...){
 
      follow_up <- match.arg(follow_up, c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"),
@@ -585,7 +585,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
           }else{
                moderator_names <- colnames(ma_list$barebones)[(which(colnames(ma_list$barebones) == "analysis_type") + 1):(which(colnames(ma_list$barebones) == "k") - 1)]
 
-               moderator_mat <- as.data.frame(as.data.frame(ma_list$barebones)[,moderator_names])
+               moderator_mat <- as.data.frame(as.data.frame(ma_list$barebones, stringsAsFactors = FALSE)[,moderator_names], stringsAsFactors = FALSE)
                colnames(moderator_mat) <- moderator_names
 
                moderator_combs <- apply(moderator_mat, 1, function(x) paste0(moderator_names, ": ", x, collapse = ", "))
@@ -601,7 +601,8 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
           names(.rmat_list) <- names(.mat_list) <- moderator_combs
 
           for(i in ma_methods){
-               r_list <- list()
+               r_list <- vector("list", length = length(moderator_combs[!duplicated(moderator_combs)]))
+               names(r_list) <- moderator_combs[!duplicated(moderator_combs)]
                for(a in moderator_combs[!duplicated(moderator_combs)]){
                     if(i == "barebones"){
                          .names <- colnames(ma_list$barebones)[which(colnames(ma_list$barebones) == "k"):ncol(ma_list$barebones)]
@@ -611,8 +612,8 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                          for(l in which(grepl(x = .names, pattern = "mean_r") |
                                         grepl(x = .names, pattern = "CI_LL_") |
                                         grepl(x = .names, pattern = "CI_UL_") |
-                                        grepl(x = .names, pattern = "CV_LL_") |
-                                        grepl(x = .names, pattern = "CV_UL_")))
+                                        grepl(x = .names, pattern = "CR_LL_") |
+                                        grepl(x = .names, pattern = "CR_UL_")))
                               .out_list[[l]] <- .rmat
 
                          for(x in constructs){
@@ -637,8 +638,8 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                              grepl(x = .names, pattern = "mean_rho") |
                                              grepl(x = .names, pattern = "CI_LL_") |
                                              grepl(x = .names, pattern = "CI_UL_") |
-                                             grepl(x = .names, pattern = "CV_LL_") |
-                                             grepl(x = .names, pattern = "CV_UL_")))
+                                             grepl(x = .names, pattern = "CR_LL_") |
+                                             grepl(x = .names, pattern = "CR_UL_")))
                                    .out_list[[l]] <- .rmat
 
                               for(x in constructs){
@@ -668,7 +669,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 
 #' @rdname get_stuff
 #' @export
-get_plots <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, 
+get_plots <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
                       plot_types = c("funnel", "forest", "leave1out", "cumulative"), ...){
 
      plot_types <- match.arg(plot_types, c("funnel", "forest", "leave1out", "cumulative"), several.ok = TRUE)

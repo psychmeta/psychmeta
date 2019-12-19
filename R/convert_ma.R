@@ -503,7 +503,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 
      .attributes <- attributes(ma_table)
      .class <- class(ma_table)
-     ma_table <- as.data.frame(ma_table)
+     ma_table <- as.data.frame(ma_table, stringsAsFactors = FALSE)
      if(colnames(ma_table)[1] != "k"){
           col1 <- ma_table[,1]
           col1_name <- colnames(ma_table)[1]

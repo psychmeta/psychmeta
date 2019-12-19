@@ -66,8 +66,8 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
      if(!is.null(dim(var_names))) var_names <- unlist(var_names)
      var_names <- as.character(var_names)
 
-     common_data <- as.data.frame(common_data)
-     unique_data <- as.data.frame(unique_data)
+     common_data <- as.data.frame(common_data, stringsAsFactors = FALSE)
+     unique_data <- as.data.frame(unique_data, stringsAsFactors = FALSE)
 
      cor_data <- as.matrix(cor_data)
      if(!lower_tri) cor_data <- t(cor_data)
@@ -139,7 +139,7 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 #'
 #' @return A long-format database
 #' @export
-#' 
+#'
 #' @importFrom stats na.omit
 #'
 #' @examples
@@ -288,9 +288,10 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
 
 
      if(is.null(es_design)) {
-          new_data <- data.frame(matrix(NA, 0, length(common_vars) + length(other_cnames) + 1))
-          colnames(new_data) <- c(common_vars, other_cnames, "x_name")
-          colnames_i <- c(common_vars, other_cnames)
+          # new_data <- data.frame(matrix(NA, 0, length(common_vars) + length(other_cnames) + 1), stringsAsFactors = FALSE)
+          # colnames(new_data) <- c(common_vars, other_cnames, "x_name")
+
+          new_data <- vector(mode = "list", length = length(var_names))
 
           for(i in 1:length(var_names)) {
                x <- var_names[i]
@@ -300,25 +301,31 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
                                             na.omit(other_design[x, ])
                     )
                     ]
-                    colnames(new_data_i) <- colnames_i
-                    new_data_i <- cbind(new_data_i, x_name = x, stringsAsFactors = FALSE)
-                    new_data <- bind_rows(new_data, new_data_i)
+                    colnames(new_data_i) <- c(common_vars,
+                                              other_cnames[which(!is.na(other_design[x,
+                                                                                     ]))])
+                    new_data_i$x_name <- x
+                    new_data[[i]] <- new_data_i
 
                }
           }
 
+          new_data <- data.table::rbindlist(new_data, fill = TRUE)
+
      } else {
-          new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)))
-          colnames(new_data) <- c(common_vars,
-                                  "n", es_name, "x_name", "y_name",
-                                  if(length(other_cnames) > 0) {c(paste0(other_cnames, "_x"), paste0(other_cnames, "_y"))} else {NULL}
-          )
-          colnames_ij <- c(common_vars, if(!is.null(es_design)) {c("n", es_name)},
-                           if(length(other_cnames) > 0) {c(paste0(other_cnames, "_x"), paste0(other_cnames, "_y"))} else {NULL})
+          # new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)), stringsAsFactors = FALSE)
+          # colnames(new_data) <- c(common_vars,
+          #                         "n", es_name, "x_name", "y_name",
+          #                         if(length(other_cnames) > 0) {c(paste0(other_cnames, "_x"), paste0(other_cnames, "_y"))} else {NULL}
+          # )
+
+          new_data <- vector(mode = "list", length = length(var_names) * (length(var_names) - 1) / 2)
+          k <- 0
 
           for(i in 1:length(var_names)) {
                for(j in 1:length(var_names)) {
                     if(i > j){
+                         k <- k + 1
                          x <- var_names[j]
                          y <- var_names[i]
 
@@ -330,16 +337,26 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
                                                       na.omit(other_design[y, ])
                               )
                               ]
-                              colnames(new_data_ij) <- colnames_ij
-                              new_data_ij <- cbind(new_data_ij, x_name = x, y_name = y, stringsAsFactors = FALSE)
-                              new_data <- bind_rows(new_data, new_data_ij)
+                              colnames(new_data_ij) <- c(common_vars,
+                                                         if(!is.null(es_design)) {c("n", es_name)}[c(!is.na(n_design[y, x]), !is.na(es_design[y, x]))],
+                                                         if(length(other_cnames) > 0) {c(paste0(other_cnames, "_x")[which(!is.na(other_design[x, ]))], paste0(other_cnames, "_y")[which(!is.na(other_design[y, ]))])} else {NULL})
+                              new_data_ij$x_name <- x
+                              new_data_ij$y_name <- y
+                              new_data[[k]] <- new_data_ij
 
                          }
                     }
                }
           }
+
+          new_data <- data.table::rbindlist(new_data, fill = TRUE)
      }
 
+     if (inherits(data, "tbl_df")) {
+       new_data <- as_tibble(new_data)
+     } else if (inherits(data, "data.frame")) {
+       new_data <- as.data.frame(new_data, stringsAsFactors = FALSE)
+     }
      new_data
 }
 

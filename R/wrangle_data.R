@@ -5,12 +5,12 @@ smartselect_ <- function (.data, ..., .dots = list()) {
      names(cols_with_spaces) <- gsub(x = cols_with_spaces, pattern = " ", replacement = "_")
      colnames(.data) <- gsub(x = colnames(.data), pattern = " ", replacement = "_")
      .dots <- gsub(x = .dots, pattern = " ", replacement = "_")
-     
+
      .data <- select_(.data, ..., .dots = .dots)
-     
+
      if(length(cols_with_spaces) > 0)
           colnames(.data)[colnames(.data) %in% names(cols_with_spaces)] <- cols_with_spaces
-     
+
      .data
 }
 
@@ -24,7 +24,7 @@ fix_df <- function(df){
                }else{
                     x
                }
-          }))
+          }), stringsAsFactors = FALSE)
      }
 }
 
@@ -46,7 +46,7 @@ match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
                }
           }else{
                if(as_array & is.null(dim(x))){
-                    setNames(as.data.frame(x), as.character(call))
+                    setNames(as.data.frame(x, stringsAsFactors = FALSE), as.character(call))
                }else{
                     x
                }
@@ -57,18 +57,18 @@ match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
 }
 
 
-clean_moderators <- function(moderator_matrix, cat_moderators, es_vec, 
-                             moderator_levels = NULL, moderator_names = NULL, 
+clean_moderators <- function(moderator_matrix, cat_moderators, es_vec,
+                             moderator_levels = NULL, moderator_names = NULL,
                              presorted = FALSE){
      .moderator_names <- moderator_names
      if(!is.null(moderator_matrix)){
-          if(is.null(dim(moderator_matrix))) moderator_matrix <- data.frame(Moderator = moderator_matrix)
+          if(is.null(dim(moderator_matrix))) moderator_matrix <- data.frame(Moderator = moderator_matrix, stringsAsFactors = FALSE)
           es_vec <- unlist(es_vec)
-          
+
           if(!presorted)
                if(nrow(moderator_matrix) != length(es_vec))
                     stop("moderator_matrix must contain as many cases as there are effect sizes in the meta-analysis", call. = FALSE)
-               
+
 
           moderator_names <- colnames(moderator_matrix)
           if(is.null(moderator_names)){
@@ -81,7 +81,7 @@ clean_moderators <- function(moderator_matrix, cat_moderators, es_vec,
           if(any(cat_moderators)){
                cat_moderator_matrix <- moderator_matrix[,cat_moderators]
                if(is.null(dim(cat_moderator_matrix))){
-                    cat_moderator_matrix <- as.data.frame(cat_moderator_matrix)
+                    cat_moderator_matrix <- as.data.frame(cat_moderator_matrix, stringsAsFactors = FALSE)
                     colnames(cat_moderator_matrix) <- colnames(moderator_matrix)[cat_moderators]
                }
 
@@ -140,7 +140,7 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
 
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
-               moderators <- data.frame(Moderator_1 = moderators)
+               moderators <- data.frame(Moderator_1 = moderators, stringsAsFactors = FALSE)
           }
      }
 
@@ -169,13 +169,13 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
      if(!is.null(construct_x)) data_x$construct_x <- construct_x
      if(!is.null(facet_x)) data_x$facet_x <- facet_x
      if(!is.null(measure_x)) data_x$measure_x <- measure_x
-     data_x <- data.frame(data_x)
-     
+     data_x <- data.frame(data_x, stringsAsFactors = FALSE)
+
      if(!is.null(construct_y)) data_y$construct_y <- construct_y
      if(!is.null(facet_y)) data_y$facet_y <- facet_y
      if(!is.null(measure_y)) data_y$measure_y <- measure_y
-     data_y <- data.frame(data_y)
-     
+     data_y <- data.frame(data_y, stringsAsFactors = FALSE)
+
      ## Create copies of data_x and data_y to manipulate
      data_x_reorg <- data_x
      data_y_reorg <- data_y
@@ -267,15 +267,15 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
 
      if(!is.null(data_x)) data_x$construct_x <- data_x_reorg$construct_x <- NULL
      if(!is.null(data_y)) data_y$construct_y <- data_y_reorg$construct_y <- NULL
-     
+
      if(!is.null(construct_x)) construct_x <- as.character(construct_x)
      if(!is.null(construct_y)) construct_y <- as.character(construct_y)
-     
+
      if(!is.null(construct_x)) if(all(is.na(construct_x))) construct_x <- NULL
      if(!is.null(construct_y)) if(all(is.na(construct_y))) construct_y <- NULL
 
      construct_mat <- cbind(construct_x, construct_y)
-     construct_dat <- as.data.frame(construct_mat)
+     construct_dat <- as.data.frame(construct_mat, stringsAsFactors = FALSE)
 
      if(!is.null(use_as_x)) use_as_x <- as.character(use_as_x)
      if(!is.null(use_as_y)) use_as_y <- as.character(use_as_y)
@@ -287,7 +287,7 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
 
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
-               moderators <- data.frame(Moderator_1 = moderators)
+               moderators <- data.frame(Moderator_1 = moderators, stringsAsFactors = FALSE)
           }
      }
 
@@ -297,35 +297,35 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
      if(!is.null(data_y_reorg)) temp_mat <- cbind(temp_mat, data_y_reorg)
      if(!is.null(moderators)) temp_mat <- cbind(moderators, temp_mat)
      if(!is.null(construct_mat)) temp_mat <- cbind(construct_dat, temp_mat)
-     temp_mat <- as.data.frame(temp_mat)
+     temp_mat <- as.data.frame(temp_mat, stringsAsFactors = FALSE)
 
      ## Pull out the re-organized data
      es_data <- temp_mat[,colnames(es_data)]
      if(!is.null(construct_dat)){
           col_names <- colnames(construct_dat)
           construct_mat <- temp_mat[,colnames(construct_dat)]
-          construct_mat <- as.data.frame(construct_mat, stringsAsFactors=FALSE)
+          construct_mat <- as.data.frame(construct_mat, stringsAsFactors = FALSE)
           colnames(construct_mat) <- col_names
      }
      if(!is.null(moderators)){
           col_names <- colnames(moderators)
           moderators <- temp_mat[,colnames(moderators)]
-          moderators <- as.data.frame(moderators, stringsAsFactors=FALSE)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
           colnames(moderators) <- col_names
      }
      if(!is.null(data_x_reorg)){
           col_names <- colnames(data_x_reorg)
           data_x_reorg <- temp_mat[,colnames(data_x_reorg)]
-          data_x_reorg <- as.data.frame(data_x_reorg, stringsAsFactors=FALSE)
+          data_x_reorg <- as.data.frame(data_x_reorg, stringsAsFactors = FALSE)
           colnames(data_x_reorg) <- col_names
      }
      if(!is.null(data_y_reorg)){
           col_names <- colnames(data_y_reorg)
           data_y_reorg <- temp_mat[,colnames(data_y_reorg)]
-          data_y_reorg <- as.data.frame(data_y_reorg, stringsAsFactors=FALSE)
+          data_y_reorg <- as.data.frame(data_y_reorg, stringsAsFactors = FALSE)
           colnames(data_y_reorg) <- col_names
      }
-     
+
      facet_x <- facet_y <- measure_x <- measure_y <- NULL
      if(!is.null(data_x_reorg))
           if(any(colnames(data_x_reorg) == "facet_x")){
@@ -348,22 +348,22 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
                measure_y <- as.character(data_y_reorg[,"measure_y"])
                data_y_reorg$measure_y <- NULL
           }
-     
+
      if(ncol(data_x_reorg) == 0) data_x_reorg <- NULL
      if(ncol(data_y_reorg) == 0) data_y_reorg <- NULL
-     
+
      if(!is.null(sample_id)){
           sample_id <- as.character(es_data[,"sample_id"])
           es_data <- es_data[,colnames(es_data) != "sample_id"]
      }
-     
+
      if(!is.null(citekey)){
           citekey <- as.character(es_data[,"citekey"])
           es_data <- es_data[,colnames(es_data) != "citekey"]
      }
 
      moderators_cleaned <- clean_moderators(moderator_matrix = moderators, cat_moderators = cat_moderators, es_vec = es_data[,1], moderator_levels = moderator_levels)
-     
+
      ## Return the reorganized data
      list(es_data = es_data,
           sample_id = sample_id,
@@ -385,9 +385,9 @@ identify_global <- function(sample_id,
                             construct_x, construct_y,
                             facet_x, facet_y,
                             measure_x, measure_y){
-     
+
      valid_facet <- !is.na(facet_x) | !is.na(facet_y)
-     
+
      global_labels <- c("overall", "global", "total")
      global_x <- tolower(facet_x) %in% global_labels
      global_y <- tolower(facet_y) %in% global_labels
@@ -395,32 +395,32 @@ identify_global <- function(sample_id,
      global_either <- global_x | global_y
      global_one <- global_either & !global_both
      global <- global_either
-     
+
      if(is.null(measure_x)) measure_x <- rep(NA, length(construct_x))
      .measure_x <- measure_x[global_x]
      .measure_x[is.na(.measure_x)] <- "No measure specified"
-     measure_x[global_x] <- .measure_x    
-     
+     measure_x[global_x] <- .measure_x
+
      if(is.null(measure_y)) measure_y <- rep(NA, length(construct_y))
      .measure_y <- measure_y[global_y]
      .measure_y[is.na(.measure_y)] <- "No measure specified"
      measure_y[global_y] <- .measure_y
-     
+
      construct_mat <- t(apply(cbind(construct_x, construct_y), 1, sort))
      sample_construct_pairs <- paste(sample_id, construct_mat[,1], construct_mat[,2])
-     
+
      pairs_both <- sample_construct_pairs[global_both]
      pairs_either <- sample_construct_pairs[global_either]
      pairs_one <- sample_construct_pairs[global_one]
-     
+
      .pairs_one <- pairs_one[pairs_one %in% pairs_both]
      global[sample_construct_pairs %in% .pairs_one & global_one] <- FALSE
-     
+
      pairs_global <- sample_construct_pairs[global]
      eliminate <- rep(FALSE, length(global))
      eliminate[sample_construct_pairs %in% pairs_global & !global_either] <- TRUE
-     
-     list(global = global, 
+
+     list(global = global,
           retain = !eliminate)
 }
 

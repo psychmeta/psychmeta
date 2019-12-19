@@ -139,18 +139,18 @@ sensitivity_bootstrap <- function(ma_obj, boot_iter = 1000, boot_conf_level = .9
                
                if(es_type == "es"){
                     es_data <- data.frame(yi = yi,
-                                          n = n)
+                                          n = n, stringsAsFactors = FALSE)
                     if(!is.null(sample_id)) es_data <- add_column(es_data, sample_id = sample_id, .before = "yi")
                }
                if(es_type == "r"){
                     es_data <- data.frame(rxy = rxy,
-                                          n = n)
+                                          n = n, stringsAsFactors = FALSE)
                     es_data$n_adj <- n_adj
                     if(!is.null(sample_id)) es_data <- add_column(es_data, sample_id = sample_id, .before = "rxy")
                }
                if(es_type == "d"){
                     es_data <- data.frame(d = d,
-                                          n1 = n1)
+                                          n1 = n1, stringsAsFactors = FALSE)
                     es_data$n2 <- n2
                     es_data$n_adj <- n_adj
                     if(!is.null(sample_id)) es_data <- add_column(es_data, sample_id = sample_id, .before = "d")

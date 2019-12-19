@@ -293,7 +293,7 @@ estimate_var_rho_tsa_meas <- function(mean_rtp, var_rxy, var_e,
      data.frame(var_art = as.numeric(var_art),
                 var_pre = as.numeric(var_pre),
                 var_res = as.numeric(var_res),
-                var_rho = as.numeric(var_rho))
+                var_rho = as.numeric(var_rho), stringsAsFactors = FALSE)
 }
 
 
@@ -361,7 +361,7 @@ estimate_var_rho_tsa_uvdrr <- function(mean_rtpa, var_rxyi, var_e,
      data.frame(var_art = as.numeric(var_art),
                 var_pre = as.numeric(var_pre),
                 var_res = as.numeric(var_res),
-                var_rho = as.numeric(var_rho))
+                var_rho = as.numeric(var_rho), stringsAsFactors = FALSE)
 }
 
 
@@ -446,7 +446,7 @@ estimate_var_rho_tsa_bvdrr <- function(mean_rtpa, var_rxyi, var_e = 0,
      data.frame(var_art = as.numeric(var_art),
                 var_pre = as.numeric(var_pre),
                 var_res = as.numeric(var_res),
-                var_rho = as.numeric(var_rho))
+                var_rho = as.numeric(var_rho), stringsAsFactors = FALSE)
 }
 
 
@@ -517,7 +517,7 @@ estimate_var_rho_tsa_uvirr <- function(mean_rtpa, var_rxyi, var_e,
      data.frame(var_art = as.numeric(var_art),
                 var_pre = as.numeric(var_pre),
                 var_res = as.numeric(var_res),
-                var_rho = as.numeric(var_rho))
+                var_rho = as.numeric(var_rho), stringsAsFactors = FALSE)
 }
 
 
@@ -607,7 +607,7 @@ estimate_var_rho_tsa_bvirr <- function(mean_rtpa, var_rxyi, var_e = 0,
      data.frame(var_art = as.numeric(var_art),
                 var_pre = as.numeric(var_pre),
                 var_res = as.numeric(var_res),
-                var_rho = as.numeric(var_rho))
+                var_rho = as.numeric(var_rho), stringsAsFactors = FALSE)
 }
 
 
@@ -675,7 +675,7 @@ estimate_var_rho_tsa_rb1 <- function(mean_rtpa, var_rxyi, var_e,
      data.frame(var_art = as.numeric(var_art),
                 var_pre = as.numeric(var_pre),
                 var_res = as.numeric(var_res),
-                var_rho = as.numeric(var_rho))
+                var_rho = as.numeric(var_rho), stringsAsFactors = FALSE)
 }
 
 
@@ -743,5 +743,5 @@ estimate_var_rho_tsa_rb2 <- function(mean_rtpa, var_rxyi, var_e,
      data.frame(var_art = as.numeric(var_art),
                 var_pre = as.numeric(var_pre),
                 var_res = as.numeric(var_res),
-                var_rho = as.numeric(var_rho))
+                var_rho = as.numeric(var_rho), stringsAsFactors = FALSE)
 }

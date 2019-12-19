@@ -40,7 +40,7 @@
           }
           mean_qxa <- wt_mean(x = qxa_mat$Value, wt = qxa_mat$Weight)
      }else{
-          qxa_mat <- data.frame(Value = 1, Weight = 1)
+          qxa_mat <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
           mean_qxa <- 1
      }
 
@@ -52,7 +52,7 @@
           }
           mean_qya <- wt_mean(x = qya_mat$Value, wt = qya_mat$Weight)
      }else{
-          qya_mat <- data.frame(Value = 1, Weight = 1)
+          qya_mat <- data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)
           mean_qya <- 1
      }
 

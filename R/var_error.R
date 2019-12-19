@@ -121,7 +121,7 @@ var_error_rel <- function(rel, n, rel_type = "alpha", k_items = NULL){
      }else{
           if(is.null(k_items)) k_items <- rep(NA, max(c(length(rel), length(n))))
           
-          dat <- suppressWarnings(as.data.frame(list(rel = rel, n = n, k_items = k_items, rel_type = rel_type)))
+          dat <- suppressWarnings(as.data.frame(list(rel = rel, n = n, k_items = k_items, rel_type = rel_type), stringsAsFactors = FALSE))
           rel <- dat$rel
           n <- dat$n
           k_items <- dat$k_items
@@ -182,7 +182,7 @@ var_error_q <- function(q, n, rel_type = "alpha", k_items = NULL){
      }else{
           if(is.null(k_items)) k_items <- rep(NA, max(c(length(q), length(n))))
           
-          dat <- suppressWarnings(as.data.frame(list(q = q, n = n, k_items = k_items, rel_type = rel_type)))
+          dat <- suppressWarnings(as.data.frame(list(q = q, n = n, k_items = k_items, rel_type = rel_type), stringsAsFactors = FALSE))
           q <- dat$q
           n <- dat$n
           k_items <- dat$k_items

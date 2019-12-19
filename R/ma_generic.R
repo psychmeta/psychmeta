@@ -80,7 +80,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
 
           es <- match_variables(call = call_full[[match("es",  names(call_full))]], arg = es, arg_name = "es", data = data)
           n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, arg_name = "n", data = data)
@@ -120,7 +120,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
-               moderators <- as.data.frame(moderators)
+               moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
                colnames(moderators) <- "Moderator"
           }
 
@@ -140,7 +140,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                moderator_levels <- NULL
           }
 
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -156,7 +156,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                     conf_method = conf_method, cred_method = cred_method,
                     var_unbiased = var_unbiased)
 
-     es_data <- data.frame(es = es, n = n, var_e = var_e)
+     es_data <- data.frame(es = es, n = n, var_e = var_e, stringsAsFactors = FALSE)
      if(wt_type == "custom"){
           if(length(weights) != nrow(es_data))
                stop("If weights are supplied manually (via the 'weights' argument), there must be as many weights as there are effect sizes", call. = FALSE)
@@ -214,7 +214,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      out <- es_data %>% 
           do(ma_wrapper(es_data = if(is.null(moderator_names$all)){.data}else{.data[,!(colnames(.data) %in% moderator_names$all)]}, 
                         es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
-                        moderator_matrix = if(is.null(moderator_names$all)){NULL}else{as.data.frame(.data)[,moderator_names$all]}, 
+                        moderator_matrix = if(is.null(moderator_names$all)){NULL}else{as.data.frame(.data, stringsAsFactors = FALSE)[,moderator_names$all]}, 
                         moderator_type = moderator_type, cat_moderators = cat_moderators,
                         
                         ma_arg_list = list(conf_level = conf_level, cred_level = cred_level,
@@ -310,7 +310,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      }else{
           escalc_obj <- data.frame(yi = es, vi = var_e_vec,
                                    n = n, weight = wt_vec,
-                                   residual = es - mean_es)
+                                   residual = es - mean_es, stringsAsFactors = FALSE)
           if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
           if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj)
           if(any(colnames(data) == "original_order")) escalc_obj <- cbind(original_order = data$original_order, escalc_obj)
@@ -336,9 +336,9 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           se_es <- sd_es / sqrt(k)
           ci <- confidence(mean = mean_es, sd = sd_es, k = k, conf_level = conf_level, conf_method = conf_method)
      }
-     cv <- credibility(mean = mean_es, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
+     cr <- credibility(mean = mean_es, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      ci <- setNames(c(ci), colnames(ci))
-     cv <- setNames(c(cv), colnames(cv))
+     cr <- setNames(c(cr), colnames(cr))
 
      list(meta = list(barebones = data.frame(t(c(k = k,
                                                  N = N,
@@ -350,7 +350,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                                                  se_es = se_es,
                                                  sd_e = sd_e,
                                                  sd_res = sd_res,
-                                                 ci, cv)))),
+                                                 ci, cr)), stringsAsFactors = FALSE)),
           escalc = list(barebones = escalc_obj))
 
 }

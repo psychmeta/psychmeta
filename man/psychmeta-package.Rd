@@ -56,7 +56,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jeffrey A. Dahlke \email{dahlk068@umn.edu}
+\strong{Maintainer}: Jeffrey A. Dahlke \email{jdahlke@humrro.org}
 
 Authors:
 \itemize{

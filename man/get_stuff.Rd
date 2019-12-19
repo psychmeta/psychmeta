@@ -70,7 +70,7 @@ get_plots(ma_obj, analyses = "all", match = c("all", "any"),
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}
 
-\item{what}{For the \code{get_stuff()} function only: Character scalar telling \code{get_stuff()} what to get. 
+\item{what}{For the \code{get_stuff()} function only: Character scalar telling \code{get_stuff()} what to get.
 All suffixes from functions in the "get_" family can be passed as arguments to \code{what}:
 "metatab", "escalc", "metafor", "ad", "followup", "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", "matrix", "plots"}
 
@@ -82,7 +82,7 @@ All suffixes from functions in the "get_" family can be passed as arguments to \
 \item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
 \item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
 \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-\item{N_minv}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
+\item{N_min:}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 }}
 
 \item{match}{Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?}

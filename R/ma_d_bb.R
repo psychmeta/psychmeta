@@ -55,7 +55,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
 
           d <- match_variables(call = call_full[[match("d",  names(call_full))]], arg = d, arg_name = "d", data = data)
           n1 <- match_variables(call = call_full[[match("n1",  names(call_full))]], arg = n1, arg_name = "n1", data = data)
@@ -74,7 +74,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
-               moderators <- as.data.frame(moderators)
+               moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
                colnames(moderators) <- "Moderator"
           }
 
@@ -94,7 +94,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                moderator_levels <- NULL
           }
 
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -112,7 +112,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                     conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, 
                     var_unbiased = var_unbiased)
 
-     es_data <- data.frame(d = d, n1 = n1, n2 = n2)
+     es_data <- data.frame(d = d, n1 = n1, n2 = n2, stringsAsFactors = FALSE)
      es_data$n_adj <- n_adj
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
      if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
@@ -228,7 +228,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           escalc_obj <- data.frame(yi = d, vi = var_e_vec,
                                    d = .d,
                                    n1 = n1, n2 = n2, n = n_vec, n_adj = n_adj,
-                                   n1_split = n1_i, n2_split = n2_i)
+                                   n1_split = n1_i, n2_split = n2_i, stringsAsFactors = FALSE)
           escalc_obj$pi <- data$pi
           if(is.null(data$pa)){
                escalc_obj$pi <- n1_i / (n1_i + n2_i)
@@ -275,9 +275,9 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           se_d <- sd_d / sqrt(k)
           ci <- confidence(mean = mean_d, sd = var_d^.5, k = k, conf_level = conf_level, conf_method = conf_method)
      }
-     cv <- credibility(mean = mean_d, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
+     cr <- credibility(mean = mean_d, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      ci <- setNames(c(ci), colnames(ci))
-     cv <- setNames(c(cv), colnames(cv))
+     cr <- setNames(c(cr), colnames(cr))
 
      barebones <- as.data.frame(t(c(k = k,
                                     N = N,
@@ -289,7 +289,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
                                     se_d = se_d,
                                     sd_e = var_e^.5,
                                     sd_res = sd_res,
-                                    ci, cv)))
+                                    ci, cr)), stringsAsFactors = FALSE)
      
      class(barebones) <- c("ma_table", class(barebones))
      attributes(barebones) <- append(attributes(barebones), list(ma_type = "d_bb"))

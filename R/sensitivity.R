@@ -108,7 +108,6 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #' @param ma_vec An optional vector of overall meta-analytic results to use as reference points on the plots.
 #' @param analysis Type of analysis to be plotted: leave-one-out or cumulative.
 #'
-#' @import ggplot2
 #'
 #' @return A list of forest plots
 #' @keywords internal
@@ -182,22 +181,22 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
      cill <- grep(x = colnames(ma_mat), pattern = "CI_LL")
      ciul <- grep(x = colnames(ma_mat), pattern = "CI_UL")
 
-     cvll <- grep(x = colnames(ma_mat), pattern = "CV_LL")
-     cvul <- grep(x = colnames(ma_mat), pattern = "CV_UL")
+     crll <- grep(x = colnames(ma_mat), pattern = "CR_LL")
+     crul <- grep(x = colnames(ma_mat), pattern = "CR_UL")
 
      conf_level <- gsub(x = colnames(ma_mat)[cill], pattern = "CI_LL_", replacement = "")
-     cred_level <- gsub(x = colnames(ma_mat)[cvll], pattern = "CV_LL_", replacement = "")
+     cred_level <- gsub(x = colnames(ma_mat)[crll], pattern = "CR_LL_", replacement = "")
 
      lower.ci <- ma_mat[,cill]
      upper.ci <- ma_mat[,ciul]
      ci.width <- upper.ci - lower.ci
-     lower.cr <- ma_mat[,cvll]
-     upper.cr <- ma_mat[,cvul]
+     lower.cr <- ma_mat[,crll]
+     upper.cr <- ma_mat[,crul]
 
      lower.cr[is.na(lower.cr)] <- mean.value[is.na(lower.cr)]
      upper.cr[is.na(upper.cr)] <- mean.value[is.na(upper.cr)]
 
-     plot.df <- data.frame(label, mean.value, sd.value, lower.ci, upper.ci, ci.width, lower.cr, upper.cr)
+     plot.df <- data.frame(label, mean.value, sd.value, lower.ci, upper.ci, ci.width, lower.cr, upper.cr, stringsAsFactors = FALSE)
 
      if(analysis == "cumulative"){
           plot.df[,1] <- factor(plot.df[,1], levels = rev(plot.df[,1]))
@@ -210,48 +209,48 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 
 
      if(es_type == "es"){
-          mean_ylab <- bquote("Mean Effect Size"~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+          mean_ylab <- bquote("Mean Effect Size"~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
           sd_ylab <- "Residual SD of Effect Sizes"
      }
 
      if(es_type == "r"){
           if("mean_rho" %in% colnames(ma_mat)){
-               mean_ylab <- bquote("Mean"~rho~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~rho~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(SD[italic(rho)])
           }else{
-               mean_ylab <- bquote("Mean"~italic(r)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~italic(r)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(Residual~SD~of~italic(r))
           }
      }
 
      if(es_type == "d"){
           if("mean_delta" %in% colnames(ma_mat)){
-               mean_ylab <- bquote("Mean"~delta~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~delta~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(SD[italic(delta)])
           }else{
-               mean_ylab <- bquote("Mean"~italic(d)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CV)")))
+               mean_ylab <- bquote("Mean"~italic(d)~.(paste0("(", conf_level, "% CI and ", cred_level, "% CR)")))
                sd_ylab <- expression(Residual~SD~of~italic(d))
           }
      }
 
-     fp.mean <- ggplot(data=plot.df,aes(x=label, y=mean.value, ymin=lower.cr, ymax=upper.cr)) +
-          geom_pointrange(shape=46) +                         # produce credibility interval line
-          geom_point(aes(y=mean.value), size=1) +             # produce mean.value point
-          geom_point(aes(y=lower.ci), shape = 108, size=3) +  # lower ci point
-          geom_point(aes(y=upper.ci), shape = 108, size=3) +  # upper ci point
-          geom_hline(yintercept=0, lty=2) +                   # add a dotted line at x=0 after coordinate flip
-          geom_hline(yintercept=grand_mean, lty=1) +
-          coord_flip() +                                      # flip coordinates (puts labels on y axis)
-          xlab("Sample") + ylab(mean_ylab) +
-          theme_bw()                                          # use a white background
+     fp.mean <- ggplot2::ggplot(data=plot.df, ggplot2::aes(x=label, y=mean.value, ymin=lower.cr, ymax=upper.cr)) +
+          ggplot2::geom_pointrange(shape=46) +                         # produce credibility interval line
+          ggplot2::geom_point(ggplot2::aes(y=mean.value), size=1) +             # produce mean.value point
+          ggplot2::geom_point(ggplot2::aes(y=lower.ci), shape = 108, size=3) +  # lower ci point
+          ggplot2::geom_point(ggplot2::aes(y=upper.ci), shape = 108, size=3) +  # upper ci point
+          ggplot2::geom_hline(yintercept=0, lty=2) +                   # add a dotted line at x=0 after coordinate flip
+          ggplot2::geom_hline(yintercept=grand_mean, lty=1) +
+          ggplot2::coord_flip() +                                      # flip coordinates (puts labels on y axis)
+          ggplot2::xlab("Sample") + ggplot2::ylab(mean_ylab) +
+          ggplot2::theme_bw()                                          # use a white background
 
-     fp.sd <- ggplot(data=plot.df, aes(x=label, y=sd.value, group=1) ) +
-          geom_point() + geom_line() +
-          geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=0 after flip
-          geom_hline(yintercept=grand_sd, lty=1) +
-          coord_flip() +                     # flip coordinates (puts labels on y axis)
-          xlab("Sample") + ylab(sd_ylab) +
-          theme_bw()                         # use a white background
+     fp.sd <- ggplot2::ggplot(data=plot.df, ggplot2::aes(x=label, y=sd.value, group=1) ) +
+          ggplot2::geom_point() + ggplot2::geom_line() +
+          ggplot2::geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=0 after flip
+          ggplot2::geom_hline(yintercept=grand_sd, lty=1) +
+          ggplot2::coord_flip() +                     # flip coordinates (puts labels on y axis)
+          ggplot2::xlab("Sample") + ggplot2::ylab(sd_ylab) +
+          ggplot2::theme_bw()                         # use a white background
 
      return(list(mean_plot = fp.mean, sd_plot = fp.sd))
 }
@@ -316,7 +315,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           for(i in rows){
                out <- rbind(out, suppressWarnings(fun(data = data, i = rows[-i], ma_arg_list = ma_arg_list)))
           }
-          as.data.frame(out)
+          as.data.frame(out, stringsAsFactors = FALSE)
      }
      cbind(study_left_out = data$sample_id, suppressWarnings(.leave1out(data = data, fun = ma_fun_boot, ma_arg_list = ma_arg_list)))
 }
@@ -352,7 +351,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
           for(i in 1:k){
                out <- rbind(out, suppressWarnings(fun(data = data, i = 1:i, ma_arg_list = ma_arg_list)))
           }
-          as.data.frame(out)
+          as.data.frame(out, stringsAsFactors = FALSE)
      }
      cbind(study_added = data$sample_id, suppressWarnings(.cumulative(data = data, fun = ma_fun_boot, ma_arg_list = ma_arg_list)))
 }

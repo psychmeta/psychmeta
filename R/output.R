@@ -1123,7 +1123,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           }
 
           if(show_conf == TRUE) col_conf <- grep("^CI_.+", x, value = TRUE) else col_conf <- NULL
-          if(show_cred == TRUE) col_cred <- grep("^CV_.+", x, value = TRUE) else col_cred <- NULL
+          if(show_cred == TRUE) col_cred <- grep("^CR_.+", x, value = TRUE) else col_cred <- NULL
 
           # Rearrange columns
           ma_table <- ma_table[1:nrow(ma_table), c(col_initial, col_moderators, col_sampsize,
@@ -1136,8 +1136,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
           colnames(ma_table)[colnames(ma_table) %in% col_conf] <- c("ci_lower", "ci_upper")
           if(show_conf == TRUE) col_conf <- c("ci_lower", "ci_upper")
-          colnames(ma_table)[colnames(ma_table) %in% col_cred] <- c("cv_lower", "cv_upper")
-          if(show_cred == TRUE) col_cred <- c("cv_lower", "cv_upper")
+          colnames(ma_table)[colnames(ma_table) %in% col_cred] <- c("cr_lower", "cr_upper")
+          if(show_cred == TRUE) col_cred <- c("cr_lower", "cr_upper")
 
           # Format columns
           ma_table[1:nrow(ma_table), col_sampsize] <-
@@ -1174,10 +1174,10 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           }
           if (show_cred == TRUE) {
                switch(cred_format,
-                      parentheses = {ma_table <- rename(select(mutate(ma_table, cv_lower = paste0("(", .data$cv_lower, ", ", .data$cv_upper, ")")),
-                                                               -.data$cv_upper), cred_int = .data$cv_lower)},
-                      brackets = {ma_table <- rename(select(mutate(ma_table, cv_lower = paste0("[", .data$cv_lower, ", ", .data$cv_upper, "]")),
-                                                            -.data$cv_upper), cred_int = .data$cv_lower)},
+                      parentheses = {ma_table <- rename(select(mutate(ma_table, cr_lower = paste0("(", .data$cr_lower, ", ", .data$cr_upper, ")")),
+                                                               -.data$cr_upper), cred_int = .data$cr_lower)},
+                      brackets = {ma_table <- rename(select(mutate(ma_table, cr_lower = paste0("[", .data$cr_lower, ", ", .data$cr_upper, "]")),
+                                                            -.data$cr_upper), cred_int = .data$cr_lower)},
                )
           }
 
@@ -1295,11 +1295,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
                     ci_lower          = paste0(conf_level*100, "% CI Lower"),
                     ci_upper          = paste0(conf_level*100, "% CI Upper"),
-                    cv_lower          = paste0(cred_level*100, "% CV Lower"),
-                    cv_upper          = paste0(cred_level*100, "% CV Upper"),
+                    cr_lower          = paste0(cred_level*100, "% CR Lower"),
+                    cr_upper          = paste0(cred_level*100, "% CR Upper"),
 
                     conf_int          = paste0(conf_level*100, "% CI"),
-                    cred_int          = paste0(cred_level*100, "% CV")
+                    cred_int          = paste0(cred_level*100, "% CR")
                )
           } else {
                c(
@@ -1359,11 +1359,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
                     ci_lower          = paste0(conf_level*100, "% CI Lower"),
                     ci_upper          = paste0(conf_level*100, "% CI Upper"),
-                    cv_lower          = paste0(cred_level*100, "% CV Lower"),
-                    cv_upper          = paste0(cred_level*100, "% CV Upper"),
+                    cr_lower          = paste0(cred_level*100, "% CR Lower"),
+                    cr_upper          = paste0(cred_level*100, "% CR Upper"),
 
                     conf_int          = paste0(conf_level*100, "% CI"),
-                    cred_int          = paste0(cred_level*100, "% CV")
+                    cred_int          = paste0(cred_level*100, "% CR")
                )
           }
      } else {
@@ -1424,11 +1424,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
                ci_lower          = paste0("**", conf_level*100, "% CI Lower**"),
                ci_upper          = paste0("**", conf_level*100, "% CI Upper**"),
-               cv_lower          = paste0("**", cred_level*100, "% CV Lower**"),
-               cv_upper          = paste0("**", cred_level*100, "% CV Upper**"),
+               cr_lower          = paste0("**", cred_level*100, "% CR Lower**"),
+               cr_upper          = paste0("**", cred_level*100, "% CR Upper**"),
 
                conf_int          = paste0("**", conf_level*100, "% CI**"),
-               cred_int          = paste0("**", cred_level*100, "% CV**")
+               cred_int          = paste0("**", cred_level*100, "% CR**")
           )
      }
 
@@ -1455,7 +1455,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_e = predicted variance of r due to sampling error"[show_var & verbose],
                                               "\u03C3\u00B2_res = residual variance of r"[show_var],
                                               "CI = confidence interval around r\u0305"[show_conf],
-                                              "CV = credibility interval around r\u0305"[show_cred]), collapse = "; "), "."),
+                                              "CR = credibility interval around r\u0305"[show_cred]), collapse = "; "), "."),
 
                       ic_ts  = paste0(paste(c("k = number of studies contributing to meta-analysis",
                                               "N = total sample size",
@@ -1478,7 +1478,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03C1 = residual variance of \u03C1"[show_var],
 
                                               "CI = confidence interval around \u03C1\u0305"[show_conf],
-                                              "CV = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected individually."),
 
@@ -1503,7 +1503,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03C1 = residual variance of \u03C1"[show_var],
 
                                               "CI = confidence interval around \u03C1\u0305"[show_conf],
-                                              "CV = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected individually."),
 
@@ -1528,7 +1528,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03C1 = residual variance of \u03C1"[show_var],
 
                                               "CI = confidence interval around \u03C1\u0305"[show_conf],
-                                              "CV = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected individually."),
 
@@ -1561,7 +1561,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03C1 = residual variance of \u03C1"[show_var],
 
                                               "CI = confidence interval around \u03C1\u0305"[show_conf],
-                                              "CV = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected using artifact distributions."),
 
@@ -1594,7 +1594,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03C1 = residual variance of \u03C1"[show_var],
 
                                               "CI = confidence interval around \u03C1\u0305"[show_conf],
-                                              "CV = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected using artifact distributions."),
 
@@ -1627,7 +1627,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03C1 = residual variance of \u03C1"[show_var],
 
                                               "CI = confidence interval around \u03C1\u0305"[show_conf],
-                                              "CV = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03C1\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected using artifact distributions.")
                     )
@@ -1645,7 +1645,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_e = predicted variance of d due to sampling error",
                                               "\u03C3\u00B2_res = residual variance of d"[show_var & verbose],
                                               "CI = confidence interval around d\u0305"[show_conf],
-                                              "CV = credibility interval around d\u0305"[show_cred]), collapse = "; "), ". "),
+                                              "CR = credibility interval around d\u0305"[show_cred]), collapse = "; "), ". "),
 
                       ic_ts  = paste0(paste(c("k = number of studies contributing to meta-analysis",
                                               "N = total sample size",
@@ -1668,7 +1668,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03B4 = residual variance of \u03B4"[show_var],
 
                                               "CI = confidence interval around \u03B4\u0305"[show_conf],
-                                              "CV = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected individually."),
 
@@ -1693,7 +1693,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03B4 = residual variance of \u03B4"[show_var],
 
                                               "CI = confidence interval around \u03B4\u0305"[show_conf],
-                                              "CV = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected individually."),
 
@@ -1718,7 +1718,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03B4 = residual variance of \u03B4"[show_var],
 
                                               "CI = confidence interval around \u03B4\u0305"[show_conf],
-                                              "CV = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected individually."),
 
@@ -1751,7 +1751,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03B4 = residual variance of \u03B4"[show_var],
 
                                               "CI = confidence interval around \u03B4\u0305"[show_conf],
-                                              "CV = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected using artifact distributions."),
 
@@ -1784,7 +1784,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03B4 = residual variance of \u03B4"[show_var],
 
                                               "CI = confidence interval around \u03B4\u0305"[show_conf],
-                                              "CV = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected using artifact distributions."),
 
@@ -1817,7 +1817,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "\u03C3\u00B2_\u03B4 = residual variance of \u03B4"[show_var],
 
                                               "CI = confidence interval around \u03B4\u0305"[show_conf],
-                                              "CV = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around \u03B4\u0305"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected using artifact distributions.")
                     )
@@ -1834,7 +1834,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                           paste0("\u03C3\u00B2_e = predicted variance of ", symbol_es, " due to sampling error")[show_var & verbose],
                                           paste0("\u03C3\u00B2_res = residual variance of ", symbol_es)[show_var],
                                           paste0("CI = confidence interval around ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""))[show_conf],
-                                          paste0("CV = credibility interval around ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""))[show_cred]), collapse = "; "), ".")
+                                          paste0("CR = credibility interval around ", paste0(strsplit(symbol_es, NULL)[[1]], "\u305", collapse = ""))[show_cred]), collapse = "; "), ".")
                     )
                }
 
@@ -1851,7 +1851,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_e = predicted variance of r due to sampling error"[show_var & verbose],
                                               "Var_res = residual variance of r"[show_var],
                                               "CI = confidence interval around Mean r"[show_conf],
-                                              "CV = credibility interval around Mean r"[show_cred]), collapse = "; "), "."),
+                                              "CR = credibility interval around Mean r"[show_cred]), collapse = "; "), "."),
 
                       ic_ts  = paste0(paste(c("k = number of studies contributing to meta-analysis",
                                               "N = total sample size",
@@ -1874,7 +1874,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_rho = residual variance of rho"[show_var],
 
                                               "CI = confidence interval around Mean rho"[show_conf],
-                                              "CV = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected individually."),
 
@@ -1899,7 +1899,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_rho = residual variance of rho"[show_var],
 
                                               "CI = confidence interval around Mean rho"[show_conf],
-                                              "CV = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected individually."),
 
@@ -1924,7 +1924,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_rho = residual variance of rho"[show_var],
 
                                               "CI = confidence interval around Mean rho"[show_conf],
-                                              "CV = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected individually."),
 
@@ -1957,7 +1957,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_rho = residual variance of rho"[show_var],
 
                                               "CI = confidence interval around Mean rho"[show_conf],
-                                              "CV = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected using artifact distributions."),
 
@@ -1990,7 +1990,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_rho = residual variance of rho"[show_var],
 
                                               "CI = confidence interval around Mean rho"[show_conf],
-                                              "CV = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected using artifact distributions."),
 
@@ -2023,7 +2023,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_rho = residual variance of rho"[show_var],
 
                                               "CI = confidence interval around Mean rho"[show_conf],
-                                              "CV = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean rho"[show_cred]), collapse = "; "), ". ",
 
                                       "Correlations corrected using artifact distributions.")
                     )
@@ -2041,7 +2041,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_e = predicted variance of d due to sampling error",
                                               "Var_res = residual variance of d"[show_var & verbose],
                                               "CI = confidence interval around Mean d"[show_conf],
-                                              "CV = credibility interval around Mean d"[show_cred]), collapse = "; "), "."),
+                                              "CR = credibility interval around Mean d"[show_cred]), collapse = "; "), "."),
 
                       ic_ts  = paste0(paste(c("k = number of studies contributing to meta-analysis",
                                               "N = total sample size",
@@ -2064,7 +2064,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_delta = residual variance of delta"[show_var],
 
                                               "CI = confidence interval around Mean delta"[show_conf],
-                                              "CV = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected individually."),
 
@@ -2089,7 +2089,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_delta = residual variance of delta"[show_var],
 
                                               "CI = confidence interval around Mean delta"[show_conf],
-                                              "CV = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected individually."),
 
@@ -2114,7 +2114,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_delta = residual variance of delta"[show_var],
 
                                               "CI = confidence interval around Mean delta"[show_conf],
-                                              "CV = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected individually."),
 
@@ -2147,7 +2147,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_delta = residual variance of delta"[show_var],
 
                                               "CI = confidence interval around Mean delta"[show_conf],
-                                              "CV = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected using artifact distributions."),
 
@@ -2180,7 +2180,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_delta = residual variance of delta"[show_var],
 
                                               "CI = confidence interval around Mean delta"[show_conf],
-                                              "CV = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected using artifact distributions."),
 
@@ -2213,7 +2213,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                               "Var_delta = residual variance of delta"[show_var],
 
                                               "CI = confidence interval around Mean delta"[show_conf],
-                                              "CV = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
+                                              "CR = credibility interval around Mean delta"[show_cred]), collapse = "; "), ". ",
 
                                       "Effect sizes corrected using artifact distributions.")
                     )
@@ -2231,7 +2231,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                           paste0("Var_e = predicted variance of ", symbol_es, " due to sampling error")[show_var & verbose],
                                           paste0("Var_res = residual variance of ", symbol_es)[show_var],
                                           paste0("CI = confidence interval around Mean [", symbol_es, "]")[show_conf],
-                                          paste0("CV = credibility interval around Mean [", symbol_es, "]")[show_cred]), collapse = "; "), ".")
+                                          paste0("CR = credibility interval around Mean [", symbol_es, "]")[show_cred]), collapse = "; "), ".")
                     )
                }
           }
@@ -2248,7 +2248,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{e}$&nbsp;=&nbsp;predicted variance of $r$ due to sampling error"[show_var & verbose],
                                          "$\\sigma^{2}_{res}$&nbsp;=&nbsp;residual variance of $r$"[show_var],
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{r}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{r}$"[show_cred]), collapse = "; "), "."),
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{r}$"[show_cred]), collapse = "; "), "."),
 
                  ic_ts  = paste0(paste(c("*k*&nbsp;=&nbsp;number of studies contributing to meta-analysis",
                                          "*N*&nbsp;=&nbsp;total sample size",
@@ -2271,7 +2271,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\symup{\\rho}}$&nbsp;=&nbsp;residual variance of $\\symup{\\rho}$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\symup{\\overline{\\rho}}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Correlations corrected individually."),
 
@@ -2296,7 +2296,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\symup{\\rho}}$&nbsp;=&nbsp;residual variance of $\\symup{\\rho}$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\symup{\\overline{\\rho}}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Correlations corrected individually."),
 
@@ -2321,7 +2321,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\symup{\\rho}}$&nbsp;=&nbsp;residual variance of $\\symup{\\rho}$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\symup{\\overline{\\rho}}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Correlations corrected individually."),
 
@@ -2354,7 +2354,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\symup{\\rho}}$&nbsp;=&nbsp;residual variance of $\\symup{\\rho}$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\symup{\\overline{\\rho}}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Correlations corrected using artifact distributions."),
 
@@ -2387,7 +2387,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\symup{\\rho}}$&nbsp;=&nbsp;residual variance of $\\symup{\\rho}$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\symup{\\overline{\\rho}}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Correlations corrected using artifact distributions."),
 
@@ -2420,7 +2420,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\symup{\\rho}}$&nbsp;=&nbsp;residual variance of $\\symup{\\rho}$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\symup{\\overline{\\rho}}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\symup{\\overline{\\rho}}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Correlations corrected using artifact distributions.")
                )
@@ -2438,7 +2438,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{e}$&nbsp;=&nbsp;predicted variance of $d$ due to sampling error",
                                          "$\\sigma^{2}_{res}$&nbsp;=&nbsp;residual variance of $d$"[show_var & verbose],
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{d}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{d}$"[show_cred]), collapse = "; "), "."),
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{d}$"[show_cred]), collapse = "; "), "."),
 
                  ic_ts  = paste0(paste(c("*k*&nbsp;=&nbsp;number of studies contributing to meta-analysis",
                                          "*N*&nbsp;=&nbsp;total sample size",
@@ -2461,7 +2461,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\delta}$&nbsp;=&nbsp;residual variance of $\\delta$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{\\delta}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Effect sizes corrected individually."),
 
@@ -2486,7 +2486,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\delta}$&nbsp;=&nbsp;residual variance of $\\delta$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{\\delta}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Effect sizes corrected individually."),
 
@@ -2511,7 +2511,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\delta}$&nbsp;=&nbsp;residual variance of $\\delta$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{\\delta}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Effect sizes corrected individually."),
 
@@ -2544,7 +2544,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\delta}$&nbsp;=&nbsp;residual variance of $\\delta$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{\\delta}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Effect sizes corrected using artifact distributions."),
 
@@ -2577,7 +2577,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\delta}$&nbsp;=&nbsp;residual variance of $\\delta$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{\\delta}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Effect sizes corrected using artifact distributions"),
 
@@ -2610,7 +2610,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                          "$\\sigma^{2}_{\\delta}$&nbsp;=&nbsp;residual variance of $\\delta$"[show_var],
 
                                          "CI&nbsp;=&nbsp;confidence interval around $\\overline{\\delta}$"[show_conf],
-                                         "CV&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
+                                         "CR&nbsp;=&nbsp;credibility interval around $\\overline{\\delta}$"[show_cred]), collapse = "; "), ". ",
 
                                  "Effect sizes corrected using artifact distributions")
                )
@@ -2627,7 +2627,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                      paste0("$\\sigma^{2}_{e}$&nbsp;=&nbsp;predicted variance of $", symbol_es, "$ due to sampling error")[show_var & verbose],
                                      paste0("$\\sigma^{2}_{res}$&nbsp;=&nbsp;residual variance of $", symbol_es, "$")[show_var & !verbose],
                                      paste0("CI&nbsp;=&nbsp;confidence interval around $\\overline{", symbol_es, "}$")[show_conf],
-                                     paste0("CV&nbsp;=&nbsp;credibility interval around $\\overline{", symbol_es, "}$")[show_cred]), collapse = "; "), ".")
+                                     paste0("CR&nbsp;=&nbsp;credibility interval around $\\overline{", symbol_es, "}$")[show_cred]), collapse = "; "), ".")
                )
           }
      }

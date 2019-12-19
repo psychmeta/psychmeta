@@ -127,14 +127,14 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
           
           if(es_type == "es"){
                es_data <- data.frame(yi = yi,
-                                     n = n)
+                                     n = n, stringsAsFactors = FALSE)
                es_data$vi <- vi_xy
                es_data$weight <- wt_xy
                if(!is.null(sample_id)) es_data <- add_column(es_data, sample_id = sample_id, .before = "yi")
           }
           if(es_type == "r"){
                es_data <- data.frame(rxy = rxy,
-                                     n = n)
+                                     n = n, stringsAsFactors = FALSE)
                es_data$n_adj <- n_adj
                es_data$vi <- vi_xy
                es_data$weight <- wt_xy
@@ -142,7 +142,7 @@ sensitivity_cumulative <- function(ma_obj, sort_method = c("weight", "n", "inv_v
           }
           if(es_type == "d"){
                es_data <- data.frame(d = d,
-                                     n1 = n1)
+                                     n1 = n1, stringsAsFactors = FALSE)
                es_data$n2 <- n2
                es_data$n <- n
                es_data$pi <- pi

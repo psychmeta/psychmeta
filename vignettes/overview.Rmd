@@ -636,13 +636,16 @@ get_ad(ma_obj, ma_method = "ic")
 
 \pagebreak
 
-## Writing (mostly) formatted tables of results to rich-text format
+## Writing formatted results tables to Word, PDF, Markdown, or other formats
 
-**`psychmeta`** can automatically produce publication-ready tables of meta-analysis results that can be copied into your word processor. These tables will generally only require light formatting adjustments.
+**`psychmeta`** can automatically produce publication-ready tables of meta-analysis 
+results that can be copied into your word processor or inserted into an RMarkdown
+document.
 
 ```{r, eval=FALSE}
-# Write meta-analysis tables to a file called "Meta-analysis table.rtf"
-metabulate(ma_obj, file = "Meta-analysis table.rtf")
+# Write meta-analysis tables to a Word file called "Meta-analysis table.docx"
+metabulate(ma_obj, file = "Meta-analysis table.docx", 
+           output_format = "word", output_dir = tempdir())
 ```
 
 
@@ -657,7 +660,7 @@ ma_obj <- plot_forest(ma_obj = ma_obj, ma_facetname = "MA")
 # Extract plots for viewing
 out_plots <- get_plots(ma_obj)
 out_plots$funnel$`analysis id: 1`$barebones
-out_plots$forest$`analysis id: 1`$barebones
+out_plots$forest$`analysis id: 1`$moderated$barebones
 
 # The sensitivity_cumulative() and sensitivity_leave1out() functions also produce plots.
 out_plots$leave1out$`analysis id: 1`$barebones$plots

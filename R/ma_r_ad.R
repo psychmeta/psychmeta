@@ -353,9 +353,9 @@ gather_ma_ad <- function(x){
           x$sd_res[is.na(x$sd_res) & x$k > 1] <-
           x$sd_rho_tp[is.na(x$sd_rho_tp) & x$k > 1] <- x$sd_rho_xp[is.na(x$sd_rho_xp) & x$k > 1] <- x$sd_rho_ty[is.na(x$sd_rho_ty) & x$k > 1] <- 0
      
-     cv_tp <- credibility(mean = x$mean_rtpa, sd = x$sd_rho_tp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
-     cv_xp <- credibility(mean = x$mean_rxpa, sd = x$sd_rho_xp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
-     cv_ty <- credibility(mean = x$mean_rtya, sd = x$sd_rho_ty, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
+     cr_tp <- credibility(mean = x$mean_rtpa, sd = x$sd_rho_tp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
+     cr_xp <- credibility(mean = x$mean_rxpa, sd = x$sd_rho_xp, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
+     cr_ty <- credibility(mean = x$mean_rtya, sd = x$sd_rho_ty, cred_level = x$cred_level, k = x$k, cred_method = x$cred_method)
      
      true_score <- cbind(k = x$k, N = x$N,
                          mean_r = x$mean_rxy,
@@ -364,7 +364,7 @@ gather_ma_ad <- function(x){
                          mean_rho = x$mean_rtpa,
                          var_r_c = x$var_r_tp, var_e_c = x$var_e_tp, var_art_c = x$var_art_tp, var_pre_c = x$var_pre_tp, var_rho = x$var_rho_tp,
                          sd_r_c = x$sd_r_tp, se_r_c = x$se_r_tp, sd_e_c = x$sd_e_tp, sd_art_c = x$sd_art_tp, sd_pre_c = x$sd_pre_tp, sd_rho = x$sd_rho_tp,
-                         x$ci_tp, cv_tp)
+                         x$ci_tp, cr_tp)
      
      validity_generalization_x <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxyi,
                                         var_r = x$var_r, var_e = x$var_e, var_art = x$var_art, var_pre = x$var_pre, var_res = x$var_res,
@@ -372,7 +372,7 @@ gather_ma_ad <- function(x){
                                         mean_rho = x$mean_rxpa,
                                         var_r_c = x$var_r_xp, var_e_c = x$var_e_xp, var_art_c = x$var_art_xp, var_pre_c = x$var_pre_xp, var_rho = x$var_rho_xp,
                                         sd_r_c = x$sd_r_xp, se_r_c = x$se_r_xp, sd_e_c = x$sd_e_xp, sd_art_c = x$sd_art_xp, sd_pre_c = x$sd_pre_xp, sd_rho = x$sd_rho_xp,
-                                        x$ci_xp, cv_xp)
+                                        x$ci_xp, cr_xp)
      
      validity_generalization_y <- cbind(k = x$k, N = x$N, mean_r = x$mean_rxyi,
                                         var_r = x$var_r, var_e = x$var_e, var_art = x$var_art, var_pre = x$var_pre, var_res = x$var_res,
@@ -380,7 +380,7 @@ gather_ma_ad <- function(x){
                                         mean_rho = x$mean_rtya,
                                         var_r_c = x$var_r_ty, var_e_c = x$var_e_ty, var_art_c = x$var_art_ty, var_pre_c = x$var_pre_ty, var_rho = x$var_rho_ty,
                                         sd_r_c = x$sd_r_ty, se_r_c = x$se_r_ty, sd_e_c = x$sd_e_ty, sd_art_c = x$sd_art_ty, sd_pre_c = x$sd_pre_ty, sd_rho = x$sd_rho_ty,
-                                        x$ci_ty, cv_ty)
+                                        x$ci_ty, cr_ty)
      
      barebones <- x$barebones
      
@@ -782,7 +782,7 @@ gather_ma_ad <- function(x){
           }
           
           flip_xy <- ifelse(correct_rr_y & !correct_rr_x, TRUE, FALSE)
-          x <- list(barebones = as.data.frame(ma_r_obj$meta$barebones), ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
+          x <- list(barebones = as.data.frame(ma_r_obj$meta$barebones, stringsAsFactors = FALSE), ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y,
                     correct_rxx = correct_rxx, correct_ryy = correct_ryy, residual_ads = residual_ads,
                     indirect_rr_x = indirect_rr_x, indirect_rr_y = indirect_rr_y,
                     sign_rxz = sign_rxz, sign_ryz = sign_ryz, cred_level = ma_r_obj$inputs$cred_level,
@@ -826,7 +826,7 @@ gather_ma_ad <- function(x){
      
      out_bb <- .ma_r_bb(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)$meta$barebones
      ma_ad_dump <- ma_arg_list$ma_ad_dump
-     ma_ad_dump$barebones <- as.data.frame(out_bb)
+     ma_ad_dump$barebones <- as.data.frame(out_bb, stringsAsFactors = FALSE)
      
      .ma_r_ad_internal <- function(x) UseMethod(generic = "ma_r_ad", object = x)
      out <- gather_ma_ad(.ma_r_ad_internal(x = ma_ad_dump))

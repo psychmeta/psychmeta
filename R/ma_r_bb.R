@@ -49,7 +49,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      call_full <- as.call(append(as.list(call), formal_args))
 
      if(!is.null(data)){
-          data <- as.data.frame(data)
+          data <- as.data.frame(data, stringsAsFactors = FALSE)
 
           r <- match_variables(call = call_full[[match("r",  names(call_full))]], arg = r, arg_name = "r", data = data)
           n <- match_variables(call = call_full[[match("n",  names(call_full))]], arg = n, arg_name = "n", data = data)
@@ -67,7 +67,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
 
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
-               moderators <- as.data.frame(moderators)
+               moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
                colnames(moderators) <- "Moderator"
           }
 
@@ -87,7 +87,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                moderator_levels <- NULL
           }
 
-          moderators <- as.data.frame(moderators)
+          moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
      }else{
           moderator_names <- list(all = NULL,
                                   cat = NULL,
@@ -121,9 +121,9 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
      citekey <- citekey[valid_r]
-     if(!is.null(moderators)) moderators <- as.data.frame(moderators)[valid_r,]
+     if(!is.null(moderators)) moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)[valid_r,]
 
-     es_data <- data.frame(r = r, n = n)
+     es_data <- data.frame(r = r, n = n, stringsAsFactors = FALSE)
      es_data$n_adj <- n_adj
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
      if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
@@ -236,7 +236,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                    rxy = .r,
                                    n = n, n_adj = n_adj,
                                    weight = wt_vec,
-                                   residual = r - mean_r_xy)
+                                   residual = r - mean_r_xy, stringsAsFactors = FALSE)
           if("pi" %in% colnames(data)) escalc_obj$pi <- data$pi
           if("pa" %in% colnames(data)) escalc_obj$pa <- data$pa
           if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
@@ -266,9 +266,9 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
           se_r <- sd_r / sqrt(k)
           ci <- confidence(mean = mean_r_xy, sd = sd_r, k = k, conf_level = conf_level, conf_method = conf_method)
      }
-     cv <- credibility(mean = mean_r_xy, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
+     cr <- credibility(mean = mean_r_xy, sd = sd_res, cred_level = cred_level, k = k, cred_method = cred_method)
      ci <- setNames(c(ci), colnames(ci))
-     cv <- setNames(c(cv), colnames(cv))
+     cr <- setNames(c(cr), colnames(cr))
 
      barebones <- data.frame(t(c(k = k,
                                  N = N,
@@ -280,7 +280,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                  se_r = se_r,
                                  sd_e = sd_e,
                                  sd_res = sd_res,
-                                 ci, cv)))
+                                 ci, cr)), stringsAsFactors = FALSE)
      
      class(barebones) <- c("ma_table", class(barebones))
      attributes(barebones) <- append(attributes(barebones), list(ma_type = "r_bb"))

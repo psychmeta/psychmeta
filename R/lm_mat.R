@@ -235,13 +235,13 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
                    predvars = NULL,
                    dataClasses = setNames(rep("numeric", length(c(y_col, x_col))), c(y_col, x_col)))
      
-     mockdat <- setNames(data.frame(t(rep(1, length(c(y_col, x_col))))), c(y_col, x_col))
+     mockdat <- setNames(data.frame(t(rep(1, length(c(y_col, x_col)))), stringsAsFactors = FALSE), c(y_col, x_col))
      terms <- .create_terms.lm(formula = formula, data = mockdat)
      
      .rownames <- rownames(b_mat)
      b_mat <- dplyr::as_tibble(b_mat)
-     beta_mat <- data.frame(b_mat[,c("beta", "SE beta", "t value", "Pr(>|t|)")])
-     b_mat <- data.frame(b_mat[,c("b", "SE b", "t value", "Pr(>|t|)")])
+     beta_mat <- data.frame(b_mat[,c("beta", "SE beta", "t value", "Pr(>|t|)")], stringsAsFactors = FALSE)
+     b_mat <- data.frame(b_mat[,c("b", "SE b", "t value", "Pr(>|t|)")], stringsAsFactors = FALSE)
      dimnames(b_mat) <- dimnames(beta_mat) <- list(.rownames, c("Estimate", "Std. Error", "t value", "Pr(>|t|)"))
      
      summary_info <- list(call = match.call(),
@@ -460,7 +460,7 @@ seBetaCor <- function(R, rxy, Nobs, alpha = .05, digits = 3,
           
      }
      
-     CIs <- as.data.frame(matrix(0, p, 3))
+     CIs <- as.data.frame(matrix(0, p, 3), stringsAsFactors = FALSE)
      colnames(CIs) <- c("lbound", "estimate", "ubound")
      for(i in 1:p) rownames(CIs)[i] <- paste("beta_", i, sep='')
      
@@ -661,7 +661,7 @@ seBeta <- function(X = NULL, y = NULL,
      
      # compute standard errors and confidence intervals
      DELse <- sqrt(DIAG(DEL.cmat))
-     CIs <- as.data.frame(matrix(0, p, 3))
+     CIs <- as.data.frame(matrix(0, p, 3), stringsAsFactors = FALSE)
      colnames(CIs) <- c("lbound", "estimate", "ubound")
      for(i in 1:p) rownames(CIs)[i] <- paste("beta_", i, sep='')
      

@@ -278,7 +278,7 @@ NULL
 estimate_var_qxi <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, qxa_type = "alpha"){
      qxa_consistency <- convert_reltype2consistency(rel_type = qxa_type)
      indirect_rr <- indirect_rr | qxa_consistency
-     dat <- data.frame(qxa = qxa, var_qxa = var_qxa, ux = ux, var_ux = var_ux, cor_qxa_ux = cor_qxa_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
+     dat <- data.frame(qxa = qxa, var_qxa = var_qxa, ux = ux, var_ux = var_ux, cor_qxa_ux = cor_qxa_ux, ux_observed = ux_observed, indirect_rr = indirect_rr, stringsAsFactors = FALSE)
      out <- rep(NA, nrow(dat))
 
      ## Clean up true-score u ratios to be used in a direct range-restriction correction
@@ -312,7 +312,7 @@ estimate_var_qxi <- function(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0, u
 estimate_var_qxa <- function(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, qxi_type = "alpha"){
      qxi_consistency <- convert_reltype2consistency(rel_type = qxi_type)
      indirect_rr <- indirect_rr | qxi_consistency
-     dat <- data.frame(qxi = qxi, var_qxi = var_qxi, ux = ux, var_ux = var_ux, cor_qxi_ux = cor_qxi_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
+     dat <- data.frame(qxi = qxi, var_qxi = var_qxi, ux = ux, var_ux = var_ux, cor_qxi_ux = cor_qxi_ux, ux_observed = ux_observed, indirect_rr = indirect_rr, stringsAsFactors = FALSE)
      out <- rep(NA, nrow(dat))
 
      ## Clean up true-score u ratios to be used in a direct range-restriction correction
@@ -346,7 +346,7 @@ estimate_var_qxa <- function(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0, u
 estimate_var_rxxi <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, rxxa_type = "alpha"){
      rxxa_consistency <- convert_reltype2consistency(rel_type = rxxa_type)
      indirect_rr <- indirect_rr | rxxa_consistency
-     dat <- data.frame(rxxa = rxxa, var_rxxa = var_rxxa, ux = ux, var_ux = var_ux, cor_rxxa_ux = cor_rxxa_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
+     dat <- data.frame(rxxa = rxxa, var_rxxa = var_rxxa, ux = ux, var_ux = var_ux, cor_rxxa_ux = cor_rxxa_ux, ux_observed = ux_observed, indirect_rr = indirect_rr, stringsAsFactors = FALSE)
      out <- rep(NA, nrow(dat))
 
      ## Clean up true-score u ratios to be used in a direct range-restriction correction
@@ -380,7 +380,7 @@ estimate_var_rxxi <- function(rxxa, var_rxxa = 0, ux, var_ux = 0, cor_rxxa_ux = 
 estimate_var_rxxa <- function(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 0, ux_observed = TRUE, indirect_rr = TRUE, rxxi_type = "alpha"){
      rxxi_consistency <- convert_reltype2consistency(rel_type = rxxi_type)
      indirect_rr <- indirect_rr | rxxi_consistency
-     dat <- data.frame(rxxi = rxxi, var_rxxi = var_rxxi, ux = ux, var_ux = var_ux, cor_rxxi_ux = cor_rxxi_ux, ux_observed = ux_observed, indirect_rr = indirect_rr)
+     dat <- data.frame(rxxi = rxxi, var_rxxi = var_rxxi, ux = ux, var_ux = var_ux, cor_rxxi_ux = cor_rxxi_ux, ux_observed = ux_observed, indirect_rr = indirect_rr, stringsAsFactors = FALSE)
      out <- rep(NA, nrow(dat))
 
      ## Clean up true-score u ratios to be used in a direct range-restriction correction
@@ -415,7 +415,7 @@ estimate_var_rxxa <- function(rxxi, var_rxxi = 0, ux, var_ux = 0, cor_rxxi_ux = 
 #'                  rxx_restricted = c(TRUE, TRUE, FALSE, FALSE),
 #'                 rxx_as_qx = c(TRUE, FALSE, TRUE, FALSE))
 estimate_var_ut <- function(rxx, var_rxx = 0, ux, var_ux = 0, cor_rxx_ux = 0, rxx_restricted = TRUE, rxx_as_qx = FALSE){
-     dat <- data.frame(rxx = rxx, var_rxx = var_rxx, ux = ux, var_ux = var_ux, cor_rxx_ux = cor_rxx_ux, rxx_restricted = rxx_restricted, rxx_as_qx = rxx_as_qx)
+     dat <- data.frame(rxx = rxx, var_rxx = var_rxx, ux = ux, var_ux = var_ux, cor_rxx_ux = cor_rxx_ux, rxx_restricted = rxx_restricted, rxx_as_qx = rxx_as_qx, stringsAsFactors = FALSE)
      out <- rep(NA, nrow(dat))
 
      if(any(dat$rxx_restricted & dat$rxx_as_qx))
@@ -443,7 +443,7 @@ estimate_var_ut <- function(rxx, var_rxx = 0, ux, var_ux = 0, cor_rxx_ux = 0, rx
 #'                  rxx_restricted = c(TRUE, TRUE, FALSE, FALSE),
 #'                 rxx_as_qx = c(TRUE, FALSE, TRUE, FALSE))
 estimate_var_ux <- function(rxx, var_rxx = 0, ut, var_ut = 0, cor_rxx_ut = 0, rxx_restricted = TRUE, rxx_as_qx = FALSE){
-     dat <- data.frame(rxx = rxx, var_rxx = var_rxx, ut = ut, var_ut = var_ut, cor_rxx_ut = cor_rxx_ut, rxx_restricted = rxx_restricted, rxx_as_qx = rxx_as_qx)
+     dat <- data.frame(rxx = rxx, var_rxx = var_rxx, ut = ut, var_ut = var_ut, cor_rxx_ut = cor_rxx_ut, rxx_restricted = rxx_restricted, rxx_as_qx = rxx_as_qx, stringsAsFactors = FALSE)
      out <- rep(NA, nrow(dat))
 
      if(any(dat$rxx_restricted & dat$rxx_as_qx))

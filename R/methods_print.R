@@ -571,7 +571,7 @@ print.ma_cumulative <- function(x, ..., digits = 3){
 print.ma_bootstrap <- function(x, ..., digits = 3){
      cat("Bootstrapped meta-analysis results \n")
      cat("---------------------------------------- \n")
-     print.data.frame(as.data.frame(x$boot_summary), digits = digits)
+     print.data.frame(as.data.frame(x$boot_summary, stringsAsFactors = FALSE), digits = digits)
      cat("\nSee list item 'boot_data' for meta-analysis results from each bootstrap iteration \n")
 }
 
@@ -730,6 +730,7 @@ print.get_ad <- function(x, ..., digits = 3){
      if("ad" %in% .names) includes <- c(includes, "\n- ad (distributions used to make artifact-distribution corrections)")
 
      cat(includes)
+     invisible(x)
 
 }
 
@@ -738,7 +739,7 @@ print.get_ad <- function(x, ..., digits = 3){
 #' @keywords internal
 #' @exportClass ma_psychmeta
 #' @method print ma_psychmeta
-print.ma_psychmeta <- function(x, ..., digits = 3){
+print.ma_psychmeta <- function(x, ..., n = NULL){
      ma_method <- attributes(x)$ma_method
      correction_type <- attributes(x)$correction_type
      ma_metric <- attributes(x)$ma_metric
@@ -764,9 +765,9 @@ print.ma_psychmeta <- function(x, ..., digits = 3){
           cat(title_text, " \n")
           cat("---------------------------------------------------------------------- \n")
      }
-     x <- ungroup(x)
-     class(x) <- c("tbl_df", "tbl", "data.frame")
-     print(x)
+     tab <- ungroup(x)
+     class(tab) <- c("tbl_df", "tbl", "data.frame")
+     print(tab, n = n)
 
      cat("\nTo extract results, try summary() or the get_stuff functions (run ?get_stuff for help). \n")
 }
@@ -890,7 +891,7 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
 
      .colnames <- colnames(x)
      leading_cols <- 1:max(which(.colnames == "N"))
-     trailing_cols <- which(grepl(x = .colnames, pattern = "CI_LL_") | grepl(x = .colnames, pattern = "CI_UL_") | grepl(x = .colnames, pattern = "CV_LL_") | grepl(x = .colnames, pattern = "CV_UL_"))
+     trailing_cols <- which(grepl(x = .colnames, pattern = "CI_LL_") | grepl(x = .colnames, pattern = "CI_UL_") | grepl(x = .colnames, pattern = "CR_LL_") | grepl(x = .colnames, pattern = "CR_UL_"))
      trailing_cols <- trailing_cols[trailing_cols > max(leading_cols)]
 
      if(verbose){
@@ -1042,7 +1043,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                method_details$ic$Correction <- as.character(method_details$ic$Correction)
                if(nrow(method_details$ic) > 1 & all(method_details$ic$Correction == method_details$ic$Correction[1])){
-                    .method_details <- data.frame(analysis_id = "All", Correction = method_details$ic$Correction[1])
+                    .method_details <- data.frame(analysis_id = "All", Correction = method_details$ic$Correction[1], stringsAsFactors = FALSE)
                     print(.method_details)
                }else{
                     print(method_details$ic)
@@ -1138,8 +1139,16 @@ print.metabulate <- function(x, ...){
 #' @exportClass metabulate_table
 #' @method print metabulate_table
 print.metabulate_table <- function(x, ...){
-        print(as.data.frame(x))
+        print(as.data.frame(x, stringsAsFactors = FALSE))
 }
 
-
+#' @export
+#' @exportClass anova.ma_psychmeta
+#' @method print anova.ma_psychmeta
+print.anova.ma_psychmeta <- function(x, ..., n = NULL) {
+        tab <- x
+        class(tab) <- c("tbl_df", "tbl", "data.frame")
+        print(tab,  n = n)
+        invisible(x)
+}
 
