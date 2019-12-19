@@ -1,6 +1,8 @@
-Changes in Version 2.3.4 (TBD)
+Changes in Version 2.3.4 (2019-12-18)
 =====================================
 - Support for contour-enhanced funnel plots added to plot_funnel() and a new plot_cefp() function.
+
+- Bug fixes for uncertainty intervals in second-order meta-analyses. 
 
 - New anova() method for comparing subgroup moderator levels.
 
@@ -12,7 +14,7 @@ Changes in Version 2.3.4 (TBD)
 
 - Updated the URL used version checking to avoid error messages experienced by a subset of users. 
 
-- Additional bug fixes in get_matrix(), reshape_wide2long(), and ma_r_order2()
+- Additional bug fixes in get_matrix(), reshape_wide2long(), and ma_r_order2().
 
 
 Changes in Version 2.3.3 (2019-04-11)
