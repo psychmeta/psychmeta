@@ -11,7 +11,7 @@ var_error_q(q, n, rel_type = "alpha", k_items = NULL)
 
 \item{n}{Vector of sample sizes.}
 
-\item{rel_type}{Character vector indicating the type(s) of reliabilities being analyzed. See documentation for \code{ma_r} for a full list of acceptable reliability types. 
+\item{rel_type}{Character vector indicating the type(s) of reliabilities being analyzed. See documentation for \code{ma_r} for a full list of acceptable reliability types.
 NOTE: Currently, only alpha has its own dedicated error-variance estimate; the error variance of other reliability types is estimated using the generic definition of reliability as the squared correlation between observed scores and true scores.}
 
 \item{k_items}{Optional numeric vector indicating the number of items in each scale for which reliabilities are being analyzed.}
