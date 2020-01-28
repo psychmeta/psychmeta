@@ -236,7 +236,7 @@
 #' \deqn{F=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{a}}}=\frac{\rho_{XY_{i}}}{q_{Y_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{q_{Y_{a}}u_{X}^{2}}}{F = (rxyi / qya + (rxyi^3 * (1 - ux^2)) / (qya * ux^2))}
 #' \deqn{G=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\rho_{XY_{i}}}{q_{X_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{q_{X_{a}}u_{X}^{2}}}{G = (rxyi / qxa + (rxyi^3 * (1 - ux^2)) / (qxa * ux^2))}
 #' \deqn{H=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\rho_{XY_{i}}-\rho_{XY_{i}}^{3}}{u_{X}}}{H = (rxyi - rxyi^3) / ux }
-
+NULL
 
 
 

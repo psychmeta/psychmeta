@@ -139,6 +139,7 @@ estimate_matrix_prods <- function(sigma_mat, mu_vec, prod_list){
 #'
 #' Goodman, L. A. (1960). On the exact variance of products.
 #' \emph{Journal of the American Statistical Association, 55}(292), 708. \url{https://doi.org/10.2307/2281592}
+NULL
 
 #' @rdname estimate_prod
 #' @export

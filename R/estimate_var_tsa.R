@@ -52,6 +52,7 @@
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
 #' \emph{Journal of Applied Psychology, 68}(3), 382–395. \url{https://doi.org/10.1037/0021-9010.68.3.382}
+NULL
 
 
 #' @rdname estimate_var_tsa

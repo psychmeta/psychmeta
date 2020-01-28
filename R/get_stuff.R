@@ -99,6 +99,7 @@
 #' get_stuff(ma_obj, what = "ad", ma_method = "ic", as_ad_obj = TRUE)
 #' get_stuff(ma_obj, what = "ad", ma_method = "ic", as_ad_obj = FALSE)
 #' }
+NULL
 
 #' @rdname get_stuff
 #' @export
