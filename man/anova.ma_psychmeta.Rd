@@ -4,10 +4,17 @@
 \alias{anova.ma_psychmeta}
 \title{Wald-type tests for moderators in psychmeta meta-analyses}
 \usage{
-\method{anova}{ma_psychmeta}(object, ..., analyses = "all",
-  moderators = NULL, L = NULL, ma_obj2 = NULL, ma_method = c("bb",
-  "ic", "ad"), correction_type = c("ts", "vgx", "vgy"),
-  conf_level = NULL)
+\method{anova}{ma_psychmeta}(
+  object,
+  ...,
+  analyses = "all",
+  moderators = NULL,
+  L = NULL,
+  ma_obj2 = NULL,
+  ma_method = c("bb", "ic", "ad"),
+  correction_type = c("ts", "vgx", "vgy"),
+  conf_level = NULL
+)
 }
 \arguments{
 \item{object}{A psychmeta meta-analysis object.}

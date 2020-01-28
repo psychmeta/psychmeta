@@ -4,11 +4,21 @@
 \alias{simulate_r_sample}
 \title{Simulation of data with measurement error and range-restriction artifacts}
 \usage{
-simulate_r_sample(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
-  mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
-  sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
-  wt_mat = NULL, sr_composites = NULL, var_names = NULL,
-  composite_names = NULL, n_as_ni = FALSE, ...)
+simulate_r_sample(
+  n,
+  rho_mat,
+  rel_vec = rep(1, ncol(rho_mat)),
+  mu_vec = rep(0, ncol(rho_mat)),
+  sigma_vec = rep(1, ncol(rho_mat)),
+  sr_vec = rep(1, ncol(rho_mat)),
+  k_items_vec = rep(1, ncol(rho_mat)),
+  wt_mat = NULL,
+  sr_composites = NULL,
+  var_names = NULL,
+  composite_names = NULL,
+  n_as_ni = FALSE,
+  ...
+)
 }
 \arguments{
 \item{n}{Number of cases to simulate before performing selection. If \code{Inf}, function will simulate parameter values.}

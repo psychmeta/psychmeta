@@ -4,9 +4,15 @@
 \alias{.ma_bootstrap}
 \title{Wrapper function to facilitate bootstrapped meta-analyses}
 \usage{
-.ma_bootstrap(data, ma_fun_boot, boot_iter = 1000,
-  boot_conf_level = 0.95, boot_ci_type = "norm", ma_arg_list,
-  convert_ma = FALSE)
+.ma_bootstrap(
+  data,
+  ma_fun_boot,
+  boot_iter = 1000,
+  boot_conf_level = 0.95,
+  boot_ci_type = "norm",
+  ma_arg_list,
+  convert_ma = FALSE
+)
 }
 \arguments{
 \item{data}{Data to be meta-analyzed.}

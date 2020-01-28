@@ -4,8 +4,15 @@
 \alias{.attenuate_r_bvirr}
 \title{Internal function to undo the Case V correction for bivariate indirect range restriction}
 \usage{
-.attenuate_r_bvirr(rtpa, qxa = 1, qya = 1, ux = 1, uy = 1,
-  sign_rxz = 1, sign_ryz = 1)
+.attenuate_r_bvirr(
+  rtpa,
+  qxa = 1,
+  qya = 1,
+  ux = 1,
+  uy = 1,
+  sign_rxz = 1,
+  sign_ryz = 1
+)
 }
 \arguments{
 \item{rtpa}{Correlation corrected for range restriction and measurement error.}

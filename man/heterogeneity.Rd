@@ -4,10 +4,13 @@
 \alias{heterogeneity}
 \title{Supplemental heterogeneity statistics for meta-analyses}
 \usage{
-heterogeneity(ma_obj, es_failsafe = NULL,
+heterogeneity(
+  ma_obj,
+  es_failsafe = NULL,
   conf_level = attributes(ma_obj)$inputs$conf_level,
   var_res_ci_method = c("profile_var_es", "profile_Q", "normal_logQ"),
-  ...)
+  ...
+)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object.}

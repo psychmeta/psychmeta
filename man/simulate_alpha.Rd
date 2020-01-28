@@ -4,8 +4,14 @@
 \alias{simulate_alpha}
 \title{Generate a vector of simulated sample alpha coefficients}
 \usage{
-simulate_alpha(item_mat = NULL, alpha = NULL, k_items = NULL,
-  n_cases, k_samples, standarized = FALSE)
+simulate_alpha(
+  item_mat = NULL,
+  alpha = NULL,
+  k_items = NULL,
+  n_cases,
+  k_samples,
+  standarized = FALSE
+)
 }
 \arguments{
 \item{item_mat}{Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both \code{alpha} and \code{k_items}.

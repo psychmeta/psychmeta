@@ -4,8 +4,15 @@
 \alias{format_wide}
 \title{Create wide-format datasets in simulate_r_database}
 \usage{
-format_wide(x, param, sample_id, var_names, show_applicant, decimals = 2,
-  noalpha = FALSE)
+format_wide(
+  x,
+  param,
+  sample_id,
+  var_names,
+  show_applicant,
+  decimals = 2,
+  noalpha = FALSE
+)
 }
 \arguments{
 \item{x}{Simulation list}

@@ -4,8 +4,14 @@
 \alias{mix_matrix}
 \title{Estimate mixture covariance matrix from within-group covariance matrices}
 \usage{
-mix_matrix(sigma_list, mu_mat, p_vec, N = Inf, group_names = NULL,
-  var_names = NULL)
+mix_matrix(
+  sigma_list,
+  mu_mat,
+  p_vec,
+  N = Inf,
+  group_names = NULL,
+  var_names = NULL
+)
 }
 \arguments{
 \item{sigma_list}{List of covariance matrices.}

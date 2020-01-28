@@ -4,8 +4,14 @@
 \alias{limits_tau}
 \title{Confidence limits of tau}
 \usage{
-limits_tau(var_es, var_pre, k, method = c("profile_var_es", "profile_Q",
-  "normal_logQ"), conf_level = 0.95, var_unbiased = TRUE)
+limits_tau(
+  var_es,
+  var_pre,
+  k,
+  method = c("profile_var_es", "profile_Q", "normal_logQ"),
+  conf_level = 0.95,
+  var_unbiased = TRUE
+)
 }
 \arguments{
 \item{var_es}{The observed variance of effect sizes.}

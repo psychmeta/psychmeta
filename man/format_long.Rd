@@ -4,8 +4,15 @@
 \alias{format_long}
 \title{Create long-format datasets in simulate_r_database}
 \usage{
-format_long(x, param, sample_id, var_names, show_applicant, decimals = 2,
-  noalpha = FALSE)
+format_long(
+  x,
+  param,
+  sample_id,
+  var_names,
+  show_applicant,
+  decimals = 2,
+  noalpha = FALSE
+)
 }
 \arguments{
 \item{x}{Simulation list}

@@ -4,11 +4,21 @@
 \alias{convert_es}
 \title{Convert effect sizes and compute confidence intervals}
 \usage{
-convert_es(es, input_es = c("r", "d", "delta", "g", "t", "p.t", "F",
-  "p.F", "chisq", "p.chisq", "or", "lor", "Fisherz", "A", "auc", "cles"),
-  output_es = c("r", "d", "A", "auc", "cles"), n1 = NULL, n2 = NULL,
-  df1 = NULL, df2 = NULL, sd1 = NULL, sd2 = NULL,
-  correct_bias = TRUE, conf_level = 0.95)
+convert_es(
+  es,
+  input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F", "chisq", "p.chisq", "or",
+    "lor", "Fisherz", "A", "auc", "cles"),
+  output_es = c("r", "d", "A", "auc", "cles"),
+  n1 = NULL,
+  n2 = NULL,
+  df1 = NULL,
+  df2 = NULL,
+  sd1 = NULL,
+  sd2 = NULL,
+  tails = 2,
+  correct_bias = TRUE,
+  conf_level = 0.95
+)
 }
 \arguments{
 \item{es}{Vector of effect sizes to convert.}
@@ -28,6 +38,8 @@ convert_es(es, input_es = c("r", "d", "delta", "g", "t", "p.t", "F",
 \item{sd1}{Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.}
 
 \item{sd2}{Vector of standard deviations of group 2 of the two groups being contrasted.}
+
+\item{tails}{Vector of the tails for \emph{p} values when \code{input_es = "p.t"}. Can be `2` (defualt) or `1`.}
 
 \item{correct_bias}{Logical argument that determines whether to correct output effect sizes and error-variance estimates for small-sample bias (\code{TRUE}) or not (\code{FALSE}) when computing confidence intervals.}
 

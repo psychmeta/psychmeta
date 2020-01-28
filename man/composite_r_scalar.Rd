@@ -4,8 +4,13 @@
 \alias{composite_r_scalar}
 \title{Scalar formula to estimate the correlation between a composite and another variable or between two composite variables}
 \usage{
-composite_r_scalar(mean_rxy, k_vars_x = NULL, mean_intercor_x = NULL,
-  k_vars_y = NULL, mean_intercor_y = NULL)
+composite_r_scalar(
+  mean_rxy,
+  k_vars_x = NULL,
+  mean_intercor_x = NULL,
+  k_vars_y = NULL,
+  mean_intercor_y = NULL
+)
 }
 \arguments{
 \item{mean_rxy}{Mean correlation between sets of X and Y variables.}

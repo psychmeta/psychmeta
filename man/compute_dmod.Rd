@@ -4,10 +4,22 @@
 \alias{compute_dmod}
 \title{Comprehensive \eqn{d_{Mod}}{d_Mod} calculator}
 \usage{
-compute_dmod(data, group, predictors, criterion, referent_id,
-  focal_id_vec = NULL, conf_level = 0.95, rescale_cdf = TRUE,
-  parametric = TRUE, bootstrap = TRUE, boot_iter = 1000,
-  stratify = FALSE, empirical_ci = FALSE, cross_validate_wts = FALSE)
+compute_dmod(
+  data,
+  group,
+  predictors,
+  criterion,
+  referent_id,
+  focal_id_vec = NULL,
+  conf_level = 0.95,
+  rescale_cdf = TRUE,
+  parametric = TRUE,
+  bootstrap = TRUE,
+  boot_iter = 1000,
+  stratify = FALSE,
+  empirical_ci = FALSE,
+  cross_validate_wts = FALSE
+)
 }
 \arguments{
 \item{data}{Data frame containing the data to be analyzed (if not a data frame, must be an object convertible to a data frame via the as.data.frame function).

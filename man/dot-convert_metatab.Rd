@@ -4,9 +4,14 @@
 \alias{.convert_metatab}
 \title{Function to convert a meta-analysis of correlations to a meta-analysis of d values or vice-versa (does one table)}
 \usage{
-.convert_metatab(ma_table, p_vec = rep(0.5, nrow(ma_table)),
-  conf_level = 0.95, cred_level = 0.8, conf_method = "t",
-  cred_method = "t")
+.convert_metatab(
+  ma_table,
+  p_vec = rep(0.5, nrow(ma_table)),
+  conf_level = 0.95,
+  cred_level = 0.8,
+  conf_method = "t",
+  cred_method = "t"
+)
 }
 \arguments{
 \item{ma_table}{Meta-analysis table.}

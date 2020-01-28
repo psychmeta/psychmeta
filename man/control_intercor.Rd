@@ -4,11 +4,24 @@
 \alias{control_intercor}
 \title{Control function to curate intercorrelations to be used in automatic compositing routine}
 \usage{
-control_intercor(rxyi = NULL, n = NULL, sample_id = NULL,
-  construct_x = NULL, construct_y = NULL, construct_names = NULL,
-  facet_x = NULL, facet_y = NULL, intercor_vec = NULL,
-  intercor_scalar = 0.5, dx = NULL, dy = NULL, p = 0.5,
-  partial_intercor = FALSE, data = NULL, ...)
+control_intercor(
+  rxyi = NULL,
+  n = NULL,
+  sample_id = NULL,
+  construct_x = NULL,
+  construct_y = NULL,
+  construct_names = NULL,
+  facet_x = NULL,
+  facet_y = NULL,
+  intercor_vec = NULL,
+  intercor_scalar = 0.5,
+  dx = NULL,
+  dy = NULL,
+  p = 0.5,
+  partial_intercor = FALSE,
+  data = NULL,
+  ...
+)
 }
 \arguments{
 \item{rxyi}{Vector or column name of observed correlations.}

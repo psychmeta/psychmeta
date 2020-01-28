@@ -4,17 +4,31 @@
 \alias{control_psychmeta}
 \title{Control for \pkg{psychmeta} meta-analyses}
 \usage{
-control_psychmeta(error_type = c("mean", "sample"), conf_level = 0.95,
-  cred_level = 0.8, conf_method = c("t", "norm"),
-  cred_method = c("t", "norm"), var_unbiased = TRUE,
-  pairwise_ads = FALSE, moderated_ads = FALSE, residual_ads = TRUE,
-  check_dependence = TRUE, collapse_method = c("composite", "average",
-  "stop"), intercor = control_intercor(), clean_artifacts = TRUE,
-  impute_artifacts = TRUE, impute_method = c("bootstrap_mod",
-  "bootstrap_full", "simulate_mod", "simulate_full", "wt_mean_mod",
-  "wt_mean_full", "unwt_mean_mod", "unwt_mean_full", "replace_unity",
-  "stop"), seed = 42, use_all_arts = TRUE, estimate_pa = FALSE,
-  decimals = 2, hs_override = FALSE, ...)
+control_psychmeta(
+  error_type = c("mean", "sample"),
+  conf_level = 0.95,
+  cred_level = 0.8,
+  conf_method = c("t", "norm"),
+  cred_method = c("t", "norm"),
+  var_unbiased = TRUE,
+  pairwise_ads = FALSE,
+  moderated_ads = FALSE,
+  residual_ads = TRUE,
+  check_dependence = TRUE,
+  collapse_method = c("composite", "average", "stop"),
+  intercor = control_intercor(),
+  clean_artifacts = TRUE,
+  impute_artifacts = TRUE,
+  impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod", "simulate_full",
+    "wt_mean_mod", "wt_mean_full", "unwt_mean_mod", "unwt_mean_full", "replace_unity",
+    "stop"),
+  seed = 42,
+  use_all_arts = TRUE,
+  estimate_pa = FALSE,
+  decimals = 2,
+  hs_override = FALSE,
+  ...
+)
 }
 \arguments{
 \item{error_type}{Method to be used to estimate error variances: "mean" uses the mean effect size to estimate error variances and "sample" uses the sample-specific effect sizes.}

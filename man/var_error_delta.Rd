@@ -4,8 +4,7 @@
 \alias{var_error_delta}
 \title{Estimate the error variance of Glass' delta values}
 \usage{
-var_error_delta(delta, nc, ne = NA, use_pooled_sd = FALSE,
-  correct_bias = TRUE)
+var_error_delta(delta, nc, ne = NA, use_pooled_sd = FALSE, correct_bias = TRUE)
 }
 \arguments{
 \item{delta}{Vector of Glass' delta values.}

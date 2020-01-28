@@ -5,11 +5,21 @@
 \alias{filter_meta}
 \title{Filter meta-analyses}
 \usage{
-filter_ma(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+filter_ma(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 
-filter_meta(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+filter_meta(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}

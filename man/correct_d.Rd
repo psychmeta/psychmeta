@@ -4,11 +4,25 @@
 \alias{correct_d}
 \title{Correct \emph{d} values for range restriction and/or measurement error}
 \usage{
-correct_d(correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g",
-  "uvirr_y", "bvdrr", "bvirr"), d, ryy = 1, uy = 1, rGg = 1,
-  pi = NULL, pa = NULL, uy_observed = TRUE, ryy_restricted = TRUE,
-  ryy_type = "alpha", k_items_y = NA, sign_rgz = 1, sign_ryz = 1,
-  n1 = NULL, n2 = NA, conf_level = 0.95, correct_bias = FALSE)
+correct_d(
+  correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"),
+  d,
+  ryy = 1,
+  uy = 1,
+  rGg = 1,
+  pi = NULL,
+  pa = NULL,
+  uy_observed = TRUE,
+  ryy_restricted = TRUE,
+  ryy_type = "alpha",
+  k_items_y = NA,
+  sign_rgz = 1,
+  sign_ryz = 1,
+  n1 = NULL,
+  n2 = NA,
+  conf_level = 0.95,
+  correct_bias = FALSE
+)
 }
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"}

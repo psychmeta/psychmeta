@@ -4,11 +4,25 @@
 \alias{ma_d_order2}
 \title{Second-order meta-analysis function for \emph{d} values}
 \usage{
-ma_d_order2(k, N = NULL, d = NULL, delta = NULL, var_d = NULL,
-  var_d_c = NULL, ma_type = c("bb", "ic", "ad"), sample_id = NULL,
-  citekey = NULL, moderators = NULL, moderator_type = "simple",
-  construct_x = NULL, construct_y = NULL, construct_order = NULL,
-  data = NULL, control = control_psychmeta(), ...)
+ma_d_order2(
+  k,
+  N = NULL,
+  d = NULL,
+  delta = NULL,
+  var_d = NULL,
+  var_d_c = NULL,
+  ma_type = c("bb", "ic", "ad"),
+  sample_id = NULL,
+  citekey = NULL,
+  moderators = NULL,
+  moderator_type = "simple",
+  construct_x = NULL,
+  construct_y = NULL,
+  construct_order = NULL,
+  data = NULL,
+  control = control_psychmeta(),
+  ...
+)
 }
 \arguments{
 \item{k}{Vector or column name of meta-analyses' k values.}

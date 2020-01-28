@@ -4,9 +4,14 @@
 \alias{.refine_var_rr}
 \title{Range-restriction refinement factor (i.e., "a") for correlations' corrected sampling variances}
 \usage{
-.refine_var_rr(rxyi, ux, rxx = NULL, indirect_rr = rep(TRUE,
-  length(rxyi)), ux_observed = rep(TRUE, length(rxyi)),
-  rxx_restricted = rep(TRUE, length(rxyi)))
+.refine_var_rr(
+  rxyi,
+  ux,
+  rxx = NULL,
+  indirect_rr = rep(TRUE, length(rxyi)),
+  ux_observed = rep(TRUE, length(rxyi)),
+  rxx_restricted = rep(TRUE, length(rxyi))
+)
 }
 \arguments{
 \item{rxyi}{Vector of observed correlations.}

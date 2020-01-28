@@ -4,11 +4,24 @@
 \alias{correct_r_coarseness}
 \title{Correct correlations for scale coarseness}
 \usage{
-correct_r_coarseness(r, kx = NULL, ky = NULL, n = NULL,
-  dist_x = "norm", dist_y = "norm", bin_value_x = c("median", "mean",
-  "index"), bin_value_y = c("median", "mean", "index"), width_x = 3,
-  width_y = 3, lbound_x = NULL, ubound_x = NULL, lbound_y = NULL,
-  ubound_y = NULL, index_values_x = NULL, index_values_y = NULL)
+correct_r_coarseness(
+  r,
+  kx = NULL,
+  ky = NULL,
+  n = NULL,
+  dist_x = "norm",
+  dist_y = "norm",
+  bin_value_x = c("median", "mean", "index"),
+  bin_value_y = c("median", "mean", "index"),
+  width_x = 3,
+  width_y = 3,
+  lbound_x = NULL,
+  ubound_x = NULL,
+  lbound_y = NULL,
+  ubound_y = NULL,
+  index_values_x = NULL,
+  index_values_y = NULL
+)
 }
 \arguments{
 \item{r}{Observed correlation.}

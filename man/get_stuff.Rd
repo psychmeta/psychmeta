@@ -16,56 +16,129 @@
 \alias{get_plots}
 \title{Extract results from a psychmeta meta-analysis object}
 \usage{
-get_stuff(ma_obj, what = c("metatab", "escalc", "metafor", "ad",
-  "followup", "heterogeneity", "leave1out", "cumulative", "bootstrap",
-  "metareg", "matrix", "plots"), analyses = "all", match = c("all",
-  "any"), case_sensitive = TRUE, ma_method = c("bb", "ic", "ad"),
-  correction_type = c("ts", "vgx", "vgy"), moderators = FALSE,
-  as_ad_obj = TRUE, inputs_only = FALSE, ad_type = c("tsa", "int"),
-  follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap",
-  "metareg"), plot_types = c("funnel", "forest", "leave1out",
-  "cumulative"), ...)
+get_stuff(
+  ma_obj,
+  what = c("metatab", "escalc", "metafor", "ad", "followup", "heterogeneity",
+    "leave1out", "cumulative", "bootstrap", "metareg", "matrix", "plots"),
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ma_method = c("bb", "ic", "ad"),
+  correction_type = c("ts", "vgx", "vgy"),
+  moderators = FALSE,
+  as_ad_obj = TRUE,
+  inputs_only = FALSE,
+  ad_type = c("tsa", "int"),
+  follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"),
+  plot_types = c("funnel", "forest", "leave1out", "cumulative"),
+  ...
+)
 
-get_escalc(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, moderators = FALSE, ...)
+get_escalc(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  moderators = FALSE,
+  ...
+)
 
-get_metafor(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, moderators = FALSE, ...)
+get_metafor(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  moderators = FALSE,
+  ...
+)
 
-get_metatab(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ma_method = c("bb", "ic", "ad"),
-  correction_type = c("ts", "vgx", "vgy"), ...)
+get_metatab(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ma_method = c("bb", "ic", "ad"),
+  correction_type = c("ts", "vgx", "vgy"),
+  ...
+)
 
-get_ad(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ma_method = c("ad", "ic"),
-  ad_type = c("tsa", "int"), as_ad_obj = FALSE, inputs_only = FALSE,
-  ...)
+get_ad(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ma_method = c("ad", "ic"),
+  ad_type = c("tsa", "int"),
+  as_ad_obj = FALSE,
+  inputs_only = FALSE,
+  ...
+)
 
-get_followup(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, follow_up = c("heterogeneity", "leave1out",
-  "cumulative", "bootstrap", "metareg"), ...)
+get_followup(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  follow_up = c("heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg"),
+  ...
+)
 
-get_heterogeneity(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_heterogeneity(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 
-get_leave1out(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_leave1out(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 
-get_cumulative(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_cumulative(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 
-get_bootstrap(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_bootstrap(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 
-get_metareg(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_metareg(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 
-get_matrix(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, ...)
+get_matrix(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  ...
+)
 
-get_plots(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, plot_types = c("funnel", "forest",
-  "leave1out", "cumulative"), ...)
+get_plots(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  plot_types = c("funnel", "forest", "leave1out", "cumulative"),
+  ...
+)
 }
 \arguments{
 \item{ma_obj}{A psychmeta meta-analysis object.}

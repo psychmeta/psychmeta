@@ -6,13 +6,21 @@
 \alias{wt_var}
 \title{Weighted descriptive statistics for a vector of numbers}
 \usage{
-wt_dist(x, wt = rep(1, length(x)), unbiased = TRUE,
-  df_type = c("count", "sum_wts"))
+wt_dist(
+  x,
+  wt = rep(1, length(x)),
+  unbiased = TRUE,
+  df_type = c("count", "sum_wts")
+)
 
 wt_mean(x, wt = rep(1, length(x)))
 
-wt_var(x, wt = rep(1, length(x)), unbiased = TRUE,
-  df_type = c("count", "sum_wts"))
+wt_var(
+  x,
+  wt = rep(1, length(x)),
+  unbiased = TRUE,
+  df_type = c("count", "sum_wts")
+)
 }
 \arguments{
 \item{x}{Vector of values to be analyzed.}

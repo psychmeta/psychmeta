@@ -4,8 +4,14 @@
 \alias{unmix_matrix}
 \title{Estimate average within-group covariance matrices from a mixture covariance matrix}
 \usage{
-unmix_matrix(sigma_mat, mu_mat, p_vec, N = Inf, group_names = NULL,
-  var_names = NULL)
+unmix_matrix(
+  sigma_mat,
+  mu_mat,
+  p_vec,
+  N = Inf,
+  group_names = NULL,
+  var_names = NULL
+)
 }
 \arguments{
 \item{sigma_mat}{Mixture covariance matrix.}

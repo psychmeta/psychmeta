@@ -4,9 +4,15 @@
 \alias{reshape_mat2dat}
 \title{Extract a long-format correlation database from a correlation matrix and its supporting vectors/matrices of variable information}
 \usage{
-reshape_mat2dat(var_names, cor_data, common_data = NULL,
-  unique_data = NULL, diag_label = NULL, lower_tri = TRUE,
-  data = NULL)
+reshape_mat2dat(
+  var_names,
+  cor_data,
+  common_data = NULL,
+  unique_data = NULL,
+  diag_label = NULL,
+  lower_tri = TRUE,
+  data = NULL
+)
 }
 \arguments{
 \item{var_names}{Vector (or scalar column name to match with \code{data}) containing variable names.}

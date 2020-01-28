@@ -4,9 +4,13 @@
 \alias{.print.summary.lm_mat}
 \title{Print method for objects of the class "summary.lm_mat"}
 \usage{
-.print.summary.lm_mat(x, digits = max(3L, getOption("digits") - 3L),
+.print.summary.lm_mat(
+  x,
+  digits = max(3L, getOption("digits") - 3L),
   symbolic.cor = x$symbolic.cor,
-  signif.stars = getOption("show.signif.stars"), ...)
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 }
 \description{
 Print method for objects of the class "summary.lm_mat"

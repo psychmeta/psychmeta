@@ -5,9 +5,18 @@
 \title{Integration function for computing parametric signed or unsigned \eqn{d_{Mod}}{d_Mod} effect sizes
 for a single focal group}
 \usage{
-.integrate_dmod(referent_int, referent_slope, focal_int, focal_slope,
-  focal_mean_x, focal_sd_x, referent_sd_y, focal_min_x, focal_max_x,
-  signed = TRUE)
+.integrate_dmod(
+  referent_int,
+  referent_slope,
+  focal_int,
+  focal_slope,
+  focal_mean_x,
+  focal_sd_x,
+  referent_sd_y,
+  focal_min_x,
+  focal_max_x,
+  signed = TRUE
+)
 }
 \arguments{
 \item{referent_int}{Referent group's intercept.}
@@ -56,14 +65,14 @@ the range of predictor scores) is computed as
 }
 \examples{
 \dontrun{
-# Example for computing \\eqn{d_{Mod_{Signed}}}{d_Mod_Signed}
+# Example for computing \eqn{d_{Mod_{Signed}}}{d_Mod_Signed}
 .integrate_dmod(referent_int = -.05, referent_slope = .5,
               focal_int = -.05, focal_slope = .3,
               focal_mean_x = -.5, focal_sd_x = 1,
               referent_sd_y = 1, focal_min_x = -Inf, focal_max_x = Inf,
               signed = TRUE)
 
-# Example for computing \\eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}
+# Example for computing \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}
 .integrate_dmod(referent_int = -.05, referent_slope = .5,
               focal_int = -.05, focal_slope = .3,
               focal_mean_x = -.5, focal_sd_x = 1,

@@ -4,11 +4,19 @@
 \alias{.plot_funnel}
 \title{Internal funnel-plot generator}
 \usage{
-.plot_funnel(x, label_es = "Effect Size", conf_level = c(0.95, 0.99),
-  conf_linetype = c("dashed", "dotted"), conf_fill = NA,
-  conf_alpha = 1, null_effect = NA, null_conf_level = c(0.9, 0.95,
-  0.99), null_conf_linetype = c("solid", "dashed", "dotted"),
-  null_conf_fill = "black", null_conf_alpha = c(0, 0.2, 0.4))
+.plot_funnel(
+  x,
+  label_es = "Effect Size",
+  conf_level = c(0.95, 0.99),
+  conf_linetype = c("dashed", "dotted"),
+  conf_fill = NA,
+  conf_alpha = 1,
+  null_effect = NA,
+  null_conf_level = c(0.9, 0.95, 0.99),
+  null_conf_linetype = c("solid", "dashed", "dotted"),
+  null_conf_fill = "black",
+  null_conf_alpha = c(0, 0.2, 0.4)
+)
 }
 \arguments{
 \item{x}{An escalc-class object}

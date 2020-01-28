@@ -4,8 +4,14 @@
 \alias{correct_matrix_mvrr}
 \title{Multivariate select/correction for covariance matrices}
 \usage{
-correct_matrix_mvrr(Sigma_i, Sigma_xx_a, x_col, y_col = NULL,
-  standardize = FALSE, var_names = NULL)
+correct_matrix_mvrr(
+  Sigma_i,
+  Sigma_xx_a,
+  x_col,
+  y_col = NULL,
+  standardize = FALSE,
+  var_names = NULL
+)
 }
 \arguments{
 \item{Sigma_i}{The complete range-restricted (unrestricted) covariance matrix to be corrected (selected upon).}

@@ -14,37 +14,117 @@
 \alias{estimate_var_ryyi}
 \title{Taylor series approximations for the variances of estimates artifact distributions.}
 \usage{
-estimate_var_qxi(qxa, var_qxa = 0, ux, var_ux = 0, cor_qxa_ux = 0,
-  ux_observed = TRUE, indirect_rr = TRUE, qxa_type = "alpha")
+estimate_var_qxi(
+  qxa,
+  var_qxa = 0,
+  ux,
+  var_ux = 0,
+  cor_qxa_ux = 0,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  qxa_type = "alpha"
+)
 
-estimate_var_qxa(qxi, var_qxi = 0, ux, var_ux = 0, cor_qxi_ux = 0,
-  ux_observed = TRUE, indirect_rr = TRUE, qxi_type = "alpha")
+estimate_var_qxa(
+  qxi,
+  var_qxi = 0,
+  ux,
+  var_ux = 0,
+  cor_qxi_ux = 0,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  qxi_type = "alpha"
+)
 
-estimate_var_rxxi(rxxa, var_rxxa = 0, ux, var_ux = 0,
-  cor_rxxa_ux = 0, ux_observed = TRUE, indirect_rr = TRUE,
-  rxxa_type = "alpha")
+estimate_var_rxxi(
+  rxxa,
+  var_rxxa = 0,
+  ux,
+  var_ux = 0,
+  cor_rxxa_ux = 0,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  rxxa_type = "alpha"
+)
 
-estimate_var_rxxa(rxxi, var_rxxi = 0, ux, var_ux = 0,
-  cor_rxxi_ux = 0, ux_observed = TRUE, indirect_rr = TRUE,
-  rxxi_type = "alpha")
+estimate_var_rxxa(
+  rxxi,
+  var_rxxi = 0,
+  ux,
+  var_ux = 0,
+  cor_rxxi_ux = 0,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  rxxi_type = "alpha"
+)
 
-estimate_var_ut(rxx, var_rxx = 0, ux, var_ux = 0, cor_rxx_ux = 0,
-  rxx_restricted = TRUE, rxx_as_qx = FALSE)
+estimate_var_ut(
+  rxx,
+  var_rxx = 0,
+  ux,
+  var_ux = 0,
+  cor_rxx_ux = 0,
+  rxx_restricted = TRUE,
+  rxx_as_qx = FALSE
+)
 
-estimate_var_ux(rxx, var_rxx = 0, ut, var_ut = 0, cor_rxx_ut = 0,
-  rxx_restricted = TRUE, rxx_as_qx = FALSE)
+estimate_var_ux(
+  rxx,
+  var_rxx = 0,
+  ut,
+  var_ut = 0,
+  cor_rxx_ut = 0,
+  rxx_restricted = TRUE,
+  rxx_as_qx = FALSE
+)
 
-estimate_var_ryya(ryyi, var_ryyi = 0, rxyi, var_rxyi = 0, ux,
-  var_ux = 0, cor_ryyi_rxyi = 0, cor_ryyi_ux = 0, cor_rxyi_ux = 0)
+estimate_var_ryya(
+  ryyi,
+  var_ryyi = 0,
+  rxyi,
+  var_rxyi = 0,
+  ux,
+  var_ux = 0,
+  cor_ryyi_rxyi = 0,
+  cor_ryyi_ux = 0,
+  cor_rxyi_ux = 0
+)
 
-estimate_var_qya(qyi, var_qyi = 0, rxyi, var_rxyi = 0, ux,
-  var_ux = 0, cor_qyi_rxyi = 0, cor_qyi_ux = 0, cor_rxyi_ux = 0)
+estimate_var_qya(
+  qyi,
+  var_qyi = 0,
+  rxyi,
+  var_rxyi = 0,
+  ux,
+  var_ux = 0,
+  cor_qyi_rxyi = 0,
+  cor_qyi_ux = 0,
+  cor_rxyi_ux = 0
+)
 
-estimate_var_qyi(qya, var_qya = 0, rxyi, var_rxyi = 0, ux,
-  var_ux = 0, cor_qya_rxyi = 0, cor_qya_ux = 0, cor_rxyi_ux = 0)
+estimate_var_qyi(
+  qya,
+  var_qya = 0,
+  rxyi,
+  var_rxyi = 0,
+  ux,
+  var_ux = 0,
+  cor_qya_rxyi = 0,
+  cor_qya_ux = 0,
+  cor_rxyi_ux = 0
+)
 
-estimate_var_ryyi(ryya, var_ryya = 0, rxyi, var_rxyi = 0, ux,
-  var_ux = 0, cor_ryya_rxyi = 0, cor_ryya_ux = 0, cor_rxyi_ux = 0)
+estimate_var_ryyi(
+  ryya,
+  var_ryya = 0,
+  rxyi,
+  var_rxyi = 0,
+  ux,
+  var_ux = 0,
+  cor_ryya_rxyi = 0,
+  cor_ryya_ux = 0,
+  cor_rxyi_ux = 0
+)
 }
 \arguments{
 \item{qxa}{Square-root of applicant reliability estimate.}

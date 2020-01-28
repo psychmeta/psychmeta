@@ -4,11 +4,21 @@
 \alias{plot_forest}
 \title{Create forest plots}
 \usage{
-plot_forest(ma_obj, analyses = "all", match = c("all", "any"),
-  case_sensitive = TRUE, show_filtered = FALSE,
-  ma_facetname = "Summary", facet_levels = NULL, conf_level = 0.95,
-  conf_method = "t", x_limits = NULL, x_breaks = NULL,
-  x_lab = NULL, y_lab = "Reference")
+plot_forest(
+  ma_obj,
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  show_filtered = FALSE,
+  ma_facetname = "Summary",
+  facet_levels = NULL,
+  conf_level = 0.95,
+  conf_method = "t",
+  x_limits = NULL,
+  x_breaks = NULL,
+  x_lab = NULL,
+  y_lab = "Reference"
+)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object.}

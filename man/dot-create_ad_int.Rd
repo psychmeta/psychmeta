@@ -4,8 +4,7 @@
 \alias{.create_ad_int}
 \title{Create a tabular array of artifact information summarizing values and weights of values in an interactive artifact distribution}
 \usage{
-.create_ad_int(art_vec, wt_vec = rep(1, length(art_vec)),
-  decimals = Inf)
+.create_ad_int(art_vec, wt_vec = rep(1, length(art_vec)), decimals = Inf)
 }
 \arguments{
 \item{art_vec}{Vector of artifact values (i.e., u ratios, reliability coefficients, square-root reliabilities).}

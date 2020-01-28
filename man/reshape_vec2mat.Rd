@@ -4,8 +4,14 @@
 \alias{reshape_vec2mat}
 \title{Assemble a variance-covariance matrix}
 \usage{
-reshape_vec2mat(cov = NULL, var = NULL, order = NULL,
-  var_names = NULL, by_row = FALSE, diag = FALSE)
+reshape_vec2mat(
+  cov = NULL,
+  var = NULL,
+  order = NULL,
+  var_names = NULL,
+  by_row = FALSE,
+  diag = FALSE
+)
 }
 \arguments{
 \item{cov}{Scalar or vector of covariance information to include the lower-triangle positions of the matrix (default value is zero).

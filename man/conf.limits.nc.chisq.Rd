@@ -6,9 +6,15 @@
 Function to determine the noncentral parameter that leads to the observed \code{Chi.Square}-value, 
 so that a confidence interval for the population noncentral chi-squrae value can be formed.}
 \usage{
-conf.limits.nc.chisq(Chi.Square = NULL, conf.level = 0.95, df = NULL,
-  alpha.lower = NULL, alpha.upper = NULL, tol = 1e-09,
-  Jumping.Prop = 0.1)
+conf.limits.nc.chisq(
+  Chi.Square = NULL,
+  conf.level = 0.95,
+  df = NULL,
+  alpha.lower = NULL,
+  alpha.upper = NULL,
+  tol = 1e-09,
+  Jumping.Prop = 0.1
+)
 }
 \arguments{
 \item{Chi.Square}{the observed chi-square value}

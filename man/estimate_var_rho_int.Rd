@@ -12,19 +12,44 @@
 \usage{
 estimate_var_rho_int_meas(mean_qx, mean_qy, var_res)
 
-estimate_var_rho_int_uvdrr(mean_rxyi, mean_rtpa, mean_qxa, mean_qyi,
-  mean_ux, var_res)
+estimate_var_rho_int_uvdrr(
+  mean_rxyi,
+  mean_rtpa,
+  mean_qxa,
+  mean_qyi,
+  mean_ux,
+  var_res
+)
 
-estimate_var_rho_int_uvirr(mean_rxyi, mean_rtpa, mean_qxi, mean_qyi,
-  mean_ut, var_res)
+estimate_var_rho_int_uvirr(
+  mean_rxyi,
+  mean_rtpa,
+  mean_qxi,
+  mean_qyi,
+  mean_ut,
+  var_res
+)
 
 estimate_var_rho_int_bvirr(mean_qxa, mean_qya, mean_ux, mean_uy, var_res)
 
-estimate_var_rho_int_bvdrr(mean_rxyi, mean_rtpa, mean_qxa, mean_qya,
-  mean_ux, mean_uy, var_res)
+estimate_var_rho_int_bvdrr(
+  mean_rxyi,
+  mean_rtpa,
+  mean_qxa,
+  mean_qya,
+  mean_ux,
+  mean_uy,
+  var_res
+)
 
-estimate_var_rho_int_rb(mean_rxyi, mean_rtpa, mean_qx, mean_qy, mean_ux,
-  var_res)
+estimate_var_rho_int_rb(
+  mean_rxyi,
+  mean_rtpa,
+  mean_qx,
+  mean_qy,
+  mean_ux,
+  var_res
+)
 }
 \arguments{
 \item{mean_qx}{Mean square root of reliability for X.}

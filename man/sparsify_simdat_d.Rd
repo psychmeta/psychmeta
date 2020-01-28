@@ -4,8 +4,12 @@
 \alias{sparsify_simdat_d}
 \title{Create sparse artifact information in a "simdat_d_database" class object}
 \usage{
-sparsify_simdat_d(data_obj, prop_missing, sparify_arts = c("rel", "u"),
-  study_wise = TRUE)
+sparsify_simdat_d(
+  data_obj,
+  prop_missing,
+  sparify_arts = c("rel", "u"),
+  study_wise = TRUE
+)
 }
 \arguments{
 \item{data_obj}{Object created by the "simdat_d_database" function.}

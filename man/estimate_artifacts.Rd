@@ -14,11 +14,21 @@
 \alias{estimate_rxxi_u}
 \title{Estimation of applicant and incumbent reliabilities and of true- and observed-score u ratios}
 \usage{
-estimate_rxxa(rxxi, ux, ux_observed = TRUE, indirect_rr = TRUE,
-  rxxi_type = "alpha")
+estimate_rxxa(
+  rxxi,
+  ux,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  rxxi_type = "alpha"
+)
 
-estimate_rxxi(rxxa, ux, ux_observed = TRUE, indirect_rr = TRUE,
-  rxxa_type = "alpha")
+estimate_rxxi(
+  rxxa,
+  ux,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  rxxa_type = "alpha"
+)
 
 estimate_ut(ux, rxx, rxx_restricted = TRUE)
 

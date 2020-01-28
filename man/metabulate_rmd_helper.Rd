@@ -70,12 +70,13 @@ set \code{word_proc} to \code{FALSE}.
 ## Include this line as 'asis' output in your RMarkdown document:
 metabulate_rmd_helper()
 
-## If you've already included \\\\usepackage{unicode-math} in your RMarkdown header
+## If you've already included \\usepackage{unicode-math} in your RMarkdown header
 ## for PDF (and related formats) header, set latex to FALSE:
 metabulate_rmd_helper(latex = FALSE)
 }
 \seealso{
-Other output functions: \code{\link{generate_bib}},
-  \code{\link{metabulate}}
+Other output functions: 
+\code{\link{generate_bib}()},
+\code{\link{metabulate}()}
 }
 \concept{output functions}

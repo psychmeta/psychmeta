@@ -5,22 +5,43 @@
 \alias{plot_cefp}
 \title{Create funnel plots}
 \usage{
-plot_funnel(ma_obj, se_type = c("auto", "mean", "sample"),
-  label_es = NULL, conf_level = c(0.95, 0.99),
-  conf_linetype = c("dashed", "dotted"), conf_fill = NA,
-  conf_alpha = 1, null_effect = NA, null_conf_level = c(0.9, 0.95,
-  0.99), null_conf_linetype = c("solid", "dashed", "dotted"),
-  null_conf_fill = "black", null_conf_alpha = c(0.1, 0.2, 0.4),
-  analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
-  show_filtered = FALSE)
+plot_funnel(
+  ma_obj,
+  se_type = c("auto", "mean", "sample"),
+  label_es = NULL,
+  conf_level = c(0.95, 0.99),
+  conf_linetype = c("dashed", "dotted"),
+  conf_fill = NA,
+  conf_alpha = 1,
+  null_effect = NA,
+  null_conf_level = c(0.9, 0.95, 0.99),
+  null_conf_linetype = c("solid", "dashed", "dotted"),
+  null_conf_fill = "black",
+  null_conf_alpha = c(0.1, 0.2, 0.4),
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  show_filtered = FALSE
+)
 
-plot_cefp(ma_obj, se_type = "sample", label_es = NULL,
-  conf_level = NA, conf_linetype = NA, conf_fill = NA,
-  conf_alpha = 1, null_effect = NULL, null_conf_level = c(0.9, 0.95,
-  0.99), null_conf_linetype = c("solid", "dashed", "dotted"),
-  null_conf_fill = "black", null_conf_alpha = c(0, 0.2, 0.4),
-  analyses = "all", match = c("all", "any"), case_sensitive = TRUE,
-  show_filtered = FALSE)
+plot_cefp(
+  ma_obj,
+  se_type = "sample",
+  label_es = NULL,
+  conf_level = NA,
+  conf_linetype = NA,
+  conf_fill = NA,
+  conf_alpha = 1,
+  null_effect = NULL,
+  null_conf_level = c(0.9, 0.95, 0.99),
+  null_conf_linetype = c("solid", "dashed", "dotted"),
+  null_conf_fill = "black",
+  null_conf_alpha = c(0, 0.2, 0.4),
+  analyses = "all",
+  match = c("all", "any"),
+  case_sensitive = TRUE,
+  show_filtered = FALSE
+)
 }
 \arguments{
 \item{ma_obj}{Meta-analysis object.}

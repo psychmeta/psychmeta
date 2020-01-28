@@ -4,13 +4,26 @@
 \alias{ma_generic}
 \title{Bare-bones meta-analysis of generic effect sizes}
 \usage{
-ma_generic(es, n, var_e, sample_id = NULL, citekey = NULL,
-  construct_x = NULL, construct_y = NULL, group1 = NULL,
-  group2 = NULL, wt_type = c("sample_size", "inv_var", "DL", "HE",
-  "HS", "SJ", "ML", "REML", "EB", "PM"), moderators = NULL,
-  cat_moderators = TRUE, moderator_type = c("simple", "hierarchical",
-  "none"), data = NULL, control = control_psychmeta(),
-  weights = NULL, ...)
+ma_generic(
+  es,
+  n,
+  var_e,
+  sample_id = NULL,
+  citekey = NULL,
+  construct_x = NULL,
+  construct_y = NULL,
+  group1 = NULL,
+  group2 = NULL,
+  wt_type = c("sample_size", "inv_var", "DL", "HE", "HS", "SJ", "ML", "REML", "EB",
+    "PM"),
+  moderators = NULL,
+  cat_moderators = TRUE,
+  moderator_type = c("simple", "hierarchical", "none"),
+  data = NULL,
+  control = control_psychmeta(),
+  weights = NULL,
+  ...
+)
 }
 \arguments{
 \item{es}{Vector or column name of observed effect sizes.}

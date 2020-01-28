@@ -4,9 +4,19 @@
 \alias{compute_dmod_par}
 \title{Function for computing parametric \eqn{d_{Mod}}{d_Mod} effect sizes for any number of focal groups}
 \usage{
-compute_dmod_par(referent_int, referent_slope, focal_int, focal_slope,
-  focal_mean_x, focal_sd_x, referent_sd_y, focal_min_x, focal_max_x,
-  focal_names = NULL, rescale_cdf = TRUE)
+compute_dmod_par(
+  referent_int,
+  referent_slope,
+  focal_int,
+  focal_slope,
+  focal_mean_x,
+  focal_sd_x,
+  referent_sd_y,
+  focal_min_x,
+  focal_max_x,
+  focal_names = NULL,
+  rescale_cdf = TRUE
+)
 }
 \arguments{
 \item{referent_int}{Referent group's intercept.}

@@ -4,10 +4,23 @@
 \alias{create_ad_group}
 \title{Generate an artifact distribution object for a dichotomous grouping variable.}
 \usage{
-create_ad_group(ad_type = c("tsa", "int"), rGg = NULL, n_rGg = NULL,
-  wt_rGg = n_rGg, pi = NULL, pa = NULL, n_pi = NULL, n_pa = NULL,
-  wt_p = n_pi, mean_rGg = NULL, var_rGg = NULL, k_rGg = NULL,
-  mean_n_rGg = NULL, var_unbiased = TRUE, ...)
+create_ad_group(
+  ad_type = c("tsa", "int"),
+  rGg = NULL,
+  n_rGg = NULL,
+  wt_rGg = n_rGg,
+  pi = NULL,
+  pa = NULL,
+  n_pi = NULL,
+  n_pa = NULL,
+  wt_p = n_pi,
+  mean_rGg = NULL,
+  var_rGg = NULL,
+  k_rGg = NULL,
+  mean_n_rGg = NULL,
+  var_unbiased = TRUE,
+  ...
+)
 }
 \arguments{
 \item{ad_type}{Type of artifact distribution to be computed: Either "tsa" for Taylor series approximation or "int" for interactive.}

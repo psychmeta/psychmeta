@@ -4,8 +4,12 @@
 \alias{.ma_cumulative}
 \title{Cumulative meta-analyses}
 \usage{
-.ma_cumulative(data, sort_method = c("n", "inv_var", "weight"),
-  ma_fun_boot, ma_arg_list)
+.ma_cumulative(
+  data,
+  sort_method = c("n", "inv_var", "weight"),
+  ma_fun_boot,
+  ma_arg_list
+)
 }
 \arguments{
 \item{data}{Data to be meta-analyzed.}

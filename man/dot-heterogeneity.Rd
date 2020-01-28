@@ -4,10 +4,26 @@
 \alias{.heterogeneity}
 \title{Computation of heterogeneity indices from meta-analytic results}
 \usage{
-.heterogeneity(mean_es, var_es, var_pre, var_res, var_e = NA,
-  var_art = NA, wt_vec, N, k, es_vec, vare_vec, es_failsafe = NULL,
-  conf_level = 0.95, es_type = "es", wt_type, ma_method, var_unbiased,
-  var_res_ci_method)
+.heterogeneity(
+  mean_es,
+  var_es,
+  var_pre,
+  var_res,
+  var_e = NA,
+  var_art = NA,
+  wt_vec,
+  N,
+  k,
+  es_vec,
+  vare_vec,
+  es_failsafe = NULL,
+  conf_level = 0.95,
+  es_type = "es",
+  wt_type,
+  ma_method,
+  var_unbiased,
+  var_res_ci_method
+)
 }
 \arguments{
 \item{mean_es}{The mean effect size.}

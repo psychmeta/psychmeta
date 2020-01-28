@@ -4,8 +4,13 @@
 \alias{composite_u_matrix}
 \title{Matrix formula to estimate the u ratio of a composite variable}
 \usage{
-composite_u_matrix(ri_mat = NULL, ra_mat = NULL, u_vec,
-  wt_vec = rep(1, length(u_vec)), sign_r_vec = 1)
+composite_u_matrix(
+  ri_mat = NULL,
+  ra_mat = NULL,
+  u_vec,
+  wt_vec = rep(1, length(u_vec)),
+  sign_r_vec = 1
+)
 }
 \arguments{
 \item{ri_mat}{Range-restricted correlation matrix from which the composite is to be computed (if \code{NULL}, \code{ri_mat} is estimated from \code{ra_mat}).}

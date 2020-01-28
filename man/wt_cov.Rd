@@ -5,9 +5,15 @@
 \alias{wt_cor}
 \title{Compute weighted covariances}
 \usage{
-wt_cov(x, y = NULL, wt = NULL, as_cor = FALSE,
-  use = c("everything", "listwise", "pairwise"), unbiased = TRUE,
-  df_type = c("count", "sum_wts"))
+wt_cov(
+  x,
+  y = NULL,
+  wt = NULL,
+  as_cor = FALSE,
+  use = c("everything", "listwise", "pairwise"),
+  unbiased = TRUE,
+  df_type = c("count", "sum_wts")
+)
 
 wt_cor(x, y = NULL, wt = NULL, use = "everything")
 }

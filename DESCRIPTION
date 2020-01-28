@@ -22,6 +22,6 @@ Imports: dplyr, stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
          ggplot2, metafor, nor1mix, progress, tidyr, stringi,
          stringr, rlang, RCurl, xml2, purrr, data.table, cli, crayon
 Suggests: RefManageR, rmarkdown, knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068

@@ -4,8 +4,15 @@
 \alias{.correct_r_bvirr}
 \title{Internal function to compute the Case V correction for bivariate indirect range restriction}
 \usage{
-.correct_r_bvirr(rxyi, qxa = 1, qya = 1, ux = 1, uy = 1,
-  sign_rxz = 1, sign_ryz = 1)
+.correct_r_bvirr(
+  rxyi,
+  qxa = 1,
+  qya = 1,
+  ux = 1,
+  uy = 1,
+  sign_rxz = 1,
+  sign_ryz = 1
+)
 }
 \arguments{
 \item{rxyi}{Vector of observed correlations.}

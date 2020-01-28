@@ -4,11 +4,20 @@
 \alias{record_fyis}
 \title{Summary of FYI messages generated within a function}
 \usage{
-record_fyis(es_metric = "r", fyi_messages = NULL, neg_var_res = 0,
-  neg_var_rtpa = 0, neg_var_rxpa = 0, neg_var_rtya = 0,
-  neg_var_r_order2 = 0, neg_var_rho_ic_order2 = 0,
-  neg_var_rho_ad_order2 = 0, neg_var_d_order2 = 0,
-  neg_var_delta_ic_order2 = 0, neg_var_delta_ad_order2 = 0)
+record_fyis(
+  es_metric = "r",
+  fyi_messages = NULL,
+  neg_var_res = 0,
+  neg_var_rtpa = 0,
+  neg_var_rxpa = 0,
+  neg_var_rtya = 0,
+  neg_var_r_order2 = 0,
+  neg_var_rho_ic_order2 = 0,
+  neg_var_rho_ad_order2 = 0,
+  neg_var_d_order2 = 0,
+  neg_var_delta_ic_order2 = 0,
+  neg_var_delta_ad_order2 = 0
+)
 }
 \arguments{
 \item{es_metric}{Effect-size metric ("r" or "d").}

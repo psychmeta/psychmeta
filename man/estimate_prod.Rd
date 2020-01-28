@@ -14,8 +14,22 @@ estimate_var_prod(mu_x, mu_y, var_x, var_y, cov_xy)
 
 estimate_cov_prods(mu_x, mu_y, mu_u, mu_v, cov_xu, cov_xv, cov_yu, cov_yv)
 
-estimate_cor_prods(mu_x, mu_y, mu_u, mu_v, var_x, var_y, var_u, var_v,
-  cov_xu, cov_xv, cov_yu, cov_yv, cov_xy, cov_uv)
+estimate_cor_prods(
+  mu_x,
+  mu_y,
+  mu_u,
+  mu_v,
+  var_x,
+  var_y,
+  var_u,
+  var_v,
+  cov_xu,
+  cov_xv,
+  cov_yu,
+  cov_yv,
+  cov_xy,
+  cov_uv
+)
 }
 \arguments{
 \item{mu_x}{Expected value of variable x.}

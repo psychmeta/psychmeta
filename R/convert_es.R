@@ -15,6 +15,7 @@
 #' @param df2 Vector of input test statistic within-group degrees of freedom (for \emph{F}).
 #' @param sd1 Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.
 #' @param sd2 Vector of standard deviations of group 2 of the two groups being contrasted.
+#' @param tails Vector of the tails for \emph{p} values when \code{input_es = "p.t"}. Can be `2` (defualt) or `1`.
 #' @param correct_bias Logical argument that determines whether to correct output effect sizes and error-variance estimates for small-sample bias (\code{TRUE}) or not (\code{FALSE}) when computing confidence intervals.
 #' @param conf_level Confidence level that defines the width of the confidence interval (default = .95).
 #'
@@ -70,7 +71,7 @@
 #' convert_es(es = .8,  input_es="d", output_es="d", n1=64, n2=36)
 #' convert_es(es = .8,  input_es="A", output_es="A", n1=64, n2=36)
 convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles"),
-                       output_es=c("r","d","A","auc","cles"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, sd1=NULL, sd2=NULL,
+                       output_es=c("r","d","A","auc","cles"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, sd1=NULL, sd2=NULL, tails = 2,
                        correct_bias=TRUE, conf_level=.95){
      warn_obj1 <- record_warnings()
 
@@ -84,7 +85,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
 
      if(input_es == "r")                      .screen_r(es)
      if(input_es == "t")                      .screen_t(es, n1, n2, df1)
-     if(input_es == "p.t")                    .screen_pt(es, n1, n2, df1)
+     if(input_es == "p.t")                    .screen_pt(es, n1, n2, df1, tails)
      if(input_es == "F")                      .screen_F(es, n1, n2, df1, df2)
      if(input_es == "p.F")                    .screen_pF(es, n1, n2, df1, df2)
      if(input_es == "chisq")                  .screen_chisq(es, df1)
@@ -143,8 +144,8 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      x$n2[subset_id] <- x$n1[subset_id] / 2
      x$n1[subset_id] <- x$n1[subset_id] / 2
 
-     if(input_es=="t" & is.null(df1)) x$df1 <- x$n - 2
-     if(input_es=="F" & is.null(df2)) x$df2 <- x$n - 2
+     if(input_es %in% c("t", "p.t") & is.null(df1)) x$df1 <- x$n - 2
+     if(input_es %in% c("F", "p.F") & is.null(df2)) x$df2 <- x$n - 2
 
      # Assume SDs as needed
      if(is.null(sd1) & is.null(sd2)){
@@ -287,12 +288,19 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 }
 
-.screen_pt <- function(es, n1, n2, df1){
+.screen_pt <- function(es, n1, n2, df1, tails){
      if(is.null(c(n1, n2, df1))){
           stop("Error: Sample size or df not supplied.", call.=FALSE)
      }else{
           if(any(es < 0 | es > 1)){
-               stop("Value supplied for p is not a probability.", call.=FALSE)
+               stop("Error: Value supplied for p is not a probability.", call.=FALSE)
+          }
+     }
+     if(is.null(tails)){
+          stop("Error: `tails` must be supplied when converting from `p.t`.", call.=FALSE)
+     }else{
+          if(any(!tails %in% c(1, 2))){
+               stop("Error: `tails` must be either 1 or 2.", call.=FALSE)
           }
      }
 }
@@ -456,14 +464,16 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      return( t / sqrt(t^2 + df1) )
 }
 
-"convert_es.p_t_to_r" <- function(p.t, df1, x = NULL) {
+"convert_es.p_t_to_r" <- function(p.t, df1, tails, x = NULL) {
      if(!is.null(x)){
           p.t <- x$es
           df1 <- x$df1
+          tails <- x$tails
      }
 
      if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
-     t <- qt(p.t, df1, lower.tail = FALSE)
+     if(is.null(tails)) stop("Error: `tails` must be supplied if `input_es` is 'p.t'.", call. = FALSE)
+     t <- qt(p.t/tails, df1, lower.tail = FALSE)
      message("t values computed from p values. Check effect direction coding.")
      return( convert_es.q_t_to_r(t, df1) )
 }
@@ -508,7 +518,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      }
 
      message("p values converted to effect sizes. Check effect direction coding.")
-     chisq <- qchisq(p.chisq, 1)
+     chisq <- qchisq(p.chisq, 1, lower.tail = FALSE)
      return( convert_es.q_chisq_to_r(chisq, n) )
 }
 
@@ -574,15 +584,17 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      return( t * sqrt(a / n) )
 }
 
-"convert_es.p_t_to_d" <- function(p.t, df1, p, x = NULL) {
+"convert_es.p_t_to_d" <- function(p.t, df1, p, tails, x = NULL) {
      if(!is.null(x)){
           p.t <- x$es
           df1 <- x$df1
           p <- x$p
+          tails <- x$tails
      }
 
      if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
-     t <- qt(p.t, df1, lower.tail = FALSE)
+     if(is.null(tails)) stop("Error: `tails` must be supplied if `input_es` is 'p.t'.", call. = FALSE)
+     t <- qt(p.t/tails, df1, lower.tail = FALSE)
      message("p values converted to effect sizes. Check effect direction coding.")
      return( convert_es.q_t_to_d(t, df1, p) )
 }
@@ -733,15 +745,16 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
      return(convert_es.q_d_to_auc(d, p, sd1, sd2))
 }
 
-"convert_es.p_t_to_auc" <- function(p.t, df1, p, sd1, sd2, x = NULL) {
+"convert_es.p_t_to_auc" <- function(p.t, df1, p, sd1, sd2, tails, x = NULL) {
      if(!is.null(x)){
           p.t <- x$es
           df1 <- x$df1
           p <- x$p
           sd1 <- x$sd1
           sd2 <- x$sd2
+          tails <- x$tails
      }
-     d <- convert_es.p_t_to_d(p.t, df1, p)
+     d <- convert_es.p_t_to_d(p.t, df1, p, tails)
      return(convert_es.q_d_to_auc(d, p, sd1, sd2))
 }
 

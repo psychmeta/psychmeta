@@ -4,8 +4,13 @@
 \alias{composite_d_scalar}
 \title{Scalar formula to estimate the standardized mean difference associated with a composite variable}
 \usage{
-composite_d_scalar(mean_d, mean_intercor, k_vars, p = 0.5,
-  partial_intercor = FALSE)
+composite_d_scalar(
+  mean_d,
+  mean_intercor,
+  k_vars,
+  p = 0.5,
+  partial_intercor = FALSE
+)
 }
 \arguments{
 \item{mean_d}{The mean standardized mean differences associated with variables in the composite to be formed.}

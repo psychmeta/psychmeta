@@ -11,26 +11,65 @@
 \alias{estimate_var_tsa_rb2}
 \title{Taylor Series Approximation of effect-size variances corrected for psychometric artifacts}
 \usage{
-estimate_var_tsa_meas(mean_rtp, var = 0, mean_qx = 1, mean_qy = 1,
-  ...)
+estimate_var_tsa_meas(mean_rtp, var = 0, mean_qx = 1, mean_qy = 1, ...)
 
-estimate_var_tsa_uvdrr(mean_rtpa, var = 0, mean_ux = 1, mean_qxa = 1,
-  mean_qyi = 1, ...)
+estimate_var_tsa_uvdrr(
+  mean_rtpa,
+  var = 0,
+  mean_ux = 1,
+  mean_qxa = 1,
+  mean_qyi = 1,
+  ...
+)
 
-estimate_var_tsa_bvdrr(mean_rtpa, var = 0, mean_ux = 1, mean_uy = 1,
-  mean_qxa = 1, mean_qya = 1, ...)
+estimate_var_tsa_bvdrr(
+  mean_rtpa,
+  var = 0,
+  mean_ux = 1,
+  mean_uy = 1,
+  mean_qxa = 1,
+  mean_qya = 1,
+  ...
+)
 
-estimate_var_tsa_uvirr(mean_rtpa, var = 0, mean_ut = 1, mean_qxa = 1,
-  mean_qyi = 1, ...)
+estimate_var_tsa_uvirr(
+  mean_rtpa,
+  var = 0,
+  mean_ut = 1,
+  mean_qxa = 1,
+  mean_qyi = 1,
+  ...
+)
 
-estimate_var_tsa_bvirr(mean_rtpa, var = 0, mean_ux = 1, mean_uy = 1,
-  mean_qxa = 1, mean_qya = 1, sign_rxz = 1, sign_ryz = 1, ...)
+estimate_var_tsa_bvirr(
+  mean_rtpa,
+  var = 0,
+  mean_ux = 1,
+  mean_uy = 1,
+  mean_qxa = 1,
+  mean_qya = 1,
+  sign_rxz = 1,
+  sign_ryz = 1,
+  ...
+)
 
-estimate_var_tsa_rb1(mean_rtpa, var = 0, mean_ux = 1, mean_rxx = 1,
-  mean_ryy = 1, ...)
+estimate_var_tsa_rb1(
+  mean_rtpa,
+  var = 0,
+  mean_ux = 1,
+  mean_rxx = 1,
+  mean_ryy = 1,
+  ...
+)
 
-estimate_var_tsa_rb2(mean_rtpa, var = 0, mean_ux = 1, mean_qx = 1,
-  mean_qy = 1, ...)
+estimate_var_tsa_rb2(
+  mean_rtpa,
+  var = 0,
+  mean_ux = 1,
+  mean_qx = 1,
+  mean_qy = 1,
+  ...
+)
 }
 \arguments{
 \item{mean_rtp}{Mean corrected correlation.}

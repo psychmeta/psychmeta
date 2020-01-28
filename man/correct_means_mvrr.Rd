@@ -4,8 +4,14 @@
 \alias{correct_means_mvrr}
 \title{Multivariate select/correction for vectors of means}
 \usage{
-correct_means_mvrr(Sigma, means_i = rep(0, ncol(Sigma)), means_x_a,
-  x_col, y_col = NULL, var_names = NULL)
+correct_means_mvrr(
+  Sigma,
+  means_i = rep(0, ncol(Sigma)),
+  means_x_a,
+  x_col,
+  y_col = NULL,
+  var_names = NULL
+)
 }
 \arguments{
 \item{Sigma}{The complete covariance matrix to be used to manipulate means: This matrix may be entirely unrestricted or entirely range restricted,

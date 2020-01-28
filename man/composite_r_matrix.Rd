@@ -4,8 +4,13 @@
 \alias{composite_r_matrix}
 \title{Matrix formula to estimate the correlation between two weighted or unweighted composite variables}
 \usage{
-composite_r_matrix(r_mat, x_col, y_col, wt_vec_x = rep(1, length(x_col)),
-  wt_vec_y = rep(1, length(y_col)))
+composite_r_matrix(
+  r_mat,
+  x_col,
+  y_col,
+  wt_vec_x = rep(1, length(x_col)),
+  wt_vec_y = rep(1, length(y_col))
+)
 }
 \arguments{
 \item{r_mat}{Correlation matrix from which composite correlations are to be computed.}
