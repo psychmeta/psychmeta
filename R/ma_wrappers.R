@@ -1,6 +1,6 @@
 #' Organization of moderator data for use in meta-analyses
 #'
-#' @param moderator_matrix Matrix (or vector) of moderator variables.
+#' @param cat_moderator_matrix Matrix (or vector) of categorical moderator variables.
 #' @param es_data Matrix of effect-size data to be used in meta-analyses.
 #' @param construct_x Vector of construct names for construct X.
 #' @param construct_y Vector of construct names for construct Y.
@@ -8,6 +8,7 @@
 #' @param moderator_levels List containing the factor levels of categorical moderator variables.
 #' @param moderator_type Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time,
 #' "hierarchical" means that all possible combinations and subsets of moderators are to be examined.
+#' @param cat_moderator_names Vector of names for the variables in cat_moderator_matrix.
 #' @param ... Further arguments.
 #'
 #' @return List containing (1) the full matrix of moderators and effect-size data for use in meta-analyses and (2) the names of the moderator variables.
@@ -16,23 +17,24 @@
 #' @import dplyr
 #'
 #' @keywords internal
-organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, construct_y = NULL,
-                                construct_order = NULL, moderator_levels = NULL, moderator_type = "hierarchical", moderator_names = NULL, ...){
+organize_moderators <- function(cat_moderator_matrix, es_data, construct_x = NULL, construct_y = NULL,
+                                construct_order = NULL, moderator_levels = NULL, moderator_type = "hierarchical", 
+                                cat_moderator_names = NULL, ...){
 
-     if(!is.null(moderator_matrix)){
-          .moderator_names <- colnames(moderator_matrix)
+     if(!is.null(cat_moderator_matrix)){
+          .cat_moderator_names <- colnames(cat_moderator_matrix)
 
-          if(any(levels(factor(unlist(moderator_matrix))) == "All Levels")){
+          if(any(levels(factor(unlist(cat_moderator_matrix))) == "All Levels")){
                stop("The moderator-level label 'All Levels' in moderator_matrix is reserved for internal usage; please use a different moderator-level label", call. = FALSE)
           }
-          if(!is.null(colnames(moderator_matrix))){
-               if(any(colnames(moderator_matrix) %in% "analysis_id")){
+          if(!is.null(colnames(cat_moderator_matrix))){
+               if(any(colnames(cat_moderator_matrix) %in% "analysis_id")){
                     stop("The column name 'analysis_id' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
                }
-               if(any(colnames(moderator_matrix) %in% "construct_x")){
+               if(any(colnames(cat_moderator_matrix) %in% "construct_x")){
                     stop("The column name 'construct_x' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
                }
-               if(any(colnames(moderator_matrix) %in% "construct_y")){
+               if(any(colnames(cat_moderator_matrix) %in% "construct_y")){
                     stop("The column name 'construct_y' in moderator_matrix is reserved for internal usage; please use a different moderator name", call. = FALSE)
                }
           }
@@ -46,13 +48,13 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
 
      ## Build the temporary data matrix
      temp_mat <- es_data
-     if(!is.null(moderator_matrix)){
+     if(!is.null(cat_moderator_matrix)){
           if(!is.null(moderator_levels)){
-               for(i in 1:ncol(moderator_matrix)){
-                    if(!is.null(moderator_levels[[i]])) moderator_matrix[,i] <- factor(moderator_matrix[,i], levels = moderator_levels[[i]])
+               for(i in 1:ncol(cat_moderator_matrix)){
+                    if(!is.null(moderator_levels[[i]])) cat_moderator_matrix[,i] <- factor(cat_moderator_matrix[,i], levels = moderator_levels[[i]])
                }
           }
-          temp_mat <- cbind(moderator_matrix, temp_mat)
+          temp_mat <- cbind(cat_moderator_matrix, temp_mat)
      }
      if(!is.null(construct_mat_initial)){
           if(!is.null(construct_order)){
@@ -65,8 +67,8 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      temp_mat <- as.data.frame(temp_mat, stringsAsFactors = FALSE)
 
      ## Organize the matrix - first by moderator levels, then by constructs
-     if(!is.null(moderator_matrix)){
-          orig_names <- colnames(moderator_matrix)
+     if(!is.null(cat_moderator_matrix)){
+          orig_names <- colnames(cat_moderator_matrix)
           temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
           colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
           temp_mat <- arrange_(temp_mat, .dots = temp_names)
@@ -88,90 +90,90 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
           construct_mat_initial <- as.data.frame(construct_mat_initial, stringsAsFactors=FALSE)
           colnames(construct_mat_initial) <- col_names
      }
-     if(!is.null(moderator_matrix)){
-          col_names <- colnames(moderator_matrix)
-          moderator_matrix <- temp_mat[,colnames(moderator_matrix)]
-          moderator_matrix <- as.data.frame(moderator_matrix, stringsAsFactors = FALSE)
-          for(i in 1:ncol(moderator_matrix)) moderator_matrix[,i] <- as.character(moderator_matrix[,i])
-          colnames(moderator_matrix) <- col_names
+     if(!is.null(cat_moderator_matrix)){
+          col_names <- colnames(cat_moderator_matrix)
+          cat_moderator_matrix <- temp_mat[,colnames(cat_moderator_matrix)]
+          cat_moderator_matrix <- as.data.frame(cat_moderator_matrix, stringsAsFactors = FALSE)
+          for(i in 1:ncol(cat_moderator_matrix)) cat_moderator_matrix[,i] <- as.character(cat_moderator_matrix[,i])
+          colnames(cat_moderator_matrix) <- col_names
      }
 
-     organize_moderators_null <- function(moderator_matrix, es_data){
-          if(is.null(moderator_matrix)){
+     organize_moderators_null <- function(cat_moderator_matrix, es_data){
+          if(is.null(cat_moderator_matrix)){
                cbind(analysis_type = "Overall", es_data)
           }else{
-               moderator_vars <- colnames(moderator_matrix)
+               moderator_vars <- colnames(cat_moderator_matrix)
                if(is.null(moderator_vars)){
-                    if(ncol(moderator_matrix) == 1){
+                    if(ncol(cat_moderator_matrix) == 1){
                          moderator_vars <- "Moderator"
                     }else{
-                         moderator_vars <- paste("Moderator", 1:ncol(moderator_matrix), sep = "_")
+                         moderator_vars <- paste("Moderator", 1:ncol(cat_moderator_matrix), sep = "_")
                     }
-                    colnames(moderator_matrix) <- moderator_vars
+                    colnames(cat_moderator_matrix) <- moderator_vars
                }
-               moderator_matrix_new <- matrix("All Levels", nrow(moderator_matrix), ncol(moderator_matrix))
+               cat_moderator_matrix_new <- matrix("All Levels", nrow(cat_moderator_matrix), ncol(cat_moderator_matrix))
 
-               colnames(moderator_matrix_new) <- moderator_vars
-               moderator_matrix_new <- as_tibble(moderator_matrix_new, .name_repair = "minimal")
-               cbind(analysis_type = "Overall", cbind(moderator_matrix_new, es_data))
+               colnames(cat_moderator_matrix_new) <- moderator_vars
+               cat_moderator_matrix_new <- as_tibble(cat_moderator_matrix_new, .name_repair = "minimal")
+               cbind(analysis_type = "Overall", cbind(cat_moderator_matrix_new, es_data))
           }
      }
 
-     organize_moderators_simple <- function(moderator_matrix, es_data){
-          moderator_vars <- colnames(moderator_matrix)
+     organize_moderators_simple <- function(cat_moderator_matrix, es_data){
+          moderator_vars <- colnames(cat_moderator_matrix)
           if(is.null(moderator_vars)){
-               if(ncol(moderator_matrix) == 1){
+               if(ncol(cat_moderator_matrix) == 1){
                     moderator_vars <- "Moderator"
                }else{
-                    moderator_vars <- paste("Moderator", 1:ncol(moderator_matrix), sep = "_")
+                    moderator_vars <- paste("Moderator", 1:ncol(cat_moderator_matrix), sep = "_")
                }
-               colnames(moderator_matrix) <- moderator_vars
+               colnames(cat_moderator_matrix) <- moderator_vars
           }
 
-          moderator_matrix_new <- es_data_new <- NULL
-          for(i in 1:ncol(moderator_matrix)){
-               moderator_matrix_i <- cbind(matrix("All Levels", nrow(moderator_matrix), i - 1),
-                                           moderator_matrix[,i],
-                                           matrix("All Levels", nrow(moderator_matrix), ncol(moderator_matrix) - i))
-               moderator_matrix_new <- rbind(moderator_matrix_new, moderator_matrix_i)
+          cat_moderator_matrix_new <- es_data_new <- NULL
+          for(i in 1:ncol(cat_moderator_matrix)){
+               cat_moderator_matrix_i <- cbind(matrix("All Levels", nrow(cat_moderator_matrix), i - 1),
+                                           cat_moderator_matrix[,i],
+                                           matrix("All Levels", nrow(cat_moderator_matrix), ncol(cat_moderator_matrix) - i))
+               cat_moderator_matrix_new <- rbind(cat_moderator_matrix_new, cat_moderator_matrix_i)
                es_data_new <- rbind(es_data_new, es_data)
           }
-          moderator_matrix_new <- as_tibble(moderator_matrix_new, .name_repair = "minimal")
+          cat_moderator_matrix_new <- as_tibble(cat_moderator_matrix_new, .name_repair = "minimal")
 
-          colnames(moderator_matrix_new) <- moderator_vars
-          cbind(analysis_type = "Simple Moderator", cbind(moderator_matrix_new, es_data_new))
+          colnames(cat_moderator_matrix_new) <- moderator_vars
+          cbind(analysis_type = "Simple Moderator", cbind(cat_moderator_matrix_new, es_data_new))
      }
 
-     organize_moderators_full_hierarchical <- function(moderator_matrix, es_data){
-          moderator_vars <- colnames(moderator_matrix)
+     organize_moderators_full_hierarchical <- function(cat_moderator_matrix, es_data){
+          moderator_vars <- colnames(cat_moderator_matrix)
           if(is.null(moderator_vars)){
-               if(ncol(moderator_matrix) == 1){
+               if(ncol(cat_moderator_matrix) == 1){
                     moderator_vars <- "Moderator"
                }else{
-                    moderator_vars <- paste("Moderator", 1:ncol(moderator_matrix), sep = "_")
+                    moderator_vars <- paste("Moderator", 1:ncol(cat_moderator_matrix), sep = "_")
                }
-               colnames(moderator_matrix) <- moderator_vars
+               colnames(cat_moderator_matrix) <- moderator_vars
           }
-          if(ncol(moderator_matrix) > 1){
-               moderator_matrix <- as_tibble(moderator_matrix, .name_repair = "minimal")
+          if(ncol(cat_moderator_matrix) > 1){
+               cat_moderator_matrix <- as_tibble(cat_moderator_matrix, .name_repair = "minimal")
 
-               cbind(analysis_type = "Fully Hierarchical Moderator", cbind(moderator_matrix, es_data))
+               cbind(analysis_type = "Fully Hierarchical Moderator", cbind(cat_moderator_matrix, es_data))
           }else{
                NULL
           }
      }
 
-     organize_moderators_part_hierarchical <- function(moderator_matrix, es_data){
-          moderator_vars <- colnames(moderator_matrix)
+     organize_moderators_part_hierarchical <- function(cat_moderator_matrix, es_data){
+          moderator_vars <- colnames(cat_moderator_matrix)
           if(is.null(moderator_vars)){
-               if(ncol(moderator_matrix) == 1){
+               if(ncol(cat_moderator_matrix) == 1){
                     moderator_vars <- "Moderator"
                }else{
-                    moderator_vars <- paste("Moderator", 1:ncol(moderator_matrix), sep = "_")
+                    moderator_vars <- paste("Moderator", 1:ncol(cat_moderator_matrix), sep = "_")
                }
-               colnames(moderator_matrix) <- moderator_vars
+               colnames(cat_moderator_matrix) <- moderator_vars
           }
-          if(ncol(moderator_matrix) > 2){
+          if(ncol(cat_moderator_matrix) > 2){
                all_combs <- NULL
                for(i in 2:(length(moderator_vars) - 1)) all_combs <- append(all_combs, apply(combn(moderator_vars, i), 2, list))
 
@@ -182,39 +184,39 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
                     }))
 
                hierachical_list <- lapply(all_combs, function(x){
-                    leave_out <- matrix("All Levels", nrow(moderator_matrix), length(x[["leave_out"]]))
+                    leave_out <- matrix("All Levels", nrow(cat_moderator_matrix), length(x[["leave_out"]]))
                     colnames(leave_out) <- x[["leave_out"]]
-                    cbind(moderator_matrix[,x[["use"]]], leave_out)[,moderator_vars]
+                    cbind(cat_moderator_matrix[,x[["use"]]], leave_out)[,moderator_vars]
                })
 
-               moderator_matrix_new <- es_data_new <- NULL
+               cat_moderator_matrix_new <- es_data_new <- NULL
                for(i in 1:length(hierachical_list)){
-                    moderator_matrix_new <- rbind(moderator_matrix_new, hierachical_list[[i]])
+                    cat_moderator_matrix_new <- rbind(cat_moderator_matrix_new, hierachical_list[[i]])
                     es_data_new <- rbind(es_data_new, es_data)
                }
-               moderator_matrix_new <- as_tibble(moderator_matrix_new, .name_repair = "minimal")
+               cat_moderator_matrix_new <- as_tibble(cat_moderator_matrix_new, .name_repair = "minimal")
 
-               cbind(analysis_type = "Partial Hierarchical Moderator", cbind(moderator_matrix_new, es_data_new))
+               cbind(analysis_type = "Partial Hierarchical Moderator", cbind(cat_moderator_matrix_new, es_data_new))
           }else{
                NULL
           }
      }
 
-     if(is.null(moderator_matrix)){
-          moderator_data <- organize_moderators_null(moderator_matrix = NULL, es_data = es_data)
+     if(is.null(cat_moderator_matrix)){
+          moderator_data <- organize_moderators_null(cat_moderator_matrix = NULL, es_data = es_data)
      }else{
           if(moderator_type == "none"){
-               moderator_data <- organize_moderators_null(moderator_matrix = moderator_matrix, es_data = es_data)
+               moderator_data <- organize_moderators_null(cat_moderator_matrix = cat_moderator_matrix, es_data = es_data)
           }
           if(moderator_type == "simple"){
-               moderator_data <- rbind(organize_moderators_null(moderator_matrix = moderator_matrix, es_data = es_data),
-                                       organize_moderators_simple(moderator_matrix = moderator_matrix, es_data = es_data))
+               moderator_data <- rbind(organize_moderators_null(cat_moderator_matrix = cat_moderator_matrix, es_data = es_data),
+                                       organize_moderators_simple(cat_moderator_matrix = cat_moderator_matrix, es_data = es_data))
           }
           if(moderator_type == "hierarchical" | moderator_type == "all"){
-               moderator_data <- rbind(organize_moderators_null(moderator_matrix = moderator_matrix, es_data = es_data),
-                                       organize_moderators_simple(moderator_matrix = moderator_matrix, es_data = es_data),
-                                       organize_moderators_part_hierarchical(moderator_matrix = moderator_matrix, es_data = es_data),
-                                       organize_moderators_full_hierarchical(moderator_matrix = moderator_matrix, es_data = es_data))
+               moderator_data <- rbind(organize_moderators_null(cat_moderator_matrix = cat_moderator_matrix, es_data = es_data),
+                                       organize_moderators_simple(cat_moderator_matrix = cat_moderator_matrix, es_data = es_data),
+                                       organize_moderators_part_hierarchical(cat_moderator_matrix = cat_moderator_matrix, es_data = es_data),
+                                       organize_moderators_full_hierarchical(cat_moderator_matrix = cat_moderator_matrix, es_data = es_data))
           }
      }
      moderator_vars <- colnames(moderator_data)[1:(ncol(moderator_data) - ncol(es_data))]
@@ -240,8 +242,8 @@ organize_moderators <- function(moderator_matrix, es_data, construct_x = NULL, c
      analysis_names <- x[!duplicated(x)]
      for(i in 1:length(analysis_names)) x[x == analysis_names[i]] <- i
 
-     if(!is.null(moderator_names)){
-          moderator_vars <- colnames(moderator_data)[colnames(moderator_data) %in% .moderator_names] <- moderator_names
+     if(!is.null(cat_moderator_names)){
+          moderator_vars <- colnames(moderator_data)[colnames(moderator_data) %in% .cat_moderator_names] <- cat_moderator_names
           moderator_vars <- c("analysis_type", moderator_vars)
      }
      moderator_data <- cbind(analysis_id = as.numeric(x), moderator_data)
@@ -289,8 +291,13 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           moderator_levels <- additional_args$moderator_levels
           construct_order <- additional_args$construct_order
           moderator_names <- additional_args$moderator_names
-
+          
           if(!is.null(presorted_data)){
+                  moderators_long <- presorted_data[,paste0(moderator_names[["all"]], "_temp")]
+                  moderators_long <- setNames(moderators_long, moderator_names[["all"]])
+                  moderators_long <- bind_cols(data.frame(original_order = 1:nrow(moderators_long)), moderators_long)
+
+                  presorted_data <- presorted_data[,id_variables]
                moderator_info <- list(data = cbind(presorted_data, es_data), id_variables = id_variables)
 
                es_colname <- colnames(es_data)[colnames(es_data) %in% c("d", "r", "rxyi")]
@@ -312,9 +319,9 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                cat_moderator_matrix <- moderators$cat_moderator_matrix
 
                if(!is.null(moderator_names)){
-                    .moderator_names <- moderator_names[["cat"]]
+                    cat_moderator_names <- moderator_names[["cat"]]
                }else{
-                    .moderator_names <- NULL
+                    cat_moderator_names <- NULL
                }
                if(!is.null(cat_moderator_matrix)){
                     cat_moderator_matrix <- as.data.frame(cat_moderator_matrix, stringsAsFactors = FALSE)
@@ -327,28 +334,22 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                     moderators$moderator_matrix <- moderator_matrix
                }
 
-               moderator_info <- organize_moderators(moderator_matrix = cat_moderator_matrix,
+               moderator_info <- organize_moderators(cat_moderator_matrix = cat_moderator_matrix,
                                                      es_data = es_data,
                                                      moderator_type = moderator_type,
                                                      construct_x = construct_x, construct_y = construct_y,
                                                      construct_order = construct_order, moderator_levels = moderator_levels,
-                                                     moderator_names = .moderator_names)
+                                                     cat_moderator_names = cat_moderator_names)
+               
+               moderators_long <- suppressMessages(left_join(select(moderator_info$data[moderator_info$data[["analysis_id"]] == 1,], "original_order"),
+                                                             as.data.frame(cbind(original_order = es_data$original_order, moderators$moderator_matrix))))
           }
-
+          
+          if(ncol(moderators_long) == 1) moderators_long <- NULL
+          
           data <- moderator_info$data
 
-          if(!is.null(moderators$moderator_matrix))
-               moderators$moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$moderator_matrix), moderators$moderator_matrix)
-          if(!is.null(moderators$cat_moderator_matrix))
-               moderators$cat_moderator_matrix <- bind_cols(original_order = 1:nrow(moderators$cat_moderator_matrix), moderators$cat_moderator_matrix)
-
-          analysis_id_variables <- moderator_info$id_variables
-          if(moderator_type == "none"){
-               moderator_matrix <- cat_moderator_matrix <- NULL
-          }
-
-          moderator_tab <- data %>%
-               group_by(.data$analysis_id) %>% do(.data[1,analysis_id_variables])
+          moderator_tab <- data %>% group_by(.data$analysis_id) %>% do(.data[1,moderator_info$id_variables])
 
           results_df <- suppressWarnings(data %>%
                                               group_by(.data$analysis_id) %>%
@@ -356,13 +357,10 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                               mutate(ma_out = map(data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
 
           results_df <- suppressMessages(suppressWarnings(full_join(moderator_tab, results_df)))
-          results_df$analysis_id <- results_df$data <- NULL
-
+          
           results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
           results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
-          results_df$escalc[[1]] <- append(results_df$escalc[[1]], list(moderator_info = moderators))
-          results_df$ma_out <- NULL
-
+      
           results_df$escalc <- map(results_df$escalc, function(x1){
                   map(x1, function(x2){
                           if(length(x2) == 0){
@@ -389,6 +387,18 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                           }
                   })
           })
+          
+          results_df$escalc <- lapply(results_df$escalc, function(x){
+                  if(is.null(moderators_long)){
+                          append(x, list(moderator_info = list(moderator_matrix = NULL, 
+                                                               cat_moderators = NULL)))
+                  }else{
+                          append(x, list(moderator_info = list(moderator_matrix = moderators_long[moderators_long[["original_order"]] %in% x$barebones[["original_order"]],], 
+                                                               cat_moderators = moderator_names[["cat"]])))
+                  }
+                  
+          })
+          results_df$ma_out <- results_df$analysis_id <- results_df$data <- NULL
 
           if(es_type == "r" & ma_type == "ic"){
                for(i in 1:nrow(results_df)){

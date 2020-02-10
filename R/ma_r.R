@@ -1460,7 +1460,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                str_compmod <- str_compmod_temp <- moderator_names_temp <- NULL
           }
           
-          full_data_mod <- organize_moderators(moderator_matrix = categorical_moderators, es_data = full_data,
+          full_data_mod <- organize_moderators(cat_moderator_matrix = categorical_moderators, es_data = full_data,
                                                construct_x = NULL, construct_y = NULL,
                                                moderator_type = moderator_type)
           
@@ -1528,7 +1528,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           analysis_type <- as.character(indep_data$analysis_type)
 
           if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
-          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, analysis_type=analysis_type, categorical_moderators), .name_repair = "minimal")
+          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, analysis_type=analysis_type, categorical_moderators, 
+                                            sample_id = sample_id, complete_moderators), .name_repair = "minimal")
 
           if(!is.null(moderator_names[["cat"]])){
                moderator_ids <- (length(analysis_id_variables) - length(moderator_names[["cat"]]) + 1):length(analysis_id_variables)

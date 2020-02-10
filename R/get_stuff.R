@@ -28,7 +28,7 @@
 #' @param what For the \code{get_stuff()} function only: Character scalar telling \code{get_stuff()} what to get.
 #' All suffixes from functions in the "get_" family can be passed as arguments to \code{what}:
 #' "metatab", "escalc", "metafor", "ad", "followup", "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg", "matrix", "plots"
-#' @param moderators Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).
+#' @param moderators Logical scalar that determines whether moderator variables should be included in escalc objects (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param follow_up Vector of follow-up analysis names (options are: "heterogeneity", "leave1out", "cumulative", "bootstrap", "metareg").
 #' @param plot_types Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative"; multiple allowed).
 #' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
@@ -138,24 +138,64 @@ get_stuff <- function(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "fo
 
 #' @rdname get_stuff
 #' @export
-get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, moderators = FALSE, ...){
-
-     ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
-
-     out <- ma_obj$escalc
-     if(!moderators)
-          out <- map(out, function(x){
-               if(any(names(x) == "moderator_info")){
-                    x$moderator_info <- NULL
-                    x
-               }else{
-                    x
-               }
-          })
-     names(out) <- paste0("analysis_id: ", ma_obj$analysis_id)
-
-     class(out) <- "get_escalc"
-     out
+get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, moderators = TRUE, ...){
+        
+        ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
+        
+        out <- ma_obj$escalc
+        if(!moderators){
+                out <- map(out, function(x){
+                        if(any(names(x) == "moderator_info")){
+                                x$moderator_info <- NULL
+                                x
+                        }else{
+                                x
+                        }
+                })             
+        }else{
+                if(any(ma_obj$analysis_type == "Overall"))
+                        out <- map(out, function(x){
+                                if(any(names(x) == "moderator_info")){
+                                        moderator_matrix <- x$moderator_info$moderator_matrix
+                                        x$moderator_info <- NULL
+                                        x <- map(x, function(xi){
+                                                if(is.data.frame(xi)){
+                                                        if(!is.null(moderator_matrix)){
+                                                                xi <- suppressMessages(right_join(moderator_matrix, xi))
+                                                                xi <- xi %>% 
+                                                                        select(colnames(xi)[colnames(xi) != "sample_id"]) %>% 
+                                                                        add_column(sample_id = xi[["sample_id"]], .after = 1)  
+                                                        }
+                                                        class(xi) <- c("escalc", "data.frame")
+                                                        xi
+                                                }else{
+                                                        map(xi, function(xij){
+                                                                if(is.data.frame(xij)){
+                                                                        if(!is.null(moderator_matrix)){
+                                                                                xij <- suppressMessages(right_join(moderator_matrix, xij))
+                                                                                xij <- xij %>% 
+                                                                                        select(colnames(xij)[colnames(xij) != "sample_id"]) %>% 
+                                                                                        add_column(sample_id = xij[["sample_id"]], .after = 1)
+                                                                        }
+                                                                        class(xij) <- c("escalc", "data.frame")
+                                                                        xij
+                                                                }else{
+                                                                        xij
+                                                                }
+                                                        })
+                                                }
+                                        })
+                                        x
+                                }else{
+                                        x
+                                }
+                        })
+        }
+        
+        names(out) <- paste0("analysis_id: ", ma_obj$analysis_id)
+        
+        class(out) <- "get_escalc"
+        out
 }
 
 #' @rdname get_stuff
