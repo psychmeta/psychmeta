@@ -1,0 +1,30 @@
+---
+title: "Heterogeneity Analyses"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Heterogeneity analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette shows options for handling effect size dependency in **psychmeta**.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+
+## Heterogeneity
+
+## `heterogeneity()`
+
+**`psychmeta`** automatically estimates residual standard deviations (_SD~res~_ and _SD~$\rho$~_) and credibility intervals. These statistics are the best way to examine heterogeneity in meta-anlayses [@WiernikEmpiricalbenchmarksinterpreting2017]. The `heterogeneity()` function computes additional heterogeneity statistics (e.g., % Variance Accounted For, _Q_, _I_^2^) that may be requested by some journals or reviewers; we don't recommend these statistics for regular use.
+
+```{r, eval=FALSE}
+ma_obj <- heterogeneity(ma_obj)
+```

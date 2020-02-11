@@ -1,0 +1,32 @@
+---
+title: "Handling Effect Size Dependency"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Handling effect size dependency}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette shows options for handling effect size dependency in **psychmeta**.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+## Handling dependency
+Psychometric meta-analysis assumes that each effect size for a particular construct relationship comes from an independent sample. If one sample provides multiple effect sizes for the same relationship, **psychmeta** can automatically consolidate them as either composites (recommended) or averages.
+
+```{r, eval=FALSE}
+ma_r(rxyi = rxyi, n = n, sample_id = sample_id,
+     collapse_method = "composite",
+     data = data_r_meas_multi)
+
+ma_r(rxyi = rxyi, n = n, sample_id = sample_id,
+     collapse_method = "average",
+     data = data_r_meas_multi)
+```

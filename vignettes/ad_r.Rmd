@@ -1,0 +1,446 @@
+---
+title: "Artifact-Distribution Meta-Analysis: Correlations"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Artifact-distribution meta-analysis: Correlations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.json
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette will walk you through estimating artifact-distribution meta-analyses
+of correlations between multiple constructs.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+
+## Preparing your data
+
+To begin, you will need to your meta-analytic data sheet into R for analysis. See
+[here for recommendations](import_organize.html) on packages for importing data to R.
+
+**psychmeta** requires your data to be in are in "long" format, with each row 
+corresponding to one **effect size**. For example, this is the format used in 
+this data frame:
+
+```{r}
+knitr::kable(data_r_meas_multi[1:10,])
+```
+
+In this table, 
+  - **`sample_id`** contains labels indicating the sample each effect size is drawn from; 
+  - **`moderator`** is a moderator variable, each row containing the effect size's level for that moderator; 
+  - **`x_name`** and **`y_name`** are columns indicating the variables/constructs being related in the effect size; 
+  - **`n`** is the sample size for the effect size; 
+  - **`rxyi`** is the effect size (the correlation between the two constructs/variables); 
+  - **`rxxi`** and **`rxyi`** are the sample reliability values for the measures of the `x_name` and `y_name` variables, respectively; 
+  - **`citekey`** containts the citations keys for each study (used to generate bibliographies of included studies).
+
+You can see this data set includes correlations among three variables: `X`, `Y`,
+and `Z`, and that each sample contributes several effect sizes, one each for
+for different pairs of variables/constructs.
+
+If your data are in a different format, **psycmeta** and the **tidyr** package
+have functions to reshape your data. See [here for details](import_organize.html).
+
+
+## Estimating an Artifact-Distribution Meta-Analysis
+
+Let's assume your data sheet is called `coding_sheet`.
+
+```{r}
+coding_sheet <- data_r_meas_multi
+
+head(coding_sheet)
+```
+
+The primary function to conduct meta-analyses of correlations is `ma_r()`. To 
+conduct artifact-distribution meta-analyses correcting for measurement error
+in both variables, run:
+
+```{r}
+ma_res <- ma_r(rxyi = rxyi, 
+               n = n, 
+               rxx = rxxi,
+               ryy = ryyi,
+               construct_x = x_name,
+               construct_y = y_name,
+               sample_id = sample_id, 
+               moderators = moderator,
+               ma_method = "ad",
+               data = coding_sheet
+               )
+```
+
+- **`data`** is your data frame. 
+- **`rxyi`**, **`n`**, **`rxxi`**, **`ryyi`**, **`sample_id`**, **`moderators`**, 
+  **`construct_x`**, and **`construct_y`** are the names of the columns in your 
+  data sheet that contain the appropriate values. 
+  - **`rxyi`** is the correlation effect sizes; 
+  - **`n`** is the sample sizes; 
+  - **`rxxi`** and **`ryyi`** are the reliability values for 
+  - **`construct_x`** and **`construct_y`** are the labels for the variables/constructs 
+    being correlated; 
+  - **`sample_id`** is the sample identification labels; 
+  - **`moderators`** is a vector of moderator variable names for the meta-analyses. 
+  - Column names can be provided either with quotes (e.g., `"rxyi"`, `"n"`) or 
+    without (e.g., `rxyi`, `n`).
+- **ma_method** specifies the the type of meta-analysis to conduct. `"ad"` indicates
+  artifact-distribution meta-analyses.
+
+To conduct an artifact-distribution meta-analysis, at minimum, `n`, `rxyi`, 
+`ma_method`, and any artifacts to be corrected (`rxx`, `ryy`, `ux`, and/or `uy`) 
+are needed.
+
+In addition to constructing artifact distributions using the studies in your 
+data frame, you can also correct using pre-existing distributions or additional
+artifacts. See [Using pre-existing artifact distributions](#using_pre-existing_artifact_distributions).
+
+
+### Correcting for measurement error
+
+
+
+### Correcting for selection effects (range restriction, collider bias)
+
+
+
+### Modeling Options
+
+- By default, correlations are weighted by sample size. You can specify alternative
+  weights using the `wt_type` argument.
+
+- Random-effects variance (τ^2^ or *SD~res~*^2^) is estimated using the 
+  Hunter-Schmidt estimator, computed using the unbiased sample variance estimator 
+  (i.e., dividing by $k-1$ rather than $k$). To use the maximum-likelihood estimator
+  instead, specify `var_unbiased = FALSE`.
+
+- Barebones results are corrected for the small-sample bias in the correlation
+  coefficient. To disable this correction, specify `correct_bias = FALSE`.
+
+- By default, confidence and credibility intervals are constructed using a _t_
+  distribution with $k-1$ degrees of freedom. To use a normal distribution instead,
+  specify, `conf_method = "norm"` and `cred_method = "norm"`. To customize the
+  coverage levels for these intervals, use the `conf_level` and `cred_level` arguments.
+    
+- **psychmeta** will automatically combine effect sizes from the same sample
+  (indicated by the `sample_id` argument) to maintain indendependence. For 
+  details, see [Handling Effect Size Dependency](dependency.html).
+  
+- For more details on arguments and options for **psychmeta** meta-analyses, see
+  [Meta-Analysis Function Arguments and Options](ma_options.html)
+  
+  
+### Artifact distribution options
+
+- By default, **psychmeta** will construct artifact distributions using the
+  Taylor Series Approximation method. To use the interactive method instead,
+  specify `ad_type = "int"`.
+
+- By default, artifact distrbutions for each construct are constructed using all 
+  of the studies in the database reporting artifacts for that construct.
+    - To construct separate artifact distributions for each _pair of constructs_,
+      (e.g., separate distributions for `X` when paired `Y` and `X` when paired
+      with `Z`, rather than one distibution for `X` overall), specify
+      `pairwise_ads = TRUE`.
+    - To construct separate artifact distributions for each level of categorical
+      moderator variables, specify `moderated_ads = TRUE`.
+    - The `pairwise_ads` and `moderated_ads` arguments can be combined if desired.
+    
+- By default, **psychmeta** will select the most appropriate artifact correction
+  model based on which artifacts are supplied (measurement error in one or both
+  variables, selection effects in one or both variables). To specify a specifc
+  artifact model, specify a value for the `correction_method` argument.
+  
+  
+## The **psychmeta** Meta-Analysis Object
+
+A **psychmeta** meta-analsyis object is a data frame ("tibble"), with each row 
+being a meta-analysis or subanalysis and each column containing information 
+about or results from that analysis. For example, the results of the analysis 
+above look like this:
+
+```{r}
+ma_res
+```
+
+Each row corresponds to a different pair of variables/constructs (X-Y; X-Z; Y-Z)
+and level of the moderator variable (overall/all levels pooled together; 
+moderator = 1; moderator = 2).
+
+  - **`analysis_id`** is a numeric label for each analysis;
+  - **`pair_id`** is a numeric label for each pair of variables/constructs (X-Y; 
+    X-Z; Y-Z); 
+  - **`construct_x`** and **`construct_y`** indicate which variables/constructs 
+    are being meta-analyzed.
+
+  - **`analysis_type`** indicates the type of analysis. 
+    - "Overall" means an overall meta-analysis, pooling across all moderator levels. 
+    - "Simple Moderator" means a subgroup moderator analysis of only studies with 
+      the specified levels of the moderator variable in the next column(s).
+
+      For additional details on moderator analyses and meta-regression, see
+      [Moderator Analyses and Meta-Regression](moderator_analysis.html).
+
+  - **`meta_tables`** contains the principal meta-analysis results tables.
+  - **`escalc`** contains tables of effect sizes, sampling error variances, weights, 
+    residuals, and other data. These tables can be used for follow-up analyses or
+    with the **metafor** package for additional meta-analysis techniques.
+  - **`ad`** contains the distributions of artifacts used to correct the meta-analyses.
+    
+You can extract results from a **psychmeta** meta-analysis object using the
+`get_stuff()` functions (e.g., `get_metatab()`, `get_ad()`). 
+For more details, keep reading or see [`?get_stuff()`](library/psychmeta/html/get_stuff.html).
+
+
+## Viewing Results Summaries
+
+To view meta-anlaysis results tables, use the `summary()` function:
+
+```{r}
+summary(ma_res)
+```
+
+In this table, 
+
+- **`analysis_id`**, **`pair_id`**, **`construct_x`**, **`construct_y`**, and 
+  the moderator columns are defined as above.
+- **`k`** is the number of effect sizes contributing to each meta-analysis. 
+  **`N`** is the total sample size contributing to each meta-analysis.
+- **`mean_r`** is the weighted mean _uncorrected_ correlation.
+- **`sd_r`** is the weighted observed standard deviation of _uncorrected_ correlations. 
+- **`se_r`** is the standard error of `mean_r`. 
+- **`sd_res`** is the estimated _uncorrected_ random-effects standard deviation 
+  (residual _SD_ of _uncorrected_ correlations after accounting for sampling error
+  and other artifacts). 
+- **`mean_rho`** is the weighted mean _corrected_ correlation.
+- **`sd_r_c`** is the weighted observed standard deviation of _corrected_ correlations. 
+- **`se_r_c`** is the standard error of `mean_rho`. 
+- **`sd_rho`** is the estimated _corrected_ random-effects standard deviation 
+  (residual _SD_ of _corrected_ correlations after accounting for sampling error
+  and other artifacts). 
+  
+- **`CI_LL_95`** and **`CI_UL_95`** are the upper and lower bounds of the 
+  confidence interval for `mean_rho`; the number indicates the coverage level 
+  (default: 95%). 
+- **`CR_LL_80`** and **`CR_UL_80`** are the upper and lower bounds of the 
+  credibility interval for the estimated population distribution of corrected
+  (true) correlations; the number indicates the coverage level (default: 80%).
+
+To view additional results, such as observed variance (`var_r`) or standard
+deviation of sampling errors (`sd_e`), use the `get_metatab()` function and 
+select the appropriate columns:
+
+```{r}
+names(get_metatab(ma_res)$artifact_distribution$true_score)
+
+get_metatab(ma_res)$artifact_distribution$true_score$var_r_c
+
+select(get_metatab(get_metatab(ma_res)$artifact_distribution$true_score), var_r_c)
+```
+
+To view all columns of this table, convert it to a `data.frame` or `tibble`:
+
+```{r}
+dplyr::as_tibble(get_metatab(ma_res)$artifact_distribution$true_score)
+```
+
+```{r}
+as.data.frame(get_metatab(ma_res)$artifact_distribution$true_score)
+```
+
+To extract additional results from a **psychmeta** meta-analysis object, use
+the [`get_stuff()` functions](library/psychmeta/html/get_stuff.html).
+
+
+## Moderator Analyses
+
+Results for subgroup analyses for different levels of categorical moderators are
+shown in the rows of the meta-analysis results table. To estimate confidence
+intervals for differences between levels or an omnibus ANOVA statistic, use the
+`anova()` function:
+
+```{r}
+anova(ma_res)
+```
+
+For additional details on moderator analyses and meta-regression, see
+[Moderator Analyses and Meta-Regression](moderator_analysis.html).
+
+
+## Outputting Results
+
+**psychmeta** can automatically format meta-analysis results tables and
+bibliographies of included studies and output these to Word, Markdown, and other
+formats. For details, see [Outputing Meta-Analysis Results ](output_results.html).
+
+
+## Follow-Up Analyses
+
+### Plotting
+
+You can add plots for each meta-analysis in `ma_res` using the `plot_forest()`
+and `plot_funnel()` functions:
+
+```{r}
+ma_res <- plot_funnel(ma_res)
+ma_res <- plot_forest(ma_res)
+```
+
+You can view these plots using the `get_plots()` function. This will return a
+list of all of the plots in this results. Specify which meta-analysis you want 
+to view plots for by passing its `analysis_id` to `[[`:
+
+```{r, fig.show='hold'}
+get_plots(ma_res)[["funnel"]][[1]]
+```
+
+For forest plots, if you have moderator variables, it will include 
+plots faceted by moderator levels (`"moderated"`) and not (`"unmoderated"`):
+
+```{r, fig.show='hold'}
+get_plots(ma_res)[["forest"]][[1]][["moderated"]][["barebones"]]
+get_plots(ma_res)[["forest"]][[1]][["unmoderated"]][["barebones"]]
+```
+
+Note that for artifact-distribution meta-analyses, plots reflect barebones 
+(uncorrected) meta-analysis results, as effect sizes are not individually 
+corrected.
+
+For more details on plotting with **psychmeta**, see 
+[Plotting Meta-Analysis Results](plots.html).
+
+
+### Heterogeneity Analyses
+
+**psychmeta** reports the random-effects standard deviaton (τ or *SD_res_*) 
+and credibility intervals (`mean_r` ± _crit_ × *SD~res~*) in the main 
+meta-analysis results tables. To view confidence intervals for τ/*SD_res_* or 
+additional heterogeneity statistics, use the `heterogeneity()` function:
+
+```{r}
+ma_res <- heterogeneity(ma_res)
+get_heterogeneity(ma_res)[[1]][["artifact_distribution"]][["true_score"]]
+```
+
+For more details, see [Heterogeneity Analyses](heterogeneity.html).
+
+
+### Publication Bias and Sensitivity Analyses
+
+**psychmeta** supports cumulative meta-analysis for publication/small-sample bias
+detection, leave-1-out sensitivity analyses, and bootstrap confidence interavals
+using the sensitivity function:
+
+```{r, fig.show='hold'}
+ma_res <- sensitivity(ma_res)
+get_cumulative(ma_res)[[1]][["artifact_distribution"]][["true_score"]]
+get_cumulative(ma_res)[[1]][["artifact_distribution"]][["true_score"]][["plots"]]
+```
+
+```{r}
+get_bootstrap(ma_res)[[1]][["artifact_distribution"]][["true_score"]]
+```
+
+For more details, see [Sensitivity Analyses](sensitivity.html).
+
+
+## Using pre-existing artifact distributions
+
+In addition to artifact information from the studies in your meta-analytic
+data frame, you can also use pre-specified artifact distributions from previous 
+meta-analyses in **psychmeta**. 
+
+There are several ways to use pre-specified distributions, ranging from using 
+them on their on their own to combining them with observed artifact information. Below are four potential methods, but **`psychmeta`** allows many other ways to use artifact distributions.
+
+1. You can use the `create_ad()` function to create artifact distribution objects.
+   Put them together into list, with names specifying what construct each 
+   distribution represent. Then, use this list in `ma_r()` by specifying the 
+   `supplemental_ads` argument:
+
+```{r, eval=FALSE}
+ad_x <- create_ad(mean_qxi = 0.89, var_qxi = .028^2, k_qxi = 40,
+                  mean_n_qxi = 298, qxi_dist_type = "alpha")
+ad_y <- create_ad(mean_qxi = 0.89, var_qxi = .028^2, k_qxi = 40,
+                  mean_n_qxi = 298, qxi_dist_type = "alpha")
+ad_z <- create_ad(mean_qxi = 0.89, var_qxi = .028^2, k_qxi = 40,
+          mean_n_qxi = 298, qxi_dist_type = "alpha")
+
+ad_list <- list(X = ad_x, Y = ad_y, Z = ad_z)
+
+ma_res <-
+  ma_r(ma_method = "ad", 
+       rxyi = rxyi, 
+       n = n,
+       construct_x = x_name, 
+       construct_y = y_name, 
+       sample_id = sample_id,
+       moderators = moderator, 
+       data = data_r_meas_multi,
+       supplemental_ads = ad_list
+       )
+```
+
+2. You can alos create a list of artifact distributions from a meta-analytic 
+   data frame of samples using the `create_ad_list()` function. Then use this 
+   list in `ma_r()` by specifying the `supplemental_ads` argument:
+   
+```{r, eval=FALSE}
+ad_list <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
+                          construct_x = x_name, construct_y = y_name,
+                          sample_id = sample_id,
+                          data = data_r_meas_multi)
+
+ma_res <-
+  ma_r(ma_method = "ad", 
+       rxyi = rxyi, 
+       n = n,
+       construct_x = x_name, 
+       construct_y = y_name, 
+       sample_id = sample_id,
+       moderators = moderator, 
+       data = data_r_meas_multi,
+       supplemental_ads = ad_list
+       )
+```
+
+Argumentes for `create_ad_list()` are the same as for `ma_r()` as listed above.
+
+3. You can combine artifacts from your database with a pre-specified distribution,
+   weighting each by sample size, by specifying both columns with artifacts in
+   your meta-analytic data frame (`rxx`, `ryy`, `ux`, and/or `uy`) and 
+   `supplemental_ads`:
+
+```{r, eval=FALSE}
+ad_x <- create_ad(mean_qxi = 0.89, var_qxi = .028^2, k_qxi = 40,
+                  mean_n_qxi = 298, qxi_dist_type = "alpha")
+ad_y <- create_ad(mean_qxi = 0.89, var_qxi = .028^2, k_qxi = 40,
+                  mean_n_qxi = 298, qxi_dist_type = "alpha")
+ad_z <- create_ad(mean_qxi = 0.89, var_qxi = .028^2, k_qxi = 40,
+          mean_n_qxi = 298, qxi_dist_type = "alpha")
+
+ad_list <- list(X = ad_x, Y = ad_y, Z = ad_z)
+
+ma_res <-
+  ma_r(ma_method = "ad", 
+       rxyi = rxyi, 
+       n = n,
+       rxx = rxxi,
+       ryy = ryyi,
+       construct_x = x_name, 
+       construct_y = y_name, 
+       sample_id = sample_id,
+       moderators = moderator, 
+       data = data_r_meas_multi,
+       supplemental_ads = ad_list
+       )
+```

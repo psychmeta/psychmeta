@@ -1,0 +1,172 @@
+---
+title: "Meta-Analysis Function Arguments and Options"
+output:
+  rmarkdown::html_vignette:
+    df_print: paged
+bibliography: vignette.json
+vignette: >
+  %\VignetteIndexEntry{Meta-Analysis Function Arguments and Options}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+csl: https://zotero.org/styles/apa
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette gives a detailed description of the arguments and options used in 
+the `ma_r()`, `ma_d()`, and `ma_generic()` functions.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+
+## `ma_r()` is the general-purpose meta-analysis function for correlations
+The arguments to this function are:
+```{r, eval=FALSE}
+ma_r(
+#### Commonly used arguments: ####
+# Which data set would you like to use?
+     data = NULL,
+
+# Specify essential effect-size information.
+     rxyi, n, n_adj = NULL,
+
+# Differentiate sources of data.
+     sample_id = NULL, citekey = NULL,
+
+# Specify methodological parameters.
+     ma_method = "bb", ad_type = "tsa",
+     correction_method = "auto",
+
+# Specify constructs and measures of constructs.
+     construct_x = NULL, construct_y = NULL,
+     measure_x = NULL, measure_y = NULL,
+
+# Weighting method
+     wt_type = "sample_size",
+
+# Correct for small-sample bias?
+     correct_bias = TRUE,
+# Correct for measurement error?
+     correct_rxx = TRUE, correct_ryy = TRUE,
+# Correct for range restriction?
+     correct_rr_x = TRUE, correct_rr_y = TRUE,
+# Is the range restriction indirect (vs. direct) in nature?
+     indirect_rr_x = TRUE, indirect_rr_y = TRUE,
+
+# What are your reliability coefficients?
+     rxx = NULL, ryy = NULL,
+# Are your reliability coefficients range restricted?
+     rxx_restricted = TRUE, ryy_restricted = TRUE,
+# What types of reliability estimates are you using?
+     rxx_type = "alpha", ryy_type = "alpha",
+
+# What are your range-restriction u (SD) ratios?
+     ux = NULL, uy = NULL,
+# Are your u ratios computed from observed (vs. true-score) SDs?
+     ux_observed = TRUE, uy_observed = TRUE,
+
+# What are your moderators and which ones are categorical?
+     moderators = NULL, cat_moderators = TRUE,
+
+# What type of moderator analysis do you want (simple vs. hierarchical)?
+     moderator_type = "simple",
+
+# If correcting for bivariate indirect RR, how do constructs correlate
+# with selection mechanisms? (only need to specify the +1 or -1 sign of the relationships)
+     sign_rxz = 1, sign_ryz = 1,
+
+# Do you have any artifact distributions to include that are not in your database?
+     supplemental_ads = NULL,
+
+#### Other arguments to know about: ####
+# Specify the order in which constructs should be displayed in output.
+     construct_order = NULL,
+# If analyzing multiple relationships, how should each constructs's measurement
+# error be handled?
+     correct_rel = NULL,
+# If analyzing multiple relationships, how should each construct's
+# range restriction be handled?
+     correct_rr = NULL,
+# If analyzing multiple relationships, which constructs are affected by indirect
+# range restriction?
+     indirect_rr = NULL,
+# If analyzing multiple relationships, how does each construct correlate with
+# the selection mechanism?
+     sign_rz = NULL,
+
+# Additional methological parameters can be modified using the "control" argument.
+     control =  control_psychmeta()
+)
+```
+
+\pagebreak
+
+In addition to the arguments used with `ma_r()` directly, the `control` argument allows users to modify methological parameters of their analyses and interact with some of the more specialized features of **`psychmeta`**'s meta-analysis functions. The `control` argument in meta-analysis functions accepts the output of the `control_psychmeta()` function.
+```{r, eval=FALSE}
+control_psychmeta(
+     # Should the mean or the sample-specific effect sizes be used to estimate error variance?
+     error_type = c("mean", "sample"),
+     # What proportion of the distribution of means should be included in confidence intervals?
+     conf_level = .95,
+     # What proportion of the residual distribution of observations should be included in credibility intervals?
+     cred_level = .8,
+     # How should confidence and credibility intervals be computed? With the t or normal distribution?
+     conf_method = c("t", "norm"),
+     cred_method = c("t", "norm"),
+     # Should weighted variance estimates be computed as unbiased (i.e., multiplied by k / [k-1])?
+     var_unbiased = TRUE,
+     # Should overall artifaction distributions be computed for each construct (pairwise_ads == FALSE) or should
+     # artifact distributions be computed separately for each construct pair (pairwise_ads == TRUE)?
+     pairwise_ads = FALSE,
+     # Should artifact distributions be computed by collapsing across moderator
+     # levels (moderated_ads == FALSE) or should artifact distributions be computed
+     # separately for each moderator combination (moderated_ads == TRUE)?
+     moderated_ads = FALSE,
+     # Should artifact-distribution corrections be computed using artifact distributions
+     # that have had sampling error removed (residual_ads == TRUE) or should the observed
+     # distributions be used (residual_ads == TRUE)?
+     residual_ads = TRUE,
+     # Should dependent observations (i.e., multiple observations of the same relationship in a single sample) be
+     # consolidated so that there is just one independent observation per sample?
+     check_dependence = TRUE,
+     # If check_dependence is TRUE, how should dependency be resolved? Options are to compute a composite
+     # effect size (default), compute the average of the effect sizes, or to stop with an error message.
+     collapse_method = c("composite", "average", "stop"),
+     # The intercor argument uses the control_intercor() function to control how the intercorrelations
+     # among variables are handled with collapse_method == "composite"
+     intercor = control_intercor(),
+     # Should artifact information be cleaned to resolve discrepancies among values recorded for multiple
+     # relationsips involving a given construct in a given sample?
+     clean_artifacts = TRUE,
+     # Should missing artifact information be imputed? (For use with individual-correction method only)
+     impute_artifacts = TRUE,
+     # If impute_artifacts is TRUE, how should imputation be performed? See the documentation for the
+     # control_psychmeta() function for descriptions of the available options.
+     impute_method = c("bootstrap_mod", "bootstrap_full", "simulate_mod", "simulate_full",
+                       "wt_mean_mod", "wt_mean_full", "unwt_mean_mod", "unwt_mean_full",
+                       "replace_unity", "stop"),
+     # What seed value should be set for the imputation process? (This makes the imputation reproducible)
+     seed = 42,
+     # Should artifact information from observations not included in meta-analyses be harvested from "data"
+     # and included in artifact distributions?
+     use_all_arts = TRUE,
+     # For meta-analyses of d values, should the proportionality of membership in the unrestricted sample
+     # be estimated from the range-restricted proportions and the range-restriction correction factor?
+     estimate_pa = FALSE,
+     # To what number of decimal places should interactive artifact distributions be rounded prior to use?
+     # Rounding reduces the computational burden of creating multi-dimensional arrays of artifact information.
+     decimals = 2,
+     # Should the "Hunter-Schmidt" override settings be used? When TRUE, this will override settings for:
+     # - wt_type will set to "sample_size"
+     # - error_type will set to "mean"
+     # - correct_bias will set to TRUE
+     # - conf_method will set to "norm"
+     # - cred_method will set to "norm"
+     # - var_unbiased will set to FALSE
+     # - residual_ads will be set to FALSE
+     # - use_all_arts will set to FALSE
+     hs_override = FALSE
+)
+```

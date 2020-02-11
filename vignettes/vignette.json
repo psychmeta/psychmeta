@@ -1,0 +1,164 @@
+[{
+  "id": "DahlkeNotrestrictedselection2019",
+  "abstract": "Range restriction is a common problem in organizational research and is an important statistical artifact to correct for in meta-analysis. Historically, researchers have had to rely on range restriction corrections that only make use of range-restriction information for one variable, but it is not uncommon for researchers to have such information for both variables in a correlation (e.g., when studying the correlation between two predictor variables). Existing meta-analytic methods incorporating bivariate range-restriction corrections overlook their unique implications for estimating the sampling variance of corrected correlations and for accurately assigning weights to studies in individual-correction meta-analyses. We introduce new methods for computing individual-correction and artifact-distribution meta-analyses using the bivariate indirect range restriction (BVIRR; “Case V”) correction and describe improved methods for applying BVIRR corrections that substantially reduce bias in parameter estimation. We illustrate the effectiveness of these methods in a large-scale simulation and in meta-analyses of expatriate data. We provide R code to implement the methods described in this article; more comprehensive and robust functions for applying these methods are available in the psychmeta package for R.",
+  "accessed": {
+    "date-parts": [
+      [2019, 10, 3]
+    ]
+  },
+  "author": [{
+    "family": "Dahlke",
+    "given": "Jeffrey A."
+  }, {
+    "family": "Wiernik",
+    "given": "Brenton M."
+  }],
+  "container-title": "Organizational Research Methods",
+  "container-title-short": "Org. Res. Meth.",
+  "DOI": "10.1177/1094428119859398",
+  "ISSN": "1094-4281, 1552-7425",
+  "issued": {
+    "date-parts": [
+      [2019, 7, 24]
+    ]
+  },
+  "language": "en",
+  "source": "Crossref",
+  "status": "Advance online publication",
+  "title": "Not restricted to selection research: accounting for indirect range restriction in organizational research",
+  "title-short": "Not restricted to selection research",
+  "type": "article-journal",
+  "URL": "http://journals.sagepub.com/doi/10.1177/1094428119859398"
+},
+{
+  "id": "Dahlkepsychmetapackagepsychometric2019",
+  "abstract": "Over the past four decades, psychometric meta-analysis (PMA) has emerged a key way that psychological disciplines build cumulative scientific knowledge. Despite the importance and popularity of PMA, software implementing the method has tended to be closed-source, inflexible, limited in terms of the psychometric corrections available, cumbersome to use for complex analyses, and/or costly. To overcome these limitations, we created the psychmeta R package: a free, open-source, comprehensive program for PMA.",
+  "author": [{
+    "family": "Dahlke",
+    "given": "Jeffrey A."
+  }, {
+    "family": "Wiernik",
+    "given": "Brenton M."
+  }],
+  "container-title": "Applied Psychological Measurement",
+  "container-title-short": "Appl. Psychol. Meas.",
+  "DOI": "10.1177/0146621618795933",
+  "issue": "5",
+  "issued": {
+    "date-parts": [
+      [2019, 7, 1]
+    ]
+  },
+  "language": "en",
+  "page": "415-416",
+  "title": "<i>psychmeta</i>: an R package for psychometric meta-analysis",
+  "title-short": "psychmeta",
+  "type": "article-journal",
+  "volume": "43"
+},
+{
+  "id": "Gonzalez-Mulemetaanalysisrelationshipgeneral2014",
+  "accessed": {
+    "date-parts": [
+      [2015, 1, 25]
+    ]
+  },
+  "author": [{
+    "family": "Gonzalez-Mulé",
+    "given": "Erik"
+  }, {
+    "family": "Mount",
+    "given": "Michael K."
+  }, {
+    "family": "Oh",
+    "given": "In-Sue"
+  }],
+  "container-title": "Journal of Applied Psychology",
+  "container-title-short": "JAP",
+  "DOI": "10.1037/a0037547",
+  "ISSN": "1939-1854, 0021-9010",
+  "issue": "6",
+  "issued": {
+    "date-parts": [
+      [2014]
+    ]
+  },
+  "language": "en",
+  "page": "1222-1243",
+  "source": "CrossRef",
+  "title": "A meta-analysis of the relationship between general mental ability and nontask performance",
+  "type": "article-journal",
+  "URL": "http://doi.apa.org/getdoi.cfm?doi=10.1037/a0037547",
+  "volume": "99"
+},
+{
+  "id": "SchmidtStatisticalmeasurementpitfalls2017",
+  "accessed": {
+    "date-parts": [
+      [2018, 4, 15]
+    ]
+  },
+  "author": [{
+    "family": "Schmidt",
+    "given": "Frank L."
+  }],
+  "container-title": "Career Development International",
+  "container-title-short": "Career Dev Int",
+  "DOI": "10.1108/cdi-08-2017-0136",
+  "ISSN": "1362-0436",
+  "issue": "5",
+  "issued": {
+    "date-parts": [
+      [2017, 9, 6]
+    ]
+  },
+  "page": "469-476",
+  "source": "emeraldinsight.com (Atypon)",
+  "title": "Statistical and measurement pitfalls in the use of meta-regression in meta-analysis",
+  "type": "article-journal",
+  "URL": "https://www.emeraldinsight.com/doi/full/10.1108/CDI-08-2017-0136",
+  "volume": "22"
+},
+{
+  "id": "WiernikEmpiricalbenchmarksinterpreting2017",
+  "abstract": "Generalization in meta-analyses is not a dichotomous decision (typically encountered in papers using the <i>Q</i> test for homogeneity, the 75% rule, or null hypothesis tests). Inattention to effect size variability in meta-analyses may stem from a lack of guidelines for interpreting credibility intervals. In this commentary, we describe two methods for making practical interpretations and determining whether a particular SDρ represents a meaningful level of variability.",
+  "accessed": {
+    "date-parts": [
+      [2017, 9, 1]
+    ]
+  },
+  "author": [{
+    "family": "Wiernik",
+    "given": "Brenton M."
+  }, {
+    "family": "Kostal",
+    "given": "Jack W."
+  }, {
+    "family": "Wilmot",
+    "given": "Michael P."
+  }, {
+    "family": "Dilchert",
+    "given": "Stephan"
+  }, {
+    "family": "Ones",
+    "given": "Deniz S."
+  }],
+  "container-title": "Industrial and Organizational Psychology",
+  "container-title-short": "IOP",
+  "DOI": "10.1017/iop.2017.44",
+  "ISSN": "1754-9426, 1754-9434",
+  "issue": "3",
+  "issued": {
+    "date-parts": [
+      [2017, 9]
+    ]
+  },
+  "language": "en",
+  "page": "472-479",
+  "source": "Cambridge Core",
+  "title": "Empirical benchmarks for interpreting effect size variability in meta-analysis",
+  "type": "article-journal",
+  "URL": "https://doi.org/10/ccnv",
+  "volume": "10"
+}
+]

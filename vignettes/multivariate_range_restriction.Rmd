@@ -1,0 +1,40 @@
+---
+title: "Multivariate Range-Restriction Correction"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Multivariate range-restriction correction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette shows how to correct for multivariate range restriction in 
+**psychmeta**.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+# Multivariate range-restriction corrections
+In addition to its array of univariate and bivariate range-restriction corrections, **`psychmeta`** includes functions to correct data for multivariate range restriction. The `correct_matrix_mvrr()` corrects covariance matrices for range restriction and the `correct_means_mvrr()` function corrects vectors of means for range restriction.
+```{r correct mvrr, eval=FALSE}
+# Create example matrices with different variances and covariances:
+Sigma_i <- reshape_vec2mat(cov = .2, var = .8, order = 4)
+Sigma_xx_a <- reshape_vec2mat(cov = .5, order = 2)
+
+# Correct "Sigma_i" for range restriction in variables 1 & 2:
+correct_matrix_mvrr(Sigma_i = Sigma_i,
+                    Sigma_xx_a = Sigma_xx_a,
+                    x_col = 1:2)
+
+# Correct the means of variables 1 & 2 for range restriction:
+correct_means_mvrr(Sigma = Sigma_i,
+                   means_i = c(2, 2, 1, 1),
+                   means_x_a = c(1, 1),
+                   x_col = 1:2)
+```
+

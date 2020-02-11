@@ -1,0 +1,53 @@
+---
+title: "Plotting Meta-Analysis Results"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Plotting meta-analysis results}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette demonstrates the types of plots that are available in **psychmeta**
+for presenting results and doing model diagnostics. 
+For more vignettes, see the **psychmeta** [overview](overview.html).
+
+## Generating plots
+
+**`psychmeta`** can produce both funnel and forest plots for visually presenting meta-analytic results.
+```{r, eval=FALSE}
+# Create funnel and forest plots
+ma_obj <- plot_funnel(ma_obj = ma_obj)
+ma_obj <- plot_forest(ma_obj = ma_obj, ma_facetname = "MA")
+
+# Extract plots for viewing
+out_plots <- get_plots(ma_obj)
+out_plots$funnel$`analysis id: 1`$barebones
+out_plots$forest$`analysis id: 1`$moderated$barebones
+
+# The sensitivity_cumulative() and sensitivity_leave1out() functions also produce plots.
+out_plots$leave1out$`analysis id: 1`$barebones$plots
+out_plots$cumulative$`analysis id: 1`$barebones$plots
+```
+
+```{r, eval=TRUE, echo=FALSE, results = "hide", fig.keep="high"}
+ma_obj_print <- ma_r(ma_method = "ic", sample_id = sample_id,
+                     rxyi = rxyi, n = n,
+                     construct_x = x_name,
+                     construct_y = y_name,
+                     rxx = rxxi,
+                     ryy = ryyi,
+                     moderators = moderator,
+                     clean_artifacts = FALSE,
+                     impute_artifacts = FALSE,
+                     data = data_r_meas_multi)
+ma_obj_print <- plot_funnel(ma_obj = ma_obj_print)
+ma_obj_print$funnel$`analysis id: 1`$barebones
+```

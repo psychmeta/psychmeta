@@ -1,0 +1,113 @@
+---
+title: "Moderator Analyses and Meta-Regression"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Moderator analyses and meta-regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+## Specifying moderators
+
+Moderator analyses are easy—just identify a column or matrix of moderator information.
+```{r, eval=FALSE}
+ma_r(rxyi = rxyi, n = n,
+     moderators = moderator,
+     data = data_r_meas_multi)
+```
+
+To use multiple moderators, supply the column names as a string vector.
+```{r, eval=FALSE}
+ma_r(rxyi = rxyi, n = n,
+     moderators = c("Rating source", "Published", "Complexity"),
+     data = data_r_gonzalezmule_2014)
+```
+
+## Meta-regression
+
+## `metareg()`
+
+`metareg()` computes meta-regression results using both categorical and continuous moderators via the `rma()` function from the **`metafor`** package.
+```{r, eval=FALSE}
+ma_obj_gm <- ma_r(ma_method = "ic",
+                  rxyi = rxyi, n = n,
+                  rxx = rxxi,
+                  ryy = ryyi,
+                  moderators = c("Rating source", "Complexity"),
+                  data = data_r_gonzalezmule_2014)
+
+ma_obj_gm <- metareg(ma_obj_gm)
+get_metareg(ma_obj = ma_obj_gm)[[1]]$individual_correction$true_score
+
+ma_obj_mc <- ma_r(ma_method = "ic",
+                  rxyi = r, n = N,
+                  moderators = c("Parent", "Age"),
+                  cat_moderators = c(TRUE, FALSE),
+                  data = data_r_mcleod_2007)
+
+ma_obj_mc <- metareg(ma_obj_mc, formula_list = list("Parent*Age" = yi ~ Parent*Age))
+get_metareg(ma_obj_mc)[[1]]$individual_correction$true_score
+```
+
+Note that the relevant sample size for meta-regression is the number of studies (_k_). Meta-regression results should be interpreted cautiously when _k_ is small or when there is low variability in moderator levels across studies [@SchmidtStatisticalmeasurementpitfalls2017]. In these and other cases, hierarhical subgroup moderator analyses can yield more reliable results:
+```{r, eval=FALSE}
+ma_obj_gm <- ma_r(ma_method = "ic",
+                  rxyi = rxyi, n = n,
+                  rxx = rxxi,
+                  ryy = ryyi,
+                  moderators = c("Rating source", "Complexity"),
+                  moderator_type = "hierarchical",
+                  data = data_r_gonzalezmule_2014)
+
+ma_obj_gm
+```
+
+
+Results for subgroup analyses for different levels of categorical moderators are
+shown in the rows of the meta-analysis results table. To estimate confidence
+intervals for differences between levels or an omnibus ANOVA statistic, use the
+`anova()` function:
+
+```{r}
+anova(ma_res)
+```
+
+For additional details on moderator analyses and meta-regression, see
+[Moderator Analyses and Meta-Regression](moderator_analysis.html).
+
+
+
+
+
+
+
+
+# Navigating meta-analysis output objects
+
+As an example, below are some results computed using the `data_r_gonzalezmule_2014` data set included with **`psychmeta`**, which is an updated version of the database reported by Gonzalez-Mulé, Mount, and Oh [-@Gonzalez-Mulemetaanalysisrelationshipgeneral2014] in their meta-analysis of the relationship between general mental ability (GMA) and organizational citizenship behaviors (i.e., prosocial behaviors exhibited in the workplace; OCBs). Gonzalez-Mulé et al. explored a number of moderators, but for this analysis we have chosen to use only two: `Rating source` (OCBs rated by self vs. supervisor) and `Type` (the target of the OCBs; OCB-I = targeted toward individuals, OCB-O = targeted toward the organization, OCB-CH = targeted toward change). To demonstrate the structure of meta-analysis objects, we have chosen to run this example using hierarchical moderator analyses (i.e., `moderator_type = "hierarchical"`), which means we will be able to see the main effects of each moderator as well as the results from individual combinations of the levels of the moderators.
+
+**Note**: This table of results is larger than can fit in most HTML viewers. Use the arrow buttons in the header to scroll horizonally through the content and use the page numbers in the lower-right corner of the object to scroll vertically.
+```{r, eval=TRUE, echo=TRUE}
+(gonzalezmule <- ma_r(ma_method = "ic", rxyi = rxyi, n = n,
+                     construct_x = "GMA",
+                     construct_y = "OCB",
+                     rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
+                     moderators = c("Rating source", "Type", "Published"),
+                     moderator_type = "hierarchical",
+                     control = control_psychmeta(hs_override = TRUE),
+                     data = data_r_gonzalezmule_2014))
+```
+
+
+
+From this tibble, we see that there are a total of 13 meta-analyses (each row of the tibble is a distinct analysis representing a unique set of construct pairings and/or combinations of moderator levels) and these meta-analyses are indexed by a unique number in the `analysis_id` column. We also see that the `pair_id` column indexes the individual construct pairs (in this example, there is only one contstruct pair: GMA and OCB), with the names of the constructs displayed in the `construct_x` and `construct_y` columns.
+
+In terms of moderator analyses, the `analysis_type` column tells us how moderator information was treated in each meta-analysis. Analyses labeled as "Overall" represent meta-analyses of all information, with all observations collapsed across moderator levels (when moderator levels are collapsed, it is indicated by "All Levels" in the columns bearing the moderator names). Analyses labeled as "Simple Moderator" represent meta-analyses of a particular level of a single moderator, collapsing across all of the other moderators (the moderator levels used in these analyses are indicated in the columns bearing the moderator names). Finally, analyses labled as "Fully Hierarchical Moderator" represent intersections of the categories of the moderators. Note that this database is smaller than what would be needed to do a good hierarchical moderator analysis and we have run this analysis for purposes of illustration only. When hierarchical moderator analyses are run with more than two moderators, results will also be diplayed for "Partial Hierarchical Moderator" analyses, which means that the results represent intersections among only a subset of the moderators while levels of the other moderators are collapsed.

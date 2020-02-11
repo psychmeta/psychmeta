@@ -1,0 +1,68 @@
+---
+title: "Computing Composite Effect Sizes and Artifacts"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Computing composite effect sizes and artifacts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette shows options for handling effect size dependency in **psychmeta**.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+# Composites
+
+## Spearman-Brown reliability estimates
+The Spearman-Brown formula can be used to estimate the reliability of a measure that has been lengthened (or shortened) *k* times. This formula is implemented in the `estimate_rel_sb()` function and its inverse (which estimates the number of times a measure needs to be lengthened to achieve a desired reliability) is implemented in the `estimate_length_sb()` function.
+```{r spearman-brown, eval=FALSE}
+estimate_rel_sb(rel_initial = .5, k = 4)
+
+estimate_length_sb(rel_initial = .5, rel_desired = .8)
+```
+
+## Correlations between a variable and a composite or between two composites
+The `composite_r_matrix()` and `composite_r_scalar()` functions can compute composite correlations using matrix and scalar inputs, respectively. Both functions are capable of computing correlations between a composite and a single variable or between two composites.
+```{r single composite r, eval=FALSE}
+# Correlation between a variable and a composite
+composite_r_matrix(r_mat = reshape_vec2mat(.4, order = 5), x_col = 2:5, y_col = 1)
+
+composite_r_scalar(mean_rxy = .4, k_vars_x = 4, mean_intercor_x = .4)
+
+
+# Correlation between two composites
+composite_r_matrix(r_mat = reshape_vec2mat(.3, order = 5), x_col = 1:3, y_col = 4:5)
+
+composite_r_scalar(mean_rxy = .3,
+                   k_vars_x = 3, mean_intercor_x = .3, k_vars_y = 2, mean_intercor_y = .3)
+```
+
+
+## *d* values of composites
+The `composite_d_matrix()` and `composite_d_scalar()` functions can compute composite *d* values using matrix and scalar inputs, respectively.
+
+```{r, eval=FALSE}
+composite_d_matrix(d_vec = c(1, 1),
+                   r_mat = reshape_vec2mat(.7),
+                   wt_vec = c(1, 1),
+                   p = .5)
+
+composite_d_scalar(mean_d = 1, mean_intercor = .7, k_vars = 2, p = .5)
+```
+
+
+## Reliability of composites
+The `composite_rel_matrix()` and `composite_rel_scalar()` functions can compute composite reliabilities (i.e., Mosier reliabilities) using matrix and scalar inputs, respectively.
+
+```{r, eval=FALSE}
+composite_rel_matrix(rel_vec = c(.8, .8), r_mat = reshape_vec2mat(.4), sd_vec = c(1, 1))
+
+composite_rel_scalar(mean_rel = .8, mean_intercor = .4, k_vars = 2)
+```

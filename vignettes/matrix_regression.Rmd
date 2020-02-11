@@ -1,0 +1,80 @@
+---
+title: "Linear Regression with Covariance (Correlation) Matrices"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Linear regression with covariance (correlation) matrices}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette shows options for handling effect size dependency in **psychmeta**.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+# Matrix regression
+
+The `lm_mat()` function mimics the structure and appearance of the `lm()` function from the **`stats`** package, but uses correlation/covariance matrices to compute regression models instead of raw data sets.
+
+```{r, eval=FALSE}
+# For purposes of demonstration, generate a dataset from the following matrix:
+S <- reshape_vec2mat(cov = c(.3 * 2 * 3,
+                             .4 * 2 * 4,
+                             .5 * 3 * 4),
+                     var = c(2, 3, 4)^2,
+                     var_names = c("X", "Y", "Z"))
+mean_vec <- setNames(c(1, 2, 3), colnames(S))
+dat <- data.frame(MASS::mvrnorm(n = 100, mu = mean_vec, Sigma = S, empirical = TRUE))
+```
+
+The same formulas can be used with `lm_mat()` as with `lm()`, you just have to provide `cov_mat` and `n` arguments (and an optional `mean_vec` argument) instead of `data`. However, `lm_mat()` can only compute moderated regressions if the product term is already in `cov_mat`.
+```{r, eval=FALSE}
+# Compute regression models using one predictor:
+lm_out1 <- lm(formula = Y ~ X, data = dat)
+lm_mat_out1 <- lm_mat(formula = Y ~ X, cov_mat = S, mean_vec = mean_vec, n = nrow(dat))
+
+# Compute regression models using two predictors:
+lm_out2 <- lm(formula = Y ~ X + Z, data = dat)
+lm_mat_out2 <- lm_mat(formula = Y ~ X + Z, cov_mat = S, mean_vec = mean_vec, n = nrow(dat))
+```
+
+The `summary()` method works for both `lm()` and `lm_mat()` results and the printouts look identical.
+```{r, eval=FALSE}
+summary(lm_out1)
+summary(lm_mat_out1)
+```
+
+`lm_mat()` results can also be used with functions such as `anova()`, `predict()`, and `confint()` to yield output comparable to what one would get with `lm()` results.
+```{r, eval=FALSE}
+anova(lm_out1, lm_out2)
+anova(lm_mat_out1, lm_mat_out2)
+```
+
+
+
+# Matrix regression applied to meta-analytic correlations
+The `get_matrix()` function can extract correlation matrices from meta-analysis objects for use in subsequent multivariate analyses.
+```{r, eval=FALSE}
+mat_array <- get_matrix(ma_obj = ma_obj)
+R <- mat_array$individual_correction$`moderator_comb: 1`$true_score$mean_rho
+n <- mat_array$individual_correction$`moderator_comb: 1`$true_score$N[1,3]
+```
+
+The `lm_mat()` function can be used to compute regressions from meta-analytic matrices, using the mean *N* or harmonic mean *N* as a sample size.
+```{r, eval=FALSE}
+lm_x <- lm_mat(formula = Y ~ X, cov_mat = R, n = n)
+lm_xz <- lm_mat(formula = Y ~ X + Z, cov_mat = R, n = n)
+```
+
+Meta-analytic incremental validity analyses are simple with the `anova()` method applied to `lm_mat()` results.
+```{r, eval=FALSE}
+summary(lm_x)
+summary(lm_xz)
+anova(lm_x, lm_xz)
+```

@@ -1,0 +1,121 @@
+---
+title: "Importing and organizing meta-analytic data"
+output:
+  rmarkdown::html_vignette:
+    df_print: paged
+bibliography: vignette.json
+vignette: >
+  %\VignetteIndexEntry{Importing and organizing meta-analytic data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+csl: https://zotero.org/styles/apa
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette demonstrates workflows for importing and organizing meta-analytic
+data for analysis with **psychmeta**. For more vignettes, see the **psychmeta**
+[overview](overview.html).
+
+
+## Data import
+
+To import your data to R, we recommend the **rio** package. This `rio::import()`
+function can conveniently import data sheets stored in most common formats. 
+For an introduction to **rio**, see `vignette("rio", "rio")`.
+
+
+## Data conversion and cleaning
+
+**psychmeta** requires data to be in a "long" format. This means that each effect 
+size is coded in its own row of a matrix. For example, a long format looks like this:
+
+```{r, echo=FALSE}
+# First 6 observations from the the database of Gonzalez-MulÃ©, Mount, and Oh (2014; JAP)
+head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source",
+                                "rxxi", "ryyi", "ux")])
+```
+
+Not all data come in a long format, so data manipulation tools can be helpful to convert it to a long format.
+
+Recommended packages for data manipulation:
+
+* **`dplyr`** (flexible package for fast, intuitive data manipulation)
+* **`tidyr`** (functions to convert between wide and long data)
+
+**`psychmeta`** can also help with reshaping data!
+
+Sometimes it can be quick to code data in a journal table-like format:
+```{r, include=FALSE}
+dat_matrix <- data.frame(var_names = c("X", "Y", "Z"),
+                         n = c(100, 100, 100),
+                         mean = c(4, 5, 3),
+                         sd = c(2.4, 2.6, 2),
+                         rel = c(.8, .7, .85),
+                         reshape_vec2mat(cov = c(.3, .4, .5),
+                                         var_names = c("X", "Y", "Z")))
+rownames(dat_matrix) <- NULL
+```
+```{r, eval=TRUE}
+dat_matrix
+```
+
+This matrix-style format can be easily converted to the long-format data **`psychmeta`** requires with the `reshape_mat2dat()` function:
+
+```{r, eval=TRUE}
+reshape_mat2dat(
+     var_names = var_names,                # Column of variable names
+     cor_data = c("X", "Y", "X"),          # Names of correlation columns
+     common_data = n,                      # Names of columns shared among relationships
+     unique_data = c("mean", "sd", "rel"), # Names of columns unique to relationships
+     data = dat_matrix)
+```
+
+\pagebreak
+
+Sometimes it can also be quick to code data with multiple correlations in one row (i.e., a wide format):
+```{r, include=FALSE}
+dat_wide <- data.frame(sample_id = c(1, 2, 3),
+                       ni = c(66, 74, 93),
+                       rxyi_X_Y = c(-.29, -.16, -.34),
+                       rxyi_X_Z = c(.18, .18, .02),
+                       rxyi_Y_Z = c(.15, .00, .00),
+                       rel_X   = c(.95, .93, .97),
+                       rel_Y   = c(.85, .86, .82),
+                       rel_Z   = c(.91, .90, .89))
+```
+```{r, eval=TRUE}
+dat_wide
+```
+
+This wide format can be easily converted to the long format **`psychmeta`** requires:
+```{r, eval=TRUE}
+common_vars <- c("sample_id")           # Column names for variables common to all
+                                        # relationships
+var_names <- c("X", "Y", "Z")
+es_design = matrix(NA, 3, 3)            # Matrix containing the column names
+es_design[lower.tri(es_design)] <-      # for the intercorrelations among variables
+  c("rxyi_X_Y", "rxyi_X_Z", "rxyi_Y_Z") # in the lower triangle of the matrix
+rownames(es_design) <-
+  colnames(es_design) <-
+  var_names
+n_design <- "ni"                        # Sample size column name or es_design-like
+                                        # matrix
+other_design <-                         # Matrix with variable names as row names,
+  cbind(rel = c("rel_X",                # names of long-format variables as column names,
+                 "rel_Y",               # and column names of dat_wide as elements
+                 "rel_Z"))
+rownames(other_design) <- var_names
+
+reshape_wide2long(common_vars = common_vars,
+                  es_design = es_design,
+                  n_design = n_design,
+                  other_design = other_design,
+                  es_name = "rxyi",              # Type of effect size in dat_wide
+                  data = dat_wide)
+```
+
+See also `vignette("pivot", "tidyr")`.

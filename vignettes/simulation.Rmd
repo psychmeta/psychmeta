@@ -1,0 +1,199 @@
+---
+title: "Simulating Psychometric Data and Meta-Analyses"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Simulating psychometric data and meta-analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette shows options for handling effect size dependency in **psychmeta**.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+# Simulations
+In addition to its collection of tools for computing meta-analyses, **`psychmeta`** also boasts a robust suite of simulation functions. These functions are intended to support high-quality meta-analytic simulations by correctly introducing sampling error, measurement error, and range restriction into a set of parameter values. These functions can be valuable for both research and pedagogical applications.
+
+## Psychometric data sets
+You can generate data impacted by psychometric artifacts for a single sample by using the `simulate_psych()` function. This function reports three datasets per sample: Observed scores, true scores, and error scores. It can also perform selection and indicate (1) which cases would be selected on the basis of observed scores (i.e., actual selection), (2) which cases would be selected on the basis of true scores (i.e., error-free selection), and (3) which cases would be selected on the basis of error scores (i.e., random selection).
+```{r, eval=FALSE}
+sim_dat <- simulate_psych(n = 1000,
+                          rho_mat = reshape_vec2mat(.5),
+                          sigma_vec = c(1, 1),
+                          sr_vec = c(1, .5),
+                          rel_vec = c(.8, .8), var_names = c("Y", "X"))
+```
+
+```{r, eval=FALSE, echo=FALSE}
+sim_dat
+cor(sim_dat$observed[,1:2])
+cor(sim_dat$true[,1:2])
+cor(sim_dat$error[,1:2])
+```
+
+
+## Psychometric correlations
+You can automate the process of analyzing a simulated sample when you are interested in effect sizes and artifact estimates. For example, you can generate correlations impacted by psychometric artifacts for a single sample of data using the `simulate_r_sample()` function. This function generates sample statistics when the `n` argument is a finite value, but it can also analyze parameters when `n = Inf`!
+
+```{r, eval=FALSE}
+simulate_r_sample(n = 1000,
+                  # Correlation parameter matrix
+                  rho_mat = reshape_vec2mat(.5, order = 5),
+                  # Reliability parameter vector
+                  rel_vec = rep(.8, 5),
+                  # Selection ratio vector
+                  sr_vec = c(1, 1, 1, 1, .5),
+                  # Number of items in each scale
+                  k_items_vec = 1:5,
+                  # Matrix of weights to use in creating composites
+                  wt_mat = cbind(c(0, 0, 0, .3, 1),
+                                 c(1, .3, 0, 0, 0)),
+                  # Selection ratios for composites
+                  sr_composites = c(.7, .5))
+
+simulate_r_sample(n = Inf,
+                  rho_mat = reshape_vec2mat(.5, order = 5),
+                  rel_vec = rep(.8, 5),
+                  sr_vec = c(1, 1, 1, 1, .5),
+                  k_items_vec = 1:5,
+                  wt_mat = cbind(c(0, 0, 0, .3, 1),
+                                 c(1, .3, 0, 0, 0)),
+                  sr_composites = c(.7, .5))
+```
+
+\pagebreak
+
+One of the most powerful simulation functions in **`psychmeta`** is `simulate_r_database()`, which can generate entire databases of correlations for use in meta-analysis simulations. This function is a wrapper for `simulate_r_sample()` and it can sample parameter values from whichever distributions you specify.
+```{r, eval=FALSE}
+# Note the varying methods for defining parameters:
+simulate_r_database(k = 10,
+
+                    # Sample-size parameters
+                    # Parameters can be defined as functions.
+                    n_params = function(n) rgamma(n, shape = 100),
+
+                    # Correlation parameters (one parameter distribution per correlation)
+                    # Parameters can also be defined as vectors...
+                    rho_params = list(c(.1, .3, .5),
+                                      # ...as a mean + a standard deviation...
+                                      c(mean = .3, sd = .05),
+                                      # ...or as a matrix of values and weights.
+                                      rbind(value = c(.1, .3, .5),
+                                            weight = c(1, 2, 1))),
+
+                    # Reliability parameters
+                    rel_params = list(c(.7, .8, .9),
+                                      c(mean = .8, sd = .05),
+                                      rbind(value = c(.7, .8, .9),
+                                            weight = c(1, 2, 1))),
+
+                    # Selection-ratio parameters
+                    sr_params = list(1, 1, c(.5, .7)),
+
+                    # Measure-length parameters
+                    k_items_params = list(5, 8, 10),
+
+                     # Composite weight parameters
+                    wt_params = list(list(1, 1, 0)),
+
+                    # Selection-ratio parameters for composites
+                    sr_composite_params = list(1),
+
+                    # Variable names
+                    var_names = c("X", "Y", "Z"))
+```
+
+\pagebreak
+
+## Psychometric *d* values
+
+**`psychmeta`** includes *d*-value simulation functions that parallel the correlation simulation functions described above. These functions automate the simulation of subgroup comparisons and can introduce sampling error, measurement error, and range-restriction artifacts into *d*-value parameters.
+
+To simulate a single sample of results, use the `simulate_d_sample()` function. This function can generate data for any number of variables with any number of groups and it can form composite variables and perform selection.
+
+```{r simulate_d_sample stats, eval=FALSE}
+## Simulate statistics by providing integers as "n_vec":
+simulate_d_sample(n_vec = c(200, 100),
+
+                  # List of rho matrices - one per group
+                  rho_mat_list = list(reshape_vec2mat(.5),
+                                      reshape_vec2mat(.4)),
+
+                  # Matrix of group means (groups on rows, variables on columns)
+                  mu_mat = rbind(c(1, .5),
+                                 c(0, 0)),
+
+                  # Matrix of group SDs (groups on rows, variables on columns)
+                  sigma_mat = rbind(c(1, 1),
+                                    c(1, 1)),
+
+                  # Matrix of group reliabilities (groups on rows, variables on columns)
+                  rel_mat = rbind(c(.8, .7),
+                                  c(.7, .7)),
+
+                  # Vector of selection ratios
+                  sr_vec = c(1, .5),
+
+                  # Number of items in each scale
+                  k_items_vec = c(5, 10),
+
+                  # Group names
+                  group_names = c("A", "B"))
+```
+
+Like `simulate_r_sample()`, `simulate_d_sample()` can also analyze parameters. To get parameter estimates, simply define the sample sizes as proportions (with the `n_vec` argument)  rather than as integers.
+```{r simulate_d_sample params, eval=FALSE}
+simulate_d_sample(n_vec = c(2/3, 1/3),
+                  rho_mat_list = list(reshape_vec2mat(.5),
+                                      reshape_vec2mat(.4)),
+                  mu_mat = rbind(c(1, .5),
+                                 c(0, 0)),
+                  sigma_mat = rbind(c(1, 1),
+                                    c(1, 1)),
+                  rel_mat = rbind(c(.8, .7),
+                                  c(.7, .7)),
+                  sr_vec = c(1, .5),
+                  k_items_vec = c(5, 10),
+                  group_names = c("A", "B"))
+```
+
+\pagebreak
+
+The `simulate_d_database()` function is the *d*-value counterpart to `simulate_r_database()`. However, each parameter argument now requires a set of parameters for each group (e.g., a distribution of correlations, means, reliabilities, etc. must be specified for each group).
+```{r simulate_d_database, eval=FALSE}
+simulate_d_database(k = 5,
+                    # "Group1" and "Group2" labels are not required for parameter arguments:
+                    # They are shown only for enhanced interpretability.
+
+                    # Sample-size parameter distributions
+                    n_params = list(Group1 = c(mean = 200, sd = 20),
+                                    Group2 = c(mean = 100, sd = 20)),
+
+                    # Correlation parameter distributions
+                    rho_params = list(Group1 = list(c(.3, .4, .5)),
+                                      Group2 = list(c(.3, .4, .5))),
+
+                    # Mean parameter distributions
+                    mu_params = list(Group1 = list(c(mean = .5, sd = .5),
+                                                   c(-.5, 0, .5)),
+                                     Group2 = list(c(mean = 0, sd = .5),
+                                                   c(-.2, 0, .2))),
+
+                    # Reliability parameter distributions
+                    rel_params = list(Group1 = list(.8, .8),
+                                      Group2 = list(c(.7, .8, .8),
+                                                    c(.7, .8, .8))),
+
+                    # Group names
+                    group_names = c("Group1", "Group2"),
+
+                    # Variable names
+                    var_names = c("Y", "Z"))
+```

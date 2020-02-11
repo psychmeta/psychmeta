@@ -1,0 +1,71 @@
+---
+title: "Converting effect sizes and applying sporadic artifact corrections"
+output:
+  rmarkdown::html_vignette:
+    df_print: paged
+bibliography: vignette.json
+vignette: >
+  %\VignetteIndexEntry{Converting effect sizes and applying sporadic artifact corrections}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+csl: https://zotero.org/styles/apa
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette demonstrates workflows for converting effect sizes between metrics
+(e.g., _r_, _d_, _OR_, _AUC_), as well as correcting for sporadic artifacts 
+(e.g., artificial dichotomization). For more vignettes, see the **psychmeta**
+[overview](overview.html).
+
+
+## Converting between effect size metrics
+
+The `convert_es()` function can be used to convert a wide variety of statistics to the _r_ or _d_ metric.
+
+```{r, eval=FALSE}
+convert_es(es = 1,    input_es = "d",       output_es = "r", n1 = 50,  n2 = 50)
+convert_es(es = -1.3, input_es = "t",       output_es = "r", n1 = 100, n2 = 140)
+convert_es(es = 10.3, input_es = "F",       output_es = "r", n1 = 100, n2 = 150)
+convert_es(es = 1.3,  input_es = "chisq",   output_es = "r", n1 = 100, n2 = 100)
+convert_es(es = .021, input_es = "p.chisq", output_es = "r", n1 = 100, n2 = 100)
+convert_es(es = 4.37, input_es = "or",      output_es = "r", n1 = 100, n2 = 100)
+convert_es(es = 1.47, input_es = "lor",     output_es = "r", n1 = 100, n2 = 100)
+
+convert_es(es = .2,   input_es = "r",       output_es = "d", n1 = 50,  n2 = 50)
+convert_es(es = -1.3, input_es = "t",       output_es = "d", n1 = 100, n2 = 140)
+convert_es(es = 10.3, input_es = "F",       output_es = "d", n1 = 100, n2 = 150)
+convert_es(es = 1.3,  input_es = "chisq",   output_es = "d", n1 = 100, n2 = 100)
+convert_es(es = .021, input_es = "p.chisq", output_es = "d", n1 = 100, n2 = 100)
+convert_es(es = 4.37, input_es = "or",      output_es = "d", n1 = 100, n2 = 100)
+convert_es(es = 1.47, input_es = "lor",     output_es = "d", n1 = 100, n2 = 100)
+```
+
+To convert effect sizes for inclusion in a meta-analysis, pull out the `meta_input` object:
+```{r, eval=TRUE}
+convert_es(es = c(.4, .3, .25),
+           input_es = "r", output_es = "d",
+           n1 = c(50, 110, 65), n2 = c(50, 70, 65)
+           )$meta_input
+```
+
+The `convert_es()` function can also be used to simply compute confidence intervals for *r*, *d*, and *A*:
+
+```{r, eval=FALSE}
+convert_es(es = .3, input_es = "r", output_es = "r", n1 = 100)
+convert_es(es = .8, input_es = "d", output_es = "d", n1 = 64, n2 = 36)
+convert_es(es = .8, input_es = "A", output_es = "A", n1 = 64, n2 = 36)
+```
+
+## Correcting for sporadic artifacts
+
+Corrections for measurement error and range restriction can be applied automatically within meta-analyses.
+
+Other corrections can be made, but they need to be applied sporadically (i.e., applied to individual effect sizes before including them in a meta-analysis).
+```{r, eval=FALSE}
+correct_r_dich(r = c(.3, .5), px = .5, py = .5, n = 100)
+correct_r_split(r = c(.3, .5), pi = .2, n = 100)
+```

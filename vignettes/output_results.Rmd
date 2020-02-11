@@ -1,0 +1,112 @@
+---
+title: "Outputing Meta-Analysis Results to Markdown, Word, or Other Formats"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Outputing meta-analysis results to Markdown, Word, or other formats}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+```
+
+This vignette demonstrates the types of plots that are available in **psychmeta**
+for presenting results and doing model diagnostics. 
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+# Results presentation
+
+To output the main meta-analysis results table to RMarkdown, Word, HTML, PDF, or 
+other formats, use the `metabulate()` function. For example, to output the above 
+results to a Word document, run:
+
+```{r, eval=FALSE}
+metabulate(ma_res, file = "meta-analysis_results.docx", output_format = "word")
+```
+
+
+
+**`psychmeta`** has several functions to access meta-analysis results and quickly prepare them for publication. The most basic way to access results is to print the `ma_obj` results object:
+```{r, eval=FALSE}
+ma_obj <- ma_r(ma_method = "ic", sample_id = sample_id,
+               rxyi = rxyi, n = n,
+               construct_x = x_name,
+               construct_y = y_name,
+               rxx = rxxi,
+               ryy = ryyi,
+               moderators = moderator,
+               clean_artifacts = FALSE,
+               impute_artifacts = FALSE,
+               data = data_r_meas_multi)
+
+ma_obj
+```
+
+
+## Writing formatted results tables to Word, PDF, Markdown, or other formats
+
+**`psychmeta`** can automatically produce publication-ready tables of meta-analysis 
+results that can be copied into your word processor or inserted into an RMarkdown
+document.
+
+```{r, eval=FALSE}
+# Write meta-analysis tables to a Word file called "Meta-analysis table.docx"
+metabulate(ma_obj, file = "Meta-analysis table.docx", 
+           output_format = "word", output_dir = tempdir())
+```
+
+
+
+## Generating reference lists
+
+**`psychmeta`** can automatically generate a formatted reference list using a BibTeX or Zotero library.
+
+First, specify the `citekey` argument when running `ma_r()`. Then use the `generate_bib()` function:
+```{r, eval=FALSE}
+ma_obj <- ma_r(ma_method = "ic",
+               rxyi = rxyi, n = n,
+               construct_x = x_name,
+               construct_y = y_name,
+               rxx = rxxi,
+               ryy = ryyi,
+               moderators = moderator,
+               clean_artifacts = FALSE,
+               impute_artifacts = FALSE,
+               citekey = citekey,
+               data = data_r_meas_multi)
+
+generate_bib(ma_obj,
+
+             # The location of your .bib file (normally should be in the same directory
+             # as the analysis script).
+             bib = system.file("templates/sample_bibliography.bib", package="psychmeta"),
+
+             # Your citation style. Must be the style ID for a style hosted at
+             # http://zotero.org/styles/
+             style = "apa",
+
+             # What format to write output as (options are: "word", "html", "pdf", "text",
+             # "Rmd", "biblatex", "citekeys")?
+             output_format = "word",
+
+             # What filename to output to (use "console" to print to the R console).
+             file = "sources.docx"
+             )
+```
+
+You can also generate a bibliography containing only sources contributing to a specific subset of the meta-analyses:
+```{r, eval=FALSE}
+generate_bib(ma_obj,
+
+             bib = system.file("templates/sample_bibliography.bib",
+                               package="psychmeta"),
+
+             analyses = list(construct_pair = list(c("X", "Y")))
+
+             )
+```
