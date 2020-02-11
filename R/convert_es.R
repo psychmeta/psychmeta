@@ -7,8 +7,8 @@
 #' This function converts a variety of effect sizes to either correlations or Cohen's \emph{d} values. The function also computes and prints confidence intervals for the output effect sizes.
 #'
 #' @param es Vector of effect sizes to convert.
-#' @param input_es Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).
-#' @param output_es Metric of output effect sizes. Currently supports correlations, Cohen's \emph{d} values, and common language effect sizes (CLES, A, AUC).
+#' @param input_es Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).
+#' @param output_es Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \emph{d} values, and common language effect sizes (CLES, A, AUC).
 #' @param n1 Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.
 #' @param n2 Vector of sample sizes of group 2 of the two groups being contrasted.
 #' @param df1 Vector of input test statistic degrees of freedom (for \emph{t} and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \emph{F}).
@@ -70,41 +70,61 @@
 #' convert_es(es = .3,  input_es="r", output_es="r", n1=100)
 #' convert_es(es = .8,  input_es="d", output_es="d", n1=64, n2=36)
 #' convert_es(es = .8,  input_es="A", output_es="A", n1=64, n2=36)
-convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles"),
+convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles"),
                        output_es=c("r","d","A","auc","cles"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, sd1=NULL, sd2=NULL, tails = 2,
                        correct_bias=TRUE, conf_level=.95){
      warn_obj1 <- record_warnings()
 
-     input_es <- match.arg(input_es, c("r","d","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles"))
+     valid_input_es <- c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles")
+     valid_output_es <- c("r","d","A","auc","cles")
+
+     input_es <- tryCatch(match.arg(input_es, valid_input_es), error = function(e) e)
+     if (inherits(input_es, "error")) {
+             if (stringi::stri_detect(input_es$message, regex = "length 1"))
+                     stop("`input_es` must be length 1.", call. = FALSE)
+             if (stringi::stri_detect(input_es$message, regex = "should be one of"))
+                     stop(paste0("Invalid `input_es` provided. Must be one of '",
+                                 paste0(valid_input_es, collapse = "', '"),
+                                 "'"), call. = FALSE)
+     }
+     output_es <- tryCatch(match.arg(output_es, valid_output_es), error = function(e) e)
+     if (inherits(output_es, "error")) {
+             if (stringi::stri_detect(output_es$message, regex = "length 1"))
+                     stop("`output_es` must be length 1.", call. = FALSE)
+             if (stringi::stri_detect(output_es$message, regex = "should be one of"))
+                     stop(paste0("Invalid `output_es` provided. Must be one of '",
+                                 paste0(valid_output_es, collapse = "', '"),
+                                 "'"), call. = FALSE)
+     }
      input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2, correct_bias=correct_bias, conf_level=conf_level)
 
      arg_lengths <- unlist(lapply(list(n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2), length))
      nonnull_nonscalar <- arg_lengths[arg_lengths > 1]
-     if(any(nonnull_nonscalar != nonnull_nonscalar[1]))
+     if (any(nonnull_nonscalar != nonnull_nonscalar[1]))
           stop("All arguments that are not NULL or of length 1 must be of equal length", call. = FALSE)
 
-     if(input_es == "r")                      .screen_r(es)
-     if(input_es == "t")                      .screen_t(es, n1, n2, df1)
-     if(input_es == "p.t")                    .screen_pt(es, n1, n2, df1, tails)
-     if(input_es == "F")                      .screen_F(es, n1, n2, df1, df2)
-     if(input_es == "p.F")                    .screen_pF(es, n1, n2, df1, df2)
-     if(input_es == "chisq")                  .screen_chisq(es, df1)
-     if(input_es == "p.chisq")                .screen_pchisq(es, df1)
-     if(input_es == "or")                     .screen_or(es)
-     if(input_es %in% c("A", "auc", "cles"))  {
+     if (input_es == "r")                      .screen_r(es)
+     if (input_es == "t")                      .screen_t(es, n1, n2, df1)
+     if (input_es == "p.t")                    .screen_pt(es, n1, n2, df1, tails)
+     if (input_es == "F")                      .screen_F(es, n1, n2, df1, df2)
+     if (input_es == "p.F")                    .screen_pF(es, n1, n2, df1, df2)
+     if (input_es == "chisq")                  .screen_chisq(es, df1)
+     if (input_es == "p.chisq")                .screen_pchisq(es, df1)
+     if (input_es == "or")                     .screen_or(es)
+     if (input_es %in% c("A", "auc", "cles")) {
           input_es <- "auc"
           .screen_auc(es)
      }
 
-     if(output_es %in% c("A", "cles"))        output_es <- "auc"
+     if (output_es %in% c("A", "cles"))        output_es <- "auc"
 
-     x <- list(es = es, n1=n1, n2=n2, df1=df1, df2=df2, sd1=sd1, sd2=sd2)
+     x <- list(es = es, n1 = n1, n2 = n2, df1 = df1, df2 = df2, sd1 = sd1, sd2 = sd2)
      # Compute sample sizes and df as needed
-     if(is.null(n1) & is.null(n2)) {
+     if (is.null(n1) & is.null(n2)) {
           x$p   <- .5
           x$n1 <- NA
           x$n2 <- NA
-          if(input_es %in% c("t", "p.t")) {
+          if (input_es %in% c("t", "p.t")) {
                x$n <- df1 + 2
           } else {
                if(input_es %in% c("F", "p.F")) {
@@ -119,7 +139,7 @@ convert_es <- function(es, input_es=c("r","d","delta","g","t","p.t","F","p.F","c
           if(output_es %in% c("d", "auc"))
                if(input_es %in% c("r", "t", "p.t", "chisq", "p.chisq"))
                     message("Sample sizes not supplied. Assumed equal group sizes.")
-     }else if(!is.null(n2)) {
+     }else if (!is.null(n2)) {
           x$n <- n1 + n2
           x$p <- n1 / x$n
      } else {
