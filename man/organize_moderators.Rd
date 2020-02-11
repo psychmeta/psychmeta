@@ -5,19 +5,19 @@
 \title{Organization of moderator data for use in meta-analyses}
 \usage{
 organize_moderators(
-  moderator_matrix,
+  cat_moderator_matrix,
   es_data,
   construct_x = NULL,
   construct_y = NULL,
   construct_order = NULL,
   moderator_levels = NULL,
   moderator_type = "hierarchical",
-  moderator_names = NULL,
+  cat_moderator_names = NULL,
   ...
 )
 }
 \arguments{
-\item{moderator_matrix}{Matrix (or vector) of moderator variables.}
+\item{cat_moderator_matrix}{Matrix (or vector) of categorical moderator variables.}
 
 \item{es_data}{Matrix of effect-size data to be used in meta-analyses.}
 
@@ -31,6 +31,8 @@ organize_moderators(
 
 \item{moderator_type}{Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time,
 "hierarchical" means that all possible combinations and subsets of moderators are to be examined.}
+
+\item{cat_moderator_names}{Vector of names for the variables in cat_moderator_matrix.}
 
 \item{...}{Further arguments.}
 }
