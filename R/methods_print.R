@@ -373,19 +373,19 @@ print.dmod <- function(x, ..., digits = 3){
           print.data.frame(x[["point_estimate"]], digits = digits)
 
           cat("\n")
-          cat("Mean Boostrapped Values:\n")
+          cat("Mean Bootstrapped Values:\n")
           print.data.frame(x[["bootstrap_mean"]], digits = digits)
 
           cat("\n")
-          cat("Bootrapped Standard Errors:\n")
+          cat("Bootstrapped Standard Errors:\n")
           print.data.frame(x[["bootstrap_se"]], digits = digits)
 
           cat("\n")
-          cat("Bootrapped Lower-Bound Confidence Limit:\n")
+          cat("Bootstrapped Lower-Bound Confidence Limit:\n")
           print.data.frame(x[[grep(x = names(x), pattern = "bootstrap_CI_LL_")]], digits = digits)
 
           cat("\n")
-          cat("Bootrapped Upper-Bound Confidence Limit:\n")
+          cat("Bootstrapped Upper-Bound Confidence Limit:\n")
           print.data.frame(x[[grep(x = names(x), pattern = "bootstrap_CI_UL_")]], digits = digits)
      }else{
           cat("\n")
