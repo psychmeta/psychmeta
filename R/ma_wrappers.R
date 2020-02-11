@@ -17,8 +17,9 @@
 #' @import dplyr
 #'
 #' @keywords internal
+
 organize_moderators <- function(cat_moderator_matrix, es_data, construct_x = NULL, construct_y = NULL,
-                                construct_order = NULL, moderator_levels = NULL, moderator_type = "hierarchical", 
+                                construct_order = NULL, moderator_levels = NULL, moderator_type = "hierarchical",
                                 cat_moderator_names = NULL, ...){
 
      if(!is.null(cat_moderator_matrix)){
@@ -71,14 +72,14 @@ organize_moderators <- function(cat_moderator_matrix, es_data, construct_x = NUL
           orig_names <- colnames(cat_moderator_matrix)
           temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
           colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
-          temp_mat <- arrange_(temp_mat, .dots = temp_names)
+          temp_mat <- arrange(temp_mat, !!!syms(temp_names)) # When the next version of dplyr relases, this could be replaced wsith arrange(temp_mat, across(temp_names))
           colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
      }
      if(!is.null(construct_mat_initial)){
           orig_names <- colnames(construct_mat_initial)
           temp_names <- gsub(x = orig_names, pattern = " ", replacement = "_")
           colnames(temp_mat)[colnames(temp_mat) %in% orig_names] <- temp_names
-          temp_mat <- arrange_(temp_mat, .dots = colnames(construct_mat_initial))
+          temp_mat <- arrange(temp_mat, !!!syms(colnames(construct_mat_initial))) # When the next version of dplyr relases, this could be replaced wsith arrange(temp_mat, across(temp_names))
           colnames(temp_mat)[colnames(temp_mat) %in% temp_names] <- orig_names
      }
 
@@ -291,7 +292,7 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           moderator_levels <- additional_args$moderator_levels
           construct_order <- additional_args$construct_order
           moderator_names <- additional_args$moderator_names
-          
+
           if(!is.null(presorted_data)){
                   moderators_long <- presorted_data[,paste0(moderator_names[["all"]], "_temp")]
                   moderators_long <- setNames(moderators_long, moderator_names[["all"]])
@@ -340,13 +341,13 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                                      construct_x = construct_x, construct_y = construct_y,
                                                      construct_order = construct_order, moderator_levels = moderator_levels,
                                                      cat_moderator_names = cat_moderator_names)
-               
+
                moderators_long <- suppressMessages(left_join(select(moderator_info$data[moderator_info$data[["analysis_id"]] == 1,], "original_order"),
                                                              as.data.frame(cbind(original_order = es_data$original_order, moderators$moderator_matrix))))
           }
-          
+
           if(ncol(moderators_long) == 1) moderators_long <- NULL
-          
+
           data <- moderator_info$data
 
           moderator_tab <- data %>% group_by(.data$analysis_id) %>% do(.data[1,moderator_info$id_variables])
@@ -357,10 +358,10 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                               mutate(ma_out = map(data, ~ ma_fun(data = .x, ma_arg_list = ma_arg_list))))
 
           results_df <- suppressMessages(suppressWarnings(full_join(moderator_tab, results_df)))
-          
+
           results_df$meta_tables <- map(results_df$ma_out, function(x) x$meta)
           results_df$escalc <- map(results_df$ma_out, function(x) x$escalc)
-      
+
           results_df$escalc <- map(results_df$escalc, function(x1){
                   map(x1, function(x2){
                           if(length(x2) == 0){
@@ -382,21 +383,21 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                                           x3
                                                   }
                                           })
-                                          
+
                                   }
                           }
                   })
           })
-          
+
           results_df$escalc <- lapply(results_df$escalc, function(x){
                   if(is.null(moderators_long)){
-                          append(x, list(moderator_info = list(moderator_matrix = NULL, 
+                          append(x, list(moderator_info = list(moderator_matrix = NULL,
                                                                cat_moderators = NULL)))
                   }else{
-                          append(x, list(moderator_info = list(moderator_matrix = moderators_long[moderators_long[["original_order"]] %in% x$barebones[["original_order"]],], 
+                          append(x, list(moderator_info = list(moderator_matrix = moderators_long[moderators_long[["original_order"]] %in% x$barebones[["original_order"]],],
                                                                cat_moderators = moderator_names[["cat"]])))
                   }
-                  
+
           })
           results_df$ma_out <- results_df$analysis_id <- results_df$data <- NULL
 
