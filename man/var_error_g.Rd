@@ -2,16 +2,18 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_g}
 \alias{var_error_g}
-\title{Estimate the error variance Hedge's g values}
+\title{Estimate the error variance Hedges's g values}
 \usage{
-var_error_g(g, n1, n2 = NA)
+var_error_g(g, n1, n2 = NA, a_method = c("gamma", "approx"))
 }
 \arguments{
-\item{g}{Vector of Hedge's g values.}
+\item{g}{Vector of Hedges's g values.}
 
 \item{n1}{Vector of sample sizes from group 1 (or the total sample size with the assumption that groups are of equal size, if no group 2 sample size is supplied).}
 
 \item{n2}{Vector of sample sizes from group 2.}
+
+\item{a_method}{Method used to correct the bias in Cohen's d to convert to Hedges's g. Options are "gamma" (default) for the exact method based on the gamma function (Hedges & Olkin, 1985) or "approx" for the computationally trivial approximation (Borenstein et al., 2006).}
 }
 \value{
 A vector of sampling-error variances.
@@ -25,7 +27,11 @@ var_error_g(g = 1, n1 = 30, n2 = 30)
 var_error_g(g = 1, n1 = 60, n2 = NA)
 }
 \references{
+Hedges, L. V., & Olkin, I. (1985).
+\emph{Statistical methods for meta-analysis}.
+Academic Press. p. 104
+
 Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. R. (2009).
 \emph{Introduction to meta-analysis}.
-Chichester, UK: Wiley. Chapter 4.
+Wiley. p. 27.
 }

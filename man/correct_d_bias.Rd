@@ -4,12 +4,14 @@
 \alias{correct_d_bias}
 \title{Correct for small-sample bias in Cohen's \emph{d} values}
 \usage{
-correct_d_bias(d, n)
+correct_d_bias(d, n, a_method = c("gamma", "approx"))
 }
 \arguments{
 \item{d}{Vector of Cohen's d values.}
 
 \item{n}{Vector of sample sizes.}
+
+\item{a_method}{Method used to correct the bias in Cohen's d to convert to Hedges's g. Options are "gamma" (default) for the exact method based on the gamma function (Hedges & Olkin, 1985) or "approx" for the computationally trivial approximation (Borenstein et al., 2006).}
 }
 \value{
 Vector of d values corrected for small-sample bias.
@@ -30,7 +32,11 @@ correct_d_bias(d = .3, n = 300)
 correct_d_bias(d = .3, n = 3000)
 }
 \references{
-Schmidt, F. L., & Hunter, J. E. (2015).
-\emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 293–295.
+Hedges, L. V., & Olkin, I. (1985).
+\emph{Statistical methods for meta-analysis}.
+Academic Press. p. 104
+
+Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. R. (2009).
+\emph{Introduction to meta-analysis}.
+Wiley. p. 27.
 }
