@@ -4,14 +4,19 @@
 #'
 #' @param d Vector of Cohen's d values.
 #' @param n Vector of sample sizes.
+#' @param a_method Method used to correct the bias in Cohen's d to convert to Hedges's g. Options are "gamma" (default) for the exact method based on the gamma function (Hedges & Olkin, 1985) or "approx" for the computationally trivial approximation (Borenstein et al., 2006).
 #'
 #' @return Vector of d values corrected for small-sample bias.
 #' @export
 #'
 #' @references
-#' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 293–295.
+#' Hedges, L. V., & Olkin, I. (1985).
+#' \emph{Statistical methods for meta-analysis}.
+#' Academic Press. p. 104
+#'
+#' Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. R. (2009).
+#' \emph{Introduction to meta-analysis}.
+#' Wiley. p. 27.
 #'
 #' @details
 #' The bias correction is estimated as:
@@ -24,12 +29,18 @@
 #' correct_d_bias(d = .3, n = 30)
 #' correct_d_bias(d = .3, n = 300)
 #' correct_d_bias(d = .3, n = 3000)
-correct_d_bias <- function(d, n){
+correct_d_bias <- function(d, n, a_method = c("gamma", "approx")){
+     a_method <- match.arg(a_method)
+     df <- n
+     if (a_method == "gamma") {
+             J <- exp(lgamma(df/2) - log(sqrt(df/2)) - lgamma((df - 1)/2))
+     } else {
+             J <- 1 - 3 / (4 * df - 1)
+     }
      out <- d
-     out[!is.na(n)] <- d[!is.na(n)] / (1 + .75 / (n[!is.na(n)] - 3))
+     out[!is.na(n)] <- d[!is.na(n)] * J[!is.na(n)]
      out
 }
-
 
 #' Correct for small-sample bias in Glass' \eqn{\Delta}{delta} values
 #'
@@ -58,7 +69,7 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
      n <- nc * ne / (nc + ne)
      m <- nc - 1
      m[use_pooled_sd] <- m[use_pooled_sd] + ne[use_pooled_sd] - 1
-     cm <- gamma(m / 2) / (sqrt(m / 2) * gamma((m - 1) / 2))
+     cm <- exp(lgamma(m/2) - log(sqrt(m/2)) - lgamma((m - 1)/2))
      delta * cm
 }
 
@@ -76,7 +87,7 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
 #' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
 #' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#' @param k_items_y Numeric vector identifying the number of items in each scale. 
+#' @param k_items_y Numeric vector identifying the number of items in each scale.
 #' @param rGg Vector of reliabilities for the group variable (i.e., the correlations between observed group membership and latent group membership).
 #' @param pi Proportion of cases in one of the groups in the observed data (not necessary if \code{n1} and \code{n2} reflect this proportionality).
 #' @param pa Proportion of cases in one of the groups in the population.
