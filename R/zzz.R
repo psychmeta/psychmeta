@@ -25,8 +25,8 @@
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage(crayon::white("----------------------------------------------------- ", crayon::bold(paste(pkgname, "version", version)), " --"))
     packageStartupMessage("\nPlease report any bugs to ", crayon::italic("github.com/psychmeta/psychmeta/issues"), "\nor ", crayon::italic("issues@psychmeta.com"))
-    packageStartupMessage("\nWe work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \n  Dahlke, J. A., & Wiernik, B. M. (2018). psychmeta: An R package for \n     psychometric meta-analysis. ",
-                          crayon::italic("Applied Psychological Measurement"), ". \n     Advance online publication. https://doi.org/10.1177/0146621618795933")
+    packageStartupMessage("\nWe work hard to produce these open-source tools for the R community.  \nPlease cite psychmeta when you use it in your research: \n  Dahlke, J. A., & Wiernik, B. M. (2019). psychmeta: An R package for \n     psychometric meta-analysis. ",
+                          crayon::italic("Applied Psychological Measurement, 43"), "(5), \n     415–416. https://doi.org/10.1177/0146621618795933")
     packageStartupMessage("\nFind info about psychmeta on the web at ", crayon::italic("psychmeta.com"), " and ", crayon::italic("twitter.com/psychmetaR"))
 
     # Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.

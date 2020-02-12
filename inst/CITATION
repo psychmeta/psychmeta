@@ -2,12 +2,14 @@ citHeader("To cite ‘psychmeta’ in publications, use:")
 
 citEntry(entry = "Article",
   author       = c(person("Jeffrey A.", "Dahlke"),
-              person("Brenton M.", "Wiernik")),
-  year         = "2018",
+                   person("Brenton M.", "Wiernik")),
+  year         = "2019",
   title        = "{psychmeta}: An R Package for Psychometric Meta-Analysis",
   journal      = "Applied Psychological Measurement",
-  note         = "Advance online publication",
+  volume       = "43",
+  number       = "5",
+  pages        = "415--416",
   doi	       = "10.1177/0146621618795933",
 
   textVersion  =
-  paste("Dahlke, J. A., & Wiernik, B. M. (2018). psychmeta: An R package for psychometric meta-analysis. Applied Psychological Measurement. Advance online publication. https://doi.org/10.1177/0146621618795933"))
+  "Dahlke, J. A., & Wiernik, B. M. (2019). psychmeta: An R package for psychometric meta-analysis. Applied Psychological Measurement, 43(5), 415-416. https://doi.org/10.1177/0146621618795933")
