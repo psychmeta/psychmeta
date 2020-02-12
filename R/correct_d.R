@@ -1,67 +1,79 @@
-#' Correct for small-sample bias in Cohen's \emph{d} values
+#' Correct for small-sample bias in Cohen's *d* values
 #'
-#' Corrects a vector of Cohen's \emph{d} values for small-sample bias, as Cohen's \emph{d} has a slight positive bias.
+#' Corrects a vector of Cohen's *d* values for small-sample bias, as Cohen's *d*
+#' has a slight positive bias. The bias-corrected *d* value is often called
+#' Hedges's *g*.
+#'
+#' The bias correction is:
+#' \deqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
+#'
+#' where
+#' \deqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = gamma((n - 2) / 2) / (sqrt(n - 2) * gamm((n - 2) / 2))}
+#'
+#' and \eqn{d_{obs}}{d} is the observed effect size, \eqn{g = d_{c}}{g = d_c} is the
+#' corrected (unbiased) estimate, \eqn{n}{n} is the total sample size, and
+#' \eqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
+#'
+#' Historically, using the gamma function was computationally intensive, so an
+#' approximation for \eqn{J} was used (Borenstein et al., 2009):
+#' \deqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
+#'
+#' This approximation is no longer necessary with modern computers.
 #'
 #' @param d Vector of Cohen's d values.
 #' @param n Vector of sample sizes.
-#' @param a_method Method used to correct the bias in Cohen's d to convert to Hedges's g. Options are "gamma" (default) for the exact method based on the gamma function (Hedges & Olkin, 1985) or "approx" for the computationally trivial approximation (Borenstein et al., 2006).
 #'
-#' @return Vector of d values corrected for small-sample bias.
+#' @return Vector of g values (d values corrected for small-sample bias).
 #' @export
 #'
 #' @references
 #' Hedges, L. V., & Olkin, I. (1985).
-#' \emph{Statistical methods for meta-analysis}.
+#' *Statistical methods for meta-analysis*.
 #' Academic Press. p. 104
 #'
 #' Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. R. (2009).
-#' \emph{Introduction to meta-analysis}.
+#' *Introduction to meta-analysis*.
 #' Wiley. p. 27.
 #'
-#' @details
-#' The bias correction is estimated as:
-#'
-#' \deqn{d_{c}=\frac{d_{obs}}{1+\frac{.75}{n-3}}}{d_c = d / (1 + .75 / (n - 3))}
-#'
-#' where \eqn{d_{obs}}{d} is the observed effect size, \eqn{d_{c}}{d_c} is the corrected estimate of \emph{d}, and \emph{n} is the total sample size.
+#' @md
 #'
 #' @examples
 #' correct_d_bias(d = .3, n = 30)
 #' correct_d_bias(d = .3, n = 300)
 #' correct_d_bias(d = .3, n = 3000)
-correct_d_bias <- function(d, n, a_method = c("gamma", "approx")){
-     a_method <- match.arg(a_method)
+correct_d_bias <- function(d, n){
      df <- n
-     if (a_method == "gamma") {
-             J <- exp(lgamma(df/2) - log(sqrt(df/2)) - lgamma((df - 1)/2))
-     } else {
-             J <- 1 - 3 / (4 * df - 1)
-     }
+     J <- exp(lgamma(df/2) - log(sqrt(df/2)) - lgamma((df - 1)/2))
      out <- d
      out[!is.na(n)] <- d[!is.na(n)] * J[!is.na(n)]
      out
 }
 
-#' Correct for small-sample bias in Glass' \eqn{\Delta}{delta} values
+#' Correct for small-sample bias in Glass' Δ values
 #'
-#' @param delta Vector of Glass' \eqn{\Delta}{delta} values.
+#' @param delta Vector of Glass' Δ values.
 #' @param nc Vector of control-group sample sizes.
 #' @param ne Vector of experimental-group sample sizes.
-#' @param use_pooled_sd Logical vector determining whether the pooled standard deviation was used (\code{TRUE}) or not (\code{FALSE}; default).
+#' @param use_pooled_sd Logical vector determining whether the pooled standard deviation was used (`TRUE`) or not (`FALSE`; default).
 #'
 #' @return Vector of d values corrected for small-sample bias.
 #' @export
 #'
 #' @references
 #' Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect size and related estimators.
-#' \emph{Journal of Educational Statistics, 6}(2), 107–128. https://doi.org/10.2307/1164588
+#' `Journal of Educational Statistics, 6`(2), 107–128. <https://doi.org/10.2307/1164588>
 #'
 #' @details
 #' The bias correction is estimated as:
 #'
-#' \deqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma(nc - 1 / 2) / (sqrt(nc - 1 / 2) * gamma((nc - 2) / 2))}
+#' \deqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
 #'
-#' where \eqn{\Delta} is the observed effect size, \eqn{\Delta_{c}} is the corrected estimate of \eqn{\Delta}, and \eqn{n_{control}}{nc} is the control-group sample size.
+#' where \eqn{\Delta}{delta} is the observed effect size, \eqn{\Delta_{c}}{delta_c} is the
+#' corrected estimate of Δ, \eqn{n_{control}}{nc} is the control-group
+#' sample size, and \eqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
+#'
+#' @md
+#' @encoding UTF-8
 #'
 #' @examples
 #' correct_glass_bias(delta = .3, nc = 30, ne = 30)
@@ -75,17 +87,18 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 
 
 
-#' Correct \emph{d} values for range restriction and/or measurement error
+#' Correct *d* values for measurement error and/or range restriction
 #'
 #' @description
-#' This function is a wrapper for the \code{\link{correct_r}} function to correct \emph{d} values for statistical and psychometric artifacts.
+#' This function is a wrapper for the [correct_r()] function to correct *d* values
+#' for statistical and psychometric artifacts.
 #'
 #' @param correction Type of correction to be applied. Options are "meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"
-#' @param d Vector of \emph{d} values.
+#' @param d Vector of *d* values.
 #' @param ryy Vector of reliability coefficients for Y (the continuous variable).
 #' @param uy Vector of u ratios for Y (the continuous variable).
-#' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (\code{TRUE}) or a true-score u ratio. All entries are \code{TRUE} by default.
-#' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
+#' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (`TRUE`) or a true-score u ratio. All entries are `TRUE` by default.
+#' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (`TRUE`) or an applicant reliability. All entries are `TRUE` by default.
 #' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
 #' @param k_items_y Numeric vector identifying the number of items in each scale.
 #' @param rGg Vector of reliabilities for the group variable (i.e., the correlations between observed group membership and latent group membership).
@@ -96,13 +109,16 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @param n1 Optional vector of sample sizes associated with group 1 (or the total sample size, if \code{n2} is \code{NULL}).
 #' @param n2 Optional vector of sample sizes associated with group 2.
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param correct_bias Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_bias Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (`TRUE`) or not (`FALSE`).
 #' For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE} (the default).
 #'
-#' @return Data frame(s) of observed \emph{d} values (\code{dgyi}), operational range-restricted \emph{d} values corrected for measurement error in Y only (\code{dgpi}), operational range-restricted \emph{d} values corrected for measurement error in the grouping only (\code{dGyi}), and range-restricted true-score \emph{d} values (\code{dGpi}),
+#' @return Data frame(s) of observed *d* values (`dgyi`), operational range-restricted \emph{d} values corrected for measurement error in Y only (\code{dgpi}), operational range-restricted \emph{d} values corrected for measurement error in the grouping only (\code{dGyi}), and range-restricted true-score \emph{d} values (\code{dGpi}),
 #' range-corrected observed-score \emph{d} values (\code{dgya}), operational range-corrected \emph{d} values corrected for measurement error in Y only (\code{dgpa}), operational range-corrected \emph{d} values corrected for measurement error in the grouping only (\code{dGya}), and range-corrected true-score \emph{d} values (\code{dGpa}).
+#'
 #' @export
 #'
+#' @encoding UTF-8
+#' @md
 #' @references
 #' Alexander, R. A., Carson, K. P., Alliger, G. M., & Carr, L. (1987).
 #' Correcting doubly truncated correlations: An improved approximation for correcting the bivariate normal correlation when truncation has occurred on both variables.
