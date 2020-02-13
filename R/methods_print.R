@@ -1,18 +1,23 @@
 #' @name print
 #'
-#' @title Print methods for \pkg{psychmeta}
+#' @title Print methods for **`psychmeta`**
 #'
 #' @description
-#' Print methods for \pkg{psychmeta} output objects with classes exported from \pkg{psychmeta}.
+#' Print methods for **`psychmeta`** output objects with classes exported from **`psychmeta`**.
 #'
 #' @param x Object to be printed (object is used to select a method).
 #' @param ... Additional arguments.
-#' @param digits Number of digits to which results should be rounded.
+#' @param digits Number of digits to which results should be rounded.]
+#' @param n Number of rows to print for meta-analysis results tables. Defaults to all rows. See [`tibble::print.tbl()`] for details.
+#' @param width Width of text output to generate for meta-analysis results tables. See [`tibble::print.tbl()`] for details.
+#' @param n_extra Number of extra columns to print abbreviated information for, if the width is too small for the entire tibble. See [`tibble::print.tbl()`] for details.
 #' @param ma_methods Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"
 #' @param correction_types Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"
 #' @param verbose Logical scalar that determines whether printed object should contain verbose information (e.g., non-standard columns of meta-analytic output; \code{TRUE}) or not (\code{FALSE}).
 #' @param symbolic.cor For \code{lm_mat} output: logical. If TRUE, print the correlations in a symbolic form (see symnum) rather than as numbers.
 #' @param signif.stars For \code{lm_mat} output: logical. If TRUE, ‘significance stars’ are printed for each coefficient.
+#'
+#' @md
 NULL
 
 
@@ -107,13 +112,13 @@ print.ad_int_list <- function(x, ..., digits = 3){
 #' @keywords internal
 #' @exportClass ad_int
 #' @method print ad_int
-print.ad_int <- function(x, ..., digits = 3){
+print.ad_int <- function(x, ..., digits = 3, n = nrow(x), width = NULL, n_extra = NULL){
      cat("Interactive Distributions\n")
      cat("-------------------------\n")
 
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
-     print(x)
+     print(x, n = n, width = width, n_extra = n_extra)
 }
 
 
@@ -129,19 +134,19 @@ print.ad_int <- function(x, ..., digits = 3){
 #' @exportClass correct_r
 #' @method print correct_r
 print.correct_r <- function(x, ..., digits = 3){
-     if(any(class(x) == "meas"))
+     if(inherits(x, "meas"))
           cat("Correlations Corrected for Measurement Error:\n")
 
-     if(any(class(x) == "uvdrr"))
+     if(inherits(x, "uvdrr"))
           cat("Correlations Corrected for Measurement Error and Univariate Direct Range Restriction:\n")
 
-     if(any(class(x) == "uvirr"))
+     if(inherits(x, "uvirr"))
           cat("Correlations Corrected for Measurement Error and Univariate Indirect Range Restriction:\n")
 
-     if(any(class(x) == "bvirr"))
+     if(inherits(x, "bvirr"))
           cat("Correlations Corrected for Measurement Error and Bivariate Indirect Range Restriction:\n")
 
-     if(any(class(x) == "bvdrr"))
+     if(inherits(x, "bvdrr"))
           cat("Correlations Corrected for Measurement Error and Bivariate Direct Range Restriction:\n")
 
      cat("---------------------------------------------------------------------------------------\n")
@@ -149,15 +154,13 @@ print.correct_r <- function(x, ..., digits = 3){
      if(is.data.frame(x[["correlations"]])){
           print.data.frame(x[["correlations"]], digits = digits)
      }else{
-          if(any(class(x) == "meas")){
+          if(inherits(x, "meas")){
                print.data.frame(x[["correlations"]][["rtp"]], digits = digits)
           }else{
                print.data.frame(x[["correlations"]][["rtpa"]], digits = digits)
           }
      }
 }
-
-
 
 
 
@@ -168,19 +171,19 @@ print.correct_r <- function(x, ..., digits = 3){
 #' @exportClass correct_d
 #' @method print correct_d
 print.correct_d <- function(x, ..., digits = 3){
-     if(any(class(x) == "meas"))
+     if(inherits(x, "meas"))
           cat("d Values Corrected for Measurement Error:\n")
 
-     if(any(class(x) == "uvdrr"))
+     if(inherits(x, "uvdrr"))
           cat("d Values Corrected for Measurement Error and Univariate Direct Range Restriction:\n")
 
-     if(any(class(x) == "uvirr"))
+     if(inherits(x, "uvirr"))
           cat("d Values Corrected for Measurement Error and Univariate Indirect Range Restriction:\n")
 
-     if(any(class(x) == "bvirr"))
+     if(inherits(x, "bvirr"))
           cat("d Values Corrected for Measurement Error and Bivariate Indirect Range Restriction:\n")
 
-     if(any(class(x) == "bvdrr"))
+     if(inherits(x, "bvdrr"))
           cat("d Values Corrected for Measurement Error and Bivariate Direct Range Restriction:\n")
 
      cat("---------------------------------------------------------------------------------------\n")
@@ -188,7 +191,7 @@ print.correct_d <- function(x, ..., digits = 3){
      if(is.data.frame(x[["d_values"]])){
           print.data.frame(x[["d_values"]], digits = digits)
      }else{
-          if(any(class(x) == "meas")){
+          if(inherits(x, "meas")){
                print.data.frame(x[["d_values"]][["dGp"]], digits = digits)
           }else{
                print.data.frame(x[["d_values"]][["dGpa"]], digits = digits)
@@ -259,12 +262,12 @@ print.simdat_r_sample <- function(x, ..., digits = 3){
 #' @exportClass simdat_r_database
 #' @method print simdat_r_database
 print.simdat_r_database <- function(x, ..., digits = 3){
-     if(any(class(x) == "merged")){
+     if(inherits(x, "merged")){
           merged <- "(Merged from Multiple Databases)"
      }else{
           merged <- NULL
      }
-     if(any(class(x) == "wide")){
+     if(inherits(x, "wide")){
           cat("Simulated Correlation Database of", nrow(x[["statistics"]]), "Studies", merged, "\n")
      }else{
           construct_pairs <- paste(unlist(x[["statistics"]][,"x_name"]), unlist(x[["statistics"]][,"y_name"]))
@@ -318,7 +321,7 @@ print.simdat_d_sample <- function(x, ..., digits = 3){
 #' @exportClass simdat_d_database
 #' @method print simdat_d_database
 print.simdat_d_database <- function(x, ..., digits = 3){
-     if(any(class(x) == "merged")){
+     if(inherits(x, "merged")){
           merged <- "(Merged from Multiple Databases)"
      }else{
           merged <- NULL
@@ -610,12 +613,12 @@ print.get_plots <- function(x, ..., digits = 3){
 #' @keywords internal
 #' @exportClass get_matrix
 #' @method print get_matrix
-print.get_matrix <- function(x, ..., digits = 3){
+print.get_matrix <- function(x, ..., digits = 3, n = nrow(x), width = NULL, n_extra = NULL){
      cat("Tibble of meta-analytic matrices \n")
      cat("---------------------------------------- \n")
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
-     print(x)
+     print(x, n = n, width = width, n_extra = n_extra)
 }
 
 
@@ -739,7 +742,7 @@ print.get_ad <- function(x, ..., digits = 3){
 #' @keywords internal
 #' @exportClass ma_psychmeta
 #' @method print ma_psychmeta
-print.ma_psychmeta <- function(x, ..., n = NULL){
+print.ma_psychmeta <- function(x, ..., n = nrow(x), width = NULL, n_extra = NULL){
      ma_method <- attributes(x)$ma_method
      correction_type <- attributes(x)$correction_type
      ma_metric <- attributes(x)$ma_metric
@@ -767,7 +770,7 @@ print.ma_psychmeta <- function(x, ..., n = NULL){
      }
      tab <- ungroup(x)
      class(tab) <- c("tbl_df", "tbl", "data.frame")
-     print(tab, n = n)
+     print(tab, n = n, width = width, n_extra = n_extra)
 
      cat("\nTo extract results, try summary() or the get_stuff functions (run ?get_stuff for help). \n")
 }
@@ -777,7 +780,7 @@ print.ma_psychmeta <- function(x, ..., n = NULL){
 #' @keywords internal
 #' @exportClass ad_tibble
 #' @method print ad_tibble
-print.ad_tibble <- function(x, ..., digits = 3){
+print.ad_tibble <- function(x, ..., digits = 3, n = nrow(x), width = NULL, n_extra = NULL){
 
      additional_args <- list(...)
      suppress_title <- additional_args$suppress_title
@@ -789,14 +792,14 @@ print.ad_tibble <- function(x, ..., digits = 3){
      }
      x <- ungroup(x)
      class(x) <- c("tbl_df", "tbl", "data.frame")
-     print(x)
+     print(x, n = n, width = width, n_extra = n_extra)
 }
 
 
 #' @export
 #' @exportClass ma_table
 #' @method print ma_table
-print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
+print.ma_table <- function(x, ..., digits = 3, verbose = FALSE, n = nrow(x), width = NULL, n_extra = NULL){
      ma_type <- attributes(x)$ma_type
 
      additional_args <- list(...)
@@ -905,7 +908,7 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE){
 
      x <- ungroup(x)
      class(x) <- class(x)[class(x) != "ma_table"]
-     print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
+     print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits, n = n, width = width, n_extra = n_extra)
 }
 
 
@@ -964,7 +967,9 @@ print.ma_ad_list <- function(x, ..., digits = 3){
 #' @export
 #' @exportClass summary.ma_psychmeta
 #' @method print summary.ma_psychmeta
-print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_types = "ts", verbose = FALSE){
+print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_types = "ts",
+                                       verbose = FALSE, n = max(sapply(x$meta_tables, nrow)),
+                                       width = NULL, n_extra = NULL){
 
      ma_obj <- x$ma_obj
      meta_tables <- x$meta_tables
@@ -1007,7 +1012,8 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                cat("Bare-bones meta-analysis results \n")
           }
           cat("---------------------------------------------------------------------- \n")
-          print(meta_tables$barebones, suppress_title = TRUE, verbose = verbose)
+          print(meta_tables$barebones, suppress_title = TRUE, verbose = verbose,
+                n = n, width = width, n_extra = n_extra)
      }
 
      if("ic" %in% ma_methods){
@@ -1018,24 +1024,31 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                     cat("\nIndividual-correction meta-analysis results \n")
                }
                cat("---------------------------------------------------------------------- \n")
-               print(meta_tables$individual_correction, suppress_title = TRUE, verbose = verbose)
+               print(meta_tables$individual_correction, suppress_title = TRUE, verbose = verbose,
+                     n = n, width = width, n_extra = n_extra)
           }else{
                cat("\nIndividual-correction meta-analysis results \n")
                cat("----------------------------------------------------------------------")
 
                if("ts" %in% correction_types_ic){
                     cat(ts_title)
-                    print(meta_tables$individual_correction[[ts_label]], suppress_title = TRUE, verbose = verbose)
+                    print(meta_tables$individual_correction[[ts_label]],
+                          suppress_title = TRUE, verbose = verbose,
+                          n = n, width = width, n_extra = n_extra)
                }
 
                if("vgx" %in% correction_types_ic){
                     cat(vgx_title)
-                    print(meta_tables$individual_correction[[vgx_label]], suppress_title = TRUE, verbose = verbose)
+                    print(meta_tables$individual_correction[[vgx_label]],
+                          suppress_title = TRUE, verbose = verbose,
+                          n = n, width = width, n_extra = n_extra)
                }
 
                if("vgy" %in% correction_types_ic){
                     cat(vgy_title)
-                    print(meta_tables$individual_correction[[vgy_label]], suppress_title = TRUE, verbose = verbose)
+                    print(meta_tables$individual_correction[[vgy_label]],
+                          suppress_title = TRUE, verbose = verbose,
+                          n = n, width = width, n_extra = n_extra)
                }
 
                cat("\n")
@@ -1062,24 +1075,32 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                     cat("\nArtifact-distribution meta-analysis results \n")
                }
                cat("---------------------------------------------------------------------- \n")
-               print(meta_tables$artifact_distribution, suppress_title = TRUE, verbose = verbose)
+               print(meta_tables$artifact_distribution,
+                     suppress_title = TRUE, verbose = verbose,
+                     n = n, width = width, n_extra = n_extra)
           }else{
                cat("\nArtifact-distribution meta-analysis results \n")
                cat("----------------------------------------------------------------------")
 
                if("ts" %in% correction_types_ad){
                     cat(ts_title)
-                    print(meta_tables$artifact_distribution[[ts_label]], suppress_title = TRUE, verbose = verbose)
+                    print(meta_tables$artifact_distribution[[ts_label]],
+                          suppress_title = TRUE, verbose = verbose,
+                          n = n, width = width, n_extra = n_extra)
                }
 
                if("vgx" %in% correction_types_ad){
                     cat(vgx_title)
-                    print(meta_tables$artifact_distribution[[vgx_label]], suppress_title = TRUE, verbose = verbose)
+                    print(meta_tables$artifact_distribution[[vgx_label]],
+                          suppress_title = TRUE, verbose = verbose,
+                          n = n, width = width, n_extra = n_extra)
                }
 
                if("vgy" %in% correction_types_ad){
                     cat(vgy_title)
-                    print(meta_tables$artifact_distribution[[vgy_label]], suppress_title = TRUE, verbose = verbose)
+                    print(meta_tables$artifact_distribution[[vgy_label]],
+                          suppress_title = TRUE, verbose = verbose,
+                          n = n, width = width, n_extra = n_extra)
                }
 
                cat("\n")
@@ -1145,10 +1166,10 @@ print.metabulate_table <- function(x, ...){
 #' @export
 #' @exportClass anova.ma_psychmeta
 #' @method print anova.ma_psychmeta
-print.anova.ma_psychmeta <- function(x, ..., n = NULL) {
+print.anova.ma_psychmeta <- function(x, ..., n = nrow(x), width = NULL, n_extra = NULL) {
         tab <- x
         class(tab) <- c("tbl_df", "tbl", "data.frame")
-        print(tab,  n = n)
+        print(tab, n = n, width = width, n_extra = n_extra)
         invisible(x)
 }
 
