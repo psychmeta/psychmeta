@@ -19,7 +19,7 @@ Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
 Imports: dplyr, stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
-         ggplot2, metafor, nor1mix, progress, tidyr, stringi,
+         ggplot2, metafor, nor1mix, progress, tidyr (>= 1.0.0), stringi,
          stringr, rlang, RCurl, xml2, purrr, data.table, cli, crayon
 Suggests: RefManageR, rmarkdown, knitr
 RoxygenNote: 7.0.2
