@@ -49,9 +49,9 @@ correct_d_bias <- function(d, n){
      out
 }
 
-#' Correct for small-sample bias in Glass' &#916; values
+#' Correct for small-sample bias in Glass' \ifelse{latex}{\out{$\Delta$}}{\ifelse{html}{\out{&#916;}}{Delta}} values
 #'
-#' @param delta Vector of Glass' &#916; values.
+#' @param delta Vector of Glass' \ifelse{latex}{\out{$\Delta$}}{\ifelse{html}{\out{&#916;}}{Delta}} values.
 #' @param nc Vector of control-group sample sizes.
 #' @param ne Vector of experimental-group sample sizes.
 #' @param use_pooled_sd Logical vector determining whether the pooled standard deviation was used (`TRUE`) or not (`FALSE`; default).
@@ -61,7 +61,7 @@ correct_d_bias <- function(d, n){
 #'
 #' @references
 #' Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect size and related estimators.
-#' `Journal of Educational Statistics, 6`(2), 107–128. <https://doi.org/10.2307/1164588>
+#' *Journal of Educational Statistics, 6*(2), 107–128. <https://doi.org/10.2307/1164588>
 #'
 #' @details
 #' The bias correction is estimated as:
@@ -69,8 +69,9 @@ correct_d_bias <- function(d, n){
 #' \deqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
 #'
 #' where \eqn{\Delta}{delta} is the observed effect size, \eqn{\Delta_{c}}{delta_c} is the
-#' corrected estimate of &#916;, \eqn{n_{control}}{nc} is the control-group
-#' sample size, and \eqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
+#' corrected estimate of \ifelse{latex}{\out{$\Delta$}}{\ifelse{html}{\out{&#916;}}{Delta}},
+#' \eqn{n_{control}}{nc} is the control-group sample size, and
+#' \eqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
 #'
 #' @encoding UTF-8
 #' @md

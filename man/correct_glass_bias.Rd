@@ -3,12 +3,12 @@
 \encoding{UTF-8}
 \name{correct_glass_bias}
 \alias{correct_glass_bias}
-\title{Correct for small-sample bias in Glass' Δ values}
+\title{Correct for small-sample bias in Glass' \ifelse{latex}{\out{$\Delta$}}{\ifelse{html}{\out{&#916;}}{Delta}} values}
 \usage{
 correct_glass_bias(delta, nc, ne, use_pooled_sd = rep(FALSE, length(delta)))
 }
 \arguments{
-\item{delta}{Vector of Glass' Δ values.}
+\item{delta}{Vector of Glass' \ifelse{latex}{\out{$\Delta$}}{\ifelse{html}{\out{&#916;}}{Delta}} values.}
 
 \item{nc}{Vector of control-group sample sizes.}
 
@@ -20,7 +20,7 @@ correct_glass_bias(delta, nc, ne, use_pooled_sd = rep(FALSE, length(delta)))
 Vector of d values corrected for small-sample bias.
 }
 \description{
-Correct for small-sample bias in Glass' Δ values
+Correct for small-sample bias in Glass' \ifelse{latex}{\out{$\Delta$}}{\ifelse{html}{\out{&#916;}}{Delta}} values
 }
 \details{
 The bias correction is estimated as:
@@ -28,13 +28,14 @@ The bias correction is estimated as:
 \deqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
 
 where \eqn{\Delta}{delta} is the observed effect size, \eqn{\Delta_{c}}{delta_c} is the
-corrected estimate of Δ, \eqn{n_{control}}{nc} is the control-group
-sample size, and \eqn{\Gamma()}{gamma()} is the \link[base:gamma]{gamma function}.
+corrected estimate of \ifelse{latex}{\out{$\Delta$}}{\ifelse{html}{\out{&#916;}}{Delta}},
+\eqn{n_{control}}{nc} is the control-group sample size, and
+\eqn{\Gamma()}{gamma()} is the \link[base:gamma]{gamma function}.
 }
 \examples{
 correct_glass_bias(delta = .3, nc = 30, ne = 30)
 }
 \references{
 Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect size and related estimators.
-\verb{Journal of Educational Statistics, 6}(2), 107–128. \url{https://doi.org/10.2307/1164588}
+\emph{Journal of Educational Statistics, 6}(2), 107–128. \url{https://doi.org/10.2307/1164588}
 }

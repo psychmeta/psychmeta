@@ -30,8 +30,13 @@
     packageStartupMessage("\nFind info about psychmeta on the web at ", crayon::italic("psychmeta.com"), " and ", crayon::italic("twitter.com/psychmetaR"))
 
     # Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.
-    con <- curl::curl("https://r-pkg.org/badges/version/psychmeta")
-    suppressWarnings(version_check <- try(readLines(con), silent = TRUE))
+    suppressWarnings(version_check <-
+        try(unlist(strsplit(
+             rawToChar(
+                  curl::curl_fetch_memory("https://CRAN.R-project.org/package=psychmeta")$content
+                  ),
+             "\n")),
+            silent = TRUE))
     if(!inherits(version_check, "try-error")) {
 
          check_version <- function(cran_version, sys_version){
@@ -78,11 +83,10 @@
                                  development = vcheck_devnum), stringsAsFactors = FALSE)
          }
 
-         cran_v_char <- version_check[stringr::str_detect(version_check, "\\d\\.\\d\\.\\d")][1]
+         cran_v_char <- stringr::str_extract(version_check[which(stringr::str_detect(version_check, "Version:")) + 1], "\\d\\.\\d\\.\\d")
          vcheck <- check_version(cran_version = cran_v_char, sys_version = version)
 
          use_symbols <- .support_unicode()
-         close(con)
 
          packageStartupMessage(crayon::white("\n", paste0("-----------------------------------------------------", paste0(rep_len("-", nchar(paste(pkgname, "version", version)) - 13), collapse = ""), " "), crayon::bold("Version check"), " --"))
          if(vcheck$best_version == "CRAN"){
