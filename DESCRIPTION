@@ -20,8 +20,8 @@ LazyData: true
 VignetteBuilder: knitr
 Imports: dplyr, stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
          ggplot2, metafor, nor1mix, progress, tidyr (>= 1.0.0), stringi,
-         stringr, rlang, RCurl, xml2, purrr, data.table, cli, crayon
-Suggests: RefManageR, rmarkdown, knitr
+         stringr, rlang, curl, purrr, data.table, cli, crayon
+Suggests: bib2df, rmarkdown, knitr
 RoxygenNote: 7.0.2
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068
