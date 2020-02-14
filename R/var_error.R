@@ -300,35 +300,46 @@ var_error_delta <- function(delta, nc, ne = NA, use_pooled_sd = FALSE, correct_b
 }
 
 
-#' Estimate the error variance Hedge's g values
+#' Estimate the error variance Hedges's g values
 #'
 #' Allows for error variance to be estimated using total sample size of both groups being compared (in this case, supply sample sizes using only the n1 argument) or
 #' using separate sample sizes for group 1 and group 2 (i.e., the groups being compared; in this case, supply sample sizes using both the n1 and n2 arguments).
 #'
-#' @param g Vector of Hedge's g values.
+#' @param g Vector of Hedges's g values.
 #' @param n1 Vector of sample sizes from group 1 (or the total sample size with the assumption that groups are of equal size, if no group 2 sample size is supplied).
 #' @param n2 Vector of sample sizes from group 2.
+#' @param a_method Method used to correct the bias in Cohen's d to convert to Hedges's g. Options are "gamma" (default) for the exact method based on the gamma function (Hedges & Olkin, 1985) or "approx" for the computationally trivial approximation (Borenstein et al., 2006).
 #'
 #' @return A vector of sampling-error variances.
 #' @export
 #'
 #' @references
+#' Hedges, L. V., & Olkin, I. (1985).
+#' \emph{Statistical methods for meta-analysis}.
+#' Academic Press. p. 104
+#'
 #' Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. R. (2009).
 #' \emph{Introduction to meta-analysis}.
-#' Chichester, UK: Wiley. Chapter 4.
+#' Wiley. p. 27.
 #'
 #' @examples
 #' var_error_g(g = 1, n1 = 30, n2 = 30)
 #' var_error_g(g = 1, n1 = 60, n2 = NA)
-var_error_g <- function(g, n1, n2 = NA){
+var_error_g <- function(g, n1, n2 = NA, a_method = c("gamma", "approx")) {
+     a_method <- match.arg(a_method)
      if(is.data.frame(g)) g <- as.matrix(g)
      if(is.data.frame(n1)) n1 <- as.matrix(n1)
      if(is.data.frame(n2)) n2 <- as.matrix(n2)
 
      n <- n1
      n[!is.na(n2)] <- n[!is.na(n2)] + n2[!is.na(n2)]
+     df <- n - 2
 
-     J <- (1 - 3 / (4 * (n - 2 - 1)))
+     if (a_method == "gamma") {
+          J <- exp(lgamma(df/2) - log(sqrt(df/2)) - lgamma((df - 1)/2))
+     } else {
+          J <- 1 - 3 / (4 * df - 1)
+     }
      d <- g / J
 
      if(length(d) == 1 & length(n1) > 1) {

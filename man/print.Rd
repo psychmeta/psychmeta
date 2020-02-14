@@ -2,13 +2,19 @@
 % Please edit documentation in R/methods_print.R
 \name{print}
 \alias{print}
-\title{Print methods for \pkg{psychmeta}}
+\title{Print methods for \strong{\code{psychmeta}}}
 \arguments{
 \item{x}{Object to be printed (object is used to select a method).}
 
 \item{...}{Additional arguments.}
 
-\item{digits}{Number of digits to which results should be rounded.}
+\item{digits}{Number of digits to which results should be rounded.]}
+
+\item{n}{Number of rows to print for meta-analysis results tables. Defaults to all rows. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
+
+\item{width}{Width of text output to generate for meta-analysis results tables. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
+
+\item{n_extra}{Number of extra columns to print abbreviated information for, if the width is too small for the entire tibble. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
 
 \item{ma_methods}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
 
@@ -21,5 +27,5 @@
 \item{signif.stars}{For \code{lm_mat} output: logical. If TRUE, ‘significance stars’ are printed for each coefficient.}
 }
 \description{
-Print methods for \pkg{psychmeta} output objects with classes exported from \pkg{psychmeta}.
+Print methods for \strong{\code{psychmeta}} output objects with classes exported from \strong{\code{psychmeta}}.
 }

@@ -153,14 +153,9 @@ anova.ma_psychmeta <- function(object, ..., analyses = "all",
                 mutate(omnibus = purrr::map(.data$anova, ~ .x$omnibus),
                        contrasts = purrr::map(.data$anova, ~ .x$contrasts)
                 ) %>%
-                select(2:4, 1, .data$omnibus, .data$contrasts)
-
-        # TODO: Consider changing this to 'Imports: tidyr (>= 0.8.4)' once the new tidyr API is released
-        if (utils::packageVersion("tidyr") <= "0.8.3") {
-                anova_tab <- tidyr::unnest(anova_tab, "omnibus", "contrasts")
-        } else {
-                anova_tab <- tidyr::unnest(anova_tab, cols = c("omnibus", "contrasts"))
-        }
+                select(2:4, 1, .data$omnibus, .data$contrasts) %>%
+          tidyr::unnest(cols = c("omnibus", "contrasts")) %>%
+          ungroup()
 
         class(anova_tab) <- c("anova.ma_psychmeta", class(anova_tab))
 

@@ -73,8 +73,7 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
           escalc <- ma_obj_i$escalc
 
           moderator_matrix <- escalc$moderator_info$moderator_matrix
-          cat_moderator_matrix <- escalc$moderator_info$cat_moderator_matrix
-
+          
           if(!is.null(moderator_matrix)){
                moderator_names <- colnames(moderator_matrix)
                moderator_names <- gsub(x = moderator_names, pattern = " ", replacement = "_")

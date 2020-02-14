@@ -12,17 +12,29 @@ correct_d_bias(d, n)
 \item{n}{Vector of sample sizes.}
 }
 \value{
-Vector of d values corrected for small-sample bias.
+Vector of g values (d values corrected for small-sample bias).
 }
 \description{
-Corrects a vector of Cohen's \emph{d} values for small-sample bias, as Cohen's \emph{d} has a slight positive bias.
+Corrects a vector of Cohen's \emph{d} values for small-sample bias, as Cohen's \emph{d}
+has a slight positive bias. The bias-corrected \emph{d} value is often called
+Hedges's \emph{g}.
 }
 \details{
-The bias correction is estimated as:
+The bias correction is:
+\deqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
 
-\deqn{d_{c}=\frac{d_{obs}}{1+\frac{.75}{n-3}}}{d_c = d / (1 + .75 / (n - 3))}
+where
+\deqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = gamma((n - 2) / 2) / (sqrt(n - 2) * gamm((n - 2) / 2))}
 
-where \eqn{d_{obs}}{d} is the observed effect size, \eqn{d_{c}}{d_c} is the corrected estimate of \emph{d}, and \emph{n} is the total sample size.
+and \eqn{d_{obs}}{d} is the observed effect size, \eqn{g = d_{c}}{g = d_c} is the
+corrected (unbiased) estimate, \eqn{n}{n} is the total sample size, and
+\eqn{\Gamma()}{gamma()} is the \link[base:gamma]{gamma function}.
+
+Historically, using the gamma function was computationally intensive, so an
+approximation for \eqn{J} was used (Borenstein et al., 2009):
+\deqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
+
+This approximation is no longer necessary with modern computers.
 }
 \examples{
 correct_d_bias(d = .3, n = 30)
@@ -30,7 +42,11 @@ correct_d_bias(d = .3, n = 300)
 correct_d_bias(d = .3, n = 3000)
 }
 \references{
-Schmidt, F. L., & Hunter, J. E. (2015).
-\emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 293–295.
+Hedges, L. V., & Olkin, I. (1985).
+\emph{Statistical methods for meta-analysis}.
+Academic Press. p. 104
+
+Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. R. (2009).
+\emph{Introduction to meta-analysis}.
+Wiley. p. 27.
 }
