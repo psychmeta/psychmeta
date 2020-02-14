@@ -2,15 +2,15 @@ Changes in Version 2.3.5 (2020-02-13)
 =====================================
 - Improved print methods for tibble-like output.
 
-- Improved small-sample bias correction for d values; use the gamma function, consistent with metafor.
+- Improved small-sample bias correction for d values; new correction uses the gamma function, consistent with metafor.
 
-- Replace deprecated functions from dplyr.
+- Replaced deprecated functions from dplyr.
 
-- Remove NA values in comput_dmod().
+- Made stability improvements to compute_dmod().
 
-- Added moderator information to escalc output.
+- Added moderator information to the output from get_escalc().
 
-- Added var_error_R() and var_error_Rsq() for multiple regression multiple correlations.
+- Added var_error_R() and var_error_Rsq() functions for the error variance of multiple correlations from multiple regression.
 
 - Updated the URL used version checking to avoid error messages experienced by a subset of users.
 
