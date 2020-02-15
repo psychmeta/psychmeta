@@ -41,8 +41,6 @@ simulate_psych(
 \item{var_names}{Vector of variable names corresponding to the variables in \code{rho_mat}.}
 
 \item{composite_names}{Optional vector of names for composite variables.}
-
-\item{...}{Further arguments.}
 }
 \value{
 A list of observed-score, true-score, and error-score data frames. If selection is requested, the data frames will include logical variables indicating whether each case would be selected on the basis of observed scores, true scores, or error scores.

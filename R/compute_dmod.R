@@ -659,7 +659,12 @@ compute_dmod <- function(data, group, predictors, criterion,
           }
      }
 
-     data <- data.frame(G = group, Y = unlist(criterion), predictors, stringsAsFactors = FALSE)
+     data <- data.frame(G = unlist(group), Y = unlist(criterion), predictors, stringsAsFactors = FALSE)
+     na_screen <- apply(is.na(data), 1, sum) > 0
+     if(any(na_screen)){
+             warning("Entries with NA values were detected: Removed ", sum(na_screen), " cases due to missingness", call. = FALSE)
+             data <- data[!na_screen,]
+     }
      xNames <- colnames(data)[-(1:2)]
 
      groupNames <- levels(factor(data[,"G"]))

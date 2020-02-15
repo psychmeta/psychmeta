@@ -12,7 +12,6 @@
 #' @param sr_composites Optional vector selection ratios for composite variables. If not \code{NULL}, \code{sr_composites} must have as many elements as there are columns in \code{wt_mat}.
 #' @param var_names Vector of variable names corresponding to the variables in \code{rho_mat}.
 #' @param composite_names Optional vector of names for composite variables.
-#' @param ... Further arguments.
 #'
 #' @return A list of observed-score, true-score, and error-score data frames. If selection is requested, the data frames will include logical variables indicating whether each case would be selected on the basis of observed scores, true scores, or error scores.
 #' @export

@@ -1,40 +1,59 @@
+Changes in Version 2.3.5 (2020-02-13)
+=====================================
+- Improved print methods for tibble-like output.
+
+- Improved small-sample bias correction for d values; new correction uses the gamma function, consistent with metafor.
+
+- Replaced deprecated functions from dplyr.
+
+- Made stability improvements to compute_dmod().
+
+- Added moderator information to the output from get_escalc().
+
+- Added var_error_R() and var_error_Rsq() functions for the error variance of multiple correlations from multiple regression.
+
+- Updated the URL used version checking to avoid error messages experienced by a subset of users.
+
+- Additional bug fixes in convert_es(), create_ad_int(), anova.ma_psychmeta(), metabulate(), generate_bib(); typo corrections in documentation.
+
+
 Changes in Version 2.3.4 (2019-12-18)
 =====================================
 - Support for contour-enhanced funnel plots added to plot_funnel() and a new plot_cefp() function.
 
-- Bug fixes for uncertainty intervals in second-order meta-analyses. 
+- Bug fixes for uncertainty intervals in second-order meta-analyses.
 
 - New anova() method for comparing subgroup moderator levels.
 
-- Abbreviation for credibility interval changed to "CR" instead of "CV"
+- Abbreviation for credibility interval changed to "CR" instead of "CV".
 
-- Support for construct_order argument added to ma_r_order2.
+- Support for construct_order argument added to ma_r_order2().
 
 - Added an error message for impossible composites. An error message is now displayed when a sample's composite effect size is statistically impossible. Prior to this update, impossible effect sizes produced generic errors that did not provide users with useful feedback on the source of the problem.
 
-- Updated the URL used version checking to avoid error messages experienced by a subset of users. 
+- Updated the URL used version checking to avoid error messages experienced by a subset of users.
 
 - Additional bug fixes in get_matrix(), reshape_wide2long(), and ma_r_order2().
 
 
 Changes in Version 2.3.3 (2019-04-11)
 =====================================
-- Bug fix for the metabulate() function's use of R Markdown. 
+- Bug fix for the metabulate() function's use of R Markdown.
 
 - Bug fix for retrieving artifact distributions with the get_ad() function.
 
 - Bug fix to accommodate truly missing artifacts in the artifact-imputation procedure.
 
-- Bug fix for leave-one-out and cumulative meta-analyses for d values. 
+- Bug fix for leave-one-out and cumulative meta-analyses for d values.
 
 - Update to sample from beta distributions with SD = 0 in simulate_r_database and simulate_d_database.
 
 
 Changes in Version 2.3.2 (2019-02-26)
 =====================================
-- Bug fix for using categorical moderators in meta-regressions. 
+- Bug fix for using categorical moderators in meta-regressions.
 
-- Bug fix for using moderators in ma_generic() when there are no construct or group-identification variables in the analysis. 
+- Bug fix for using moderators in ma_generic() when there are no construct or group-identification variables in the analysis.
 
 - Added an optional "weights" argument to ma_generic(), which allows users to supply their own custom weights for effect sizes.
 
@@ -47,13 +66,13 @@ Changes in Version 2.3.1 (2019-02-15)
 
 - Updated estimates for small-sample-bias corrected error variances to be computed from the bias-corrected effect size rather than applying a post-hoc linear variance adjustment.
 
-- Changed default weighting method for d values to "n_effective." This method is superior to sample-size weights because it accounts for both total sample size and deviations from equal subgroup representation. 
+- Changed default weighting method for d values to "n_effective." This method is superior to sample-size weights because it accounts for both total sample size and deviations from equal subgroup representation.
 
-- Updated compatibility with dplyr version 0.8.0. 
+- Updated compatibility with dplyr version 0.8.0.
 
-- Updated the labeling of output from the mix_dist function. 
+- Updated the labeling of output from the mix_dist function.
 
-- Assorted bug fixes affecting mean d value estimates (from the ma_d and ma_d_ic functions), artifact distributions, and weighted correlations and covariances. 
+- Assorted bug fixes affecting mean d value estimates (from the ma_d and ma_d_ic functions), artifact distributions, and weighted correlations and covariances.
 
 
 Changes in Version 2.3.0 (2019-01-08)
@@ -81,7 +100,7 @@ Changes in Version 2.2.1 (2018-10-12)
 
 - Increased support for common wide database formats in the reshape_wide2long() function.
 
-- Bug fixes for managing dependent observations in artifact distributions created within ma_r() and ma_d(). 
+- Bug fixes for managing dependent observations in artifact distributions created within ma_r() and ma_d().
 
 - Bug fixes for resolving dependency in effect sizes in meta-analyses with moderators.
 
@@ -105,29 +124,29 @@ Changes in Version 2.1.12 (2018-09-07)
 Changes in Version 2.1.11 (2018-08-30)
 =====================================
 - Bug fix for create_ad() with interactive method when all sample sizes are NA.
- 
-- Bug fix for ma_r_ad() with individual artifact distributions supplied. 
+
+- Bug fix for ma_r_ad() with individual artifact distributions supplied.
 
 
 Changes in Version 2.1.10 (2018-08-24)
 =====================================
-- Bug fix for using output of metabulate() in Rmarkdown documents. 
+- Bug fix for using output of metabulate() in Rmarkdown documents.
 
-- Bug fix for meta-analyses of effect sizes that have been averaged or composited. 
+- Bug fix for meta-analyses of effect sizes that have been averaged or composited.
 
 
 Changes in Version 2.1.9 (2018-08-22)
 =====================================
-- Increased the stability of artifact-distribution meta-analyses with moderators computed using the ma_r() function. 
+- Increased the stability of artifact-distribution meta-analyses with moderators computed using the ma_r() function.
 
-- Bug fix for the get_ad() function to appropriately handle artifact-distribution objects that contain no artifact information. 
+- Bug fix for the get_ad() function to appropriately handle artifact-distribution objects that contain no artifact information.
 
 
 Changes in Version 2.1.8 (2018-08-21)
 =====================================
-- Updated and corrected the text displayed in table notes produced by the metabulate() function. 
+- Updated and corrected the text displayed in table notes produced by the metabulate() function.
 
-- Bug fix for handling meta-analyses with only one effect size. 
+- Bug fix for handling meta-analyses with only one effect size.
 
 
 Changes in Version 2.1.7 (2018-07-16)
@@ -154,29 +173,29 @@ Changes in Version 2.1.4 (2018-06-28)
 
 Changes in Version 2.1.3 (2018-06-27)
 =====================================
-- Changed unicode entities to HTML entities for increased support across locales. 
+- Changed unicode entities to HTML entities for increased support across locales.
 
-- Bug fix for artifact imputation without a moderator. 
+- Bug fix for artifact imputation without a moderator.
 
 
 Changes in Version 2.1.2 (2018-06-26)
 =====================================
-- Added grouping variables and construct variables to ma_generic(). This helps to streamline meta-analyses of generic effect sizes that involve multiple group-wise contrasts and/or multiple constructs. 
+- Added grouping variables and construct variables to ma_generic(). This helps to streamline meta-analyses of generic effect sizes that involve multiple group-wise contrasts and/or multiple constructs.
 
 - Bug fixes for format_num() and metabulate() to allow missing values in formatted numeric strings.
 
-- Updated lm_mat()to use fungible::seBetaCor to estimate standard errors when se_beta_method is "normal" and cov_mat is a correlation matrix. 
+- Updated lm_mat()to use fungible::seBetaCor to estimate standard errors when se_beta_method is "normal" and cov_mat is a correlation matrix.
 
 
 Changes in Version 2.1.1 (2018-06-10)
 =====================================
-- Updates and bug fixes for the metabulate() function. Fixed issues with file-writing protocols. Increased support for unicode characters on Windows systems. Added arguments to control whether table headers are rendered in bolded font (bold_headers) and whether redundant construct-pair labels are collapsed in meta-analysis tables (collapse_construct_labels). 
+- Updates and bug fixes for the metabulate() function. Fixed issues with file-writing protocols. Increased support for unicode characters on Windows systems. Added arguments to control whether table headers are rendered in bolded font (bold_headers) and whether redundant construct-pair labels are collapsed in meta-analysis tables (collapse_construct_labels).
 
-- Updated the “summary” attributes of artifact-distribution objects for greater consistency between interactive and Taylor-series objects. 
+- Updated the “summary” attributes of artifact-distribution objects for greater consistency between interactive and Taylor-series objects.
 
 - Added third-order sample sizes (i.e., the number of meta-analyses meta-analyzed; denoted as “L”) to the output from second-order meta-analyses.
 
-- Added get_stuff() function that serves as a wrapper for other functions in the “get_stuff” family of functions. 
+- Added get_stuff() function that serves as a wrapper for other functions in the “get_stuff” family of functions.
 
 
 Changes in Version 2.1.0 (2018-06-01)

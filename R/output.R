@@ -449,8 +449,8 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
      }
 
      if (!is.null(bib)) {
-             if (!requireNamespace("RefManageR", quietly = TRUE)) {
-                     stop("Package 'RefManageR' not installed. 'RefManageR' is required to generate bibliographies. \nInstall 'RefManageR' or set 'bib = NULL'.",
+             if (!requireNamespace("bib2df", quietly = TRUE)) {
+                     stop("Package 'bib2df' not installed. 'bib2df' is required to generate bibliographies. \nInstall 'bib2df' or set 'bib = NULL'.",
                           .call = FALSE)
              }
      }
@@ -509,7 +509,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
      if(!is.null(file)) file <- .filename_check(file, output_format)
 
      # Assign values to citekeys and citations, convert bib to R bibliography
-     if(!is.null(file)) {
+     if(is.null(file)) {
           if(!is.null(bib)) warning("Bibliography not generated when file == NULL.\nTry generate_bib() to include a bibliography in an RMarkdown document.")
           bib <- NULL
      } else if(!is.null(bib)) {
@@ -519,7 +519,8 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
      # Render the output
      .psychmeta_render(file = file, output_format = output_format, output_dir = output_dir,
                        meta_tables = meta_tables, ma_type = ma_type, es_type = es_type,
-                       bib = bib$bib, citations = bib$citations, citekeys = bib$citekeys,
+                       bib = bib$bib, citations = bib$citations, bib_df = bib$bib_df,
+                       citekeys = bib$citekeys,
                        title.bib = title.bib, style = style,
                        save_build_files = save_build_files, header = header, ...)
 
@@ -536,7 +537,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
 #' @param style What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list.
-#' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions}} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
+#' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", a tibble with basic citation information; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
 #' @param output_dir The filepath for the output file. Defaults to the current working directory.
 #' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
@@ -546,7 +547,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
 #' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
 #'
-#' @return A list containing the RefManageR BibEntry object. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
+#' @return A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
 #'
 #' @export
 #'
@@ -573,8 +574,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                          analyses="all", match=c("all", "any"), case_sensitive = TRUE,
                          save_build_files = FALSE, header=list(), ...){
 
-     if (!requireNamespace("RefManageR", quietly = TRUE)) {
-          stop("Package 'RefManageR' not installed. 'RefManageR' is required to generate bibliographies.",
+     if (!requireNamespace("bib2df", quietly = TRUE)) {
+          stop("Package 'bib2df' not installed. 'bib2df' is required to generate bibliographies.",
                call. = FALSE)
      }
 
@@ -602,6 +603,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
      bib <- .generate_bib(ma_obj, bib, additional_citekeys)
      citekeys <- bib$citekeys
      citations <- bib$citations
+     bib_df <- bib$bib_df
      bib <- bib$bib
 
      # Set the output file name
@@ -619,17 +621,18 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
             },
 
             biblatex = {
-                 if(!is.null(file)) {
-                      print(bib[citekeys], .opts = list(style = "Biblatex"))
+                 if(is.null(file)) {
+                         export_df_bib(bib)
                  } else {
-                      suppressMessages(RefManageR::WriteBib(bib[citekeys], file = file))
+                         export_df_bib(bib, file = file)
                  }
             },
             # else =
             {
                  .psychmeta_render(file = file, output_format = output_format,
                                    output_dir = output_dir, bib = bib, citations = citations,
-                                   citekeys = citekeys, title.bib = title.bib, style = style,
+                                   bib_df = bib_df, citekeys = citekeys, title.bib = title.bib,
+                                   style = style,
                                    save_build_files = save_build_files, header = header, ...)
                  invisible(bib[citekeys])
             }
@@ -644,24 +647,22 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
      # Compile unique citekeys from meta-analyses and additionally supplied list
      citekeys <-
           unique(c(additional_citekeys,
-                   unlist(map(get_metafor(ma_obj),
-                              ~ strsplit(as.character(.x$barebones$citekey), ", ")))
+                   unlist(lapply(get_metafor(ma_obj),
+                                 function(.x) strsplit(as.character(.x$barebones$citekey), ", ")),
+                          use.names = FALSE)
           ))
 
      # Render citekeys as Markdown citations
      citations <- paste0("@", citekeys, collapse=", ")
 
-     # Set BibOptions to accept entries with missing data
-     Bib_check.entries_original <- RefManageR::BibOptions()[["check.entries"]]
-     RefManageR::BibOptions(check.entries = FALSE)
+     bib_df <- bib2df::bib2df(bib) %>%
+             mutate_at(-c(5, 10), stringr::str_replace_all, pattern = "[{}]", replacement = "") %>%
+             mutate_at(c(5, 10), sapply,
+                       FUN = function(.x) stringr::str_replace_all(.x,
+                                                                   pattern = "[{}]",
+                                                                   replacement = ""))
 
-     # Read in .bib file
-     bib <- RefManageR::ReadBib(bib)
-
-     # Reset BibOptions to original
-     RefManageR::BibOptions(check.entries = Bib_check.entries_original)
-
-     return(list(bib = bib, citekeys = citekeys, citations = citations))
+     return(list(bib = bib, citekeys = citekeys, citations = citations, bib_df = bib_df))
 
 }
 
@@ -695,7 +696,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
 .psychmeta_render <- function(file = NULL, output_format, meta_tables = NULL, ma_type = NULL,
                               es_type = NULL, bib = NULL, citations = NULL,
-                              citekeys = NULL, title.bib = NULL, style = style,
+                              citekeys = NULL, bib_df = NULL, title.bib = NULL, style = style,
                               save_build_files = FALSE, output_dir = NULL,
                               header = list(), ...){
 
@@ -705,6 +706,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
      if(!is.null(style)) style <- .clean_style_name(style)
 
      if(is.null(output_dir)) output_dir <- getwd()
+
+     if (!is.null(bib)) bib_df <- filter(bib_df, .data$BIBTEXKEY %in% citekeys)
 
      if(is.null(file)) {
 
@@ -720,9 +723,28 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                title.bib, "\n",
                                rep("=", nchar(title.bib)), "\n\n", sep = ""
                            )
-                           # TODO: Replace this with a call to citation.js to use CSL styles
-                           RefManageR::NoCite(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
-                           RefManageR::PrintBibliography(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
+
+                           bib_df <- bib_df %>%
+                                   mutate(DOI = if_else(is.na(.data$DOI), .data$DOI, paste0("https://doi.org/", .data$DOI))) %>%
+                                   transmute(
+                                           author = sapply(.data$AUTHOR, function(.x) {
+                                                   case_when(is.na(.x) ~ .x,
+                                                             length(.x) == 1 ~ .x,
+                                                             length(.x) == 2 ~ paste0(.x, collapse = ", & "),
+                                                             TRUE ~ paste0(.x[1], ", et al."))[1]
+                                           }),
+                                           year = if_else(is.na(.data$DATE) | length(stringr::str_extract_all(.data$DATE, "\\d{4}")) == 0,
+                                                          .data$YEAR,
+                                                          unlist(stringr::str_extract_all(.data$DATE, "\\d{4}"))),
+                                           title = .data$TITLE,
+                                           container = if_else(is.na(.data$JOURNALTITLE), .data$BOOKTITLE, .data$JOURNALTITLE),
+                                           publisher = if_else(.data$CATEGORY == "ARTICLE", NA_character_,
+                                                               if_else(!is.na(.data$PUBLISHER), .data$PUBLISHER,
+                                                                       if_else(!is.na(.data$INSTITUTION), .data$INSTITUTION,
+                                                                               if_else(!is.na(.data$SCHOOL), .data$SCHOOL,
+                                                                                       .data$ORGANIZATION)))),
+                                           access = if_else(is.na(.data$DOI), .data$URL, .data$DOI))
+                                   print(bib_df, n = nrow(bib_df))
                       }
 
                       invisible(meta_tables[!is.null(meta_tables)])
@@ -733,14 +755,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                  {    if (!is.null(meta_tables)) {
                       # Prevent LaTeX from removing figure space characters
                       for (i in 1:length(meta_tables)) {
-                              meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
-                                                          stringr::str_replace_all,
-                                                          pattern = "&#8199;",
-                                                          replacement = "&#8199;\\\\phantom{+}")
-                              meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
-                                                          stringr::str_replace_all,
-                                                          pattern = "\u2007",
-                                                          replacement = "\u2007\\\\phantom{+}")
+                              old <- meta_tables[[i]]
+                              meta_tables[[i]] <-
+                                      meta_tables[[i]] %>%
+                                      mutate_all(stringr::str_replace_all,
+                                                 pattern = "&#8199;",
+                                                 replacement = "&#8199;\\\\phantom{+}") %>%
+                                      mutate_all(stringr::str_replace_all,
+                                                 pattern = "\u2007",
+                                                 replacement = "\u2007\\\\phantom{+}")
+                              meta_tables[[i]] <- reattribute(old, meta_tables[[i]])
                       }
                       meta_tables <- meta_tables[!is.null(meta_tables)]
                       class(meta_tables) <- "metabulate"
@@ -753,8 +777,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                            # Write the bibliography file
                            # Ignore save_build_files
                            bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
-                           suppressMessages(RefManageR::WriteBib(bib[citekeys],
-                                                                 file = bib_file))
+                           file.copy(bib, bib_file, overwrite = TRUE)
 
                            sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s",
                                    bib_file)
@@ -769,7 +792,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                            if (!is.null(style)) sprintf("csl: %s\n", style )
                            sprintf('nocite: |\n  %s\n---\n', citations)
 
-                           invisible(bib[citekeys])
+                           invisible(bib_df)
                       }
 
                  }
@@ -780,14 +803,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           # Prevent LaTeX from removing figure space characters
           if(output_format != "text" & !is.null(meta_tables)) {
                 for (i in 1:length(meta_tables)) {
-                        meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
-                                                    stringr::str_replace_all,
-                                                    pattern = "&#8199;",
-                                                    replacement = "&#8199;\\\\phantom{+}")
-                        meta_tables[[i]][] <- apply(meta_tables[[i]], 2,
-                                                    stringr::str_replace_all,
-                                                    pattern = "\u2007",
-                                                    replacement = "\u2007\\\\phantom{+}")
+                        old <- meta_tables[[i]]
+                        meta_tables[[i]] <-
+                                meta_tables[[i]] %>%
+                                mutate_all(stringr::str_replace_all,
+                                           pattern = "&#8199;",
+                                           replacement = "&#8199;\\\\phantom{+}") %>%
+                                mutate_all(stringr::str_replace_all,
+                                           pattern = "\u2007",
+                                           replacement = "\u2007\\\\phantom{+}")
+                        meta_tables[[i]] <- reattribute(old, meta_tables[[i]])
                 }
                class(meta_tables) <- "metabulate"
           }
@@ -810,52 +835,48 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           switch(output_format,
 
                  text = {if(!is.null(bib)) {
-                      sink("NUL")
-                      # TODO: Replace this with a call to citation.js to use CSL styles
-                      RefManageR::NoCite(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
-                      bibliography <- RefManageR::PrintBibliography(bib[citekeys], .opts = list(style = "text", bib.style = "authoryear"))
-                      sink()
+                      bibliography <- bib_df %>%
+                              mutate(DOI = if_else(is.na(.data$DOI), .data$DOI, paste0("https://doi.org/", .data$DOI))) %>%
+                              transmute(
+                                      author = sapply(.data$AUTHOR, function(.x) {
+                                              case_when(is.na(.x) ~ .x,
+                                                        length(.x) == 1 ~ .x,
+                                                        length(.x) == 2 ~ paste0(.x, collapse = ", & "),
+                                                        TRUE ~ paste0(.x[1], ", et al."))[1]
+                                      }),
+                                      year = if_else(is.na(.data$DATE) | length(stringr::str_extract_all(.data$DATE, "\\d{4}")) == 0,
+                                                     .data$YEAR,
+                                                     unlist(stringr::str_extract_all(.data$DATE, "\\d{4}"))),
+                                      title = .data$TITLE,
+                                      container = if_else(is.na(.data$JOURNALTITLE), .data$BOOKTITLE, .data$JOURNALTITLE),
+                                      publisher = if_else(.data$CATEGORY == "ARTICLE", NA_character_,
+                                                          if_else(!is.na(.data$PUBLISHER), .data$PUBLISHER,
+                                                                  if_else(!is.na(.data$INSTITUTION), .data$INSTITUTION,
+                                                                          if_else(!is.na(.data$SCHOOL), .data$SCHOOL,
+                                                                                  .data$ORGANIZATION)))),
+                                      access = if_else(is.na(.data$DOI), .data$URL, .data$DOI))
                  } else bibliography <- NULL
 
+                 if (!is.null(meta_tables)) {
+                         tables_out <- vector(mode = "list", length = length(ma_type))
+                         for (i in 1:length(ma_type)) {
+                                 tables_out[[i]] <- c(
+                                         paste0("##### ", attr(meta_tables[[ma_type[i]]], "caption")),
+                                         suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[i]]], align = attr(meta_tables[[ma_type[i]]], "align")))),
+                                         paste0("Note: ", attr(meta_tables[[ma_type[i]]], "footnote"), "\n\n\n"),
+                                         "\\newpage"
+                                 )
+                         }
+                         tables_out[[length(ma_type)]] <- tables_out[[length(ma_type)]][-4]
+                         tables_out <- unlist(tables_out)
+                 } else tables_out <- NULL
+
                  document <- c(paste(stringr::str_to_title(names(header)), ": ", header, collapse = "\n"), "\n\n",
-
-                               paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"))[!is.null(meta_tables[[ma_type[1]]])],
-                               suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))[!is.null(meta_tables[[ma_type[1]]])]),
-                               paste0("Note: ", attr(meta_tables[[ma_type[1]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[1]]])],
-                               "\\newpage"[!is.null(meta_tables[[ma_type[1]]]) & length(ma_type) > 1],
-
-                               paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"))[!is.null(meta_tables[[ma_type[2]]])],
-                               suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))[!is.null(meta_tables[[ma_type[2]]])]),
-                               paste0("Note: ", attr(meta_tables[[ma_type[2]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[2]]])],
-                               "\\newpage"[!is.null(meta_tables[[ma_type[2]]]) & length(ma_type) > 2],
-
-                               paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"))[!is.null(meta_tables[[ma_type[3]]])],
-                               suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))[!is.null(meta_tables[[ma_type[3]]])]),
-                               paste0("Note: ", attr(meta_tables[[ma_type[3]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[3]]])],
-                               "\\newpage"[!is.null(meta_tables[[ma_type[3]]]) & length(ma_type) > 3],
-
-                               paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"))[!is.null(meta_tables[[ma_type[4]]])],
-                               suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))[!is.null(meta_tables[[ma_type[4]]])]),
-                               paste0("Note: ", attr(meta_tables[[ma_type[4]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[4]]])],
-                               "\\newpage"[!is.null(meta_tables[[ma_type[4]]]) & length(ma_type) > 4],
-
-                               paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"))[!is.null(meta_tables[[ma_type[5]]])],
-                               suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))[!is.null(meta_tables[[ma_type[5]]])]),
-                               paste0("Note: ", attr(meta_tables[[ma_type[5]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[5]]])],
-                               "\\newpage"[!is.null(meta_tables[[ma_type[5]]]) & length(ma_type) > 5],
-
-                               paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"))[!is.null(meta_tables[[ma_type[6]]])],
-                               suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))[!is.null(meta_tables[[ma_type[6]]])]),
-                               paste0("Note: ", attr(meta_tables[[ma_type[6]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[6]]])],
-                               "\\newpage"[!is.null(meta_tables[[ma_type[6]]]) & length(ma_type) > 6],
-
-                               paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"))[!is.null(meta_tables[[ma_type[7]]])],
-                               suppressWarnings(knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))[!is.null(meta_tables[[ma_type[7]]])]),
-                               paste0("Note: ", attr(meta_tables[[ma_type[7]]], "footnote"), "\n\n\n")[!is.null(meta_tables[[ma_type[7]]])],
-                               "\\newpage"[!is.null(meta_tables) & !is.null(bib)],
+                               tables_out[!is.null(tables_out)],
+                               "\\newpage"[!is.null(tables_out) & !is.null(bib)],
 
                                paste0(title.bib, "\n\n")[!is.null(title.bib) & !is.null(bib)],
-                               print(bibliography[!is.null(bib)], .opts = list(style = "text", bib.style = "authoryear"))
+                               print(bibliography[!is.null(bib)], n = nrow(bibliography))
                  )
 
                  stringi::stri_write_lines(document, file, sep="")
@@ -879,8 +900,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                            if(save_build_files) {
                                 bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
                            } else bib_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
-                           suppressMessages(RefManageR::WriteBib(bib[citekeys],
-                                                                 file = bib_file))
+                           file.copy(bib, bib_file, overwrite = TRUE)
 
                            header$bibliography <- if(.Platform$`OS.type` == "windows") {
                                 gsub("\\\\", "/", bib_file)
@@ -889,10 +909,11 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
                            if (!is.null(style)) {
                                 if (attr(style, "source") %in% c("url", "Zotero")) {
-                                        if (RCurl::url.exists(style)) {
+
+                                        if (startsWith(as.character(curl::curl_fetch_memory(style)$status), "2")) {
                                                 header$csl <- style
                                         } else {
-                                                message(sprintf("Caution: Style not found at %s\n         Check the %s or specify a local CSL style file.\n         References formatted using to the Chicago Manual of Style.",
+                                                message(sprintf("Caution: Style not found at %s\n         Check the %s or specify a local CSL style file.\n         References formatted using the Chicago Manual of Style.",
                                                                 style,
                                                                 if (attr(style, "source") == "url") "URL" else "style name"))
                                         }
@@ -900,7 +921,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                      if (file.exists(style)) {
                                           header$csl <- style
                                      } else {
-                                          message(sprintf("Caution: Style not found at %s\n         Check the file path or specify a CSL style name from the Zotero Style Repository (https://zotero.org/styles).\n         References formatted using to the Chicago Manual of Style.",
+                                          message(sprintf("Caution: Style not found at %s\n         Check the file path or specify a CSL style name from the Zotero Style Repository (https://zotero.org/styles).\n         References formatted using the Chicago Manual of Style.",
                                                           style))
                                      }
                                 }
@@ -917,6 +938,19 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                            rdata_file <- if (.Platform$`OS.type` == "windows") {
                                 gsub("\\\\", "/", rdata_file)
                            } else rdata_file
+
+                           tables_out <- vector(mode = "list", length = length(ma_type))
+                           for (i in 1:length(ma_type)) {
+                                   tables_out[[i]] <- c(
+                                           paste0('cat(paste0("##### ", attr(meta_tables[[ma_type[', i, ']]], "caption"), "\\n"))'),
+                                           paste0('knitr::knit_print(knitr::kable(meta_tables[[ma_type[', i, ']]], align = attr(meta_tables[[ma_type[', i, ']]], "align")))'),
+                                           paste0('cat(paste0("*Note:* ", attr(meta_tables[[ma_type[', i, ']]], "footnote"), "\\n\\n"))'),
+                                           paste0('cat("\\\\newpage")')
+                                   )
+                           }
+                           tables_out[[length(ma_type)]] <- tables_out[[length(ma_type)]][-4]
+                           tables_out <- unlist(tables_out)
+
 
                            tables_document <- c(
 
@@ -935,39 +969,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                 '```{r, results = "asis", echo = FALSE}',
                                 'ma_type <- names(meta_tables)',
 
-                                'cat(paste0("##### ", attr(meta_tables[[ma_type[1]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[1]]])])',
-                                'knitr::knit_print(knitr::kable(meta_tables[[ma_type[1]]], align = attr(meta_tables[[ma_type[1]]], "align")))',
-                                'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[1]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[1]]])])',
-                                'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[1]]])])',
+                                tables_out,
 
-                                'cat(paste0("##### ", attr(meta_tables[[ma_type[2]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[2]]])])',
-                                'knitr::knit_print(knitr::kable(meta_tables[[ma_type[2]]], align = attr(meta_tables[[ma_type[2]]], "align")))',
-                                'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[2]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[2]]])])',
-                                'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[2]]])])',
-
-                                'cat(paste0("##### ", attr(meta_tables[[ma_type[3]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[3]]])])',
-                                'knitr::knit_print(knitr::kable(meta_tables[[ma_type[3]]], align = attr(meta_tables[[ma_type[3]]], "align")))',
-                                'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[3]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[3]]])])',
-                                'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[3]]])])',
-
-                                'cat(paste0("##### ", attr(meta_tables[[ma_type[4]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[4]]])])',
-                                'knitr::knit_print(knitr::kable(meta_tables[[ma_type[4]]], align = attr(meta_tables[[ma_type[4]]], "align")))',
-                                'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[4]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[4]]])])',
-                                'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[4]]])])',
-
-                                'cat(paste0("##### ", attr(meta_tables[[ma_type[5]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[5]]])])',
-                                'knitr::knit_print(knitr::kable(meta_tables[[ma_type[5]]], align = attr(meta_tables[[ma_type[5]]], "align")))',
-                                'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[5]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[5]]])])',
-                                'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[5]]])])',
-
-                                'cat(paste0("##### ", attr(meta_tables[[ma_type[6]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[6]]])])',
-                                'knitr::knit_print(knitr::kable(meta_tables[[ma_type[6]]], align = attr(meta_tables[[ma_type[6]]], "align")))',
-                                'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[6]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[6]]])])',
-                                'cat("\\\\newpage"[!is.null(meta_tables[[ma_type[6]]])])',
-
-                                'cat(paste0("##### ", attr(meta_tables[[ma_type[7]]], "caption"), "\\n")[!is.null(meta_tables[[ma_type[7]]])])',
-                                'knitr::knit_print(knitr::kable(meta_tables[[ma_type[7]]], align = attr(meta_tables[[ma_type[7]]], "align")))',
-                                'cat(paste0("*Note:* ", attr(meta_tables[[ma_type[7]]], "footnote"), "\\n\\n")[!is.null(meta_tables[[ma_type[7]]])])',
 
                                 '```',
 
@@ -999,7 +1002,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                              encoding = "UTF-8",
                                              ...)
                       }
-                      invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], list(bib = bib[citekeys])[!is.null(bib)]))
+                      invisible(c(list(meta_tables = meta_tables)[!is.null(meta_tables)], bib_df = bib_df[!is.null(bib)]))
                  }
           )
      }
@@ -1140,44 +1143,37 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           if(show_cred == TRUE) col_cred <- c("cr_lower", "cr_upper")
 
           # Format columns
-          ma_table[1:nrow(ma_table), col_sampsize] <-
-               format_num(ma_table[1:nrow(ma_table), col_sampsize], digits = 0L, decimal.mark = decimal.mark,
-                          leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
-                          drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                          small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
-                          inf.mark = inf.mark, lgl.mark = lgl.mark)
-
-          numeric_columns <- c(col_se_bb, col_sd_bb, col_var_bb, col_se_cor, col_sd_cor, col_var_cor)
-          ma_table[1:nrow(ma_table), numeric_columns] <-
-               format_num(ma_table[1:nrow(ma_table), numeric_columns], digits = digits, decimal.mark = decimal.mark,
-                          leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
-                          drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                          small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
-                          inf.mark = inf.mark, lgl.mark = lgl.mark)
-
-          numeric_columns <- c(col_m_bb, col_m_cor, col_conf, col_cred)
-          ma_table[,numeric_columns][1:length(ma_table[,numeric_columns])] <-
-               format_num(unlist(ma_table[,numeric_columns]), digits = digits, decimal.mark = decimal.mark,
-                          leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
-                          drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
-                          small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
-                          inf.mark = inf.mark, lgl.mark = lgl.mark)
+          ma_table <-
+               mutate_at(ma_table, col_sampsize, ~
+                    format_num(.x, digits = 0L, decimal.mark = decimal.mark,
+                               leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                               drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                               small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
+                               inf.mark = inf.mark, lgl.mark = lgl.mark)
+               ) %>% mutate_at(c(col_se_bb, col_sd_bb, col_var_bb, col_se_cor, col_sd_cor, col_var_cor,
+                                 col_m_bb, col_m_cor, col_conf, col_cred), ~
+                       format_num(.x, digits = digits, decimal.mark = decimal.mark,
+                                  leading0 = leading0, neg.sign = neg.sign, pos.sign = pos.sign,
+                                  drop0integer = drop0integer, big.mark = big.mark, big.interval = big.interval,
+                                  small.mark = small.mark, small.interval = small.interval, na.mark = na.mark,
+                                  inf.mark = inf.mark, lgl.mark = lgl.mark)
+               )
 
           # Format the interval columns
           if (show_conf == TRUE) {
                switch(conf_format,
-                      parentheses = {ma_table <- rename(select(mutate(ma_table, ci_lower = paste0("(", .data$ci_lower, ", ", .data$ci_upper, ")")),
-                                                               -.data$ci_upper), conf_int = .data$ci_lower)},
-                      brackets = {ma_table <- rename(select(mutate(ma_table, ci_lower = paste0("[", .data$ci_lower, ", ", .data$ci_upper, "]")),
-                                                            -.data$ci_upper), conf_int = .data$ci_lower)},
+                      parentheses = {ma_table <- select(mutate(ma_table, conf_int = paste0("(", .data$ci_lower, ", ", .data$ci_upper, ")")),
+                                                        -.data$ci_lower, -.data$ci_upper)},
+                      brackets = {ma_table <- select(mutate(ma_table, conf_int = paste0("[", .data$ci_lower, ", ", .data$ci_upper, "]")),
+                                                     -.data$ci_lower, -.data$ci_upper)},
                )
           }
           if (show_cred == TRUE) {
                switch(cred_format,
-                      parentheses = {ma_table <- rename(select(mutate(ma_table, cr_lower = paste0("(", .data$cr_lower, ", ", .data$cr_upper, ")")),
-                                                               -.data$cr_upper), cred_int = .data$cr_lower)},
-                      brackets = {ma_table <- rename(select(mutate(ma_table, cr_lower = paste0("[", .data$cr_lower, ", ", .data$cr_upper, "]")),
-                                                            -.data$cr_upper), cred_int = .data$cr_lower)},
+                      parentheses = {ma_table <- select(mutate(ma_table, cred_int = paste0("(", .data$cr_lower, ", ", .data$cr_upper, ")")),
+                                                        -.data$cr_lower, -.data$cr_upper)},
+                      brackets = {ma_table <- select(mutate(ma_table, cred_int = paste0("[", .data$cr_lower, ", ", .data$cr_upper, "]")),
+                                                     -.data$cr_lower, -.data$cr_upper)},
                )
           }
 
@@ -2634,4 +2630,63 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
      return(list(col_names = col_names,
                  footnote = footnote))
+}
+
+# df2bib() are copied from bib2df (https://github.com/ropensci/bib2df)
+# to correct problematic capitalization in bib2df::df2bib()
+export_df_bib <- function (x, file = "", append = FALSE) {
+        if (!is.character(file)) {
+                stop("Invalid file path: Non-character supplied.", call. = FALSE)
+        }
+        if (as.numeric(file.access(dirname(file), mode = 2)) != 0 &&
+            file != "") {
+                stop("Invalid file path: File is not writeable.", call. = FALSE)
+        }
+        if (any({
+                df_elements <- sapply(x$AUTHOR, inherits, "data.frame")
+        })) {
+                x$AUTHOR[df_elements] <- lapply(x$AUTHOR[df_elements],
+                                                na_replace)
+                x$AUTHOR[df_elements] <- lapply(x$AUTHOR[df_elements],
+                                                function(x) {
+                                                        paste(x$last_name, ", ", x$first_name, " ", x$middle_name,
+                                                              sep = "")
+                                                })
+                x$AUTHOR[df_elements] <- lapply(x$AUTHOR[df_elements],
+                                                trimws)
+        }
+        names(x) <- tolower(names(x))
+        fields <- lapply(seq_len(nrow(x)), function(r) {
+                rowfields <- rep(list(character(0)), ncol(x))
+                names(rowfields) <- names(x)
+                for (i in seq_along(rowfields)) {
+                        f <- x[[i]][r]
+                        if (is.list(f)) {
+                                f <- unlist(f)
+                        }
+                        rowfields[[i]] <- if (!length(f) || is.na(f)) {
+                                character(0L)
+                        }
+                        else if (names(x)[i] %in% c("author", "editor")) {
+                                paste(f, collapse = " and ")
+                        }
+                        else {
+                                paste0(f, collapse = ", ")
+                        }
+                }
+                rowfields <- rowfields[lengths(rowfields) > 0]
+                rowfields <- rowfields[!names(rowfields) %in% c("category",
+                                                                "bibtexkey")]
+                paste0("  ", names(rowfields), " = {", unname(unlist(rowfields)),
+                       "}", collapse = ",\n")
+        })
+        cat(paste0("@", tolower(x$category), "{", x$bibtexkey,
+                   ",\n", unlist(fields), "\n}\n", collapse = "\n\n"), file = file,
+            append = append)
+        invisible(file)
+}
+
+na_replace <- function(df) {
+        df[is.na(df)] <- ""
+        return(df)
 }

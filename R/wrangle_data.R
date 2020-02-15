@@ -1,19 +1,3 @@
-# This is an augmentation of dplyr::select_() that doesn't fail when variable names have spaces in them
-smartselect_ <- function (.data, ..., .dots = list()) {
-     .cols <- colnames(.data)
-     cols_with_spaces <- .cols[grepl(x = .cols, pattern = " ")]
-     names(cols_with_spaces) <- gsub(x = cols_with_spaces, pattern = " ", replacement = "_")
-     colnames(.data) <- gsub(x = colnames(.data), pattern = " ", replacement = "_")
-     .dots <- gsub(x = .dots, pattern = " ", replacement = "_")
-
-     .data <- select_(.data, ..., .dots = .dots)
-
-     if(length(cols_with_spaces) > 0)
-          colnames(.data)[colnames(.data) %in% names(cols_with_spaces)] <- cols_with_spaces
-
-     .data
-}
-
 fix_df <- function(df){
      if(!is.data.frame(df)){
           df

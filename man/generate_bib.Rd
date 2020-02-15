@@ -32,7 +32,7 @@ generate_bib(
 
 \item{additional_citekeys}{Additional citekeys to include in the reference list.}
 
-\item{file}{The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", the formatted references in \code{\link[RefManageR]{BibOptions}} "authoryear" style; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).}
+\item{file}{The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", a tibble with basic citation information; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).}
 
 \item{output_dir}{The filepath for the output file. Defaults to the current working directory.}
 
@@ -51,7 +51,7 @@ generate_bib(
 \item{...}{Additional arguments to pass to \code{\link[rmarkdown]{render}}.}
 }
 \value{
-A list containing the RefManageR BibEntry object. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
+A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
 }
 \description{
 This function generates a list of studies contributing to a meta-analysis

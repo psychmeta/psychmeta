@@ -25,12 +25,18 @@
     version <- read.dcf(file=system.file("DESCRIPTION", package=pkgname), fields="Version")
     packageStartupMessage(crayon::white("----------------------------------------------------- ", crayon::bold(paste(pkgname, "version", version)), " --"))
     packageStartupMessage("\nPlease report any bugs to ", crayon::italic("github.com/psychmeta/psychmeta/issues"), "\nor ", crayon::italic("issues@psychmeta.com"))
-    packageStartupMessage("\nWe work hard to produce these open-source tools for the R community, \nplease cite psychmeta when you use it in your research: \n  Dahlke, J. A., & Wiernik, B. M. (2018). psychmeta: An R package for \n     psychometric meta-analysis. ",
-                          crayon::italic("Applied Psychological Measurement"), ". \n     Advance online publication. https://doi.org/10.1177/0146621618795933")
+    packageStartupMessage("\nWe work hard to produce these open-source tools for the R community.  \nPlease cite psychmeta when you use it in your research: \n  Dahlke, J. A., & Wiernik, B. M. (2019). psychmeta: An R package for \n     psychometric meta-analysis. ",
+                          crayon::italic("Applied Psychological Measurement, 43"), "(5), \n     415\u2013416. https://doi.org/10.1177/0146621618795933")
     packageStartupMessage("\nFind info about psychmeta on the web at ", crayon::italic("psychmeta.com"), " and ", crayon::italic("twitter.com/psychmetaR"))
 
     # Check if there is an internet connection. If there is, check whether the local version of psychmeta is up to date compared to the CRAN version.
-    version_check <- try(RCurl::getURL("https://r-pkg.org/badges/version/psychmeta"), silent = TRUE)
+    suppressWarnings(version_check <-
+        try(unlist(strsplit(
+             rawToChar(
+                  curl::curl_fetch_memory("https://CRAN.R-project.org/package=psychmeta")$content
+                  ),
+             "\n")),
+            silent = TRUE))
     if(!inherits(version_check, "try-error")) {
 
          check_version <- function(cran_version, sys_version){
@@ -77,8 +83,7 @@
                                  development = vcheck_devnum), stringsAsFactors = FALSE)
          }
 
-         pkg_badge <- xml2::read_html(version_check)
-         cran_v_char <- gsub(x = stringr::str_split(as.character(pkg_badge), "\n")[[1]][9], pattern = " ", replacement = "")
+         cran_v_char <- stringr::str_extract(version_check[which(stringr::str_detect(version_check, "Version:")) + 1], "\\d\\.\\d\\.\\d")
          vcheck <- check_version(cran_version = cran_v_char, sys_version = version)
 
          use_symbols <- .support_unicode()

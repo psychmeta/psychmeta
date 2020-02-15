@@ -39,7 +39,7 @@ get_escalc(
   analyses = "all",
   match = c("all", "any"),
   case_sensitive = TRUE,
-  moderators = FALSE,
+  moderators = TRUE,
   ...
 )
 
@@ -48,7 +48,7 @@ get_metafor(
   analyses = "all",
   match = c("all", "any"),
   case_sensitive = TRUE,
-  moderators = FALSE,
+  moderators = TRUE,
   ...
 )
 
@@ -166,7 +166,7 @@ All suffixes from functions in the "get_" family can be passed as arguments to \
 
 \item{correction_type}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
 
-\item{moderators}{Logical scalar that determines whether moderator information should be included in the escalc list (\code{TRUE}) or not (\code{FALSE}; default).}
+\item{moderators}{Logical scalar that determines whether moderator variables should be included in escalc objects (\code{TRUE}; default) or not (\code{FALSE}).}
 
 \item{as_ad_obj}{Logical scalar that determines whether artifact information should be returned as artifact-distribution objects (\code{TRUE}) or a summary table of artifact-distribution descriptive statistics (\code{FALSE}; default).}
 
