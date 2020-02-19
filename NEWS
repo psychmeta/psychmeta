@@ -1,3 +1,9 @@
+Changes in Version 2.3.6 (2020-02-19)
+=====================================
+- Bug fix in dependent sample consolidation.
+
+- A vector of moderator variable names can now be specified quoted or unquoted, like other arguments.
+
 Changes in Version 2.3.5 (2020-02-13)
 =====================================
 - Improved print methods for tibble-like output.
