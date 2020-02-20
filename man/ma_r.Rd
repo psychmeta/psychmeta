@@ -157,8 +157,8 @@ be used when interative artifact distributions are provided). See "Details" of \
 
 \item{construct_x, construct_y}{Vector of construct names for constructs initially designated as "X" or as "Y".}
 
-\item{facet_x, facet_y}{Vector of facet names for constructs initially designated as "X" or as "Y". 
-Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+\item{facet_x, facet_y}{Vector of facet names for constructs initially designated as "X" or as "Y".
+Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements.
 To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets.}
 
 \item{measure_x, measure_y}{Vector of names for measures associated with constructs initially designated as "X" or as "Y".}
@@ -238,9 +238,9 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{sign_ryz}{Sign of the relationship between Y and the selection mechanism (for use with bvirr corrections only).}
 
-\item{moderators}{Matrix or column names of moderator variables to be used in the meta-analysis (can be a vector in the case of one moderator).}
+\item{moderators}{Either (1) a vector of column names in \code{data} of moderator variables to be used in the meta-analysis (names can be quoted or unquoted), or (2) a vector, data frame, or matrix containing moderator variables.}
 
-\item{cat_moderators}{Logical scalar or vector identifying whether variables in the \code{moderators} argument are categorical variables (\code{TRUE}) or continuous variables (\code{FALSE}).}
+\item{cat_moderators}{Either (1) A character vector listing the variable names in \code{moderators} that are categorical, or (2) a logical scalar or vector identifying whether each variable in \code{moderators} is categorical (\code{TRUE}) or continuous (\code{FALSE}).}
 
 \item{moderator_type}{Type of moderator analysis: "none" means that no moderators are to be used, "simple" means that moderators are to be examined one at a time, and
 "hierarchical" means that all possible combinations and subsets of moderators are to be examined.}
@@ -365,7 +365,7 @@ Components of output tables for artifact-distribution meta-analyses:
 }
 }
 \description{
-The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for correlations, respectively. 
+The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for correlations, respectively.
 The \code{ma_r} function is the master function for meta-analyses of correlations - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of construct pairs.
 When artifact-distribution meta-analyses are performed, \code{ma_r} will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
 \code{ma_r} is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
@@ -521,22 +521,22 @@ ma_r_bb(r = rxyi, n = n, hs_override = FALSE, data = data_r_gonzalezmule_2014)
 
 
 ### Demonstration of ma_r_ic ###
-## Simulated example satisfying the assumptions of the Case IV 
+## Simulated example satisfying the assumptions of the Case IV
 ## range-restriction correction (parameter values: mean_rho = .3, sd_rho = .15):
 ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, ux = ux, data = data_r_uvirr)
 
-## Simulated example satisfying the assumptions of the Case V 
+## Simulated example satisfying the assumptions of the Case V
 ## range-restriction correction
-ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi, 
-        rxx_type = "parallel", ryy_type = "parallel", 
+ma_r_ic(rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
+        rxx_type = "parallel", ryy_type = "parallel",
         ux = ux, uy = uy, data = data_r_bvirr)
 
 ## Published example from Gonzalez-Mule et al. (2014)
 ma_r_ic(rxyi = rxyi, n = n, hs_override = TRUE, data = data_r_gonzalezmule_2014,
         rxx = rxxi, ryy = ryyi, ux = ux, indirect_rr_x = TRUE,
         moderators = c("Rating source", "Published", "Type", "Complexity"))
-        
-        
+
+
 
 ### Demonstration of ma_r_ad ###
 ## Compute barebones meta-analysis
@@ -559,8 +559,8 @@ ma_r_ad(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y, correction_me
 ## Compute artifact-distribution meta-analysis, correcting for univariate direct range restriction
 ma_r_ad(ma_obj = ma_obj, ad_obj_x = ad_obj_x, ad_obj_y = ad_obj_y, correction_method = "uvdrr",
         correct_rr_y = FALSE, indirect_rr_x = FALSE)
-        
-        
+
+
 # The results of ma_r() can also be corrected using artifact distributions
 ma_obj <- ma_r(ma_method = "bb", rxyi = rxyi, n = n,
                construct_x = x_name, construct_y = y_name, sample_id = sample_id,
@@ -572,8 +572,8 @@ ad_tibble <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
                             construct_x = x_name, construct_y = y_name,
                             sample_id = sample_id,
                             data = data_r_meas_multi)
-# Passing that collection of distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
-ma_obj_tibble <- ma_r_ad(ma_obj = ma_obj, 
+# Passing that collection of distributions to ma_r_ad() corrects 'ma_obj' for artifacts:
+ma_obj_tibble <- ma_r_ad(ma_obj = ma_obj,
                          ad_obj_x = ad_tibble, ad_obj_y = ad_tibble)
 summary(ma_obj_tibble)
 ma_obj_tibble$meta_tables[[1]]$artifact_distribution$true_score
@@ -582,13 +582,13 @@ ma_obj_tibble$meta_tables[[1]]$artifact_distribution$true_score
 # The same outcomes as the previous example can be achieved by passing a named list of
 # artifact information, with each element bearing the name of a construct:
 ad_list <- setNames(ad_tibble$ad_x, ad_tibble$construct_x)
-ma_obj_list <- ma_r_ad(ma_obj = ma_obj, 
+ma_obj_list <- ma_r_ad(ma_obj = ma_obj,
                        ad_obj_x = ad_list, ad_obj_y = ad_list)
 summary(ma_obj_list)
 ma_obj_list$meta_tables[[1]]$artifact_distribution$true_score
 
 
-# It is also possible to construct artifact distributions in a pairwise fashion. 
+# It is also possible to construct artifact distributions in a pairwise fashion.
 # For example, if correlations between X and Y and between X and Z are being analyzed,
 # X will get a different distribution for its relationships with Y than with Z.
 # These pairwise distributions are based only on artifact data from specific construct pairs.
@@ -597,24 +597,24 @@ ad_tibble_pair <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
                                  sample_id = sample_id,
                                  control = control_psychmeta(pairwise_ads = TRUE),
                                  data = data_r_meas_multi)
-# Passing these pairwise distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
-ma_obj_pair <- ma_r_ad(ma_obj = ma_obj, 
+# Passing these pairwise distributions to ma_r_ad() corrects 'ma_obj' for artifacts:
+ma_obj_pair <- ma_r_ad(ma_obj = ma_obj,
                        ad_obj_x = ad_tibble_pair, ad_obj_y = ad_tibble_pair)
 summary(ma_obj_pair)
 ma_obj_pair$meta_tables[[1]]$artifact_distribution$true_score
 
 
 # Sometimes moderators have important influcnces on artifact distributions as well as
-# distributions of effect sizes. When this occurs, moderated artifact distributions 
-# can be created to make more appropriate corrections. 
+# distributions of effect sizes. When this occurs, moderated artifact distributions
+# can be created to make more appropriate corrections.
 ad_tibble_mod <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
                                 construct_x = x_name, construct_y = y_name,
                                 sample_id = sample_id,
                                 control = control_psychmeta(moderated_ads = TRUE),
                                 moderators = moderator,
                                 data = data_r_meas_multi)
-# Passing these moderated distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
-ma_obj_mod <- ma_r_ad(ma_obj = ma_obj, 
+# Passing these moderated distributions to ma_r_ad() corrects 'ma_obj' for artifacts:
+ma_obj_mod <- ma_r_ad(ma_obj = ma_obj,
                       ad_obj_x = ad_tibble_mod, ad_obj_y = ad_tibble_mod)
 summary(ma_obj_mod)
 ma_obj_mod$meta_tables[[1]]$artifact_distribution$true_score
@@ -628,8 +628,8 @@ ad_tibble_pairmod <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,
                                                                 pairwise_ads = TRUE),
                                     moderators = moderator,
                                     data = data_r_meas_multi)
-# Passing these pairwise moderated distributions to ma_r_ad() corrects 'ma_obj' for artifacts:  
-ma_obj_pairmod <- ma_r_ad(ma_obj = ma_obj, 
+# Passing these pairwise moderated distributions to ma_r_ad() corrects 'ma_obj' for artifacts:
+ma_obj_pairmod <- ma_r_ad(ma_obj = ma_obj,
                           ad_obj_x = ad_tibble_pairmod, ad_obj_y = ad_tibble_pairmod)
 summary(ma_obj_pairmod)
 ma_obj_pairmod$meta_tables[[1]]$artifact_distribution$true_score
@@ -637,7 +637,7 @@ ma_obj_pairmod$meta_tables[[1]]$artifact_distribution$true_score
 
 # For even more control over which artifact distributions are used in corrections, you can supply
 # un-named list of distributions in which the order of distributions corresponds to the order of
-# meta-analyses in ma_obj. It is important for the elements to be un-named, as the absence of names 
+# meta-analyses in ma_obj. It is important for the elements to be un-named, as the absence of names
 # and the length of the list are the two ways in which ma_r_ad() validates the lists.
 ad_list_pairmod_x <- ad_tibble_pairmod$ad_x
 ad_list_pairmod_y <- ad_tibble_pairmod$ad_y

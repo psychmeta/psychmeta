@@ -40,6 +40,48 @@ match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
      }
 }
 
+match_variables_df <- function(moderators, data, name) {
+        if (inherits(try(moderators, silent = TRUE), "try-error")) {
+                moderators <- tryCatch(dplyr::select(data, {{moderators}}),
+                                       error = function(e) stop("`moderators` included variables not included in `data`.", call. = FALSE)
+                                               )
+        } else if (is.matrix(moderators)) {
+                if (is.null(colnames(moderators))) {
+                        moderators <- setNames(as.data.frame(moderators,
+                                                             stringsAsFactors = FALSE),
+                                               paste(name,
+                                                     1:ncol(moderators), sep = "_"))
+                } else {
+                        moderators <- as.data.frame(moderators,
+                                                    stringsAsFactors = FALSE)
+                }
+        } else if (is.list(moderators)) {
+                if (is.null(names(moderators))) {
+                        moderators <- setNames(as.data.frame(moderators,
+                                                             stringsAsFactors = FALSE),
+                                               paste(name,
+                                                     1:length(moderators), sep = "_"))
+                } else {
+                        moderators <- as.data.frame(moderators,
+                                                    stringsAsFactors = FALSE)
+                }
+        } else {
+                if (length(moderators) == nrow(data)) {
+                        moderators <- setNames(as.data.frame(moderators,
+                                                             stringsAsFactors = FALSE),
+                                               name)
+                } else {
+                        moderators <- try(dplyr::select(data, {{moderators}}))
+                        if (inherits(moderators, "try-error"))
+                                stop("`moderators` included variables not included in `data`.\n  If providing moderator vectors directly, `length(moderators)` must match `nrow(data)`.", call. = FALSE)
+                }
+        }
+        if (nrow(moderators) != nrow(data))
+                stop("`length(moderators)` must match `nrow(data)`.", call. = FALSE)
+
+        return(moderators)
+}
+
 
 clean_moderators <- function(moderator_matrix, cat_moderators, es_vec,
                              moderator_levels = NULL, moderator_names = NULL,

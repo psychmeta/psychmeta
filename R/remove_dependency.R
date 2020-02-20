@@ -76,9 +76,9 @@
 .consolidate_dependent_artifacts <- function(n, n_adj, p = rep(.5, length(es)), es, es_metric, rxx, ryy, ux, uy, rxx_restricted, ryy_restricted, ux_observed, uy_observed){
      ux_out <- .consolidate_dependent_u(ux = ux, rxx = rxx, n = n, ux_observed = ux_observed, rxx_restricted = rxx_restricted)
      uy_out <- .consolidate_dependent_u(ux = uy, rxx = ryy, n = n, ux_observed = uy_observed, rxx_restricted = ryy_restricted)
-     
+
      if(es_metric == "d") es <- convert_es.q_d_to_r(d = es, p = p)
-     
+
      rxx_out <- .colsolidate_dependent_rel(rxx = rxx, ux = ux_out$ux, uy = uy_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = rxx_restricted, ux_observed = ux_out$ux_observed)
      ryy_out <- .colsolidate_dependent_rel(rxx = ryy, ux = uy_out$ux, uy = ux_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = ryy_restricted, ux_observed = uy_out$ux_observed)
 
@@ -117,7 +117,7 @@
           }else{
                measure_y <- NULL
           }
-          
+
           if(length(moderator_names$all) > 0){
                moderators <- as.data.frame(as_tibble(data, .name_repair = "minimal")[,moderator_names$all], stringsAsFactors = FALSE)
           }else{
@@ -127,7 +127,7 @@
      }
 
      additional_args <- list(...)
-     
+
      es_metric <- match.arg(es_metric, c("r", "d"))
 
      dup_IDs <- duplicated(sample_id) | duplicated(sample_id,fromLast=TRUE)
@@ -144,6 +144,7 @@
      p_vec <- es_data$pi
      if(is.null(p_vec)) p_vec <- rep(.5, nrow(es_data))
 
+
      out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair, function(i) {
 
           if(!is.null(citekey)){
@@ -151,23 +152,23 @@
           }else{
                citekey_comp <- NULL
           }
-          
+
           if(!is.null(moderators)){
-               moderators_comp_i <- as_tibble(moderators, .name_repair = "minimal")[i,]
-               moderators_comp <- as_tibble(moderators, .name_repair = "minimal")[1,]
-               
+               moderators_comp_i <- moderators[i,]
+               moderators_comp <- moderators[1,]
+
                if(!is.null(moderator_names$cat))
                     moderators_comp[,moderator_names$cat] <-
                     apply(as.data.frame(moderators_comp_i[,moderator_names$cat], stringsAsFactors = FALSE), 2, function(x){
                          paste(sort(unique(as.character(x))), collapse = " & ")
                     })
-               
+
                if(!is.null(moderator_names$noncat))
-                    moderators_comp[,moderator_names$noncat] <- 
+                    moderators_comp[,moderator_names$noncat] <-
                     apply(as.data.frame(moderators_comp_i[,moderator_names$noncat], stringsAsFactors = FALSE), 2, function(x){
                          mean(x, na.rm = TRUE)
                     })
-               
+
                moderators_comp <- as.data.frame(moderators_comp, stringsAsFactors = FALSE)
           }else{
                moderators_comp <- NULL
@@ -230,35 +231,35 @@
           if(collapse_method == "composite"){
                if(length(intercor) > 1) {
                     if(is.null(construct_x) & is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
-                    
+
                     intercor_x <- intercor[paste(sample_id[i][1], construct_x[i][1])]
                     intercor_y <- intercor[paste(sample_id[i][1], construct_y[i][1])]
-                    
+
                     if(is.na(intercor_x)) intercor_x <- intercor[construct_x[i][1]]
                     if(is.na(intercor_y)) intercor_y <- intercor[construct_y[i][1]]
-                    
+
                     if(is.na(intercor_x)) intercor_x <- intercor[paste(sample_id[i][1], str_split(string = construct_x[i][1], pattern = ":")[[1]][1])]
                     if(is.na(intercor_y)) intercor_y <- intercor[paste(sample_id[i][1], str_split(string = construct_y[i][1], pattern = ":")[[1]][1])]
-                    
+
                     if(is.na(intercor_x)) intercor_x <- intercor[str_split(string = construct_x[i][1], pattern = ":")[[1]][1]]
                     if(is.na(intercor_y)) intercor_y <- intercor[str_split(string = construct_y[i][1], pattern = ":")[[1]][1]]
-                    
+
                     if(is.na(intercor_x) & is.na(intercor_y)){
-                         warning("Valid same-construct intercorrelations for constructs '", as.character(construct_x[i][1]), 
+                         warning("Valid same-construct intercorrelations for constructs '", as.character(construct_x[i][1]),
                                  "' and '", as.character(construct_y[i][1]),
-                                 "' not provided for sample '", sample_id[i][1], 
+                                 "' not provided for sample '", sample_id[i][1],
                                  "': '\n    Computing averages rather than composites", call. = FALSE)
                     }else if(is.na(intercor_x) | is.na(intercor_y)){
                          if(is.na(intercor_x)){
-                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_x[i][1]), 
-                                      "' not provided for sample '", sample_id[i][1], 
-                                      "': '\n     Compositing using information from construct '", as.character(construct_y[i][1]), "' only", call. = FALSE)     
+                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_x[i][1]),
+                                      "' not provided for sample '", sample_id[i][1],
+                                      "': '\n     Compositing using information from construct '", as.character(construct_y[i][1]), "' only", call. = FALSE)
                          }else{
-                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_y[i][1]), 
-                                      "' not provided for sample '", sample_id[i][1], 
-                                      "': '\n     Compositing using information from construct '", as.character(construct_x[i][1]), "' only", call. = FALSE)     
+                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_y[i][1]),
+                                      "' not provided for sample '", sample_id[i][1],
+                                      "': '\n     Compositing using information from construct '", as.character(construct_x[i][1]), "' only", call. = FALSE)
                          }
-                            
+
                     }
 
                } else {
@@ -268,14 +269,14 @@
                if(length(partial_intercor) > 1){
                     if(is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
                     partial_y <- partial_intercor[construct_y[i][1]]
-                    
+
                     partial_y <- partial_y[paste(sample_id[i][1], construct_y[i][1])]
 
                     if(is.na(partial_y)) partial_y <- partial_y[construct_y[i][1]]
                } else {
                     partial_y <- partial_intercor
                }
-               
+
                if(partial_y){
                     if(!is.null(additional_args$.dx_internal_designation)){
                          intercor_y <- mix_r_2group(rxy = intercor_y, dx = es_data$d, dy = es_data$d, p = es_data$pi)
@@ -289,7 +290,7 @@
                                                        k_vars_x = length(es_data$rxyi[i]), mean_intercor_x = mean(c(intercor_x,intercor_y), na.rm = TRUE),
                                                        k_vars_y = 1, mean_intercor_y = intercor_y)
                     } else {
-                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), 
+                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]),
                                                        mean_intercor = intercor_y, partial_intercor = partial_y)
                     }
 
@@ -367,7 +368,7 @@
                     }else{
                          es_comp <- wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i])
                     }
-                    
+
                     if(ma_method != "bb"){
                          rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
                          ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
@@ -376,7 +377,7 @@
                     }
                }
           }
-          
+
           if(ma_method != "bb"){
                k_items_x_comp <- wt_mean(x = data_x$k_items_x[i], wt = es_data$n[i])
                k_items_y_comp  <- wt_mean(x = data_y$k_items_y[i], wt = es_data$n[i])
@@ -384,17 +385,17 @@
 
           if(ma_method == "bb") rxx_comp <- ux_comp <- ryy_comp <- uy_comp <-
                rxx_restricted_comp <- ryy_restricted_comp <- ux_observed_comp <- uy_observed_comp <-
-               correct_rr_x <- correct_rr_y <- indirect_rr_x <- indirect_rr_y <- 
+               correct_rr_x <- correct_rr_y <- indirect_rr_x <- indirect_rr_y <-
                     k_items_x_comp <- k_items_y_comp <- NULL
 
           n_comp <- wt_mean(x = es_data$n[i], wt = es_data$n_adj[i])
           n_adj_comp <- wt_mean(x = es_data$n_adj[i], wt = es_data$n_adj[i])
-          
-          if(abs(es_comp) > 1) 
+
+          if(abs(es_comp) > 1)
                   stop("The composite effect size for sample ID '", es_data$sample_id[i][1], "' is not possible.
-Please (a) supply alternative intercorrelations, (b) supply sample-specific intercorrelations, 
+Please (a) supply alternative intercorrelations, (b) supply sample-specific intercorrelations,
 (c) change the 'collapse_method' argument, or (d) manually consolidate the dependency among estimates.", call. = FALSE)
-          
+
           if(all(c("d", "n1", "n2", "pi", "pa") %in% colnames(es_data))){
                n1_comp <- wt_mean(x = es_data$n1[i], wt = es_data$n_adj[i])
                n2_comp <- wt_mean(x = es_data$n2[i], wt = es_data$n_adj[i])
@@ -406,7 +407,7 @@ Please (a) supply alternative intercorrelations, (b) supply sample-specific inte
           }
 
           out <- list(sample_id = sample_id[i][1],
-                      moderators_comp = moderators_comp, 
+                      moderators_comp = moderators_comp,
                       es_comp = es_comp, n_comp = n_comp, n_adj_comp = n_adj_comp,
                       rxx_comp = rxx_comp, ryy_comp = ryy_comp,
                       ux_comp = ux_comp, uy_comp = uy_comp,
@@ -414,9 +415,9 @@ Please (a) supply alternative intercorrelations, (b) supply sample-specific inte
                       ryy_restricted_comp = ryy_restricted_comp,
                       ux_observed_comp = ux_observed_comp,
                       uy_observed_comp = uy_observed_comp,
-                      k_items_x_comp = k_items_x_comp, 
-                      k_items_y_comp = k_items_y_comp, 
-                      
+                      k_items_x_comp = k_items_x_comp,
+                      k_items_y_comp = k_items_y_comp,
+
                       correct_rr_x = correct_rr_x[i][1],
                       correct_rr_y = correct_rr_y[i][1],
 
@@ -472,7 +473,7 @@ Please (a) supply alternative intercorrelations, (b) supply sample-specific inte
 
           out
      })
-     
+
      if(!is.null(moderators)){
           mod_out <- as.data.frame(data.table::rbindlist(lapply(out, function(x) x$moderators_comp)), stringsAsFactors = FALSE)
      }else{
@@ -496,7 +497,7 @@ Please (a) supply alternative intercorrelations, (b) supply sample-specific inte
                          rxx_type = unlist(lapply(out, function(x) x$rxx_type)),
                          rxx_consistency = unlist(lapply(out, function(x) x$rxx_consistency)),
                          k_items_x = unlist(lapply(out, function(x) x$k_items_x_comp)),
-                         
+
                          ux = unlist(lapply(out, function(x) x$ux_comp)),
                          rxx_restricted = unlist(lapply(out, function(x) x$rxx_restricted_comp)),
                          ux_observed = unlist(lapply(out, function(x) x$ux_observed_comp)),
@@ -511,7 +512,7 @@ Please (a) supply alternative intercorrelations, (b) supply sample-specific inte
                          ryy_type = unlist(lapply(out, function(x) x$ryy_type)),
                          ryy_consistency = unlist(lapply(out, function(x) x$ryy_consistency)),
                          k_items_y = unlist(lapply(out, function(x) x$k_items_y_comp)),
-                         
+
                          uy = unlist(lapply(out, function(x) x$uy_comp)),
                          ryy_restricted = unlist(lapply(out, function(x) x$ryy_restricted_comp)),
                          uy_observed = unlist(lapply(out, function(x) x$uy_observed_comp)),
