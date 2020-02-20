@@ -717,7 +717,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                           cat_moderators)
                                           }
                                   )
-          moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0 || is.na(x)){NULL}else{x})
+          moderator_names <- lapply(moderator_names, function(x) if(length(x) == 0 || (length(x) == 1 & anyNA(x))){NULL}else{x})
 
           if (!is.null(moderator_names$cat)) {
                moderator_levels <- lapply(as_tibble(moderators, .name_repair = "minimal")[,cat_moderators], function(x){
