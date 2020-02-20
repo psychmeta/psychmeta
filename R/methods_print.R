@@ -908,7 +908,11 @@ print.ma_table <- function(x, ..., digits = 3, verbose = FALSE, n = nrow(x), wid
 
      x <- ungroup(x)
      class(x) <- class(x)[class(x) != "ma_table"]
-     print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits, n = n, width = width, n_extra = n_extra)
+     if (inherits(x, "tbl_df")) {
+             print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits, n = n, width = width, n_extra = n_extra)
+     } else {
+             print(x[,c(leading_cols, middle_cols, trailing_cols)], digits = digits)
+     }
 }
 
 
@@ -968,7 +972,7 @@ print.ma_ad_list <- function(x, ..., digits = 3){
 #' @exportClass summary.ma_psychmeta
 #' @method print summary.ma_psychmeta
 print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_types = "ts",
-                                       verbose = FALSE, n = max(sapply(x$meta_tables, nrow)),
+                                       verbose = FALSE, n = NULL,
                                        width = NULL, n_extra = NULL){
 
      ma_obj <- x$ma_obj
@@ -1012,6 +1016,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                cat("Bare-bones meta-analysis results \n")
           }
           cat("---------------------------------------------------------------------- \n")
+          if (is.null(n)) n <- nrow(meta_tables$barebones)
           print(meta_tables$barebones, suppress_title = TRUE, verbose = verbose,
                 n = n, width = width, n_extra = n_extra)
      }
@@ -1024,6 +1029,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                     cat("\nIndividual-correction meta-analysis results \n")
                }
                cat("---------------------------------------------------------------------- \n")
+               if (is.null(n)) n <- nrow(meta_tables$individual_correction)
                print(meta_tables$individual_correction, suppress_title = TRUE, verbose = verbose,
                      n = n, width = width, n_extra = n_extra)
           }else{
@@ -1032,6 +1038,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                if("ts" %in% correction_types_ic){
                     cat(ts_title)
+                    if (is.null(n)) n <- nrow(meta_tables$individual_correction[[ts_label]])
                     print(meta_tables$individual_correction[[ts_label]],
                           suppress_title = TRUE, verbose = verbose,
                           n = n, width = width, n_extra = n_extra)
@@ -1039,6 +1046,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                if("vgx" %in% correction_types_ic){
                     cat(vgx_title)
+                    if (is.null(n)) n <- nrow(meta_tables$individual_correction[[vgx_label]])
                     print(meta_tables$individual_correction[[vgx_label]],
                           suppress_title = TRUE, verbose = verbose,
                           n = n, width = width, n_extra = n_extra)
@@ -1046,6 +1054,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                if("vgy" %in% correction_types_ic){
                     cat(vgy_title)
+                    if (is.null(n)) n <- nrow(meta_tables$individual_correction[[vgy_label]])
                     print(meta_tables$individual_correction[[vgy_label]],
                           suppress_title = TRUE, verbose = verbose,
                           n = n, width = width, n_extra = n_extra)
@@ -1075,6 +1084,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
                     cat("\nArtifact-distribution meta-analysis results \n")
                }
                cat("---------------------------------------------------------------------- \n")
+               if (is.null(n)) n <- nrow(meta_tables$artifact_distribution)
                print(meta_tables$artifact_distribution,
                      suppress_title = TRUE, verbose = verbose,
                      n = n, width = width, n_extra = n_extra)
@@ -1084,6 +1094,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                if("ts" %in% correction_types_ad){
                     cat(ts_title)
+                    if (is.null(n)) n <- nrow(meta_tables$artifact_distribution[[ts_label]])
                     print(meta_tables$artifact_distribution[[ts_label]],
                           suppress_title = TRUE, verbose = verbose,
                           n = n, width = width, n_extra = n_extra)
@@ -1091,6 +1102,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                if("vgx" %in% correction_types_ad){
                     cat(vgx_title)
+                    if (is.null(n)) n <- nrow(meta_tables$artifact_distribution[[vgx_label]])
                     print(meta_tables$artifact_distribution[[vgx_label]],
                           suppress_title = TRUE, verbose = verbose,
                           n = n, width = width, n_extra = n_extra)
@@ -1098,6 +1110,7 @@ print.summary.ma_psychmeta <- function(x, ..., ma_methods = NULL, correction_typ
 
                if("vgy" %in% correction_types_ad){
                     cat(vgy_title)
+                    if (is.null(n)) n <- nrow(meta_tables$artifact_distribution[[vgy_label]])
                     print(meta_tables$artifact_distribution[[vgy_label]],
                           suppress_title = TRUE, verbose = verbose,
                           n = n, width = width, n_extra = n_extra)
