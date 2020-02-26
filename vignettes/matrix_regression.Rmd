@@ -1,6 +1,8 @@
 ---
 title: "Linear Regression with Covariance (Correlation) Matrices"
 date: "`r Sys.Date()`"
+csl: https://zotero.org/styles/apa
+bibliography: vignette.json
 output: 
   rmarkdown::html_vignette:
     df_print: paged
@@ -15,66 +17,241 @@ knitr::opts_chunk$set(echo = TRUE)
 library(psychmeta)
 ```
 
-This vignette shows options for handling effect size dependency in **psychmeta**.
-For more vignettes, see the [**psychmeta** overview](overview.html).
+This vignette shows how to conduct multiple regression analyses in **psychmeta**
+using correlation or covariances as input. For more vignettes, see the [**psychmeta** overview](overview.html).
 
-# Matrix regression
+## Matrix regression
 
-The `lm_mat()` function mimics the structure and appearance of the `lm()` function from the **`stats`** package, but uses correlation/covariance matrices to compute regression models instead of raw data sets.
+It is possible to estiamte OLS regression models using just the correlation matrix
+(or covariance matrix and means) among variables. This is commonly done when 
+estimating regression models using the results of meta-analyses. **psychmeta** 
+provides a function, `lm_mat()`, to conduct regression analyses using a 
+correlation/covariance matrix that integrates well with the base R regession 
+function: `lm()` function from the **`stats`** package. Results from the `lm_mat()`
+function will look and behave just like results from `lm()`, and you can use them
+with all sorts of regression helper functions, such as `summary()`, `predict()`,
+and `anova()`.
 
-```{r, eval=FALSE}
-# For purposes of demonstration, generate a dataset from the following matrix:
-S <- reshape_vec2mat(cov = c(.3 * 2 * 3,
-                             .4 * 2 * 4,
-                             .5 * 3 * 4),
-                     var = c(2, 3, 4)^2,
-                     var_names = c("X", "Y", "Z"))
-mean_vec <- setNames(c(1, 2, 3), colnames(S))
-dat <- data.frame(MASS::mvrnorm(n = 100, mu = mean_vec, Sigma = S, empirical = TRUE))
+## Regression with a correlation matrix
+
+Let's analyze this correlation matrix. It includes correlations among the Big
+Five personality traits (Agreeableness [AG], Emotional Stability [ES],
+Conscientiousness [CO], Extraversion [EX], Openness [OP]), two additional 
+personality variables (proactive personality [PP], self-efficacy [SE]), and
+career satisfaction (Csat).
+
+Let's assume that this correlation matrix was estimated in a sample of 250 people.
+
+```{r}
+cor_mat <- matrix(
+  c(
+    1.00, 0.31, 0.41, 0.20, 0.19, 0.07, 0.11, 0.15,
+    0.31, 1.00, 0.33, 0.27, 0.09, 0.12, 0.35, 0.34,
+    0.41, 0.33, 1.00, 0.19, 0.12, 0.34, 0.22, 0.16,
+    0.20, 0.27, 0.19, 1.00, 0.33, 0.41, 0.33, 0.24,
+    0.19, 0.09, 0.12, 0.33, 1.00, 0.34, 0.20, 0.17,
+    0.07, 0.12, 0.34, 0.41, 0.34, 1.00, 0.56, 0.31,
+    0.11, 0.35, 0.22, 0.33, 0.20, 0.56, 1.00, 0.53,
+    0.15, 0.34, 0.16, 0.24, 0.17, 0.31, 0.53, 1.00
+    ), nrow = 8, ncol = 8, byrow = TRUE, 
+  dimnames = list(c("AG", "ES", "CO", "EX", "OP", "PP", "SE", "Csat"),
+                  c("AG", "ES", "CO", "EX", "OP", "PP", "SE", "Csat"))
+  )
+
+N <- 250
 ```
 
-The same formulas can be used with `lm_mat()` as with `lm()`, you just have to provide `cov_mat` and `n` arguments (and an optional `mean_vec` argument) instead of `data`. However, `lm_mat()` can only compute moderated regressions if the product term is already in `cov_mat`.
-```{r, eval=FALSE}
-# Compute regression models using one predictor:
-lm_out1 <- lm(formula = Y ~ X, data = dat)
-lm_mat_out1 <- lm_mat(formula = Y ~ X, cov_mat = S, mean_vec = mean_vec, n = nrow(dat))
+You specify models in `lm_mat()` using the same formula syntax as in `lm()`. 
 
-# Compute regression models using two predictors:
-lm_out2 <- lm(formula = Y ~ X + Z, data = dat)
-lm_mat_out2 <- lm_mat(formula = Y ~ X + Z, cov_mat = S, mean_vec = mean_vec, n = nrow(dat))
+For example, to estimate a model using the Big Five traits to predict career
+satisfaction, run:
+
+```{r}
+mod_b5 <- lm_mat(Csat ~ AG + ES + CO + EX + OP,
+                 cov_mat = cor_mat,
+                 n = N,
+                 se_beta_method = "normal")
 ```
 
-The `summary()` method works for both `lm()` and `lm_mat()` results and the printouts look identical.
-```{r, eval=FALSE}
-summary(lm_out1)
-summary(lm_mat_out1)
+  - Here, the first argument is the model prediction formula. For details on formula
+    specification in R, see `help("stats::lm")`.
+  - `cov_mat` is your covariance or correlation matrix you will use to estimate the
+    model. It must have row and column names corresponding to the variables in the 
+    formula.
+  - `n` is the sample size.
+  - `se_beta_method`. This argument controls how standard errors and confidence 
+    intervals are calculated for standardized regression coefficients (beta or 
+    \u03B2; including all coefficients for models estimated using a correlation 
+    [not covariance] matrix). 
+      - The default, `"lm"`, will compute standard errors using the same method 
+        as `lm()`, based on @Cohen2003. This method ignores uncertainty 
+        in the standard deviations used to standardize the coefficients and 
+        correlations. As a result, confidence intervals will be too narrow. 
+      - More accurate standard errors and confidence intervals for standardized 
+        coefficients can be obtained by settings `se_beta_method = "normal"`,
+        which will use the normal-theory approach from @JonesWaller2013 [@JonesWaller2015].
+        
+Note that `lm_mat()` is limited to linear models. It can only compute moderated 
+or polynomial regression models if the product or polynomial terms are already 
+in `cov_mat`. It cannot fit generalized linear models with non-identity link 
+functions (as in `glm()`).
+
+### Working with `lm_mat()` output
+
+You can use the same functions to work with `lm_mat()` results as you can
+with `lm()` results. For example, to view a regression output table:
+
+```{r}
+summary(mod_b5)
 ```
 
-`lm_mat()` results can also be used with functions such as `anova()`, `predict()`, and `confint()` to yield output comparable to what one would get with `lm()` results.
-```{r, eval=FALSE}
-anova(lm_out1, lm_out2)
-anova(lm_mat_out1, lm_mat_out2)
+To predict outcome values for new data:
+
+```{r}
+predict(mod_b5, 
+        newdata = data.frame(AG = 1, ES = 1, CO = 1, EX = 0, OP = 0))
+```
+
+To extract the model coefficients:
+```{r}
+coef(mod_b5)
+```
+
+To compute confidence intervals for the model coefficients:
+```{r}
+confint(mod_b5)
+```
+
+### Hierarchical regression and model comparison
+
+To compare models, use the `anova()` function.
+
+For example, let's say that we want to examine the incremental validity of
+self-efficacy for predicting career satisfaction. Does knowing someone's self-
+efficacy score enable us to predict their career satisfaction better than if
+we only knew their Big Five trait scores?
+
+To answer this question, fit a regression model including both the Big Five traits
+and self-efficacy as predictors:
+
+```{r}
+mod_b5_plus_se <- 
+  lm_mat(Csat ~ AG + ES + CO + EX + OP + SE,
+         cov_mat = cor_mat,
+         n = N,
+         se_beta_method = "normal")
+```
+
+Then compare the two models using `anova()`:
+
+```{r}
+anova(mod_b5, mod_b5_plus_se)
 ```
 
 
+## Regression with a covariance matrix and/or variable means
 
-# Matrix regression applied to meta-analytic correlations
-The `get_matrix()` function can extract correlation matrices from meta-analysis objects for use in subsequent multivariate analyses.
-```{r, eval=FALSE}
-mat_array <- get_matrix(ma_obj = ma_obj)
-R <- mat_array$individual_correction$`moderator_comb: 1`$true_score$mean_rho
-n <- mat_array$individual_correction$`moderator_comb: 1`$true_score$N[1,3]
+You can similarly estimate linear regression models using a covariance matrix 
+and (optionally) a vector of variable means:
+
+```{r}
+sd_vec   <- c(AG = 2, ES = 3, CO = 2, EX = 1, OP = 2, PP = 4, SE = 5, Csat = 30)
+mean_vec <- c(AG = 10, ES = 11, CO = 9, EX = 10, OP = 6, PP = 20, SE = 15, Csat = 50)
+cov_mat <- cor_mat * (sd_vec %*% t(sd_vec))
+
+mod_b5_unstd <- 
+  lm_mat(Csat ~ AG + ES + CO + EX + OP,
+         cov_mat = cov_mat, 
+         mean_vec = mean_vec,
+         n = N,
+         se_beta_method = "normal")
 ```
 
-The `lm_mat()` function can be used to compute regressions from meta-analytic matrices, using the mean *N* or harmonic mean *N* as a sample size.
-```{r, eval=FALSE}
-lm_x <- lm_mat(formula = Y ~ X, cov_mat = R, n = n)
-lm_xz <- lm_mat(formula = Y ~ X + Z, cov_mat = R, n = n)
+Here, `cov_mat` is your covariance matrix, `mean_vec` is the vector of variable 
+means, and other arguments are defined as above.
+
+You can view unstandardized regression results using `summary()`:
+
+```{r}
+summary(mod_b5_unstd)
 ```
 
-Meta-analytic incremental validity analyses are simple with the `anova()` method applied to `lm_mat()` results.
-```{r, eval=FALSE}
-summary(lm_x)
-summary(lm_xz)
-anova(lm_x, lm_xz)
+To view standardized results for a model estimated with a covariance matrix,
+extract the `coefficients.std` object from the `summary()` of the model:
+
+```{r}
+summary(mod_b5_unstd)$coefficients.std
 ```
+
+
+## Meta-analytic regresssion models
+
+<!-- When an `se_var` argument is implemented, discuss that here, too. -->
+
+You can use `lm_mat()` to conduct regression analsyes with correlation matrices
+constructed from meta-analytic results. To extract correlation matrices for such
+analyses from the results of `psychmeta` meta-analsysis objects, use the 
+`get_matrix()` function:
+
+```{r}
+ma_obj <- ma_r(rxyi = rxyi, n = n, 
+               rxx = rxxi, ryy = ryyi, 
+               ma_method = "ic", 
+               construct_x = x_name,
+               construct_y = y_name,
+               data = data_r_meas_multi)
+meta_matrix <- get_matrix(ma_obj = ma_obj)
+```
+
+`get_matrix()` return a tibble containing lists of matrices for each meta-analysis
+parameter, arranged like correlation matrices:
+
+```{r}
+print(meta_matrix)
+```
+
+For example, in the `individual_correction` results, you can see matrices for *k*,
+*N*, *mean_r*, *sd_res*, *mean_rho*, *sd_rho*, etc.:
+
+```{r}
+print(mat_array$individual_correction$`1`$true_score)
+```
+
+We can get a matrix of meta-analytic mean correlations by extracting the `mean_rho`
+object from this list:
+
+```{r}
+R_meta <- mat_array$individual_correction$`1`$true_score
+```
+
+We can approximate a sample size for regression analyses by taking an average
+of the sample sizes from the contributing meta-analyses. For example, the harmonic
+mean *N* across meta-analyses is often used [@ViswesvaranOnes1995]:
+
+```{r}
+harmonic_mean <- function(x, na.rm = FALSE) {
+  ix <- 1 / x
+  imn <- mean(ix, na.rm = na.rm)
+  return(1 / imn)
+}
+
+N_meta <- mat_array$individual_correction$`1`$N
+N_harm <- harmonic_mean(N_meta[lower.tri(N_meta)])
+```
+
+Using the meta-analytic matrix and mean sample size, you can then estimate a
+meta-analytic regression mode:
+
+```{r}
+mod_meta <- lm_mat(Y ~ X + Z, 
+                   cov_mat = R_meta,
+                   n = N_harm,
+                   se_beta_method = "normal")
+```
+
+**Note! The standard errors, confidence intervals, and p values for regression 
+results based on an average sample size are only approximate. For more accurate 
+results, consider a GLS approach based on @Becker1992. Functions for this approach
+will be added in a future version.**
+
+## References

@@ -1,6 +1,5 @@
 [{
   "id": "DahlkeNotrestrictedselection2019",
-  "abstract": "Range restriction is a common problem in organizational research and is an important statistical artifact to correct for in meta-analysis. Historically, researchers have had to rely on range restriction corrections that only make use of range-restriction information for one variable, but it is not uncommon for researchers to have such information for both variables in a correlation (e.g., when studying the correlation between two predictor variables). Existing meta-analytic methods incorporating bivariate range-restriction corrections overlook their unique implications for estimating the sampling variance of corrected correlations and for accurately assigning weights to studies in individual-correction meta-analyses. We introduce new methods for computing individual-correction and artifact-distribution meta-analyses using the bivariate indirect range restriction (BVIRR; “Case V”) correction and describe improved methods for applying BVIRR corrections that substantially reduce bias in parameter estimation. We illustrate the effectiveness of these methods in a large-scale simulation and in meta-analyses of expatriate data. We provide R code to implement the methods described in this article; more comprehensive and robust functions for applying these methods are available in the psychmeta package for R.",
   "accessed": {
     "date-parts": [
       [2019, 10, 3]
@@ -32,7 +31,6 @@
 },
 {
   "id": "Dahlkepsychmetapackagepsychometric2019",
-  "abstract": "Over the past four decades, psychometric meta-analysis (PMA) has emerged a key way that psychological disciplines build cumulative scientific knowledge. Despite the importance and popularity of PMA, software implementing the method has tended to be closed-source, inflexible, limited in terms of the psychometric corrections available, cumbersome to use for complex analyses, and/or costly. To overcome these limitations, we created the psychmeta R package: a free, open-source, comprehensive program for PMA.",
   "author": [{
     "family": "Dahlke",
     "given": "Jeffrey A."
@@ -121,7 +119,6 @@
 },
 {
   "id": "WiernikEmpiricalbenchmarksinterpreting2017",
-  "abstract": "Generalization in meta-analyses is not a dichotomous decision (typically encountered in papers using the <i>Q</i> test for homogeneity, the 75% rule, or null hypothesis tests). Inattention to effect size variability in meta-analyses may stem from a lack of guidelines for interpreting credibility intervals. In this commentary, we describe two methods for making practical interpretations and determining whether a particular SDρ represents a meaningful level of variability.",
   "accessed": {
     "date-parts": [
       [2017, 9, 1]
@@ -160,5 +157,151 @@
   "type": "article-journal",
   "URL": "https://doi.org/10/ccnv",
   "volume": "10"
+},
+{
+  "id": "JonesWaller2013",
+  "author": [{
+    "family": "Jones",
+    "given": "Jeff A."
+  }, {
+    "family": "Waller",
+    "given": "Niels G."
+  }],
+  "container-title": "Psychological Methods",
+  "container-title-short": "PMET",
+  "DOI": "10/gckfx4",
+  "ISSN": "1939-1463(Electronic);1082-989X(Print)",
+  "issue": "4",
+  "issued": {
+    "date-parts": [
+      [2013]
+    ]
+  },
+  "language": "en",
+  "page": "435-453",
+  "source": "APA PsycNET",
+  "title": "Computing confidence intervals for standardized regression coefficients",
+  "type": "article-journal",
+  "volume": "18"
+},
+{
+  "id": "JonesWaller2015",
+  "accessed": {
+    "date-parts": [
+      [2017, 4, 6]
+    ]
+  },
+  "author": [{
+    "family": "Jones",
+    "given": "Jeff A."
+  }, {
+    "family": "Waller",
+    "given": "Niels G."
+  }],
+  "container-title": "Psychometrika",
+  "container-title-short": "PMK",
+  "DOI": "10/gckfx5",
+  "ISSN": "0033-3123, 1860-0980",
+  "issue": "2",
+  "issued": {
+    "date-parts": [
+      [2015, 6]
+    ]
+  },
+  "language": "en",
+  "page": "365-378",
+  "source": "CrossRef",
+  "title": "The normal-theory and asymptotic distribution-free (ADF) covariance matrix of standardized regression coefficients: theoretical extensions and finite sample behavior",
+  "title-short": "The normal-theory and asymptotic distribution-free (ADF) covariance matrix of standardized regression coefficients",
+  "type": "article-journal",
+  "URL": "http://link.springer.com/10.1007/s11336-013-9380-y",
+  "volume": "80"
+},
+{
+  "id": "Cohen2003",
+  "author": [{
+    "family": "Cohen",
+    "given": "Jacob"
+  }, {
+    "family": "Cohen",
+    "given": "Patricia"
+  }, {
+    "family": "West",
+    "given": "Stephen G."
+  }, {
+    "family": "Aiken",
+    "given": "Leona S."
+  }],
+  "DOI": "10/crtf",
+  "edition": "3",
+  "ISBN": "0-8058-2223-2 978-0-8058-2223-6",
+  "issued": {
+    "date-parts": [
+      [2003]
+    ]
+  },
+  "language": "en",
+  "number-of-pages": "736",
+  "publisher": "Routledge",
+  "publisher-place": "New York, NY, US",
+  "title": "Applied multiple regression/correlation analysis for the behavioral sciences",
+  "type": "book",
+  "URL": "https://doi.org/10/crtf"
+},
+{
+  "id": "ViswesvaranOnes1995",
+  "author": [{
+    "family": "Viswesvaran",
+    "given": "Chockalingam"
+  }, {
+    "family": "Ones",
+    "given": "Deniz S."
+  }],
+  "container-title": "Personnel Psychology",
+  "container-title-short": "PP",
+  "DOI": "10.1111/j.1744-6570.1995.tb01784.x",
+  "ISSN": "0031-5826 (Print); 1744-6570 (Online)",
+  "issue": "4",
+  "issued": {
+    "date-parts": [
+      [1995]
+    ]
+  },
+  "language": "en",
+  "page": "865-885",
+  "title": "Theory testing: combining psychometric meta-analysis and structural equations modeling",
+  "title-short": "Theory testing",
+  "type": "article-journal",
+  "URL": "http://doi.org/10/dct45z",
+  "volume": "48"
+},
+{
+	"id": "Becker1992",
+	"accessed": {
+		"date-parts": [
+			[2018, 6, 28]
+		]
+	},
+	"author": [{
+		"family": "Becker",
+		"given": "Betsy Jane"
+	}],
+	"container-title": "Journal of Educational Statistics",
+	"container-title-short": "J. Educ. Stat.",
+	"DOI": "10.3102/10769986017004341",
+	"ISSN": "0362-9791",
+	"issue": "4",
+	"issued": {
+		"date-parts": [
+			[1992, 12]
+		]
+	},
+	"language": "en",
+	"page": "341-362",
+	"source": "Crossref",
+	"title": "Using results from replicated studies to estimate linear models",
+	"type": "article-journal",
+	"URL": "http://journals.sagepub.com/doi/10.3102/10769986017004341",
+	"volume": "17"
 }
 ]
