@@ -4,7 +4,9 @@
 \name{data_r_bvdrr}
 \alias{data_r_bvdrr}
 \title{Hypothetical dataset simulated to satisfy the assumptions of the bivariate correction for direct range restriction}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_r_bvdrr)
 }

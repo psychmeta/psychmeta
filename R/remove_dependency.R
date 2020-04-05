@@ -154,6 +154,7 @@
           }
 
           if(!is.null(moderators)){
+                  moderators <- as_tibble(moderators)
                moderators_comp_i <- moderators[i,]
                moderators_comp <- moderators[1,]
 

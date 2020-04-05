@@ -625,22 +625,22 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, arg_name = "n_adj", data = data)
 
           if(deparse(substitute(construct_x))[1] != "NULL")
-               construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
+                  construct_x <- match_variables2(arg = {{construct_x}}, data = data, name = deparse(substitute(construct_x)), arg_name = "construct_x")
 
           if(deparse(substitute(construct_y))[1] != "NULL")
-               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+                  construct_y <- match_variables2(arg = {{construct_y}}, data = data, name = deparse(substitute(construct_y)), arg_name = "construct_y")
 
           if(deparse(substitute(facet_x))[1] != "NULL")
-               facet_x <- match_variables(call = call_full[[match("facet_x", names(call_full))]], arg = facet_x, arg_name = "facet_x", data = data)
+                  facet_x <- match_variables2(arg = {{facet_x}}, data = data, name = deparse(substitute(facet_x)), arg_name = "facet_x")
 
           if(deparse(substitute(facet_y))[1] != "NULL")
-               facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, arg_name = "facet_y", data = data)
+                  facet_y <- match_variables2(arg = {{facet_y}}, data = data, name = deparse(substitute(facet_y)), arg_name = "facet_y")
 
           if(deparse(substitute(measure_x))[1] != "NULL")
-               measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, arg_name = "measure_x", data = data)
+                  measure_x <- match_variables2(arg = {{measure_x}}, data = data, name = deparse(substitute(measure_x)), arg_name = "measure_x")
 
           if(deparse(substitute(measure_y))[1] != "NULL")
-               measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, arg_name = "measure_y", data = data)
+                  measure_y <- match_variables2(arg = {{measure_y}}, data = data, name = deparse(substitute(measure_y)), arg_name = "measure_y")
 
           if(deparse(substitute(rxx))[1] != "NULL")
                rxx <- match_variables(call = call_full[[match("rxx", names(call_full))]], arg = rxx, arg_name = "rxx", data = data)
@@ -683,11 +683,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(deparse(substitute(citekey))[1] != "NULL")
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
-
-          if (!is.null(substitute(moderators))) {
-                  moderators <- match_variables_df({{moderators}}, data, name = deparse(substitute(moderators)))
-          }
-
+          
+          if(!is.null(substitute(moderators)))
+                  moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
+          
           if(deparse(substitute(correct_rr_x))[1] != "NULL")
                correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x", names(call_full))]], arg = correct_rr_x, arg_name = "correct_rr_x", data = data)
 

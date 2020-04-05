@@ -4,7 +4,9 @@
 \name{data_r_uvdrr}
 \alias{data_r_uvdrr}
 \title{Hypothetical dataset simulated to satisfy the assumptions of the univariate correction for direct range restriction}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_r_uvdrr)
 }
