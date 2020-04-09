@@ -1,8 +1,8 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 2.3.6
-Date: 2020-02-19
+Version: 2.3.7
+Date: 2020-04-09
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "jdahlke@humrro.org"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
@@ -22,6 +22,6 @@ Imports: dplyr, stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
          ggplot2, metafor, nor1mix, progress, tidyr (>= 1.0.0), stringi,
          stringr, rlang, curl, purrr, data.table, cli, crayon
 Suggests: bib2df, rmarkdown, knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068

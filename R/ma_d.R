@@ -333,13 +333,13 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                group2 <- match_variables(call = call_full[[match("group2", names(call_full))]], arg = group2, data = data)
           
           if(deparse(substitute(construct_y))[1] != "NULL")
-               construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, data = data)
+                  construct_y <- match_variables2(arg = {{construct_y}}, data = data, name = deparse(substitute(construct_y)), arg_name = "construct_y")
           
           if(deparse(substitute(facet_y))[1] != "NULL")
-               facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, data = data)
+                  facet_y <- match_variables2(arg = {{facet_y}}, data = data, name = deparse(substitute(facet_y)), arg_name = "facet_y")
           
           if(deparse(substitute(measure_y))[1] != "NULL")
-               measure_y <- match_variables(call = call_full[[match("measure_y",  names(call_full))]], arg = measure_y, data = data)
+                  measure_y <- match_variables2(arg = {{measure_y}}, data = data, name = deparse(substitute(measure_y)), arg_name = "measure_y")
 
           if(deparse(substitute(rGg))[1] != "NULL")
                rGg <- match_variables(call = call_full[[match("rGg", names(call_full))]], arg = rGg, data = data)
@@ -369,8 +369,8 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators", names(call_full))]], arg = moderators, data = as_tibble(data, .name_repair = "minimal"), as_array = TRUE)
-
+                  moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
+          
           if(deparse(substitute(correct_rr_g))[1] != "NULL")
                correct_rr_g <- match_variables(call = call_full[[match("correct_rr_g", names(call_full))]], arg = correct_rr_g, data = data)
 

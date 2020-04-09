@@ -4,7 +4,9 @@
 \name{data_d_bb_multi}
 \alias{data_d_bb_multi}
 \title{Hypothetical \emph{d} value dataset simulated with sampling error only}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_d_bb_multi)
 }

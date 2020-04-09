@@ -84,34 +84,36 @@
          }
 
          cran_v_char <- stringr::str_extract(version_check[which(stringr::str_detect(version_check, "Version:")) + 1], "\\d\\.\\d\\.\\d")
-         vcheck <- check_version(cran_version = cran_v_char, sys_version = version)
-
-         use_symbols <- .support_unicode()
-
-         packageStartupMessage(crayon::white("\n", paste0("-----------------------------------------------------", paste0(rep_len("-", nchar(paste(pkgname, "version", version)) - 13), collapse = ""), " "), crayon::bold("Version check"), " --"))
-         if(vcheck$best_version == "CRAN"){
-              version_message <- "Oh no! It looks like your copy of psychmeta is out of date!"
-              if(use_symbols) version_message <- paste0(cli::symbol$cross, " ", version_message)
-              packageStartupMessage(crayon::red(version_message))
-              packageStartupMessage("No worries, it's easy to obtain the latest version - just run the following command: \n")
-              packageStartupMessage('                       install.packages("psychmeta")')
-         }else if(vcheck$best_version == "Current"){
-              version_message <- "Yay! Your copy of psychmeta is up to date!"
-              if(use_symbols) version_message <- paste0(cli::symbol$tick, " ", version_message)
-              packageStartupMessage(crayon::green(version_message))
-         }else if(vcheck$best_version == "Local"){
-              version_message <- "Kudos! Your copy of psychmeta is more recent than the current CRAN release!"
-              if(use_symbols) version_message <- paste0(cli::symbol$tick, " ", version_message)
-              packageStartupMessage(crayon::green(version_message))
+         if(length(cran_v_char) > 0){
+           vcheck <- check_version(cran_version = cran_v_char, sys_version = version)
+           
+           use_symbols <- .support_unicode()
+           
+           packageStartupMessage(crayon::white("\n", paste0("-----------------------------------------------------", paste0(rep_len("-", nchar(paste(pkgname, "version", version)) - 13), collapse = ""), " "), crayon::bold("Version check"), " --"))
+           if(vcheck$best_version == "CRAN"){
+             version_message <- "Oh no! It looks like your copy of psychmeta is out of date!"
+             if(use_symbols) version_message <- paste0(cli::symbol$cross, " ", version_message)
+             packageStartupMessage(crayon::red(version_message))
+             packageStartupMessage("No worries, it's easy to obtain the latest version - just run the following command: \n")
+             packageStartupMessage('                       install.packages("psychmeta")')
+           }else if(vcheck$best_version == "Current"){
+             version_message <- "Yay! Your copy of psychmeta is up to date!"
+             if(use_symbols) version_message <- paste0(cli::symbol$tick, " ", version_message)
+             packageStartupMessage(crayon::green(version_message))
+           }else if(vcheck$best_version == "Local"){
+             version_message <- "Kudos! Your copy of psychmeta is more recent than the current CRAN release!"
+             if(use_symbols) version_message <- paste0(cli::symbol$tick, " ", version_message)
+             packageStartupMessage(crayon::green(version_message))
+           }
+           
          }
-
+         
+         sys_v_char <- stringr::str_split(version, "[.]")[[1]]
+         sys_v_num <- as.numeric(sys_v_char)
+         if(length(sys_v_num) == 3) sys_v_num <- c(sys_v_num, 0)
+         if(sys_v_num[4] > 0)
+           packageStartupMessage(paste0("NOTE: You are currently using an UNRELEASED development build (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))   
     }
-
-    sys_v_char <- stringr::str_split(version, "[.]")[[1]]
-    sys_v_num <- as.numeric(sys_v_char)
-    if(length(sys_v_num) == 3) sys_v_num <- c(sys_v_num, 0)
-    if(sys_v_num[4] > 0)
-         packageStartupMessage(paste0("NOTE: You are currently using an UNRELEASED development build (augmentation of release v", paste(sys_v_char[1:3], collapse = "."), ")"))
 }
 
 .support_unicode <- function(override = NULL) {

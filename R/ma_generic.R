@@ -103,7 +103,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                group2 <- match_variables(call = call_full[[match("group2",  names(call_full))]], arg = group2, arg_name = "group2", data = data)
           
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
+                  moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
           
           if(deparse(substitute(weights))[1] != "NULL")
                weights <- match_variables(call = call_full[[match("weights",  names(call_full))]], arg = weights, arg_name = "weights", data = data)

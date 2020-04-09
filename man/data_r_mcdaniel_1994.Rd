@@ -4,7 +4,9 @@
 \name{data_r_mcdaniel_1994}
 \alias{data_r_mcdaniel_1994}
 \title{Artifact-distribution meta-analysis of the validity of interviews}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_r_mcdaniel_1994)
 }
