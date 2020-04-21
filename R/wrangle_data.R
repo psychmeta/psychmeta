@@ -40,60 +40,61 @@ match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
         }
 }
 
-match_variables2 <- function(arg, data, name, arg_name, as_df = FALSE){
-        
-        do_postprocess <- TRUE
-        if(length(name) == 1 & !name[1] %in% colnames(data)){
-                do_postprocess <- FALSE
-        } else if (inherits(try(arg, silent = TRUE), "try-error")) {
-                arg <- tryCatch(dplyr::select(data, {{arg}}),
-                                error = function(e) stop(paste0("The variable `", name, "` supplied as the `" , arg_name, "` argument is not in `data`."), call. = FALSE)
-                )
-        } else if (is.matrix(arg)) {
-                if (is.null(colnames(arg))) {
-                        arg <- setNames(as.data.frame(`arg`,
-                                                      stringsAsFactors = FALSE),
-                                        paste(name,
-                                              1:ncol(`arg`), sep = "_"))
-                } else {
-                        arg <- as.data.frame(arg,
-                                             stringsAsFactors = FALSE)
-                }
-        } else if (is.list(arg)) {
-                if (is.null(names(arg))) {
-                        arg <- setNames(as.data.frame(arg,
-                                                      stringsAsFactors = FALSE),
-                                        paste(name,
-                                              1:length(arg), sep = "_"))
-                } else {
-                        arg <- as.data.frame(arg,
-                                             stringsAsFactors = FALSE)
-                }
-        } else {
-                if (length(arg) == nrow(data)) {
-                        arg <- setNames(as.data.frame(arg,
-                                                      stringsAsFactors = FALSE),
-                                        name)
-                } else {
-                        arg <- try(dplyr::select(data, name))
-                        if (inherits(arg, "try-error"))
-                                stop(paste0("`", arg_name, "` appears to reference variable(s) not included in `data`.\nIf providing the `", arg_name,"` argument as a vector, `length(", arg_name, ")` must match `nrow(data)`."), call. = FALSE)
-                }
-        }
-        
-        if(do_postprocess){
-                if(!is.null(data))
-                        if (nrow(arg) != nrow(data))
-                                stop("`length(arg)` must match `nrow(data)`.", call. = FALSE)
-                
-                if(!as_df){
-                        if(ncol(arg) > 1) stop(paste0("Argument `", arg_name, "` must be a single variable."), call. = FALSE)
-                        arg <- setNames(c(unlist(arg)), NULL)
-                }       
-        }
-        
-        return(arg)
-}
+## Under development
+# match_variables2 <- function(arg, data, name, arg_name, as_df = FALSE){
+#         
+#         do_postprocess <- TRUE
+#         if(length(name) == 1 & !name[1] %in% colnames(data)){
+#                 do_postprocess <- FALSE
+#         } else if (inherits(try(arg, silent = TRUE), "try-error")) {
+#                 arg <- tryCatch(dplyr::select(data, {{arg}}),
+#                                 error = function(e) stop(paste0("The variable `", name, "` supplied as the `" , arg_name, "` argument is not in `data`."), call. = FALSE)
+#                 )
+#         } else if (is.matrix(arg)) {
+#                 if (is.null(colnames(arg))) {
+#                         arg <- setNames(as.data.frame(`arg`,
+#                                                       stringsAsFactors = FALSE),
+#                                         paste(name,
+#                                               1:ncol(`arg`), sep = "_"))
+#                 } else {
+#                         arg <- as.data.frame(arg,
+#                                              stringsAsFactors = FALSE)
+#                 }
+#         } else if (is.list(arg)) {
+#                 if (is.null(names(arg))) {
+#                         arg <- setNames(as.data.frame(arg,
+#                                                       stringsAsFactors = FALSE),
+#                                         paste(name,
+#                                               1:length(arg), sep = "_"))
+#                 } else {
+#                         arg <- as.data.frame(arg,
+#                                              stringsAsFactors = FALSE)
+#                 }
+#         } else {
+#                 if (length(arg) == nrow(data)) {
+#                         arg <- setNames(as.data.frame(arg,
+#                                                       stringsAsFactors = FALSE),
+#                                         name)
+#                 } else {
+#                         arg <- try(dplyr::select(data, name))
+#                         if (inherits(arg, "try-error"))
+#                                 stop(paste0("`", arg_name, "` appears to reference variable(s) not included in `data`.\nIf providing the `", arg_name,"` argument as a vector, `length(", arg_name, ")` must match `nrow(data)`."), call. = FALSE)
+#                 }
+#         }
+#         
+#         if(do_postprocess){
+#                 if(!is.null(data))
+#                         if (nrow(arg) != nrow(data))
+#                                 stop("`length(arg)` must match `nrow(data)`.", call. = FALSE)
+#                 
+#                 if(!as_df){
+#                         if(ncol(arg) > 1) stop(paste0("Argument `", arg_name, "` must be a single variable."), call. = FALSE)
+#                         arg <- setNames(c(unlist(arg)), NULL)
+#                 }       
+#         }
+#         
+#         return(arg)
+# }
 
 match_variables_df <- function(moderators, data, name) {
         if (inherits(try(moderators, silent = TRUE), "try-error")) {
