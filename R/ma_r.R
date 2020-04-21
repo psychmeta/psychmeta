@@ -623,25 +623,25 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(deparse(substitute(n_adj))[1] != "NULL")
                n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, arg_name = "n_adj", data = data)
-
+          
           if(deparse(substitute(construct_x))[1] != "NULL")
-                  construct_x <- match_variables2(arg = {{construct_x}}, data = data, name = deparse(substitute(construct_x)), arg_name = "construct_x")
-
+                  construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
+          
           if(deparse(substitute(construct_y))[1] != "NULL")
-                  construct_y <- match_variables2(arg = {{construct_y}}, data = data, name = deparse(substitute(construct_y)), arg_name = "construct_y")
-
+                  construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+          
           if(deparse(substitute(facet_x))[1] != "NULL")
-                  facet_x <- match_variables2(arg = {{facet_x}}, data = data, name = deparse(substitute(facet_x)), arg_name = "facet_x")
-
+                  facet_x <- match_variables(call = call_full[[match("facet_x", names(call_full))]], arg = facet_x, arg_name = "facet_x", data = data)
+          
           if(deparse(substitute(facet_y))[1] != "NULL")
-                  facet_y <- match_variables2(arg = {{facet_y}}, data = data, name = deparse(substitute(facet_y)), arg_name = "facet_y")
-
+                  facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, arg_name = "facet_y", data = data)
+          
           if(deparse(substitute(measure_x))[1] != "NULL")
-                  measure_x <- match_variables2(arg = {{measure_x}}, data = data, name = deparse(substitute(measure_x)), arg_name = "measure_x")
-
+                  measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, arg_name = "measure_x", data = data)
+          
           if(deparse(substitute(measure_y))[1] != "NULL")
-                  measure_y <- match_variables2(arg = {{measure_y}}, data = data, name = deparse(substitute(measure_y)), arg_name = "measure_y")
-
+                  measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, arg_name = "measure_y", data = data)
+          
           if(deparse(substitute(rxx))[1] != "NULL")
                rxx <- match_variables(call = call_full[[match("rxx", names(call_full))]], arg = rxx, arg_name = "rxx", data = data)
 

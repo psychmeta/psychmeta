@@ -333,14 +333,14 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
                group2 <- match_variables(call = call_full[[match("group2", names(call_full))]], arg = group2, data = data)
           
           if(deparse(substitute(construct_y))[1] != "NULL")
-                  construct_y <- match_variables2(arg = {{construct_y}}, data = data, name = deparse(substitute(construct_y)), arg_name = "construct_y")
+                  construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
           
           if(deparse(substitute(facet_y))[1] != "NULL")
-                  facet_y <- match_variables2(arg = {{facet_y}}, data = data, name = deparse(substitute(facet_y)), arg_name = "facet_y")
+                  facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, arg_name = "facet_y", data = data)
           
           if(deparse(substitute(measure_y))[1] != "NULL")
-                  measure_y <- match_variables2(arg = {{measure_y}}, data = data, name = deparse(substitute(measure_y)), arg_name = "measure_y")
-
+                  measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, arg_name = "measure_y", data = data)
+          
           if(deparse(substitute(rGg))[1] != "NULL")
                rGg <- match_variables(call = call_full[[match("rGg", names(call_full))]], arg = rGg, data = data)
 

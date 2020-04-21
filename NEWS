@@ -1,3 +1,8 @@
+Changes in Version 2.3.8 (2020-04-21)
+=====================================
+- Bug fix to correct an issue that arose in version 2.3.7 in which factor-type variables passed to ma_r() and ma_d() as construct/facet/measure arguments were coerced to numeric variables.
+
+
 Changes in Version 2.3.7 (2020-04-09)
 =====================================
 - Updates to ensure consistency with upcoming R version 4.0.0.
