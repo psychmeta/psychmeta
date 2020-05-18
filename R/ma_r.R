@@ -616,6 +616,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      for(i in names(formal_args)) if(i %in% names(call)) formal_args[[i]] <- NULL
      call_full <- as.call(append(as.list(call), formal_args))
 
+     # Select data columns from arugments
+     # TODO: Switch to tidyselect or move to separate function
      if(!is.null(data)){
           data <- as.data.frame(data, stringsAsFactors = FALSE)
 
@@ -750,6 +752,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(is.null(n_adj)) n_adj <- n
 
      ##### Data checking #####
+
+     # TODO: Move these checks to separate functions
+
      ## Filter for valid correlations
      valid_r <- filter_r(r_vec = rxyi, n_vec = n)
      if(all(!valid_r)) stop("No valid correlations and/or sample sizes provided", call. = FALSE)
@@ -847,6 +852,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }
      }
 
+     #### Extract construct-pair-specific correction methods ####
+     # TODO: Move to separate function
+     # TODO: Also accept a 3-column data frame
      if(is.matrix(correction_method)){
           .colnames <- colnames(correction_method)
           .rownames <- rownames(correction_method)
@@ -883,6 +891,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
 
      ## Check the lengths of all arguments
+     # TODO: Offload to separate function
      if(ma_method != "bb"){
 
           .distribute_logic <- function(logic_general,
@@ -1246,6 +1255,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           es_data$pa <- pa
      }
 
+     #### Set default values for missing correction variables
+     # TODO: Move to separate function
      if(ma_method != "bb"){
           data_x <- data_y <- data.frame(matrix(NA, length(rxyi), 0), stringsAsFactors = FALSE)
           if(!is.null(rxx)){data_x$rxx <- rxx}else{data_x$rxx <- NA}
@@ -1275,8 +1286,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           data_x <- data_y <- NULL
      }
 
-     if(is.null(construct_order))
-          construct_order <- unique(c(construct_x, construct_y))
+     if (is.null(construct_order)) {
+       construct_order <- unique(c(construct_x, construct_y))
+     }
+
 
      cleaned_data <- organize_database(es_data = es_data, sample_id = sample_id, citekey = citekey,
                                        construct_x = construct_x, construct_y = construct_y,
@@ -1449,6 +1462,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      dups_exist <- any(duplicated(study_construct_pair))
 
      ##### Check for dependent correlations #####
+     # TODO: Move to separate function
      if(!is.null(sample_id) & dups_exist & check_dependence) {
           # Separate duplicate from non-duplicate Study IDs. Pass-through non-duplicates, use duplicates for further compositing
           full_data <- es_data
@@ -1572,6 +1586,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      progbar <- progress::progress_bar$new(format = " Computing meta-analyses [:bar] :percent est. time remaining: :eta",
                                            total = n_pairs, clear = FALSE, width = options()$width)
 
+
      if(ma_method == "ic"){
           .psychmeta_reserved_internal_mod_aabbccddxxyyzz <- complete_moderators
           if(!is.null(.psychmeta_reserved_internal_mod_aabbccddxxyyzz)){
@@ -1579,6 +1594,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
           }
 
+          # TODO: Move this extraneous object creation to get_ad()
           ad_obj_list <- create_ad_list(n = "n", sample_id = "sample_id",
                                         construct_x = "construct_x", construct_y = "construct_y",
                                         rxx = "rxx", rxx_restricted = "rxx_restricted", rxx_type = "rxx_type", k_items_x = "k_items_x",
@@ -1596,6 +1612,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                         construct_order = construct_order,
                                         data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y, stringsAsFactors = FALSE)[use_for_arts,],
                                         control_only = TRUE, process_ads = FALSE, ...)
+
+          # TODO: Why are we doing this with IC analyses?
 
           ad_obj_list_tsa <- join_adobjs(ad_type = "tsa",
                                          primary_ads = ad_obj_list,
@@ -1639,6 +1657,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                if(!is.null(.psychmeta_reserved_internal_mod_aabbccddxxyyzz))
                     colnames(.psychmeta_reserved_internal_mod_aabbccddxxyyzz) <- moderator_names[["all"]]
 
+               # TODO: Split into two functions: correct and ma_wrapper
                out <- ma_r_ic(rxyi = "rxyi", n = "n", n_adj = "n_adj", sample_id = "sample_id", citekey = "citekey",
                               wt_type = wt_type,
                               correct_bias = correct_bias, correct_rxx = "correct_rxx", correct_ryy = "correct_ryy",
@@ -1684,15 +1703,18 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                out
           })
 
+          # TODO: Drop pair_id and analyis_id
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
 
           out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
 
+          # TODO: Move to get_ad()
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa, ad_obj_y = ad_obj_list_tsa)
           out <- out %>% rename(ad_x_tsa = "ad_x", ad_y_tsa = "ad_y")
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_int, ad_obj_y = ad_obj_list_int)
           out <- out %>% rename(ad_x_int = "ad_x", ad_y_int = "ad_y")
 
+          # TODO: Drop this
           out$ad <- apply(out, 1, function(x){
                list(ic = list(ad_x_int = x$ad_x_int,
                               ad_x_tsa = x$ad_x_tsa,
@@ -1703,6 +1725,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           })
           out <- out %>% select(colnames(out)[!(colnames(out) %in% c("ad_x_int", "ad_x_tsa", "ad_y_int", "ad_y_tsa"))])
 
+          # TODO: Change attributes for single-method
           if(es_d & treat_as_d){
                attributes(out) <- append(attributes(out), list(call_history = list(call),
                                                                inputs = inputs,
@@ -1720,6 +1743,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      if(ma_method == "bb" | ma_method == "ad"){
 
+          # TODO: Change this apply over the data frame itself, splitting on the two construct columns
           out <- by(1:length(construct_pair), construct_pair, function(i){
                if(psychmeta.show_progress)
                     progbar$tick()
@@ -1745,6 +1769,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                if(!is.null(construct_y)) data <- data.frame(data, construct_y = construct_y[i], stringsAsFactors = FALSE)
 
                if(es_d & treat_as_d){
+                    # TODO: Move this to ma_d()
                     out <- ma_wrapper(es_data = es_data[i,], es_type = "d", ma_type = "bb", ma_fun = .ma_d_bb,
                                       moderator_matrix = complete_moderators[j,], moderator_type = moderator_type, cat_moderators = cat_moderators,
 
