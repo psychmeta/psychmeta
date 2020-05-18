@@ -564,7 +564,14 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      use_all_arts <- control$use_all_arts
      estimate_pa <- control$estimate_pa
 
-     if(hs_override){
+     if (hs_override) {
+          warning(
+            paste("`hs_override` is deprecated and will be removed in a future version.",
+                  "Manually set desired values for arguments:",
+                  "  `wt_type`, `error_type`, `correct_bias`, `var_unbiased`",
+                  "  `residual_ads`, `conf_method`, `cred_method`",
+                  sep = "\n"),
+            call. = FALSE)
           wt_type <- "sample_size"
           error_type <- "mean"
           correct_bias <- TRUE
@@ -623,25 +630,25 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(deparse(substitute(n_adj))[1] != "NULL")
                n_adj <- match_variables(call = call_full[[match("n_adj", names(call_full))]], arg = n_adj, arg_name = "n_adj", data = data)
-          
+
           if(deparse(substitute(construct_x))[1] != "NULL")
                   construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
-          
+
           if(deparse(substitute(construct_y))[1] != "NULL")
                   construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
-          
+
           if(deparse(substitute(facet_x))[1] != "NULL")
                   facet_x <- match_variables(call = call_full[[match("facet_x", names(call_full))]], arg = facet_x, arg_name = "facet_x", data = data)
-          
+
           if(deparse(substitute(facet_y))[1] != "NULL")
                   facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, arg_name = "facet_y", data = data)
-          
+
           if(deparse(substitute(measure_x))[1] != "NULL")
                   measure_x <- match_variables(call = call_full[[match("measure_x", names(call_full))]], arg = measure_x, arg_name = "measure_x", data = data)
-          
+
           if(deparse(substitute(measure_y))[1] != "NULL")
                   measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, arg_name = "measure_y", data = data)
-          
+
           if(deparse(substitute(rxx))[1] != "NULL")
                rxx <- match_variables(call = call_full[[match("rxx", names(call_full))]], arg = rxx, arg_name = "rxx", data = data)
 
@@ -683,10 +690,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(deparse(substitute(citekey))[1] != "NULL")
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
-          
+
           if(!is.null(substitute(moderators)))
                   moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
-          
+
           if(deparse(substitute(correct_rr_x))[1] != "NULL")
                correct_rr_x <- match_variables(call = call_full[[match("correct_rr_x", names(call_full))]], arg = correct_rr_x, arg_name = "correct_rr_x", data = data)
 
