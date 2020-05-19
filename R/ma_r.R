@@ -756,6 +756,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      # TODO: Move these checks to separate functions
 
      ## Filter for valid correlations
+     # TODO: Just filter the data frame instead of taking these indices along through the
+     # whole function. If data are supplied as vectors, then build a model frame
+     # the same way that lm() does.
      valid_r <- filter_r(r_vec = rxyi, n_vec = n)
      if(all(!valid_r)) stop("No valid correlations and/or sample sizes provided", call. = FALSE)
      if(sum(!valid_r) > 0)
@@ -1855,6 +1858,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(es_d & treat_as_d){
                out$analysis_id <- NULL
                out <- bind_cols(analysis_id = 1:nrow(out), out)
+               # TODO: Move ma_methods to class
                attributes(out) <- append(attributes(out), list(call_history = list(call),
                                                                inputs = inputs,
                                                                ma_methods = "bb",
@@ -1863,6 +1867,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }else{
                out$analysis_id <- NULL
                out <- bind_cols(analysis_id = 1:nrow(out), out)
+               # TODO: Move ma_methods to class
                attributes(out) <- append(attributes(out), list(call_history = list(call),
                                                                inputs = inputs,
                                                                ma_methods = "bb",
