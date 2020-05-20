@@ -513,6 +513,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
                  supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
 
+     # TODO: Deprecate cat_moderators and replace with subgroup_moderators
+
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
@@ -617,7 +619,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      call_full <- as.call(append(as.list(call), formal_args))
 
      # Select data columns from arugments
-     # TODO: Switch to tidyselect or move to separate function
+     # TODO: Switch to tidyselect or eval(expr, data, enclose = parent.frame()) -- if eval and
+     # argument is a string, then eval(str2lang(expr), data, enclose = parent.frame())
      if(!is.null(data)){
           data <- as.data.frame(data, stringsAsFactors = FALSE)
 
@@ -1706,7 +1709,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                out
           })
 
-          # TODO: Drop pair_id and analyis_id
+          # TODO: Drop pair_id and analyis_id, just group by construct pair and moderator
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
 
           out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
