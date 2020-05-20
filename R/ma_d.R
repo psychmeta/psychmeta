@@ -1,6 +1,6 @@
 #' Meta-analysis of \emph{d} values
 #'
-#' The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for \emph{d} values, respectively. 
+#' The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for \emph{d} values, respectively.
 #' The \code{ma_d} function is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
 #' When artifact-distribution meta-analyses are performed, \code{ma_d} will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
 #' \code{ma_d} is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
@@ -28,8 +28,8 @@
 #' If \code{group_order} is \code{NULL}, the order of group pairings will be determined internally using alpha-numeric ordering.
 #' @param construct_y Vector of construct names for construct designated as "Y".
 #' @param facet_y Vector of facet names for constructs designated as "Y".
-#' Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
-#' To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets. 
+#' Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements.
+#' To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets.
 #' @param measure_y Vector of names for measures associated with constructs designated as "Y".
 #' @param construct_order Vector indicating the order in which Y variables should be arranged.
 #' @param wt_type Type of weight to use in the meta-analysis: options are "n_effective" (effective sample size), "sample_size", "inv_var_mean" (inverse variance computed using mean effect size), and
@@ -51,7 +51,7 @@
 #' @param ryy Vector or column name of reliability estimates for Y.
 #' @param ryy_restricted Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#' @param k_items_y Numeric vector identifying the number of items in each scale. 
+#' @param k_items_y Numeric vector identifying the number of items in each scale.
 #' @param pi Scalar or vector containing the restricted-group proportions of group membership. If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param pa Scalar or vector containing the unrestricted-group proportions of group membership (default = .5). If a vector, it must either (1) have as many elements as there are \emph{d} values or (2) be named so as to match with levels of the \code{group_id} argument.
 #' @param uy Vector or column name of u ratios for Y.
@@ -67,7 +67,7 @@
 #' @param data Data frame containing columns whose names may be provided as arguments to vector arguments and/or moderators.
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
-#' 
+#'
 #' @param supplemental_ads_y For \code{ma_d_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.
 #' @param ma_obj For \code{ma_d_ad} only: Meta-analysis object of correlations or \emph{d} values (regardless of input metric, output metric will be \emph{d}).
 #' @param ad_obj_g For \code{ma_d_ad} only: Artifact-distribution object for the grouping variable (output of the \code{link{create_ad}} or \code{link{create_ad_group}} functions).
@@ -229,30 +229,30 @@
 #' ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
 #'      ryy = ryyi, correct_rr_y = FALSE,
 #'      construct_y = construct, data = data_d_meas_multi)
-#'      
-#'      
+#'
+#'
 #' ### Demonstration of ma_d_bb ###
 #' ## Example meta-analyses using simulated data:
 #' ma_d_bb(d = d, n1 = n1, n2 = n2,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 #' ma_d_bb(d = d, n1 = n1, n2 = n2,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-#'         
-#'         
+#'
+#'
 #' ### Demonstration of ma_d_ic ###
 #' ## Example meta-analyses using simulated data:
 #' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 #' ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
 #'         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_r = FALSE, 
-                 ma_method = c("bb", "ic", "ad"), 
-                 ad_type = c("tsa", "int"), 
+ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NULL, treat_as_r = FALSE,
+                 ma_method = c("bb", "ic", "ad"),
+                 ad_type = c("tsa", "int"),
                  correction_method = "auto",
                  group_id = NULL, group1 = NULL, group2 = NULL, group_order = NULL,
                  construct_y = NULL, facet_y = NULL, measure_y = NULL, construct_order = NULL,
-                 wt_type = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
-                             "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
+                 wt_type = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample",
+                             "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
                  correct_bias = TRUE,
                  correct_rel = NULL, correct_rGg = FALSE, correct_ryy = TRUE,
                  correct_rr = NULL, correct_rr_g = TRUE, correct_rr_y = TRUE,
@@ -268,19 +268,19 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
-     
+
      ##### Get inputs #####
      call <- match.call()
-     
+
      ma_method <- match.arg(ma_method, choices = c("bb", "ic", "ad"))
-     wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
+     wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample",
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
      ad_type <- match.arg(ad_type, choices = c("tsa", "int"))
-     
+
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
                                   .control_psychmeta_arg = control)
-     
+
      if(control$hs_override){
           wt_type <- "sample_size"
           error_type <- "mean"
@@ -292,7 +292,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      treat_as_d <- list(...)$treat_as_d
      if(is.null(treat_as_d)) treat_as_d <- !treat_as_r
-     
+
      if(psychmeta.show_progress)
           cat(" **** Running ma_d: Meta-analysis of d values **** \n")
 
@@ -331,16 +331,16 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
           if(deparse(substitute(group2))[1] != "NULL")
                group2 <- match_variables(call = call_full[[match("group2", names(call_full))]], arg = group2, data = data)
-          
+
           if(deparse(substitute(construct_y))[1] != "NULL")
                   construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
-          
+
           if(deparse(substitute(facet_y))[1] != "NULL")
                   facet_y <- match_variables(call = call_full[[match("facet_y", names(call_full))]], arg = facet_y, arg_name = "facet_y", data = data)
-          
+
           if(deparse(substitute(measure_y))[1] != "NULL")
                   measure_y <- match_variables(call = call_full[[match("measure_y", names(call_full))]], arg = measure_y, arg_name = "measure_y", data = data)
-          
+
           if(deparse(substitute(rGg))[1] != "NULL")
                rGg <- match_variables(call = call_full[[match("rGg", names(call_full))]], arg = rGg, data = data)
 
@@ -352,10 +352,10 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
           if(deparse(substitute(ryy_type))[1] != "NULL")
                ryy_type <- match_variables(call = call_full[[match("ryy_type", names(call_full))]], arg = ryy_type, data = data)
-          
+
           if(deparse(substitute(k_items_y))[1] != "NULL")
                k_items_y <- match_variables(call = call_full[[match("k_items_y", names(call_full))]], arg = k_items_y, arg_name = "k_items_y", data = data)
-          
+
           if(deparse(substitute(uy))[1] != "NULL")
                uy <- match_variables(call = call_full[[match("uy", names(call_full))]], arg = uy, data = data)
 
@@ -370,7 +370,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
           if(deparse(substitute(moderators))[1] != "NULL")
                   moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
-          
+
           if(deparse(substitute(correct_rr_g))[1] != "NULL")
                correct_rr_g <- match_variables(call = call_full[[match("correct_rr_g", names(call_full))]], arg = correct_rr_g, data = data)
 
@@ -529,10 +529,11 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      pa[is.na(pa)] <- pi[is.na(pa)]
 
      ## Compute meta-analysis
+     # TODO: Use functions pulled out from ma_r() instead
      out <- ma_r(ma_method = ma_method, ad_type = ad_type, correction_method = correction_method, citekey = citekey,
                  rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
                  construct_x = group_id, construct_y = construct_y,
-                 construct_order = c(group_order, construct_order), 
+                 construct_order = c(group_order, construct_order),
                  facet_x = NULL, facet_y = facet_y,
                  measure_x = NULL, measure_y = measure_y,
                  wt_type = wt_type, correct_bias = correct_bias,
@@ -558,6 +559,6 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
 
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-     
+
      return(out)
 }
