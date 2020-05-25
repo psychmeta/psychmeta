@@ -22,6 +22,12 @@
 #' @examples
 #' adjust_n_r(r = .3, var_e = .01)
 adjust_n_r <- function(r, var_e){
+  
+  #Checks for var_e != 0
+  if (var_e == 0){
+    stop("var_e cannot be 0")
+  }
+  
      ((r^2 - 1)^2 + var_e) / var_e
 }
 
@@ -49,6 +55,12 @@ adjust_n_r <- function(r, var_e){
 #' @examples
 #' adjust_n_d(d = 1, var_e = .03, p = NA)
 adjust_n_d <- function(d, var_e, p = NA){
+  
+  #Checks for var_e != 0
+  if (var_e == 0){
+    stop("var_e cannot be 0")
+  }
+  
      n <- (d^2 + sqrt(d^4 + 4 * d^2 * (var_e + 4) + 4 * (9 * var_e^2 + 8 * var_e + 16)) + 6 * var_e + 8) / (4 * var_e)
      n[!is.na(p)] <- ((d^2 * p * (1 - p) + 2) / (2 * p * (1 - p) * var_e))[!is.na(p)]
      as.numeric(n)
