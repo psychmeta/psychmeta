@@ -1,4 +1,4 @@
-context("adjust_n")
+context("convert_es")
 
 library(psychmeta)
 
@@ -15,6 +15,12 @@ test_that("convert_es", {
 
   # Testing
   expect_equal(test_d_r_actual$meta_input, test_d_r_made_metainput, tolerance = 1e-7)
+  
+  #All combinations of the inputs/outputs
+  #Focus on the metainput
+  
+  
 })
+
 
 

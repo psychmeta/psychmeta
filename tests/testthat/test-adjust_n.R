@@ -20,6 +20,8 @@ test_that("adjust_n_d provides a correct/numerical answer", {
 
   # Checks for "numeric" class
   expect_is(adjust_n_d(d = 1, var_e = .03), "numeric")
+  
+  #Expect warning without prop
 
   #when p != NA
  
