@@ -292,8 +292,8 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                  messages = warning_out)
 
      class(out) <- c("convert_es", output_es)
-     
      print(warning_out)
+     print("out$meta_input")
      return(out$meta_input)
 }
 
