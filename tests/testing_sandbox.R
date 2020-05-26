@@ -1,3 +1,6 @@
+#' The purpose of this script is so that I can test my changes to functions in an environment.
+#' I couldn't think of a different way of doing this so ta-da!
+
 #Installs my version of psychmeta
 devtools::install_github("wesley4546/psychmeta", ref = "r4")
 
