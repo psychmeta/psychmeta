@@ -286,8 +286,6 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
 
      out <- list(meta_input = meta_input,
-                 original_es = original_es,
-                 conf_int = conf_int,
                  messages = warning_out)
 
      class(out) <- c("convert_es", output_es)
