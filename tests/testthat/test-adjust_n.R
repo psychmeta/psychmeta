@@ -1,4 +1,4 @@
-context("adjust_n")
+context("adjust_n - testing vignette examples")
 
 library(psychmeta)
 
