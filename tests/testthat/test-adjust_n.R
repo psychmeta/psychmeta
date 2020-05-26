@@ -3,7 +3,6 @@ context("adjust_n")
 library(psychmeta)
 
 test_that("adjust_n_r provides a correct/numerical answer", {
-  # TODO: Look at checking for var_e == 0
 
   # Tests to see if working
   expect_equal(adjust_n_r(r = .3, var_e = .01), 83.81, tolerance = 1e-2)
@@ -18,7 +17,6 @@ test_that("adjust_n_r provides a correct/numerical answer", {
 })
 
 test_that("adjust_n_d provides a correct/numerical answer", {
-  # TODO: Look at checking for var_e == 0
 
   # Tests to see if working
   expect_equal(adjust_n_d(d = 1, var_e = .03), 152.0132, tolerance = 1e-6)
