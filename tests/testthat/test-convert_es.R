@@ -1,17 +1,20 @@
+#' Loads in a .RData file that has pre-made variables (from the vignette) and tests them
+#' with manually created data.frames.
+#' 
+#' TODO: Finetune the tolerance values
+
 context("convert_es - testing vignette examples")
-
-
-#' Loads in a .RData file that has pre-made variables (from the vignette) and tests them 
-#' with manually created data.frames. 
-
 
 library(psychmeta)
 
-# Make sure this is correct!
+###### Make sure this is correct!
 load("~/GitHub/psychmeta/tests/testthat/RData_testfiles/test-convert_es-actual.RData")
 
-test_that("d to r conversion", {
 
+# output_es = "r" ---------------------------------------------------------
+
+test_that("d to r conversion", {
+  
   # Creating test variable
   test__d_r__convert_es <- data.frame(
     r = c(0.4472136),
@@ -21,8 +24,8 @@ test_that("d to r conversion", {
   # Testing
   expect_equal(test__d_r__convert_es, actual__d_r__convert_es, tolerance = 1e-7)
   expect_message(convert_es(es = 1, input_es = "d", output_es = "r", n1 = 100), "Assumed equal group sizes.")
-
-
+  
+  
   # Creating test variable
   test__d_rn2__convert_es <- data.frame(
     r = c(0.4472136),
@@ -32,6 +35,99 @@ test_that("d to r conversion", {
   # Testing
   expect_equal(test__d_rn2__convert_es, actual__d_rn2__convert_es, tolerance = 1e-7)
 })
+
+test_that("t to r conversion", {
+  
+  # Creating test variable
+  test__t_r__convert_es <- data.frame(
+    r = c(-0.08396889),
+    n_effective = c(240),
+    var_e = c(0.004125061)
+  )
+  
+  # Testing
+  expect_equal(test__t_r__convert_es, actual__t_r__convert_es, tolerance = 1e-7)
+})
+
+test_that("F to r conversion", {
+  # Creating test variable
+  test__F_r__convert_es <- data.frame(
+    r = c(0.19969),
+    n_effective = c(250),
+    var_e = c(0.003700924)
+  )
+  
+  # Testing
+  expect_equal(test__F_r__convert_es, actual__F_r__convert_es, tolerance = 1e-6)
+})
+
+test_that("chisq to r conversion", {
+  
+  # Creating test variable
+  test__chisq_r__convert_es <- data.frame(
+    r = c(0.08062258),
+    n_effective = c(200),
+    var_e = c(0.004959685)
+  )
+  
+  # Testing
+  expect_equal(test__chisq_r__convert_es, actual__chisq_r__convert_es, tolerance = 1e-6)
+})
+
+test_that("p.chisq to r conversion", {
+  # Creating test variable
+  test__p.chisq_r__convert_es <- data.frame(
+    r = c(0.1631991),
+    n_effective = c(200),
+    var_e = c(0.004759701)
+  )
+  
+  # Testing
+  expect_equal(test__p.chisq_r__convert_es, actual__p.chisq_r__convert_es, tolerance = 1e-6)
+  expect_message(convert_es(es = .021, input_es = "p.chisq", output_es = "r", n1 = 100, n2 = 100), "p values converted to effect sizes. Check effect direction coding.")
+})
+
+test_that("or to r conversion", {
+  
+  # Creating test variable
+  test__or_r__convert_es <- data.frame(
+    r = c(0.3766074),
+    n_effective = c(200),
+    var_e = c(0.003694603)
+  )
+  
+  # Testing
+  expect_equal(test__or_r__convert_es, actual__or_r__convert_es, tolerance = 1e-6)
+})
+
+test_that("lor to r conversion", {
+  
+  # Creating test variable
+  test__lor_r__convert_es <- data.frame(
+    r = c(0.3755629),
+    n_effective = c(200),
+    var_e = c(0.003701411)
+  )
+  
+  # Testing
+  expect_equal(test__lor_r__convert_es, actual__lor_r__convert_es, tolerance = 1e-6)
+})
+
+test_that("r to r calculation", {
+  
+  # Creating test variable
+  test__r_r__convert_es <- data.frame(
+    r = c(0.3),
+    n_effective = c(100),
+    var_e = c(0.0083479)
+  )
+  
+  # Testing
+  expect_equal(test__r_r__convert_es, actual__r_r__convert_es)
+})
+
+
+# output_es = "d" ---------------------------------------------------------
 
 test_that("r to d conversion", {
 
@@ -48,17 +144,19 @@ test_that("r to d conversion", {
   expect_equal(test__r_d__convert_es, actual__r_d__convert_es, tolerance = 1e-6)
 })
 
-test_that("t to r conversion", {
-
+test_that("t to d conversion", {
+  
   # Creating test variable
-  test__t_r__convert_es <- data.frame(
-    r = c(-0.08396889),
+  test__t_d__convert_es <- data.frame(
+    d = c(-0.17021),
     n_effective = c(240),
-    var_e = c(0.004125061)
+    n_total = c(240),
+    n1 = c(100),
+    n2 = c(140),
+    var_e = c(0.01734801)
   )
-
   # Testing
-  expect_equal(test__t_r__convert_es, actual__t_r__convert_es, tolerance = 1e-7)
+  expect_equal(test__t_d__convert_es, actual__t_d__convert_es, tolerance = 1e-6)
 })
 
 test_that("F to d conversion", {
@@ -75,21 +173,22 @@ test_that("F to d conversion", {
 
   # Testing
   expect_equal(test__F_d__convert_es, actual__F_d__convert_es, tolerance = 1e-6)
-  expect_message(convert_es(es = 10.3, input_es="F", output_es="d", n1 = 100, n2 = 150), "F values converted to effect sizes. Check effect direction coding.")
+  expect_message(convert_es(es = 10.3, input_es = "F", output_es = "d", n1 = 100, n2 = 150), "F values converted to effect sizes. Check effect direction coding.")
 })
 
-test_that("chisq to r conversion", {
-
+test_that("chisq to d conversion", {
+  
   # Creating test variable
-  test__chisq_r__convert_es <- data.frame(
-    r = c(0.08062258),
+  test__chisq_d__convert_es <- data.frame(
+    d = c(0.1617718),
     n_effective = c(200),
-    var_e = c(0.004959685)
+    n_total = c(200),
+    n1 = c(100),
+    n2 = c(100),
+    var_e = c(0.02026864)
   )
-
   # Testing
-  expect_equal(test__chisq_r__convert_es, actual__chisq_r__convert_es, tolerance = 1e-6)
-})
+  expect_equal(test__chisq_d__convert_es, actual__chisq_d__convert_es, tolerance = 1e-6)})
 
 test_that("p.chisq to d conversion", {
 
@@ -105,20 +204,7 @@ test_that("p.chisq to d conversion", {
 
   # Testing
   expect_equal(test__p.chisq_d__convert_es, actual__p.chisq_d__convert_es, tolerance = 1e-6)
-  expect_message(convert_es(es = .021, input_es="p.chisq", output_es="d", n1 = 100, n2 = 100), "p values converted to effect sizes. Check effect direction coding.")
-})
-
-test_that("or to r conversion", {
-
-  # Creating test variable
-  test__or_r__convert_es <- data.frame(
-    r = c(0.3766074),
-    n_effective = c(200),
-    var_e = c(0.003694603)
-  )
-
-  # Testing
-  expect_equal(test__or_r__convert_es, actual__or_r__convert_es, tolerance = 1e-6)
+  expect_message(convert_es(es = .021, input_es = "p.chisq", output_es = "d", n1 = 100, n2 = 100), "p values converted to effect sizes. Check effect direction coding.")
 })
 
 test_that("or to d conversion", {
@@ -137,31 +223,53 @@ test_that("or to d conversion", {
   expect_equal(test__or_d__convert_es, actual__or_d__convert_es, tolerance = 1e-6)
 })
 
-test_that("lor to r conversion", {
-  
-  # Creating test variable
-  test__lor_r__convert_es <- data.frame(
-  r = c(0.3755629),
-  n_effective = c(200),
-  var_e = c(0.003701411)
-  )
-  
-  # Testing
-  expect_equal(test__lor_r__convert_es, actual__lor_r__convert_es, tolerance = 1e-6)
-})
-
 test_that("lor to d conversion", {
-  
+
   # Creating test variable
   test__lor_d__convert_es <- data.frame(
-    d = c(0.8104535 ),
+    d = c(0.8104535),
     n_effective = c(200),
     n_total = c(200),
     n1 = c(100),
     n2 = c(100),
     var_e = c(0.02184937)
   )
-  
+
   # Testing
   expect_equal(test__lor_d__convert_es, actual__lor_d__convert_es, tolerance = 1e-6)
+})
+
+test_that("d to d calculation", {
+  
+  # Creating test variable
+  test__d_d__convert_es <- data.frame(
+    d = c(0.8),
+    n_effective = c(100),
+    n_total = c(100),
+    n1 = c(64),
+    n2 = c(36),
+    var_e = c(0.04751471)
+  )
+  
+  # Testing
+  expect_equal(test__d_d__convert_es, actual__d_d__convert_es, tolerance = 1e-6)
+})
+
+
+# output_es = "A" ---------------------------------------------------------
+
+test_that("A to A calculation", {
+  
+  # Creating test variable
+  test__A_A__convert_es <- data.frame(
+    A = c(0.8),
+    n_effective = c(100),
+    n_total = c(100),
+    n1 = c(64),
+    n2 = c(36),
+    var_e = c(0.003653067)
+  )
+  
+  # Testing
+  expect_equal(test__A_A__convert_es, actual__A_A__convert_es, tolerance = 1e-6)
 })
