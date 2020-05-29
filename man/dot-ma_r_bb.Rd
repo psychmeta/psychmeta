@@ -9,7 +9,7 @@
 \arguments{
 \item{data}{Data frame of bare-bones information.}
 
-\item{run_lean}{If TRUE, the meta-analysis will not generate an escalc object. Meant to speed up bootstrap analyses that do not require supplmental output.}
+\item{run_lean}{If TRUE, the meta-analysis will not generate an escalc object. Meant to speed up bootstrap analyses that do not require supplemental output.}
 
 \item{ma_arg_list}{List of arguments to be used in the meta-analysis function.}
 }
