@@ -7,10 +7,6 @@ context("convert_es - testing vignette examples")
 
 library(psychmeta)
 
-###### Make sure this is correct!
-load("~/GitHub/psychmeta/tests/testthat/RData_testfiles/test-convert_es-actual.RData")
-
-
 # output_es = "r" ---------------------------------------------------------
 
 test_that("d to r conversion", {
