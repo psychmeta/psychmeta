@@ -1,7 +1,7 @@
 #' Loads in a .RData file that has pre-made variables (from the vignette) and tests them
 #' with manually created data.frames.
 #'
-#' TODO: Finetune the tolerance values
+#' TODO: Fine-tune the tolerance values
 
 context("convert_es - testing vignette examples")
 
@@ -17,6 +17,11 @@ test_that("d to r conversion", {
     n_effective = c(100),
     var_e = c(0.006431956)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "d"
+  attr(expected_convert_es, "output_es") <- "r"
+
+
   # Testing
   expect_equal(
     expected_convert_es,
@@ -34,6 +39,11 @@ test_that("d to r conversion", {
     n_effective = c(100),
     var_e = c(0.006431956)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "d"
+  attr(expected_convert_es, "output_es") <- "r"
+
+
   # Testing
   expect_equal(
     expected_convert_es,
@@ -50,6 +60,9 @@ test_that("t to r conversion", {
     n_effective = c(240),
     var_e = c(0.004125061)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "t"
+  attr(expected_convert_es, "output_es") <- "r"
 
   # Testing
   expect_equal(
@@ -66,6 +79,9 @@ test_that("F to r conversion", {
     n_effective = c(250),
     var_e = c(0.003700924)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "F"
+  attr(expected_convert_es, "output_es") <- "r"
 
   # Testing
   expect_equal(
@@ -83,6 +99,9 @@ test_that("chisq to r conversion", {
     n_effective = c(200),
     var_e = c(0.004959685)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "chisq"
+  attr(expected_convert_es, "output_es") <- "r"
 
   # Testing
   expect_equal(
@@ -100,6 +119,9 @@ test_that("p.chisq to r conversion", {
     n_effective = c(200),
     var_e = c(0.004759701)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "p.chisq"
+  attr(expected_convert_es, "output_es") <- "r"
 
   # Testing
   expect_equal(
@@ -122,6 +144,9 @@ test_that("or to r conversion", {
     n_effective = c(200),
     var_e = c(0.003694603)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "or"
+  attr(expected_convert_es, "output_es") <- "r"
 
   # Testing
   expect_equal(
@@ -134,15 +159,18 @@ test_that("or to r conversion", {
 test_that("lor to r conversion", {
 
   # Creating test variable
-  expectedlor_r__convert_es <- data.frame(
+  expected_convert_es <- data.frame(
     r = c(0.3755629),
     n_effective = c(200),
     var_e = c(0.003701411)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "lor"
+  attr(expected_convert_es, "output_es") <- "r"
 
   # Testing
   expect_equal(
-    expectedlor_r__convert_es,
+    expected_convert_es,
     convert_es(es = 1.47, input_es = "lor", output_es = "r", n1 = 100, n2 = 100),
     tolerance = 1e-6
   )
@@ -156,6 +184,9 @@ test_that("r to r calculation", {
     n_effective = c(100),
     var_e = c(0.0083479)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "r"
+  attr(expected_convert_es, "output_es") <- "r"
 
   # Testing
   expect_equal(
@@ -178,6 +209,10 @@ test_that("r to d conversion", {
     n2 = c(150),
     var_e = c(0.01714955)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "r"
+  attr(expected_convert_es, "output_es") <- "d"
+
   # Testing
   expect_equal(
     expected_convert_es,
@@ -197,6 +232,10 @@ test_that("t to d conversion", {
     n2 = c(140),
     var_e = c(0.01734801)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "t"
+  attr(expected_convert_es, "output_es") <- "d"
+
   # Testing
   expect_equal(
     expected_convert_es,
@@ -216,6 +255,10 @@ test_that("F to d conversion", {
     n2 = c(150),
     var_e = c(0.01714566)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "F"
+  attr(expected_convert_es, "output_es") <- "d"
+
 
   # Testing
   expect_equal(
@@ -241,6 +284,10 @@ test_that("chisq to d conversion", {
     n2 = c(100),
     var_e = c(0.02026864)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "chisq"
+  attr(expected_convert_es, "output_es") <- "d"
+
   # Testing
   expect_equal(
     expected_convert_es,
@@ -260,6 +307,9 @@ test_that("p.chisq to d conversion", {
     n2 = c(100),
     var_e = c(0.02047738)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "p.chisq"
+  attr(expected_convert_es, "output_es") <- "d"
 
   # Testing
   expect_equal(
@@ -284,6 +334,9 @@ test_that("or to d conversion", {
     n2 = c(100),
     var_e = c(0.02186005)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "or"
+  attr(expected_convert_es, "output_es") <- "d"
 
   # Testing
   expect_equal(
@@ -304,6 +357,9 @@ test_that("lor to d conversion", {
     n2 = c(100),
     var_e = c(0.02184937)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "lor"
+  attr(expected_convert_es, "output_es") <- "d"
 
   # Testing
   expect_equal(
@@ -324,6 +380,9 @@ test_that("d to d calculation", {
     n2 = c(36),
     var_e = c(0.04751471)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "d"
+  attr(expected_convert_es, "output_es") <- "d"
 
   # Testing
   expect_equal(
@@ -347,6 +406,9 @@ test_that("A to A calculation", {
     n2 = c(36),
     var_e = c(0.003653067)
   )
+  class(expected_convert_es) <- c("convert_es", "data.frame")
+  attr(expected_convert_es, "input_es") <- "auc"
+  attr(expected_convert_es, "output_es") <- "auc"
 
   # Testing
   expect_equal(

@@ -292,11 +292,11 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         
         
         
-        out <- list(meta_input = meta_input,
-                    messages = warning_out)
-        
-        class(out) <- c("convert_es", output_es)
-        return(out$meta_input)
+        out <- meta_input
+        class(out) <- c("convert_es", "data.frame")
+        attr(out, "input_es") <- input_es
+        attr(out, "output_es") <- output_es
+        return(out)
 }
 
 
