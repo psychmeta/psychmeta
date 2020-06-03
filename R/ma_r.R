@@ -1358,6 +1358,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           facet_y_orig <- facet_y
 
           .construct_x <- construct_x
+          .facet_x <- facet_x
           .construct_x[!is.na(.facet_x)] <- paste0(.construct_x[!is.na(.facet_x)], ": ", .facet_x[!is.na(.facet_x)])
           construct_x <- c(construct_x[retain],
                            construct_x[valid_facet_y],
