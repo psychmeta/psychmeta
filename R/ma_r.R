@@ -1358,8 +1358,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           facet_y_orig <- facet_y
 
           .construct_x <- construct_x
-          .facet_x <- facet_x
-          .construct_x[!is.na(.facet_x)] <- paste0(.construct_x[!is.na(.facet_x)], ": ", .facet_x[!is.na(.facet_x)])
+          .construct_x[!is.na(facet_x)] <- paste0(.construct_x[!is.na(facet_x)], ": ", facet_x[!is.na(facet_x)])
           construct_x <- c(construct_x[retain],
                            construct_x[valid_facet_y],
                            .construct_x[valid_facet_x],
@@ -1374,8 +1373,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                          measure_x[valid_facet])
 
           .construct_y <- construct_y
-          .facet_y <- facet_y
-          .construct_y[!is.na(.facet_y)] <- paste0(.construct_y[!is.na(.facet_y)], ": ", .facet_y[!is.na(.facet_y)])
+          .construct_y[!is.na(facet_y)] <- paste0(.construct_y[!is.na(facet_y)], ": ", facet_y[!is.na(facet_y)])
           construct_y <- c(construct_y[retain],
                            .construct_y[valid_facet_y],
                            construct_y[valid_facet_x],
