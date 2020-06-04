@@ -145,7 +145,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
      if(length(y_col) > 1)
           stop("This function currently only supports models with one left-hand-side (i.e., criterion) variable", call. = F)
      x_col <- as.character(formula)[[3]]
-     x_col <- str_split(x_col, pattern = "[+]")[[1]]
+     x_col <- strsplit(x_col, split = "[+]")[[1]]
      x_col <- .remove_charmargins(x = x_col)
      if(any(grepl(x = x_col, pattern = "[*]")))
           stop("Interactions cannot be computed from variables in covariance matrices: Please include interactions as variables in the covariance matrix", call. = F)
