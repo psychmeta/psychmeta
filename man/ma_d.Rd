@@ -170,7 +170,7 @@ If \code{group_order} is \code{NULL}, the order of group pairings will be determ
 \item{construct_y}{Vector of construct names for construct designated as "Y".}
 
 \item{facet_y}{Vector of facet names for constructs designated as "Y".
-Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements. 
+Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements.
 To avoid double-compositing, any observation with one of these reserved names will only be eligible for auto-compositing with other such observations and will not be combined with narrow facets.}
 
 \item{measure_y}{Vector of names for measures associated with constructs designated as "Y".}
@@ -355,7 +355,7 @@ Components of output tables for artifact-distribution meta-analyses:
 }
 }
 \description{
-The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for \emph{d} values, respectively. 
+The \code{ma_r_bb}, \code{ma_r_ic}, and \code{ma_r_ad} functions implement bare-bones, individual-correction, and artifact-distribution correction methods for \emph{d} values, respectively.
 The \code{ma_d} function is the master function for meta-analyses of \emph{d} values - it facilitates the computation of bare-bones, artifact-distribution, and individual-correction meta-analyses of correlations for any number of group-wise contrasts and any number of dependent variables.
 When artifact-distribution meta-analyses are performed, \code{ma_d} will automatically extract the artifact information from a database and organize it into the requested type of artifact distribution object (i.e., either Taylor series or interactive artifact distributions).
 \code{ma_d} is also equipped with the capability to clean databases containing inconsistently recorded artifact data, impute missing artifacts (when individual-correction meta-analyses are requested), and remove dependency among samples by forming composites or averaging effect sizes and artifacts.
@@ -399,16 +399,16 @@ ma_d(ma_method = "ic", d = d, n1 = n1, n2 = n2, ryy = ryyi,
 ma_d(ma_method = "ad", d = d, n1 = n1, n2 = n2,
      ryy = ryyi, correct_rr_y = FALSE,
      construct_y = construct, data = data_d_meas_multi)
-     
-     
+
+
 ### Demonstration of ma_d_bb ###
 ## Example meta-analyses using simulated data:
 ma_d_bb(d = d, n1 = n1, n2 = n2,
         data = data_d_meas_multi[data_d_meas_multi$construct == "Y",])
 ma_d_bb(d = d, n1 = n1, n2 = n2,
         data = data_d_meas_multi[data_d_meas_multi$construct == "Z",])
-        
-        
+
+
 ### Demonstration of ma_d_ic ###
 ## Example meta-analyses using simulated data:
 ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
