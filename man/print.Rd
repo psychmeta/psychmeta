@@ -8,23 +8,23 @@
 
 \item{...}{Additional arguments.}
 
-\item{digits}{Number of digits to which results should be rounded.]}
-
-\item{n}{Number of rows to print for meta-analysis results tables. Defaults to all rows. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
-
-\item{width}{Width of text output to generate for meta-analysis results tables. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
-
-\item{n_extra}{Number of extra columns to print abbreviated information for, if the width is too small for the entire tibble. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
+\item{digits}{Number of digits to which results should be rounded.}
 
 \item{ma_methods}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
 
-\item{correction_types}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
+\item{correction_types}{Types of meta-analytic corrections to be included Valid options are: "ts", "vgx", and "vgy"}
 
 \item{verbose}{Logical scalar that determines whether printed object should contain verbose information (e.g., non-standard columns of meta-analytic output; \code{TRUE}) or not (\code{FALSE}).}
 
-\item{symbolic.cor}{For \code{lm_mat} output: logical. If TRUE, print the correlations in a symbolic form (see symnum) rather than as numbers.}
+\item{n}{For \code{\link[=print.ma_psychmeta]{print.ma_psychmeta()}} and \code{\link[=print.ad_tibble]{print.ad_tibble()}}, number of rows to print for tibble. Defaults to all rows. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
 
-\item{signif.stars}{For \code{lm_mat} output: logical. If TRUE, ‘significance stars’ are printed for each coefficient.}
+\item{width}{For \code{\link[=print.ma_psychmeta]{print.ma_psychmeta()}} and \code{\link[=print.ad_tibble]{print.ad_tibble()}}, width of text output to generate for tibble. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
+
+\item{n_extra}{For \code{\link[=print.ma_psychmeta]{print.ma_psychmeta()}} and \code{\link[=print.ad_tibble]{print.ad_tibble()}}, number of extra columns to print abbreviated information for, if the width is too small for the entire meta-analysis tibble. See \code{\link[tibble:print.tbl]{tibble::print.tbl()}} for details.}
+
+\item{symbolic.cor}{For \code{\link[=lm_mat]{lm_mat()}}, Logical. If \code{TRUE}, print the correlations in a symbolic form (see \code{\link[stats:symnum]{stats::symnum()}}) rather than as numbers.}
+
+\item{signif.stars}{For \code{\link[=lm_mat]{lm_mat()}}, Logical. If \code{TRUE}, ‘significance stars’ are printed for each coefficient.}
 }
 \description{
 Print methods for \strong{\code{psychmeta}} output objects with classes exported from \strong{\code{psychmeta}}.
