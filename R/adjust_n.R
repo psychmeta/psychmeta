@@ -23,7 +23,7 @@
 #' adjust_n_r(r = .3, var_e = .01)
 adjust_n_r <- function(r, var_e) {
   
-  if (var_e <= 0) {
+  if (any(var_e <= 0)) {
     stop("`var_e` must be positive")
   }
   
@@ -55,7 +55,7 @@ adjust_n_r <- function(r, var_e) {
 #' adjust_n_d(d = 1, var_e = .03, p = NA)
 adjust_n_d <- function(d, var_e, p = NA) {
   
-  if (var_e <= 0) {
+  if (any(var_e <= 0)) {
     stop("`var_e` must be positive")
   }
   

@@ -1,4 +1,5 @@
-#' Tests the adjust_n_r and adjust_n_d functions with the examples from the vignette
+#' Testing the adjust_n_r and adjust_n_d functions
+
 context("adjust_n - testing vignette examples")
 
 library(psychmeta)
@@ -25,8 +26,6 @@ test_that("adjust_n_d provides a correct/numerical answer", {
 
   # Checks for var_e = 0 error
   expect_error(adjust_n_r(r = 1, var_e = 0), "`var_e` must be positive")
-
-  # Expect warning without prop
 
   # when p != NA
 

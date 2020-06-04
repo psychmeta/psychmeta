@@ -15,7 +15,7 @@
 #' @param df2 Vector of input test statistic within-group degrees of freedom (for *F*).
 #' @param sd1 Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.
 #' @param sd2 Vector of standard deviations of group 2 of the two groups being contrasted.
-#' @param tails Vector of the tails for \emph{p} values when `input_es = "p.t"`. Can be `2` (defualt) or `1`.
+#' @param tails Vector of the tails for *p* values when `input_es = "p.t"`. Can be `2` (default) or `1`.
 #'
 #' @return A data frame of class `es` with variables:
 #' \item{`r`, `d`, `A`}{The converted effect sizes}

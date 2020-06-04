@@ -1,6 +1,4 @@
-#' Tests the conversions found in the vignette
-#'
-#' TODO: Fine-tune the tolerance values
+#' Tests the conversions functions
 
 context("convert_es - testing vignette examples")
 
