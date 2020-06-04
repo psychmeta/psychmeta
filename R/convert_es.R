@@ -37,7 +37,7 @@
 #' @references
 #' Chinn, S. (2000).
 #' A simple method for converting an odds ratio to effect size for use in meta-analysis.
-#' *Statistics in Medicine, 19*(22), 3127–3131. 
+#' *Statistics in Medicine, 19*(22), 3127–3131.
 #' <https://doi.org/10.1002/1097-0258(20001130)19:22<3127::AID-SIM784>3.0.CO;2-M>
 #'
 #' Lipsey, M. W., & Wilson, D. B. (2001). *Practical meta-analysis*. SAGE Publications.
@@ -65,10 +65,10 @@
 convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles"),
                        output_es=c("r","d","A","auc","cles"), n1 = NULL, n2 = NULL, df1=NULL, df2=NULL, sd1=NULL, sd2=NULL, tails = 2){
         warn_obj1 <- record_warnings()
-        
+
         valid_input_es <- c("r","d","delta","g","t","p.t","F","p.F","chisq","p.chisq","or","lor","Fisherz","A","auc","cles")
         valid_output_es <- c("r","d","A","auc","cles")
-        
+
         input_es <- tryCatch(match.arg(input_es, valid_input_es), error = function(e) e)
         if (inherits(input_es, "error")) {
                 if (stringi::stri_detect(input_es$message, regex = "length 1"))
@@ -89,12 +89,12 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                                     "'"))
         }
         input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2)
-        
+
         arg_lengths <- unlist(lapply(list(n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2), length))
         nonnull_nonscalar <- arg_lengths[arg_lengths > 1]
         if (any(nonnull_nonscalar != nonnull_nonscalar[1]))
                 stop("All arguments that are not NULL or of length 1 must be of equal length")
-        
+
         switch(input_es,
                r       = .screen_r(es),
                t       = .screen_t(es, n1, n2, df1),
@@ -108,11 +108,11 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                cles    = {input_es <- "auc"; .screen_auc(es)},
                auc     = .screen_auc(es)
               )
-        
+
         if (output_es %in% c("A", "cles")) {
           output_es <- "auc"
         }
-        
+
         x <- list(es = es, n1 = n1, n2 = n2, df1 = df1, df2 = df2, sd1 = sd1, sd2 = sd2)
         # Compute sample sizes and df as needed
         if (is.null(n1) & is.null(n2)) {
@@ -150,18 +150,18 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         }
         subset_id <- is.na(x$n) & !is.na(x$n1)
         x$n[subset_id] <- x$n1[subset_id]
-        
+
         subset_id <- is.na(x$n1) & !is.na(x$n2)
         x$n1[subset_id] <- x$n2[subset_id] / 2
         x$n2[subset_id] <- x$n2[subset_id] / 2
-        
+
         subset_id <- !is.na(x$n1) & is.na(x$n2)
         x$n2[subset_id] <- x$n1[subset_id] / 2
         x$n1[subset_id] <- x$n1[subset_id] / 2
-        
+
         if(input_es %in% c("t", "p.t") & is.null(df1)) x$df1 <- x$n - 2
         if(input_es %in% c("F", "p.F") & is.null(df2)) x$df2 <- x$n - 2
-        
+
         # Assume SDs as needed
         if (is.null(sd1) & is.null(sd2)) {
                 x$sd1 <- x$sd2 <- 1
@@ -174,77 +174,77 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                   message("Equal group SDs assumed.")
                 }
         }
-        
+
         if (grepl(x = input_es, pattern = "p.")) {
                 class(x) <- paste(gsub(x = input_es, pattern = "p.", replacement = "p_"), "to", output_es, sep = "_")
         } else {
                 class(x) <- paste("q", input_es, "to", output_es, sep = "_")
         }
-        
+
         .convert <- function(x) {
                 UseMethod(generic = "convert_es", object = x)
         }
-        
+
         if (output_es == "d") {
                 # TODO: Handle separately conversion of point-biserial and continuous r to d
                 d <- .convert(x = x)
                 n <- x$n
                 n1 <- x$n1
                 n2 <- x$n2
-                
+
                 if(input_es == "delta" | input_es == "g"){
                         if(input_es == "delta"){
                                 n_effective <- adjust_n_d(d = d, var_e = var_error_delta(delta = d, nc = n1, ne = n2, correct_bias = FALSE))
                         }
                         if(input_es == "g"){
-                                n_effective <- adjust_n_d(d = d.ci, var_e = var_error_g(g = d.ci, n1 = n1, n2 = n2))
+                                n_effective <- adjust_n_d(d = d, var_e = var_error_g(g = d, n1 = n1, n2 = n2))
                         }
                 }else{
                         n_effective <- n
                 }
-                
+
                 # TODO: Adjust these based on other input_es as needed
-                V.d <- rep(NA, length(d.ci))
-                V.d[is.na(n2)] <- var_error_d(d=d.ci[is.na(n2)], n1=n[is.na(n2)], correct_bias=FALSE)
-                V.d[!is.na(n2)] <- var_error_d(d=d.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)], correct_bias=FALSE)
-                
-                out <- data.frame(d = d, 
-                                  n_effective = n_effective, 
-                                  n = n, 
-                                  n1 = n1, 
-                                  n2 = n2, 
+                V.d <- rep(NA, length(d))
+                V.d[is.na(n2)] <- var_error_d(d=d[is.na(n2)], n1=n[is.na(n2)], correct_bias=FALSE)
+                V.d[!is.na(n2)] <- var_error_d(d=d[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)], correct_bias=FALSE)
+
+                out <- data.frame(d = d,
+                                  n_effective = n_effective,
+                                  n = n,
+                                  n1 = n1,
+                                  n2 = n2,
                                   var_e = V.d, stringsAsFactors = FALSE)
-          
+
         } else if (output_es == "r") {
                 r <- .convert(x = x)
                 n <- x$n
                 n1 <- x$n1
                 n2 <- x$n2
-                
+
                 if(input_es == "delta" | input_es == "g"){
                         if(input_es == "delta"){
                                 n_effective <- adjust_n_d(d = x$es, var_e = var_error_delta(delta = x$es, nc = n1, ne = n2, correct_bias = FALSE))
                         }
                         if(input_es == "g"){
-                                d.ci <- convert_es.q_g_to_d(x = x)
-                                n_effective <- adjust_n_d(d = d.ci, var_e = var_error_g(g = d.ci, n1 = n1, n2 = n2))
+                                d <- convert_es.q_g_to_d(x = x)
+                                n_effective <- adjust_n_d(d = d, var_e = var_error_g(g = d, n1 = n1, n2 = n2))
                         }
                 }else{
                         n_effective <- n
                 }
-                
+
                 # TODO: Adjust these based on input_es as needed
-                V.r <- var_error_r(r.ci, n, correct_bias = FALSE)
-                out <- data.frame(r = r, 
-                                  n_effective = n_effective, 
+                V.r <- var_error_r(r, n, correct_bias = FALSE)
+                out <- data.frame(r = r,
+                                  n_effective = n_effective,
                                   n = n,
                                   n1 = n1,
                                   n2 = n2,
                                   var_e = V.r, stringsAsFactors = FALSE)
-                if (all(is.null(n1)) {
+                if (all(is.null(n1))) {
                   out <- out[,-c("n1")]
                 }
-                if (all(is.null(n2)) {
+                if (all(is.null(n2))) {
                   out <- out[,-c("n2")]
                 }
         } else if (output_es == "auc") {
@@ -253,34 +253,34 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 n <- x$n
                 n1 <- x$n1
                 n2 <- x$n2
-                
+
                 if(input_es == "delta" | input_es == "g"){
                         if(input_es == "delta"){
                                 n_effective <- adjust_n_d(d = d, var_e = var_error_delta(delta = x$es, nc = n1, ne = n2, correct_bias = FALSE))
                         }
                         if(input_es == "g"){
-                                d.ci <- convert_es.q_g_to_d(x = x)
-                                n_effective <- adjust_n_d(d = d.ci, var_e = var_error_g(g = d.ci, n1 = n1, n2 = n2))
+                                d <- convert_es.q_g_to_d(x = x)
+                                n_effective <- adjust_n_d(d = d, var_e = var_error_g(g = d, n1 = n1, n2 = n2))
                         }
                 }else{
                         n_effective <- n
                 }
-                
+
                 # TODO: Adjust these based on other input_es as needed
-                V.A <- rep(NA, length(A.ci))
-                V.A[is.na(n2)]  <- var_error_A(A=A.ci[is.na(n2)], n1=n[is.na(n2)])
-                V.A[!is.na(n2)] <- var_error_A(A=A.ci[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)])
-                
-                out <- data.frame(A = A, 
-                                  n_effective = n_effective, 
-                                  n = n, 
-                                  n1 = n1, 
-                                  n2 = n2, 
-                                  var_e = V.A, stringsAsFactors = FALSE)               
+                V.A <- rep(NA, length(A))
+                V.A[is.na(n2)]  <- var_error_A(A=A[is.na(n2)], n1=n[is.na(n2)])
+                V.A[!is.na(n2)] <- var_error_A(A=A[!is.na(n2)], n1=n1[!is.na(n2)], n2=n2[!is.na(n2)])
+
+                out <- data.frame(A = A,
+                                  n_effective = n_effective,
+                                  n = n,
+                                  n1 = n1,
+                                  n2 = n2,
+                                  var_e = V.A, stringsAsFactors = FALSE)
         }
-        
-        warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())             
-        
+
+        warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
+
         class(out) <- c("convert_es", "data.frame")
         attr(out, "input_es") <- input_es
         attr(out, "output_es") <- output_es
@@ -391,12 +391,12 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
 }
 
 # Internal es conversion functions
-          
+
 "convert_es.q_r_to_r" <- function(r, x = NULL) {
         if(!is.null(x)){
                 r <- x$es
         }
-        
+
         r
 }
 
@@ -404,7 +404,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         if(!is.null(x)){
                 d <- x$es
         }
-        
+
         d
 }
 
@@ -412,7 +412,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         if(!is.null(x)){
                 auc <- x$es
         }
-        
+
         auc
 }
 
@@ -420,7 +420,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         if(!is.null(x)){
                 d <- x$es
         }
-        
+
         d
 }
 
@@ -429,7 +429,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 g <- x$es
                 n <- x$n
         }
-        
+
         g / (1 - 3 / (4 * (n - 2 - 1)))
 }
 
@@ -438,7 +438,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 d <- x$es
                 p <- x$p
         }
-        
+
         a <- 1 / (p * (1-p))
         return(d / sqrt(a + d^2))
 }
@@ -448,7 +448,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 d <- x$es
                 p <- x$p
         }
-        
+
         convert_es.q_d_to_r(d = d, p = p)
 }
 
@@ -458,10 +458,10 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 n <- x$n
                 p <- x$p
         }
-        
+
         d <- g / (1 - 3 / (4 * (n - 2 - 1)))
         convert_es.q_d_to_r(d = d, p = p)
-        
+
 }
 
 "convert_es.q_t_to_r" <- function(t, df1, x = NULL) {
@@ -469,9 +469,9 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 t <- x$es
                 df1 <- x$df1
         }
-        
+
         if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
-        
+
         return( t / sqrt(t^2 + df1) )
 }
 
@@ -481,7 +481,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 df1 <- x$df1
                 tails <- x$tails
         }
-        
+
         if(is.null(df1)) stop("Error: df for t statistic could not be determined.", call.=FALSE)
         if(is.null(tails)) stop("Error: `tails` must be supplied if `input_es` is 'p.t'.", call. = FALSE)
         t <- qt(p.t/tails, df1, lower.tail = FALSE)
@@ -494,7 +494,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 F <- x$es
                 df2 <- x$df2
         }
-        
+
         if(is.null(df2)) stop("Error: df2 for F statistic could not be determined.", call.=FALSE)
         return( sqrt(F / (F + df2)) )
 }
@@ -504,7 +504,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 p.F <- x$es
                 df2 <- x$df2
         }
-        
+
         F <- qf(p.F, 1, df2, lower.tail = FALSE)
         message("p values converted to effect sizes. Check effect direction coding.")
         return( convert_es.q_F_to_r(F, df2) )
@@ -515,7 +515,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 chisq <- x$es
                 n <- x$n
         }
-        
+
         r <- sqrt(chisq / n)
         if(any(abs(r) > 1))
                 stop("Impossible values supplied for chi squared and n.", call.=FALSE)
@@ -527,7 +527,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 p.chisq <- x$es
                 n <- x$n
         }
-        
+
         message("p values converted to effect sizes. Check effect direction coding.")
         chisq <- qchisq(p.chisq, 1, lower.tail = FALSE)
         return( convert_es.q_chisq_to_r(chisq, n) )
@@ -538,7 +538,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 or <- x$es
                 p <- x$p
         }
-        
+
         d <- log(or) * sqrt(3) / pi
         return( convert_es.q_d_to_r(d, p) )
 }
@@ -548,7 +548,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 lor <- x$es
                 p <- x$p
         }
-        
+
         d <- lor * sqrt(3) / pi
         return( convert_es.q_d_to_r(d, p))
 }
@@ -557,7 +557,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         if(!is.null(x)){
                 Fisherz <- x$es
         }
-        
+
         return( (exp(2 * Fisherz) - 1) / (1 + exp(2 * Fisherz)) )
 }
 
@@ -565,7 +565,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         if(!is.null(x)){
                 r <- x$es
         }
-        
+
         if(any(abs(r) > 1))
                 stop("Value supplied for r is not a correlation.", call.=FALSE)
         return(.5 * log( (1+r) / (1-r) ))
@@ -576,7 +576,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 r <- x$es
                 p <- x$p
         }
-        
+
         if(any(abs(r) > 1))
                 stop("Value supplied for r is not a correlation.", call.=FALSE)
         a   <- 1 / (p * (1-p))
@@ -589,7 +589,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 df1 <- x$df1
                 p <- x$p
         }
-        
+
         a <- 1 / (p * (1-p))
         n <- df1 + 2
         return( t * sqrt(a / n) )
@@ -602,7 +602,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 p <- x$p
                 tails <- x$tails
         }
-        
+
         if(is.null(df1)) stop("df for t statistic could not be determined.", call. = FALSE)
         if(is.null(tails)) stop("`tails` must be supplied if `input_es` is 'p.t'.", call. = FALSE)
         t <- qt(p.t/tails, df1, lower.tail = FALSE)
@@ -616,7 +616,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 df2 <- x$df2
                 p <- x$p
         }
-        
+
         a <- 1 / (p * (1-p))
         n <- df2 + 2
         message("F values converted to effect sizes. Check effect direction coding.")
@@ -629,7 +629,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 df2 <- x$df2
                 p <- x$p
         }
-        
+
         F <- qf(p.F, 1, df2, lower.tail = FALSE)
         message("p values converted to effect sizes. Check effect direction coding.")
         return( convert_es.q_F_to_d(F, df2, p) )
@@ -641,7 +641,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 n <- x$n
                 p <- x$p
         }
-        
+
         r <- convert_es.q_chisq_to_r(chisq, n)
         return( convert_es.q_r_to_d(r, p))
 }
@@ -652,7 +652,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 n <- x$n
                 p <- x$p
         }
-        
+
         r <- convert_es.p_chisq_to_r(p.chisq, n)
         return( convert_es.q_r_to_d(r, p))
 }
@@ -661,7 +661,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         if(!is.null(x)){
                 or <- x$es
         }
-        
+
         return( log(or) * sqrt(3) / pi )
 }
 
@@ -669,7 +669,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
         if(!is.null(x)){
                 lor <- x$es
         }
-        
+
         return( lor * sqrt(3) / pi )
 }
 
@@ -678,7 +678,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 Fisherz <- x$es
                 p <- x$p
         }
-        
+
         r <- convert_es.q_Fisherz_to_r(Fisherz)
         return( convert_es.q_r_to_d(r, p) )
 }
@@ -690,7 +690,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 sd1 <- x$sd1
                 sd2 <- x$sd2
         }
-        
+
         return( qnorm(auc) * sqrt( (sd1^2 + sd2^2)/(p*sd1^2 + (1-p)*sd2^2) ) )
 }
 
@@ -701,7 +701,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 sd1 <- x$sd1
                 sd2 <- x$sd2
         }
-        
+
         d <- convert_es.q_auc_to_d(auc)
         return( convert_es.q_d_to_r(d, p) )
 }
@@ -713,7 +713,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
                 sd1 <- x$sd1
                 sd2 <- x$sd2
         }
-        
+
         return(pnorm(d / sqrt( (sd1^2 + sd2^2)/(p*sd1^2 + (1-p)*sd2^2) ) ))
 }
 
