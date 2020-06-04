@@ -1671,13 +1671,24 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                               es_d = inputs$es_d, treat_as_d = inputs$treat_as_d,
                               d_orig = data$d, n1_d = data$n1, n2_d = data$n2, pi_d = data$pi, pa_d = data$pa, as_worker = TRUE)
 
-               if(!is.null(construct_y)) out <- bind_cols(construct_y = rep(construct_y[i][1], nrow(out)), out)
-               if(!is.null(construct_x)) out <- bind_cols(construct_x = rep(construct_x[i][1], nrow(out)), out)
+               out <- list(
+                        construct_x = if (is.null(construct_x)) {
+                          NULL
+                        } else {
+                          rep(construct_x[i][1], nrow(out))
+                        },
+                        construct_y = if (is.null(construct_y)) {
+                          NULL
+                        } else {
+                          rep(construct_y[i][1], nrow(out))
+                        },
+                        out
+                      )
 
                out
           })
 
-          for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
+          for(i in 1:length(out)) out[[i]] <- tibble(pair_id = rep(i, nrow(out[[i]][[3]])), !!!out[[i]])
 
           out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
 
