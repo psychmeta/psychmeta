@@ -290,6 +290,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      class(barebones) <- c("ma_table", class(barebones))
      attributes(barebones) <- append(attributes(barebones), list(ma_type = "r_bb"))
 
+     # TODO: Drop this and just return the requested one
      list(meta = list(barebones = barebones,
                       individual_correction = NULL,
                       artifact_distribution = NULL),

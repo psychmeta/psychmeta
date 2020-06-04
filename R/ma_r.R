@@ -513,6 +513,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
                  supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
 
+     # TODO: Deprecate cat_moderators and replace with subgroup_moderators
+
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
@@ -617,7 +619,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      call_full <- as.call(append(as.list(call), formal_args))
 
      # Select data columns from arugments
-     # TODO: Switch to tidyselect or move to separate function
+     # TODO: Switch to tidyselect or eval(expr, data, enclose = parent.frame()) -- if eval and
+     # argument is a string, then eval(str2lang(expr), data, enclose = parent.frame())
      if(!is.null(data)){
           data <- as.data.frame(data, stringsAsFactors = FALSE)
 
@@ -1381,7 +1384,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           facet_y_orig <- facet_y
 
           .construct_x <- construct_x
-          .construct_x[!is.na(.facet_x)] <- paste0(.construct_x[!is.na(.facet_x)], ": ", .facet_x[!is.na(.facet_x)])
+          .construct_x[!is.na(facet_x)] <- paste0(.construct_x[!is.na(facet_x)], ": ", facet_x[!is.na(facet_x)])
           construct_x <- c(construct_x[retain],
                            construct_x[valid_facet_y],
                            .construct_x[valid_facet_x],
@@ -1396,7 +1399,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                          measure_x[valid_facet])
 
           .construct_y <- construct_y
-          .construct_y[!is.na(.facet_y)] <- paste0(.construct_y[!is.na(.facet_y)], ": ", .facet_y[!is.na(.facet_y)])
+          .construct_y[!is.na(facet_y)] <- paste0(.construct_y[!is.na(facet_y)], ": ", facet_y[!is.na(facet_y)])
           construct_y <- c(construct_y[retain],
                            .construct_y[valid_facet_y],
                            construct_y[valid_facet_x],
@@ -1706,7 +1709,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                out
           })
 
-          # TODO: Drop pair_id and analyis_id
+          # TODO: Drop pair_id and analyis_id, just group by construct pair and moderator
           for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
 
           out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
