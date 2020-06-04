@@ -199,6 +199,7 @@
 #' the adjusted procedure attempts to estimate the applicant reliability information for the criterion. The "rb" procedures are included for posterity: We strongly recommend using
 #' the "uvdrr" procedure to appropriately correct for univariate range restriction.
 #'
+#' @md
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
@@ -208,9 +209,10 @@
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
 #' \emph{Journal of Applied Psychology, 79}(3), 425.
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-#' Accounting for indirect range restriction in organizational and psychological research}.
-#' Manuscript submitted for review.
+#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Accounting for indirect range restriction in organizational research.
+#' _Organizational Research Methods_. Advance online publication.
+#' <https://doi.org/10.1177/1094428119859398>
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
 #' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382

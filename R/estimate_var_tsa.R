@@ -41,10 +41,12 @@
 #' @section Notes:
 #' A typographical error in Raju and Burke's article has been corrected in \code{estimate_var_tsa_rb2} so as to compute appropriate partial derivatives.
 #'
+#' @md
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-#' Accounting for indirect range restriction in organizational and psychological research}.
-#' Manuscript submitted for review.
+#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Accounting for indirect range restriction in organizational research.
+#' _Organizational Research Methods_. Advance online publication.
+#' <https://doi.org/10.1177/1094428119859398>
 #'
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 #' Implications of direct and indirect range restriction for meta-analysis methods and findings.
