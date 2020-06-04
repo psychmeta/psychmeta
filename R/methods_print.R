@@ -11,11 +11,11 @@
 #' @param ma_methods Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"
 #' @param correction_types Types of meta-analytic corrections to be included Valid options are: "ts", "vgx", and "vgy"
 #' @param verbose Logical scalar that determines whether printed object should contain verbose information (e.g., non-standard columns of meta-analytic output; `TRUE`) or not (`FALSE`).
-#' @param n For [print.ma_psychmeta()] and [print.ad_tibble()], number of rows to print for tibble. Defaults to all rows. See [tibble::print.tbl()] for details.
-#' @param width For [print.ma_psychmeta()] and [print.ad_tibble()], width of text output to generate for tibble. See [tibble::print.tbl()] for details.
-#' @param n_extra For [print.ma_psychmeta()] and [print.ad_tibble()], number of extra columns to print abbreviated information for, if the width is too small for the entire meta-analysis tibble. See [tibble::print.tbl()] for details.
-#' @param symbolic.cor For [lm_mat()], Logical. If `TRUE`, print the correlations in a symbolic form (see [stats::symnum()]) rather than as numbers.
-#' @param signif.stars For [lm_mat()], Logical. If `TRUE`, ‘significance stars’ are printed for each coefficient.
+#' @param n For `print.ma_psychmeta()` and `print.ad_tibble()`, number of rows to print for tibble. Defaults to all rows. See [tibble::print.tbl()] for details.
+#' @param width For `print.ma_psychmeta()` and `print.ad_tibble()`, width of text output to generate for tibble. See [tibble::print.tbl()] for details.
+#' @param n_extra For `print.ma_psychmeta()` and `print.ad_tibble()`, number of extra columns to print abbreviated information for, if the width is too small for the entire meta-analysis tibble. See [tibble::print.tbl()] for details.
+#' @param symbolic.cor For `print.lm_mat()`, Logical. If `TRUE`, print the correlations in a symbolic form (see [stats::symnum()]) rather than as numbers.
+#' @param signif.stars For `print.lm_mat()`, Logical. If `TRUE`, ‘significance stars’ are printed for each coefficient.
 #'
 #' @md
 NULL
