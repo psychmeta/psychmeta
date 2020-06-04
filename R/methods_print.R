@@ -350,9 +350,9 @@ print.simdat_d_database <- function(x, ..., digits = 3){
 #' @keywords internal
 #' @method print convert_es
 print.convert_es <- function(x, ..., digits = 3){
-        cat("Effect Sizes with Effective Sample Sizes and Confidence Intervals:\n")
-        cat("------------------------------------------------------------------\n")
-        print.data.frame(x[["conf_int"]], digits = digits)
+        cat(attr(x, "output_es"), "values converted from", attr(x, "input_es"), "values\n")
+        cat("-----------------------------------------\n")
+        print.data.frame(x, digits = digits)
         invisible(x)
 }
 
