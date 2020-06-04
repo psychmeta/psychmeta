@@ -139,9 +139,9 @@ get_stuff <- function(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "fo
 #' @rdname get_stuff
 #' @export
 get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, moderators = TRUE, ...){
-        
+
         ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
-        
+
         out <- ma_obj$escalc
         if(!moderators){
                 out <- map(out, function(x){
@@ -151,7 +151,7 @@ get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                         }else{
                                 x
                         }
-                })             
+                })
         }else{
                 if(any(ma_obj$analysis_type == "Overall"))
                         out <- map(out, function(x){
@@ -162,9 +162,9 @@ get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                                 if(is.data.frame(xi)){
                                                         if(!is.null(moderator_matrix)){
                                                                 xi <- suppressMessages(right_join(moderator_matrix, xi))
-                                                                xi <- xi %>% 
-                                                                        select(colnames(xi)[colnames(xi) != "sample_id"]) %>% 
-                                                                        add_column(sample_id = xi[["sample_id"]], .after = 1)  
+                                                                xi <- xi %>%
+                                                                        select(colnames(xi)[colnames(xi) != "sample_id"]) %>%
+                                                                        add_column(sample_id = xi[["sample_id"]], .after = 1)
                                                         }
                                                         class(xi) <- c("escalc", "data.frame")
                                                         xi
@@ -173,8 +173,8 @@ get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                                                 if(is.data.frame(xij)){
                                                                         if(!is.null(moderator_matrix)){
                                                                                 xij <- suppressMessages(right_join(moderator_matrix, xij))
-                                                                                xij <- xij %>% 
-                                                                                        select(colnames(xij)[colnames(xij) != "sample_id"]) %>% 
+                                                                                xij <- xij %>%
+                                                                                        select(colnames(xij)[colnames(xij) != "sample_id"]) %>%
                                                                                         add_column(sample_id = xij[["sample_id"]], .after = 1)
                                                                         }
                                                                         class(xij) <- c("escalc", "data.frame")
@@ -191,9 +191,9 @@ get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                 }
                         })
         }
-        
+
         names(out) <- paste0("analysis_id: ", ma_obj$analysis_id)
-        
+
         class(out) <- "get_escalc"
         out
 }
@@ -610,6 +610,9 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
 
      if(do_matrix){
           ma_list <- get_metatab(ma_obj = ma_obj)
+          if (!inherits(ma_list, "get_metatab")) {
+                  ma_list <- list(barebones = ma_list)
+          }
           ma_methods <- names(ma_list)
 
           if("construct_x" %in% colnames(ma_list$barebones))
@@ -647,8 +650,7 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                for(a in moderator_combs[!duplicated(moderator_combs)]){
                     if(i == "barebones"){
                          .names <- colnames(ma_list$barebones)[which(colnames(ma_list$barebones) == "k"):ncol(ma_list$barebones)]
-                         .out_list <- rep(list(.mat), length(.names))
-                         names(.out_list) <- .names
+                         .out_list <- setNames(rep(list(.mat), length(.names)), .names)
 
                          for(l in which(grepl(x = .names, pattern = "mean_r") |
                                         grepl(x = .names, pattern = "CI_LL_") |
@@ -699,10 +701,14 @@ get_matrix <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                }
                out[[i]] <- r_list
           }
+          if (identical(moderator_combs, rep(1, nrow(ma_obj)))) {
+                  out <- out[1,-c(1, 2)]
+          }
           class(out) <- c("get_matrix", class(out))
      }else{
           out <- NULL
      }
+
      out
 }
 
