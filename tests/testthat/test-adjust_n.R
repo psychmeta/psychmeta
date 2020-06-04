@@ -1,13 +1,7 @@
 #' Tests the adjust_n_r and adjust_n_d functions with the examples from the vignette
-#' 
-#' TODO: Perhaps make a .RData file to be read in to be consistent with other testing styles?
-
 context("adjust_n - testing vignette examples")
 
 library(psychmeta)
-
-
-# adjust_n_r --------------------------------------------------------------
 
 test_that("adjust_n_r provides a correct/numerical answer", {
 
@@ -20,9 +14,6 @@ test_that("adjust_n_r provides a correct/numerical answer", {
   # Checks for var_e = 0 error
   expect_error(adjust_n_r(r = 1, var_e = 0), "`var_e` must be positive")
 })
-
-
-# adjust_n_d --------------------------------------------------------------
 
 test_that("adjust_n_d provides a correct/numerical answer", {
 
