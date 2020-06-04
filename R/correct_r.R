@@ -218,7 +218,7 @@ correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
      ay[!is.na(py)] <- dnorm(qnorm(py[!is.na(py)], lower.tail = FALSE)) / sqrt(py[!is.na(py)] * (1 - py[!is.na(py)]))
 
      if(!is.null(n)){
-          var_e <- var_error_r(r = r, n = n)
+          var_e <- var_error_r(r = r, n = n, correct_bias = FALSE)
           r_c <- r / (ax * ay)
           var_e_c = var_e / (ax * ay)^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
@@ -258,7 +258,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
      r_c <- r / (u * sqrt((u^-2 - 1) * r^2 + 1))
 
      if(!is.null(n)){
-          var_e <- var_error_r(r = r, n = n)
+          var_e <- var_error_r(r = r, n = n, correct_bias = FALSE)
           a <- r / r_c
           var_e_c = var_e / a^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
