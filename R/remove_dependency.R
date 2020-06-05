@@ -144,8 +144,10 @@
      p_vec <- es_data$pi
      if(is.null(p_vec)) p_vec <- rep(.5, nrow(es_data))
 
-
-     out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair, .remove_dependency_by_sample_id_construct_pair)
+     environment(.remove_dependency_by_sample_id_construct_pair) <- environment()
+     out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair,
+               .remove_dependency_by_sample_id_construct_pair
+               )
 
      if(!is.null(moderators)){
           mod_out <- as.data.frame(data.table::rbindlist(lapply(out, function(x) x$moderators_comp)), stringsAsFactors = FALSE)
