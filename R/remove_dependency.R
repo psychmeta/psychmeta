@@ -155,18 +155,18 @@
 
           if(!is.null(moderators)){
                   moderators <- as.data.frame(moderators)
-               moderators_comp_i <- moderators[i,]
-               moderators_comp <- moderators[1,]
+               moderators_comp_i <- moderators[i,, drop = FALSE]
+               moderators_comp <- moderators[1,, drop = FALSE]
 
                if(!is.null(moderator_names$cat))
-                    moderators_comp[,moderator_names$cat] <-
-                    apply(as.data.frame(moderators_comp_i[,moderator_names$cat], stringsAsFactors = FALSE), 2, function(x){
+                    moderators_comp[,moderator_names$cat, drop = FALSE] <-
+                    apply(as.data.frame(moderators_comp_i[,moderator_names$cat, drop = FALSE], stringsAsFactors = FALSE), 2, function(x){
                          paste(sort(unique(as.character(x))), collapse = " & ")
                     })
 
                if(!is.null(moderator_names$noncat))
-                    moderators_comp[,moderator_names$noncat] <-
-                    apply(as.data.frame(moderators_comp_i[,moderator_names$noncat], stringsAsFactors = FALSE), 2, function(x){
+                    moderators_comp[,moderator_names$noncat, drop = FALSE] <-
+                    apply(as.data.frame(moderators_comp_i[,moderator_names$noncat, drop = FALSE], stringsAsFactors = FALSE), 2, function(x){
                          mean(x, na.rm = TRUE)
                     })
 
