@@ -1331,25 +1331,25 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           valid_facet_y <- valid_facet_y & !global_y
 
           use_for_arts <- c(rep(TRUE, sum(retain)),
-                            rep(FALSE, sum(valid_facet_y)),
-                            rep(FALSE, sum(valid_facet_x)),
+                            # rep(FALSE, sum(valid_facet_y)),
+                            # rep(FALSE, sum(valid_facet_x)),
                             rep(TRUE, sum(valid_facet)))
 
           sample_id <- c(sample_id[retain],
-                         sample_id[valid_facet_y],
-                         sample_id[valid_facet_x],
+                         # sample_id[valid_facet_y],
+                         # sample_id[valid_facet_x],
                          sample_id[valid_facet])
           es_data <- rbind(es_data[retain,],
-                           es_data[valid_facet_y,],
-                           es_data[valid_facet_x,],
+                           # es_data[valid_facet_y,],
+                           # es_data[valid_facet_x,],
                            es_data[valid_facet,])
           data_x <- rbind(data_x[retain,],
-                          data_x[valid_facet_y,],
-                          data_x[valid_facet_x,],
+                          # data_x[valid_facet_y,],
+                          # data_x[valid_facet_x,],
                           data_x[valid_facet,])
           data_y <- rbind(data_y[retain,],
-                          data_y[valid_facet_y,],
-                          data_y[valid_facet_x,],
+                          # data_y[valid_facet_y,],
+                          # data_y[valid_facet_x,],
                           data_y[valid_facet,])
 
           construct_x_orig <- construct_x
@@ -1360,55 +1360,55 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           .construct_x <- construct_x
           .construct_x[!is.na(facet_x)] <- paste0(.construct_x[!is.na(facet_x)], ": ", facet_x[!is.na(facet_x)])
           construct_x <- c(construct_x[retain],
-                           construct_x[valid_facet_y],
-                           .construct_x[valid_facet_x],
+                           # construct_x[valid_facet_y],
+                           # .construct_x[valid_facet_x],
                            .construct_x[valid_facet])
           facet_x <- c(facet_x[retain],
-                       facet_x[valid_facet_y],
-                       facet_x[valid_facet_x],
+                       # facet_x[valid_facet_y],
+                       # facet_x[valid_facet_x],
                        facet_x[valid_facet])
           measure_x <- c(measure_x[retain],
-                         measure_x[valid_facet_y],
-                         measure_x[valid_facet_x],
+                         # measure_x[valid_facet_y],
+                         # measure_x[valid_facet_x],
                          measure_x[valid_facet])
 
           .construct_y <- construct_y
           .construct_y[!is.na(facet_y)] <- paste0(.construct_y[!is.na(facet_y)], ": ", facet_y[!is.na(facet_y)])
           construct_y <- c(construct_y[retain],
-                           .construct_y[valid_facet_y],
-                           construct_y[valid_facet_x],
+                           # .construct_y[valid_facet_y],
+                           # construct_y[valid_facet_x],
                            .construct_y[valid_facet])
           facet_y <- c(facet_y[retain],
-                       facet_y[valid_facet_y],
-                       facet_y[valid_facet_x],
+                       # facet_y[valid_facet_y],
+                       # facet_y[valid_facet_x],
                        facet_y[valid_facet])
           measure_y <- c(measure_y[retain],
-                         measure_y[valid_facet_y],
-                         measure_y[valid_facet_x],
+                         # measure_y[valid_facet_y],
+                         # measure_y[valid_facet_x],
                          measure_y[valid_facet])
 
           if(!is.null(moderators))
                moderators <- as.data.frame(rbind(as_tibble(moderators, .name_repair = "minimal")[retain,],
-                                                 as_tibble(moderators, .name_repair = "minimal")[valid_facet_y,],
-                                                 as_tibble(moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                 # as_tibble(moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                 # as_tibble(moderators, .name_repair = "minimal")[valid_facet_x,],
                                                  as_tibble(moderators, .name_repair = "minimal")[valid_facet,]), stringsAsFactors = FALSE)
 
           if(!is.null(complete_moderators))
                complete_moderators <- as.data.frame(rbind(as_tibble(complete_moderators, .name_repair = "minimal")[retain,],
-                                                          as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet_y,],
-                                                          as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                          # as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                          # as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet_x,],
                                                           as_tibble(complete_moderators, .name_repair = "minimal")[valid_facet,]), stringsAsFactors = FALSE)
 
           if(!is.null(categorical_moderators))
                categorical_moderators <- as.data.frame(rbind(as_tibble(categorical_moderators, .name_repair = "minimal")[retain,],
-                                                             as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet_y,],
-                                                             as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                             # as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                             # as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet_x,],
                                                              as_tibble(categorical_moderators, .name_repair = "minimal")[valid_facet,]), stringsAsFactors = FALSE)
 
           if(!is.null(continuous_moderators))
                continuous_moderators <- as.data.frame(rbind(as_tibble(continuous_moderators, .name_repair = "minimal")[retain,],
-                                                            as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet_y,],
-                                                            as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet_x,],
+                                                            # as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet_y,],
+                                                            # as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet_x,],
                                                             as_tibble(continuous_moderators, .name_repair = "minimal")[valid_facet,]), stringsAsFactors = FALSE)
 
           .construct_vec <- c(construct_x_orig, construct_y_orig)
