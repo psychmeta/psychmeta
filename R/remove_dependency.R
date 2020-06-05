@@ -145,335 +145,7 @@
      if(is.null(p_vec)) p_vec <- rep(.5, nrow(es_data))
 
 
-     out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair, function(i) {
-
-          if(!is.null(citekey)){
-               citekey_comp <- paste(unique(as.character(citekey)[i]), collapse = ",")
-          }else{
-               citekey_comp <- NULL
-          }
-
-          if(!is.null(moderators)){
-                  moderators <- as.data.frame(moderators)
-               moderators_comp_i <- moderators[i,, drop = FALSE]
-               moderators_comp <- moderators[1,, drop = FALSE]
-
-               if(!is.null(moderator_names$cat))
-                    moderators_comp[,moderator_names$cat, drop = FALSE] <-
-                    apply(as.data.frame(moderators_comp_i[,moderator_names$cat, drop = FALSE], stringsAsFactors = FALSE), 2, function(x){
-                         paste(sort(unique(as.character(x))), collapse = " & ")
-                    })
-
-               if(!is.null(moderator_names$noncat))
-                    moderators_comp[,moderator_names$noncat, drop = FALSE] <-
-                    apply(as.data.frame(moderators_comp_i[,moderator_names$noncat, drop = FALSE], stringsAsFactors = FALSE), 2, function(x){
-                         mean(x, na.rm = TRUE)
-                    })
-
-               moderators_comp <- as.data.frame(moderators_comp, stringsAsFactors = FALSE)
-          }else{
-               moderators_comp <- NULL
-          }
-
-          if(ma_method != "bb"){
-               art_out <- .consolidate_dependent_artifacts(n = es_data$n[i],
-                                                           n_adj = es_data$n_adj[i],
-                                                           p = p_vec[i],
-                                                           es = es_data$rxyi[i],
-                                                           es_metric = es_metric,
-                                                           rxx = data_x$rxx[i],
-                                                           ryy = data_y$ryy[i],
-                                                           ux = data_x$ux[i],
-                                                           uy = data_y$uy[i],
-                                                           rxx_restricted = data_x$rxx_restricted[i],
-                                                           ryy_restricted = data_y$ryy_restricted[i],
-                                                           ux_observed = data_x$ux_observed[i],
-                                                           uy_observed = data_y$uy_observed[i])
-
-               data_x$ux[i] <- art_out$ux$ux
-               data_x$ux_observed[i] <- art_out$ux$ux_observed
-
-               data_y$uy[i] <- art_out$uy$ux
-               data_y$uy_observed[i] <- art_out$uy$ux_observed
-
-               data_x$rxx[i] <- art_out$rxx$rxx
-               data_x$rxx_restricted[i] <- art_out$rxx$rxx_restricted
-
-               data_y$ryy[i] <- art_out$ryy$rxx
-               data_y$ryy_restricted[i] <- art_out$ryy$rxx_restricted
-
-               ux_observed_comp <- art_out$ux$ux_observed_comp
-               uy_observed_comp <- art_out$uy$ux_observed_comp
-               rxx_restricted_comp <- art_out$rxx$rxx_restricted_comp
-               ryy_restricted_comp <- art_out$ryy$rxx_restricted_comp
-
-               correct_rr_x <- data_x$correct_rr_x
-               correct_rr_y <- data_y$correct_rr_y
-
-               indirect_rr_x <- data_x$indirect_rr_x
-               indirect_rr_y <- data_y$indirect_rr_y
-          }
-
-          if(collapse_method == "average") {
-               if(es_metric=="r"){
-                    es_comp <- wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i])
-               }else{
-                    es_comp <- wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i])
-               }
-
-               if(ma_method != "bb"){
-                    rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
-                    ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
-                    ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
-                    uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
-               }
-          }
-
-          if(collapse_method == "composite"){
-               if(length(intercor) > 1) {
-                    if(is.null(construct_x) & is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
-
-                    intercor_x <- intercor[paste(sample_id[i][1], construct_x[i][1])]
-                    intercor_y <- intercor[paste(sample_id[i][1], construct_y[i][1])]
-
-                    if(is.na(intercor_x)) intercor_x <- intercor[construct_x[i][1]]
-                    if(is.na(intercor_y)) intercor_y <- intercor[construct_y[i][1]]
-
-                    if(is.na(intercor_x)) intercor_x <- intercor[paste(sample_id[i][1], str_split(string = construct_x[i][1], pattern = ":")[[1]][1])]
-                    if(is.na(intercor_y)) intercor_y <- intercor[paste(sample_id[i][1], str_split(string = construct_y[i][1], pattern = ":")[[1]][1])]
-
-                    if(is.na(intercor_x)) intercor_x <- intercor[str_split(string = construct_x[i][1], pattern = ":")[[1]][1]]
-                    if(is.na(intercor_y)) intercor_y <- intercor[str_split(string = construct_y[i][1], pattern = ":")[[1]][1]]
-
-                    if(is.na(intercor_x) & is.na(intercor_y)){
-                         warning("Valid same-construct intercorrelations for constructs '", as.character(construct_x[i][1]),
-                                 "' and '", as.character(construct_y[i][1]),
-                                 "' not provided for sample '", sample_id[i][1],
-                                 "': '\n    Computing averages rather than composites", call. = FALSE)
-                    }else if(is.na(intercor_x) | is.na(intercor_y)){
-                         if(is.na(intercor_x)){
-                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_x[i][1]),
-                                      "' not provided for sample '", sample_id[i][1],
-                                      "': '\n     Compositing using information from construct '", as.character(construct_y[i][1]), "' only", call. = FALSE)
-                         }else{
-                              warning("Valid same-construct intercorrelations for construct '", as.character(construct_y[i][1]),
-                                      "' not provided for sample '", sample_id[i][1],
-                                      "': '\n     Compositing using information from construct '", as.character(construct_x[i][1]), "' only", call. = FALSE)
-                         }
-
-                    }
-
-               } else {
-                    intercor_x <- intercor_y <- intercor
-               }
-
-               if(length(partial_intercor) > 1){
-                    if(is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
-                    partial_y <- partial_intercor[construct_y[i][1]]
-
-                    partial_y <- partial_y[paste(sample_id[i][1], construct_y[i][1])]
-
-                    if(is.na(partial_y)) partial_y <- partial_y[construct_y[i][1]]
-               } else {
-                    partial_y <- partial_intercor
-               }
-
-               if(partial_y){
-                    if(!is.null(additional_args$.dx_internal_designation)){
-                         intercor_y <- mix_r_2group(rxy = intercor_y, dx = es_data$d, dy = es_data$d, p = es_data$pi)
-                         partial_y <- FALSE
-                    }
-               }
-
-               if(is.null(measure_x) & is.null(measure_y) & (!is.na(intercor_x) | !is.na(intercor_y))){
-                    if(es_metric=="r") {
-                         es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
-                                                       k_vars_x = length(es_data$rxyi[i]), mean_intercor_x = mean(c(intercor_x,intercor_y), na.rm = TRUE),
-                                                       k_vars_y = 1, mean_intercor_y = intercor_y)
-                    } else {
-                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]),
-                                                       mean_intercor = intercor_y, partial_intercor = partial_y)
-                    }
-
-                    if(ma_method != "bb"){
-                         rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
-                         ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
-                         ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
-                         uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
-                    }
-               } else if(!is.null(measure_x) & is.null(measure_y) & !is.na(intercor_x)) {
-                    if(es_metric=="r") {
-                         es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
-                                                       k_vars_x = length(es_data$rxyi[i]),  mean_intercor_x = intercor_x,
-                                                       k_vars_y = 1, mean_intercor_y = intercor_y)
-                    } else {
-                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), mean_intercor = intercor_y, partial_intercor = partial_y)
-                    }
-
-                    if(ma_method != "bb"){
-                         ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
-                         uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
-
-                         if(es_metric=="r") {
-                              rxx_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_x$rxx[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_intercor = intercor_x)
-                              ux_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_x$ux[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_ri = intercor_x)
-                         } else {
-                              rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
-                              ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
-                         }
-                    }
-
-
-               } else if(is.null(measure_x) & !is.null(measure_y) & !is.na(intercor_y)) {
-                    if(es_metric=="r") {
-                         es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
-                                                       k_vars_x = 1, mean_intercor_x = intercor_x,
-                                                       k_vars_y = length(es_data$rxyi[i]), mean_intercor_y = intercor_y)
-                    } else {
-                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), mean_intercor = intercor_y, partial_intercor = partial_y)
-                    }
-                    if(ma_method != "bb"){
-                         ryy_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_y$ryy[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_intercor = intercor_y)
-                         uy_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_y$uy[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_ri = intercor_y)
-                         rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
-                         ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
-                    }
-
-               } else if(!is.null(measure_x) & !is.null(measure_y) & !is.na(intercor_x) & !is.na(intercor_y)){
-                    kx <- length(unique(measure_x[i]))
-                    ky <- length(unique(measure_y[i]))
-
-                    if(es_metric=="r") {
-                         es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
-                                                                     k_vars_x = kx, mean_intercor_x = intercor_x,
-                                                                     k_vars_y = ky, mean_intercor_y = intercor_y)
-                    } else {
-                         es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), mean_intercor = intercor_y)
-                    }
-
-                    if(ma_method != "bb"){
-                         ryy_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_y$ryyi[i], wt = es_data$n[i]), k_vars = ky, mean_intercor = intercor_y)
-                         uy_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_y$uy[i], wt = es_data$n[i]), k_vars = ky, mean_ri = intercor_y)
-
-                         if(es_metric=="r") {
-                              rxx_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_x$rxxi[i], wt = es_data$n[i]), k_vars = kx, mean_intercor = intercor_x)
-                              ux_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_x$ux[i], wt = es_data$n[i]), k_vars = kx, mean_ri = intercor_x)
-                         } else {
-                              rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
-                              ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
-                         }
-                    }
-               }else{
-                    if(es_metric=="r"){
-                         es_comp <- wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i])
-                    }else{
-                         es_comp <- wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i])
-                    }
-
-                    if(ma_method != "bb"){
-                         rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
-                         ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
-                         ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
-                         uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
-                    }
-               }
-          }
-
-          if(ma_method != "bb"){
-               k_items_x_comp <- wt_mean(x = data_x$k_items_x[i], wt = es_data$n[i])
-               k_items_y_comp  <- wt_mean(x = data_y$k_items_y[i], wt = es_data$n[i])
-          }
-
-          if(ma_method == "bb") rxx_comp <- ux_comp <- ryy_comp <- uy_comp <-
-               rxx_restricted_comp <- ryy_restricted_comp <- ux_observed_comp <- uy_observed_comp <-
-               correct_rr_x <- correct_rr_y <- indirect_rr_x <- indirect_rr_y <-
-                    k_items_x_comp <- k_items_y_comp <- NULL
-
-          n_comp <- wt_mean(x = es_data$n[i], wt = es_data$n_adj[i])
-          n_adj_comp <- wt_mean(x = es_data$n_adj[i], wt = es_data$n_adj[i])
-
-          if(abs(es_comp) > 1)
-                  stop("The composite effect size for sample ID '", es_data$sample_id[i][1], "' is not possible.
-Please (a) supply alternative intercorrelations, (b) supply sample-specific intercorrelations,
-(c) change the 'collapse_method' argument, or (d) manually consolidate the dependency among estimates.", call. = FALSE)
-
-          if(all(c("d", "n1", "n2", "pi", "pa") %in% colnames(es_data))){
-               n1_comp <- wt_mean(x = es_data$n1[i], wt = es_data$n_adj[i])
-               n2_comp <- wt_mean(x = es_data$n2[i], wt = es_data$n_adj[i])
-               pi_comp <- wt_mean(x = es_data$pi[i], wt = es_data$n_adj[i])
-               pa_comp <- wt_mean(x = es_data$pa[i], wt = es_data$n_adj[i])
-               d_comp <- convert_r_to_d(r = es_comp, p = pi_comp)
-          }else{
-               n1_comp <- n2_comp <- pi_comp <- pa_comp <- d_comp <- NULL
-          }
-
-          out <- list(sample_id = sample_id[i][1],
-                      moderators_comp = moderators_comp,
-                      es_comp = es_comp, n_comp = n_comp, n_adj_comp = n_adj_comp,
-                      rxx_comp = rxx_comp, ryy_comp = ryy_comp,
-                      ux_comp = ux_comp, uy_comp = uy_comp,
-                      rxx_restricted_comp = rxx_restricted_comp,
-                      ryy_restricted_comp = ryy_restricted_comp,
-                      ux_observed_comp = ux_observed_comp,
-                      uy_observed_comp = uy_observed_comp,
-                      k_items_x_comp = k_items_x_comp,
-                      k_items_y_comp = k_items_y_comp,
-
-                      correct_rr_x = correct_rr_x[i][1],
-                      correct_rr_y = correct_rr_y[i][1],
-
-                      indirect_rr_x = indirect_rr_x[i][1],
-                      indirect_rr_y = indirect_rr_y[i][1],
-
-                      d_comp = d_comp, n1_comp = n1_comp, n2_comp = n2_comp, pi_comp = pi_comp, pa_comp = pa_comp)
-
-          if(!is.null(correct_rr_x))
-               if(length(correct_rr_x) > 1){
-                    out$correct_rr_x <- correct_rr_x[i][1]
-               }else{
-                    out$correct_rr_x <- correct_rr_x
-               }
-
-          if(!is.null(correct_rr_y))
-               if(length(correct_rr_y) > 1){
-                    out$correct_rr_y <- correct_rr_y[i][1]
-               }else{
-                    out$correct_rr_y <- correct_rr_y
-               }
-
-          if(!is.null(indirect_rr_x))
-               if(length(indirect_rr_x) > 1){
-                    out$indirect_rr_x <- indirect_rr_x[i][1]
-               }else{
-                    out$indirect_rr_x <- indirect_rr_x
-               }
-
-          if(!is.null(indirect_rr_y))
-               if(length(indirect_rr_y) > 1){
-                    out$indirect_rr_y <- indirect_rr_y[i][1]
-               }else{
-                    out$indirect_rr_y <- indirect_rr_y
-               }
-
-          out$construct_x <- construct_x[i][1]
-          out$construct_y <- construct_y[i][1]
-
-          if(!is.null(data_x$rxx_consistency)) out$rxx_consistency <- as.logical(mean(data_x$rxx_consistency[i]))
-          if(!is.null(data_y$ryy_consistency)) out$ryy_consistency <- as.logical(mean(data_y$ryy_consistency[i]))
-
-          if(!is.null(data_x$correct_rxx)) out$correct_rxx <- as.logical(mean(data_x$correct_rxx[i]))
-          if(!is.null(data_y$correct_ryy)) out$correct_ryy <- as.logical(mean(data_y$correct_ryy[i]))
-
-          if(!is.null(data_x$sign_rxz)) out$sign_rxz <- sign(mean(data_x$sign_rxz[i]))
-          if(!is.null(data_y$sign_ryz)) out$sign_ryz <- sign(mean(data_y$sign_ryz[i]))
-
-          if(!is.null(data_x$rxx_type)) out$rxx_type <- convert_consistency2reltype(consistency = out$rxx_consistency)
-          if(!is.null(data_y$ryy_type)) out$ryy_type <- convert_consistency2reltype(consistency = out$ryy_consistency)
-
-          out$citekey <- citekey_comp
-
-          out
-     })
+     out <- by(1:length(sample_id_construct_pair), sample_id_construct_pair, .remove_dependency_by_sample_id_construct_pair)
 
      if(!is.null(moderators)){
           mod_out <- as.data.frame(data.table::rbindlist(lapply(out, function(x) x$moderators_comp)), stringsAsFactors = FALSE)
@@ -549,6 +221,336 @@ Please (a) supply alternative intercorrelations, (b) supply sample-specific inte
      }
 
      es_data
+}
+
+.remove_dependency_by_sample_id_construct_pair <- function(i) {
+
+  if(!is.null(citekey)){
+    citekey_comp <- paste(unique(as.character(citekey)[i]), collapse = ",")
+  }else{
+    citekey_comp <- NULL
+  }
+
+  if(!is.null(moderators)){
+    moderators <- as.data.frame(moderators)
+    moderators_comp_i <- moderators[i,, drop = FALSE]
+    moderators_comp <- moderators[1,, drop = FALSE]
+
+    if(!is.null(moderator_names$cat))
+      moderators_comp[,moderator_names$cat] <-
+      apply(as.data.frame(moderators_comp_i[,moderator_names$cat, drop = FALSE], stringsAsFactors = FALSE), 2, function(x){
+        paste(sort(unique(as.character(x))), collapse = " & ")
+      })
+
+    if(!is.null(moderator_names$noncat))
+      moderators_comp[,moderator_names$noncat] <-
+      apply(as.data.frame(moderators_comp_i[,moderator_names$noncat, drop = FALSE], stringsAsFactors = FALSE), 2, function(x){
+        mean(x, na.rm = TRUE)
+      })
+
+    moderators_comp <- as.data.frame(moderators_comp, stringsAsFactors = FALSE)
+  }else{
+    moderators_comp <- NULL
+  }
+
+  if(ma_method != "bb"){
+    art_out <- .consolidate_dependent_artifacts(n = es_data$n[i],
+                                                n_adj = es_data$n_adj[i],
+                                                p = p_vec[i],
+                                                es = es_data$rxyi[i],
+                                                es_metric = es_metric,
+                                                rxx = data_x$rxx[i],
+                                                ryy = data_y$ryy[i],
+                                                ux = data_x$ux[i],
+                                                uy = data_y$uy[i],
+                                                rxx_restricted = data_x$rxx_restricted[i],
+                                                ryy_restricted = data_y$ryy_restricted[i],
+                                                ux_observed = data_x$ux_observed[i],
+                                                uy_observed = data_y$uy_observed[i])
+
+    data_x$ux[i] <- art_out$ux$ux
+    data_x$ux_observed[i] <- art_out$ux$ux_observed
+
+    data_y$uy[i] <- art_out$uy$ux
+    data_y$uy_observed[i] <- art_out$uy$ux_observed
+
+    data_x$rxx[i] <- art_out$rxx$rxx
+    data_x$rxx_restricted[i] <- art_out$rxx$rxx_restricted
+
+    data_y$ryy[i] <- art_out$ryy$rxx
+    data_y$ryy_restricted[i] <- art_out$ryy$rxx_restricted
+
+    ux_observed_comp <- art_out$ux$ux_observed_comp
+    uy_observed_comp <- art_out$uy$ux_observed_comp
+    rxx_restricted_comp <- art_out$rxx$rxx_restricted_comp
+    ryy_restricted_comp <- art_out$ryy$rxx_restricted_comp
+
+    correct_rr_x <- data_x$correct_rr_x
+    correct_rr_y <- data_y$correct_rr_y
+
+    indirect_rr_x <- data_x$indirect_rr_x
+    indirect_rr_y <- data_y$indirect_rr_y
+  }
+
+  if(collapse_method == "average") {
+    if(es_metric=="r"){
+      es_comp <- wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i])
+    }else{
+      es_comp <- wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i])
+    }
+
+    if(ma_method != "bb"){
+      rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
+      ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
+      ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
+      uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
+    }
+  }
+
+  if(collapse_method == "composite"){
+    if(length(intercor) > 1) {
+      if(is.null(construct_x) & is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
+
+      intercor_x <- intercor[paste(sample_id[i][1], construct_x[i][1])]
+      intercor_y <- intercor[paste(sample_id[i][1], construct_y[i][1])]
+
+      if(is.na(intercor_x)) intercor_x <- intercor[construct_x[i][1]]
+      if(is.na(intercor_y)) intercor_y <- intercor[construct_y[i][1]]
+
+      if(is.na(intercor_x)) intercor_x <- intercor[paste(sample_id[i][1], str_split(string = construct_x[i][1], pattern = ":")[[1]][1])]
+      if(is.na(intercor_y)) intercor_y <- intercor[paste(sample_id[i][1], str_split(string = construct_y[i][1], pattern = ":")[[1]][1])]
+
+      if(is.na(intercor_x)) intercor_x <- intercor[str_split(string = construct_x[i][1], pattern = ":")[[1]][1]]
+      if(is.na(intercor_y)) intercor_y <- intercor[str_split(string = construct_y[i][1], pattern = ":")[[1]][1]]
+
+      if(is.na(intercor_x) & is.na(intercor_y)){
+        warning("Valid same-construct intercorrelations for constructs '", as.character(construct_x[i][1]),
+                "' and '", as.character(construct_y[i][1]),
+                "' not provided for sample '", sample_id[i][1],
+                "': '\n    Computing averages rather than composites", call. = FALSE)
+      }else if(is.na(intercor_x) | is.na(intercor_y)){
+        if(is.na(intercor_x)){
+          warning("Valid same-construct intercorrelations for construct '", as.character(construct_x[i][1]),
+                  "' not provided for sample '", sample_id[i][1],
+                  "': '\n     Compositing using information from construct '", as.character(construct_y[i][1]), "' only", call. = FALSE)
+        }else{
+          warning("Valid same-construct intercorrelations for construct '", as.character(construct_y[i][1]),
+                  "' not provided for sample '", sample_id[i][1],
+                  "': '\n     Compositing using information from construct '", as.character(construct_x[i][1]), "' only", call. = FALSE)
+        }
+
+      }
+
+    } else {
+      intercor_x <- intercor_y <- intercor
+    }
+
+    if(length(partial_intercor) > 1){
+      if(is.null(construct_y)) stop("Multiple intercorrelations provided without effect-size construct labels.\nProvide either a scalar intercorrelation or effect size construct labels.")
+      partial_y <- partial_intercor[construct_y[i][1]]
+
+      partial_y <- partial_y[paste(sample_id[i][1], construct_y[i][1])]
+
+      if(is.na(partial_y)) partial_y <- partial_y[construct_y[i][1]]
+    } else {
+      partial_y <- partial_intercor
+    }
+
+    if(partial_y){
+      if(!is.null(additional_args$.dx_internal_designation)){
+        intercor_y <- mix_r_2group(rxy = intercor_y, dx = es_data$d, dy = es_data$d, p = es_data$pi)
+        partial_y <- FALSE
+      }
+    }
+
+    if(is.null(measure_x) & is.null(measure_y) & (!is.na(intercor_x) | !is.na(intercor_y))){
+      if(es_metric=="r") {
+        es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
+                                      k_vars_x = length(es_data$rxyi[i]), mean_intercor_x = mean(c(intercor_x,intercor_y), na.rm = TRUE),
+                                      k_vars_y = 1, mean_intercor_y = intercor_y)
+      } else {
+        es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]),
+                                      mean_intercor = intercor_y, partial_intercor = partial_y)
+      }
+
+      if(ma_method != "bb"){
+        rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
+        ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
+        ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
+        uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
+      }
+    } else if(!is.null(measure_x) & is.null(measure_y) & !is.na(intercor_x)) {
+      if(es_metric=="r") {
+        es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
+                                      k_vars_x = length(es_data$rxyi[i]),  mean_intercor_x = intercor_x,
+                                      k_vars_y = 1, mean_intercor_y = intercor_y)
+      } else {
+        es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), mean_intercor = intercor_y, partial_intercor = partial_y)
+      }
+
+      if(ma_method != "bb"){
+        ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
+        uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
+
+        if(es_metric=="r") {
+          rxx_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_x$rxx[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_intercor = intercor_x)
+          ux_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_x$ux[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_ri = intercor_x)
+        } else {
+          rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
+          ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
+        }
+      }
+
+
+    } else if(is.null(measure_x) & !is.null(measure_y) & !is.na(intercor_y)) {
+      if(es_metric=="r") {
+        es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
+                                      k_vars_x = 1, mean_intercor_x = intercor_x,
+                                      k_vars_y = length(es_data$rxyi[i]), mean_intercor_y = intercor_y)
+      } else {
+        es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$d[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), mean_intercor = intercor_y, partial_intercor = partial_y)
+      }
+      if(ma_method != "bb"){
+        ryy_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_y$ryy[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_intercor = intercor_y)
+        uy_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_y$uy[i], wt = es_data$n[i]), k_vars = length(es_data$n[i]), mean_ri = intercor_y)
+        rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
+        ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
+      }
+
+    } else if(!is.null(measure_x) & !is.null(measure_y) & !is.na(intercor_x) & !is.na(intercor_y)){
+      kx <- length(unique(measure_x[i]))
+      ky <- length(unique(measure_y[i]))
+
+      if(es_metric=="r") {
+        es_comp <- composite_r_scalar(mean_rxy = wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i]),
+                                      k_vars_x = kx, mean_intercor_x = intercor_x,
+                                      k_vars_y = ky, mean_intercor_y = intercor_y)
+      } else {
+        es_comp <- composite_d_scalar(mean_d = wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i]), k_vars = length(es_data$dxyi[i]), mean_intercor = intercor_y)
+      }
+
+      if(ma_method != "bb"){
+        ryy_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_y$ryyi[i], wt = es_data$n[i]), k_vars = ky, mean_intercor = intercor_y)
+        uy_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_y$uy[i], wt = es_data$n[i]), k_vars = ky, mean_ri = intercor_y)
+
+        if(es_metric=="r") {
+          rxx_comp <- composite_rel_scalar(mean_rel = wt_mean(x = data_x$rxxi[i], wt = es_data$n[i]), k_vars = kx, mean_intercor = intercor_x)
+          ux_comp  <- composite_u_scalar(mean_u = wt_mean(x = data_x$ux[i], wt = es_data$n[i]), k_vars = kx, mean_ri = intercor_x)
+        } else {
+          rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
+          ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
+        }
+      }
+    }else{
+      if(es_metric=="r"){
+        es_comp <- wt_mean(x = es_data$rxyi[i], wt = es_data$n_adj[i])
+      }else{
+        es_comp <- wt_mean(x = es_data$dxyi[i], wt = es_data$n_adj[i])
+      }
+
+      if(ma_method != "bb"){
+        rxx_comp <- wt_mean(x = data_x$rxx[i], wt = es_data$n[i])
+        ux_comp  <- wt_mean(x = data_x$ux[i], wt = es_data$n[i])
+        ryy_comp <- wt_mean(x = data_y$ryy[i], wt = es_data$n[i])
+        uy_comp  <- wt_mean(x = data_y$uy[i], wt = es_data$n[i])
+      }
+    }
+  }
+
+  if(ma_method != "bb"){
+    k_items_x_comp <- wt_mean(x = data_x$k_items_x[i], wt = es_data$n[i])
+    k_items_y_comp  <- wt_mean(x = data_y$k_items_y[i], wt = es_data$n[i])
+  }
+
+  if(ma_method == "bb") rxx_comp <- ux_comp <- ryy_comp <- uy_comp <-
+      rxx_restricted_comp <- ryy_restricted_comp <- ux_observed_comp <- uy_observed_comp <-
+      correct_rr_x <- correct_rr_y <- indirect_rr_x <- indirect_rr_y <-
+      k_items_x_comp <- k_items_y_comp <- NULL
+
+  n_comp <- wt_mean(x = es_data$n[i], wt = es_data$n_adj[i])
+  n_adj_comp <- wt_mean(x = es_data$n_adj[i], wt = es_data$n_adj[i])
+
+  if(abs(es_comp) > 1)
+    stop("The composite effect size for sample ID '", es_data$sample_id[i][1], "' is not possible.
+Please (a) supply alternative intercorrelations, (b) supply sample-specific intercorrelations,
+(c) change the 'collapse_method' argument, or (d) manually consolidate the dependency among estimates.", call. = FALSE)
+
+  if(all(c("d", "n1", "n2", "pi", "pa") %in% colnames(es_data))){
+    n1_comp <- wt_mean(x = es_data$n1[i], wt = es_data$n_adj[i])
+    n2_comp <- wt_mean(x = es_data$n2[i], wt = es_data$n_adj[i])
+    pi_comp <- wt_mean(x = es_data$pi[i], wt = es_data$n_adj[i])
+    pa_comp <- wt_mean(x = es_data$pa[i], wt = es_data$n_adj[i])
+    d_comp <- convert_r_to_d(r = es_comp, p = pi_comp)
+  }else{
+    n1_comp <- n2_comp <- pi_comp <- pa_comp <- d_comp <- NULL
+  }
+
+  out <- list(sample_id = sample_id[i][1],
+              moderators_comp = moderators_comp,
+              es_comp = es_comp, n_comp = n_comp, n_adj_comp = n_adj_comp,
+              rxx_comp = rxx_comp, ryy_comp = ryy_comp,
+              ux_comp = ux_comp, uy_comp = uy_comp,
+              rxx_restricted_comp = rxx_restricted_comp,
+              ryy_restricted_comp = ryy_restricted_comp,
+              ux_observed_comp = ux_observed_comp,
+              uy_observed_comp = uy_observed_comp,
+              k_items_x_comp = k_items_x_comp,
+              k_items_y_comp = k_items_y_comp,
+
+              correct_rr_x = correct_rr_x[i][1],
+              correct_rr_y = correct_rr_y[i][1],
+
+              indirect_rr_x = indirect_rr_x[i][1],
+              indirect_rr_y = indirect_rr_y[i][1],
+
+              d_comp = d_comp, n1_comp = n1_comp, n2_comp = n2_comp, pi_comp = pi_comp, pa_comp = pa_comp)
+
+  if(!is.null(correct_rr_x))
+    if(length(correct_rr_x) > 1){
+      out$correct_rr_x <- correct_rr_x[i][1]
+    }else{
+      out$correct_rr_x <- correct_rr_x
+    }
+
+  if(!is.null(correct_rr_y))
+    if(length(correct_rr_y) > 1){
+      out$correct_rr_y <- correct_rr_y[i][1]
+    }else{
+      out$correct_rr_y <- correct_rr_y
+    }
+
+  if(!is.null(indirect_rr_x))
+    if(length(indirect_rr_x) > 1){
+      out$indirect_rr_x <- indirect_rr_x[i][1]
+    }else{
+      out$indirect_rr_x <- indirect_rr_x
+    }
+
+  if(!is.null(indirect_rr_y))
+    if(length(indirect_rr_y) > 1){
+      out$indirect_rr_y <- indirect_rr_y[i][1]
+    }else{
+      out$indirect_rr_y <- indirect_rr_y
+    }
+
+  out$construct_x <- construct_x[i][1]
+  out$construct_y <- construct_y[i][1]
+
+  if(!is.null(data_x$rxx_consistency)) out$rxx_consistency <- as.logical(mean(data_x$rxx_consistency[i]))
+  if(!is.null(data_y$ryy_consistency)) out$ryy_consistency <- as.logical(mean(data_y$ryy_consistency[i]))
+
+  if(!is.null(data_x$correct_rxx)) out$correct_rxx <- as.logical(mean(data_x$correct_rxx[i]))
+  if(!is.null(data_y$correct_ryy)) out$correct_ryy <- as.logical(mean(data_y$correct_ryy[i]))
+
+  if(!is.null(data_x$sign_rxz)) out$sign_rxz <- sign(mean(data_x$sign_rxz[i]))
+  if(!is.null(data_y$sign_ryz)) out$sign_ryz <- sign(mean(data_y$sign_ryz[i]))
+
+  if(!is.null(data_x$rxx_type)) out$rxx_type <- convert_consistency2reltype(consistency = out$rxx_consistency)
+  if(!is.null(data_y$ryy_type)) out$ryy_type <- convert_consistency2reltype(consistency = out$ryy_consistency)
+
+  out$citekey <- citekey_comp
+
+  out
 }
 
 
