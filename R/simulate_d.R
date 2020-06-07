@@ -786,8 +786,13 @@ append_dmat <- function(di_mat, da_mat,
                     cut <- qnorm(sr_composites[i], mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
                     sr_composites_mat[,i] <- pnorm(cut, mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
                }else{
-                    mix <- norMix(mu = .mu_mat[,i], w = p_vec, sigma = .sigma_mat[,i])
-                    cut <- qnorMix(sr_composites[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
+                    if (!requireNamespace("nor1mix", quietly = TRUE)) {
+                            stop("The package 'nor1mix' is not installed.\n",
+                                 "  'nor1mix' is required to estimate population parameters under multivariate selection.\n",
+                                 "  Please install 'nor1mix'.")
+                    }
+                    mix <- nor1mix::norMix(mu = .mu_mat[,i], w = p_vec, sigma = .sigma_mat[,i])
+                    cut <- nor1mix::qnorMix(sr_composites[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
                     sr_composites_mat[,i] <- pnorm(cut, mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
                }
           }
