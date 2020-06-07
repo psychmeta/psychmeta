@@ -22,9 +22,8 @@ A vector of lambda values.
 Internal function to produce lambda coefficients to use in the Case V correction for bivariate indirect range restriction.
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
-Accounting for indirect range restriction in organizational research.
-\emph{Organizational Research Methods}. Advance online publication.
-\url{https://doi.org/10.1177/1094428119859398}
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }
 \keyword{internal}

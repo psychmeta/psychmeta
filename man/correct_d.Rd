@@ -44,7 +44,7 @@ correct_d(
 
 \item{ryy_restricted}{Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.}
 
-\item{ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link[=ma_r]{ma_r()}} for a full list of acceptable reliability types.}
+\item{ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
 
 \item{k_items_y}{Numeric vector identifying the number of items in each scale.}
 
@@ -120,27 +120,22 @@ correct_d(correction = "bvirr", d = .5, ryy = .8, uy = .7,
 }
 \references{
 Alexander, R. A., Carson, K. P., Alliger, G. M., & Carr, L. (1987).
-Correcting doubly truncated correlations: An improved approximation for
-correcting the bivariate normal correlation when truncation has occurred on
-both variables. \emph{Educational and Psychological Measurement, 47}(2), 309–315.
-\url{https://doi.org/10.1177/0013164487472002}
+Correcting doubly truncated correlations: An improved approximation for correcting the bivariate normal correlation when truncation has occurred on both variables.
+\emph{Educational and Psychological Measurement, 47}(2), 309–315. \url{https://doi.org/10.1177/0013164487472002}
 
-Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
-Accounting for indirect range restriction in organizational research.
-\emph{Organizational Research Methods}. Advance online publication.
-\url{https://doi.org/10.1177/1094428119859398}
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 
-Hunter, J. E., Schmidt, F. L., & Le, H. (2006). Implications of direct and
-indirect range restriction for meta-analysis methods and findings.
-\emph{Journal of Applied Psychology, 91}(3), 594–612.
-\url{https://doi.org/10.1037/0021-9010.91.3.594}
+Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
+Implications of direct and indirect range restriction for meta-analysis methods and findings.
+\emph{Journal of Applied Psychology, 91}(3), 594–612. \url{https://doi.org/10.1037/0021-9010.91.3.594}
 
 Le, H., Oh, I.-S., Schmidt, F. L., & Wooldridge, C. D. (2016).
-Correction for range restriction in meta-analysis revisited:
-Improvements and implications for organizational research.
+Correction for range restriction in meta-analysis revisited: Improvements and implications for organizational research.
 \emph{Personnel Psychology, 69}(4), 975–1008. \url{https://doi.org/10.1111/peps.12122}
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-SAGE Publications. \url{https://doi.org/10.4135/9781483398105}. pp. 43–44, 140–141.
+Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 43–44, 140–141.
 }

@@ -51,11 +51,6 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
      S <- diag(sigma_vec) %*% diag(rel_vec^.5) %*% rho_mat %*% diag(rel_vec^.5) %*% diag(sigma_vec)
 
      ## Generate true-score, error-score, and observed-score data
-     if (!requireNamespace("MASS", quietly = TRUE)) {
-             stop("The package 'MASS' is not installed.\n",
-                  "  'MASS' is required to simulate samples.\n",
-                  "  Please install 'MASS'.")
-     }
      true_scores_a <- MASS::mvrnorm(n = n, mu = mu_vec, Sigma = S)
      error_scores_a <- MASS::mvrnorm(n = n, mu = rep(0, ncol(rho_mat)), Sigma = diag(sigma_vec^2 - sigma_vec^2 * rel_vec))
 
@@ -302,38 +297,17 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
                s_mat_i <- truncate_var(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
                means_x_i <- truncate_mean(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
                sr_overall <- sr_vec[x_col]
-          } else {
-               if (!requireNamespace("tmvtnorm", quietly = TRUE)) {
-                       stop("The package 'tmvtnorm' is not installed.\n",
-                            "  'tmvtnorm' is required to estimate population parameters under multivariate selection.\n",
-                            "  Please install 'tmvtnorm'.")
-               }
-
-               if (zapsmall(det(S_complete_a[x_col,x_col])) == 0) {
-                       stop("Covariance matrix among selection variables is not ",
-                            "positive definite.\n  Selection cannot be performed.",
-                            call. = FALSE)
-               }
-
-               dat_i <- tmvtnorm::mtmvnorm(
-                       mean = mu_complete_a[x_col],
-                       sigma = S_complete_a[x_col,x_col],
-                       lower = qnorm(sr_vec[x_col],
-                                     mean = mu_complete_a[x_col],
-                                     sd = diag(S_complete_a[x_col,x_col])^.5,
-                                     lower.tail = FALSE))
+          }else{
+               if(zapsmall(det(S_complete_a[x_col,x_col])) == 0)
+                    stop("Covariance matrix among selection variables is not positive definite: Selection cannot be performed", call. = FALSE)
+               dat_i <- mtmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
+                                 lower = qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE))
                means_x_i <- dat_i$tmean
                s_mat_i <- dat_i$tvar
                s_mat_i <- zapsmall((s_mat_i + t(s_mat_i)) / 2)
-               sr_overall <- tmvtnorm::ptmvnorm(
-                       mean = mu_complete_a[x_col],
-                       sigma = S_complete_a[x_col,x_col],
-                       lowerx = qnorm(sr_vec[x_col],
-                                      mean = mu_complete_a[x_col],
-                                      sd = diag(S_complete_a[x_col,x_col])^.5,
-                                      lower.tail = FALSE),
-                       upperx = rep(Inf, length(x_col))
-                       )[1]
+               sr_overall <- ptmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
+                                      lowerx = qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE),
+                                      upperx = rep(Inf, length(x_col)))[1]
           }
           S_complete_i <- correct_matrix_mvrr(Sigma_i = S_complete_a, Sigma_xx_a = s_mat_i, x_col = x_col, standardize = FALSE)
           means_i <- correct_means_mvrr(Sigma = S_complete_a, means_i = mu_complete_a, means_x_a = means_x_i, x_col = x_col)
@@ -441,7 +415,6 @@ simulate_r_database_noalpha <- function(k, n_params, rho_params,
                                         wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL, var_names = NULL, composite_names = NULL,
                                         n_as_ni = FALSE, show_applicant = FALSE, keep_vars = "all", decimals = 2,
                                         format = "long", max_iter = 100){
-
      inputs <- as.list(environment())
      call <- match.call()
 

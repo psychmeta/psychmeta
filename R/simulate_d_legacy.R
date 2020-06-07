@@ -25,7 +25,7 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
      out$overall_results$observed <- as_tibble(out$overall_results$observed, .name_repair = "minimal")
      out$overall_results$true <- as_tibble(out$overall_results$true, .name_repair = "minimal")
      out$overall_results$error <- as_tibble(out$overall_results$error, .name_repair = "minimal")
-
+     
      out
 }
 
@@ -437,13 +437,8 @@ simulate_d_sample_noalpha <- function(n_vec, rho_mat_list, mu_mat, sigma_mat, re
           if(all(mu_mat[,i] == mu_mat[1,i]) & all(sigma_mat[,i] == sigma_mat[1,i])){
                cut <- qnorm(sr_vec[i], mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
           }else{
-               if (!requireNamespace("nor1mix", quietly = TRUE)) {
-                       stop("The package 'nor1mix' is not installed.\n",
-                            "  'nor1mix' is required to estimate population parameters under multivariate selection.\n",
-                            "  Please install 'nor1mix'.")
-               }
-               mix <- nor1mix::norMix(mu = mu_mat[,i], w = p_vec, sigma = sigma_mat[,i])
-               cut <- nor1mix::qnorMix(sr_vec[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
+               mix <- norMix(mu = mu_mat[,i], w = p_vec, sigma = sigma_mat[,i])
+               cut <- qnorMix(sr_vec[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
                sr_mat[,i] <- pnorm(cut, mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
           }
      }
@@ -1040,22 +1035,22 @@ simulate_d_database_noalpha <- function(k, n_params, rho_params,
 
 sparsify_simdat_d_noalpha <- function(data_obj, prop_missing, sparify_arts = c("rel", "u"), study_wise = TRUE){
      sparify_arts <- match.arg(sparify_arts, c("rel", "u"), several.ok  = TRUE)
-
+     
      if(!any(class(data_obj) == "simdat_d"))
           stop("'data_obj' must be of class 'simdat_d'", call. = FALSE)
-
+     
      call <- match.call()
-
+     
      name_vec <- colnames(data_obj$statistics)
-
+     
      sparify_rel <- any(sparify_arts == "rel")
      sparify_u <- any(sparify_arts == "u")
-
+     
      k <- length(levels(factor(data_obj$statistics$sample_id)))
-
+     
      show_applicant <- any(grepl(x = name_vec, pattern = "ryya")) & any(grepl(x = name_vec, pattern = "na"))
      sample_id <- unique(data_obj$statistics$sample_id)
-
+     
      if(study_wise){
           if(show_applicant){
                art_logic_stat <- c(rep(sparify_u, 6), rep(sparify_rel, 18))
@@ -1088,10 +1083,10 @@ sparsify_simdat_d_noalpha <- function(data_obj, prop_missing, sparify_arts = c("
                                     "raw_alpha_yi", "raw_alpha_yi1", "raw_alpha_yi2",
                                     "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")[art_logic_stat]
           }
-
+          
           art_names_stat <- art_names_stat[art_names_stat %in% colnames(data_obj$statistics)]
           art_names_param <- art_names_param[art_names_param %in% colnames(data_obj$parameters)]
-
+          
           delete_id <- sample(x = sample_id, size = round(prop_missing * k), replace = FALSE)
           delete_id <- data_obj$statistics$sample_id %in% delete_id
           data_obj$statistics[delete_id,art_names_stat] <- NA
@@ -1118,18 +1113,18 @@ sparsify_simdat_d_noalpha <- function(data_obj, prop_missing, sparify_arts = c("
                                                         "std_alpha_yi", "std_alpha_yi1", "std_alpha_yi2")
                     }
                }
-
+               
                art_i_stat <- art_i_stat[art_i_stat %in% colnames(data_obj$statistics)]
                art_i_param <- art_i_param[art_i_param %in% colnames(data_obj$parameters)]
-
+               
                for(ij in art_i_stat) data_obj$statistics[delete_id,ij] <- NA
                for(ij in art_i_param) data_obj$parameters[delete_id,ij] <- NA
           }
      }
-
+     
      data_obj$call_history <- append(data_obj$call_history, list(call))
      if(!any(class(data_obj) == "sparsified"))
           class(data_obj) <- c(class(data_obj), "sparsified")
-
+     
      data_obj
 }

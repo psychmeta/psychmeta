@@ -716,7 +716,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(any(do_bvirr)){
           ## Prepare for bivariate estimates
           bvirr_art_id <- do_bvirr
-          if(!is.null(presorted_data)) bvirr_art_id <- presorted_data[,"analysis_id"] == 1 & do_bvirr
+          if(!is.null(presorted_data)) bvirr_art_id <- presorted_data[,"Analysis_ID"] == 1 & do_bvirr
 
           rxx_tsa <- rxx
           rxx_restricted_tsa <- rxx_restricted

@@ -21,7 +21,8 @@
 #' @param ... Further arguments.
 #'
 #' @return A list of study information, including correlations, reliabilities, standard deviations, means, and \emph{u} ratios for true scores and for observed scores.
-
+#'
+#' @importFrom MASS mvrnorm
 #' @importFrom stats integrate
 #' @importFrom stats qnorm
 #' @importFrom stats dnorm
@@ -30,6 +31,8 @@
 #' @importFrom stats cor
 #' @importFrom stats cov
 #' @importFrom stats var
+#' @importFrom tmvtnorm ptmvnorm
+#' @importFrom tmvtnorm mtmvnorm
 #' @export
 #'
 #' @keywords datagen
@@ -80,7 +83,6 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                    wt_mat = args$wt_mat, sr_composites = args$sr_composites,
                                    var_names = args$var_names, composite_names = args$composite_names)
      }else{
-
           .simulate_r_sample_params(n = args$n, rho_mat = args$rho_mat,
                                     mu_vec = args$mu_vec, sigma_vec = args$sigma_vec,
                                     rel_vec = args$rel_vec, sr_vec = args$sr_vec,
@@ -251,7 +253,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
      true_scores_a <- as_tibble(true_scores_a, .name_repair = "minimal")
      error_scores_a <- as_tibble(error_scores_a, .name_repair = "minimal")
      obs_scores_a <- as_tibble(obs_scores_a, .name_repair = "minimal")
-
+     
      alpha_a <- .alpha_items(item_dat = obs_scores_a, item_index = item_index)
      alpha_i <- .alpha_items(item_dat = obs_scores_a[select_vec,], item_index = item_index)
 
@@ -495,7 +497,6 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                                       sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
                                       wt_mat = NULL, sr_composites = NULL,
                                       var_names = NULL, composite_names = NULL, show_items = FALSE, keep_vars = NULL, ...){
-
      if(is.null(var_names)){
           var_names <- paste("x", 1:ncol(rho_mat), sep = "")
      }
@@ -561,38 +562,16 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                means_x_i <- truncate_mean(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
                sr_overall <- sr_vec[x_col]
           }else{
-               if (!requireNamespace("tmvtnorm", quietly = TRUE)) {
-                       stop("The package 'tmvtnorm' is not installed.\n",
-                            "  'tmvtnorm' is required to estimate population parameters under multivariate selection.\n",
-                            "  Please install 'tmvtnorm'.")
-               }
-
-               if (zapsmall(det(S_complete_a[x_col,x_col])) == 0) {
-                 stop("Covariance matrix among selection variables is not ",
-                      "positive definite.\n  Selection cannot be performed.",
-                      call. = FALSE)
-               }
-
-               dat_i <- tmvtnorm::mtmvnorm(
-                       mean = mu_complete_a[x_col],
-                       sigma = S_complete_a[x_col,x_col],
-                       lower = qnorm(sr_vec[x_col],
-                                     mean = mu_complete_a[x_col],
-                                     sd = diag(S_complete_a[x_col,x_col])^.5,
-                                     lower.tail = FALSE)
-                       )
+               if(zapsmall(det(S_complete_a[x_col,x_col])) == 0)
+                    stop("Covariance matrix among selection variables is not positive definite: Selection cannot be performed", call. = FALSE)
+               dat_i <- mtmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
+                                 lower = qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = diag(S_complete_a[x_col,x_col])^.5, lower.tail = FALSE))
                means_x_i <- dat_i$tmean
                s_mat_i <- dat_i$tvar
                s_mat_i <- zapsmall((s_mat_i + t(s_mat_i)) / 2)
-               sr_overall <- tmvtnorm::ptmvnorm(
-                       mean = mu_complete_a[x_col],
-                       sigma = S_complete_a[x_col,x_col],
-                       lowerx = qnorm(sr_vec[x_col],
-                                      mean = mu_complete_a[x_col],
-                                      sd = diag(S_complete_a)[x_col]^.5,
-                                      lower.tail = FALSE),
-                       upperx = rep(Inf, length(x_col))
-                       )[1]
+               sr_overall <- ptmvnorm(mean = mu_complete_a[x_col], sigma = S_complete_a[x_col,x_col],
+                                      lowerx = qnorm(sr_vec[x_col], mean = mu_complete_a[x_col], sd = diag(S_complete_a)[x_col]^.5, lower.tail = FALSE),
+                                      upperx = rep(Inf, length(x_col)))[1]
           }
           S_complete_i <- correct_matrix_mvrr(Sigma_i = S_complete_a, Sigma_xx_a = s_mat_i, x_col = x_col, standardize = FALSE)
           means_i <- correct_means_mvrr(Sigma = S_complete_a, means_i = mu_complete_a, means_x_a = means_x_i, x_col = x_col)
@@ -881,12 +860,12 @@ simulate_r_database <- function(k, n_params, rho_params,
                                 wt_params = NULL, allow_neg_wt = FALSE, sr_composite_params = NULL, var_names = NULL, composite_names = NULL,
                                 n_as_ni = FALSE, show_applicant = FALSE, keep_vars = NULL, decimals = 2,
                                 format = "long", max_iter = 100, ...){
-
+     
      .dplyr.show_progress <- options()$dplyr.show_progress
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
-
+     
      inputs <- as.list(environment())
      call <- match.call()
 
@@ -1243,12 +1222,12 @@ simulate_r_database <- function(k, n_params, rho_params,
      out <- list(call_history = list(call), inputs = inputs,
                  statistics = as_tibble(dat_stats, .name_repair = "minimal"),
                  parameters = as_tibble(dat_params, .name_repair = "minimal"))
-
+     
      class(out) <- c("simdat_r_database", format)
-
+     
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-
+     
      out
 }
 
@@ -1395,7 +1374,7 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
   }else{
     alpha <- mean * ((mean * (1 - mean)) / sd^2 - 1)
     beta <- (1 - mean) * alpha / mean
-    rbeta(n = n, shape1 = alpha, shape2 = beta)
+    rbeta(n = n, shape1 = alpha, shape2 = beta) 
   }
 }
 
@@ -1868,7 +1847,7 @@ sparsify_simdat_r <- function(data_obj, prop_missing, sparify_arts = c("rel", "u
 
      data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
      data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
-
+     
      data_obj
 }
 
@@ -1937,7 +1916,7 @@ merge_simdat_r <- function(...){
 
      data_obj$statistics <- as_tibble(data_obj$statistics, .name_repair = "minimal")
      data_obj$parameters <- as_tibble(data_obj$parameters, .name_repair = "minimal")
-
+     
      data_obj
 }
 

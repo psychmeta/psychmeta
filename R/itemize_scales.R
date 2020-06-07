@@ -101,11 +101,6 @@ simulate_psych_items <- function(n, k_vec, R_scales, rel_vec,
                     item_index = obs_out$item_index_complete)
 
      if(!is.infinite(n)){
-          if (!requireNamespace("MASS", quietly = TRUE)) {
-                  stop("The package 'MASS' is not installed.\n",
-                       "  'MASS' is required to simulate samples.\n",
-                       "  Please install 'MASS'.")
-          }
           items_true <- MASS::mvrnorm(n = n, mu = true_out$item_means, Sigma = true_out$S_items)
           items_error <- MASS::mvrnorm(n = n, mu = error_out$item_means, Sigma = error_out$S_items)
           colnames(items_true) <- colnames(items_error) <- colnames(true_out$S_items)

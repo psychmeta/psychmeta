@@ -44,12 +44,10 @@ var_error_r <- function(r, n, correct_bias = TRUE){
 #' @return A vector of sampling-error variances.
 #' @export
 #'
-#' @md
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
-#' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+#' Accounting for indirect range restriction in organizational and psychological research}.
+#' Manuscript submitted for review.
 #'
 #' @details
 #' The sampling variance of a u ratio is computed differently for independent samples (i.e., settings where the referent unrestricted standard deviation comes from an different sample than the range-restricted standard deviation) than for dependent samples (i.e., unrestricted samples from which a subset of individuals are selected to be in the incumbent sample).
@@ -96,6 +94,11 @@ var_error_u <- function(u, ni, na = NA, dependent_sds = FALSE){
 #' @return A vector of sampling-error variances.
 #' @export
 #'
+#' @references
+#' Dahlke, J. A., & Wiernik, B. M. (2017).
+#' \emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
+#' Unpublished manuscript.
+#'
 #' @details
 #' The sampling variance of a reliability coefficient is:
 #'
@@ -103,13 +106,7 @@ var_error_u <- function(u, ni, na = NA, dependent_sds = FALSE){
 #'
 #' For the equation to estimate the variance of coefficient alpha, see Duhachek and Iacobucci (2004).
 #'
-#' @md
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
-#' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
-#'
 #' Duhachek, A., & Iacobucci, D. (2004).
 #' Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
 #' \emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
@@ -158,6 +155,11 @@ var_error_rel <- function(rel, n, rel_type = "alpha", k_items = NULL){
 #' @return A vector of sampling-error variances.
 #' @export
 #'
+#' @references
+#' Dahlke, J. A., & Wiernik, B. M. (2017).
+#' \emph{One of these artifacts is not like the others: New methods to account for the unique implications of indirect range-restriction corrections in organizational research}.
+#' Unpublished manuscript.
+#'
 #' @details
 #' The sampling variance of the square root of a reliability coefficient is:
 #'
@@ -165,13 +167,7 @@ var_error_rel <- function(rel, n, rel_type = "alpha", k_items = NULL){
 #'
 #' For the equation to estimate the variance of coefficient alpha, see Duhachek and Iacobucci (2004).
 #'
-#' @md
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
-#' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
-#'
 #' Duhachek, A., & Iacobucci, D. (2004).
 #' Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
 #' \emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}

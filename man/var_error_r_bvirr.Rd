@@ -2,7 +2,7 @@
 % Please edit documentation in R/var_error_tsa.R
 \name{var_error_r_bvirr}
 \alias{var_error_r_bvirr}
-\title{Taylor series approximation of the sampling variance of correlations corrected using the bivariate indirect range restriction correction (Case V)}
+\title{Taylor series approximation of the sampling variance of correlations corrected using the Case V correction for indirect range restriction}
 \usage{
 var_error_r_bvirr(
   rxyi,
@@ -154,8 +154,7 @@ var_error_r_bvirr(rxyi = .3, var_e = var_error_r(r = .3, n = 100), ni = 100,
                 sign_rxz = 1, sign_ryz = 1)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
-Accounting for indirect range restriction in organizational research.
-\emph{Organizational Research Methods}. Advance online publication.
-\url{https://doi.org/10.1177/1094428119859398}
+Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
+Accounting for indirect range restriction in organizational and psychological research}.
+Manuscript submitted for review.
 }

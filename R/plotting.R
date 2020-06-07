@@ -287,6 +287,8 @@ plot_cefp <- function(ma_obj,
 #'
 #' @author Based on code by John Sakaluk
 #'
+#' @importFrom stringr str_split
+#'
 #' @examples
 #' \dontrun{
 #' ma_obj <- ma_r(ma_method = "ic", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
