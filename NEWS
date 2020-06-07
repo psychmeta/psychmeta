@@ -1,7 +1,9 @@
-Changes in Version 2.3.10 (2020-06-05)
+Changes in Version 2.3.10 (2020-06-07)
 ======================================
 - Bug fix when compositing facets into overall construct variables.
 - Bug fix in ma_r_ic.
+- Moved packages `MASS`, `tmvtnorm`, and `nor1mix` to "Suggests" to avoid errors some users have encountered when loading `psychmeta` in R 4.0.0.
+
 
 Changes in Version 2.3.9 (2020-06-04)
 =====================================

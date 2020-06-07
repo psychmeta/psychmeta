@@ -62,7 +62,7 @@ correct_d_bias <- function(d, n){
 #' @references
 #' Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect
 #' size and related estimators. *Journal of Educational Statistics, 6*(2),
-#' 107–128. <https://doi.org/10.2307/1164588>
+#' 107–128. https://doi.org/10.2307/1164588
 #'
 #' @details
 #' The bias correction is estimated as:
