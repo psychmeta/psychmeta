@@ -172,13 +172,13 @@ These functions use Taylor series approximations (i.e., the delta method) to est
 
 The available Taylor-series functions include:
 \itemize{
-     \item{\code{estimate_var_rho_tsa_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
-     \item{\code{estimate_var_rho_tsa_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-     \item{\code{estimate_var_rho_tsa_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
-     \item{\code{estimate_var_rho_tsa_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-     \item{\code{estimate_var_rho_tsa_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-     \item{\code{estimate_var_rho_tsa_rb1}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
-     \item{\code{estimate_var_rho_tsa_rb2}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
+\item{\code{estimate_var_rho_tsa_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
+\item{\code{estimate_var_rho_tsa_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+\item{\code{estimate_var_rho_tsa_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
+\item{\code{estimate_var_rho_tsa_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+\item{\code{estimate_var_rho_tsa_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+\item{\code{estimate_var_rho_tsa_rb1}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
+\item{\code{estimate_var_rho_tsa_rb2}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
 }
 }
 \details{
@@ -198,9 +198,6 @@ where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, and \eqn{b_{3}}{b3} are first-order part
 \deqn{b_{1}=\frac{\partial\rho_{XY}}{\partial q_{X}}=\rho_{TP}q_{Y}}{b1 = rtp * qy}
 \deqn{b_{2}=\frac{\partial\rho_{XY}}{\partial q_{Y}}=\rho_{TP}q_{X}}{b2 = rtp * qx }
 \deqn{b_{3}=\frac{\partial\rho_{XY}}{\partial\rho_{TP}}=q_{X}q_{Y}}{b3 = qx * qy}
-
-
-
 
 ######## Univariate direct range restriction (UVDRR; i.e., Case II) ########
 
@@ -226,9 +223,6 @@ where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, and \eqn{b_{4}}{b4} are
 \deqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\rho_{XY_{i}}}{q_{Y_{i}}}}{b2 = qxa * qyi * rtpa * ux * A / qyi }
 \deqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=-\rho_{TP_{a}}q_{Y_{i}}q_{X_{a}}\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}-1\right)A^{3}}{b3 = -(qyi * rtpa * qxa * (rtpa^2 * qxa^2 - 1)) * A^3 }
 \deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=q_{Y_{i}}q_{X_{a}}u_{X}A^{3}}{b4 = (qyi * qxa * ux) * A^3}
-
-
-
 
 ######## Univariate indirect range restriction (UVIRR; i.e., Case IV) ########
 
@@ -259,9 +253,6 @@ where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, and \eqn{b_{4}}{b4} are
 \deqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{T}}=\frac{2\rho_{XY_{i}}}{u_{T}}-\rho_{XY_{i}}u_{T}q_{X_{a}}^{2}B^{2}-\rho_{XY_{i}}u_{T}\rho_{TP_{a}}^{2}A^{2}}{b3 = (2 * rxyi) / ut - rxyi * ut * qxa^2 * B^2 - rxyi * ut * rtpa^2 * A^2}
 \deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\rho_{XY_{i}}}{\rho_{TP_{a}}}-\rho_{XY_{i}}\rho_{TP_{a}}A^{2}\left(u_{T}^{2}-1\right)}{b4 = rxyi / rtpa - rxyi * rtpa * A^2 * (ut^2 - 1)}
 
-
-
-
 ######## Bivariate direct range restriction (BVDRR) ########
 
 Under bivariate direct range restriction, the attenuation formula yielding \eqn{\rho_{XY_{i}}}{rxyi} is:
@@ -290,9 +281,6 @@ The first-order partial derivatives of the attenuation formula are:
 \deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial u_{Y}}=-\frac{\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}-1\right)\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}+1\right)B}{u_{Y}C}}{b4 = -((qya * rtpa * qxa - 1) * (qya * rtpa * qxa + 1) * B) / (uy * C)}
 \deqn{b_{5}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1\right)B}{\rho_{TP_{a}}C}}{b5 = ((rtpa^2 * qxa^2 * qya^2 + 1) * B) / (rtpa * C)}
 
-
-
-
 ######## Bivariate indirect range restriction (BVIRR; i.e., Case V) ########
 
 Under bivariate indirect range restriction, the attenuation formula yielding \eqn{\rho_{XY_{i}}}{rxyi} is:
@@ -311,10 +299,6 @@ where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, \eqn{b_{4}}{b4}, and \e
 \deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial u_{Y}}=\frac{\lambda\left(1-u_{Y}^{2}\right)\sqrt{\left|1-u_{X}^{2}\right|}}{u_{X}\left|1-u_{Y}^{2}\right|^{1.5}}-\frac{\rho_{XY_{i}}}{u_{Y}}}{b4 = (lambda * (1 - uy^2) * sqrt(abs(1 - ux^2))) / (ux * abs(1 - uy^2)^1.5) - rxyi / uy}
 \deqn{b_{5}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{q_{X_{a}}q_{Y_{a}}}{u_{X}u_{Y}}}{b5 = (qxa * qya) / (ux * uy)}
 
-
-
-
-
 ######## Raju and Burke's TSA1 procedure ########
 
 Raju and Burke's attenuation formula may be represented as
@@ -331,9 +315,6 @@ where A, B, C, and D are first-order partial derivatives of the attenuation form
 \deqn{B=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{YY_{a}}}=\frac{1}{2}\left(\frac{\rho_{XY_{i}}}{\rho_{YY_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{YY_{a}}u_{X}^{2}}\right)}{B = .5 * (rxyi / ryya + (rxyi^3 * (1 - ux^2)) / (ryya * ux^2))}
 \deqn{C=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{XX_{a}}}=\frac{1}{2}\left(\frac{\rho_{XY_{i}}}{\rho_{XX_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{XX_{a}}u_{X}^{2}}\right)}{C = .5 * (rxyi / rxxa + (rxyi^3 * (1 - ux^2)) / (rxxa * ux^2))}
 \deqn{D=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\rho_{XY_{i}}-\rho_{XY_{i}}^{3}}{u_{X}}}{D = (rxyi - rxyi^3) / ux}
-
-
-
 
 ######## Raju and Burke's TSA2 procedure ########
 
@@ -390,9 +371,10 @@ estimate_var_rho_tsa_rb2(mean_rtpa = .5, var_rxyi = .02, var_e = .01,
                 mean_qy = .8, var_qy = .005)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-Accounting for indirect range restriction in organizational and psychological research}.
-Manuscript submitted for review.
+Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+Accounting for indirect range restriction in organizational research.
+\emph{Organizational Research Methods}. Advance online publication.
+\url{https://doi.org/10.1177/1094428119859398}
 
 Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 Implications of direct and indirect range restriction for meta-analysis methods and findings.

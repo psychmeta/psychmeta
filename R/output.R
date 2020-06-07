@@ -450,7 +450,9 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 
      if (!is.null(bib)) {
              if (!requireNamespace("bib2df", quietly = TRUE)) {
-                     stop("Package 'bib2df' not installed. 'bib2df' is required to generate bibliographies. \nInstall 'bib2df' or set 'bib = NULL'.",
+                     stop("Package 'bib2df' not installed.\n",
+                          "'bib2df' is required to generate bibliographies.\n",
+                          "Install 'bib2df' or set 'bib = NULL'.",
                           .call = FALSE)
              }
      }

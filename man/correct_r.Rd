@@ -124,9 +124,10 @@ Alexander, R. A., Carson, K. P., Alliger, G. M., & Carr, L. (1987).
 Correcting doubly truncated correlations: An improved approximation for correcting the bivariate normal correlation when truncation has occurred on both variables.
 \emph{Educational and Psychological Measurement, 47}(2), 309–315. \url{https://doi.org/10.1177/0013164487472002}
 
-Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-Accounting for indirect range restriction in organizational and psychological research}.
-Manuscript submitted for review.
+Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+Accounting for indirect range restriction in organizational research.
+\emph{Organizational Research Methods}. Advance online publication.
+\url{https://doi.org/10.1177/1094428119859398}
 
 Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 Implications of direct and indirect range restriction for meta-analysis methods and findings.

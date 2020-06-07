@@ -304,8 +304,8 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      if(pairwise_ads){
           .artifact_org_pair <- function(dat, construct_order = NULL){
                ad_list_names <- names(dat$meta_tables[[1]])
-               construct_x <- unlist(lapply(str_split(string = names(dat$meta_tables[[1]][[1]]), pattern = ", construct: "), function(x) x[2]))
-               construct_y <- unlist(lapply(str_split(string = names(dat$meta_tables[[1]][[2]]), pattern = ", construct: "), function(x) x[2]))
+               construct_x <- unlist(lapply(strsplit(x = names(dat$meta_tables[[1]][[1]]), split = ", construct: "), function(x) x[2]))
+               construct_y <- unlist(lapply(strsplit(x = names(dat$meta_tables[[1]][[2]]), split = ", construct: "), function(x) x[2]))
 
                out <- NULL
                for(i in 1:length(construct_x)){

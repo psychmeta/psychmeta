@@ -36,6 +36,7 @@ corrected estimate of \ifelse{latex}{\eqn{\Delta}}{\ifelse{html}{\out{&#916;}}{d
 correct_glass_bias(delta = .3, nc = 30, ne = 30)
 }
 \references{
-Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect size and related estimators.
-\emph{Journal of Educational Statistics, 6}(2), 107–128. https://doi.org/10.2307/1164588
+Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect
+size and related estimators. \emph{Journal of Educational Statistics, 6}(2),
+107–128. https://doi.org/10.2307/1164588
 }
