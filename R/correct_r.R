@@ -40,8 +40,6 @@ correct_r_bias <- function(r, n){
 #' @return Vector of correlations corrected for scale coarseness (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 #' @export
 #'
-#' @importFrom methods getFunction
-#'
 #' @references
 #' Aguinis, H., Pierce, C. A., & Culpepper, S. A. (2009).
 #' Scale coarseness as a methodological artifact:
@@ -109,8 +107,9 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
                     x <- seq(lbound + .01, ubound - .01, .01)
                     bin_id <- apply(t(x), 2, function(xi) which(xi > cuts))
                     bin_id <- unlist(lapply(bin_id, function(xi) xi[length(xi)]))
+                    ddist <- get(paste0("d", dist))
 
-                    wt_cor(x = x, y = bin_vec[bin_id], wt = methods::getFunction(paste0("d", dist))(x))
+                    wt_cor(x = x, y = bin_vec[bin_id], wt = ddist(x))
                }
 
                .fun(k = k, bin_vec = bin_vec, dist = dist, lbound = lbound, ubound = ubound, cuts = cuts)
@@ -218,7 +217,7 @@ correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
      ay[!is.na(py)] <- dnorm(qnorm(py[!is.na(py)], lower.tail = FALSE)) / sqrt(py[!is.na(py)] * (1 - py[!is.na(py)]))
 
      if(!is.null(n)){
-          var_e <- var_error_r(r = r, n = n)
+          var_e <- var_error_r(r = r, n = n, correct_bias = FALSE)
           r_c <- r / (ax * ay)
           var_e_c = var_e / (ax * ay)^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
@@ -258,7 +257,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
      r_c <- r / (u * sqrt((u^-2 - 1) * r^2 + 1))
 
      if(!is.null(n)){
-          var_e <- var_error_r(r = r, n = n)
+          var_e <- var_error_r(r = r, n = n, correct_bias = FALSE)
           a <- r / r_c
           var_e_c = var_e / a^2
           n_adj <- adjust_n_r(r = r_c, var_e = var_e_c)
@@ -284,7 +283,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' @param rxx_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
 #' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (\code{TRUE}) or an applicant reliability. All entries are \code{TRUE} by default.
 #' @param rxx_type,ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
-#' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale. 
+#' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale.
 #' @param sign_rxz Vector of signs of the relationships between X variables and the selection mechanism.
 #' @param sign_ryz Vector of signs of the relationships between Y variables and the selection mechanism.
 #' @param n Optional vector of sample sizes associated with the rxyi correlations.
@@ -296,14 +295,16 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' range-corrected observed-score correlations (\code{rxya}), operational range-corrected correlations corrected for measurement error in Y only (\code{rxpa}), operational range-corrected correlations corrected for measurement error in X only (\code{rtya}), and range-corrected true-score correlations (\code{rtpa}).
 #' @export
 #'
+#' @md
 #' @references
 #' Alexander, R. A., Carson, K. P., Alliger, G. M., & Carr, L. (1987).
 #' Correcting doubly truncated correlations: An improved approximation for correcting the bivariate normal correlation when truncation has occurred on both variables.
 #' \emph{Educational and Psychological Measurement, 47}(2), 309–315. \url{https://doi.org/10.1177/0013164487472002}
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-#' Accounting for indirect range restriction in organizational and psychological research}.
-#' Manuscript submitted for review.
+#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Accounting for indirect range restriction in organizational research.
+#' _Organizational Research Methods_. Advance online publication.
+#' <https://doi.org/10.1177/1094428119859398>
 #'
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 #' Implications of direct and indirect range restriction for meta-analysis methods and findings.
@@ -370,8 +371,8 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
                       rxyi, ux = 1, uy = 1,
                       rxx = 1, ryy = 1,
                       ux_observed = TRUE, uy_observed = TRUE,
-                      rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA, 
-                      ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA, 
+                      rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
+                      ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                       sign_rxz = 1, sign_ryz = 1,
                       n = NULL, conf_level = .95, correct_bias = FALSE){
      correction <- match.arg(correction)
@@ -401,7 +402,7 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
 
      if(correction == "uvirr_y")
           out <- correct_r_uvirr(rxyi = rxyi, ux = uy, rxx = ryy, ryy = rxx,
-                                 ux_observed = uy_observed, 
+                                 ux_observed = uy_observed,
                                  rxx_restricted = ryy_restricted, ryy_restricted = rxx_restricted,
                                  n = n, conf_level = conf_level, correct_bias = correct_bias)
 
@@ -417,8 +418,8 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
           out <- correct_r_bvirr(rxyi = rxyi, ux = ux, uy = uy,
                      rxx = rxx, ryy = ryy,
                      ux_observed = ux_observed, uy_observed = uy_observed,
-                     rxx_restricted = rxx_restricted, rxx_type = rxx_type, k_items_x = k_items_x, 
-                     ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y, 
+                     rxx_restricted = rxx_restricted, rxx_type = rxx_type, k_items_x = k_items_x,
+                     ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
                      sign_rxz = sign_rxz, sign_ryz = sign_ryz,
                      n = n, conf_level = conf_level, correct_bias = correct_bias)
 
@@ -444,36 +445,36 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
      warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
-     
+
      if(!is.null(n)){
           var_e <- var_error_r(r = rxy, n = n, correct_bias = correct_bias)
           if(correct_bias) rxy <- correct_r_bias(r = rxy, n = n)
           rxy <- data.frame(value = rxy, confidence_r(r = rxy, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
-     
+
      rxp <- rxy / sqrt(ryy)
      rty <- rxy / sqrt(rxx)
      rtp <- rxp / sqrt(rxx)
-     
+
      if(any(is.na(rxx))) warning("Some rxx values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ryy))) warning("Some ryy values were undefined: Interpret results accordingly", call. = FALSE)
-     
-     
+
+
      artifacts <- data.frame(rxx = rxx, ryy = ryy, stringsAsFactors = FALSE)
-     
+
      corrections <- data.frame(rxy = rxy, rxp = rxp, rty = rty, rtp = rtp, stringsAsFactors = FALSE)
-     
+
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
-     
+
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-     
+
      if(!is.null(n)){
           rxy$n <- rxp$n <- rty$n <- rtp$n <- n
           rxy$n_effective <- n
           rxp$n_effective <- adjust_n_r(r = rxp[,1], var_e = var_e * (rxp[,1] / rxy[,1])^2)
           rty$n_effective <- adjust_n_r(r = rty[,1], var_e = var_e * (rty[,1] / rxy[,1])^2)
           rtp$n_effective <- adjust_n_r(r = rtp[,1], var_e = var_e * (rtp[,1] / rxy[,1])^2)
-          
+
           out <- list(correlations = list(rxy = rxy, rxp = rxp, rty = rty, rtp = rtp),
                       artifacts = artifacts,
                       messages = warning_out)
@@ -482,7 +483,7 @@ correct_r_meas <- function(rxy, rxx = 1, ryy = 1,
                       artifacts = artifacts,
                       messages = warning_out)
      }
-     
+
      class(out) <- c("correct_r", "meas")
      return(out)
 }
@@ -497,28 +498,28 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
-     
+
      ux[!ux_observed] <- estimate_ux(ut = ux[!ux_observed], rxx = rxx[!ux_observed], rxx_restricted = rxx_restricted[!ux_observed])
-     
+
      rxxi <- rxxa <- rxx
      rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted], rxxi_type = rxx_type[rxx_restricted]))
      rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted], rxxa_type = rxx_type[!rxx_restricted]))
-     
+
      ryyi <- ryy
      ryyi[!ryy_restricted] <- suppressWarnings(estimate_ryyi(ryya = ryyi[!ryy_restricted], rxyi = rxyi[!ryy_restricted], ux = ux[!ryy_restricted]))
      ryya <- suppressWarnings(estimate_ryyi(ryya = ryyi, rxyi = rxyi, ux = ux))
-     
+
      if(any(is.na(rxxa))) warning("Some rxxa values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(rxxi))) warning("Some rxxi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ryy))) warning("Some ryyi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ux))) warning("Some ux values were undefined: Interpret results accordingly", call. = FALSE)
-     
+
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
           rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
-     
+
      rxpi <- rxyi / sqrt(ryy)
      rtpi <- rxpi / sqrt(rxxi)
      rtyi <- rxyi / sqrt(ryy)
@@ -526,32 +527,32 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      rxpa <- .correct_r_uvdrr(rxyi = rxpi, qxa = 1, qyi = 1, ux = ux)
      rtpa <- rxpa / sqrt(rxxa)
      rtya <- rtpa * sqrt(ryya)
-     
+
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryy,
                              ux = ux, stringsAsFactors = FALSE)
-     
+
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
-     
+
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
-     
+
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-     
+
      if(!is.null(n)){
           a <- .refine_var_rr(rxyi = rxyi[,1], ux = ux, rxx = NULL, indirect_rr = FALSE, ux_observed = TRUE, rxx_restricted = TRUE)
-          
+
           rxyi$n <- rxpi$n <- rtpi$n <- rtyi$n <- rxya$n <- rxpa$n <- rtya$n <- rtpa$n <- n
           rxyi$n_effective <- n
           rxpi$n_effective <- adjust_n_r(r = rxpi[,1], var_e = var_e * (rxpi[,1] / rxyi[,1])^2)
           rtyi$n_effective <- adjust_n_r(r = rtyi[,1], var_e = var_e * (rtyi[,1] / rxyi[,1])^2)
           rtpi$n_effective <- adjust_n_r(r = rtpi[,1], var_e = var_e * (rtpi[,1] / rxyi[,1])^2)
-          
+
           rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_e * (rxya[,1] / rxyi[,1])^2 * a^2)
           rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_e * (rxpa[,1] / rxyi[,1])^2 * a^2)
           rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_e * (rtya[,1] / rxyi[,1])^2 * a^2)
           rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_e * (rtpa[,1] / rxyi[,1])^2 * a^2)
-          
+
           out <- list(correlations = list(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                           rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa),
                       artifacts = artifacts,
@@ -561,7 +562,7 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
                       artifacts = artifacts,
                       messages = warning_out)
      }
-     
+
      class(out) <- c("correct_r", "uvdrr")
      return(out)
 }
@@ -574,30 +575,30 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
-     
+
      ut <- ux
      ut[ux_observed] <- suppressWarnings(estimate_ut(ux = ux[ux_observed], rxx = rxx[ux_observed], rxx_restricted = rxx_restricted[ux_observed]))
      ux[!ux_observed] <- suppressWarnings(estimate_ux(ut = ux[!ux_observed], rxx = rxx[!ux_observed], rxx_restricted = rxx_restricted[!ux_observed]))
-     
+
      rxxa <- rxxi <- rxx
      rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted]))
      rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted]))
-     
+
      ryyi <- ryy
      ryyi[!ryy_restricted] <- suppressWarnings(estimate_ryyi(ryya = ryyi[!ryy_restricted], rxyi = rxyi[!ryy_restricted], ux = ux[!ryy_restricted]))
      ryya <- suppressWarnings(estimate_ryyi(ryya = ryyi, rxyi = rxyi, ux = ut))
-     
+
      if(any(is.na(rxxa))) warning("Some rxxa values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(rxxi))) warning("Some rxxi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ryy))) warning("Some ryyi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ut))) warning("Some ut values were undefined: Interpret results accordingly", call. = FALSE)
-     
+
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
           rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
-     
+
      rxpi <- rxyi / sqrt(ryy)
      rtyi <- rxyi / sqrt(rxxi)
      rtpi <- rxpi / sqrt(rxxi)
@@ -605,32 +606,32 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      rtpa <- .correct_r_uvirr(rxyi = rtpi, qxi = 1, qyi = 1, ut = ut)
      rxpa <- rtpa * sqrt(rxxa)
      rtya <- rtpa * sqrt(ryya)
-     
+
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryy,
                              ux = ux, ut = ut, stringsAsFactors = FALSE)
-     
+
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
-     
+
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
-     
+
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-     
+
      if(!is.null(n)){
           a <- .refine_var_rr(rxyi = rxyi[,1], ux = ut, rxx = NULL, indirect_rr = TRUE, ux_observed = FALSE, rxx_restricted = TRUE)
-          
+
           rxyi$n <- rxpi$n <- rtpi$n <- rtyi$n <- rxya$n <- rxpa$n <- rtya$n <- rtpa$n <- n
           rxyi$n_effective <- n
           rxpi$n_effective <- adjust_n_r(r = rxpi[,1], var_e = var_e * (rxpi[,1] / rxyi[,1])^2)
           rtyi$n_effective <- adjust_n_r(r = rtyi[,1], var_e = var_e * (rtyi[,1] / rxyi[,1])^2)
           rtpi$n_effective <- adjust_n_r(r = rtpi[,1], var_e = var_e * (rtpi[,1] / rxyi[,1])^2)
-          
+
           rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_e * (rxya[,1] / rxyi[,1])^2 * a^2)
           rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_e * (rxpa[,1] / rxyi[,1])^2 * a^2)
           rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_e * (rtya[,1] / rxyi[,1])^2 * a^2)
           rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_e * (rtpa[,1] / rxyi[,1])^2 * a^2)
-          
+
           out <- list(correlations = list(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                           rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa),
                       artifacts = artifacts,
@@ -640,7 +641,7 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
                       artifacts = artifacts,
                       messages = warning_out)
      }
-     
+
      class(out) <- c("correct_r", "uvirr")
      return(out)
 }
@@ -649,8 +650,8 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
 correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
                             rxx = 1, ryy = 1,
                             ux_observed = TRUE, uy_observed = TRUE,
-                            rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA, 
-                            ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA, 
+                            rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
+                            ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                             sign_rxz = 1, sign_ryz = 1,
                             n = NULL, conf_level = .95, correct_bias = FALSE){
      warn_obj1 <- record_warnings()
@@ -658,31 +659,31 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
      screen_u(u_vec = uy, art_name = "uy")
-     
+
      ux[!ux_observed] <- suppressWarnings(estimate_ux(ut = ux[!ux_observed], rxx = rxx[!ux_observed], rxx_restricted = rxx_restricted[!ux_observed]))
      uy[!uy_observed] <- suppressWarnings(estimate_ux(ut = uy[!uy_observed], rxx = ryy[!uy_observed], rxx_restricted = ryy_restricted[!uy_observed]))
-     
+
      rxxi <- rxxa <- rxx
      rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted]))
      rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted]))
-     
+
      ryyi <- ryya <- ryy
      ryya[ryy_restricted] <- suppressWarnings(estimate_rxxa(ux = uy[ryy_restricted], rxxi = ryy[ryy_restricted]))
      ryyi[!ryy_restricted] <- suppressWarnings(estimate_rxxi(ux = uy[!ryy_restricted], rxxa = ryy[!ryy_restricted]))
-     
+
      if(any(is.na(rxxa))) warning("Some rxxa values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(rxxi))) warning("Some rxxi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ryya))) warning("Some ryya values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ryyi))) warning("Some ryyi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ux))) warning("Some ux values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(uy))) warning("Some uy values were undefined: Interpret results accordingly", call. = FALSE)
-     
+
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
           rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
-     
+
      rxpi <- rxyi / sqrt(ryyi)
      rtyi <- rxyi / sqrt(rxxi)
      rtpi <- rxpi / sqrt(rxxi)
@@ -690,46 +691,46 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
      rxpa <- rxya / sqrt(ryya)
      rtya <- rxya / sqrt(rxxa)
      rtpa <- rxpa / sqrt(rxxa)
-     
+
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryyi, ryya = ryya,
                              ux = ux, uy = uy, stringsAsFactors = FALSE)
-     
+
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
-     
+
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
-     
+
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-     
+
      if(!is.null(n)){
           rxyi$n <- rxpi$n <- rtpi$n <- rtyi$n <- rxya$n <- rxpa$n <- rtya$n <- rtpa$n <- n
           rxyi$n_effective <- n
           rxpi$n_effective <- adjust_n_r(r = rxpi[,1], var_e = var_e * (rxpi[,1] / rxyi[,1])^2)
           rtyi$n_effective <- adjust_n_r(r = rtyi[,1], var_e = var_e * (rtyi[,1] / rxyi[,1])^2)
           rtpi$n_effective <- adjust_n_r(r = rtpi[,1], var_e = var_e * (rtpi[,1] / rxyi[,1])^2)
-          
+
           rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
-                                                                                 qx = 1, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x, 
-                                                                                 qy = 1, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y, 
+                                                                                 qx = 1, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x,
+                                                                                 qy = 1, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y,
                                                                                  sign_rxz = sign_rxz, sign_ryz = sign_ryz))
           rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
-                                                                                 qx = 1, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x, 
-                                                                                 qy = ryyi^.5, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y, 
+                                                                                 qx = 1, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x,
+                                                                                 qy = ryyi^.5, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y,
                                                                                  sign_rxz = sign_rxz, sign_ryz = sign_ryz))
           rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
-                                                                                 qx = rxxi^.5, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x, 
-                                                                                 qy = 1, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y, 
+                                                                                 qx = rxxi^.5, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x,
+                                                                                 qy = 1, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y,
                                                                                  sign_rxz = sign_rxz, sign_ryz = sign_ryz))
           rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_error_r_bvirr(rxyi = rxyi[,1], var_e = var_e, ni = n,
                                                                                  ux = ux, uy = uy,
-                                                                                 qx = rxxi^.5, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x, 
-                                                                                 qy = ryyi^.5, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y, 
+                                                                                 qx = rxxi^.5, qx_restricted = TRUE, qx_type = rxx_type, k_items_x = k_items_x,
+                                                                                 qy = ryyi^.5, qy_restricted = TRUE, qy_type = ryy_type, k_items_y = k_items_y,
                                                                                  sign_rxz = sign_rxz, sign_ryz = sign_ryz))
-          
+
           out <- list(correlations = list(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                           rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa),
                       artifacts = artifacts,
@@ -739,7 +740,7 @@ correct_r_bvirr <- function(rxyi, ux = 1, uy = 1,
                       artifacts = artifacts,
                       messages = warning_out)
      }
-     
+
      class(out) <- c("correct_r", "bvirr")
      return(out)
 }
@@ -752,36 +753,36 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
                             ryy_restricted = TRUE, ryy_type = "alpha",
                             n = NULL, conf_level = .95, correct_bias = FALSE){
      warn_obj1 <- record_warnings()
-     
+
      screen_rel(rel_vec = rxx, art_name = "rxx")
      screen_rel(rel_vec = ryy, art_name = "ryy")
      screen_u(u_vec = ux, art_name = "ux")
      screen_u(u_vec = uy, art_name = "uy")
-     
+
      ux[!ux_observed] <- suppressWarnings(estimate_ux(ut = ux[!ux_observed], rxx = rxx[!ux_observed], rxx_restricted = rxx_restricted[!ux_observed]))
      uy[!uy_observed] <- suppressWarnings(estimate_ux(ut = uy[!uy_observed], rxx = ryy[!uy_observed], rxx_restricted = ryy_restricted[!uy_observed]))
-     
+
      rxxi <- rxxa <- rxx
      rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted], rxxi_type = rxx_type[rxx_restricted]))
      rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted], rxxa_type = rxx_type[!rxx_restricted]))
-     
+
      ryyi <- ryya <- ryy
      ryya[ryy_restricted] <- suppressWarnings(estimate_rxxa(ux = uy[ryy_restricted], rxxi = ryy[ryy_restricted], rxxi_type = ryy_type[ryy_restricted]))
      ryyi[!ryy_restricted] <- suppressWarnings(estimate_rxxi(ux = uy[!ryy_restricted], rxxa = ryy[!ryy_restricted], rxxa_type = ryy_type[!ryy_restricted]))
-     
+
      if(any(is.na(rxxa))) warning("Some rxxa values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(rxxi))) warning("Some rxxi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ryya))) warning("Some ryya values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ryyi))) warning("Some ryyi values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(ux))) warning("Some ux values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(uy))) warning("Some uy values were undefined: Interpret results accordingly", call. = FALSE)
-     
+
      if(!is.null(n)){
           var_e <- var_error_r(r = rxyi, n = n, correct_bias = correct_bias)
           if(correct_bias) rxyi <- correct_r_bias(r = rxyi, n = n)
           rxyi <- data.frame(value = rxyi, confidence_r(r = rxyi, n = n, conf_level = conf_level), stringsAsFactors = FALSE)
      }
-     
+
      rxpi <- rxyi / sqrt(ryyi)
      rtyi <- rxyi / sqrt(rxxi)
      rtpi <- rxpi / sqrt(rxxi)
@@ -789,30 +790,30 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
      rxpa <- rxya / sqrt(ryya)
      rtya <- rxya / sqrt(rxxa)
      rtpa <- rxpa / sqrt(rxxa)
-     
+
      artifacts <- data.frame(rxxi = rxxi, rxxa = rxxa,
                              ryyi = ryyi, ryya = ryya,
                              ux = ux, uy = uy, stringsAsFactors = FALSE)
-     
+
      corrections <- data.frame(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa, stringsAsFactors = FALSE)
-     
+
      if(any(abs(corrections) > 1)) warning("Some corrected correlations exceed 1 in absolute magnitude: Interpret results accordingly", call. = FALSE)
-     
+
      warning_out <- clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings())
-     
+
      if(!is.null(n)){
           rxyi$n <- rxpi$n <- rtpi$n <- rtyi$n <- rxya$n <- rxpa$n <- rtya$n <- rtpa$n <- n
           rxyi$n_effective <- n
           rxpi$n_effective <- adjust_n_r(r = rxpi[,1], var_e = var_e * (rxpi[,1] / rxyi[,1])^2)
           rtyi$n_effective <- adjust_n_r(r = rtyi[,1], var_e = var_e * (rtyi[,1] / rxyi[,1])^2)
           rtpi$n_effective <- adjust_n_r(r = rtpi[,1], var_e = var_e * (rtpi[,1] / rxyi[,1])^2)
-          
+
           rxya$n_effective <- adjust_n_r(r = rxya[,1], var_e = var_e * (rxya[,1] / rxyi[,1])^2)
           rxpa$n_effective <- adjust_n_r(r = rxpa[,1], var_e = var_e * (rxpa[,1] / rxyi[,1])^2)
           rtya$n_effective <- adjust_n_r(r = rtya[,1], var_e = var_e * (rtya[,1] / rxyi[,1])^2)
           rtpa$n_effective <- adjust_n_r(r = rtpa[,1], var_e = var_e * (rtpa[,1] / rxyi[,1])^2)
-          
+
           out <- list(correlations = list(rxyi = rxyi, rxpi = rxpi, rtyi = rtyi, rtpi = rtpi,
                                           rxya = rxya, rxpa = rxpa, rtya = rtya, rtpa = rtpa),
                       artifacts = artifacts,
@@ -822,7 +823,7 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
                       artifacts = artifacts,
                       messages = warning_out)
      }
-     
+
      class(out) <- c("correct_r", "bvdrr")
      return(out)
 }

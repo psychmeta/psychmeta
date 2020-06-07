@@ -222,6 +222,7 @@
 #' the adjusted procedure attempts to estimate the applicant reliability information for the criterion. The "rb" procedures are included for posterity: We strongly recommend using
 #' the "uvdrr" procedure to appropriately correct for univariate range restriction.
 #'
+#' @md
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
@@ -231,9 +232,10 @@
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
 #' \emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-#' Accounting for indirect range restriction in organizational and psychological research}.
-#' Manuscript submitted for review.
+#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Accounting for indirect range restriction in organizational research.
+#' _Organizational Research Methods_. Advance online publication.
+#' <https://doi.org/10.1177/1094428119859398>
 #'
 #' Raju, N. S., & Burke, M. J. (1983).
 #' Two new procedures for studying validity generalization.
@@ -1326,9 +1328,20 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           global_x <- tolower(facet_x) %in% c("overall", "global", "total")
           global_y <- tolower(facet_y) %in% c("overall", "global", "total")
           global_x[is.na(global_x)] <- global_y[is.na(global_y)] <- FALSE
+          construct_x_has_facets <- construct_x %in% unique(construct_x[valid_facet_x])
+          construct_y_has_facets <- construct_y %in% unique(construct_y[valid_facet_y])
           valid_facet <- valid_facet & !(global_x | global_y)
-          valid_facet_x <- valid_facet_x & !global_x
-          valid_facet_y <- valid_facet_y & !global_y
+
+          # The next two lines create indices for rows that have facets for one
+          # variable and excluding the other variable if it never has facets
+          valid_facet_x <- valid_facet_x & !global_x & construct_y_has_facets
+          valid_facet_y <- valid_facet_y & !global_y & construct_x_has_facets
+
+          # Construct data frames with rows for each combination of composited variables
+          #   - Global X w/ Global Y [or global with construct w/ no facets]
+          #   - Global X w/  Facet Y
+          #   -  Facet X w/ Global Y
+          #   -  Facet X w/  Facet Y [or facet with construct w/ no facets]
 
           use_for_arts <- c(rep(TRUE, sum(retain)),
                             rep(FALSE, sum(valid_facet_y)),

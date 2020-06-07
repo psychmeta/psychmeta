@@ -60,8 +60,9 @@ correct_d_bias <- function(d, n){
 #' @export
 #'
 #' @references
-#' Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect size and related estimators.
-#' *Journal of Educational Statistics, 6*(2), 107–128. https://doi.org/10.2307/1164588
+#' Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect
+#' size and related estimators. *Journal of Educational Statistics, 6*(2),
+#' 107–128. https://doi.org/10.2307/1164588
 #'
 #' @details
 #' The bias correction is estimated as:
@@ -100,10 +101,10 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @param uy Vector of u ratios for Y (the continuous variable).
 #' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (`TRUE`) or a true-score u ratio. All entries are `TRUE` by default.
 #' @param ryy_restricted Logical vector in which each entry specifies whether the corresponding rxx value is an incumbent reliability (`TRUE`) or an applicant reliability. All entries are `TRUE` by default.
-#' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
+#' @param ryy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for [ma_r()] for a full list of acceptable reliability types.
 #' @param k_items_y Numeric vector identifying the number of items in each scale.
 #' @param rGg Vector of reliabilities for the group variable (i.e., the correlations between observed group membership and latent group membership).
-#' @param pi Proportion of cases in one of the groups in the observed data (not necessary if \code{n1} and \code{n2} reflect this proportionality).
+#' @param pi Proportion of cases in one of the groups in the observed data (not necessary if `n1` and `n2` reflect this proportionality).
 #' @param pa Proportion of cases in one of the groups in the population.
 #' @param sign_rgz Vector of signs of the relationships between grouping variables and the selection mechanism.
 #' @param sign_ryz Vector of signs of the relationships between Y variables and the selection mechanism.
@@ -113,8 +114,8 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @param correct_bias Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (`TRUE`) or not (`FALSE`).
 #' For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE} (the default).
 #'
-#' @return Data frame(s) of observed *d* values (`dgyi`), operational range-restricted \emph{d} values corrected for measurement error in Y only (\code{dgpi}), operational range-restricted \emph{d} values corrected for measurement error in the grouping only (\code{dGyi}), and range-restricted true-score \emph{d} values (\code{dGpi}),
-#' range-corrected observed-score \emph{d} values (\code{dgya}), operational range-corrected \emph{d} values corrected for measurement error in Y only (\code{dgpa}), operational range-corrected \emph{d} values corrected for measurement error in the grouping only (\code{dGya}), and range-corrected true-score \emph{d} values (\code{dGpa}).
+#' @return Data frame(s) of observed *d* values (`dgyi`), operational range-restricted *d* values corrected for measurement error in Y only (`dgpi`), operational range-restricted *d* values corrected for measurement error in the grouping only (`dGyi`), and range-restricted true-score *d* values (`dGpi`),
+#' range-corrected observed-score *d* values (\code{dgya}), operational range-corrected *d* values corrected for measurement error in Y only (`dgpa`), operational range-corrected *d* values corrected for measurement error in the grouping only (`dGya`), and range-corrected true-score *d* values (`dGpa`).
 #'
 #' @export
 #'
@@ -122,24 +123,31 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @md
 #' @references
 #' Alexander, R. A., Carson, K. P., Alliger, G. M., & Carr, L. (1987).
-#' Correcting doubly truncated correlations: An improved approximation for correcting the bivariate normal correlation when truncation has occurred on both variables.
-#' \emph{Educational and Psychological Measurement, 47}(2), 309–315. \url{https://doi.org/10.1177/0013164487472002}
+#' Correcting doubly truncated correlations: An improved approximation for
+#' correcting the bivariate normal correlation when truncation has occurred on
+#' both variables. *Educational and Psychological Measurement, 47*(2), 309–315.
+#' <https://doi.org/10.1177/0013164487472002>
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-#' Accounting for indirect range restriction in organizational and psychological research}.
-#' Manuscript submitted for review.
+#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Accounting for indirect range restriction in organizational research.
+#' _Organizational Research Methods_. Advance online publication.
+#' <https://doi.org/10.1177/1094428119859398>
 #'
-#' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
-#' Implications of direct and indirect range restriction for meta-analysis methods and findings.
-#' \emph{Journal of Applied Psychology, 91}(3), 594–612. \url{https://doi.org/10.1037/0021-9010.91.3.594}
+#' Hunter, J. E., Schmidt, F. L., & Le, H. (2006). Implications of direct and
+#' indirect range restriction for meta-analysis methods and findings.
+#' *Journal of Applied Psychology, 91*(3), 594–612.
+#' <https://doi.org/10.1037/0021-9010.91.3.594>
 #'
 #' Le, H., Oh, I.-S., Schmidt, F. L., & Wooldridge, C. D. (2016).
-#' Correction for range restriction in meta-analysis revisited: Improvements and implications for organizational research.
-#' \emph{Personnel Psychology, 69}(4), 975–1008. \url{https://doi.org/10.1111/peps.12122}
+#' Correction for range restriction in meta-analysis revisited:
+#' Improvements and implications for organizational research.
+#' *Personnel Psychology, 69*(4), 975–1008. <https://doi.org/10.1111/peps.12122>
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 43–44, 140–141.
+#' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
+#' SAGE Publications. <https://doi.org/10.4135/9781483398105>. pp. 43–44, 140–141.
+#'
+#' @md
 #'
 #' @examples
 #' ## Correction for measurement error only
