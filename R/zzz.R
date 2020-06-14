@@ -164,7 +164,7 @@
   if (length(sys_v_num) >= 4) {
     if (sys_v_num[4] > 0) {
       packageStartupMessage(
-        "NOTE: You are currently using an UNRELEASED development build (augmentation of release",
+        "NOTE: You are currently using an UNRELEASED development build (augmentation of release ",
         paste0("v", paste(sys_v_num[1:3], collapse = "."), ")")
       )
     }
