@@ -37,7 +37,7 @@ convert_es(
 
 \item{sd2}{Vector of standard deviations of group 2 of the two groups being contrasted.}
 
-\item{tails}{Vector of the tails for \emph{p} values when \code{input_es = "p.t"}. Can be \code{2} (defualt) or \code{1}.}
+\item{tails}{Vector of the tails for \emph{p} values when \code{input_es = "p.t"}. Can be \code{2} (default) or \code{1}.}
 }
 \value{
 A data frame of class \code{es} with variables:
