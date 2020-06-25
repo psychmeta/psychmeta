@@ -1,6 +1,6 @@
 #' Testing the distribute_logic function
 
-context("distribute_logic - testing functionality")
+context(".distribute_logic - testing functionality")
 
 library(psychmeta)
 
