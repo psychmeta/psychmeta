@@ -1,7 +1,5 @@
 #' Testing the adjust_n_r and adjust_n_d functions
 
-context("adjust_n - testing vignette examples")
-
 library(psychmeta)
 
 test_that("adjust_n_r provides a correct/numerical answer", {
