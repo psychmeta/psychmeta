@@ -17,10 +17,8 @@ rxyi <- c(
 )
 
 construct_x <- rep(c("A", "A", "B"), 40)
- 
 
 construct_y <- rep(c("B", "C", "C"), 40)
-
 
 # Testing -----------------------------------------------------------------
 
@@ -30,31 +28,28 @@ construct_y <- rep(c("B", "C", "C"), 40)
 test_that("Global = NULL, Column all TRUE", {
 
   # Creating expected
-
   correct_rel <- NULL
 
   correct_rxx <- TRUE
 
   correct_ryy <- TRUE
 
-  genuine_rel <- .distribute_logic(
-    logic_general = correct_rel,
-    logic_x = correct_rxx,
-    logic_y = correct_ryy,
-    name_logic_x = "correct_rxx",
-    name_logic_y = "correct_ryy",
-    construct_x = construct_x,
-    construct_y = construct_y,
-    es_length = length(rxyi)
-  )
-
-
   expected_rel <- list(x = TRUE, y = TRUE)
 
-
   # Testing
-
-  expect_equal(genuine_rel, expected_rel)
+  expect_equal(
+    .distribute_logic(
+      logic_general = correct_rel,
+      logic_x = correct_rxx,
+      logic_y = correct_ryy,
+      name_logic_x = "correct_rxx",
+      name_logic_y = "correct_ryy",
+      construct_x = construct_x,
+      construct_y = construct_y,
+      es_length = length(rxyi)
+    ),
+    expected_rel
+  )
 })
 
 test_that("Global all TRUE, Column all TRUE", {
@@ -66,71 +61,62 @@ test_that("Global all TRUE, Column all TRUE", {
 
   correct_ryy <- TRUE
 
-  genuine_rel <- .distribute_logic(
-    logic_general = correct_rel,
-    logic_x = correct_rxx,
-    logic_y = correct_ryy,
-    name_logic_x = "correct_rxx",
-    name_logic_y = "correct_ryy",
-    construct_x = construct_x,
-    construct_y = construct_y,
-    es_length = length(rxyi)
-  )
+  genuine_rel <-
 
-  expected_rel <- list(
-    x = c(
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
-    ),
-    y = c(
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
+    expected_rel <- list(
+      x = c(
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
+      ),
+      y = c(
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+        TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
+      )
     )
-  )
 
   # Testing
-  expect_equal(genuine_rel, expected_rel)
+  expect_equal(
+    .distribute_logic(
+      logic_general = correct_rel,
+      logic_x = correct_rxx,
+      logic_y = correct_ryy,
+      name_logic_x = "correct_rxx",
+      name_logic_y = "correct_ryy",
+      construct_x = construct_x,
+      construct_y = construct_y,
+      es_length = length(rxyi)
+    ),
+    expected_rel
+  )
 })
 
 test_that("Global all FALSE, Column all FALSE", {
-  
+
   # Creating expected
-  
   correct_rel <- c(X = FALSE, Y = FALSE, Z = FALSE)
-  
+
   correct_rxx <- FALSE
-  
+
   correct_ryy <- FALSE
-  
-  expected_rel <- .distribute_logic(
-    logic_general = correct_rel,
-    logic_x = correct_rxx,
-    logic_y = correct_ryy,
-    name_logic_x = "correct_rxx",
-    name_logic_y = "correct_ryy",
-    construct_x = construct_x,
-    construct_y = construct_y,
-    es_length = length(rxyi)
-  )
-  
+
   genuine_rel <- list(
     x = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -161,31 +147,31 @@ test_that("Global all FALSE, Column all FALSE", {
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
     )
   )
-  
+
   # Testing
-  expect_equal(genuine_rel, expected_rel)
+  expect_equal(
+    .distribute_logic(
+      logic_general = correct_rel,
+      logic_x = correct_rxx,
+      logic_y = correct_ryy,
+      name_logic_x = "correct_rxx",
+      name_logic_y = "correct_ryy",
+      construct_x = construct_x,
+      construct_y = construct_y,
+      es_length = length(rxyi)
+    ),
+    expected_rel
+  )
 })
 
 test_that("Global all FALSE, Column all TRUE", {
 
   # Creating expected
-
   correct_rel <- c(A = FALSE, B = FALSE, C = FALSE)
 
   correct_rxx <- TRUE
 
   correct_ryy <- TRUE
-
-  genuine_rel <- .distribute_logic(
-    logic_general = correct_rel,
-    logic_x = correct_rxx,
-    logic_y = correct_ryy,
-    name_logic_x = "correct_rxx",
-    name_logic_y = "correct_ryy",
-    construct_x = construct_x,
-    construct_y = construct_y,
-    es_length = length(rxyi)
-  )
 
   expected_rxx <- list(
     x = c(
@@ -219,30 +205,29 @@ test_that("Global all FALSE, Column all TRUE", {
   )
 
   # Testing
-  expect_equal(genuine_rel, expected_rxx)
+  expect_equal(
+    .distribute_logic(
+      logic_general = correct_rel,
+      logic_x = correct_rxx,
+      logic_y = correct_ryy,
+      name_logic_x = "correct_rxx",
+      name_logic_y = "correct_ryy",
+      construct_x = construct_x,
+      construct_y = construct_y,
+      es_length = length(rxyi)
+    ),
+    expected_rxx
+  )
 })
 
 test_that("Global Z missing A = TRUE B = FALSE, Column all TRUE", {
 
   # Creating expected
-
   correct_rel <- c(A = TRUE, B = FALSE)
 
   correct_rxx <- TRUE
 
   correct_ryy <- TRUE
-
-  expected_rel <- .distribute_logic(
-    logic_general = correct_rel,
-    logic_x = correct_rxx,
-    logic_y = correct_ryy,
-    name_logic_x = "correct_rxx",
-    name_logic_y = "correct_ryy",
-    construct_x = construct_x,
-    construct_y = construct_y,
-    es_length = length(rxyi)
-  )
-
 
   genuine_rel <- list(
     x = c(
@@ -273,30 +258,30 @@ test_that("Global Z missing A = TRUE B = FALSE, Column all TRUE", {
   )
 
   # Testing
-  expect_equal(genuine_rel, expected_rel)
+  expect_equal(
+    .distribute_logic(
+      logic_general = correct_rel,
+      logic_x = correct_rxx,
+      logic_y = correct_ryy,
+      name_logic_x = "correct_rxx",
+      name_logic_y = "correct_ryy",
+      construct_x = construct_x,
+      construct_y = construct_y,
+      es_length = length(rxyi)
+    ),
+    expected_rel
+  )
 })
 
 test_that("Global X = FALSE, Y = TRUE, Z = FALSE, Column rxx = FALSE, ryy = TRUE", {
 
   # Creating expected
-
   correct_rel <- c(X = FALSE, Y = TRUE, Z = TRUE)
 
   correct_rxx <- FALSE
 
   correct_ryy <- TRUE
 
-  expected_rel <- .distribute_logic(
-    logic_general = correct_rel,
-    logic_x = correct_rxx,
-    logic_y = correct_ryy,
-    name_logic_x = "correct_rxx",
-    name_logic_y = "correct_ryy",
-    construct_x = construct_x,
-    construct_y = construct_y,
-    es_length = length(rxyi)
-  )
-
   genuine_rel <- list(
     x = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -327,30 +312,29 @@ test_that("Global X = FALSE, Y = TRUE, Z = FALSE, Column rxx = FALSE, ryy = TRUE
   )
 
   # Testing
-  expect_equal(genuine_rel, expected_rel)
+  expect_equal(
+    .distribute_logic(
+      logic_general = correct_rel,
+      logic_x = correct_rxx,
+      logic_y = correct_ryy,
+      name_logic_x = "correct_rxx",
+      name_logic_y = "correct_ryy",
+      construct_x = construct_x,
+      construct_y = construct_y,
+      es_length = length(rxyi)
+    ), expected_rel
+  )
 })
 
 test_that("Global X = FALSE, Y = TRUE, Column rxx = TRUE, ryy = FALSE", {
-  
+
   # Creating expected
-  
   correct_rel <- c(X = FALSE, Y = TRUE)
-  
+
   correct_rxx <- TRUE
-  
+
   correct_ryy <- FALSE
-  
-  expected_rel <- .distribute_logic(
-    logic_general = correct_rel,
-    logic_x = correct_rxx,
-    logic_y = correct_ryy,
-    name_logic_x = "correct_rxx",
-    name_logic_y = "correct_ryy",
-    construct_x = construct_x,
-    construct_y = construct_y,
-    es_length = length(rxyi)
-  )
-  
+
   genuine_rel <- list(
     x = c(
       TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
@@ -379,7 +363,19 @@ test_that("Global X = FALSE, Y = TRUE, Column rxx = TRUE, ryy = FALSE", {
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
     )
   )
-  
+
   # Testing
-  expect_equal(genuine_rel, expected_rel)
+  expect_equal(
+    .distribute_logic(
+      logic_general = correct_rel,
+      logic_x = correct_rxx,
+      logic_y = correct_ryy,
+      name_logic_x = "correct_rxx",
+      name_logic_y = "correct_ryy",
+      construct_x = construct_x,
+      construct_y = construct_y,
+      es_length = length(rxyi)
+    ),
+    expected_rel
+  )
 })
