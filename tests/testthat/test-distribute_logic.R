@@ -117,7 +117,7 @@ test_that("Global all FALSE, Column all FALSE", {
 
   correct_ryy <- FALSE
 
-  genuine_rel <- list(
+  expected_rel <- list(
     x = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -173,7 +173,7 @@ test_that("Global all FALSE, Column all TRUE", {
 
   correct_ryy <- TRUE
 
-  expected_rxx <- list(
+  expected_rel <- list(
     x = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -216,7 +216,7 @@ test_that("Global all FALSE, Column all TRUE", {
       construct_y = construct_y,
       es_length = length(rxyi)
     ),
-    expected_rxx
+    expected_rel
   )
 })
 
@@ -229,7 +229,7 @@ test_that("Global Z missing A = TRUE B = FALSE, Column all TRUE", {
 
   correct_ryy <- TRUE
 
-  genuine_rel <- list(
+  expected_rel <- list(
     x = c(
       TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE,
       TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE,
@@ -282,7 +282,7 @@ test_that("Global X = FALSE, Y = TRUE, Z = FALSE, Column rxx = FALSE, ryy = TRUE
 
   correct_ryy <- TRUE
 
-  genuine_rel <- list(
+  expected_rel <- list(
     x = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
       FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -335,7 +335,7 @@ test_that("Global X = FALSE, Y = TRUE, Column rxx = TRUE, ryy = FALSE", {
 
   correct_ryy <- FALSE
 
-  genuine_rel <- list(
+  expected_rel <- list(
     x = c(
       TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
       TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
