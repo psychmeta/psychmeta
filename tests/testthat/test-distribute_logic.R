@@ -1,10 +1,6 @@
-#' Testing the distribute_logic function
+# Testing the distribute_logic function
 
 library(psychmeta)
-
-# fix contruct_y
-# general logic vs. variable logic
-
 
 # Declaring Variables -----------------------------------------------------
 
@@ -31,7 +27,6 @@ construct_y <- rep(c("B", "C", "C"), 40)
 # Global logic refers to the values of correct_rel
 # Column logic refers to correct_rxx, correct_ryy
 
-# Good
 test_that("Global = NULL, Column all TRUE", {
 
   # Creating expected
@@ -62,7 +57,6 @@ test_that("Global = NULL, Column all TRUE", {
   expect_equal(genuine_rel, expected_rel)
 })
 
-# Good
 test_that("Global all TRUE, Column all TRUE", {
 
   # Creating expected
@@ -116,7 +110,6 @@ test_that("Global all TRUE, Column all TRUE", {
   expect_equal(genuine_rel, expected_rel)
 })
 
-# Good
 test_that("Global all FALSE, Column all FALSE", {
   
   # Creating expected
@@ -173,7 +166,6 @@ test_that("Global all FALSE, Column all FALSE", {
   expect_equal(genuine_rel, expected_rel)
 })
 
-# Good
 test_that("Global all FALSE, Column all TRUE", {
 
   # Creating expected
@@ -230,7 +222,6 @@ test_that("Global all FALSE, Column all TRUE", {
   expect_equal(genuine_rel, expected_rxx)
 })
 
-# Good
 test_that("Global Z missing A = TRUE B = FALSE, Column all TRUE", {
 
   # Creating expected
@@ -285,7 +276,6 @@ test_that("Global Z missing A = TRUE B = FALSE, Column all TRUE", {
   expect_equal(genuine_rel, expected_rel)
 })
 
-# Good
 test_that("Global X = FALSE, Y = TRUE, Z = FALSE, Column rxx = FALSE, ryy = TRUE", {
 
   # Creating expected
@@ -340,7 +330,6 @@ test_that("Global X = FALSE, Y = TRUE, Z = FALSE, Column rxx = FALSE, ryy = TRUE
   expect_equal(genuine_rel, expected_rel)
 })
 
-# Good
 test_that("Global X = FALSE, Y = TRUE, Column rxx = TRUE, ryy = FALSE", {
   
   # Creating expected
@@ -394,11 +383,3 @@ test_that("Global X = FALSE, Y = TRUE, Column rxx = TRUE, ryy = FALSE", {
   # Testing
   expect_equal(genuine_rel, expected_rel)
 })
-
-
-
-
-
-
-
-
