@@ -1,7 +1,5 @@
 #' Tests the conversions functions
 
-context("convert_es - testing vignette examples")
-
 library(psychmeta)
 
 # output_es = "r" ---------------------------------------------------------
