@@ -910,11 +910,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                construct_x = construct_x, 
                                                construct_y = construct_y, 
                                                es_length = length(rxyi))
-             correct_rxx <- .correct_rel["x"]
-             correct_ryy <- .correct_rel["y"]
+             correct_rxx <- .correct_rel[["x"]]
+             correct_ryy <- .correct_rel[["y"]]
              
              # distribute correct_rr
-             .correct_rr  <- .distribute_logic(logic_general = correct_rr, 
+             .correct_rr <- .distribute_logic(logic_general = correct_rr, 
                                                logic_x = correct_rr_x, 
                                                logic_y = correct_rr_y,
                                                name_logic_x = "correct_rr_x", 
@@ -922,11 +922,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                construct_x = construct_x, 
                                                construct_y = construct_y, 
                                                es_length = length(rxyi))
-             correct_rr_x  <- .correct_rr["x"]
-             correct_rr_y  <- .correct_rr["y"]
+             correct_rr_x <- .correct_rr[["x"]]
+             correct_rr_y <- .correct_rr[["y"]]
              
              # distribute indirect_rr
-             .indirect_rr  <- .distribute_logic(logic_general = indirect_rr, 
+             .indirect_rr <- .distribute_logic(logic_general = indirect_rr, 
                                                 logic_x = indirect_rr_x, 
                                                 logic_y = indirect_rr_y,
                                                 name_logic_x = "indirect_rr_x", 
@@ -934,8 +934,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                 construct_x = construct_x, 
                                                 construct_y = construct_y, 
                                                 es_length = length(rxyi))
-             indirect_rr_x   <- .indirect_rr["x"]
-             indirect_rr_y   <- .indirect_rr["y"]
+             indirect_rr_x <- .indirect_rr[["x"]]
+             indirect_rr_y <- .indirect_rr[["y"]]
              
              # distribute sign_rz
              .sign_rz <- .distribute_logic(logic_general = sign_rz, 
@@ -946,8 +946,8 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                            construct_x = construct_x, 
                                            construct_y = construct_y, 
                                            es_length = length(rxyi))
-             sign_rxz   <- .sign_rz["x"]
-             sign_ryz   <- .sign_rz["y"]
+             sign_rxz <- .sign_rz[["x"]]
+             sign_ryz <- .sign_rz[["y"]]
      }
 
      rxx_type <- as.character(rxx_type)
@@ -992,7 +992,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }else{
                .measure_y <- NULL
           }
-
           if(!is.null(facet_x)){
                .facet_x <- as.character(facet_x)[!valid_r]
           }else{
