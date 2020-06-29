@@ -873,7 +873,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                stop("Row names and column names of correction_method must contain the same levels", call. = FALSE)
 
           .correction_method <- correction_method <- correction_method[.colnames,.colnames]
-          for(i in .colnames){
+          for (i in .colnames) {
                for(j in .colnames){
                     if(i != j){
                          .methods <- c(.correction_method[i,j], .correction_method[j,i])
@@ -891,7 +891,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                }
           }
           rm(.correction_method)
-     }else{
+     } else {
           correction_method <- scalar_arg_warning(arg = unlist(correction_method), arg_name = "correction_method")
           unique_constructs <- unique(c(as.character(construct_x), as.character(construct_y)))
           correction_method <- matrix(correction_method, length(unique_constructs), length(unique_constructs))
@@ -899,98 +899,55 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
 
      ## Check the lengths of all arguments
-     # TODO: Offload to separate function
-     if(ma_method != "bb"){
-
-          .distribute_logic <- function(logic_general,
-                                        logic_x = NULL, logic_y= NULL,
-                                        name_logic_x, name_logic_y,
-                                        construct_x, construct_y, vec_length,
-                                        reference_function = ma_r){
-               .logic_x <- logic_x
-               .logic_y <- logic_y
-
-               construct_x <- as.character(construct_x)
-               construct_y <- as.character(construct_y)
-               unique_constructs <- unique(c(as.character(construct_x), as.character(construct_y)))
-
-               if(!is.null(.logic_x)){
-                    if(length(.logic_x) == 1){
-                         logic_x <- rep(.logic_x, vec_length)
-                    }else{
-                         logic_x <- rep(formals(reference_function)[[name_logic_x]], vec_length)
-                    }
-               }else{
-                    logic_x <- rep(formals(reference_function)[[name_logic_x]], vec_length)
-               }
-
-               if(!is.null(.logic_y)){
-                    if(length(.logic_y) == 1){
-                         logic_y <- rep(.logic_y, vec_length)
-                    }else{
-                         logic_y <- rep(formals(reference_function)[[name_logic_y]], vec_length)
-                    }
-               }else{
-                    logic_y <- rep(formals(reference_function)[[name_logic_y]], vec_length)
-               }
-
-               for(construct in unique_constructs){
-                    if(any(names(logic_general) == construct)){
-                         logic_x[construct_x == construct] <- logic_general[construct]
-                         logic_y[construct_y == construct] <- logic_general[construct]
-                    }
-               }
-
-               setNames(list(logic_x, logic_y), c(name_logic_x, name_logic_y))
-          }
-
-          if(!is.null(correct_rel)){
-               .correct_rel <- .distribute_logic(logic_general = correct_rel,
-                                                 logic_x = correct_rxx, logic_y = correct_ryy,
-                                                 name_logic_x = "correct_rxx", name_logic_y = "correct_ryy",
-                                                 construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
-               correct_rxx <- .correct_rel[["correct_rxx"]]
-               correct_ryy <- .correct_rel[["correct_ryy"]]
-          }else{
-               if(length(correct_rxx) != length(rxyi)) correct_rxx <- scalar_arg_warning(arg = correct_rxx, arg_name = "correct_rxx")
-               if(length(correct_ryy) != length(rxyi)) correct_ryy <- scalar_arg_warning(arg = correct_ryy, arg_name = "correct_ryy")
-          }
-
-          if(!is.null(correct_rr)){
-               .correct_rr <- .distribute_logic(logic_general = correct_rr,
-                                                logic_x = correct_rr_x, logic_y = correct_rr_y,
-                                                name_logic_x = "correct_rr_x", name_logic_y = "correct_rr_y",
-                                                 construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
-               correct_rr_x <- .correct_rel[["correct_rr_x"]]
-               correct_rr_y <- .correct_rel[["correct_rr_y"]]
-          }else{
-               if(length(correct_rr_x) != length(rxyi)) correct_rr_x <- scalar_arg_warning(arg = correct_rr_x, arg_name = "correct_rr_x")
-               if(length(correct_rr_y) != length(rxyi)) correct_rr_y <- scalar_arg_warning(arg = correct_rr_y, arg_name = "correct_rr_y")
-          }
-
-          if(!is.null(indirect_rr)){
-               .indirect_rr <- .distribute_logic(logic_general = indirect_rr,
-                                                 logic_x = indirect_rr_x, logic_y = indirect_rr_y,
-                                                 name_logic_x = "indirect_rr_x", name_logic_y = "indirect_rr_y",
-                                                construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
-               indirect_rr_x <- .correct_rel[["indirect_rr_x"]]
-               indirect_rr_y <- .correct_rel[["indirect_rr_y"]]
-          }else{
-               if(length(indirect_rr_x) != length(rxyi)) indirect_rr_x <- scalar_arg_warning(arg = indirect_rr_x, arg_name = "indirect_rr_x")
-               if(length(indirect_rr_y) != length(rxyi)) indirect_rr_y <- scalar_arg_warning(arg = indirect_rr_y, arg_name = "indirect_rr_y")
-          }
-
-          if(!is.null(sign_rz)){
-               .sign_rz <- .distribute_logic(logic_general = sign_rz,
-                                              logic_x = sign_rxz, logic_y = sign_ryz,
-                                              name_logic_x = "sign_rxz", name_logic_y = "sign_ryz",
-                                              construct_x = construct_x, construct_y = construct_y, vec_length = length(rxyi))
-               sign_rxz <- .sign_rz[["sign_rxz"]]
-               sign_ryz <- .sign_rz[["sign_ryz"]]
-          }else{
-               sign_rxz <- scalar_arg_warning(arg = sign_rxz, arg_name = "sign_rxz")
-               sign_ryz <- scalar_arg_warning(arg = sign_ryz, arg_name = "sign_ryz")
-          }
+     if (ma_method != "bb") {
+             
+             # distribute correct_rel
+             .correct_rel <- .distribute_logic(logic_general = correct_rel, 
+                                               logic_x = correct_rxx, 
+                                               logic_y = correct_ryy,
+                                               name_logic_x = "correct_rxx", 
+                                               name_logic_y = "correct_ryy",
+                                               construct_x = construct_x, 
+                                               construct_y = construct_y, 
+                                               es_length = length(rxyi))
+             correct_rxx <- .correct_rel[["x"]]
+             correct_ryy <- .correct_rel[["y"]]
+             
+             # distribute correct_rr
+             .correct_rr <- .distribute_logic(logic_general = correct_rr, 
+                                               logic_x = correct_rr_x, 
+                                               logic_y = correct_rr_y,
+                                               name_logic_x = "correct_rr_x", 
+                                               name_logic_y = "correct_rr_y",
+                                               construct_x = construct_x, 
+                                               construct_y = construct_y, 
+                                               es_length = length(rxyi))
+             correct_rr_x <- .correct_rr[["x"]]
+             correct_rr_y <- .correct_rr[["y"]]
+             
+             # distribute indirect_rr
+             .indirect_rr <- .distribute_logic(logic_general = indirect_rr, 
+                                                logic_x = indirect_rr_x, 
+                                                logic_y = indirect_rr_y,
+                                                name_logic_x = "indirect_rr_x", 
+                                                name_logic_y = "indirect_rr_y",
+                                                construct_x = construct_x, 
+                                                construct_y = construct_y, 
+                                                es_length = length(rxyi))
+             indirect_rr_x <- .indirect_rr[["x"]]
+             indirect_rr_y <- .indirect_rr[["y"]]
+             
+             # distribute sign_rz
+             .sign_rz <- .distribute_logic(logic_general = sign_rz, 
+                                           logic_x = sign_rxz, 
+                                           logic_y = sign_ryz,
+                                           name_logic_x = "sign_rxz", 
+                                           name_logic_y = "sign_ryz",
+                                           construct_x = construct_x, 
+                                           construct_y = construct_y, 
+                                           es_length = length(rxyi))
+             sign_rxz <- .sign_rz[["x"]]
+             sign_ryz <- .sign_rz[["y"]]
      }
 
      rxx_type <- as.character(rxx_type)
@@ -1035,7 +992,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }else{
                .measure_y <- NULL
           }
-
           if(!is.null(facet_x)){
                .facet_x <- as.character(facet_x)[!valid_r]
           }else{
@@ -1990,3 +1946,53 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      return(out)
 }
 
+
+.distribute_logic <- function(logic_general,
+                              logic_x = NULL, logic_y = NULL,
+                              name_logic_x, name_logic_y,
+                              construct_x, construct_y, es_length,
+                              reference_function = ma_r) {
+        if (!is.null(logic_general)) {
+                .logic_x <- logic_x
+                .logic_y <- logic_y
+                
+                construct_x <- as.character(construct_x)
+                construct_y <- as.character(construct_y)
+                unique_constructs <- unique(c(construct_x, construct_y))
+                
+                if (!is.null(.logic_x)) {
+                        if (length(.logic_x) == 1) {
+                                logic_x <- rep(.logic_x, es_length)
+                        } else {
+                                logic_x <- rep(formals(reference_function)[[name_logic_x]], es_length)
+                        }
+                } else {
+                        logic_x <- rep(formals(reference_function)[[name_logic_x]], es_length)
+                }
+                
+                if (!is.null(.logic_y)) {
+                        if (length(.logic_y) == 1) {
+                                logic_y <- rep(.logic_y, es_length)
+                        } else {
+                                logic_y <- rep(formals(reference_function)[[name_logic_y]], es_length)
+                        }
+                } else {
+                        logic_y <- rep(formals(reference_function)[[name_logic_y]], es_length)
+                }
+                
+                for (construct in unique_constructs) {
+                        if (any(names(logic_general) == construct)) {
+                                logic_x[construct_x == construct] <- logic_general[construct]
+                                logic_y[construct_y == construct] <- logic_general[construct]
+                        }
+                }
+        } else {
+                if (length(logic_x) != es_length) {
+                        logic_x <- scalar_arg_warning(arg = logic_x, arg_name = name_logic_x)
+                }
+                if (length(logic_y) != es_length) {
+                        logic_y <- scalar_arg_warning(arg = logic_y, arg_name = name_logic_y)
+                }
+        }
+        return(list(x = logic_x, y = logic_y))
+}
