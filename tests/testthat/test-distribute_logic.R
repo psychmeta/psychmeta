@@ -61,9 +61,7 @@ test_that("Global all TRUE, Column all TRUE", {
 
   correct_ryy <- TRUE
 
-  genuine_rel <-
-
-    expected_rel <- list(
+  expected_rel <- list(
       x = c(
         TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
         TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
