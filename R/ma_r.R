@@ -1354,9 +1354,20 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           global_x <- tolower(facet_x) %in% c("overall", "global", "total")
           global_y <- tolower(facet_y) %in% c("overall", "global", "total")
           global_x[is.na(global_x)] <- global_y[is.na(global_y)] <- FALSE
+          construct_x_has_facets <- construct_x %in% unique(construct_x[valid_facet_x])
+          construct_y_has_facets <- construct_y %in% unique(construct_y[valid_facet_y])
           valid_facet <- valid_facet & !(global_x | global_y)
-          valid_facet_x <- valid_facet_x & !global_x
-          valid_facet_y <- valid_facet_y & !global_y
+
+          # The next two lines create indices for rows that have facets for one
+          # variable and excluding the other variable if it never has facets
+          valid_facet_x <- valid_facet_x & !global_x & construct_y_has_facets
+          valid_facet_y <- valid_facet_y & !global_y & construct_x_has_facets
+
+          # Construct data frames with rows for each combination of composited variables
+          #   - Global X w/ Global Y [or global with construct w/ no facets]
+          #   - Global X w/  Facet Y
+          #   -  Facet X w/ Global Y
+          #   -  Facet X w/  Facet Y [or facet with construct w/ no facets]
 
           use_for_arts <- c(rep(TRUE, sum(retain)),
                             rep(FALSE, sum(valid_facet_y)),
