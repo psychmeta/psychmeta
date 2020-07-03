@@ -1531,10 +1531,24 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           analysis_type <- as.character(indep_data$analysis_type)
 
           if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
-          if(is.null(categorical_moderators)) categorical_moderators <- data.frame(analysis_id)[,0]
-          if(is.null(complete_moderators)) complete_moderators <- data.frame(analysis_id)[,0]
-          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, analysis_type=analysis_type, categorical_moderators,
-                                            sample_id = sample_id, complete_moderators), .name_repair = "minimal")
+          presorted_data <- tibble(analysis_id = analysis_id,
+                                   analysis_type = analysis_type,
+                                   sample_id = sample_id,
+                                   # This if structure is needed to avoid errors
+                                   # when categorical_moderators or
+                                   # complete_moderators is NULL
+                                   # (NULL is treated as a zero-row data frame)
+                                   if (is.null(categorical_moderators)) {
+                                     data.frame(analysis_id)[,0]
+                                   } else {
+                                     categorical_moderators
+                                   },
+                                   if (is.null(complete_moderators)) {
+                                     data.frame(analysis_id)[,0]
+                                   } else {
+                                     complete_moderators
+                                   },
+                                   .name_repair = "minimal")
 
           if(!is.null(moderator_names[["cat"]])){
                moderator_ids <- (length(analysis_id_variables) - length(moderator_names[["cat"]]) + 1):length(analysis_id_variables)
