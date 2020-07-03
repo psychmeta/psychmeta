@@ -30,7 +30,7 @@ The bias correction is estimated as:
 where \eqn{\Delta}{delta} is the observed effect size, \eqn{\Delta_{c}}{delta_c} is the
 corrected estimate of \ifelse{latex}{\eqn{\Delta}}{\ifelse{html}{\out{&#916;}}{delta}},
 \eqn{n_{control}}{nc} is the control-group sample size, and
-\eqn{\Gamma()}{gamma()} is the \link[base:gamma]{gamma function}.
+\eqn{\Gamma()}{gamma()} is the \link[base:Special]{gamma function}.
 }
 \examples{
 correct_glass_bias(delta = .3, nc = 30, ne = 30)
@@ -38,5 +38,5 @@ correct_glass_bias(delta = .3, nc = 30, ne = 30)
 \references{
 Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect
 size and related estimators. \emph{Journal of Educational Statistics, 6}(2),
-107–128. <https://doi.org/10.2307/1164588>
+107–128. \url{https://doi.org/10.2307/1164588}
 }
