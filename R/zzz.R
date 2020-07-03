@@ -121,7 +121,7 @@
 
     cran_v_char <- version_check[grep("Version:", version_check) + 1]
     cran_v_char <- regmatches(cran_v_char,
-                              regexpr("\\d\\.\\d\\.\\d", cran_v_char))
+                              regexpr("(?:\\d+\\.?)+", cran_v_char))
     if (length(cran_v_char) > 0) {
       vcheck <- check_version(cran_version = cran_v_char,
                               sys_version = version)
@@ -164,7 +164,7 @@
   if (length(sys_v_num) >= 4) {
     if (sys_v_num[4] > 0) {
       packageStartupMessage(
-        "NOTE: You are currently using an UNRELEASED development build (augmentation of release",
+        "NOTE: You are currently using an UNRELEASED development build (augmentation of release ",
         paste0("v", paste(sys_v_num[1:3], collapse = "."), ")")
       )
     }

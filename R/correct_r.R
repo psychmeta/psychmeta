@@ -40,8 +40,6 @@ correct_r_bias <- function(r, n){
 #' @return Vector of correlations corrected for scale coarseness (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 #' @export
 #'
-#' @importFrom methods getFunction
-#'
 #' @references
 #' Aguinis, H., Pierce, C. A., & Culpepper, S. A. (2009).
 #' Scale coarseness as a methodological artifact:
@@ -109,8 +107,9 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
                     x <- seq(lbound + .01, ubound - .01, .01)
                     bin_id <- apply(t(x), 2, function(xi) which(xi > cuts))
                     bin_id <- unlist(lapply(bin_id, function(xi) xi[length(xi)]))
+                    ddist <- get(paste0("d", dist))
 
-                    wt_cor(x = x, y = bin_vec[bin_id], wt = methods::getFunction(paste0("d", dist))(x))
+                    wt_cor(x = x, y = bin_vec[bin_id], wt = ddist(x))
                }
 
                .fun(k = k, bin_vec = bin_vec, dist = dist, lbound = lbound, ubound = ubound, cuts = cuts)

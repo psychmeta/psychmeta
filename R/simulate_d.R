@@ -16,10 +16,6 @@
 #' @param composite_names Optional vector of names for composite variables.
 #' @param diffs_as_obs Logical scalar that determines whether standard deviation parameters represent standard deviations of observed scores (\code{TRUE}) or of true scores (\code{FALSE}; default).
 #'
-#' @importFrom nor1mix norMix
-#' @importFrom nor1mix qnorMix
-#' @importFrom tidyr gather
-#'
 #' @return A sample of simulated mean differences.
 #' @export
 #'
@@ -746,11 +742,16 @@ append_dmat <- function(di_mat, da_mat,
 
      sr_mat <- mu_mat
      sr_mat[1:length(sr_mat)] <- 1
-     for(i in 1:length(sr_vec)){
-          if(all(mu_mat[,i] == mu_mat[1,i]) & all(sigma_mat[,i] == sigma_mat[1,i])){
+     for (i in 1:length(sr_vec)) {
+          if (all(mu_mat[,i] == mu_mat[1,i]) & all(sigma_mat[,i] == sigma_mat[1,i])) {
                cut <- qnorm(sr_vec[i], mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
                sr_mat[,i] <- pnorm(cut, mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
-          }else{
+          } else {
+               if (!requireNamespace("nor1mix", quietly = TRUE)) {
+                       stop("The package 'nor1mix' is not installed.\n",
+                            "  'nor1mix' is required to estimate population parameters under multivariate selection.\n",
+                            "  Please install 'nor1mix'.")
+               }
                mix <- nor1mix::norMix(mu = mu_mat[,i], w = p_vec, sigma = sigma_mat[,i])
                cut <- nor1mix::qnorMix(sr_vec[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
                sr_mat[,i] <- pnorm(cut, mean = mu_mat[,i], sd = sigma_mat[,i], lower.tail = FALSE)
@@ -785,8 +786,13 @@ append_dmat <- function(di_mat, da_mat,
                     cut <- qnorm(sr_composites[i], mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
                     sr_composites_mat[,i] <- pnorm(cut, mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
                }else{
-                    mix <- norMix(mu = .mu_mat[,i], w = p_vec, sigma = .sigma_mat[,i])
-                    cut <- qnorMix(sr_composites[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
+                    if (!requireNamespace("nor1mix", quietly = TRUE)) {
+                            stop("The package 'nor1mix' is not installed.\n",
+                                 "  'nor1mix' is required to estimate population parameters under multivariate selection.\n",
+                                 "  Please install 'nor1mix'.")
+                    }
+                    mix <- nor1mix::norMix(mu = .mu_mat[,i], w = p_vec, sigma = .sigma_mat[,i])
+                    cut <- nor1mix::qnorMix(sr_composites[i], mix, lower.tail = FALSE, tol = .Machine$double.eps)
                     sr_composites_mat[,i] <- pnorm(cut, mean = .mu_mat[,i], sd = .sigma_mat[,i], lower.tail = FALSE)
                }
           }

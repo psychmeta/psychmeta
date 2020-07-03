@@ -1310,9 +1310,20 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           global_x <- tolower(facet_x) %in% c("overall", "global", "total")
           global_y <- tolower(facet_y) %in% c("overall", "global", "total")
           global_x[is.na(global_x)] <- global_y[is.na(global_y)] <- FALSE
+          construct_x_has_facets <- construct_x %in% unique(construct_x[valid_facet_x])
+          construct_y_has_facets <- construct_y %in% unique(construct_y[valid_facet_y])
           valid_facet <- valid_facet & !(global_x | global_y)
-          valid_facet_x <- valid_facet_x & !global_x
-          valid_facet_y <- valid_facet_y & !global_y
+
+          # The next two lines create indices for rows that have facets for one
+          # variable and excluding the other variable if it never has facets
+          valid_facet_x <- valid_facet_x & !global_x & construct_y_has_facets
+          valid_facet_y <- valid_facet_y & !global_y & construct_x_has_facets
+
+          # Construct data frames with rows for each combination of composited variables
+          #   - Global X w/ Global Y [or global with construct w/ no facets]
+          #   - Global X w/  Facet Y
+          #   -  Facet X w/ Global Y
+          #   -  Facet X w/  Facet Y [or facet with construct w/ no facets]
 
           use_for_arts <- c(rep(TRUE, sum(retain)),
                             rep(FALSE, sum(valid_facet_y)),
@@ -1520,8 +1531,24 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           analysis_type <- as.character(indep_data$analysis_type)
 
           if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
-          presorted_data <- as_tibble(cbind(analysis_id=analysis_id, analysis_type=analysis_type, categorical_moderators,
-                                            sample_id = sample_id, complete_moderators), .name_repair = "minimal")
+          presorted_data <- tibble(analysis_id = analysis_id,
+                                   analysis_type = analysis_type,
+                                   sample_id = sample_id,
+                                   # This if structure is needed to avoid errors
+                                   # when categorical_moderators or
+                                   # complete_moderators is NULL
+                                   # (NULL is treated as a zero-row data frame)
+                                   if (is.null(categorical_moderators)) {
+                                     data.frame(analysis_id)[,0]
+                                   } else {
+                                     categorical_moderators
+                                   },
+                                   if (is.null(complete_moderators)) {
+                                     data.frame(analysis_id)[,0]
+                                   } else {
+                                     complete_moderators
+                                   },
+                                   .name_repair = "minimal")
 
           if(!is.null(moderator_names[["cat"]])){
                moderator_ids <- (length(analysis_id_variables) - length(moderator_names[["cat"]]) + 1):length(analysis_id_variables)
