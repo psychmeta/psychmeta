@@ -113,7 +113,7 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
           output_es <- "auc"
         }
 
-        x <- list(es = es, n1 = n1, n2 = n2, df1 = df1, df2 = df2, sd1 = sd1, sd2 = sd2)
+        x <- list(es = es, n1 = n1, n2 = n2, df1 = df1, df2 = df2, sd1 = sd1, sd2 = sd2, tails = tails)
         # Compute sample sizes and df as needed
         if (is.null(n1) & is.null(n2)) {
                 x$p   <- .5
