@@ -1,3 +1,11 @@
+Changes in Version 2.4.0 (2020-07-10)
+======================================
+- Bug fix in convert_es().
+- convert_es() now returns a simple frame with converted effect sizes, variances, and (effective) sample sizes.
+- Bug fix in moderator reconciliation.
+- Add robustnesss to variable selection and second-order meta-analysis functions.
+
+
 Changes in Version 2.3.10 (2020-06-07)
 ======================================
 - Bug fix when compositing facets into overall construct variables.
