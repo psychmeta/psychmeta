@@ -6,6 +6,7 @@ Date: 2020-06-07
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "jdahlke@humrro.org"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
+              person("Wesley", "Gardiner", role = "ctb", comment = "Unit tests"),
               person("Michael T.", "Brannick", role = "ctb", comment = "Testing"),
               person("Jack", "Kostal", role = "ctb", comment = "Code for reshape_mat2dat function"),
               person("Sean", "Potter", role = "ctb", comment = "Testing; Code for cumulative and leave1out plots"),
@@ -29,7 +30,8 @@ Suggests:
     cli, 
     crayon,
     rmarkdown,
-    knitr
+    knitr,
+    testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068
