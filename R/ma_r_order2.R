@@ -105,15 +105,28 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 
           if(deparse(substitute(moderators))[1] != "NULL")
                   moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
-          
+
           if(deparse(substitute(construct_x))[1] != "NULL")
                construct_x <- match_variables(call = call_full[[match("construct_x", names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
 
           if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y", names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
+     }
 
-          if(deparse(substitute(construct_order))[1] != "NULL")
-            construct_order <- match_variables(call = call_full[[match("construct_order", names(call_full))]], arg = construct_order, arg_name = "construct_order", data = data)
+     ## Filter for valid correlations
+     # TODO: Just filter the data frame instead of taking these indices along through the
+     # whole function. If data are supplied as vectors, then build a model frame
+     # the same way that lm() does.
+     valid_r <- filter_r(r_vec = r, n_vec = k)
+     if (all(!valid_r)) {
+             stop("No valid correlations and/or sample sizes provided", call. = FALSE)
+     }
+     if (sum(!valid_r) > 0) {
+             if (sum(!valid_r) == 1) {
+                     warning(sum(!valid_r), " invalid correlation and/or sample size detected: Offending entry has been removed", call. = FALSE)
+             } else {
+                     warning(sum(!valid_r), " invalid correlations and/or sample sizes detected: Offending entries have been removed", call. = FALSE)
+             }
      }
 
      if(!is.null(moderators)){
@@ -136,6 +149,35 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
                                   noncat = NULL)
 
           moderator_levels <- NULL
+     }
+
+     if (!is.null(construct_order)) {
+             if (any(duplicated(construct_order))) {
+                     warning("Each element of 'construct_order' must have a unique value: First occurence of each value used", call. = FALSE)
+                     construct_order <- construct_order[!duplicated(construct_order)]
+             }
+
+             if (!is.null(construct_x) | !is.null(construct_y)) {
+                     keep_construct <- as.character(construct_order) %in% c(as.character(construct_x), as.character(construct_y))
+                     if (any(!keep_construct)) {
+                             warning("'construct_order' contained invalid construct names: Invalid names removed", call. = FALSE)
+                     }
+                     construct_order <- construct_order[keep_construct]
+             }
+
+             if (!is.null(construct_x) & !is.null(construct_y)) {
+                     valid_r <- valid_r & construct_x %in% construct_order & construct_y %in% construct_order
+             } else {
+                     if (!is.null(construct_x)) {
+                             valid_r <- valid_r & construct_x %in% construct_order
+                     }
+                     if (!is.null(construct_y)) {
+                             valid_r <- valid_r & construct_y %in% construct_order
+                     }
+             }
+             if (all(!valid_r)) {
+                     stop("No valid construct combinations provided", call. = FALSE)
+             }
      }
 
      inputs <- list(k = k, N = N, r = r, rho = rho, var_r = var_r, var_r_c = var_r_c,
