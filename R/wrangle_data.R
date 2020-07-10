@@ -13,7 +13,7 @@ fix_df <- function(df){
 }
 
 match_variables <- function(call, arg, data,
-                            arg_name = NULL, as_array = FALSE) {
+                            arg_name = NULL, as_array = FALSE, allow_multiple = FALSE) {
   x  <- tryCatch(eval(call, data, enclos=sys.frame(sys.parent())),
                  error = function(e) e)
   if (inherits(x, "error")) {
@@ -21,27 +21,29 @@ match_variables <- function(call, arg, data,
   }
   if (!is.null(x)) {
     if (is.character(x)) {
-      if (length(x) == 1) {
-        if (x %in% colnames(data)) {
-          data[,x]
+      if (any(x %in% colnames(data)) & (length(x) == 1 | allow_multiple) & !anyDuplicated(x)) {
+        d <- tryCatch(data[,x], error = function(e) e)
+        if (inherits(d, "simpleError")) {
+          stop(paste("Columns",
+                     paste0("`", x[!x %in% colnames(data)], "`", collapse = ", "),
+                     "not present in `data`."))
         } else {
-          if (!is.null(arg_name)) {
-            if (x == arg_name) {
-              x <- NULL
-            } else {
-              x
-            }
-          }
-          x
+          d
         }
       } else {
+        if (!is.null(arg_name) & length(x) == 1) {
+          if(x == arg_name){
+            x <- NULL
+          } else {
+            x
+          }
+        }
         x
       }
     } else {
       if (as_array & is.null(dim(x))) {
         setNames(as.data.frame(x, stringsAsFactors = FALSE),
-                 as.character(call)
-        )
+                 as.character(call))
       } else {
         x
       }
