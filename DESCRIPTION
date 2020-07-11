@@ -24,7 +24,7 @@ Imports: dplyr, stats, boot, tibble, reshape2,
          stringr, rlang, curl, purrr, data.table
 Suggests: 
     MASS,
-    tmvtnorm,
+    mvtnorm,
     nor1mix, 
     bib2df,
     cli, 
