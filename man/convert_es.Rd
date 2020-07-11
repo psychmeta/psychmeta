@@ -2,7 +2,7 @@
 % Please edit documentation in R/convert_es.R
 \name{convert_es}
 \alias{convert_es}
-\title{Convert effect sizes and compute confidence intervals}
+\title{Convert effect sizes}
 \usage{
 convert_es(
   es,
@@ -15,9 +15,7 @@ convert_es(
   df2 = NULL,
   sd1 = NULL,
   sd2 = NULL,
-  tails = 2,
-  correct_bias = TRUE,
-  conf_level = 0.95
+  tails = 2
 )
 }
 \arguments{
@@ -39,28 +37,20 @@ convert_es(
 
 \item{sd2}{Vector of standard deviations of group 2 of the two groups being contrasted.}
 
-\item{tails}{Vector of the tails for \emph{p} values when \code{input_es = "p.t"}. Can be `2` (defualt) or `1`.}
-
-\item{correct_bias}{Logical argument that determines whether to correct output effect sizes and error-variance estimates for small-sample bias (\code{TRUE}) or not (\code{FALSE}) when computing confidence intervals.}
-
-\item{conf_level}{Confidence level that defines the width of the confidence interval (default = .95).}
+\item{tails}{Vector of the tails for \emph{p} values when \code{input_es = "p.t"}. Can be \code{2} (default) or \code{1}.}
 }
 \value{
-A \pkg{psychmeta} effect size \code{es} object containing:
-\item{meta_input}{A matrix of converted effect sizes and adjusted sample sizes for use in subsequent meta-anlayses.}
-\item{original_es}{The input data.}
-\item{confidence}{The output data with computed confidence intervals (for printing).}
+A data frame of class \code{es} with variables:
+\item{\code{r}, \code{d}, \code{A}}{The converted effect sizes}
+\item{\code{n_effective}}{The effective total sample size}
+\item{\code{n}}{The total number of cases (original sample size)}
+\item{\code{n1}, \code{n2}}{If applicable, subgroup sample sizes}
+\item{\code{var_e}}{The estimated sampling error variance}
 }
 \description{
-This function converts a variety of effect sizes to either correlations or Cohen's \emph{d} values. The function also computes and prints confidence intervals for the output effect sizes.
+This function converts a variety of effect sizes to correlations, Cohen's \emph{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
 }
-\section{Notes}{
-
-To use converted effect sizes in a meta-analysis, add the values from \code{es$meta_input} to your meta-analytic input data frame.
-}
-
 \examples{
-## To convert a statistic to r or d metric:
 convert_es(es = 1,  input_es="d", output_es="r", n1=100)
 convert_es(es = 1, input_es="d", output_es="r", n1=50, n2 = 50)
 convert_es(es = .2, input_es="r", output_es="d",  n1=100, n2=150)
@@ -72,20 +62,14 @@ convert_es(es = 4.37, input_es="or", output_es="r", n1=100, n2=100)
 convert_es(es = 4.37, input_es="or", output_es="d", n1=100, n2=100)
 convert_es(es = 1.47, input_es="lor", output_es="r", n1=100, n2=100)
 convert_es(es = 1.47, input_es="lor", output_es="d", n1=100, n2=100)
-
-## To simply compute a confidence interval for r, d, or A:
-convert_es(es = .3,  input_es="r", output_es="r", n1=100)
-convert_es(es = .8,  input_es="d", output_es="d", n1=64, n2=36)
-convert_es(es = .8,  input_es="A", output_es="A", n1=64, n2=36)
 }
 \references{
 Chinn, S. (2000).
 A simple method for converting an odds ratio to effect size for use in meta-analysis.
-\emph{Statistics in Medicine, 19}(22), 3127–3131. \url{https://doi.org/10/c757hm}
+\emph{Statistics in Medicine, 19}(22), 3127–3131.
+<https://doi.org/10.1002/1097-0258(20001130)19:22<3127::AID-SIM784>3.0.CO;2-M>
 
-Lipsey, M. W., & Wilson, D. B. (2001).
-\emph{Practical meta-analysis}.
-Thousand Oaks, CA: SAGE.
+Lipsey, M. W., & Wilson, D. B. (2001). \emph{Practical meta-analysis}. SAGE Publications.
 
 Ruscio, J. (2008).
 A probability-based measure of effect size: Robustness to base rates and other factors.
@@ -93,5 +77,5 @@ A probability-based measure of effect size: Robustness to base rates and other f
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}
+SAGE Publications. \url{https://doi.org/10.4135/9781483398105}
 }

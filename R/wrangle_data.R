@@ -12,37 +12,50 @@ fix_df <- function(df){
      }
 }
 
-match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
-        x  <- eval(call, data, enclos=sys.frame(sys.parent()))
-        if(!is.null(x)){
-                if(is.character(x)){
-                        if(any(x %in% colnames(data))){
-                                data[,x]
-                        }else{
-                                if(!is.null(arg_name) & length(x) == 1){
-                                        if(x == arg_name){
-                                                x <- NULL
-                                        }else{
-                                                x
-                                        }
-                                }
-                                x
-                        }
-                }else{
-                        if(as_array & is.null(dim(x))){
-                                setNames(as.data.frame(x, stringsAsFactors = FALSE), as.character(call))
-                        }else{
-                                x
-                        }
-                }
-        }else{
-                arg
+match_variables <- function(call, arg, data,
+                            arg_name = NULL, as_array = FALSE, allow_multiple = FALSE) {
+  x  <- tryCatch(eval(call, data, enclos=sys.frame(sys.parent())),
+                 error = function(e) e)
+  if (inherits(x, "error")) {
+    stop(paste0("Column `", call, "` not present in `data`."), call. = FALSE)
+  }
+  if (!is.null(x)) {
+    if (is.character(x)) {
+      if (any(x %in% colnames(data)) & (length(x) == 1 | allow_multiple) & !anyDuplicated(x)) {
+        d <- tryCatch(data[,x], error = function(e) e)
+        if (inherits(d, "simpleError")) {
+          stop(paste("Columns",
+                     paste0("`", x[!x %in% colnames(data)], "`", collapse = ", "),
+                     "not present in `data`."))
+        } else {
+          d
         }
+      } else {
+        if (!is.null(arg_name) & length(x) == 1) {
+          if(x == arg_name){
+            x <- NULL
+          } else {
+            x
+          }
+        }
+        x
+      }
+    } else {
+      if (as_array & is.null(dim(x))) {
+        setNames(as.data.frame(x, stringsAsFactors = FALSE),
+                 as.character(call))
+      } else {
+        x
+      }
+    }
+  } else {
+    arg
+  }
 }
 
 ## Under development
 # match_variables2 <- function(arg, data, name, arg_name, as_df = FALSE){
-#         
+#
 #         do_postprocess <- TRUE
 #         if(length(name) == 1 & !name[1] %in% colnames(data)){
 #                 do_postprocess <- FALSE
@@ -81,18 +94,18 @@ match_variables <- function(call, arg, data, arg_name = NULL, as_array = FALSE){
 #                                 stop(paste0("`", arg_name, "` appears to reference variable(s) not included in `data`.\nIf providing the `", arg_name,"` argument as a vector, `length(", arg_name, ")` must match `nrow(data)`."), call. = FALSE)
 #                 }
 #         }
-#         
+#
 #         if(do_postprocess){
 #                 if(!is.null(data))
 #                         if (nrow(arg) != nrow(data))
 #                                 stop("`length(arg)` must match `nrow(data)`.", call. = FALSE)
-#                 
+#
 #                 if(!as_df){
 #                         if(ncol(arg) > 1) stop(paste0("Argument `", arg_name, "` must be a single variable."), call. = FALSE)
 #                         arg <- setNames(c(unlist(arg)), NULL)
-#                 }       
+#                 }
 #         }
-#         
+#
 #         return(arg)
 # }
 

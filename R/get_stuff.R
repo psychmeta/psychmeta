@@ -141,61 +141,66 @@ get_stuff <- function(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "fo
 get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, moderators = TRUE, ...){
 
         ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
-
-        out <- ma_obj$escalc
-        if(!moderators){
-                out <- map(out, function(x){
-                        if(any(names(x) == "moderator_info")){
-                                x$moderator_info <- NULL
-                                x
-                        }else{
-                                x
-                        }
-                })
+        
+        if(!"escalc" %in% colnames(ma_obj)){
+                message("Column 'escalc' is not present in 'ma_obj'")
+                NULL
         }else{
-                if(any(ma_obj$analysis_type == "Overall"))
+                out <- ma_obj$escalc
+                if(!moderators){
                         out <- map(out, function(x){
                                 if(any(names(x) == "moderator_info")){
-                                        moderator_matrix <- x$moderator_info$moderator_matrix
                                         x$moderator_info <- NULL
-                                        x <- map(x, function(xi){
-                                                if(is.data.frame(xi)){
-                                                        if(!is.null(moderator_matrix)){
-                                                                xi <- suppressMessages(right_join(moderator_matrix, xi))
-                                                                xi <- xi %>%
-                                                                        select(colnames(xi)[colnames(xi) != "sample_id"]) %>%
-                                                                        add_column(sample_id = xi[["sample_id"]], .after = 1)
-                                                        }
-                                                        class(xi) <- c("escalc", "data.frame")
-                                                        xi
-                                                }else{
-                                                        map(xi, function(xij){
-                                                                if(is.data.frame(xij)){
-                                                                        if(!is.null(moderator_matrix)){
-                                                                                xij <- suppressMessages(right_join(moderator_matrix, xij))
-                                                                                xij <- xij %>%
-                                                                                        select(colnames(xij)[colnames(xij) != "sample_id"]) %>%
-                                                                                        add_column(sample_id = xij[["sample_id"]], .after = 1)
-                                                                        }
-                                                                        class(xij) <- c("escalc", "data.frame")
-                                                                        xij
-                                                                }else{
-                                                                        xij
-                                                                }
-                                                        })
-                                                }
-                                        })
                                         x
                                 }else{
                                         x
                                 }
                         })
+                }else{
+                        if(any(ma_obj$analysis_type == "Overall"))
+                                out <- map(out, function(x){
+                                        if(any(names(x) == "moderator_info")){
+                                                moderator_matrix <- x$moderator_info$moderator_matrix
+                                                x$moderator_info <- NULL
+                                                x <- map(x, function(xi){
+                                                        if(is.data.frame(xi)){
+                                                                if(!is.null(moderator_matrix)){
+                                                                        xi <- suppressMessages(right_join(moderator_matrix, xi))
+                                                                        xi <- xi %>%
+                                                                                select(colnames(xi)[colnames(xi) != "sample_id"]) %>%
+                                                                                add_column(sample_id = xi[["sample_id"]], .after = 1)
+                                                                }
+                                                                class(xi) <- c("escalc", "data.frame")
+                                                                xi
+                                                        }else{
+                                                                map(xi, function(xij){
+                                                                        if(is.data.frame(xij)){
+                                                                                if(!is.null(moderator_matrix)){
+                                                                                        xij <- suppressMessages(right_join(moderator_matrix, xij))
+                                                                                        xij <- xij %>%
+                                                                                                select(colnames(xij)[colnames(xij) != "sample_id"]) %>%
+                                                                                                add_column(sample_id = xij[["sample_id"]], .after = 1)
+                                                                                }
+                                                                                class(xij) <- c("escalc", "data.frame")
+                                                                                xij
+                                                                        }else{
+                                                                                xij
+                                                                        }
+                                                                })
+                                                        }
+                                                })
+                                                x
+                                        }else{
+                                                x
+                                        }
+                                })
+                }
+                
+                names(out) <- paste0("analysis_id: ", ma_obj$analysis_id)
+                
+                class(out) <- "get_escalc"
+                out       
         }
-
-        names(out) <- paste0("analysis_id: ", ma_obj$analysis_id)
-
-        class(out) <- "get_escalc"
-        out
 }
 
 #' @rdname get_stuff
@@ -491,35 +496,40 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
           list(ad_x = ad_x, ad_y = ad_y)
      }
 
-     ad <- list(ic = NULL, ad = NULL)
-     if("ic" %in% ma_method){
-          if("tsa" %in% ad_type){
-               ad_list_ic_x <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_x_", "tsa")]]})
-               ad_list_ic_y <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_y_", "tsa")]]})
-
-               ad$ic$tsa <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ic_x, ad_y = ad_list_ic_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
-               rm(ad_list_ic_x, ad_list_ic_y)
-          }
-          if("int" %in% ad_type){
-               ad_list_ic_x <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_x_", "int")]]})
-               ad_list_ic_y <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_y_", "int")]]})
-
-               ad$ic$int <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ic_x, ad_y = ad_list_ic_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
-               rm(ad_list_ic_x, ad_list_ic_y)
-          }
+     if(!"ad" %in% colnames(ma_obj)){
+             message("Column 'ad' is not present in 'ma_obj'")
+             NULL
+     }else{
+             ad <- list(ic = NULL, ad = NULL)
+             if("ic" %in% ma_method){
+                     if("tsa" %in% ad_type){
+                             ad_list_ic_x <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_x_", "tsa")]]})
+                             ad_list_ic_y <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_y_", "tsa")]]})
+                             
+                             ad$ic$tsa <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ic_x, ad_y = ad_list_ic_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
+                             rm(ad_list_ic_x, ad_list_ic_y)
+                     }
+                     if("int" %in% ad_type){
+                             ad_list_ic_x <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_x_", "int")]]})
+                             ad_list_ic_y <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_y_", "int")]]})
+                             
+                             ad$ic$int <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ic_x, ad_y = ad_list_ic_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
+                             rm(ad_list_ic_x, ad_list_ic_y)
+                     }
+             }
+             
+             if("ad" %in% ma_method){
+                     ad_list_ad_x <- map(ma_obj$ad, function(x) x[["ad"]][["ad_x"]])
+                     ad_list_ad_y <- map(ma_obj$ad, function(x) x[["ad"]][["ad_y"]])
+                     
+                     ad$ad <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ad_x, ad_y = ad_list_ad_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
+                     rm(ad_list_ad_x, ad_list_ad_y)
+             }
+             
+             class(ad) <- "get_ad"
+             
+             ad       
      }
-
-     if("ad" %in% ma_method){
-          ad_list_ad_x <- map(ma_obj$ad, function(x) x[["ad"]][["ad_x"]])
-          ad_list_ad_y <- map(ma_obj$ad, function(x) x[["ad"]][["ad_y"]])
-
-          ad$ad <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ad_x, ad_y = ad_list_ad_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
-          rm(ad_list_ad_x, ad_list_ad_y)
-     }
-
-     class(ad) <- "get_ad"
-
-     ad
 }
 
 
@@ -534,65 +544,95 @@ get_followup <- function(ma_obj, analyses = "all", match = c("all", "any"), case
      ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
 
      follow_up <- follow_up[follow_up %in% colnames(ma_obj)]
-     class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
-     .followup <- ma_obj[,follow_up]
-
-     out <- apply(.followup, 2, function(x){
-          as.list(x)
-     })
-     for(i in names(out)) names(out[[i]]) <- paste0("analysis id: ", ma_obj$analysis_id)
-     if(any(names(out) == "metareg")){
-          out$metareg <- out$metareg[!unlist(map(out$metareg, is.null))]
+     if(length(follow_up) == 0){
+             message("None of the requested follow-up analyses are present in 'ma_obj'")
+             NULL
+     }else{
+             class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
+             .followup <- ma_obj[,follow_up]
+             
+             out <- apply(.followup, 2, function(x){
+                     as.list(x)
+             })
+             for(i in names(out)) names(out[[i]]) <- paste0("analysis id: ", ma_obj$analysis_id)
+             if(any(names(out) == "metareg")){
+                     out$metareg <- out$metareg[!unlist(map(out$metareg, is.null))]
+             }
+             
+             class(out) <- c("get_followup")
+             
+             out       
      }
-
-     class(out) <- c("get_followup")
-
-     out
 }
 
 #' @rdname get_stuff
 #' @export
 get_heterogeneity <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
-     out <- get_followup(ma_obj = ma_obj, follow_up = "heterogeneity",
-                         analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("get_heterogeneity")
-     out
+        if(!"heterogeneity" %in% colnames(ma_obj)){
+                message("Column 'heterogeneity' is not present in 'ma_obj'")
+                NULL
+        }else{
+                out <- get_followup(ma_obj = ma_obj, follow_up = "heterogeneity",
+                                    analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
+                class(out) <- c("get_heterogeneity")
+                out       
+        }
 }
 
 #' @rdname get_stuff
 #' @export
 get_leave1out <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
-     out <- get_followup(ma_obj = ma_obj, follow_up = "leave1out",
-                         analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("get_leave1out")
-     out
+        if(!"leave1out" %in% colnames(ma_obj)){
+                message("Column 'leave1out' is not present in 'ma_obj'")
+                NULL
+        }else{
+                out <- get_followup(ma_obj = ma_obj, follow_up = "leave1out",
+                                    analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
+                class(out) <- c("get_leave1out")
+                out    
+        }
 }
 
 #' @rdname get_stuff
 #' @export
 get_cumulative <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
-     out <- get_followup(ma_obj = ma_obj, follow_up = "cumulative",
-                         analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("get_cumulative")
-     out
+        if(!"cumulative" %in% colnames(ma_obj)){
+                message("Column 'cumulative' is not present in 'ma_obj'")
+                NULL
+        }else{
+                out <- get_followup(ma_obj = ma_obj, follow_up = "cumulative",
+                                    analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
+                class(out) <- c("get_cumulative")
+                out   
+        }
 }
 
 #' @rdname get_stuff
 #' @export
 get_bootstrap <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
-     out <- get_followup(ma_obj = ma_obj, follow_up = "bootstrap",
-                         analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("get_bootstrap")
-     out
+        if(!"bootstrap" %in% colnames(ma_obj)){
+                message("Column 'bootstrap' is not present in 'ma_obj'")
+                NULL
+        }else{
+                out <- get_followup(ma_obj = ma_obj, follow_up = "bootstrap",
+                                    analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
+                class(out) <- c("get_bootstrap")
+                out
+        }
 }
 
 #' @rdname get_stuff
 #' @export
 get_metareg <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, ...){
-     out <- get_followup(ma_obj = ma_obj, follow_up = "metareg",
-                         analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
-     class(out) <- c("get_metareg")
-     out
+        if(!"metareg" %in% colnames(ma_obj)){
+                message("Column 'metareg' is not present in 'ma_obj'")
+                NULL
+        }else{
+                out <- get_followup(ma_obj = ma_obj, follow_up = "metareg",
+                                    analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
+                class(out) <- c("get_metareg")
+                out
+        }
 }
 
 
@@ -736,19 +776,24 @@ get_plots <- function(ma_obj, analyses = "all", match = c("all", "any"), case_se
      }
 
      plot_types <- plot_types[plot_types %in% colnames(ma_obj)]
-     class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
-     .plots <- ma_obj[,plot_types]
-
-     out <- apply(.plots, 2, function(x){
-          as.list(x)
-     })
-     for(i in names(out)) names(out[[i]]) <- paste0("analysis id: ", ma_obj$analysis_id)
-     if(any(names(out) == "forest")){
-          out$forest <- out$forest[!unlist(map(out$forest, is.null))]
+     if(length(plot_types) == 0){
+             message("None of the requested plots are present in 'ma_obj'")
+             NULL
+     }else{
+             class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
+             .plots <- ma_obj[,plot_types]
+             
+             out <- apply(.plots, 2, function(x){
+                     as.list(x)
+             })
+             for(i in names(out)) names(out[[i]]) <- paste0("analysis id: ", ma_obj$analysis_id)
+             if(any(names(out) == "forest")){
+                     out$forest <- out$forest[!unlist(map(out$forest, is.null))]
+             }
+             
+             class(out) <- c("get_plots")
+             out
      }
-
-     class(out) <- c("get_plots")
-     out
 }
 
 
