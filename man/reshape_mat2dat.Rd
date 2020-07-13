@@ -27,10 +27,10 @@ reshape_mat2dat(
 
 \item{lower_tri}{Logical scalar that identifies whether the correlations are in the lower triangle (\code{TRUE}) or in the upper triangle \code{FALSE} of the matrix.}
 
-\item{data}{Matrix, dataframe, or tibble containing study data (when present, column names of \code{data} will be matched to column names provided as other arguments).}
+\item{data}{Matrix or data frame containing study data (when present, column names of \code{data} will be matched to column names provided as other arguments).}
 }
 \value{
-Long-format dataframe of correlation data, variable names, and supporting information
+Long-format data frame of correlation data, variable names, and supporting information
 }
 \description{
 This function is designed to extract data from a correlation matrix that is in the format commonly published in journals, with leading columns of construct names and descriptive statistics
@@ -45,20 +45,20 @@ mat <- data.frame(var_names = c("X", "Y", "Z"),
                   rel = c(.8, .7, .85),
                   reshape_vec2mat(cov = c(.3, .4, .5)))
 
-## Arguments can be provided as quoted characters or as the unquoted names of data's columns:
+## Arguments can be provided as quoted characters or as the unquoted names of `data`'s columns:
 reshape_mat2dat(var_names = var_names,
                cor_data = c("Var1", "Var2", "Var3"),
                common_data = "n",
                unique_data = c("mean", "sd", "rel"),
                data = mat)
 
-## Arguments can also provided as raw vectors, matrices, dataframes, etc. without a data argument:
+## Arguments can also provided as raw vectors, matrices, or data frames, without a data argument:
 reshape_mat2dat(var_names = mat[,1],
                cor_data = mat[,6:8],
                common_data = mat[,2],
                unique_data = mat[,3:5])
 
-## If data is not null, arguments can be a mix of matrix/dataframe/vector and column-name arguments
+## If data is not null, arguments can be a mix of matrix/data frame/vector and column-name arguments
 reshape_mat2dat(var_names = mat[,1],
                cor_data = mat[,6:8],
                common_data = "n",

@@ -1548,7 +1548,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(!is.null(categorical_moderators)) categorical_moderators <- setNames(data.frame(categorical_moderators), moderator_names[["cat"]])
           presorted_data <- tibble(analysis_id = analysis_id,
                                    analysis_type = analysis_type,
-                                   sample_id = sample_id,
                                    # This if structure is needed to avoid errors
                                    # when categorical_moderators or
                                    # complete_moderators is NULL
@@ -1558,6 +1557,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                    } else {
                                      categorical_moderators
                                    },
+                                   sample_id = sample_id,
                                    if (is.null(complete_moderators)) {
                                      data.frame(analysis_id)[,0]
                                    } else {

@@ -9,9 +9,9 @@
 #' @param unique_data Vector or matrix (or vector of column names to match with \code{data}) of data unique to X and Y variables (e.g., mean, SD, reliability).
 #' @param diag_label Optional name to attribute to values extracted from the diagonal of the matrix (if NULL, no values are extracted from the diagonal).
 #' @param lower_tri Logical scalar that identifies whether the correlations are in the lower triangle (\code{TRUE}) or in the upper triangle \code{FALSE} of the matrix.
-#' @param data Matrix, dataframe, or tibble containing study data (when present, column names of \code{data} will be matched to column names provided as other arguments).
+#' @param data Matrix or data frame containing study data (when present, column names of \code{data} will be matched to column names provided as other arguments).
 #'
-#' @return Long-format dataframe of correlation data, variable names, and supporting information
+#' @return Long-format data frame of correlation data, variable names, and supporting information
 #' @export
 #'
 #' @author Jack W. Kostal
@@ -28,20 +28,20 @@
 #'                   rel = c(.8, .7, .85),
 #'                   reshape_vec2mat(cov = c(.3, .4, .5)))
 #'
-#' ## Arguments can be provided as quoted characters or as the unquoted names of data's columns:
+#' ## Arguments can be provided as quoted characters or as the unquoted names of `data`'s columns:
 #' reshape_mat2dat(var_names = var_names,
 #'                cor_data = c("Var1", "Var2", "Var3"),
 #'                common_data = "n",
 #'                unique_data = c("mean", "sd", "rel"),
 #'                data = mat)
 #'
-#' ## Arguments can also provided as raw vectors, matrices, dataframes, etc. without a data argument:
+#' ## Arguments can also provided as raw vectors, matrices, or data frames, without a data argument:
 #' reshape_mat2dat(var_names = mat[,1],
 #'                cor_data = mat[,6:8],
 #'                common_data = mat[,2],
 #'                unique_data = mat[,3:5])
 #'
-#' ## If data is not null, arguments can be a mix of matrix/dataframe/vector and column-name arguments
+#' ## If data is not null, arguments can be a mix of matrix/data frame/vector and column-name arguments
 #' reshape_mat2dat(var_names = mat[,1],
 #'                cor_data = mat[,6:8],
 #'                common_data = "n",
@@ -56,14 +56,37 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 
      if(!is.null(data)){
           data <- as_tibble(data, .name_repair = "minimal")
-          var_names <- match_variables(call = call_full[[match("var_names", names(call_full))]], arg = var_names, arg_name = "var_names", data = data)
-          cor_data <- match_variables(call = call_full[[match("cor_data", names(call_full))]], arg = cor_data, arg_name = "cor_data", data = data, as_array = TRUE)
-          if(deparse(substitute(common_data))[1] != "NULL")
-               common_data <- match_variables(call = call_full[[match("common_data",  names(call_full))]], arg = common_data, arg_name = "common_data", data = data, as_array = TRUE)
-          if(deparse(substitute(unique_data))[1] != "NULL")
-               unique_data <- match_variables(call = call_full[[match("unique_data",  names(call_full))]], arg = unique_data, arg_name = "unique_data", data = data, as_array = TRUE)
+          var_names <- match_variables(call = call_full[[match("var_names", names(call_full))]],
+                                       arg = var_names,
+                                       arg_name = "var_names",
+                                       data = data)
+          cor_data <- match_variables(call = call_full[[match("cor_data", names(call_full))]],
+                                      arg = cor_data,
+                                      arg_name = "cor_data",
+                                      data = data,
+                                      as_array = TRUE,
+                                      allow_multiple = TRUE)
+          if (deparse(substitute(common_data))[1] != "NULL") {
+                  common_data <- match_variables(call = call_full[[match("common_data",  names(call_full))]],
+                                                 arg = common_data,
+                                                 arg_name = "common_data",
+                                                 data = data,
+                                                 as_array = TRUE,
+                                                 allow_multiple = TRUE)
+          }
+          if (deparse(substitute(unique_data))[1] != "NULL") {
+                  unique_data <- match_variables(call = call_full[[match("unique_data",  names(call_full))]],
+                                                 arg = unique_data,
+                                                 arg_name = "unique_data",
+                                                 data = data,
+                                                 as_array = TRUE,
+                                                 allow_multiple = TRUE)
+          }
+
      }
-     if(!is.null(dim(var_names))) var_names <- unlist(var_names)
+     if (!is.null(dim(var_names))) {
+             var_names <- unlist(var_names)
+     }
      var_names <- as.character(var_names)
 
      common_data <- as.data.frame(common_data, stringsAsFactors = FALSE)
