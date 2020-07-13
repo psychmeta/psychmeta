@@ -2,7 +2,7 @@ Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
 Version: 2.4.0
-Date: 2020-07-10
+Date: 2020-07-11
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "jdahlke@humrro.org"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
@@ -24,7 +24,7 @@ Imports: dplyr, stats, boot, tibble, reshape2,
          stringr, rlang, curl, purrr, data.table
 Suggests: 
     MASS,
-    tmvtnorm,
+    mvtnorm,
     nor1mix, 
     bib2df,
     cli, 
