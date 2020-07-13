@@ -2,14 +2,25 @@
 
 library(psychmeta)
 
+#duplicates 
+#d
+#intercor
+#ma_method
+#str_data_x
+#str_data_y
+#str_es_data
+
 test_that("testing no moderators specified", {
   
-  collapse_data_list_spec
+  #collpase_method
+  #moderator_names_temp
+  #str_moderators
+
+})
+
+test_that("testing  moderators specified", {
   
-  
-  
-  
-  
+
 })
 
 
