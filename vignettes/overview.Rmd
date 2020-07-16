@@ -1,14 +1,14 @@
 ---
-title: "Welcome to **psychmeta**!"
+title: "psychmeta Overview"
 output:
   rmarkdown::html_vignette:
     df_print: paged
-bibliography: vignette.json
 vignette: >
-  %\VignetteIndexEntry{* psychmeta overview}
+  %\VignetteIndexEntry{psychmeta Overview}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
 csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
 
 ```{r setup, include=FALSE}
@@ -24,6 +24,10 @@ artifacts, and much more!
 
 This tutorial is meant to introduce you to some of the most critical features of 
 **psychmeta** and familiarize you with workflows within the package.
+
+A new collection of short vignettes for specific tasks is in progress. For the 
+previous "overview" vignette that has been used as a workshop handout, see
+[Welcome to psychmeta!](workshop.html)
 
 # Installing and loading **psychmeta**
 
@@ -49,13 +53,10 @@ The following vignettes show workflows for common tasks in **psychmeta**:
   - [Import and organize meta-analytic data](import_organize.html)
   - [Effect size conversion and sporadic artifact correction](es_conversion.html)
   - Computing meta-analyses
-    - [Barebones meta-analysis: Correlations](barebones_r.html)
-    - [Barebones meta-analysis: d values](barebones_d.html)
-    - [Individual-corrections meta-analysis: Correlations](ic_r.html)
-    - [Individual-corrections meta-analysis: d values](ic_d.html)
-    - [Artifact-distribution meta-analysis: Correlations](ad_r.html)
-    - [Artifact-distribution meta-analysis: d values](ad_d.html)
-    - [Generic effect size meta-analysis](ma_generic.html)
+    - [Meta-analyzing correlations](ma_r.html)
+    - [Meta-analyzing d values](ma_d.html)
+    - [Artifact corrections](artifact_corrections.html)
+    - Meta-analyzing other effect sizes (coming soon)
   - Follow-up analyses
     - [Sensitivity analyses](sensitivity.html)
       - Publication bias, leave-one-out, bootstrap confidence intervals
@@ -80,6 +81,6 @@ Additional topics:
 2. Include your data table as a CSV in an online supplement.
 3. Cite **psychmeta**.
      - Please reference our software announcement in 
-       *Applied Psychological Measurement* [@Dahlkepsychmetapackagepsychometric2019].
+       *Applied Psychological Measurement* [@psychmetaAPM].
 
 # Bibliography

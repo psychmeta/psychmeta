@@ -1,5 +1,5 @@
 ---
-title: "Computing Composite Effect Sizes and Artifacts"
+title: "Computing composite effect sizes and artifacts"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -7,21 +7,34 @@ output:
 vignette: >
   %\VignetteIndexEntry{Computing composite effect sizes and artifacts}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
+
+**Note: This vignette is a work in progress.** 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(psychmeta)
 ```
 
-This vignette shows options for handling effect size dependency in **psychmeta**.
+This vignette shows options for computing composite effect sizes in **psychmeta**.
 For more vignettes, see the [**psychmeta** overview](overview.html).
+
+**Note:** When a meta-analysis includes dependent effect sizes (indicated by
+the `sample_id` argument in `ma_r()` or `ma_d()`), by default **psychmeta** will
+automatically compute composite effect sizes and artifacts, assuming an average
+correlation among dependent measures of _r_ = .50. The functions described below
+can be used to compute the composite effect sizes and artifacts yourself.
+For more information, see [Effect size dependency](dependency.html).
 
 # Composites
 
 ## Spearman-Brown reliability estimates
+
 The Spearman-Brown formula can be used to estimate the reliability of a measure that has been lengthened (or shortened) *k* times. This formula is implemented in the `estimate_rel_sb()` function and its inverse (which estimates the number of times a measure needs to be lengthened to achieve a desired reliability) is implemented in the `estimate_length_sb()` function.
+
 ```{r spearman-brown, eval=FALSE}
 estimate_rel_sb(rel_initial = .5, k = 4)
 
@@ -29,6 +42,7 @@ estimate_length_sb(rel_initial = .5, rel_desired = .8)
 ```
 
 ## Correlations between a variable and a composite or between two composites
+
 The `composite_r_matrix()` and `composite_r_scalar()` functions can compute composite correlations using matrix and scalar inputs, respectively. Both functions are capable of computing correlations between a composite and a single variable or between two composites.
 ```{r single composite r, eval=FALSE}
 # Correlation between a variable and a composite

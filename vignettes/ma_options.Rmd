@@ -1,15 +1,17 @@
 ---
-title: "Meta-Analysis Function Arguments and Options"
+title: "Meta-analysis function arguments and options"
 output:
   rmarkdown::html_vignette:
     df_print: paged
-bibliography: vignette.json
 vignette: >
-  %\VignetteIndexEntry{Meta-Analysis Function Arguments and Options}
+  %\VignetteIndexEntry{Meta-analysis function arguments and options}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
 csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
+
+**Note: This vignette is a work in progress.** 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -22,7 +24,9 @@ For more vignettes, see the [**psychmeta** overview](overview.html).
 
 
 ## `ma_r()` is the general-purpose meta-analysis function for correlations
+
 The arguments to this function are:
+
 ```{r, eval=FALSE}
 ma_r(
 #### Commonly used arguments: ####
@@ -101,9 +105,8 @@ ma_r(
 )
 ```
 
-\pagebreak
-
 In addition to the arguments used with `ma_r()` directly, the `control` argument allows users to modify methological parameters of their analyses and interact with some of the more specialized features of **`psychmeta`**'s meta-analysis functions. The `control` argument in meta-analysis functions accepts the output of the `control_psychmeta()` function.
+
 ```{r, eval=FALSE}
 control_psychmeta(
      # Should the mean or the sample-specific effect sizes be used to estimate error variance?

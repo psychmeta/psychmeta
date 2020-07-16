@@ -1,5 +1,5 @@
 ---
-title: "Multivariate Range-Restriction Correction"
+title: "Multivariate range-restriction correction"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -7,8 +7,12 @@ output:
 vignette: >
   %\VignetteIndexEntry{Multivariate range-restriction correction}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
+
+**Note: This vignette is a work in progress.** 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

@@ -1,5 +1,5 @@
 ---
-title: "Sensitivity Analyses"
+title: "Sensitivity analyses"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -7,25 +7,28 @@ output:
 vignette: >
   %\VignetteIndexEntry{Sensitivity analyses}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
+
+**Note: This vignette is a work in progress.** 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(psychmeta)
 ```
 
-## Heterogeneity
-
 ## `sensitivity()`
 
 `sensitivity()` computes several different types of sensitivity analyses for meta-analytic results:
 
-* `bootstrap` (calculate bootstrap confidence intervals on all meta-analysis results)
-* `cumulative` (calculate cumulative meta-analyses—a form of publication bias analysis)
-* `leave1out` (compute meta-anlayses leaving out 1 sample at a time—for outlier/influential point detection)
+- `bootstrap` (calculate bootstrap confidence intervals on all meta-analysis results)
+- `cumulative` (calculate cumulative meta-analyses—a form of publication bias analysis)
+- `leave1out` (compute meta-analyses leaving out 1 sample at a time—for outlier/influential point detection)
 
 You can either call all sensitivity analyses at once (`sensitivity()`) or call each type of analysis individually (`sensitivity_bootstrap()`, `sensitivity_cumulative()`, `sensitivity_leave1out()`):
+
 ```{r, eval=FALSE}
 ma_obj <- sensitivity(ma_obj,
                       leave1out = TRUE,

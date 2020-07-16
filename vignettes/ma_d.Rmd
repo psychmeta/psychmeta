@@ -1,0 +1,316 @@
+---
+title: "Meta-analyzing d values"
+author: "Brenton Wiernik"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Meta-analyzing d values}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
+---
+
+**Note: This vignette is a work in progress.** 
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(psychmeta)
+options(width = 160)
+```
+
+This vignette will walk you through estimating meta-analyses of
+standardized mean differences (i.e., Cohen's _d_ or Hedges's _g_) between 
+groups on multiple constructs.
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+## Getting Started
+
+To begin, you will need your meta-analytic data sheet for analysis. We recommend
+the **rio** package for importing data to **R**. For an introduction to **rio**, see
+`vignette("rio", "rio")`.
+
+**psychmeta** assumes that your data are in "long" format, with each row corresponding
+to one effect size. For example, this is the format used in this data frame:
+
+```{r}
+coding_sheet <- 
+  tibble::tribble(
+    ~sample_id, ~construct,  ~n1,  ~n2,   ~d, ~ryyi,  ~rater,
+            1L,        "X", 237L,  45L, 1.23,  0.83,  "self",
+            1L,        "X", 237L,  45L, 0.95,  0.76, "other",
+            1L,        "Y", 237L,  45L,  0.8,   0.7,  "self",
+            1L,        "Y", 237L,  45L, 1.03,  0.64, "other",
+            2L,        "X", 122L, 282L, 0.72,  0.76,  "self",
+            2L,        "X", 122L, 282L, 1.14,  0.78, "other",
+            2L,        "Y", 122L, 282L, 1.16,  0.78,  "self",
+            2L,        "Y", 122L, 282L, 0.83,  0.76, "other",
+            3L,        "X",  74L,  23L, 0.57,  0.76,  "self",
+            3L,        "X",  74L,  23L, 0.75,  0.73, "other",
+            3L,        "Y",  74L,  23L, 0.48,  0.68,  "self",
+            3L,        "Y",  74L,  23L, 0.35,  0.73, "other",
+            4L,        "X",  17L, 107L, 0.51,   0.7,  "self",
+            4L,        "X",  17L, 107L, 0.78,  0.79, "other",
+            4L,        "Y",  17L, 107L, 0.66,   0.7,  "self",
+            4L,        "Y",  17L, 107L, 0.99,   0.8, "other",
+            5L,        "X", 100L, 146L, 0.79,  0.73,  "self",
+            5L,        "X", 100L, 146L, 1.03,  0.78, "other",
+            5L,        "Y", 100L, 146L, 0.79,  0.72,  "self",
+            5L,        "Y", 100L, 146L, 0.45,  0.69, "other"
+    )
+
+knitr::kable(coding_sheet)
+```
+
+In this table, 
+  - **`sample_id`** contains labels indicating the sample each effect size is drawn from; 
+  - **`construct`** indicates the variable/construct being compared in the effect size; 
+  - **`n1`** and **`n2`** are the sample sizes for each group for the effect size; 
+  - **`d`** is the Cohen's d effect size;
+    - Values should be entered as Cohen's _d_, not Hedges's _g_ (i.e., not
+      correcting for small-sample bias). Small-sample bias will be automatically
+      corrected in the `ma_d()` function.
+  - **`ryyi`** is the sample reliability values for the measures of the `construct` variables; 
+  - **`rater`** here is a categorical moderator indicating whether the ratings were
+    provided by the person themselves or another person.
+
+You can see this data set includes group comparisons for two variables: `X` and `Y`, 
+and that each sample contributes several effect sizes, one for each construct-rater
+combination.
+
+If your data are in a different format, you can use the `reshape_wide2long()`
+function to reshape it. See the [import_organize](import_organize.html) vignette 
+for details.
+
+## Estimating a Barebones Meta-Analysis
+
+Let's use the data frame above, called `coding_sheet`.
+
+The primary function to conduct meta-analyses of _d_ values is `ma_d()`. To 
+conduct barebones meta-analyses, run:
+
+```{r}
+ma_res <- ma_d(d = d, 
+               n1 = n1,
+               n2 = n2,
+               construct_y = construct,
+               sample_id = sample_id, 
+               moderators = rater,
+               data = coding_sheet
+               )
+```
+
+- **`data`** is your data frame. 
+- **`d`**, **`n1`**, **`n2`**, **`sample_id`**, and **`moderators`** are the 
+  names of the columns in your data frame that contain the appropriate values. 
+  - **`d`** is the Cohen's _d_ effect sizes; 
+    - Values should be entered as Cohen's _d_, not Hedges's _g_ (i.e., not
+      correcting for small-sample bias). Small-sample bias will be automatically
+      corrected in the `ma_d()` function.
+  - **`n1`** and **`n2`** are the group sample sizes; 
+    - If `n2` is `NA`, then `n1` as the _total sample size_ across both groups.
+  - **`construct_y`** are the labels for the variables/constructs being compared; 
+  - **`sample_id`** is the sample identification labels; 
+  - **`moderators`** is a vector of moderator variable names for the meta-analyses. 
+  - Column names can be provided either with quotes (e.g., `"d"`, `"n1"`) or 
+    without (e.g., `d`, `n1`).
+- Multiple different group comparisons (e.g., Treatment 1 vs. Control;
+  Treatment 2 vs. Control) by specifing the **`group_id`** or **`group1`**/**`group2`**
+  columns:
+    - **`group_id`** gives labels for the _comparison_ (e.g., "Treatment1-Control")
+    - **`group1`** and **`group2`** give labels for the two groups in separate 
+      columns (e.g., "Treatment1" in `group1` and "Control" in `group2`).
+
+To conduct a barebones meta-analysis, at minimum, `n1` and `d` are needed.
+
+### Modeling Options
+
+- By default, Cohen's _d_ values are weighted by **effective sample size**.
+  Effective sample size is computed as:
+  
+  $$N_{effective} = 4 \times \frac{n_{1} \times n_{2}}{n_{1} + n_{2}}$$
+  
+  This is similiar to weighting by total sample size, but account for increased
+  uncertainty when group sizes are unequal [see @Bakbergenuly2019SMD].
+  
+  You can specify alternative weights using the `wt_type` argument.
+
+- Random-effects variance (τ^2^ or *SD~res~*^2^) is estimated using the 
+  Hunter-Schmidt estimator, computed using the unbiased sample variance estimator 
+  (i.e., dividing by $k-1$ rather than $k$). To use the maximum-likelihood estimator
+  instead, specify `var_unbiased = FALSE`.
+
+- Barebones results are corrected for the small-sample bias in Cohen's _d_ 
+  (i.e., results are Hedges's _g_ values). To disable this correction, 
+  specify `correct_bias = FALSE`.
+
+- By default, confidence and credibility intervals are constructed using a _t_
+  distribution with $k-1$ degrees of freedom. To use a normal distribution instead,
+  specify, `conf_method = "norm"` and `cred_method = "norm"`. To customize the
+  coverage levels for these intervals, use the `conf_level` and `cred_level` arguments.
+
+## The **psychmeta** Meta-Analysis Object
+
+A **psychmeta** meta-analsyis object is a data frame, with each row being a meta-analysis 
+or subanalysis and each column containing information about or results from that 
+analysis. For example, the results of the analysis above look like this:
+
+```{r}
+ma_res
+```
+
+Each row corresponds to a different pair of variables/constructs (X-Y; X-Z; Y-Z)
+and level of the moderator variable (overall/all levels pooled together; 
+moderator = 1; moderator = 2).
+
+- **`analysis_id`** is a numeric label for each analysis;
+- **`pair_id`** is a numeric label for each combination of group comparison
+  and variable/construct (Treatment1-Control differences on X; Treatment2-Control
+  differences on Y); 
+- **`group_contrast`** indicates the pair of groups being compared;
+- **`construct_y`** indicates which variables/constructs are being compared.
+
+- **`analysis_type`** indicates the type of analysis. 
+  - "Overall" means an overall meta-analysis, pooling across all moderator levels. 
+  - "Simple Moderator" means a subgroup moderator analysis of only studies with 
+    the specified levels of the moderator variable(s) in the next column(s).
+
+    (See below for how to conduct meta-analyses with multiple moderator variables
+    or with continuous moderators)
+
+- **`meta_tables`** contains the principal meta-analysis results tables.
+- **`escalc`** contains tables of effect sizes, sampling error variances, weights, 
+  residuals, and other data. These tables can be used for follow-up analyses or
+  with the **metafor** package for additional meta-analysis techniques.
+
+## Viewing Results Summaries
+
+To view meta-anlaysis results tables, use the `summary()` function:
+
+```{r}
+summary(ma_res)
+```
+
+In this table, 
+
+- **`analysis_id`**, **`pair_id`**, **`group_contrast`**, **`construct_y`**, and the
+  moderator columns are defined as above.
+- **`k`** is the number of effect sizes contributing to each meta-analysis. 
+- **`N`** is the total sample size contributing to each meta-analysis.
+- **`mean_d`** is the weighted mean Cohen's _d_ (Hedges's _g_) value.
+- **`sd_d`** is the weighted observed standard deviation of _d_ (_g_) values.
+- **`se_d`** is the standard error of `mean_d`. 
+- **`sd_res`** is the estimated random-effects standard deviation (residual _SD_ 
+  of _d_ [_g_] after accounting for sampling error). 
+- **`CI_LL_95`** and **`CI_UL_95`** are the upper and lower bounds of the confidence 
+  interval for `mean_d`; the number indicates the coverage level (default: 95%). 
+- **`CR_LL_80`** and **`CR_UL_80`** are the upper and lower bounds of the credibility 
+  interval for the estimated population distribution; the number indicates the 
+  coverage level (default: 80%).
+
+To view additional results, such as observed variance (`var_d`) or standard
+deviation of sampling errors (`sd_e`), use the `get_metatab()` function and select
+the appropriate columns:
+
+```{r}
+names(get_metatab(ma_res))
+
+get_metatab(ma_res)$var_r
+```
+
+To view all columns of this table, convert it to a `data.frame` or `tibble`:
+
+```{r}
+dplyr::as_tibble(get_metatab(ma_res))
+```
+
+```{r}
+as.data.frame(get_metatab(ma_res))
+```
+
+### Moderator Analyses
+
+Results for subgroup analyses for different levels of categorical moderators are
+shown in the rows of the meta-analysis results table. To estimate confidence
+intervals for differences between levels or an omnibus ANOVA statistic, use the
+`anova()` function:
+
+```{r}
+anova(ma_res)
+```
+
+### Correcting for Statistical Artifacts
+
+See Artifact corrections](artifact_corrections.html).
+
+## Outputting Results
+
+To output the main meta-analysis results table to RMarkdown, Word, HTML, PDF, or 
+other formats, use the `metabulate()` function. For example, to output the above 
+results to a Word document, run:
+
+```{r, eval=FALSE}
+metabulate(ma_res, file = "meta-analysis_results.docx", output_format = "word")
+```
+
+## Follow-Up Analyses
+
+### Plotting
+
+You can add plots for each meta-analysis in `ma_res` using the `plot_forest()`
+and `plot_funnel()` functions:
+
+```{r}
+ma_res <- plot_funnel(ma_res)
+ma_res <- plot_forest(ma_res)
+```
+
+You can view these plots using the `get_plots()` function. This will return a
+list of all of the plots in this results. Specify which meta-analysis you want 
+to view plots for by passing its `analysis_id` to `[[`:
+
+```{r, fig.show='hold'}
+get_plots(ma_res)[["forest"]][[2]]
+get_plots(ma_res)[["funnel"]][[2]]
+```
+
+For forest plots, if you select an "Overall" meta-analysis, it will include 
+plots faceted by moderator levels (`"moderated"`) and not (`"unmoderated"`):
+
+```{r, fig.show='hold'}
+get_plots(ma_res)[["forest"]][[1]][["moderated"]][["barebones"]]
+get_plots(ma_res)[["forest"]][[1]][["unmoderated"]][["barebones"]]
+```
+
+### Heterogeneity Analyses
+
+**psychmeta** reports the random-effects standard deviaton (τ or *SD_res_*) 
+and credibility intervals (`mean_r` ± _crit_ × *SD~res~*) in the main 
+meta-analaysis results tables. To view confidence intervals for *SD_res_* or 
+additional heterogeneity statistics, use the `heterogeneity()` function:
+
+```{r}
+ma_res <- heterogeneity(ma_res)
+get_heterogeneity(ma_res)[[1]][["barebones"]]
+```
+
+### Publication Bias and Sensitivity Analyses
+
+**psychmeta** supports cumulative meta-analysis for publication/small-sample bias
+detection, leave-1-out sensitivity analyses, and bootstrap confidence intervals
+using the sensitivity function:
+
+```{r, fig.show='hold'}
+ma_res <- sensitivity(ma_res)
+get_cumulative(ma_res)[[1]][["barebones"]]
+get_cumulative(ma_res)[[1]][["barebones"]][["plots"]]
+```
+
+```{r}
+get_bootstrap(ma_res)[[1]][["barebones"]]
+```
+
+# Bibliography

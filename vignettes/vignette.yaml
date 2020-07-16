@@ -1,0 +1,256 @@
+---
+references:
+- id: Bakbergenuly2019SMD
+  accessed:
+    - year: 2019
+      month: 7
+      day: 26
+  author:
+    - family: Bakbergenuly
+      given: Ilyas
+    - family: Hoaglin
+      given: David C.
+    - family: Kulinskaya
+      given: Elena
+  issued:
+    - year: 2019
+      month: 3
+      day: 4
+  publisher: arXiv
+  source: arXiv.org
+  title: >-
+    Simulation study of estimating between-study variance and overall effect in
+    meta-analysis of standardized mean difference
+  type: article
+  URL: 'http://arxiv.org/abs/1903.01362'
+
+- id: BeckerUsingresultsreplicated1992
+  accessed:
+    - year: 2018
+      month: 6
+      day: 28
+  author:
+    - family: Becker
+      given: Betsy Jane
+  container-title: Journal of Educational Statistics
+  DOI: 10.3102/10769986017004341
+  ISSN: 0362-9791
+  issue: '4'
+  issued:
+    - year: 1992
+      month: 12
+  language: en
+  page: 341-362
+  source: Crossref
+  title: Using results from replicated studies to estimate linear models
+  type: article-journal
+  URL: 'http://journals.sagepub.com/doi/10.3102/10769986017004341'
+  volume: '17'
+
+- id: Cohen2003AppliedMultiple
+  author:
+    - family: Cohen
+      given: Jacob
+    - family: Cohen
+      given: Patricia
+    - family: West
+      given: Stephen G.
+    - family: Aiken
+      given: Leona S.
+  DOI: 10.4324/9780203774441
+  edition: '3'
+  event-place: 'New York, NY, US'
+  ISBN: 0-8058-2223-2 978-0-8058-2223-6
+  issued:
+    - year: 2003
+  language: en
+  number-of-pages: '736'
+  publisher: Routledge
+  publisher-place: 'New York, NY, US'
+  title: Applied multiple regression/correlation analysis for the behavioral sciences
+  type: book
+  URL: 'https://doi.org/10.4324/9780203774441'
+
+- id: DahlkeNotrestrictedselection2019
+  accessed:
+    - year: 2019
+      month: 10
+      day: 3
+  author:
+    - family: Dahlke
+      given: Jeffrey A.
+    - family: Wiernik
+      given: Brenton M.
+  container-title: Organizational Research Methods
+  container-title-short: Org. Res. Meth.
+  DOI: 10.1177/1094428119859398
+  ISSN: '1094-4281, 1552-7425'
+  issued:
+    - year: 2019
+      month: 7
+      day: 24
+  language: en
+  source: Crossref
+  status: Advance online publication
+  title: >-
+    Not restricted to selection research: accounting for indirect range
+    restriction in organizational research
+  title-short: Not restricted to selection research
+  type: article-journal
+  URL: 'http://journals.sagepub.com/doi/10.1177/1094428119859398'
+
+- id: Gonzalez-Mulemetaanalysisrelationshipgeneral2014
+  accessed:
+    - year: 2015
+      month: 1
+      day: 25
+  author:
+    - family: Gonzalez-Mulé
+      given: Erik
+    - family: Mount
+      given: Michael K.
+    - family: Oh
+      given: In-Sue
+  container-title: Journal of Applied Psychology
+  container-title-short: JAP
+  DOI: 10.1037/a0037547
+  ISSN: '1939-1854, 0021-9010'
+  issue: '6'
+  issued:
+    - year: 2014
+  language: en
+  page: 1222-1243
+  source: CrossRef
+  title: >-
+    A meta-analysis of the relationship between general mental ability and
+    nontask performance
+  type: article-journal
+  URL: 'http://doi.apa.org/getdoi.cfm?doi=10.1037/a0037547'
+  volume: '99'
+
+- id: JonesComputingconfidenceintervals2013
+  author:
+    - family: Jones
+      given: Jeff A.
+    - family: Waller
+      given: Niels G.
+  container-title: Psychological Methods
+  container-title-short: PMET
+  DOI: 10/gckfx4
+  ISSN: 1939-1463(Electronic);1082-989X(Print)
+  issue: '4'
+  issued:
+    - year: 2013
+  language: en
+  page: 435-453
+  source: APA PsycNET
+  title: Computing confidence intervals for standardized regression coefficients
+  type: article-journal
+  volume: '18'
+
+- id: psychmetaAPM
+  author:
+    - family: Dahlke
+      given: Jeffrey A.
+    - family: Wiernik
+      given: Brenton M.
+  container-title: Applied Psychological Measurement
+  container-title-short: Appl. Psychol. Meas.
+  DOI: 10.1177/0146621618795933
+  issue: '5'
+  issued:
+    - year: 2019
+      month: 7
+      day: 1
+  language: en
+  page: 415-416
+  title: '*psychmeta*: an R package for psychometric meta-analysis'
+  title-short: psychmeta
+  type: article-journal
+  volume: '43'
+  
+- id: SchmidtMetaRegression2017
+  accessed:
+    - year: 2018
+      month: 4
+      day: 15
+  author:
+    - family: Schmidt
+      given: Frank L.
+  container-title: Career Development International
+  container-title-short: Career Dev Int
+  DOI: 10.1108/cdi-08-2017-0136
+  ISSN: 1362-0436
+  issue: '5'
+  issued:
+    - year: 2017
+      month: 9
+      day: 6
+  page: 469-476
+  source: emeraldinsight.com (Atypon)
+  title: >-
+    Statistical and measurement pitfalls in the use of meta-regression in
+    meta-analysis
+  type: article-journal
+  URL: 'https://www.emeraldinsight.com/doi/full/10.1108/CDI-08-2017-0136'
+  volume: '22'
+
+- id: ViswesvaranTheoryTesting1995
+  author:
+    - family: Viswesvaran
+      given: Chockalingam
+    - family: Ones
+      given: Deniz S.
+  container-title: Personnel Psychology
+  container-title-short: PP
+  DOI: 10.1111/j.1744-6570.1995.tb01784.x
+  ISSN: 0031-5826 (Print); 1744-6570 (Online)
+  issue: '4'
+  issued:
+    - year: 1995
+  language: en
+  page: 865-885
+  title: >-
+    Theory testing: combining psychometric meta-analysis and structural
+    equations modeling
+  title-short: Theory testing
+  type: article-journal
+  URL: 'http://doi.org/10/dct45z'
+  volume: '48'
+
+- id: WiernikEmpiricalBenchmarks2017
+  accessed:
+    - year: 2017
+      month: 9
+      day: 1
+  author:
+    - family: Wiernik
+      given: Brenton M.
+    - family: Kostal
+      given: Jack W.
+    - family: Wilmot
+      given: Michael P.
+    - family: Dilchert
+      given: Stephan
+    - family: Ones
+      given: Deniz S.
+  container-title: Industrial and Organizational Psychology
+  container-title-short: IOP
+  DOI: 10.1017/iop.2017.44
+  ISSN: '1754-9426, 1754-9434'
+  issue: '3'
+  issued:
+    - year: 2017
+      month: 9
+  language: en
+  page: 472-479
+  source: Cambridge Core
+  title: >-
+    Empirical benchmarks for interpreting effect size variability in
+    meta-analysis
+  type: article-journal
+  URL: 'https://doi.org/10/ccnv'
+  volume: '10'
+...
+
+

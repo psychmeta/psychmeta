@@ -1,5 +1,5 @@
 ---
-title: "Outputing Meta-Analysis Results to Markdown, Word, or Other Formats"
+title: "Outputing meta-analysis results to Markdown, Word, or other formats"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -7,8 +7,12 @@ output:
 vignette: >
   %\VignetteIndexEntry{Outputing meta-analysis results to Markdown, Word, or other formats}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
+
+**Note: This vignette is a work in progress.** 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

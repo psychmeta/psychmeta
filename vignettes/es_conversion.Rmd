@@ -3,12 +3,12 @@ title: "Converting effect sizes and applying sporadic artifact corrections"
 output:
   rmarkdown::html_vignette:
     df_print: paged
-bibliography: vignette.json
 vignette: >
   %\VignetteIndexEntry{Converting effect sizes and applying sporadic artifact corrections}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
 csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
 
 ```{r setup, include=FALSE}
@@ -44,28 +44,36 @@ convert_es(es = 4.37, input_es = "or",      output_es = "d", n1 = 100, n2 = 100)
 convert_es(es = 1.47, input_es = "lor",     output_es = "d", n1 = 100, n2 = 100)
 ```
 
-To convert effect sizes for inclusion in a meta-analysis, pull out the `meta_input` object:
+To include converted effect sizes in a meta-analysis, merge output of 
+`convert_es()` into your data frame, at least the the columns for the converted 
+effect sizes (`r`, `d`, `AUC`), sample size (`n`), effective sample size (`n_eff`):
+
 ```{r, eval=TRUE}
 convert_es(es = c(.4, .3, .25),
            input_es = "r", output_es = "d",
            n1 = c(50, 110, 65), n2 = c(50, 70, 65)
-           )$meta_input
-```
-
-The `convert_es()` function can also be used to simply compute confidence intervals for *r*, *d*, and *A*:
-
-```{r, eval=FALSE}
-convert_es(es = .3, input_es = "r", output_es = "r", n1 = 100)
-convert_es(es = .8, input_es = "d", output_es = "d", n1 = 64, n2 = 36)
-convert_es(es = .8, input_es = "A", output_es = "A", n1 = 64, n2 = 36)
+           )
 ```
 
 ## Correcting for sporadic artifacts
 
-Corrections for measurement error and range restriction can be applied automatically within meta-analyses.
+Corrections for measurement error, range restriction, and small-sample bias
+can be applied automatically within meta-analyses estimated with the 
+`ma_r()` or `ma_d()` families of functions.
 
-Other corrections can be made, but they need to be applied sporadically (i.e., applied to individual effect sizes before including them in a meta-analysis).
+Other corrections can be made, such as artificial dichotomization, uneven splits
+of dichotomization, or scale coarseness, but these need to be applied 
+sporadically (i.e., applied to individual effect sizes before including 
+them in a meta-analysis).
+
+To correct for artifacts sporadically, pass the effect sizes, sample sizes,
+and other information (e.g., the proportions of people in one group when 
+correcting for dichotomization). 
+
 ```{r, eval=FALSE}
 correct_r_dich(r = c(.3, .5), px = .5, py = .5, n = 100)
 correct_r_split(r = c(.3, .5), pi = .2, n = 100)
 ```
+To include corrected effect sizes in a meta-analysis, merge the output of the 
+correction functions into your dat frame, at least the colums for the corrected 
+effect sizes (`r_corrected`, `d_corrected`) and adjusted sample size (`n_adj`).

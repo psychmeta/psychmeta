@@ -1,16 +1,18 @@
 ---
-title: "Linear Regression with Covariance (Correlation) Matrices"
+title: "Linear regression with covariance (correlation) matrices"
 date: "`r Sys.Date()`"
-csl: https://zotero.org/styles/apa
-bibliography: vignette.json
 output: 
   rmarkdown::html_vignette:
     df_print: paged
 vignette: >
   %\VignetteIndexEntry{Linear regression with covariance (correlation) matrices}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
+
+**Note: This vignette is a work in progress.** 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -84,12 +86,12 @@ mod_b5 <- lm_mat(Csat ~ AG + ES + CO + EX + OP,
     \u03B2; including all coefficients for models estimated using a correlation 
     [not covariance] matrix). 
       - The default, `"lm"`, will compute standard errors using the same method 
-        as `lm()`, based on @Cohen2003. This method ignores uncertainty 
+        as `lm()`, based on @Cohen2003AppliedMultiple. This method ignores uncertainty 
         in the standard deviations used to standardize the coefficients and 
         correlations. As a result, confidence intervals will be too narrow. 
       - More accurate standard errors and confidence intervals for standardized 
         coefficients can be obtained by settings `se_beta_method = "normal"`,
-        which will use the normal-theory approach from @JonesWaller2013 [@JonesWaller2015].
+        which will use the normal-theory approach from @JonesComputingconfidenceintervals2013.
         
 Note that `lm_mat()` is limited to linear models. It can only compute moderated 
 or polynomial regression models if the product or polynomial terms are already 
@@ -214,19 +216,19 @@ For example, in the `individual_correction` results, you can see matrices for *k
 *N*, *mean_r*, *sd_res*, *mean_rho*, *sd_rho*, etc.:
 
 ```{r}
-print(mat_array$individual_correction$`1`$true_score)
+print(meta_matrix$individual_correction$`1`$true_score)
 ```
 
 We can get a matrix of meta-analytic mean correlations by extracting the `mean_rho`
 object from this list:
 
 ```{r}
-R_meta <- mat_array$individual_correction$`1`$true_score
+R_meta <- meta_matrix$individual_correction$`1`$true_score$mean_rho
 ```
 
 We can approximate a sample size for regression analyses by taking an average
 of the sample sizes from the contributing meta-analyses. For example, the harmonic
-mean *N* across meta-analyses is often used [@ViswesvaranOnes1995]:
+mean *N* across meta-analyses is often used [@ViswesvaranTheoryTesting1995]:
 
 ```{r}
 harmonic_mean <- function(x, na.rm = FALSE) {
@@ -235,7 +237,7 @@ harmonic_mean <- function(x, na.rm = FALSE) {
   return(1 / imn)
 }
 
-N_meta <- mat_array$individual_correction$`1`$N
+N_meta <- meta_matrix$individual_correction$`1`$true_score$N
 N_harm <- harmonic_mean(N_meta[lower.tri(N_meta)])
 ```
 
@@ -251,7 +253,7 @@ mod_meta <- lm_mat(Y ~ X + Z,
 
 **Note! The standard errors, confidence intervals, and p values for regression 
 results based on an average sample size are only approximate. For more accurate 
-results, consider a GLS approach based on @Becker1992. Functions for this approach
-will be added in a future version.**
+results, consider a GLS approach based on @BeckerUsingresultsreplicated1992. 
+Functions for this approach will be added in a future version.**
 
 ## References

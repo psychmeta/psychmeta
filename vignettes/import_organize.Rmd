@@ -3,12 +3,12 @@ title: "Importing and organizing meta-analytic data"
 output:
   rmarkdown::html_vignette:
     df_print: paged
-bibliography: vignette.json
 vignette: >
   %\VignetteIndexEntry{Importing and organizing meta-analytic data}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
 csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
 
 ```{r setup, include=FALSE}
@@ -34,7 +34,7 @@ For an introduction to **rio**, see `vignette("rio", "rio")`.
 size is coded in its own row of a matrix. For example, a long format looks like this:
 
 ```{r, echo=FALSE}
-# First 6 observations from the the database of Gonzalez-MulÃ©, Mount, and Oh (2014; JAP)
+# First 6 observations from the the database of Gonzalez-Mule, Mount, and Oh (2014; JAP)
 head(data_r_gonzalezmule_2014[,c("Study", "n", "rxyi", "Rating source",
                                 "rxxi", "ryyi", "ux")])
 ```
@@ -68,7 +68,7 @@ This matrix-style format can be easily converted to the long-format data **`psyc
 ```{r, eval=TRUE}
 reshape_mat2dat(
      var_names = var_names,                # Column of variable names
-     cor_data = c("X", "Y", "X"),          # Names of correlation columns
+     cor_data = c("X", "Y", "Z"),          # Names of correlation columns
      common_data = n,                      # Names of columns shared among relationships
      unique_data = c("mean", "sd", "rel"), # Names of columns unique to relationships
      data = dat_matrix)

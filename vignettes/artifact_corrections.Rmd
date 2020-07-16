@@ -1,0 +1,77 @@
+---
+title: "Correcting for artifacts in meta-analyses"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{Correcting for artifacts in meta-analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
+---
+
+**Note: This vignette is a work in progress.**
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(psychmeta)
+library(dplyr)
+```
+
+This vignette will walk you through correcting for measurement error and 
+selection biases (e.g., range restriction, collider bias) in meta-analyses. 
+These discussions apply to meta-analyses of corrections (`ma_r()`) and _d_ (_g_)
+values (`ma_d()`).
+For more vignettes, see the [**psychmeta** overview](overview.html).
+
+See [Meta-analyzing correlations](ma_r.html) and [Meta-analyzing d values](ma_d.html)
+for more information on specifying meta-analyses in **psychmeta**.
+
+
+## Individual-correction meta-analyses
+**`psychmeta`** can automatically make corrections for reliability and range restriction as it computes meta-analyses. To do so, specify vectors of data for each artifact your want to correct. To apply corrections individually to each study, specify `ma_method = "ic"`.
+
+The `clean_artifacts` and `impute_artifacts` arguments are used to impute missing artifact data and check for various errors or inconsistencies in the artifacts. You should generally leave these set to `TRUE`; they are only `FALSE` here to speed up computations during this tutorial, as our data are clean.
+```{r, eval=FALSE}
+ma_obj <- ma_r(ma_method = "ic",
+               rxyi = rxyi, n = n,
+               construct_x = x_name,
+               construct_y = y_name,
+               rxx = rxxi,
+               ryy = ryyi,
+               moderators = moderator,
+               clean_artifacts = FALSE,
+               impute_artifacts = FALSE,
+               data = data_r_meas_multi)
+```
+
+## Artifact-distribution meta-analyses
+To apply corrections to meta-analysis results overall, rather than to individual studies, specify `ma_method = "ad"`. Artifact distribution methods are useful when you have missing data (they make imputating missing values unnecessary). They can also be used to supplement observed artifacts with values from other sources (reducing artifact sampling error) and for applying corrections to artifact values to yield more accurate meta-analysis results [e.g., @DahlkeNotrestrictedselection2019].
+
+**`psychmeta`** can apply a variety of artifact correction models. You can specify which method to use with the `correction_method` argument. The default is "auto", and **`psychmeta`** will choose the best method based on available artifact data and settings for these arguments:
+
+* `correct_bias`
+* `correct_rxx`, `correct_ryy`
+* `correct_rr_x`, `correct_rr_y`
+* `indirect_rr_x`, `indirect_rr_y`
+* `correct_rel`, `correct_rr`, `indirect_rr`
+
+```{r, eval=FALSE}
+ma_r(ma_method = "ad",
+     rxyi = rxyi, n = n,
+     construct_x = x_name,
+     construct_y = y_name,
+     rxx = rxxi,
+     ryy = ryyi,
+     correct_rr_x = FALSE,
+     correct_rr_y = FALSE,
+     moderators = moderator,
+     data = data_r_meas_multi)
+```
+
+You can also convert a meta-analysis previously calculated using barebones or individual-correction methods to an artifact-distribution meta-analysis:
+```{r, eval=FALSE}
+ma_r_ad(ma_obj, correct_rr_x = FALSE, correct_rr_y = FALSE)
+```
