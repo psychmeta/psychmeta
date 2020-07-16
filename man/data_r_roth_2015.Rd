@@ -4,7 +4,9 @@
 \name{data_r_roth_2015}
 \alias{data_r_roth_2015}
 \title{Artifact-distribution meta-analysis of the correlation between school grades and cognitive ability}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_r_roth_2015)
 }

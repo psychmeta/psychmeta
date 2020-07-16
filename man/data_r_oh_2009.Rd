@@ -4,7 +4,9 @@
 \name{data_r_oh_2009}
 \alias{data_r_oh_2009}
 \title{Second order meta-analysis of operational validities of big five personality measures across East Asian countries}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_r_oh_2009)
 }

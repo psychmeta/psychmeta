@@ -107,7 +107,7 @@ anova.ma_psychmeta <- function(object, ..., analyses = "all",
 
         metatab <- get_metatab(object, analyses = analyses, ma_method = ma_method,
                                correction_type = correction_type) %>%
-                as_tibble() %>%
+                as_tibble(.name_repair = base::make.names) %>%
                 filter(.data$analysis_type %in% c("Overall", "Simple Moderator"))
 
         if (is.null(moderators)) moderators <-

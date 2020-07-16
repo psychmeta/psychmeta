@@ -183,7 +183,7 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
                uy_observed <- match_variables(call = call_full[[match("uy_observed", names(call_full))]], arg = uy_observed, arg_name = "uy_observed", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators))[1] != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data), as_array = TRUE)
+                  moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
      }
 
      if(!moderated_ads) moderators <- NULL
@@ -304,8 +304,8 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
      if(pairwise_ads){
           .artifact_org_pair <- function(dat, construct_order = NULL){
                ad_list_names <- names(dat$meta_tables[[1]])
-               construct_x <- unlist(lapply(str_split(string = names(dat$meta_tables[[1]][[1]]), pattern = ", construct: "), function(x) x[2]))
-               construct_y <- unlist(lapply(str_split(string = names(dat$meta_tables[[1]][[2]]), pattern = ", construct: "), function(x) x[2]))
+               construct_x <- unlist(lapply(strsplit(x = names(dat$meta_tables[[1]][[1]]), split = ", construct: "), function(x) x[2]))
+               construct_y <- unlist(lapply(strsplit(x = names(dat$meta_tables[[1]][[2]]), split = ", construct: "), function(x) x[2]))
 
                out <- NULL
                for(i in 1:length(construct_x)){

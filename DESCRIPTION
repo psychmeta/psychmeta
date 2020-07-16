@@ -1,11 +1,12 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 2.3.5
-Date: 2020-02-13
+Version: 2.4.0
+Date: 2020-07-11
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "jdahlke@humrro.org"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
+              person("Wesley", "Gardiner", role = "ctb", comment = "Unit tests"),
               person("Michael T.", "Brannick", role = "ctb", comment = "Testing"),
               person("Jack", "Kostal", role = "ctb", comment = "Code for reshape_mat2dat function"),
               person("Sean", "Potter", role = "ctb", comment = "Testing; Code for cumulative and leave1out plots"),
@@ -18,10 +19,19 @@ Depends: R (>= 3.4.0)
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-Imports: dplyr, stats, methods, MASS, boot, tmvtnorm, tibble, reshape2,
-         ggplot2, metafor, nor1mix, progress, tidyr (>= 1.0.0), stringi,
-         stringr, rlang, curl, purrr, data.table, cli, crayon
-Suggests: bib2df, rmarkdown, knitr
-RoxygenNote: 7.0.2
+Imports: dplyr, stats, boot, tibble, reshape2,
+         ggplot2, metafor, progress, tidyr (>= 1.0.0), stringi,
+         stringr, rlang, curl, purrr, data.table
+Suggests: 
+    MASS,
+    mvtnorm,
+    nor1mix, 
+    bib2df,
+    cli, 
+    crayon,
+    rmarkdown,
+    knitr,
+    testthat (>= 2.1.0)
+RoxygenNote: 7.1.0
 NeedsCompilation: no
 Packaged: 2018-05-01 18:29:28 UTC; dahlk068

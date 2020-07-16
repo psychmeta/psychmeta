@@ -113,13 +113,13 @@ These functions use Taylor series approximations (i.e., the delta method) to est
 
 The available Taylor-series functions include:
 \itemize{
-     \item{\code{estimate_var_tsa_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
-     \item{\code{estimate_var_tsa_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-     \item{\code{estimate_var_tsa_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
-     \item{\code{estimate_var_tsa_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-     \item{\code{estimate_var_tsa_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-     \item{\code{estimate_var_tsa_rb1}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
-     \item{\code{estimate_var_tsa_rb2}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
+\item{\code{estimate_var_tsa_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
+\item{\code{estimate_var_tsa_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+\item{\code{estimate_var_tsa_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
+\item{\code{estimate_var_tsa_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+\item{\code{estimate_var_tsa_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+\item{\code{estimate_var_tsa_rb1}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
+\item{\code{estimate_var_tsa_rb2}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
 }
 }
 \section{Notes}{
@@ -160,9 +160,10 @@ estimate_var_tsa_rb2(mean_rtpa = .5, var = .02,
                 mean_qy = .8)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2018). \emph{One of these artifacts is not like the others:
-Accounting for indirect range restriction in organizational and psychological research}.
-Manuscript submitted for review.
+Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+Accounting for indirect range restriction in organizational research.
+\emph{Organizational Research Methods}. Advance online publication.
+\url{https://doi.org/10.1177/1094428119859398}
 
 Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 Implications of direct and indirect range restriction for meta-analysis methods and findings.

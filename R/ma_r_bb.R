@@ -2,13 +2,13 @@
 #' @export
 #' @aliases ma_r_barebones
 ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
-                                      wt_type = c("sample_size", "inv_var_mean", "inv_var_sample", 
-                                                  "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"), 
+                                      wt_type = c("sample_size", "inv_var_mean", "inv_var_sample",
+                                                  "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"),
                                       correct_bias = TRUE,
-                                      moderators = NULL, cat_moderators = TRUE, 
-                                      moderator_type = c("simple", "hierarchical", "none"), 
+                                      moderators = NULL, cat_moderators = TRUE,
+                                      moderator_type = c("simple", "hierarchical", "none"),
                                       data = NULL, control = control_psychmeta(), ...){
-     
+
      .dplyr.show_progress <- options()$dplyr.show_progress
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
@@ -17,10 +17,10 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      warn_obj1 <- record_warnings()
      call <- match.call()
 
-     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+     wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample",
                                                "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
-     
+
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
                                   .control_psychmeta_arg = control)
      error_type <- control$error_type
@@ -62,7 +62,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data, .name_repair = "minimal"), as_array = TRUE)
+                  moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
      }
 
      if(!is.null(moderators)){
@@ -97,11 +97,11 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      }
 
      additional_args <- list(...)
-     
+
      as_worker <- additional_args$as_worker
      if(is.null(as_worker)) as_worker <- FALSE
-     
-     inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias, 
+
+     inputs <- list(hs_override = hs_override, wt_type = wt_type, error_type = error_type, correct_bias = correct_bias,
                     conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased)
 
      if(is.null(n_adj)){
@@ -139,21 +139,21 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
 
      if(!as_worker){
           out <- bind_cols(analysis_id = 1:nrow(out), out)
-          attributes(out) <- append(attributes(out), list(call_history = list(call), 
-                                                          inputs = inputs, 
+          attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                          inputs = inputs,
                                                           ma_methods = "bb",
-                                                          ma_metric = "r_as_r", 
+                                                          ma_metric = "r_as_r",
                                                           default_print = "bb",
                                                           warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                                                          fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
+                                                          fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE))))
           out <- namelists.ma_psychmeta(ma_obj = out)
      }
 
      class(out) <- c("ma_psychmeta", class(out))
-     
+
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-     
+
      return(out)
 }
 
@@ -163,7 +163,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
 #' Internal function for computing bare-bones meta-analyses of correlations
 #'
 #' @param data Data frame of bare-bones information.
-#' @param run_lean If TRUE, the meta-analysis will not generate an escalc object. Meant to speed up bootstrap analyses that do not require supplmental output.
+#' @param run_lean If TRUE, the meta-analysis will not generate an escalc object. Meant to speed up bootstrap analyses that do not require supplemental output.
 #' @param ma_arg_list List of arguments to be used in the meta-analysis function.
 #'
 #' @return A list object containing the results of bare-bones meta-analyses of correlations.
@@ -204,7 +204,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
 
      .r <- r
      if(correct_bias) r <- correct_r_bias(r = r, n = n)
-     
+
      wt_source <- check_wt_type(wt_type = wt_type)
      if(wt_source == "psychmeta"){
           if(wt_type == "n_effective") wt_vec <- n_adj
@@ -227,7 +227,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
      if(error_type == "mean") var_e_vec <- var_error_r(r = mean_r_xy, n = n_adj, correct_bias = FALSE)
      if(error_type == "sample") var_e_vec <- var_error_r(r = r, n = n_adj, correct_bias = FALSE)
      var_e <- wt_mean(x = var_e_vec, wt = wt_vec)
-     
+
      ## Create escalc object
      if(run_lean){
           escalc_obj <- NULL
@@ -281,15 +281,15 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
                                  sd_e = sd_e,
                                  sd_res = sd_res,
                                  ci, cr)), stringsAsFactors = FALSE)
-     
+
      class(barebones) <- c("ma_table", class(barebones))
      attributes(barebones) <- append(attributes(barebones), list(ma_type = "r_bb"))
-     
+
      list(meta = list(barebones = barebones,
-                      individual_correction = NULL, 
-                      artifact_distribution = NULL), 
+                      individual_correction = NULL,
+                      artifact_distribution = NULL),
           escalc = list(barebones = escalc_obj,
-                        individual_correction = NULL, 
+                        individual_correction = NULL,
                         artifact_distribution = NULL))
 }
 

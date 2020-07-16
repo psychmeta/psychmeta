@@ -19,7 +19,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
-     
+
      call <- match.call()
      warn_obj1 <- record_warnings()
 
@@ -30,10 +30,10 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           treat_as_d <- FALSE
      }
      if(treat_as_d){
-          wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample", 
+          wt_type <- match.arg(wt_type, choices = c("n_effective", "sample_size", "inv_var_mean", "inv_var_sample",
                                                     "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      }else{
-          wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample", 
+          wt_type <- match.arg(wt_type, choices = c("sample_size", "inv_var_mean", "inv_var_sample",
                                                     "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      }
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
@@ -51,9 +51,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      hs_override <- control$hs_override
      use_all_arts <- control$use_all_arts
      estimate_pa <- control$estimate_pa
-     
+
      control$pairwise_ads <- TRUE
-     
+
      if(hs_override){
           wt_type <- "sample_size"
           error_type <- "mean"
@@ -78,7 +78,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      as_worker <- additional_args$as_worker
      if(is.null(as_worker)) as_worker <- FALSE
-     
+
      inputs <- append(inputs, additional_args)
      presorted_data <- additional_args$presorted_data
      if(!is.null(additional_args$es_d)){
@@ -156,7 +156,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
 
           if(deparse(substitute(moderators))[1] != "NULL" & deparse(substitute(moderators))[1] != ".psychmeta_reserved_internal_mod_aabbccddxxyyzz")
-               moderators <- match_variables(call = call_full[[match("moderators",  names(call_full))]], arg = moderators, arg_name = "moderators", data = as_tibble(data, .name_repair = "minimal"), as_array = TRUE)
+                  moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
      }
 
      if(length(moderators) > 0){
@@ -227,14 +227,14 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }else{
                .sample_id <- NULL
           }
-          
+
           if(!is.null(moderators)){
                if(!is.null(moderators)) colnames(moderators) <- moderator_names$all
                .moderators <- as.data.frame(as_tibble(moderators, .name_repair = "minimal")[!valid_r,], stringsAsFactors = FALSE)
           }else{
                .moderators <- NULL
           }
-          
+
           .n <- n[!valid_r]
           .rxx <- manage_arglength(x = rxx, y = rxyi)[!valid_r]
           .rxx_restricted <- manage_arglength(x = rxx_restricted, y = rxyi)[!valid_r]
@@ -255,7 +255,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                               rxx = .rxx, rxx_restricted = .rxx_restricted, rxx_type = .rxx_type, k_items_x = .k_items_x,
                                               ryy = .ryy, ryy_restricted = .ryy_restricted, ryy_type = .ryy_type, k_items_y = .k_items_y,
                                               ux = .ux, ux_observed = .ux_observed,
-                                              uy = .uy, uy_observed = .uy_observed, 
+                                              uy = .uy, uy_observed = .uy_observed,
                                               moderators = .moderators, cat_moderators = cat_moderators, moderator_type = moderator_type,
                                               control = control, process_ads = FALSE)
      }
@@ -291,7 +291,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(!is.null(sample_id)) sample_id <- sample_id[valid_r]
      if(!is.null(citekey)) citekey <- citekey[valid_r]
 
-     
+
      if(!is.null(moderators)) colnames(moderators) <- moderator_names$all
      if(!as_worker){
           if(is.null(sample_id)){
@@ -306,17 +306,17 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                         rxx = rxx, rxx_restricted = rxx_restricted, rxx_type = rxx_type, k_items_x = k_items_x,
                                         ryy = ryy, ryy_restricted = ryy_restricted, ryy_type = ryy_type, k_items_y = k_items_y,
                                         ux = ux, ux_observed = ux_observed,
-                                        uy = uy, uy_observed = uy_observed, 
+                                        uy = uy, uy_observed = uy_observed,
                                         moderators = moderators, cat_moderators = cat_moderators, moderator_type = moderator_type,
                                         control = control, process_ads = FALSE)
-          
-          ad_obj_list_tsa <- join_adobjs(ad_type = "tsa", 
-                                         primary_ads = ad_obj_list, 
-                                         harvested_ads = harvested_ads, 
+
+          ad_obj_list_tsa <- join_adobjs(ad_type = "tsa",
+                                         primary_ads = ad_obj_list,
+                                         harvested_ads = harvested_ads,
                                          supplemental_ads_x = supplemental_ads_x, supplemental_ads_y = supplemental_ads_y)
-          ad_obj_list_int <- join_adobjs(ad_type = "int", 
-                                         primary_ads = ad_obj_list, 
-                                         harvested_ads = harvested_ads, 
+          ad_obj_list_int <- join_adobjs(ad_type = "int",
+                                         primary_ads = ad_obj_list,
+                                         harvested_ads = harvested_ads,
                                          supplemental_ads_x = supplemental_ads_x, supplemental_ads_y = supplemental_ads_y)
      }
 
@@ -700,12 +700,12 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      .ryya_vec[subset_vec] <- ryya_vec[subset_vec]
      .ryya_vec[do_uvirr_x] <- estimate_ryya(ryyi = ryyi_vec[do_uvirr_x], rxyi = rxyi[do_uvirr_x], ux = ut_vec[do_uvirr_x])
      .ryya_vec[do_uvdrr_x] <- estimate_ryya(ryyi = ryyi_vec[do_uvdrr_x], rxyi = rxyi[do_uvdrr_x], ux = ux_vec[do_uvdrr_x])
-     
+
      ## Determine attenuation factors for conventional corrections
      a_vec <- A_vec <- rep(1, length(rxyi))
 
      A_vec[!do_bvirr] <- .estimate_attenuation(r_observed = rxyi[!do_bvirr], r_corrected = rtpa_vec[!do_bvirr])
-     
+
      a_vec[do_uvdrr_x] <- .refine_var_rr(ux = ux_vec[do_uvdrr_x], rxyi = rxyi[do_uvdrr_x], indirect_rr = FALSE, ux_observed = TRUE, rxx_restricted = FALSE)
      a_vec[do_uvirr_x] <- .refine_var_rr(ux = ut_vec[do_uvirr_x], rxyi = rxyi[do_uvirr_x], indirect_rr = TRUE, ux_observed = FALSE, rxx_restricted = FALSE)
      a_vec[do_uvdrr_y] <- .refine_var_rr(ux = uy_vec[do_uvdrr_y], rxyi = rxyi[do_uvdrr_y], indirect_rr = FALSE, ux_observed = TRUE, rxx_restricted = FALSE)
@@ -716,7 +716,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(any(do_bvirr)){
           ## Prepare for bivariate estimates
           bvirr_art_id <- do_bvirr
-          if(!is.null(presorted_data)) bvirr_art_id <- presorted_data[,"Analysis_ID"] == 1 & do_bvirr
+          if(!is.null(presorted_data)) bvirr_art_id <- presorted_data[,"analysis_id"] == 1 & do_bvirr
 
           rxx_tsa <- rxx
           rxx_restricted_tsa <- rxx_restricted
@@ -839,25 +839,25 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(!as_worker){
           out <- bind_cols(analysis_id = 1:nrow(out),
                            construct_x = rep("X", nrow(out)),
-                           construct_y = rep("Y", nrow(out)), 
+                           construct_y = rep("Y", nrow(out)),
                            out)
-          
+
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa, ad_obj_y = ad_obj_list_tsa)
           out <- out %>% rename(ad_x_tsa = "ad_x", ad_y_tsa = "ad_y")
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_int, ad_obj_y = ad_obj_list_tsa)
           out <- out %>% rename(ad_x_int = "ad_x", ad_y_int = "ad_y")
-          
+
           out$ad <- apply(out, 1, function(x){
-               list(ic = list(ad_x_int = x$ad_x_int, 
-                              ad_x_tsa = x$ad_x_tsa, 
-                              
-                              ad_y_int = x$ad_y_int, 
-                              ad_y_tsa = x$ad_y_tsa), 
+               list(ic = list(ad_x_int = x$ad_x_int,
+                              ad_x_tsa = x$ad_x_tsa,
+
+                              ad_y_int = x$ad_y_int,
+                              ad_y_tsa = x$ad_y_tsa),
                     ad = NULL)
           })
-          
+
           out <- out %>% select(colnames(out)[!(colnames(out) %in% c("construct_x", "construct_y", "ad_x_int", "ad_x_tsa", "ad_y_int", "ad_y_tsa"))])
-          
+
           attributes(out) <- append(attributes(out), list(call_history = list(call),
                                                           inputs = inputs,
                                                           ma_methods = c("bb", "ic"),
@@ -870,13 +870,14 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                             neg_var_rxpa = neg_var_rxpa,
                                                                             neg_var_rtya = neg_var_rtya)))
           out <- namelists.ma_psychmeta(ma_obj = out)
+          class(out) <- c("ma_psychmeta", class(out))
      }
 
-     class(out) <- c("ma_psychmeta", class(out))
+
 
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-     
+
      return(out)
                          }
 
@@ -921,7 +922,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           var_e_xy_vec <- convert_vard_to_varr(d = out$escalc$barebones[,"yi"], var = out$escalc$barebones[,"vi"], p = data$pi)
           out$escalc$barebones$vi <- convert_vard_to_varr(d = out$escalc$barebones$yi, var = out$escalc$barebones$vi, p = data$pi)
           out$escalc$barebones$yi <- convert_es.q_d_to_r(d = out$escalc$barebones$yi, p = data$pi)
-          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = out$escalc$barebones$weight), 
+          out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = out$escalc$barebones$weight),
                                                  conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
      }else{
           out <- .ma_r_bb(data = data, ma_arg_list = ma_arg_list)
@@ -951,11 +952,11 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
 
      wt_source <- check_wt_type(wt_type = wt_type)
-     
+
      rtpa_vec <- data$rtpa
      A_vec_tp <- data$A
      var_e_tp_vec <- var_e_xy_vec / A_vec_tp^2 * a_vec^2
-     
+
      if(wt_source == "psychmeta"){
           wt_vec_tp <- out$escalc$barebones[,"weight"] * A_vec_tp^2
      }
@@ -963,17 +964,17 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           wt_vec_tp <- as.numeric(metafor::weights.rma.uni(metafor::rma(yi = rtpa_vec, vi = var_e_tp_vec,
                                                                         control = list(maxiter = 1000, stepadj = .5), method = wt_type)))
      }
-     
+
      mean_rtpa <- wt_mean(x = rtpa_vec, wt = wt_vec_tp)
      var_rtpa <- wt_var(x = rtpa_vec, wt = wt_vec_tp, unbiased = var_unbiased)
      var_e_tp_a <- wt_mean(x = var_e_tp_vec, wt = wt_vec_tp)
      var_rho_tp_a <- var_rtpa - var_e_tp_a
-     
+
      sd_rtpa <- var_rtpa^.5
      sd_e_tp_a <- var_e_tp_a^.5
      sd_rho_tp_a <- var_rho_tp_a^.5
      sd_rho_tp_a[is.na(sd_rho_tp_a)] <- 0
-     
+
      if(k == 1){
           var_rtpa <- sd_rtpa <- NA
           var_rho_tp_a <- sd_rho_tp_a <- NA
@@ -986,7 +987,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      cr_tp_a <- credibility(mean = mean_rtpa, sd = var_rho_tp_a^.5, cred_level = cred_level, k = k, cred_method = cred_method)
      ci_tp_a <- setNames(c(ci_tp_a), colnames(ci_tp_a))
      cr_tp_a <- setNames(c(cr_tp_a), colnames(cr_tp_a))
-     
+
      if(type == "ts" | type == "all"){
           if(run_lean){
                escalc_tp <- NULL
@@ -998,18 +999,18 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                        weight = wt_vec_tp,
                                        residual = rtpa_vec - mean_rtpa,
                                        A = A_vec_tp,
-                                       a = a_vec, 
-                                       rxxa_est = rxxa_est, 
+                                       a = a_vec,
+                                       rxxa_est = rxxa_est,
                                        ryya_est = ryya_est, stringsAsFactors = FALSE)
                escalc_tp$pi <- data$pi
                escalc_tp$pa <- data$pa
-               
+
                if(!is.null(citekey)) escalc_tp <- cbind(citekey = citekey, escalc_tp)
                if(!is.null(sample_id)) escalc_tp <- cbind(sample_id = sample_id, escalc_tp)
                if(any(colnames(data) == "original_order")) escalc_tp <- cbind(original_order = data$original_order, escalc_tp)
                class(escalc_tp) <- c("escalc", "data.frame")
-          }    
-          
+          }
+
           meta <- data.frame(t(c(k = k, N = N,
                                  unlist(select(out$meta$barebones, .data$mean_r:.data$sd_res)),
                                  mean_rho = mean_rtpa,
@@ -1021,17 +1022,17 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                  sd_e_c = sd_e_tp_a,
                                  sd_rho = sd_rho_tp_a,
                                  ci_tp_a, cr_tp_a)), stringsAsFactors = FALSE)
-          
+
           class(meta) <- c("ma_table", class(meta))
           attributes(meta) <- append(attributes(meta), list(ma_type = "r_ic"))
-          
+
           out$meta$individual_correction$true_score <- meta
           out$escalc$individual_correction$true_score <- escalc_tp
      }
-     
+
      if(type == "vgx" | type == "all"){
           mean_rxxa <- wt_mean(rxxa_est, wt_vec_tp)
-          
+
           rxpa_vec <- data$rtpa * sqrt(mean_rxxa)
           A_vec_xp <- A_vec_tp / sqrt(mean_rxxa)
           var_e_xp_vec <- var_e_tp_vec * sqrt(mean_rxxa)
@@ -1090,25 +1091,25 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
      if(type == "vgy" | type == "all"){
           mean_ryya <- wt_mean(ryya_est, wt_vec_tp)
-          
+
           rtya_vec <- data$rtpa * sqrt(mean_ryya)
           A_vec_ty <- A_vec_tp / sqrt(mean_ryya)
           var_e_ty_vec <- var_e_tp_vec * sqrt(mean_ryya)
           wt_vec_ty <- wt_vec_tp / sqrt(mean_ryya)
-          
+
           mean_rtya <- mean_rtpa * sqrt(mean_ryya)
           ci_ty_a <- ci_tp_a * sqrt(mean_ryya)
           cr_ty_a <- cr_tp_a * sqrt(mean_ryya)
           var_rtya <- var_rtpa * mean_ryya
           var_e_ty_a <- var_e_tp_a * mean_ryya
           var_rho_ty_a <- var_rtya - var_e_ty_a
-          
+
           se_rtya <- se_rtpa * sqrt(mean_ryya)
           sd_rtya <- var_rtya^.5
           sd_e_ty_a <- var_e_ty_a^.5
           sd_rho_ty_a <- var_rho_ty_a^.5
           sd_rho_ty_a[is.na(sd_rho_ty_a)] <- 0
-          
+
           if(run_lean){
                escalc_ty <- NULL
           }else{

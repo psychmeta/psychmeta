@@ -4,7 +4,9 @@
 \name{data_r_mcleod_2007}
 \alias{data_r_mcleod_2007}
 \title{Bare-bones meta-analysis of parenting and childhood depression}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_r_mcleod_2007)
 }

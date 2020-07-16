@@ -294,7 +294,8 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
           moderator_names <- additional_args$moderator_names
 
           if(!is.null(presorted_data)){
-                  moderators_long <- presorted_data[,paste0(moderator_names[["all"]], "_temp")]
+                  moderators_long <- presorted_data[,intersect(colnames(presorted_data),
+                                                               paste0(moderator_names[["all"]], "_temp"))]
                   moderators_long <- setNames(moderators_long, moderator_names[["all"]])
                   moderators_long <- bind_cols(data.frame(original_order = 1:nrow(moderators_long)), moderators_long)
 

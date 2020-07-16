@@ -1,3 +1,55 @@
+Changes in Version 2.4.0 (2020-07-11)
+======================================
+- Bug fix in convert_es().
+
+- convert_es() now returns a simple frame with converted effect sizes, variances, and (effective) sample sizes.
+
+- Bug fix in moderator reconciliation.
+
+- Added robustness to variable selection and second-order meta-analysis functions.
+
+
+Changes in Version 2.3.10 (2020-06-07)
+======================================
+- Bug fix when compositing facets into overall construct variables.
+
+- Bug fix in ma_r_ic.
+
+- Moved packages `MASS`, `tmvtnorm`, and `nor1mix` to "Suggests" to avoid errors some users have encountered when loading `psychmeta` in R 4.0.0.
+
+
+Changes in Version 2.3.9 (2020-06-04)
+=====================================
+- Bug fix when compositing facets into overall construct variables.
+
+- Remove unnecessary S4 class exports.
+
+- Bug fix in get_matrix().
+
+- Fix extraneous warnings in ma_r() when ma_method="ic" since dplyr 1.0.0.
+
+- Print all columns of meta-analysis results tables.
+
+
+Changes in Version 2.3.8 (2020-04-21)
+=====================================
+- Bug fix to correct an issue that arose in version 2.3.7 in which factor-type variables passed to ma_r() and ma_d() as construct/facet/measure arguments were coerced to numeric variables.
+
+
+Changes in Version 2.3.7 (2020-04-09)
+=====================================
+- Updates to ensure consistency with upcoming R version 4.0.0.
+
+- Bug fixes in ma_r() moderated meta-analyses that involve dependency consolidation.
+
+
+Changes in Version 2.3.6 (2020-02-19)
+=====================================
+- Bug fix in dependent sample consolidation.
+
+- A vector of moderator variable names can now be specified quoted or unquoted, like other arguments.
+
+
 Changes in Version 2.3.5 (2020-02-13)
 =====================================
 - Improved print methods for tibble-like output.

@@ -16,8 +16,6 @@
 #' @return A list of observed-score, true-score, and error-score data frames. If selection is requested, the data frames will include logical variables indicating whether each case would be selected on the basis of observed scores, true scores, or error scores.
 #' @export
 #'
-#' @importFrom MASS mvrnorm
-#'
 #' @keywords datagen
 #'
 #' @examples
@@ -124,7 +122,7 @@ simulate_psych <- function(n, rho_mat,
           error <- error[,keep_id]
      }
 
-     out <- list(observed = as_tibble(obs, .name_repair = "minimal"), 
+     out <- list(observed = as_tibble(obs, .name_repair = "minimal"),
                  true = as_tibble(true, .name_repair = "minimal"),
                  error = as_tibble(error, .name_repair = "minimal"))
      class(out) <- "simdat_psych"
@@ -205,6 +203,11 @@ simulate_psych <- function(n, rho_mat,
      S <- diag(sigma_vec) %*% diag(rel_vec^.5) %*% rho_mat %*% diag(rel_vec^.5) %*% diag(sigma_vec)
 
      ## Generate true-score, error-score, and observed-score data
+     if (!requireNamespace("MASS", quietly = TRUE)) {
+             stop("The package 'MASS' is not installed.\n",
+                  "  'MASS' is required to simulate samples.\n",
+                  "  Please install 'MASS'.")
+     }
      true_scores_a <- MASS::mvrnorm(n = n, mu = mu_vec, Sigma = S)
      error_scores_a <- MASS::mvrnorm(n = n, mu = rep(0, ncol(rho_mat)), Sigma = diag(sigma_vec^2 - sigma_vec^2 * rel_vec))
 

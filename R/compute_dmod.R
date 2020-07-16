@@ -644,9 +644,19 @@ compute_dmod <- function(data, group, predictors, criterion,
                     cross_validate_wts = cross_validate_wts)
 
      if(!is.data.frame(data)) data <- as.data.frame(data, stringsAsFactors = FALSE)
-     group <- match_variables(call = call[[match("group", names(call))]], arg = group, arg_name = "group", data = data)
-     predictors <- match_variables(call = call[[match("predictors", names(call))]], arg = predictors, arg_name = "predictors", data = data)
-     criterion <- match_variables(call = call[[match("criterion", names(call))]], arg = criterion, arg_name = "criterion", data = data)
+     group <- match_variables(call = call[[match("group", names(call))]],
+                              arg = group,
+                              arg_name = "group",
+                              data = data)
+     predictors <- match_variables(call = call[[match("predictors", names(call))]],
+                                   arg = predictors,
+                                   arg_name = "predictors",
+                                   data = data,
+                                   allow_multiple = TRUE)
+     criterion <- match_variables(call = call[[match("criterion", names(call))]],
+                                  arg = criterion,
+                                  arg_name = "criterion",
+                                  data = data)
 
      if(!is.null(dim(group))){
           if(ncol(group) > 1){
@@ -734,7 +744,7 @@ compute_dmod <- function(data, group, predictors, criterion,
                                                 as.numeric(by(data_i, INDICES = data_i[,"G"], nrow)) < 3) |
                               any(0 == sd_vec) | any(is.na(sd_vec))
                     }
-               }    
+               }
           }else{
                data_i <- data
           }

@@ -4,7 +4,9 @@
 \name{data_r_gonzalezmule_2014}
 \alias{data_r_gonzalezmule_2014}
 \title{Meta-analysis of OCB correlations with other constructs}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 data(data_r_gonzalezmule_2014)
 }
