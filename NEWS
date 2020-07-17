@@ -1,3 +1,8 @@
+Changes in development version
+======================================
+- Improved standard error for SD_res when var_unbiased == TRUE.
+
+
 Changes in Version 2.4.1 (2020-07-16)
 ======================================
 - Restore 'overview' vignette.
