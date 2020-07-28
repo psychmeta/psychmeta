@@ -2055,12 +2055,13 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 construct_y = .data$construct_y,
                 measure_x = .data$measure_x,
                 measure_y = .data$measure_y,
-                moderator_names = .data$moderator_names_temp,
+                moderator_names = .data$moderator_names,
                 es_metric = .data$es_metric,
                 data = .data$duplicates[i, ],
                 ma_method = .data$ma_method,
                 .dx_internal_designation = .data$.dx_internal_designation
         )
+        
         dependencies_removed$use_for_arts <- .data$duplicates$use_for_arts[1]
         out <- as.data.frame(
                 cbind(as_tibble(.data$duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", .data$str_moderators)][1, ], dependencies_removed),stringsAsFactors = FALSE)
