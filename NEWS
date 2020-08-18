@@ -1,5 +1,7 @@
-Changes in development version
+Changes in Version 2.4.2 (2020-08-18)
 ======================================
+- Fixed a bug in which missing artifacts were sometimes not imputed when resolving dependency among observations.
+
 - Improved standard error for SD_res when var_unbiased == TRUE.
 
 
