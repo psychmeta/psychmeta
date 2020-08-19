@@ -1493,18 +1493,33 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           progbar <- progress::progress_bar$new(format = " Consolidating dependent observations [:bar] :percent est. time remaining: :eta",
                                       total = length(unique(duplicates$analysis_id)), clear = FALSE, width = options()$width)
-          collapsed_data_list <- by(1:length(duplicates$analysis_id), duplicates$analysis_id, function(i){
-               if(psychmeta.show_progress)
-                    progbar$tick()
-               out <- .remove_dependency(sample_id = "sample_id", citekey = "citekey", es_data = str_es_data,
-                                         data_x = str_data_x, data_y = str_data_y, collapse_method=collapse_method, retain_original = FALSE,
-                                         intercor=intercor, partial_intercor = FALSE, construct_x = "construct_x", construct_y = "construct_y",
-                                         measure_x = "measure_x", measure_y = "measure_y", moderator_names = moderator_names_temp,
-                                         es_metric = "r", data = duplicates[i,], ma_method = ma_method, .dx_internal_designation = d)
-               out$use_for_arts <- duplicates$use_for_arts[1]
-               as.data.frame(cbind(as_tibble(duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", str_moderators)][1,], out), stringsAsFactors = FALSE)
-          })
-
+          collapsed_data_list <-
+                  by(1:length(duplicates$analysis_id),
+                     duplicates$analysis_id,
+                     .collapse_data_list,
+                     .data = list(
+                             duplicates = duplicates,
+                             sample_id = "sample_id",
+                             citekey = "citekey",
+                             es_data = str_es_data,
+                             data_x = str_data_x,
+                             data_y = str_data_y,
+                             collapse_method = collapse_method,
+                             retain_original = FALSE,
+                             intercor = intercor,
+                             partial_intercor = FALSE,
+                             construct_x = "construct_x",
+                             construct_y = "construct_y",
+                             measure_x = "measure_x",
+                             measure_y = "measure_y",
+                             moderator_names = moderator_names_temp,
+                             es_metric = "r",
+                             ma_method = ma_method,
+                             .dx_internal_designation = d,
+                             str_moderators = str_moderators
+                     )
+                  )
+          
           collapsed_data <- as.data.frame(data.table::rbindlist(collapsed_data_list), stringsAsFactors = FALSE)
           colnames(collapsed_data)[colnames(collapsed_data) == "es"] <- "rxyi"
           collapsed_data <- collapsed_data[,colnames(full_data_mod)]
@@ -2022,4 +2037,34 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 }
         }
         return(list(x = logic_x, y = logic_y))
+}
+
+.collapse_data_list <- function(i, .data) {
+        
+        dependencies_removed <- .remove_dependency(
+                sample_id = .data$sample_id,
+                citekey = .data$citekey,
+                es_data = .data$es_data,
+                data_x = .data$data_x,
+                data_y = .data$data_y,
+                collapse_method = .data$collapse_method,
+                retain_original = .data$retain_original,
+                intercor = .data$intercor,
+                partial_intercor = .data$partial_intercor,
+                construct_x = .data$construct_x,
+                construct_y = .data$construct_y,
+                measure_x = .data$measure_x,
+                measure_y = .data$measure_y,
+                moderator_names = .data$moderator_names,
+                es_metric = .data$es_metric,
+                data = .data$duplicates[i, ],
+                ma_method = .data$ma_method,
+                .dx_internal_designation = .data$.dx_internal_designation
+        )
+        
+        dependencies_removed$use_for_arts <- .data$duplicates$use_for_arts[1]
+        out <- as.data.frame(
+                cbind(as_tibble(.data$duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", .data$str_moderators)][1, ], dependencies_removed), stringsAsFactors = FALSE)
+        
+        return(out)
 }
