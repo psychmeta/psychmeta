@@ -2064,7 +2064,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
         
         dependencies_removed$use_for_arts <- .data$duplicates$use_for_arts[1]
         out <- as.data.frame(
-                cbind(as_tibble(.data$duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", .data$str_moderators)][1, ], dependencies_removed),stringsAsFactors = FALSE)
+                cbind(as_tibble(.data$duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", .data$str_moderators)][1, ], dependencies_removed), stringsAsFactors = FALSE)
         
         return(out)
 }
