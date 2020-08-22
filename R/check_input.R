@@ -44,6 +44,7 @@ valid_r <- filter_r(r_vec = rxyi, n_vec = n)
 
 # Validates the constructs and returns a validated valid_r object
 .validate_construct_xy <- function(valid_r, artifact_obj) {
+  # Messages
   message_singluar <- paste(" missing", deparse(substitute(artifact_name)), "entry removed: To use this observation, provide a non-NA label")
   message_plural <- paste(" missing", deparse(substitute(artifact_name)), "entries removed: To use these observations, provide non-NA labels")
 
