@@ -1,13 +1,17 @@
 ---
-title: "Barebones Meta-Analysis of Correlations"
+title: "Meta-analyzing correlations"
 author: "Brenton Wiernik"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{psychmeta barebones_correlations}
+  %\VignetteIndexEntry{Meta-analyzing correlations}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+csl: https://zotero.org/styles/apa
+bibliography: vignette.yaml
 ---
+
+**Note: This vignette is a work in progress.** 
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -20,6 +24,7 @@ options(width = 160)
 
 This vignette will walk you through estimating barebones meta-analyses of
 correlations between multiple constructs.
+For more vignettes, see the [**psychmeta** overview](overview.html).
 
 ## Getting Started
 
@@ -27,7 +32,7 @@ To begin, you will need your meta-analytic data sheet for analysis. We recommend
 the **rio** package for importing data to **R**. For an introduction to **rio**, see
 `vignette("rio", "rio")`.
 
-**psychmeta** assumes that your data are in "wide" format, with each row corresponding
+**psychmeta** assumes that your data are in "long" format, with each row corresponding
 to one effect size. For example, this is the format used in this data frame:
 
 ```{r}
@@ -40,19 +45,20 @@ In this table,
   - **`x_name`** and **`y_name`** are columns indicating the variables/constructs being related in the effect size; 
   - **`n`** is the sample size for the effect size; 
   - **`rxyi`** is the effect size (the correlation between the two constructs/variables); 
-  - **`rxxi`** and **`rxyi`** are the sample reliability values for the measures of the `x_name` and `y_name` variables, respectively; 
-  - **`citekey`** containts the citations keys for each study (used to generate bibliographies of included studies).
+  - **`rxxi`** and **`ryyi`** are the sample reliability values for the measures of the `x_name` and `y_name` variables, respectively; 
+  - **`citekey`** contains the citations keys for each study (used to generate bibliographies of included studies).
 
 You can see this data set includes correlations among three variables: `X`, `Y`,
 and `Z`, and that each sample contributes several effect sizes, one each for
 for different pairs of variables/constructs.
 
 If your data are in a different format, you can use the `reshape_wide2long()`
-function to reshape it. See also `vignette("pivot", "tidyr")`.
+function to reshape it. See the [import_organize](import_organize.html) vignette 
+for details.
 
 ## Estimating a Barebones Meta-Analysis
 
-Let's assume your data sheet is called `coding_sheet`.
+Let's assume your data frame is called `coding_sheet`.
 
 ```{r}
 coding_sheet <- data_r_meas_multi
@@ -75,8 +81,9 @@ ma_res <- ma_r(rxyi = rxyi,
 ```
 
 - **`data`** is your data frame. 
-- **`rxyi`**, **`n`**, **`sample_id`**, and **`moderators`** are the names of the columns in your 
-  data sheet that contain the appropriate values. 
+- **`rxyi`**, **`n`**, **`construct_x`**, **`construct_y`**, **`sample_id`**, 
+  and **`moderators`** are the names of the columns in your data frame that 
+  contain the appropriate values. 
   - **`rxyi`** is the correlation effect sizes; 
   - **`n`** is the sample sizes; 
   - **`construct_x`** and **`construct_y`** are the labels for the variables/constructs 
@@ -160,7 +167,7 @@ In this table,
   of correlations after accounting for sampling error). 
 - **`CI_LL_95`** and **`CI_UL_95`** are the upper and lower bounds of the confidence 
   interval for `mean_r`; the number indicates the coverage level (default: 95%). 
-- **`CR_LL_95`** and **`CR_UL_95`** are the upper and lower bounds of the credibility 
+- **`CR_LL_80`** and **`CR_UL_80`** are the upper and lower bounds of the credibility 
   interval for the estimated population distribution; the number indicates the 
   coverage level (default: 80%).
 
@@ -194,6 +201,13 @@ intervals for differences between levels or an omnibus ANOVA statistic, use the
 ```{r}
 anova(ma_res)
 ```
+
+For additional details on moderator analyses and meta-regression, see
+[Moderator analyses and meta-regression](moderator_analysis.html).
+
+### Correcting for Statistical Artifacts
+
+See Artifact corrections](artifact_corrections.html).
 
 ## Outputting Results
 
@@ -249,7 +263,7 @@ get_heterogeneity(ma_res)[[1]][["barebones"]]
 ### Publication Bias and Sensitivity Analyses
 
 **psychmeta** supports cumulative meta-analysis for publication/small-sample bias
-detection, leave-1-out sensitivity analyses, and bootstrap confidence interavals
+detection, leave-1-out sensitivity analyses, and bootstrap confidence intervals
 using the sensitivity function:
 
 ```{r, fig.show='hold'}

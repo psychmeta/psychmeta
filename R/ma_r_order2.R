@@ -117,15 +117,15 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
      # TODO: Just filter the data frame instead of taking these indices along through the
      # whole function. If data are supplied as vectors, then build a model frame
      # the same way that lm() does.
-     valid_r <- filter_r(r_vec = r, n_vec = k)
+     valid_r <- filter_r_bar(r_bar_vec = r, k_vec = k)
      if (all(!valid_r)) {
-             stop("No valid correlations and/or sample sizes provided", call. = FALSE)
+             stop("No valid correlations and/or numbers of studies provided", call. = FALSE)
      }
      if (sum(!valid_r) > 0) {
              if (sum(!valid_r) == 1) {
-                     warning(sum(!valid_r), " invalid correlation and/or sample size detected: Offending entry has been removed", call. = FALSE)
+                     warning(sum(!valid_r), " invalid correlation and/or number of studies detected: Offending entry has been removed", call. = FALSE)
              } else {
-                     warning(sum(!valid_r), " invalid correlations and/or sample sizes detected: Offending entries have been removed", call. = FALSE)
+                     warning(sum(!valid_r), " invalid correlations and/or numbers of studies detected: Offending entries have been removed", call. = FALSE)
              }
      }
 
