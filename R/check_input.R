@@ -191,10 +191,10 @@
       }
     }
   } else {
-    out_corr_methods <- list(correction_method <- scalar_arg_warning(arg = unlist(correction_method), arg_name = "correction_method"),
-                             unique_constructs <- unique(c(as.character(construct_x), as.character(construct_y))),
-                             correction_method <- matrix(correction_method, length(unique_constructs), length(unique_constructs)),
-                             rownames(correction_method) <- colnames(correction_method) <- unique_constructs)
+    correction_method <- scalar_arg_warning(arg = unlist(correction_method), arg_name = "correction_method"),
+    unique_constructs <- unique(c(as.character(construct_x), as.character(construct_y))),
+    correction_method <- matrix(correction_method, length(unique_constructs), length(unique_constructs)),
+    rownames(correction_method) <- colnames(correction_method) <- unique_constructs)
   }
   
   out <- list(
@@ -207,14 +207,12 @@
     facet_x = facet_x,
     facet_y = facet_y,
     intercor = intercor,
-    correction_metho
+    correction_method = correction_method
     
   ) 
   
   
 }
-
-
 
 
 # List of outputs ---------------------------------------------------------
@@ -226,4 +224,4 @@
 # construct_x & y
 # facet_x & y
 # intercor
-# correct
+# correction_method
