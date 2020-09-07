@@ -20,7 +20,7 @@ The official [CRAN release](https://cran.r-project.org/package=psychmeta) of `ps
 install.packages("psychmeta")
 ```
 
-Development versions of `psychmeta` from [GitHub](https://github.com/jadahlke/psychmeta) reflect updates made to the package between official CRAN releases. The GitHub release can be installed with the following code:
+Development versions of `psychmeta` from [GitHub](https://github.com/psychmeta/psychmeta) reflect updates made to the package between official CRAN releases. The GitHub release can be installed with the following code:
 ```r
 install.packages("remotes")
 remotes::install_github("psychmeta/psychmeta")

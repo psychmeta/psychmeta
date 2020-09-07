@@ -2,7 +2,7 @@ Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
 Version: 2.4.2
-Date: 2020-08-18
+Date: 2020-09-07
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "jdahlke@humrro.org"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
@@ -19,19 +19,20 @@ Depends: R (>= 3.4.0)
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-Imports: dplyr, stats, boot, tibble, reshape2,
-         ggplot2, metafor, progress, tidyr (>= 1.0.0), stringi,
-         stringr, rlang, curl, purrr, data.table
-Suggests: 
-    MASS,
-    mvtnorm,
-    nor1mix, 
-    bib2df,
-    cli, 
-    crayon,
-    rmarkdown,
-    knitr,
-    testthat (>= 2.1.0)
+Imports: dplyr, stats, boot, tibble, reshape2, ggplot2, metafor,
+        progress, tidyr (>= 1.0.0), stringi, stringr, rlang, curl,
+        purrr, data.table
+Suggests: MASS, mvtnorm, nor1mix, bib2df, cli, crayon, rmarkdown,
+        knitr, testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
 NeedsCompilation: no
-Packaged: 2018-05-01 18:29:28 UTC; dahlk068
+Packaged: 2020-09-07 17:03:30 UTC; jeffreydahlke
+Author: Jeffrey A. Dahlke [aut, cre],
+  Brenton M. Wiernik [aut],
+  Wesley Gardiner [ctb] (Unit tests),
+  Michael T. Brannick [ctb] (Testing),
+  Jack Kostal [ctb] (Code for reshape_mat2dat function),
+  Sean Potter [ctb] (Testing; Code for cumulative and leave1out plots),
+  John Sakaluk [ctb] (Code for funnel and forest plots),
+  Yuejia (Mandy) Teng [ctb] (Testing)
+Maintainer: Jeffrey A. Dahlke <jdahlke@humrro.org>
