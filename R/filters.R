@@ -63,6 +63,43 @@ filter_r <- function(r_vec, n_vec){
      keep_id
 }
 
+#' Filter to detect and remove impossible values in vectors of meta-analytic mean correlations and numbers of studies
+#'
+#'
+#' @param r_bar_vec Vector of meta-analytic mean correlations.
+#' @param k_vec Vector of numbers of studies (k values).
+#'
+#' @return List of filtered correlations and numbers of studies.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' ## Not run
+#' ## filter_r_bar(r_bar_vec = c(-.3, .5, 1.1), k_vec = c(100, 100, 100))
+#' ## filter_r_bar(r_bar_vec = c(-.3, .5, .8), k_vec = c(Inf, 100, 100))
+#' ## filter_r_bar(r_bar_vec = c(-.3, .5, .8), k_vec = c(2, 100, 100))
+filter_r_bar <- function(r_bar_vec, k_vec){
+        if (length(r_bar_vec) != length(k_vec)) {
+                stop("Vectors of mean correlations and numbers of studies must have equal numbers of elements", call. = FALSE)
+        }
+
+
+        if(!is.numeric(r_bar_vec)) stop("Correlations must be numeric", call. = FALSE)
+        if(any(is.infinite(r_bar_vec))) stop("Correlations cannot be infinite", call. = FALSE)
+        if(any(abs(r_bar_vec[!is.na(r_bar_vec)]) > 1)) stop("Correlations cannot exceed 1 in absolute value", call. = FALSE)
+
+        if(!is.numeric(k_vec)) stop("Numbers of studies must be numeric", call. = FALSE)
+        if(any(is.infinite(k_vec))) stop("Numbers of studies cannot be infinite", call. = FALSE)
+
+        keep_id <- !is.na(r_bar_vec) & !is.na(k_vec)
+
+        if(sum(keep_id) == 0) stop("No valid sets of correlations and numbers of studies were provided", call. = FALSE)
+        if(any(is.na(r_bar_vec))) warning("Meta-analyses with missing correlations have been identified and will be removed", call. = FALSE)
+        if(any(is.na(k_vec))) warning("Meta-analyses with numbers of studies have been identified and will be removed", call. = FALSE)
+
+        keep_id
+}
+
 #' Screen to detect impossible values in vectors of reliability estimates.
 #'
 #' @param rel_vec Vector of reliability estimates.

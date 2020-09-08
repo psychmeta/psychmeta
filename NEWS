@@ -1,16 +1,45 @@
+Changes in Version 2.4.2 (2020-08-18)
+======================================
+- Fixed a bug in which missing artifacts were sometimes not imputed when resolving dependency among observations.
+
+- Improved standard error for SD_res when var_unbiased == TRUE.
+
+
+Changes in Version 2.4.1 (2020-07-16)
+======================================
+- Restore 'overview' vignette.
+
+
+Changes in Version 2.4.0 (2020-07-11)
+======================================
+- Bug fix in convert_es().
+
+- convert_es() now returns a simple frame with converted effect sizes, variances, and (effective) sample sizes.
+
+- Bug fix in moderator reconciliation.
+
+- Added robustness to variable selection and second-order meta-analysis functions.
+
+
 Changes in Version 2.3.10 (2020-06-07)
 ======================================
 - Bug fix when compositing facets into overall construct variables.
+
 - Bug fix in ma_r_ic.
+
 - Moved packages `MASS`, `tmvtnorm`, and `nor1mix` to "Suggests" to avoid errors some users have encountered when loading `psychmeta` in R 4.0.0.
 
 
 Changes in Version 2.3.9 (2020-06-04)
 =====================================
 - Bug fix when compositing facets into overall construct variables.
+
 - Remove unnecessary S4 class exports.
+
 - Bug fix in get_matrix().
+
 - Fix extraneous warnings in ma_r() when ma_method="ic" since dplyr 1.0.0.
+
 - Print all columns of meta-analysis results tables.
 
 

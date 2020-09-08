@@ -35,6 +35,7 @@
 #' @keywords datagen
 #'
 #' @examples
+#' \dontrun{
 #' ## Generate data for a simple sample with two variables:
 #' simulate_r_sample(n = 1000, rho_mat = matrix(c(1, .5, .5, 1), 2, 2),
 #'           rel_vec = c(.8, .8), sr_vec = c(1, .5), var_names = c("Y", "X"))
@@ -52,6 +53,7 @@
 #' simulate_r_sample(n = 1000, rho_mat = rho_mat,
 #'                 rel_vec = rep(.8, 5), sr_vec = c(1, 1, 1, 1, .5),
 #'                 wt_mat = cbind(c(0, 0, 0, .3, 1), c(1, .3, 0, 0, 0)), sr_composites = c(.7, .5))
+#'}                 
 simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                               mu_vec = rep(0, ncol(rho_mat)), sigma_vec = rep(1, ncol(rho_mat)),
                               sr_vec = rep(1, ncol(rho_mat)), k_items_vec = rep(1, ncol(rho_mat)),
@@ -561,10 +563,10 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                means_x_i <- truncate_mean(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
                sr_overall <- sr_vec[x_col]
           }else{
-               if (!requireNamespace("tmvtnorm", quietly = TRUE)) {
-                       stop("The package 'tmvtnorm' is not installed.\n",
-                            "  'tmvtnorm' is required to estimate population parameters under multivariate selection.\n",
-                            "  Please install 'tmvtnorm'.")
+               if (!requireNamespace("mvtnorm", quietly = TRUE)) {
+                       stop("The package 'mvtnorm' is not installed.\n",
+                            "  'mvtnorm' is required to estimate population parameters under multivariate selection.\n",
+                            "  Please install 'mvtnorm'.")
                }
 
                if (zapsmall(det(S_complete_a[x_col,x_col])) == 0) {
@@ -573,7 +575,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                       call. = FALSE)
                }
 
-               dat_i <- tmvtnorm::mtmvnorm(
+               dat_i <- mtmvnorm(
                        mean = mu_complete_a[x_col],
                        sigma = S_complete_a[x_col,x_col],
                        lower = qnorm(sr_vec[x_col],
@@ -584,7 +586,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
                means_x_i <- dat_i$tmean
                s_mat_i <- dat_i$tvar
                s_mat_i <- zapsmall((s_mat_i + t(s_mat_i)) / 2)
-               sr_overall <- tmvtnorm::ptmvnorm(
+               sr_overall <- ptmvnorm(
                        mean = mu_complete_a[x_col],
                        sigma = S_complete_a[x_col,x_col],
                        lowerx = qnorm(sr_vec[x_col],
@@ -847,6 +849,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #' @keywords datagen
 #'
 #' @examples
+#' \dontrun{
 #' ## Note the varying methods for defining parameters:
 #' n_params = function(n) rgamma(n, shape = 100)
 #' rho_params <- list(c(.1, .3, .5),
@@ -875,6 +878,7 @@ simulate_r_sample <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)),
 #'                   rel_params = rel_params, sr_params = sr_params,
 #'                   sr_composite_params = sr_composite_params, wt_params = wt_params,
 #'                   var_names = c("X", "Y", "Z"), format = "wide")
+#'}
 simulate_r_database <- function(k, n_params, rho_params,
                                 mu_params = 0, sigma_params = 1,
                                 rel_params = 1, sr_params = 1, k_items_params = 1,
