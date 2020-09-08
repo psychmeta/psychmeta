@@ -765,7 +765,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      # whole function. If data are supplied as vectors, then build a model frame
      # the same way that lm() does.
 
-     checked_input <- .check_input(rxyi, n, construct_x, construct_y, sample_id, construct_order, facet_x, facet_y, intercor, correction_method)
+     checked_input <- .check_input(rxyi, n, construct_x, construct_y, sample_id, construct_order, facet_x, facet_y, intercor, correction_method, n_adj)
 
      valid_r <- checked_input[["valid_r"]]
      sample_id = checked_input[["sample_id"]]
@@ -1904,7 +1904,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
         return(list(x = logic_x, y = logic_y))
 }
 
-.check_input <- function(rxyi, n, construct_x, construct_y, sample_id, construct_order, facet_x, facet_y, intercor, correction_method) {
+.check_input <- function(rxyi, n, construct_x, construct_y, sample_id, construct_order, facet_x, facet_y, intercor, correction_method, n_adj) {
         
         valid_r <- filter_r(r_vec = rxyi, n_vec = n)
         
@@ -1928,7 +1928,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
         }
         .check_valid_r(valid_r)
         
-        # Validates the constructs and returns a validated valid_r object
+        # Removes any missing entries from artifact_obj with NA labels
         .validate_construct_xy <- function(valid_r, artifact_obj) {
                 # Messages
                 message_singluar <- paste(" missing", deparse(substitute(artifact_name)), "entry removed: To use this observation, provide a non-NA label")
@@ -1942,8 +1942,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                 } else {
                                         warning(sum(na_xy), message_plural, call. = FALSE)
                                 }
-                                valid_r <- valid_r & !na_xy
-                                return(valid_r)
+                                out <- valid_r & !na_xy
+                        } else {
+                                out <- valid_r
                         }
                 }
         }
@@ -1964,8 +1965,9 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                 } else {
                                         message(sum(na_sample_id), message_plural, call. = FALSE)
                                 }
-                                
                                 sample_id[na_sample_id] <- paste0("psychmeta generated sample ID #", 1:sum(na_sample_id))
+                        } else {
+                                sample_id
                         }
                 }
         }
@@ -2010,22 +2012,23 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
         if (length(facet_x) == 0) facet_x <- rep(NA, length(rxyi))
         if (length(facet_y) == 0) facet_y <- rep(NA, length(rxyi))
         
-        # Checks inheritens
+        # Checks inheriting
         if (inherits(intercor, "control_intercor")) {
                 if (is.list(intercor)) {
                         intercor <- do.call(control_intercor, args = intercor)
                 } else {
-                        intercor <- control_intercor(
-                                rxyi = rxyi,
-                                n = n_adj,
-                                sample_id = sample_id,
-                                construct_x = construct_x,
-                                construct_y = construct_y,
-                                construct_names = unique(c(construct_x, construct_y)),
-                                facet_x = facet_x,
-                                facet_y = facet_y,
-                                intercor_vec = intercor
-                        )
+                        intercor <- 
+                                control_intercor(
+                                        rxyi = rxyi,
+                                        n = n_adj,
+                                        sample_id = sample_id,
+                                        construct_x = construct_x,
+                                        construct_y = construct_y,
+                                        construct_names = unique(c(construct_x, construct_y)),
+                                        facet_x = facet_x,
+                                        facet_y = facet_y,
+                                        intercor_vec = intercor
+                                )
                 }
         }
         
