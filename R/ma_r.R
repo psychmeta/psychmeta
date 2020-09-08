@@ -2110,6 +2110,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 correction_method = correction_method
         )
 }
+
 .collapse_data_list <- function(i, .data) {
         
         dependencies_removed <- .remove_dependency(
