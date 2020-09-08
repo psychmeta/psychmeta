@@ -437,7 +437,11 @@ print.ma_heterogeneity <- function(x, ..., digits = 3){
         cat("Random effects variance estimates")
         cat("\n---------------------------------\n")
 
-        cat("Hunter-Schmidt method:")
+        if (attributes(x)$revc_method == "HS") {
+          cat("Hunter-Schmidt method:")
+        } else {
+          cat("Hunter-Schmidt method (with k-correction):")
+        }
         cat("\n")
         cat("  ", sd_label, "  (tau):   ", round2char(x$HS_method$tau[1], digits = digits),
             ", SE = ", round2char(x$HS_method$tau[2], digits = digits), ", ",

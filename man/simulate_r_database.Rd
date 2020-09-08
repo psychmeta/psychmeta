@@ -93,6 +93,7 @@ with the values to be sampled.
 }
 }
 \examples{
+\dontrun{
 ## Note the varying methods for defining parameters:
 n_params = function(n) rgamma(n, shape = 100)
 rho_params <- list(c(.1, .3, .5),
@@ -121,5 +122,6 @@ simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
                   rel_params = rel_params, sr_params = sr_params,
                   sr_composite_params = sr_composite_params, wt_params = wt_params,
                   var_names = c("X", "Y", "Z"), format = "wide")
+}
 }
 \keyword{datagen}

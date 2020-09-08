@@ -303,10 +303,10 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
                means_x_i <- truncate_mean(a = cut_scores, mean = mu_complete_a[x_col], sd = S_complete_a[x_col,x_col]^.5)
                sr_overall <- sr_vec[x_col]
           } else {
-               if (!requireNamespace("tmvtnorm", quietly = TRUE)) {
-                       stop("The package 'tmvtnorm' is not installed.\n",
-                            "  'tmvtnorm' is required to estimate population parameters under multivariate selection.\n",
-                            "  Please install 'tmvtnorm'.")
+               if (!requireNamespace("mvtnorm", quietly = TRUE)) {
+                       stop("The package 'mvtnorm' is not installed.\n",
+                            "  'mvtnorm' is required to estimate population parameters under multivariate selection.\n",
+                            "  Please install 'mvtnorm'.")
                }
 
                if (zapsmall(det(S_complete_a[x_col,x_col])) == 0) {
@@ -315,7 +315,7 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
                             call. = FALSE)
                }
 
-               dat_i <- tmvtnorm::mtmvnorm(
+               dat_i <- mtmvnorm(
                        mean = mu_complete_a[x_col],
                        sigma = S_complete_a[x_col,x_col],
                        lower = qnorm(sr_vec[x_col],
@@ -325,7 +325,7 @@ simulate_r_sample_noalpha <- function(n, rho_mat, rel_vec = rep(1, ncol(rho_mat)
                means_x_i <- dat_i$tmean
                s_mat_i <- dat_i$tvar
                s_mat_i <- zapsmall((s_mat_i + t(s_mat_i)) / 2)
-               sr_overall <- tmvtnorm::ptmvnorm(
+               sr_overall <- ptmvnorm(
                        mean = mu_complete_a[x_col],
                        sigma = S_complete_a[x_col,x_col],
                        lowerx = qnorm(sr_vec[x_col],

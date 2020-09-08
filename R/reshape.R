@@ -183,10 +183,12 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 #'                       rbind(value = c(1, 2, 3), weight = c(1, 2, 1))))
 #'
 #' ## Simulate with wide format
+#' \dontrun{
 #' data <- simulate_r_database(k = 10, n_params = n_params, rho_params = rho_params,
 #'                           rel_params = rel_params, sr_params = sr_params,
 #'                           sr_composite_params = sr_composite_params, wt_params = wt_params,
 #'                           var_names = c("X", "Y", "Z"), format = "wide")$statistics
+#' }
 #'
 #' ## Define values to abstract from the data object
 #' common_vars <- "sample_id"

@@ -347,7 +347,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      if(any(correct_rxx & !is.na(rxx))) screen_rel(rel_vec = rxx[correct_rxx & !is.na(rxx)], art_name = "rxx")
      if(any(correct_ryy & !is.na(ryy))) screen_rel(rel_vec = ryy[correct_ryy & !is.na(ryy)], art_name = "ryy")
 
-     ## Only organize moderators when the call comes from the user, now when it comes from a master function
+     ## Only organize moderators when the call comes from the user, not when it comes from a master function
      if(is.null(presorted_data)){
           moderator_matrix <- clean_moderators(moderator_matrix = moderators, cat_moderators = cat_moderators, es_vec = rxyi)
           cat_moderator_matrix <- moderator_matrix$cat_moderator_matrix
@@ -356,6 +356,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(is.null(cat_moderator_matrix) & grepl(x = impute_method, "_mod")){
                impute_method <- gsub(x = impute_method, pattern = "_mod", replacement = "_full")
           }
+     } else {
+       # cat_moderator_matrix is used for imputing missing artifacts if needed
+       cat_moderator_matrix <- presorted_data[moderator_names[["cat"]]]
      }
 
      if(any(correct_rr_x | correct_rr_y)){
@@ -363,41 +366,40 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           ux_imputed <- ut_imputed <- ux
           ux_imputed[!ux_observed] <- ut_imputed[ux_observed] <- NA
 
-          if(is.null(presorted_data))
-               if(any(correct_rr_x)){
-                    if(any(is.na(ux_imputed)) & !all(is.na(ux_imputed))){
-                         fyi_messages <- c(fyi_messages, "Imputed missing ux values")
-                         ux_imputed <- impute_artifacts(art_vec = ux_imputed, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "u", n_vec = n)
-                    }
-
-                    subset <- correct_rr_x & indirect_rr_x & !correct_rr_y
-                    if(any(subset)){
-                         if(any(is.na(ut_imputed[subset])) & !all(is.na(ut_imputed[subset]))){
-                              fyi_messages <- c(fyi_messages, "Imputed missing ut values")
-                              ut_imputed[subset] <- impute_artifacts(art_vec = ut_imputed[subset], cat_moderator_matrix = cat_moderator_matrix[subset,], impute_method = impute_method, art_type = "u", n_vec = n[subset])
-                         }
-                    }
-                    ux[is.infinite(ux) | ux <= 0] <- NA
+          if(any(correct_rr_x)){
+               if(any(is.na(ux_imputed)) & !all(is.na(ux_imputed))){
+                    fyi_messages <- c(fyi_messages, "Imputed missing ux values")
+                    ux_imputed <- impute_artifacts(art_vec = ux_imputed, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "u", n_vec = n)
                }
+
+               subset <- correct_rr_x & indirect_rr_x & !correct_rr_y
+               if(any(subset)){
+                    if(any(is.na(ut_imputed[subset])) & !all(is.na(ut_imputed[subset]))){
+                         fyi_messages <- c(fyi_messages, "Imputed missing ut values")
+                         ut_imputed[subset] <- impute_artifacts(art_vec = ut_imputed[subset], cat_moderator_matrix = cat_moderator_matrix[subset,], impute_method = impute_method, art_type = "u", n_vec = n[subset])
+                    }
+               }
+               ux[is.infinite(ux) | ux <= 0] <- NA
+          }
 
           uy_imputed <- up_imputed <- uy
           uy_imputed[!uy_observed] <- up_imputed[uy_observed] <- NA
-          if(is.null(presorted_data))
-               if(any(correct_rr_y)){
-                    if(any(is.na(uy_imputed)) & !all(is.na(uy_imputed))){
-                         fyi_messages <- c(fyi_messages, "Imputed missing uy values")
-                         uy_imputed <- impute_artifacts(art_vec = uy_imputed, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "u", n_vec = n)
-                    }
 
-                    subset <- correct_rr_y & indirect_rr_y & !correct_rr_x
-                    if(any(subset)){
-                         if(any(is.na(up_imputed[subset])) & !all(is.na(up_imputed[subset]))){
-                              fyi_messages <- c(fyi_messages, "Imputed missing up values")
-                              up_imputed[subset] <- impute_artifacts(art_vec = up_imputed[subset], cat_moderator_matrix = cat_moderator_matrix[subset,], impute_method = impute_method, art_type = "u", n_vec = n[subset])
-                         }
-                    }
-                    uy[is.infinite(uy) | uy <= 0] <- NA
+          if(any(correct_rr_y)){
+               if(any(is.na(uy_imputed)) & !all(is.na(uy_imputed))){
+                    fyi_messages <- c(fyi_messages, "Imputed missing uy values")
+                    uy_imputed <- impute_artifacts(art_vec = uy_imputed, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "u", n_vec = n)
                }
+
+               subset <- correct_rr_y & indirect_rr_y & !correct_rr_x
+               if(any(subset)){
+                    if(any(is.na(up_imputed[subset])) & !all(is.na(up_imputed[subset]))){
+                         fyi_messages <- c(fyi_messages, "Imputed missing up values")
+                         up_imputed[subset] <- impute_artifacts(art_vec = up_imputed[subset], cat_moderator_matrix = cat_moderator_matrix[subset,], impute_method = impute_method, art_type = "u", n_vec = n[subset])
+                    }
+               }
+               uy[is.infinite(uy) | uy <= 0] <- NA
+          }
 
           rr_eligible_x <- !is.na(ux) | !is.na(ux_imputed) | !is.na(ut_imputed)
           rr_eligible_y <- !is.na(uy) | !is.na(uy_imputed) | !is.na(up_imputed)
@@ -466,7 +468,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                valid_rxxi <- !is.na(rxxi_vec) & correct_rxx
                valid_rxxa <- !is.na(rxxa_vec) & correct_rxx
 
-               ## Estimate the necessary incumbent relibilities for X
+               ## Estimate the necessary incumbent reliabilities for X
                ## If the u ratio for X is known:
                subset_vec1 <- valid_rxxa & !rxx_restricted & rr_eligible_x & (do_uvirr_x | do_uvdrr_y | do_uvirr_y)
                rxxi_vec[subset_vec1] <- estimate_rxxi(rxxa = rxx[subset_vec1], ux = ux[subset_vec1], ux_observed = ux_observed[subset_vec1], indirect_rr = indirect_rr_x[subset_vec1], rxxa_type = rxx_type[subset_vec1])
@@ -479,39 +481,37 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                  rxx_restricted = ryy_restricted[subset_vec2][!uy_observed[subset_vec2]])
                rxxi_vec[subset_vec2] <- estimate_ryya(ryyi = ryy[subset_vec2], rxyi = rxyi[subset_vec2], ux = uy_temp)
 
-               ## If any of the neceesary reliabilities are missing, run the imputation subroutine
+               ## If any of the necessary reliabilities are missing, run the imputation subroutine
                subset_vec <- correct_rxx & (do_uvirr_x | do_uvdrr_y | do_uvirr_y)
-               if(is.null(presorted_data))
-                    if(any(is.na(rxxi_vec[subset_vec])))
-                         if(any(!is.na(rxxi_vec[subset_vec]))){
-                              fyi_messages <- c(fyi_messages, "Imputed missing rxxi values")
-                              rxxi_vec[subset_vec] <- impute_artifacts(art_vec = rxxi_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
-                         }else{
-                              stop("No non-missing rxxi values could be determined: These values are necessary to compute the requested range-restriction correction.
-                                   To proceed with the present data, set correct_rxx to FALSE.", call. = FALSE)
-                         }
+               if(any(is.na(rxxi_vec[subset_vec])))
+                    if(any(!is.na(rxxi_vec[subset_vec]))){
+                         fyi_messages <- c(fyi_messages, "Imputed missing rxxi values")
+                         rxxi_vec[subset_vec] <- impute_artifacts(art_vec = rxxi_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
+                    }else{
+                         stop("No non-missing rxxi values could be determined: These values are necessary to compute the requested range-restriction correction.\n",
+                              "To proceed with the present data, set correct_rxx to FALSE.", call. = FALSE)
+                    }
                rxxi_vec[!subset_vec] <- NA
 
-               ## Estimate the necessary applicant relibilities for X
+               ## Estimate the necessary applicant reliabilities for X
                ## If the u ratio for X is known:
                subset_vec <- valid_rxxi & rxx_restricted & rr_eligible_x & (do_uvdrr_x | do_uvirr_x | do_bvirr | do_bvdrr)
                rxxa_vec[subset_vec] <- estimate_rxxa(rxxi = rxx[subset_vec], ux = ux[subset_vec], ux_observed = ux_observed[subset_vec], indirect_rr = indirect_rr_x[subset_vec], rxxi_type = rxx_type[subset_vec])
                subset_vec <- (do_uvdrr_x | do_uvirr_x | do_bvirr | do_bvdrr)
                rxxa_vec[!subset_vec] <- NA
 
-               ## If any of the neceesary reliabilities are missing, run the imputation subroutine
-               if(is.null(presorted_data))
-                    if(any(is.na(rxxa_vec[subset_vec])))
-                         if(any(!is.na(rxxa_vec[subset_vec]))){
-                              fyi_messages <- c(fyi_messages, "Imputed missing rxxa values")
-                              rxxa_vec[subset_vec] <- impute_artifacts(art_vec = rxxa_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
-                         }else{
-                              stop("No non-missing rxxa values could be determined: These values are necessary to compute the requested range-restriction correction.
-                                   To proceed with the present data, set correct_rxx to FALSE.", call. = FALSE)
-                         }
-                         }else{
-                              rxxi_vec <- rxxa_vec <- rep(1, length(rxyi))
-                         }
+               ## If any of the necessary reliabilities are missing, run the imputation subroutine
+               if(any(is.na(rxxa_vec[subset_vec])))
+                    if(any(!is.na(rxxa_vec[subset_vec]))){
+                         fyi_messages <- c(fyi_messages, "Imputed missing rxxa values")
+                         rxxa_vec[subset_vec] <- impute_artifacts(art_vec = rxxa_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
+                    }else{
+                         stop("No non-missing rxxa values could be determined: These values are necessary to compute the requested range-restriction correction.\n",
+                              "To proceed with the present data, set correct_rxx to FALSE.", call. = FALSE)
+                    }
+                    }else{
+                         rxxi_vec <- rxxa_vec <- rep(1, length(rxyi))
+                    }
 
           if(!all(!correct_ryy | is.na(ryy))){
                ryyi_vec <- ryya_vec <- ryy
@@ -519,7 +519,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                valid_ryyi <- correct_ryy & !is.na(ryyi_vec)
                valid_ryya <- correct_ryy & !is.na(ryya_vec)
 
-               ## Estimate the necessary incumbent relibilities for Y
+               ## Estimate the necessary incumbent reliabilities for Y
                ## If the u ratio for Y is known:
                subset_vec1 <- valid_ryya & !ryy_restricted & rr_eligible_y & (do_uvirr_y | do_uvdrr_x | do_uvirr_x)
                ryyi_vec[subset_vec1] <- estimate_rxxi(rxxa = ryy[subset_vec1], ux = uy[subset_vec1], ux_observed = uy_observed[subset_vec1], indirect_rr = indirect_rr_y[subset_vec1], rxxa_type = ryy_type[subset_vec1])
@@ -532,39 +532,37 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                                                  rxx_restricted = rxx_restricted[subset_vec2][!ux_observed[subset_vec2]])
                ryyi_vec[subset_vec2] <- estimate_ryya(ryyi = ryy[subset_vec2], rxyi = rxyi[subset_vec2], ux = ux_temp)
 
-               ## If any of the neceesary reliabilities are missing, run the imputation subroutine
+               ## If any of the necessary reliabilities are missing, run the imputation subroutine
                subset_vec <- correct_ryy & (do_uvirr_y | do_uvdrr_x | do_uvirr_x)
-               if(is.null(presorted_data))
-                    if(any(is.na(ryyi_vec[subset_vec])))
-                         if(any(!is.na(ryyi_vec[subset_vec]))){
-                              fyi_messages <- c(fyi_messages, "Imputed missing ryyi values")
-                              ryyi_vec[subset_vec] <- impute_artifacts(art_vec = ryyi_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
-                         }else{
-                              stop("No non-missing ryyi values could be determined: These values are necessary to compute the requested range-restriction correction.
-                                   To proceed with the present data, set correct_ryy to FALSE.", call. = FALSE)
-                         }
+               if(any(is.na(ryyi_vec[subset_vec])))
+                    if(any(!is.na(ryyi_vec[subset_vec]))){
+                         fyi_messages <- c(fyi_messages, "Imputed missing ryyi values")
+                         ryyi_vec[subset_vec] <- impute_artifacts(art_vec = ryyi_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
+                    }else{
+                         stop("No non-missing ryyi values could be determined: These values are necessary to compute the requested range-restriction correction.\n",
+                              "To proceed with the present data, set correct_ryy to FALSE.", call. = FALSE)
+                    }
                ryyi_vec[!(do_uvirr_y | do_uvdrr_x | do_uvirr_x)] <- NA
 
-               ## Estimate the necessary applicant relibilities for Y
+               ## Estimate the necessary applicant reliabilities for Y
                ## If the u ratio for Y is known:
                subset_vec <- valid_ryyi & ryy_restricted & rr_eligible_y & (do_uvdrr_y | do_uvirr_y | do_bvirr | do_bvdrr)
                ryya_vec[subset_vec] <- estimate_rxxa(rxxi = ryy[subset_vec], ux = uy[subset_vec], ux_observed = uy_observed[subset_vec], indirect_rr = indirect_rr_y[subset_vec], rxxi_type = rxx_type[subset_vec])
                subset_vec <- (do_uvdrr_y | do_uvirr_y | do_bvirr | do_bvdrr)
                ryya_vec[!subset_vec] <- NA
 
-               ## If any of the neceesary reliabilities are missing, run the imputation subroutine
-               if(is.null(presorted_data))
-                    if(any(is.na(ryya_vec[subset_vec])))
-                         if(any(!is.na(ryya_vec[subset_vec]))){
-                              fyi_messages <- c(fyi_messages, "Imputed missing ryya values")
-                              ryya_vec[subset_vec] <- impute_artifacts(art_vec = ryya_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
-                         }else{
-                              stop("No non-missing ryya values could be determined: These values are necessary to compute the requested range-restriction correction.
-                                   To proceed with the present data, set correct_ryy to FALSE.", call. = FALSE)
-                         }
-                         }else{
-                              ryyi_vec <- ryya_vec <- rep(1, length(rxyi))
-                         }
+               ## If any of the necessary reliabilities are missing, run the imputation subroutine
+               if(any(is.na(ryya_vec[subset_vec])))
+                    if(any(!is.na(ryya_vec[subset_vec]))){
+                         fyi_messages <- c(fyi_messages, "Imputed missing ryya values")
+                         ryya_vec[subset_vec] <- impute_artifacts(art_vec = ryya_vec, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)[subset_vec]
+                    }else{
+                         stop("No non-missing ryya values could be determined: These values are necessary to compute the requested range-restriction correction.\n",
+                              "To proceed with the present data, set correct_ryy to FALSE.", call. = FALSE)
+                    }
+                    }else{
+                         ryyi_vec <- ryya_vec <- rep(1, length(rxyi))
+                    }
 
           subset_vec <- correct_rxx & is.na(rxxi_vec) & (do_meas | do_uvdrr_y | do_uvirr_y)
           if(any(subset_vec)){
@@ -611,7 +609,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           if(any(is.na(ut_vec[do_uvirr_x]))){
 
-               warning("Some studies' true-score u ratios were undefined for X. \n",
+               warning("Some studies' true-score u ratios were undefined for X.\n",
                        "The following studies will be corrected using uvdrr instead of uvirr:",
                        paste(which(do_uvirr_x & is.na(ut_vec)), collapse = ", "))
 
@@ -623,7 +621,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           }
 
           if(any(is.na(up_vec[do_uvirr_y]))){
-               warning("Some studies' true-score u ratios were undefined for Y. \n",
+               warning("Some studies' true-score u ratios were undefined for Y.\n",
                        "The following studies will be corrected using uvdrr instead of uvirr:",
                        paste(which(do_uvirr_y & is.na(up_vec)), collapse = ", "))
 
@@ -640,7 +638,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           if(any(correct_rxx | correct_ryy)){
                do_meas <- correct_rxx | correct_ryy
                if(any(correct_rxx)){
-                    if(is.null(presorted_data)){
+                    if(any(is.na(rxx))){
                          rxxi_vec <- impute_artifacts(art_vec = rxx, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)
                     }else{
                          rxxi_vec <- rxx
@@ -649,7 +647,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                     rxxi_vec <- 1
                }
                if(any(correct_ryy)){
-                    if(is.null(presorted_data)){
+                    if(any(is.na(ryy))){
                          ryyi_vec <- impute_artifacts(art_vec = ryy, cat_moderator_matrix = cat_moderator_matrix, impute_method = impute_method, art_type = "rel", n_vec = n)
                     }else{
                          ryyi_vec <- ryy
@@ -751,7 +749,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }
 
 
-     ## If a compound attenuation factor is missing, it means division by zero has occured and that the missing values should be set to unity
+     ## If a compound attenuation factor is missing, it means division by zero has occurred and that the missing values should be set to unity
      A_vec[is.na(A_vec)] <- 1
 
      correction_type <- rep("None", length(rxyi))
