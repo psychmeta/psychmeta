@@ -53,8 +53,7 @@ and `Z`, and that each sample contributes several effect sizes, one each for
 for different pairs of variables/constructs.
 
 If your data are in a different format, you can use the `reshape_wide2long()`
-function to reshape it. See the [import_organize](import_organize.html) vignette 
-for details.
+function to reshape it.
 
 ## Estimating a Barebones Meta-Analysis
 
@@ -201,9 +200,6 @@ intervals for differences between levels or an omnibus ANOVA statistic, use the
 ```{r}
 anova(ma_res)
 ```
-
-For additional details on moderator analyses and meta-regression, see
-[Moderator analyses and meta-regression](moderator_analysis.html).
 
 ### Correcting for Statistical Artifacts
 
