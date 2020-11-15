@@ -777,54 +777,54 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      facet_y = checked_input[["facet_y"]]
      intercor = checked_input[["intercor"]]
      correction_method = checked_input[["correction_method"]]
-     
+
      ## Check the lengths of all arguments
      if (ma_method != "bb") {
-             
+
              # distribute correct_rel
-             .correct_rel <- .distribute_logic(logic_general = correct_rel, 
-                                               logic_x = correct_rxx, 
+             .correct_rel <- .distribute_logic(logic_general = correct_rel,
+                                               logic_x = correct_rxx,
                                                logic_y = correct_ryy,
-                                               name_logic_x = "correct_rxx", 
+                                               name_logic_x = "correct_rxx",
                                                name_logic_y = "correct_ryy",
-                                               construct_x = construct_x, 
-                                               construct_y = construct_y, 
+                                               construct_x = construct_x,
+                                               construct_y = construct_y,
                                                es_length = length(rxyi))
              correct_rxx <- .correct_rel[["x"]]
              correct_ryy <- .correct_rel[["y"]]
-             
+
              # distribute correct_rr
-             .correct_rr <- .distribute_logic(logic_general = correct_rr, 
-                                               logic_x = correct_rr_x, 
+             .correct_rr <- .distribute_logic(logic_general = correct_rr,
+                                               logic_x = correct_rr_x,
                                                logic_y = correct_rr_y,
-                                               name_logic_x = "correct_rr_x", 
+                                               name_logic_x = "correct_rr_x",
                                                name_logic_y = "correct_rr_y",
-                                               construct_x = construct_x, 
-                                               construct_y = construct_y, 
+                                               construct_x = construct_x,
+                                               construct_y = construct_y,
                                                es_length = length(rxyi))
              correct_rr_x <- .correct_rr[["x"]]
              correct_rr_y <- .correct_rr[["y"]]
-             
+
              # distribute indirect_rr
-             .indirect_rr <- .distribute_logic(logic_general = indirect_rr, 
-                                                logic_x = indirect_rr_x, 
+             .indirect_rr <- .distribute_logic(logic_general = indirect_rr,
+                                                logic_x = indirect_rr_x,
                                                 logic_y = indirect_rr_y,
-                                                name_logic_x = "indirect_rr_x", 
+                                                name_logic_x = "indirect_rr_x",
                                                 name_logic_y = "indirect_rr_y",
-                                                construct_x = construct_x, 
-                                                construct_y = construct_y, 
+                                                construct_x = construct_x,
+                                                construct_y = construct_y,
                                                 es_length = length(rxyi))
              indirect_rr_x <- .indirect_rr[["x"]]
              indirect_rr_y <- .indirect_rr[["y"]]
-             
+
              # distribute sign_rz
-             .sign_rz <- .distribute_logic(logic_general = sign_rz, 
-                                           logic_x = sign_rxz, 
+             .sign_rz <- .distribute_logic(logic_general = sign_rz,
+                                           logic_x = sign_rxz,
                                            logic_y = sign_ryz,
-                                           name_logic_x = "sign_rxz", 
+                                           name_logic_x = "sign_rxz",
                                            name_logic_y = "sign_ryz",
-                                           construct_x = construct_x, 
-                                           construct_y = construct_y, 
+                                           construct_x = construct_x,
+                                           construct_y = construct_y,
                                            es_length = length(rxyi))
              sign_rxz <- .sign_rz[["x"]]
              sign_ryz <- .sign_rz[["y"]]
@@ -1399,7 +1399,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                              str_moderators = str_moderators
                      )
                   )
-          
+
           collapsed_data <- as.data.frame(data.table::rbindlist(collapsed_data_list), stringsAsFactors = FALSE)
           colnames(collapsed_data)[colnames(collapsed_data) == "es"] <- "rxyi"
           collapsed_data <- collapsed_data[,colnames(full_data_mod)]
@@ -1877,11 +1877,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
         if (!is.null(logic_general)) {
                 .logic_x <- logic_x
                 .logic_y <- logic_y
-                
+
                 construct_x <- as.character(construct_x)
                 construct_y <- as.character(construct_y)
                 unique_constructs <- unique(c(construct_x, construct_y))
-                
+
                 if (!is.null(.logic_x)) {
                         if (length(.logic_x) == 1) {
                                 logic_x <- rep(.logic_x, es_length)
@@ -1891,7 +1891,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 } else {
                         logic_x <- rep(formals(reference_function)[[name_logic_x]], es_length)
                 }
-                
+
                 if (!is.null(.logic_y)) {
                         if (length(.logic_y) == 1) {
                                 logic_y <- rep(.logic_y, es_length)
@@ -1901,7 +1901,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 } else {
                         logic_y <- rep(formals(reference_function)[[name_logic_y]], es_length)
                 }
-                
+
                 for (construct in unique_constructs) {
                         if (any(names(logic_general) == construct)) {
                                 logic_x[construct_x == construct] <- logic_general[construct]
@@ -1920,18 +1920,18 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 }
 
 .check_input <- function(rxyi, n, construct_x, construct_y, sample_id, construct_order, facet_x, facet_y, intercor, correction_method, n_adj) {
-        
+
         valid_r <- filter_r(r_vec = rxyi, n_vec = n)
-        
+
         # Checks for any issues with valid_r
         .check_valid_r <- function(valid_r) {
                 # Checks for a valid_r
                 if (all(!valid_r)) stop("No valid correlations and/or sample sizes provided", call. = FALSE)
-                
+
                 # Messages
                 message_singular <- " invalid correlation and/or sample size detected: Offending entry has been removed"
                 message_plural <- " invalid correlations and/or sample sizes detected: Offending entries have been removed"
-                
+
                 # Checks for validity
                 if (sum(!valid_r) > 0) {
                         if (sum(!valid_r) == 1) {
@@ -1942,13 +1942,13 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 }
         }
         .check_valid_r(valid_r)
-        
+
         # Removes any missing entries from artifact_obj with NA labels
         .validate_construct_xy <- function(valid_r, artifact_obj) {
                 # Messages
                 message_singluar <- paste(" missing", deparse(substitute(artifact_name)), "entry removed: To use this observation, provide a non-NA label")
                 message_plural <- paste(" missing", deparse(substitute(artifact_name)), "entries removed: To use these observations, provide non-NA labels")
-                
+
                 if (!is.null(artifact_obj)) {
                         na_xy <- is.na(artifact_obj)
                         if (any(na_xy)) {
@@ -1961,17 +1961,20 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                         } else {
                                 out <- valid_r
                         }
+                } else {
+                  out <- valid_r
                 }
+                out
         }
         valid_r <- .validate_construct_xy(valid_r, construct_x)
         valid_r <- .validate_construct_xy(valid_r, construct_y)
-        
+
         # Validates sample_id and returns and fixed NA sample_ids
         .validate_sample_id <- function(sample_id) {
                 # Messages
                 message_singular <- " missing sample_id label identified: Missing label has been replaced by a generic designator"
                 message_plural <- " missing sample_id labels identified: Missing labels have been replaced by unique generic designators"
-                
+
                 if (!is.null(sample_id)) {
                         na_sample_id <- is.na(sample_id)
                         if (any(na_sample_id)) {
@@ -1981,28 +1984,27 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                         message(sum(na_sample_id), message_plural, call. = FALSE)
                                 }
                                 sample_id[na_sample_id] <- paste0("psychmeta generated sample ID #", 1:sum(na_sample_id))
-                        } else {
-                                sample_id
                         }
                 }
+                sample_id
         }
         sample_id <- .validate_sample_id(sample_id)
-        
+
         if (!is.null(construct_order)) {
-                
+
                 # Checks for any non-unique values within construct_order
                 if (any(duplicated(construct_order))) {
                         message("Each element of 'construct_order' must have a unique value: First occurence of each value used", call. = FALSE)
                         construct_order <- construct_order[!duplicated(construct_order)]
                 }
-                
+
                 # Checks for any invalid construct names and removes them
                 if (!is.null(construct_x) | !is.null(construct_y)) {
                         keep_construct <- as.character(construct_order) %in% c(as.character(construct_x), as.character(construct_y))
                         if (any(!keep_construct)) warning("'construct_order' contained invalid construct names: Invalid names removed", call. = FALSE)
                         construct_order <- construct_order[keep_construct]
                 }
-                
+
                 # Checks for valid construct combinations
                 if (!is.null(construct_x) & !is.null(construct_y)) {
                         valid_r <- valid_r & construct_x %in% construct_order & construct_y %in% construct_order
@@ -2010,29 +2012,29 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                         if (!is.null(construct_x)) valid_r <- valid_r & construct_x %in% construct_order
                         if (!is.null(construct_y)) valid_r <- valid_r & construct_y %in% construct_order
                 }
-                
+
                 # Checks for non-valid construct combinations
                 if (all(!valid_r)) stop("No valid construct combinations provided", call. = FALSE)
         }
-        
+
         if (length(construct_x) == 1) construct_x <- rep(construct_x, length(rxyi))
         if (length(construct_y) == 1) construct_y <- rep(construct_y, length(rxyi))
-        
+
         if (is.null(construct_x)) construct_x <- rep("X", length(rxyi))
         if (is.null(construct_y)) construct_y <- rep("Y", length(rxyi))
-        
+
         if (length(facet_x) == 1) facet_x <- rep(facet_x, length(rxyi))
         if (length(facet_y) == 1) facet_y <- rep(facet_y, length(rxyi))
-        
+
         if (length(facet_x) == 0) facet_x <- rep(NA, length(rxyi))
         if (length(facet_y) == 0) facet_y <- rep(NA, length(rxyi))
-        
+
         # Checks inheriting
         if (inherits(intercor, "control_intercor")) {
                 if (is.list(intercor)) {
                         intercor <- do.call(control_intercor, args = intercor)
                 } else {
-                        intercor <- 
+                        intercor <-
                                 control_intercor(
                                         rxyi = rxyi,
                                         n = n_adj,
@@ -2046,33 +2048,33 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                 )
                 }
         }
-        
+
         # End of checking 1 -------------------------------------------------------
-        
+
         #### Extract construct-pair-specific correction methods ####
         # TODO: Move to separate function
         # TODO: Also accept a 3-column data frame
-        
+
         .check_corr_method_names <- function(correction_method) {
                 .colnames <- colnames(correction_method)
                 .rownames <- rownames(correction_method)
-                
+
                 if (length(.colnames) != length(.rownames)) {
                         stop("If correction_method is a matrix, it must be square", call. = FALSE)
                 }
-                
+
                 if (!all(.colnames %in% .rownames)) {
                         stop("Row names and column names of correction_method must contain the same levels", call. = FALSE)
                 }
         }
-        
+
         .check_corr_method_names(correction_method)
-        
-        
+
+
         if (is.matrix(correction_method)) {
                 .colnames <- colnames(correction_method)
                 .correction_method <- correction_method <- correction_method[.colnames, .colnames]
-                
+
                 for (i in .colnames) {
                         for (j in .colnames) {
                                 if (i != j) {
@@ -2097,7 +2099,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 correction_method <- matrix(correction_method, length(unique_constructs), length(unique_constructs))
                 rownames(correction_method) <- colnames(correction_method) <- unique_constructs
         }
-        
+
         out <- list(
                 valid_r = valid_r,
                 sample_id = sample_id,
@@ -2112,7 +2114,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 }
 
 .collapse_data_list <- function(i, .data) {
-        
+
         dependencies_removed <- .remove_dependency(
                 sample_id = .data$sample_id,
                 citekey = .data$citekey,
@@ -2133,11 +2135,11 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                 ma_method = .data$ma_method,
                 .dx_internal_designation = .data$.dx_internal_designation
         )
-        
+
         dependencies_removed$use_for_arts <- .data$duplicates$use_for_arts[1]
         out <- as.data.frame(
                 cbind(as_tibble(.data$duplicates, .name_repair = "minimal")[i, c("analysis_id", "analysis_type", .data$str_moderators)][1, ], dependencies_removed), stringsAsFactors = FALSE)
-        
+
         return(out)
 
 }
