@@ -30,7 +30,7 @@ The bias correction is estimated as:
 where \eqn{\Delta}{delta} is the observed effect size, \eqn{\Delta_{c}}{delta_c} is the
 corrected estimate of \ifelse{latex}{\eqn{\Delta}}{\ifelse{html}{\out{&#916;}}{delta}},
 \eqn{n_{control}}{nc} is the control-group sample size, and
-\eqn{\Gamma()}{gamma()} is the \link[base:gamma]{gamma function}.
+\eqn{\Gamma()}{gamma()} is the \link[base:Special]{gamma function}.
 }
 \examples{
 correct_glass_bias(delta = .3, nc = 30, ne = 30)
