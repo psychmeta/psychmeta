@@ -233,13 +233,13 @@
           data_x <- NULL
      }else{
           rownames(data_x) <- 1:nrow(es_data)
-          es_data <- data.frame(es_data, data_x, stringsAsFactors = FALSE)
+          es_data <- data.frame(es_data, data_x, stringsAsFactors = FALSE, check.names = FALSE)
      }
      if(nrow(data_y) == 0){
           data_y <- NULL
      }else{
           rownames(data_y) <- 1:nrow(es_data)
-          es_data <- data.frame(es_data, data_y, stringsAsFactors = FALSE)
+          es_data <- data.frame(es_data, data_y, stringsAsFactors = FALSE, check.names = FALSE)
      }
 
      es_data

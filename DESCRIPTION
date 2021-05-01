@@ -19,11 +19,19 @@ Depends: R (>= 3.4.0)
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-Imports: dplyr, stats, boot, tibble, reshape2, ggplot2, metafor,
-        progress, tidyr (>= 1.0.0), stringi, stringr, rlang, curl,
-        purrr, data.table
-Suggests: MASS, mvtnorm, nor1mix, bib2df, cli, crayon, rmarkdown,
-        knitr, testthat (>= 2.1.0)
+Imports: dplyr, stats, boot, tibble, reshape2,
+         ggplot2, metafor, progress, tidyr (>= 1.0.0), stringi,
+         stringr, rlang, curl, purrr, data.table
+Suggests: 
+    MASS,
+    mvtnorm,
+    nor1mix, 
+    bib2df,
+    cli, 
+    crayon,
+    rmarkdown,
+    knitr,
+    testthat (>= 2.1.0)
 RoxygenNote: 7.1.1
 NeedsCompilation: no
 Packaged: 2020-09-07 17:03:30 UTC; jeffreydahlke
