@@ -28,7 +28,7 @@ where
 
 and \eqn{d_{obs}}{d} is the observed effect size, \eqn{g = d_{c}}{g = d_c} is the
 corrected (unbiased) estimate, \eqn{n}{n} is the total sample size, and
-\eqn{\Gamma()}{gamma()} is the \link[base:gamma]{gamma function}.
+\eqn{\Gamma()}{gamma()} is the \link[base:Special]{gamma function}.
 
 Historically, using the gamma function was computationally intensive, so an
 approximation for \eqn{J} was used (Borenstein et al., 2009):
