@@ -43,7 +43,8 @@ predict.summary.lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
           slope_ids <- rep(TRUE, length(slopes))
      }
      x_star <- c(as.matrix(newdata[,rownames(object$coefficients)[slope_ids]]) %*% slopes)
-     df <- object$ftest["n"] - 2
+     n <- as.numeric(object$ftest["n"])
+     df <- as.numeric(object$ftest["df2"])
      pred.var <- object$sigma^2
      
      fit <- as.numeric(intercept + x_star)
@@ -66,34 +67,32 @@ predict.summary.lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
           if(is.infinite(object[["ftest"]]["n"])){
                stop("Sample size must be finite to compute standard errors or intervals", call. = F)
           }else{
-               fit.se <- sqrt(diag(cbind(1, as.matrix(newdata)) %*% (object$cov.unscaled * pred.var) %*% t(cbind(1, as.matrix(newdata)))))
-               pred.se <- pred.var^.5 * sqrt(1 + 1 / object$ftest["n"] + (x_star - object$composite["mean"])^2 / (object$composite["var"] * (object$ftest["n"] - 1)))
-               
-               fit.se <- as.numeric(fit.se)
+                pred_names <- rownames(object$coefficients)[rownames(object$coefficients) != "(Intercept)"]
+               fit.se <- as.numeric(sqrt(diag(cbind(1, as.matrix(newdata[,pred_names])) %*% (object$XRinv * pred.var) %*% t(cbind(1, as.matrix(newdata[,pred_names]))))))
+
                if(length(fit.se) > 1) fit.se <- setNames(fit.se, 1:length(fit.se))
                
                if(interval == "none"){
                     lower <- upper <- NULL
                }else{
-                    if(interval == "confidence"){
-                         int.se <- fit.se
-                    }
-                    if(interval == "prediction"){
-                         int.se <- pred.se
-                    }
-                    
-                    lower <- fit - qt((1 - level) / 2, df = df, lower.tail = F) * int.se
-                    upper <- fit + qt((1 - level) / 2, df = df, lower.tail = F) * int.se
-                    
+                       if(interval == "confidence"){
+                               int.range <- qt((1 - level) / 2, df = df, lower.tail = F) * fit.se
+                       }
+                       if(interval == "prediction"){
+                               int.range <- qt((1 - level) / 2, df = df, lower.tail = F) * sqrt(fit.se^2 + pred.var)
+                       }
+                       lower <- fit - int.range
+                       upper <- fit + int.range
+                       
                     fit <- data.frame(fit = fit, lwr = lower, upr = upper, stringsAsFactors = FALSE)
                }
           }
      }
-     
+     object$ftest
      if(se.fit){
           list(fit = fit,
                se.fit = fit.se,
-               df = as.numeric(object$ftest["n"] - 2),
+               df = as.numeric(object$ftest["df2"]),
                residual.scale = object$sigma)
      }else{
           fit

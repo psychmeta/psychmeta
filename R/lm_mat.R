@@ -164,8 +164,8 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
      var_vec <- setNames(diag(S), rownames(S))
      if(!is.infinite(n)){
           .mean_vec <- c(1, mean_vec[x_col])
-          cov.unscaled <- solve((t(t(.mean_vec)) %*% t(.mean_vec) * n + rbind(0, cbind(0, S[x_col,x_col])) * (n - 1)))
-          dimnames(cov.unscaled) <- list(c("(Intercept)", x_col),
+          XRinv <- solve((t(t(.mean_vec)) %*% t(.mean_vec) * n + rbind(0, cbind(0, S[x_col,x_col])) * (n - 1)))
+          dimnames(XRinv) <- list(c("(Intercept)", x_col),
                                          c("(Intercept)", x_col))
 
           df1 <- length(x_col)
@@ -196,7 +196,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
 
      }else{
           R2adj <- R2
-          cov.unscaled <- NULL
+          XRinv <- NULL
           df1 <- df2 <- F_ratio <- p_F <- NA
           se_beta <- se_b <- t <- p_t <- matrix(NA, length(R2), length(hat))
           se_reg <- sqrt(1 - R2) * var_vec[y_col]^.5
@@ -211,7 +211,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
      b0 <- -(comp_mean - mean_vec[y_col])
      ss_comp <- n * comp_mean^2 + (n - 1) * comp_var
      ss_devs <- n * (n - 1) * comp_var
-     se_b0 <- as.numeric(sqrt(se_reg^2 * diag(cov.unscaled)[1]))
+     se_b0 <- as.numeric(sqrt(se_reg^2 * diag(XRinv)[1]))
 
      se_beta0 <- sqrt(1 - R2adj) * sqrt(1 / n)
      t0 <- b0 / se_b0
@@ -254,7 +254,7 @@ lm_mat <- function(formula, cov_mat, mean_vec = rep(0, ncol(cov_mat)), n = Inf,
                           r.squared = R2,
                           adj.r.squared = R2adj,
                           fstatistic = c(value = F_ratio, numdf = df1, dendf = df2, n = n, p = p_F),
-                          cov.unscaled = cov.unscaled,
+                          XRinv = XRinv,
                           ftest = c(value = F_ratio, df1 = df1, df2 = df2, n = n, p = p_F),
                           coefficients.std = beta_mat,
                           composite = c(mean = comp_mean, var = comp_var),
