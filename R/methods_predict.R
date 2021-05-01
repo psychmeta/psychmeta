@@ -68,7 +68,7 @@ predict.summary.lm_mat <- function(object, newdata, se.fit = FALSE, df = Inf,
                stop("Sample size must be finite to compute standard errors or intervals", call. = F)
           }else{
                 pred_names <- rownames(object$coefficients)[rownames(object$coefficients) != "(Intercept)"]
-               fit.se <- as.numeric(sqrt(diag(cbind(1, as.matrix(newdata[,pred_names])) %*% (object$cov.unscaled * pred.var) %*% t(cbind(1, as.matrix(newdata[,pred_names]))))))
+               fit.se <- as.numeric(sqrt(diag(cbind(1, as.matrix(newdata[,pred_names])) %*% (object$XRinv * pred.var) %*% t(cbind(1, as.matrix(newdata[,pred_names]))))))
 
                if(length(fit.se) > 1) fit.se <- setNames(fit.se, 1:length(fit.se))
                
