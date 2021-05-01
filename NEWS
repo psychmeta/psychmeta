@@ -1,3 +1,10 @@
+Changes in Version 2.5.0 (2021-05-01)
+======================================
+- Added var_error_spearman(), var_error_mult_R(), and var_error_mult_Rsq() functions.
+
+- Made internal code updates to improve performance.
+
+
 Changes in Version 2.4.2 (2020-08-18)
 ======================================
 - Fixed a bug in which missing artifacts were sometimes not imputed when resolving dependency among observations.

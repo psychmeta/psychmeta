@@ -40,5 +40,5 @@ var_error_d(d = 1, n1 = 60, n2 = NA, correct_bias = TRUE)
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. pp. 292–295.
+\doi{10.4135/9781483398105}. pp. 292–295.
 }

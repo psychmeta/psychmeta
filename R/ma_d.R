@@ -531,6 +531,7 @@ ma_d <- function(d, n1, n2 = NULL, n_adj = NULL, sample_id = NULL, citekey = NUL
      pa[is.na(pa)] <- pi[is.na(pa)]
 
      ## Compute meta-analysis
+     # TODO: Use functions pulled out from ma_r() instead
      out <- ma_r(ma_method = ma_method, ad_type = ad_type, correction_method = correction_method, citekey = citekey,
                  rxyi = rxyi, n = n, n_adj = n_adj, sample_id = sample_id,
                  construct_x = group_id, construct_y = construct_y,

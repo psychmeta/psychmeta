@@ -108,25 +108,50 @@ plot_funnel <- function(ma_obj,
           if (se_type == "mean") {
             mean_es <- wt_mean(barebones$yi, barebones$weight)
             if (ma_metric %in% c("d_as_r", "d_as_d")) {
-              barebones$vi <- var_error_d(d  = mean_es,
-                                          n1 = barebones$n1_split,
-                                          n2 = barebones$n2_split,
-                                          correct_bias = FALSE)
+              barebones <- lapply(
+                barebones,
+                function(d) {
+                  d$vi <- var_error_d(d  = mean_es,
+                                                n1 = d$n1_split,
+                                                n2 = d$n2_split,
+                                                correct_bias = FALSE)
+                  return(d)
+                }
+              )
+              barebones$vi
             } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
-              barebones$vi <- var_error_r(r = mean_es,
-                                          n = barebones$n,
-                                          correct_bias = FALSE)
+              barebones <- lapply(
+                barebones,
+                function(d) {
+                  d$vi <- var_error_r(r = mean_es,
+                                                n = d$n,
+                                                correct_bias = FALSE)
+                  return(d)
+                }
+              )
             } else warning("se_type == 'mean' not supported for generic meta-analyses.")
           } else if (se_type == "sample") {
             if (ma_metric %in% c("d_as_r", "d_as_d")) {
-              barebones$vi <- var_error_d(d  = barebones$yi,
-                                          n1 = barebones$n1_split,
-                                          n2 = barebones$n2_split,
-                                          correct_bias = FALSE)
+              barebones <- lapply(
+                barebones,
+                function(d) {
+                  d$vi <- var_error_d(d  = d$yi,
+                                                n1 = d$n1_split,
+                                                n2 = d$n2_split,
+                                                correct_bias = FALSE)
+                  return(d)
+                }
+              )
             } else if (ma_metric %in% c("r_as_r", "r_as_d")) {
-              barebones$vi <- var_error_r(r = barebones$yi,
-                                          n = barebones$n,
-                                          correct_bias = FALSE)
+              barebones <- lapply(
+                barebones,
+                function(d) {
+                  d$vi <- var_error_r(r = d$yi,
+                                                n = d$n,
+                                                correct_bias = FALSE)
+                  return(d)
+                }
+              )
             }
           }
           barebones <- lapply(barebones, .plot_funnel,
