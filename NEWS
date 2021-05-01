@@ -1,3 +1,7 @@
+Changes in Version 2.5.0 (2021-05-01)
+======================================
+- 
+
 Changes in Version 2.4.2 (2020-08-18)
 ======================================
 - Fixed a bug in which missing artifacts were sometimes not imputed when resolving dependency among observations.
