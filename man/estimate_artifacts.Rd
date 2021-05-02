@@ -163,17 +163,17 @@ estimate_rxxi_u(ux = c(.7, .8), ut = c(.65, .75))
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg} p. 127.
+Thousand Oaks, CA: Sage. \doi{10/b6mg} p. 127.
 
 Le, H., & Schmidt, F. L. (2006).
 Correcting for indirect range restriction in meta-analysis: Testing a new meta-analytic procedure.
-\emph{Psychological Methods, 11}(4), 416–438. \url{https://doi.org/10.1037/1082-989X.11.4.416}
+\emph{Psychological Methods, 11}(4), 416–438. \doi{10.1037/1082-989X.11.4.416}
 
 Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 Implications of direct and indirect range restriction for meta-analysis methods and findings.
-\emph{Journal of Applied Psychology, 91}(3), 594–612. \url{https://doi.org/10.1037/0021-9010.91.3.594}
+\emph{Journal of Applied Psychology, 91}(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
 
 Le, H., Oh, I.-S., Schmidt, F. L., & Wooldridge, C. D. (2016).
 Correction for range restriction in meta-analysis revisited: Improvements and implications for organizational research.
-\emph{Personnel Psychology, 69}(4), 975–1008. \url{https://doi.org/10.1111/peps.12122}
+\emph{Personnel Psychology, 69}(4), 975–1008. \doi{10.1111/peps.12122}
 }

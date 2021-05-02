@@ -59,5 +59,5 @@ San Francisco, CA: Freeman. p. 163-164.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. pp. 441 - 447.
+Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
 }

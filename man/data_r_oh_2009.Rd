@@ -23,6 +23,6 @@ Oh, I. -S. (2009).
 
 Schmidt, F. L., & Oh, I.-S. (2013).
 Methods for second order meta-analysis and illustrative applications.
-\emph{Organizational Behavior and Human Decision Processes, 121}(2), 204–218. \url{https://doi.org/10.1016/j.obhdp.2013.03.002}
+\emph{Organizational Behavior and Human Decision Processes, 121}(2), 204–218. \doi{10.1016/j.obhdp.2013.03.002}
 }
 \keyword{datasets}

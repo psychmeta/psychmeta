@@ -70,25 +70,25 @@ ma_obj$heterogeneity[[1]]$artifact_distribution$latentGroup_latentY
 Becker, B. J. (2005).
 Failsafe \emph{N} or file-drawer number.
 In H. R. Rothstein, A. J. Sutton, & M. Borenstein (Eds.),
-\emph{Publication bias in meta-analysis: Prevention, assessment and adjustments} (pp. 111–125). Hoboken, NJ: Wiley. \url{https://doi.org/10.1002/0470870168.ch7}
+\emph{Publication bias in meta-analysis: Prevention, assessment and adjustments} (pp. 111–125). Hoboken, NJ: Wiley. \doi{10.1002/0470870168.ch7}
 
 Higgins, J. P. T., & Thompson, S. G. (2002).
 Quantifying heterogeneity in a meta-analysis.
-\emph{Statistics in Medicine, 21}(11), 1539–1558. \url{https://doi.org/10.1002/sim.1186}
+\emph{Statistics in Medicine, 21}(11), 1539–1558. \doi{10.1002/sim.1186}
 
 Lin, L., Chu, H., & Hodges, J. S. (2017).
 Alternative measures of between-study heterogeneity in meta-analysis: Reducing the impact of outlying studies.
-\emph{Biometrics, 73}(1), 156–166. \url{https://doi.org/10.1111/biom.12543}
+\emph{Biometrics, 73}(1), 156–166. \doi{10.1111/biom.12543}
 
 Schmidt, F. (2010).
 Detecting and correcting the lies that data tell.
-\emph{Perspectives on Psychological Science, 5}(3), 233–242. \url{https://doi.org/10.1177/1745691610369339}
+\emph{Perspectives on Psychological Science, 5}(3), 233–242. \doi{10.1177/1745691610369339}
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. pp. 15, 414, 426, 533–534.
+Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 15, 414, 426, 533–534.
 
 Wiernik, B. M., Kostal, J. W., Wilmot, M. P., Dilchert, S., & Ones, D. S. (2017).
 Empirical benchmarks for interpreting effect size variability in meta-analysis.
-\emph{Industrial and Organizational Psychology, 10}(3). \url{https://doi.org/10.1017/iop.2017.44}
+\emph{Industrial and Organizational Psychology, 10}(3). \doi{10.1017/iop.2017.44}
 }

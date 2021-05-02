@@ -77,8 +77,8 @@ Available functions include:
 }
 \references{
 Bohrnstedt, G. W., & Goldberger, A. S. (1969). On the exact covariance of products of random variables.
-\emph{Journal of the American Statistical Association, 64}(328), 1439. \url{https://doi.org/10.2307/2286081}
+\emph{Journal of the American Statistical Association, 64}(328), 1439. \doi{10.2307/2286081}
 
 Goodman, L. A. (1960). On the exact variance of products.
-\emph{Journal of the American Statistical Association, 55}(292), 708. \url{https://doi.org/10.2307/2281592}
+\emph{Journal of the American Statistical Association, 55}(292), 708. \doi{10.2307/2281592}
 }

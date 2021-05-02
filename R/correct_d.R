@@ -62,7 +62,7 @@ correct_d_bias <- function(d, n){
 #' @references
 #' Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect
 #' size and related estimators. *Journal of Educational Statistics, 6*(2),
-#' 107–128. <https://doi.org/10.2307/1164588>
+#' 107–128. \doi{10.2307/1164588}
 #'
 #' @details
 #' The bias correction is estimated as:
@@ -126,26 +126,25 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' Correcting doubly truncated correlations: An improved approximation for
 #' correcting the bivariate normal correlation when truncation has occurred on
 #' both variables. *Educational and Psychological Measurement, 47*(2), 309–315.
-#' <https://doi.org/10.1177/0013164487472002>
+#' \doi{10.1177/0013164487472002}
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006). Implications of direct and
 #' indirect range restriction for meta-analysis methods and findings.
 #' *Journal of Applied Psychology, 91*(3), 594–612.
-#' <https://doi.org/10.1037/0021-9010.91.3.594>
+#' \doi{10.1037/0021-9010.91.3.594}
 #'
 #' Le, H., Oh, I.-S., Schmidt, F. L., & Wooldridge, C. D. (2016).
 #' Correction for range restriction in meta-analysis revisited:
 #' Improvements and implications for organizational research.
-#' *Personnel Psychology, 69*(4), 975–1008. <https://doi.org/10.1111/peps.12122>
+#' *Personnel Psychology, 69*(4), 975–1008. \doi{10.1111/peps.12122}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
-#' SAGE Publications. <https://doi.org/10.4135/9781483398105>. pp. 43–44, 140–141.
+#' SAGE Publications. \doi{10.4135/9781483398105}. pp. 43–44, 140–141.
 #'
 #' @md
 #'

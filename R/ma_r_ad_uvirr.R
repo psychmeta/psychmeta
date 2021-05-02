@@ -8,15 +8,15 @@
 #' @references
 #' Le, H., & Schmidt, F. L. (2006).
 #' Correcting for indirect range restriction in meta-analysis: Testing a new meta-analytic procedure.
-#' \emph{Psychological Methods, 11}(4), 416–438. \url{https://doi.org/10.1037/1082-989X.11.4.416}
+#' \emph{Psychological Methods, 11}(4), 416–438. \doi{10.1037/1082-989X.11.4.416}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 4.
+#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. Chapter 4.
 #'
 #' Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
-#' \emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
+#' \emph{Journal of Applied Psychology, 79}(3), 425–438. \doi{10.1037/0021-9010.79.3.425}
 #'
 #' @keywords internal
 "ma_r_ad.int_uvirr" <- function(x){
@@ -220,7 +220,7 @@
 #' @references
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 #' Implications of direct and indirect range restriction for meta-analysis methods and findings.
-#' \emph{Journal of Applied Psychology, 91}(3), 594–612. \url{https://doi.org/10.1037/0021-9010.91.3.594}
+#' \emph{Journal of Applied Psychology, 91}(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
 #' @keywords internal
 "ma_r_ad.tsa_uvirr" <- function(x){
 

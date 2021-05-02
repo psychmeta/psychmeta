@@ -226,20 +226,19 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 4.
+#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. Chapter 4.
 #'
 #' Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
-#' \emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
+#' \emph{Journal of Applied Psychology, 79}(3), 425–438. \doi{10.1037/0021-9010.79.3.425}
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' Raju, N. S., & Burke, M. J. (1983).
 #' Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \url{https://doi.org/10.1037/0021-9010.68.3.382}
+#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
 #'
 #' @examples
 #' \dontrun{
@@ -514,9 +513,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
                  supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
-
-     # TODO: Deprecate cat_moderators and replace with subgroup_moderators
-
+        
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
@@ -1498,8 +1495,6 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                                         construct_order = construct_order,
                                         data = data.frame(es_data, construct_x = construct_x, construct_y = construct_y, data_x, data_y, stringsAsFactors = FALSE)[use_for_arts,],
                                         control_only = TRUE, process_ads = FALSE, ...)
-
-          # TODO: Why are we doing this with IC analyses?
 
           ad_obj_list_tsa <- join_adobjs(ad_type = "tsa",
                                          primary_ads = ad_obj_list,

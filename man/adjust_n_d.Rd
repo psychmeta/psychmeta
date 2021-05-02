@@ -30,5 +30,5 @@ adjust_n_d(d = 1, var_e = .03, p = NA)
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. Chapter 7 (Equations 7.23 and 7.23a).
+Thousand Oaks, CA: SAGE. \doi{10/b6mg}. Chapter 7 (Equations 7.23 and 7.23a).
 }

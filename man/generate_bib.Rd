@@ -29,7 +29,7 @@ generate_bib(
 
 \item{title.bib}{The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
 
-\item{style}{What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
+\item{style}{What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://www.zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
 
 \item{additional_citekeys}{Additional citekeys to include in the reference list.}
 

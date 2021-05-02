@@ -19,6 +19,6 @@ data(data_r_mcdaniel_1994)
 \references{
 McDaniel, M. A., Whetzel, D. L., Schmidt, F. L., & Maurer, S. D. (1994).
 The validity of employment interviews: A comprehensive review and meta-analysis.
-\emph{Journal of Applied Psychology, 79}(4), 599–616. \url{https://doi.org/10.1037/0021-9010.79.4.599}
+\emph{Journal of Applied Psychology, 79}(4), 599–616. \doi{10.1037/0021-9010.79.4.599}
 }
 \keyword{datasets}

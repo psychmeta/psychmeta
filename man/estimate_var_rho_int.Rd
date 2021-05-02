@@ -100,5 +100,5 @@ Available functions include:
 \references{
 Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
-\emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
+\emph{Journal of Applied Psychology, 79}(3), 425–438. \doi{10.1037/0021-9010.79.3.425}
 }

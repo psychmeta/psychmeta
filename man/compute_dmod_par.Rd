@@ -103,7 +103,7 @@ compute_dmod_par(referent_int = -.05, referent_slope = .5,
                  focal_names = NULL, rescale_cdf = TRUE)
 }
 \references{
-Nye, C. D., & Sackett, P. R. (2016).
+Nye, C. D., & Sackett, P. R. (2017).
 New effect sizes for tests of categorical moderation and differential prediction.
-\emph{Organizational Research Methods}, https://doi.org/10.1177/1094428116644505.
+\emph{Organizational Research Methods, 20}(4), 639–664. \doi{10.1177/1094428116644505}
 }

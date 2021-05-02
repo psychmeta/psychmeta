@@ -371,15 +371,14 @@ estimate_var_rho_tsa_rb2(mean_rtpa = .5, var_rxyi = .02, var_e = .01,
                 mean_qy = .8, var_qy = .005)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 Accounting for indirect range restriction in organizational research.
-\emph{Organizational Research Methods}. Advance online publication.
-\url{https://doi.org/10.1177/1094428119859398}
+\emph{Organizational Research Methods, 23}(4), 717–749. \doi{10.1177/1094428119859398}
 
 Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 Implications of direct and indirect range restriction for meta-analysis methods and findings.
-\emph{Journal of Applied Psychology, 91}(3), 594–612. \url{https://doi.org/10.1037/0021-9010.91.3.594}
+\emph{Journal of Applied Psychology, 91}(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
 
 Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-\emph{Journal of Applied Psychology, 68}(3), 382–395. \url{https://doi.org/10.1037/0021-9010.68.3.382}
+\emph{Journal of Applied Psychology, 68}(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
 }

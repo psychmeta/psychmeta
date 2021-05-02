@@ -17,7 +17,7 @@
 #'
 #' Schmidt, F. L., & Oh, I.-S. (2013).
 #' Methods for second order meta-analysis and illustrative applications.
-#' \emph{Organizational Behavior and Human Decision Processes, 121}(2), 204–218. \url{https://doi.org/10.1016/j.obhdp.2013.03.002}
+#' \emph{Organizational Behavior and Human Decision Processes, 121}(2), 204–218. \doi{10.1016/j.obhdp.2013.03.002}
 #'
 #' @examples
 #' data(data_r_oh_2009)
@@ -42,7 +42,7 @@
 #' @references
 #' Gonzalez-Mulé, E., Mount, M. K., & Oh, I.-S. (2014).
 #' A meta-analysis of the relationship between general mental ability and nontask performance.
-#' \emph{Journal of Applied Psychology, 99}(6), 1222–1243. \url{https://doi.org/10.1037/a0037547}
+#' \emph{Journal of Applied Psychology, 99}(6), 1222–1243. \doi{10.1037/a0037547}
 #'
 #' @examples
 #' data(data_r_gonzalezmule_2014)
@@ -67,7 +67,7 @@
 #' @references
 #' McDaniel, M. A., Whetzel, D. L., Schmidt, F. L., & Maurer, S. D. (1994).
 #' The validity of employment interviews: A comprehensive review and meta-analysis.
-#' \emph{Journal of Applied Psychology, 79}(4), 599–616. \url{https://doi.org/10.1037/0021-9010.79.4.599}
+#' \emph{Journal of Applied Psychology, 79}(4), 599–616. \doi{10.1037/0021-9010.79.4.599}
 #'
 #' @examples
 #' data(data_r_mcdaniel_1994)
@@ -93,7 +93,7 @@
 #' @references
 #' Roth, B., Becker, N., Romeyke, S., Schäfer, S., Domnick, F., & Spinath, F. M. (2015).
 #' Intelligence and school grades: A meta-analysis.
-#' \emph{Intelligence, 53}, 118–137. \url{https://doi.org/10.1016/j.intell.2015.09.002}
+#' \emph{Intelligence, 53}, 118–137. \doi{10.1016/j.intell.2015.09.002}
 #'
 #' @examples
 #' data(data_r_roth_2015)
@@ -119,7 +119,7 @@
 #' @references
 #' McLeod, B. D., Weisz, J. R., & Wood, J. J., (2007).
 #' Examining the association between parenting and childhood depression:  A meta-analysis.
-#' \emph{Clinical Psychology Review, 27}(8), 986–1003. \url{https://doi.org/10.1016/j.cpr.2007.03.001}
+#' \emph{Clinical Psychology Review, 27}(8), 986–1003. \doi{10.1016/j.cpr.2007.03.001}
 #'
 #' @examples
 #' data(data_r_mcleod_2007)

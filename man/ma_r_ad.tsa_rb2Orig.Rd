@@ -17,6 +17,6 @@ Taylor series approximation artifact-distribution meta-analysis correcting for R
 }
 \references{
 Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-\emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
+\emph{Journal of Applied Psychology, 68}(3), 382. \doi{10.1037/0021-9010.68.3.382}
 }
 \keyword{internal}

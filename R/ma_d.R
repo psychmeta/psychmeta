@@ -209,13 +209,12 @@
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
 #' \emph{Journal of Applied Psychology, 79}(3), 425.
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
+#' \emph{Journal of Applied Psychology, 68}(3), 382. \doi{10.1037/0021-9010.68.3.382}
 #'
 #' @examples
 #' ### Demonstration of ma_d ###

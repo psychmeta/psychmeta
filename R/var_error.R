@@ -82,10 +82,9 @@ var_error_spearman <- function(r, n, correct_bias = TRUE){
 #'
 #' @md
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' @details
 #' The sampling variance of a u ratio is computed differently for independent samples (i.e., settings where the referent unrestricted standard deviation comes from an different sample than the range-restricted standard deviation) than for dependent samples (i.e., unrestricted samples from which a subset of individuals are selected to be in the incumbent sample).
@@ -141,14 +140,13 @@ var_error_u <- function(u, ni, na = NA, dependent_sds = FALSE){
 #'
 #' @md
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' Duhachek, A., & Iacobucci, D. (2004).
 #' Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
-#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
+#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \doi{10.1037/0021-9010.89.5.792}
 #'
 #' @examples
 #' var_error_rel(rel = .8, n = 100)
@@ -203,14 +201,13 @@ var_error_rel <- function(rel, n, rel_type = "alpha", k_items = NULL){
 #'
 #' @md
 #' @references
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' Duhachek, A., & Iacobucci, D. (2004).
 #' Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
-#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
+#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \doi{10.1037/0021-9010.89.5.792}
 #'
 #' @examples
 #' var_error_q(q = .8, n = 100)
@@ -417,7 +414,7 @@ var_error_g <- function(g, n1, n2 = NA, a_method = c("gamma", "approx")) {
 #' @references
 #' Duhachek, A., & Iacobucci, D. (2004).
 #' Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
-#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
+#' \emph{Journal of Applied Psychology, 89}(5), 792–808. \doi{10.1037/0021-9010.89.5.792}
 #'
 #' @examples
 #' item_mat <- matrix(.3, 5, 5)
@@ -471,7 +468,7 @@ var_error_alpha <- function(item_mat = NULL, alpha = NULL, k_items = NULL, n_cas
 #' @references
 #' Ruscio, J. (2008).
 #' A probability-based measure of effect size: Robustness to base rates and other factors.
-#' \emph{Psychological Methods, 13}(1), 19–30. \url{https://doi.org/10.1037/1082-989X.13.1.19}
+#' \emph{Psychological Methods, 13}(1), 19–30. \doi{10.1037/1082-989X.13.1.19}
 #'
 #' @details
 #' The sampling variance of a \emph{A} (also called \emph{AUC} [area under curve] or \emph{CLES} [common-language effect size]) value is:
@@ -530,10 +527,10 @@ var_error_cles <- function(A, n1, n2 = NA){
 #' @references
 #' Cohen, J., Cohen, P., West, S. G., & Aiken, L. S. (2003).
 #' \emph{Applied multiple regression/correlation analysis for the behavioral sciences} (3rd ed.).
-#' Mahwah, NJ: Erlbaum. \url{https://doi.org/10/crtf}. p. 88.
+#' Mahwah, NJ: Erlbaum. \doi{10/crtf}. p. 88.
 #'
 #' Olkin, I., & Finn, J. D. (1995). Correlations redux.
-#' \emph{Psychological Bulletin, 118}(1), 155–164. https://doi.org/10/bt48vd
+#' \emph{Psychological Bulletin, 118}(1), 155–164. \doi{10/bt48vd}
 #'
 #' @details
 #' The sampling variance of a multiple correlation is approximately:

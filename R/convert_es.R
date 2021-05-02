@@ -38,17 +38,17 @@
 #' Chinn, S. (2000).
 #' A simple method for converting an odds ratio to effect size for use in meta-analysis.
 #' *Statistics in Medicine, 19*(22), 3127–3131.
-#' <https://doi.org/10.1002/1097-0258(20001130)19:22<3127::AID-SIM784>3.0.CO;2-M>
+#' \doi{10.1002/1097-0258(20001130)19:22<3127::AID-SIM784>3.0.CO;2-M}
 #'
 #' Lipsey, M. W., & Wilson, D. B. (2001). *Practical meta-analysis*. SAGE Publications.
 #'
 #' Ruscio, J. (2008).
 #' A probability-based measure of effect size: Robustness to base rates and other factors.
-#' *Psychological Methods, 13*(1), 19–30. <https://doi.org/10.1037/1082-989X.13.1.19>
+#' *Psychological Methods, 13*(1), 19–30. \doi{10.1037/1082-989X.13.1.19}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
-#' SAGE Publications. <https://doi.org/10.4135/9781483398105>
+#' SAGE Publications. \doi{10.4135/9781483398105}
 #'
 #' @examples
 #' convert_es(es = 1,  input_es="d", output_es="r", n1=100)

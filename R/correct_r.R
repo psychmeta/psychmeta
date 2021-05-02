@@ -9,7 +9,7 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 140–141.
+#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 140–141.
 #'
 #' @details
 #' \deqn{r_{c}=\frac{r_{obs}}{\left(\frac{2n-2}{2n-1}\right)}}{r_c = r / ((2 * n - 2) / (2 * n - 1))}
@@ -44,15 +44,15 @@ correct_r_bias <- function(r, n){
 #' Aguinis, H., Pierce, C. A., & Culpepper, S. A. (2009).
 #' Scale coarseness as a methodological artifact:
 #' Correcting correlation coefficients attenuated from using coarse scales.
-#' \emph{Organizational Research Methods, 12}(4), 623–652. \url{https://doi.org/10.1177/1094428108318065}
+#' \emph{Organizational Research Methods, 12}(4), 623–652. \doi{10.1177/1094428108318065}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 287-288.
+#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 287-288.
 #'
 #' Peters, C. C., & Van Voorhis, W. R. (1940).
 #' \emph{Statistical procedures and their mathematical bases}.
-#' New York, NY: Mcgraw-Hill. \url{https://doi.org/10.1037/13596-000}. pp. 393–399.
+#' New York, NY: Mcgraw-Hill. \doi{10.1037/13596-000}. pp. 393–399.
 #'
 #' @examples
 #' correct_r_coarseness(r = .35, kx = 5, ky = 4, n = 100)
@@ -195,7 +195,7 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 43–44.
+#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 43–44.
 #'
 #' @details
 #' \deqn{r_{c}=\frac{r_{obs}}{\left[\frac{\phi\left(p_{X}\right)}{p_{X}\left(1-p_{X}\right)}\right]\left[\frac{\phi\left(p_{Y}\right)}{p_{Y}\left(1-p_{Y}\right)}\right]}}{r_c = r_obs / (ordinate(p_x) / sqrt(p_x * (1 - p_x) * ordinate(p_y) / sqrt(p_y * (1 - p_y))}
@@ -243,7 +243,7 @@ correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 287-288.
+#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 287-288.
 #'
 #' @details
 #' \deqn{r_{c}=\frac{r_{obs}}{u\sqrt{\left(\frac{1}{u^{2}}-1\right)r_{obs}^{2}+1}}}{r_c = r / (sqrt((pi*(1-pi))/(pa*(1-pa))) * sqrt(((pa*(1-pa))/(pi*(1-pi)) - 1) * r^2 + 1))}
@@ -299,24 +299,23 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' @references
 #' Alexander, R. A., Carson, K. P., Alliger, G. M., & Carr, L. (1987).
 #' Correcting doubly truncated correlations: An improved approximation for correcting the bivariate normal correlation when truncation has occurred on both variables.
-#' \emph{Educational and Psychological Measurement, 47}(2), 309–315. \url{https://doi.org/10.1177/0013164487472002}
+#' \emph{Educational and Psychological Measurement, 47}(2), 309–315. \doi{10.1177/0013164487472002}
 #'
-#' Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+#' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' _Organizational Research Methods_. Advance online publication.
-#' <https://doi.org/10.1177/1094428119859398>
+#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 #' Implications of direct and indirect range restriction for meta-analysis methods and findings.
-#' \emph{Journal of Applied Psychology, 91}(3), 594–612. \url{https://doi.org/10.1037/0021-9010.91.3.594}
+#' \emph{Journal of Applied Psychology, 91}(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
 #'
 #' Le, H., Oh, I.-S., Schmidt, F. L., & Wooldridge, C. D. (2016).
 #' Correction for range restriction in meta-analysis revisited: Improvements and implications for organizational research.
-#' \emph{Personnel Psychology, 69}(4), 975–1008. \url{https://doi.org/10.1111/peps.12122}
+#' \emph{Personnel Psychology, 69}(4), 975–1008. \doi{10.1111/peps.12122}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 43-44, 140–141.
+#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 43-44, 140–141.
 #'
 #' @details
 #' The correction for measurement error is:
