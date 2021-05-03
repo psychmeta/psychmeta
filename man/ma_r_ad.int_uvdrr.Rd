@@ -18,10 +18,10 @@ Interactive artifact-distribution meta-analysis correcting for Case II direct ra
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 4.
+Thousand Oaks, CA: Sage. \doi{10/b6mg}. Chapter 4.
 
 Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
-\emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
+\emph{Journal of Applied Psychology, 79}(3), 425–438. \doi{10.1037/0021-9010.79.3.425}
 }
 \keyword{internal}

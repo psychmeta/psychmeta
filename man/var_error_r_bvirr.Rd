@@ -154,8 +154,7 @@ var_error_r_bvirr(rxyi = .3, var_e = var_error_r(r = .3, n = 100), ni = 100,
                 sign_rxz = 1, sign_ryz = 1)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 Accounting for indirect range restriction in organizational research.
-\emph{Organizational Research Methods}. Advance online publication.
-\url{https://doi.org/10.1177/1094428119859398}
+\emph{Organizational Research Methods, 23}(4), 717–749. \doi{10.1177/1094428119859398}
 }

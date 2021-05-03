@@ -35,5 +35,5 @@ var_error_alpha(alpha = c(alpha, alpha), k_items = c(k_items, k_items), n_cases 
 \references{
 Duhachek, A., & Iacobucci, D. (2004).
 Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
-\emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
+\emph{Journal of Applied Psychology, 89}(5), 792–808. \doi{10.1037/0021-9010.89.5.792}
 }

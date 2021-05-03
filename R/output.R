@@ -230,7 +230,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #'
 #' (Note that \code{header-includes} is generally discouraged in favor of adding
 #' an \code{include} argument to specific output formats, see
-#' \url{http://rmarkdown.rstudio.com/pdf_document_format.html#includes}.)
+#' \url{https://bookdown.org/yihui/rmarkdown/pdf-document.html#includes}.)
 #'
 #' @section HTML output:
 #' If \code{html} is \code{TRUE} and you render to HTML (or related formats, see
@@ -327,7 +327,7 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses. If provided and file is not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
 #' @param title.bib The title to give to the bibliography (see \code{bib} above). If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param style What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
+#' @param style What style should the bibliography (see \code{bib} above) be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://www.zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list (see \code{bib} above).
 #' @param save_build_files Should the RMarkdown and BibLaTeX (if any) files used to generate the output be saved (default: \code{FALSE})?
 #' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
@@ -537,7 +537,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @param ma_obj A psychmeta meta-analysis object with \code{citekeys} supplied.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses.
 #' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param style What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
+#' @param style What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://www.zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list.
 #' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", a tibble with basic citation information; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
 #' @param output_dir The filepath for the output file. Defaults to the current working directory.
@@ -689,7 +689,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           attributes(style) <- list(source = "local")
           return(style)
      } else {
-          style <- paste0("https://zotero.org/styles/", stringr::str_replace(style, "\\.csl$", "") )
+          style <- paste0("https://www.zotero.org/styles/", stringr::str_replace(style, "\\.csl$", "") )
           attributes(style) <- list(source = "Zotero")
           return(style)
      }
@@ -923,7 +923,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                      if (file.exists(style)) {
                                           header$csl <- style
                                      } else {
-                                          message(sprintf("Caution: Style not found at %s\n         Check the file path or specify a CSL style name from the Zotero Style Repository (https://zotero.org/styles).\n         References formatted using the Chicago Manual of Style.",
+                                          message(sprintf("Caution: Style not found at %s\n         Check the file path or specify a CSL style name from the Zotero Style Repository (https://www.zotero.org/styles).\n         References formatted using the Chicago Manual of Style.",
                                                           style))
                                      }
                                 }

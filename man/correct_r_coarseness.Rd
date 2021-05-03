@@ -57,13 +57,13 @@ correct_r_coarseness(r = .35, kx = 5, ky = 4, n = 100, dist_x="unif", dist_y="no
 Aguinis, H., Pierce, C. A., & Culpepper, S. A. (2009).
 Scale coarseness as a methodological artifact:
 Correcting correlation coefficients attenuated from using coarse scales.
-\emph{Organizational Research Methods, 12}(4), 623–652. \url{https://doi.org/10.1177/1094428108318065}
+\emph{Organizational Research Methods, 12}(4), 623–652. \doi{10.1177/1094428108318065}
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \url{https://doi.org/10/b6mg}. pp. 287-288.
+Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 287-288.
 
 Peters, C. C., & Van Voorhis, W. R. (1940).
 \emph{Statistical procedures and their mathematical bases}.
-New York, NY: Mcgraw-Hill. \url{https://doi.org/10.1037/13596-000}. pp. 393–399.
+New York, NY: Mcgraw-Hill. \doi{10.1037/13596-000}. pp. 393–399.
 }

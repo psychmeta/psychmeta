@@ -19,6 +19,6 @@ data(data_r_mcleod_2007)
 \references{
 McLeod, B. D., Weisz, J. R., & Wood, J. J., (2007).
 Examining the association between parenting and childhood depression:  A meta-analysis.
-\emph{Clinical Psychology Review, 27}(8), 986–1003. \url{https://doi.org/10.1016/j.cpr.2007.03.001}
+\emph{Clinical Psychology Review, 27}(8), 986–1003. \doi{10.1016/j.cpr.2007.03.001}
 }
 \keyword{datasets}

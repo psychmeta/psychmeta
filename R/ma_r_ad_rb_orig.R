@@ -15,7 +15,7 @@
 #' \emph{Journal of Applied Psychology, 79}(3), 425.
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
+#' \emph{Journal of Applied Psychology, 68}(3), 382. \doi{10.1037/0021-9010.68.3.382}
 #'
 #' @keywords internal
 "ma_r_ad.int_rbOrig" <- function(x){
@@ -213,7 +213,7 @@
 #'
 #' @references
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
+#' \emph{Journal of Applied Psychology, 68}(3), 382. \doi{10.1037/0021-9010.68.3.382}
 #'
 #' @keywords internal
 "ma_r_ad.tsa_rb1Orig" <- function(x){
@@ -411,7 +411,7 @@
 #'
 #' @references
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382. https://doi.org/10.1037/0021-9010.68.3.382
+#' \emph{Journal of Applied Psychology, 68}(3), 382. \doi{10.1037/0021-9010.68.3.382}
 #'
 #' @keywords internal
 "ma_r_ad.tsa_rb2Orig" <- function(x){

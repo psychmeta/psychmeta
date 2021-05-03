@@ -21,6 +21,6 @@ data(data_r_gonzalezmule_2014)
 \references{
 Gonzalez-Mulé, E., Mount, M. K., & Oh, I.-S. (2014).
 A meta-analysis of the relationship between general mental ability and nontask performance.
-\emph{Journal of Applied Psychology, 99}(6), 1222–1243. \url{https://doi.org/10.1037/a0037547}
+\emph{Journal of Applied Psychology, 99}(6), 1222–1243. \doi{10.1037/a0037547}
 }
 \keyword{datasets}

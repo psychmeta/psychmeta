@@ -19,6 +19,6 @@ data(data_r_roth_2015)
 \references{
 Roth, B., Becker, N., Romeyke, S., Schäfer, S., Domnick, F., & Spinath, F. M. (2015).
 Intelligence and school grades: A meta-analysis.
-\emph{Intelligence, 53}, 118–137. \url{https://doi.org/10.1016/j.intell.2015.09.002}
+\emph{Intelligence, 53}, 118–137. \doi{10.1016/j.intell.2015.09.002}
 }
 \keyword{datasets}

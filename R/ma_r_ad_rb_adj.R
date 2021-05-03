@@ -8,15 +8,15 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \url{https://doi.org/10/b6mg}. Chapter 4.
+#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. Chapter 4.
 #'
 #' Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
-#' \emph{Journal of Applied Psychology, 79}(3), 425–438. \url{https://doi.org/10.1037/0021-9010.79.3.425}
+#' \emph{Journal of Applied Psychology, 79}(3), 425–438. \doi{10.1037/0021-9010.79.3.425}
 #'
 #' Raju, N. S., & Burke, M. J. (1983).
 #' Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \url{https://doi.org/10.1037/0021-9010.68.3.382}
+#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
 #'
 #' @keywords internal
 "ma_r_ad.int_rbAdj" <- function(x){
@@ -217,7 +217,7 @@
 #' @references
 #' Raju, N. S., & Burke, M. J. (1983).
 #' Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \url{https://doi.org/10.1037/0021-9010.68.3.382}
+#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
 #'
 #' @keywords internal
 "ma_r_ad.tsa_rb1Adj" <- function(x){
@@ -419,7 +419,7 @@
 #' @references
 #' Raju, N. S., & Burke, M. J. (1983).
 #' Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \url{https://doi.org/10.1037/0021-9010.68.3.382}
+#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
 #' @keywords internal
 "ma_r_ad.tsa_rb2Adj" <- function(x){
 

@@ -34,12 +34,11 @@ var_error_rel(rel = .8, n = 100)
 var_error_rel(rel = .8, n = 100, rel_type = "alpha", k_items = 10)
 }
 \references{
-Dahlke, J. A., & Wiernik, B. M. (2019). Not restricted to selection research:
+Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 Accounting for indirect range restriction in organizational research.
-\emph{Organizational Research Methods}. Advance online publication.
-\url{https://doi.org/10.1177/1094428119859398}
+\emph{Organizational Research Methods, 23}(4), 717–749. \doi{10.1177/1094428119859398}
 
 Duhachek, A., & Iacobucci, D. (2004).
 Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
-\emph{Journal of Applied Psychology, 89}(5), 792–808. \url{https://doi.org/10.1037/0021-9010.89.5.792}
+\emph{Journal of Applied Psychology, 89}(5), 792–808. \doi{10.1037/0021-9010.89.5.792}
 }
