@@ -596,7 +596,7 @@
          "  (b) supply sample-specific intercorrelations,\n",
          "  (c) change the `collapse_method` argument, or\n",
          "  (d) manually consolidate the dependency among estimates.\n\n",
-         "  See `help("control_intercor")` for more details.",
+         "  See `help('control_intercor')` for more details.",
          call. = FALSE)
   }
 
