@@ -97,14 +97,42 @@ test_that("Passing artifact information with the 'supplemental_ads' argument - e
 })
 
 test_that("use_all_arts = TRUE, artifacts from studies without valid correlations - example 7", {
-  expect_equal(
+  m <- expect_warning(
     ma_r(
       ma_method = "ad", rxyi = rxyi, n = n, rxx = rxxi, ryy = ryyi,
       correct_rr_x = FALSE, correct_rr_y = FALSE,
       construct_x = x_name, construct_y = y_name,
       sample_id = sample_id, moderators = moderator,
       use_all_arts = TRUE, data = dat
-    ),
+    )
+  )
+  expect_equal(
+    m,
     ma_r_example_seven
+  )
+})
+
+test_that("control_intercor with same-construct convergent correlation data", {
+  dat <- data.frame(
+    sample_id = c(1, 2, 2, 2),
+    n = c(100, 50, 50, 50),
+    r_xy = c(.07, .38, .82, .83),
+    x_name = c("faultline_strength", "diversity", "diversity", "diversity"),
+    y_name = c("faultline_strength", "diversity", "faultline_strength", "faultline_strength"),
+    rel_x = 1, rel_y = 1
+  )
+  m <- ma_r(
+    ma_method = "ad",
+    data = dat,
+    rxyi = r_xy,
+    n = n,
+    sample_id = sample_id,
+    collapse_method = "composite",
+    construct_x = x_name, construct_y = y_name,
+    rxx = rel_x, ryy = rel_y
+  )
+  expect_equal(
+    get_metatab(m)[[2]][[1]]$mean_rho,
+    c(0.07035354, 0.96234864, 0.38387755)
   )
 })

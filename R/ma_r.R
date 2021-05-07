@@ -513,7 +513,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                  sign_rz = NULL, sign_rxz = 1, sign_ryz = 1,
                  moderators = NULL, cat_moderators = TRUE, moderator_type = c("simple", "hierarchical", "none"),
                  supplemental_ads = NULL, data = NULL, control = control_psychmeta(), ...){
-        
+
      ##### Get inputs #####
      call <- match.call()
      warn_obj1 <- record_warnings()
@@ -2025,7 +2025,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
         if (length(facet_y) == 0) facet_y <- rep(NA, length(rxyi))
 
         # Checks inheriting
-        if (inherits(intercor, "control_intercor")) {
+        if (! inherits(intercor, "control_intercor")) {
                 if (is.list(intercor)) {
                         intercor <- do.call(control_intercor, args = intercor)
                 } else {
