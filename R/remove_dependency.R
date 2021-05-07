@@ -588,14 +588,15 @@
   n_comp <- wt_mean(x = .data$es_data$n[i], wt = .data$es_data$n_adj[i])
   n_adj_comp <- wt_mean(x = .data$es_data$n_adj[i], wt = .data$es_data$n_adj[i])
 
-  if (abs(es_comp) > 1) {
-    stop("The composite effect size for sample ID '",
+  if (abs(es_comp) > 1 && .data$es_metric == "r") {
+    stop("The composite correlation for sample ID '",
          .data$es_data$sample_id[i][1],
-         "' is not possible. Please\n",
+         "' is not possible (> 1). Please\n",
          "  (a) supply alternative intercorrelations,\n",
          "  (b) supply sample-specific intercorrelations,\n",
          "  (c) change the `collapse_method` argument, or\n",
-         "  (d) manually consolidate the dependency among estimates.",
+         "  (d) manually consolidate the dependency among estimates.\n\n",
+         "  See `help("control_intercor")` for more details.",
          call. = FALSE)
   }
 
