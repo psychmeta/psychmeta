@@ -163,8 +163,8 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           es_data$weights <- weights
      }
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
-     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
-     es_data <- cbind(sample_id = sample_id, es_data)
+     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data) %>% mutate(citekey = as.character(citekey))
+     es_data <- cbind(sample_id = sample_id, es_data) %>% mutate(sample_id = as.character(sample_id))
 
      if(!is.null(construct_y)){
           es_data <- cbind(construct_y = construct_y, es_data)
@@ -311,8 +311,8 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           escalc_obj <- data.frame(yi = es, vi = var_e_vec,
                                    n = n, weight = wt_vec,
                                    residual = es - mean_es, stringsAsFactors = FALSE)
-          if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
-          if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj)
+          if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj) %>% mutate(citekey = as.character(citekey))
+          if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj) %>% mutate(sample_id = as.character(sample_id))
           if(any(colnames(data) == "original_order")) escalc_obj <- cbind(original_order = data$original_order, escalc_obj)
           class(escalc_obj) <- c("escalc", "data.frame")
      }

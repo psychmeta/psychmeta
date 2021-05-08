@@ -230,8 +230,8 @@ organize_database <- function(es_data, sample_id = NULL, citekey = NULL,
                               data_x = NULL, data_y = NULL, moderators = NULL,
                               use_as_x = NULL, use_as_y = NULL, construct_order = NULL, cat_moderators = TRUE, moderator_levels = NULL){
 
-     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
-     if(!is.null(sample_id)) es_data <- cbind(sample_id = sample_id, es_data)
+     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data) %>% mutate(citekey = as.character(citekey))
+     if(!is.null(sample_id)) es_data <- cbind(sample_id = sample_id, es_data) %>% mutate(sample_id = as.character(sample_id))
 
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){

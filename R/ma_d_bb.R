@@ -115,8 +115,8 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
      es_data <- data.frame(d = d, n1 = n1, n2 = n2, stringsAsFactors = FALSE)
      es_data$n_adj <- n_adj
      if(is.null(sample_id)) sample_id <- paste0("Sample #", 1:nrow(es_data))
-     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data)
-     es_data <- cbind(sample_id = sample_id, es_data)
+     if(!is.null(citekey)) es_data <- cbind(citekey = citekey, es_data) %>% mutate(citekey = as.character(citekey))
+     es_data <- cbind(sample_id = sample_id, es_data) %>% mutate(sample_id = as.character(sample_id))
 
      out <- ma_wrapper(es_data = es_data, es_type = "d", ma_type = "bb", ma_fun = .ma_d_bb,
                        moderator_matrix = moderators, moderator_type = moderator_type, cat_moderators = cat_moderators,
@@ -244,8 +244,8 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
           escalc_obj$weight <- wt_vec
           escalc_obj$residual <- d - mean_d
 
-          if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj)
-          if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj)
+          if(!is.null(citekey)) escalc_obj <- cbind(citekey = citekey, escalc_obj) %>% mutate(citekey = as.character(citekey))
+          if(!is.null(sample_id)) escalc_obj <- cbind(sample_id = sample_id, escalc_obj) %>% mutate(sample_id = as.character(sample_id))
           if(any(colnames(data) == "original_order")) escalc_obj <- cbind(original_order = data$original_order, escalc_obj)
           class(escalc_obj) <- c("escalc", "data.frame")
      }
