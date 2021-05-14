@@ -97,7 +97,7 @@ metabulate(
 
 \item{caption}{Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).}
 
-\item{header}{A list of YAML header parameters to pass to \code{link[rmarkdown]{render}}.}
+\item{header}{A list of YAML header parameters to pass to \code{\link[rmarkdown]{render}}.}
 
 \item{verbose}{Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?}
 

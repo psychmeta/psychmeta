@@ -126,12 +126,12 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
      # Clean up unicode big.mark and small.mark
      out[] <- apply(out, 2,
-                    stringr::str_replace_all,
+                    gsub,
                     pattern = paste0("(",paste(rev(strsplit(sub(" ", big.mark, " "),"")[[1]]), collapse = ""),"|", sub(" ", big.mark, " "),")"),
                     replacement = big.mark
                     )
      out[] <- apply(out, 2,
-                    stringr::str_replace_all,
+                    gsub,
                     pattern = paste0("(",paste(rev(strsplit(sub(" ", small.mark, " "),"")[[1]]), collapse = ""),"|", sub(" ", small.mark, " "),")"),
                     replacement = small.mark
                     )
@@ -139,27 +139,27 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
      # Clean up leading zeros
      switch(as.character(leading0),
             "TRUE" = {},
-            "FALSE" = out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark))),
+            "FALSE" = out[] <- purrr::map(out, ~ gsub(x = .x, pattern = paste0("^(\\+|-?)0", replacement = decimal.mark), paste0("\\1", decimal.mark))),
             "conditional" = {
                  out <- dplyr::mutate_if(out,
                                          sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
-                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
+                                         function(i) gsub(x = i, pattern = paste0("^(\\+|-?)0", replacement = decimal.mark), paste0("\\1", decimal.mark)))
             },
             "figure" = {
                  out <- dplyr::mutate_if(out,
                                          sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
-                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1\u2007", decimal.mark)))
+                                         function(i) gsub(x = i, pattern = paste0("^(\\+|-?)0", replacement = decimal.mark), paste0("\\1\u2007", decimal.mark)))
                  out <- dplyr::mutate_if(out,
                                          sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
-                                         function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
+                                         function(i) gsub(x = i, pattern = paste0("^(\\+|-?)0", replacement = decimal.mark), paste0("\\1", decimal.mark)))
             },
             "figure_html" = {
                     out <- dplyr::mutate_if(out,
                                             sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
-                                            function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1&#8199;", decimal.mark)))
+                                            function(i) gsub(x = i, pattern = paste0("^(\\+|-?)0", replacement = decimal.mark), paste0("\\1&#8199;", decimal.mark)))
                     out <- dplyr::mutate_if(out,
                                             sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) abs(i) >= 1, na.rm = TRUE)}),
-                                            function(i) stringr::str_replace_all(i, paste0("^(\\+|-?)0", decimal.mark), paste0("\\1", decimal.mark)))
+                                            function(i) gsub(x = i, pattern = paste0("^(\\+|-?)0", replacement = decimal.mark), paste0("\\1", decimal.mark)))
             },
             # else =
             {out[] <- {}}
@@ -172,21 +172,21 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
             "figure" = {
                  out <- dplyr::mutate_if(out,
                                          sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
-                                         function(i) stringr::str_replace_all(i, "^\\+", ""))
+                                         function(i) gsub(x = i, pattern = "^\\+", replacement = ""))
                  out <- dplyr::mutate_if(out,
                                          sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
-                                         function(i) stringr::str_replace_all(i, "^\\+", "\u2007"))
+                                         function(i) gsub(x = i, pattern = "^\\+", replacement = "\u2007"))
             },
             "figure_html" = {
                     out <- dplyr::mutate_if(out,
                                             sapply(x, function(i) {is.numeric(i) & !any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
-                                            function(i) stringr::str_replace_all(i, "^\\+", ""))
+                                            function(i) gsub(x = i, pattern = "^\\+", replacement = ""))
                     out <- dplyr::mutate_if(out,
                                             sapply(x, function(i) {is.numeric(i) & any(if (is.numeric(i)) i < 0, na.rm = TRUE)}),
-                                            function(i) stringr::str_replace_all(i, "^\\+", "&#8199;"))
+                                            function(i) gsub(x = i, pattern = "^\\+", replacement = "&#8199;"))
             },
             # else =
-            {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, "^\\+", pos.sign))}
+            {out[] <- purrr::map(out, ~ gsub(x = .x, pattern = "^\\+", replacement = pos.sign))}
      )
 
      # Clean up negative signs
@@ -195,7 +195,7 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
             "FALSE" = {},
             "-" = {},
             # else =
-            {out[] <- purrr::map(out, ~ stringr::str_replace_all(.x, "^-", neg.sign))}
+            {out[] <- purrr::map(out, ~ gsub(x = .x, pattern = "^-", replacement = neg.sign))}
      )
 
      if (x_type == "tibble") {
@@ -322,7 +322,7 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' @param cred_format How should credility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).
 #' @param caption Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).
-#' @param header A list of YAML header parameters to pass to \code{link[rmarkdown]{render}}.
+#' @param header A list of YAML header parameters to pass to \code{\link[rmarkdown]{render}}.
 #' @param verbose Logical. Should detailed SD and variance components be shown (default: \code{FALSE})?
 #' @param unicode Logical. If \code{output_format} is "text", should UTF-8 characters be used (defaults to system default).
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses. If provided and file is not \code{NULL}, a bibliography will be included with the meta-analysis table. See \code{\link{generate_bib}} for additional arguments controlling the bibliography.
@@ -534,24 +534,25 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #'
 #' This function generates a list of studies contributing to a meta-analysis
 #'
-#' @param ma_obj A psychmeta meta-analysis object with \code{citekeys} supplied.
+#' @param ma_obj A psychmeta meta-analysis object with `citekeys` supplied.
 #' @param bib A BibTeX file containing the citekeys for the meta-analyses.
-#' @param title.bib The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"
-#' @param style What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://www.zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
+#' @param title.bib The title to give to the bibliography. If `NULL`, defaults to "Sources Contributing to Meta-Analyses"
+#' @param style What style should references be formatted in? Can be a file path or URL for a [CSL citation style](https://github.com/citation-style-language/styles) or the style ID for any style available from the [Zotero Style Repository](https://www.zotero.org/styles). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).
 #' @param additional_citekeys Additional citekeys to include in the reference list.
-#' @param file The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", a tibble with basic citation information; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
+#' @param file The filename or filepath for the output file. If `NULL`, function will output directly to the R console (if `output_format` is `"text"`, a tibble with basic citation information; if `"citekeys"`, the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).
 #' @param output_dir The filepath for the output file. Defaults to the current working directory.
-#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
-#' @param analyses Which analyses to extract references for? See \code{\link{filter_ma}} for details.
-#' @param match Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.
-#' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{FALSE}; always \code{TRUE} if file is \code{NULL})?
-#' @param header A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.
-#' @param ... Additional arguments to pass to \code{\link[rmarkdown]{render}}.
+#' @param output_format The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown [output_format][rmarkdown::output_format()].
+#' @param analyses Which analyses to extract references for? See [filter_ma()] for details.
+#' @param match Match `"all"` or `"any"` of the filter criteria? See [filter_ma()] for details.
+#' @param case_sensitive Logical scalar that determines whether character values supplied in `analyses` should be treated as case sensitive (`TRUE`, default) or not (`FALSE`).
+#' @param save_build_files Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: `FALSE`; always `TRUE` if file is `NULL`)?
+#' @param header A list of YAML header parameters to pass to [rmarkdown::render()].
+#' @param ... Additional arguments to pass to [rmarkdown::render()].
 #'
 #' @return A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
 #'
 #' @export
+#' @md
 #'
 #' @family output functions
 #'
@@ -657,12 +658,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
      # Render citekeys as Markdown citations
      citations <- paste0("@", citekeys, collapse=", ")
 
-     bib_df <- bib2df::bib2df(bib) %>%
-             mutate_at(-c(5, 10), stringr::str_replace_all, pattern = "[{}]", replacement = "") %>%
-             mutate_at(c(5, 10), sapply,
-                       FUN = function(.x) stringr::str_replace_all(.x,
-                                                                   pattern = "[{}]",
-                                                                   replacement = ""))
+     bib_df <- bib2df::bib2df(bib)
+     bib_df[names(bib_df) %in% c("AUTHOR", "EDITOR")] <-
+             lapply(bib_df[names(bib_df) %in% c("AUTHOR", "EDITOR")],
+                    function(x) lapply(x, FUN = gsub,
+                                       pattern = "[{}]", replacement = "")
+                    )
+     bib_df[! names(bib_df) %in% c("AUTHOR", "EDITOR")] <-
+             lapply(bib_df[! names(bib_df) %in% c("AUTHOR", "EDITOR")],
+                    FUN = gsub, pattern = "[{}]", replacement = ""
+             )
 
      return(list(bib = bib, citekeys = citekeys, citations = citations, bib_df = bib_df))
 
@@ -682,14 +687,16 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 }
 
 .clean_style_name <- function(style) {
-     if(grepl("://", style)) {
+     if (grepl("://", style)) {
           attributes(style) <- list(source = "url")
           return(style)
-     } else if(grepl("(~|:/|:\\\\)", style)) {
+     } else if (grepl("(~|:/|:\\\\)", style)) {
           attributes(style) <- list(source = "local")
           return(style)
      } else {
-          style <- paste0("https://www.zotero.org/styles/", stringr::str_replace(style, "\\.csl$", "") )
+          style <- paste0("https://www.zotero.org/styles/",
+                          sub(x = style, pattern = "\\.csl$", replacement = "")
+                          )
           attributes(style) <- list(source = "Zotero")
           return(style)
      }
@@ -726,27 +733,8 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                rep("=", nchar(title.bib)), "\n\n", sep = ""
                            )
 
-                           bib_df <- bib_df %>%
-                                   mutate(DOI = if_else(is.na(.data$DOI), .data$DOI, paste0("https://doi.org/", .data$DOI))) %>%
-                                   transmute(
-                                           author = sapply(.data$AUTHOR, function(.x) {
-                                                   case_when(is.na(.x) ~ .x,
-                                                             length(.x) == 1 ~ .x,
-                                                             length(.x) == 2 ~ paste0(.x, collapse = ", & "),
-                                                             TRUE ~ paste0(.x[1], ", et al."))[1]
-                                           }),
-                                           year = if_else(is.na(.data$DATE) | length(stringr::str_extract_all(.data$DATE, "\\d{4}")) == 0,
-                                                          .data$YEAR,
-                                                          unlist(stringr::str_extract_all(.data$DATE, "\\d{4}"))),
-                                           title = .data$TITLE,
-                                           container = if_else(is.na(.data$JOURNALTITLE), .data$BOOKTITLE, .data$JOURNALTITLE),
-                                           publisher = if_else(.data$CATEGORY == "ARTICLE", NA_character_,
-                                                               if_else(!is.na(.data$PUBLISHER), .data$PUBLISHER,
-                                                                       if_else(!is.na(.data$INSTITUTION), .data$INSTITUTION,
-                                                                               if_else(!is.na(.data$SCHOOL), .data$SCHOOL,
-                                                                                       .data$ORGANIZATION)))),
-                                           access = if_else(is.na(.data$DOI), .data$URL, .data$DOI))
-                                   print(bib_df, n = nrow(bib_df))
+                           bib_df <- .format_bib_df_for_printing(bib_df)
+                           print(bib_df, n = nrow(bib_df))
                       }
 
                       invisible(meta_tables[!is.null(meta_tables)])
@@ -760,10 +748,10 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                               old <- meta_tables[[i]]
                               meta_tables[[i]] <-
                                       meta_tables[[i]] %>%
-                                      mutate_all(stringr::str_replace_all,
+                                      mutate_all(gsub,
                                                  pattern = "&#8199;",
                                                  replacement = "&#8199;\\\\phantom{+}") %>%
-                                      mutate_all(stringr::str_replace_all,
+                                      mutate_all(gsub,
                                                  pattern = "\u2007",
                                                  replacement = "\u2007\\\\phantom{+}")
                               meta_tables[[i]] <- reattribute(old, meta_tables[[i]])
@@ -778,7 +766,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                       if (!is.null(bib)) {
                            # Write the bibliography file
                            # Ignore save_build_files
-                           bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
+                           bib_file <- file.path(output_dir, sub(x = file, pattern = "\\.(rmd|pdf|docx|html|odt)$", replacement = "\\.bib", ignore.case = TRUE))
                            file.copy(bib, bib_file, overwrite = TRUE)
 
                            sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s",
@@ -808,10 +796,10 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                         old <- meta_tables[[i]]
                         meta_tables[[i]] <-
                                 meta_tables[[i]] %>%
-                                mutate_all(stringr::str_replace_all,
+                                mutate_all(gsub,
                                            pattern = "&#8199;",
                                            replacement = "&#8199;\\\\phantom{+}") %>%
-                                mutate_all(stringr::str_replace_all,
+                                mutate_all(gsub,
                                            pattern = "\u2007",
                                            replacement = "\u2007\\\\phantom{+}")
                         meta_tables[[i]] <- reattribute(old, meta_tables[[i]])
@@ -836,28 +824,12 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
           switch(output_format,
 
-                 text = {if(!is.null(bib)) {
-                      bibliography <- bib_df %>%
-                              mutate(DOI = if_else(is.na(.data$DOI), .data$DOI, paste0("https://doi.org/", .data$DOI))) %>%
-                              transmute(
-                                      author = sapply(.data$AUTHOR, function(.x) {
-                                              case_when(is.na(.x) ~ .x,
-                                                        length(.x) == 1 ~ .x,
-                                                        length(.x) == 2 ~ paste0(.x, collapse = ", & "),
-                                                        TRUE ~ paste0(.x[1], ", et al."))[1]
-                                      }),
-                                      year = if_else(is.na(.data$DATE) | length(stringr::str_extract_all(.data$DATE, "\\d{4}")) == 0,
-                                                     .data$YEAR,
-                                                     unlist(stringr::str_extract_all(.data$DATE, "\\d{4}"))),
-                                      title = .data$TITLE,
-                                      container = if_else(is.na(.data$JOURNALTITLE), .data$BOOKTITLE, .data$JOURNALTITLE),
-                                      publisher = if_else(.data$CATEGORY == "ARTICLE", NA_character_,
-                                                          if_else(!is.na(.data$PUBLISHER), .data$PUBLISHER,
-                                                                  if_else(!is.na(.data$INSTITUTION), .data$INSTITUTION,
-                                                                          if_else(!is.na(.data$SCHOOL), .data$SCHOOL,
-                                                                                  .data$ORGANIZATION)))),
-                                      access = if_else(is.na(.data$DOI), .data$URL, .data$DOI))
-                 } else bibliography <- NULL
+                 text = {
+                   if (!is.null(bib)) {
+                     bibliography <- .format_bib_df_for_printing(bib_df)
+                   } else {
+                     bibliography <- NULL
+                   }
 
                  if (!is.null(meta_tables)) {
                          tables_out <- vector(mode = "list", length = length(ma_type))
@@ -873,7 +845,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                          tables_out <- unlist(tables_out)
                  } else tables_out <- NULL
 
-                 document <- c(paste(stringr::str_to_title(names(header)), ": ", header, collapse = "\n"), "\n\n",
+                 document <- c(paste0(names(header), ": ", header, collapse = "\n"), "\n\n",
                                tables_out[!is.null(tables_out)],
                                "\\newpage"[!is.null(tables_out) & !is.null(bib)],
 
@@ -895,18 +867,24 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                                                    if(output_format == "odt"& is.null(meta_tables)) paste0(":\n    reference_odt: ", system.file('templates/reference_odt.odt', package='psychmeta')),
                                                    if(output_format == "odt"& !is.null(meta_tables)) paste0(":\n    reference_odt: ", system.file('templates/reference_odt_landscape.odt', package='psychmeta'))
                            )
-                      } else header$output <- output_format
+                      } else {
+                           header$output <- output_format
+                      }
 
                       if(!is.null(bib)) {
                            # Write the bibliography file
-                           if(save_build_files) {
-                                bib_file <- file.path(output_dir, stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
-                           } else bib_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(Rmd|pdf|docx|html|odt)$", "\\.bib"))
+                           if (save_build_files) {
+                                bib_file <- file.path(output_dir, sub(x = file, pattern = "\\.(rmd|pdf|docx|html|odt)$", replacement = "\\.bib", ignore.case = TRUE))
+                           } else {
+                                bib_file <- file.path(tempdir(), sub(x = file, pattern = "\\.(rmd|pdf|docx|html|odt)$", replacement = "\\.bib", ignore.case = TRUE))
+                           }
                            file.copy(bib, bib_file, overwrite = TRUE)
 
-                           header$bibliography <- if(.Platform$`OS.type` == "windows") {
-                                gsub("\\\\", "/", bib_file)
-                           } else bib_file
+                           header$bibliography <- if (.Platform$`OS.type` == "windows") {
+                                gsub(x = bib_file, pattern = "\\\\", replacement = "/")
+                           } else {
+                                bib_file
+                           }
 
 
                            if (!is.null(style)) {
@@ -933,13 +911,17 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                       # Save meta_tables to an RData workspace for later loading by Rmarkdown
                       if (!is.null(meta_tables)) {
                            if (save_build_files) {
-                                rdata_file <- file.path(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
-                           } else rdata_file <- file.path(tempdir(), stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.Rdata"))
+                                rdata_file <- file.path(output_dir, sub(x = file, pattern = "\\.(pdf|docx|html|odt)$", replacement = "\\.Rdata", ignore.case = TRUE))
+                           } else {
+                                rdata_file <- file.path(tempdir(), sub(x = file, pattern = "\\.(pdf|docx|html|odt)$", replacement = "\\.Rdata", ignore.case = TRUE))
+                           }
                            save(meta_tables, file = rdata_file)
 
                            rdata_file <- if (.Platform$`OS.type` == "windows") {
-                                gsub("\\\\", "/", rdata_file)
-                           } else rdata_file
+                                gsub(x = rdata_file, pattern = "\\\\", replacement = "/")
+                           } else {
+                                rdata_file
+                           }
 
                            tables_out <- vector(mode = "list", length = length(ma_type))
                            for (i in 1:length(ma_type)) {
@@ -991,13 +973,15 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                       )
 
                       # Create Rmd and output files
-                      if(save_build_files) {
-                           rmd_document <- file.path(output_dir, stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd"))
-                      } else rmd_document <- file.path(tempdir(), stringr::str_replace(file, "\\.(pdf|docx|html|odt)$", "\\.rmd"))
+                      if (save_build_files) {
+                           rmd_document <- file.path(output_dir, sub(x = file, pattern = "\\.(pdf|docx|html|odt)$", replacement = "\\.rmd", ignore.case = TRUE))
+                      } else {
+                           rmd_document <- file.path(tempdir(),  sub(x = file, pattern = "\\.(pdf|docx|html|odt)$", replacement = "\\.rmd", ignore.case = TRUE))
+                      }
 
                       stringi::stri_write_lines(document, rmd_document)
 
-                      if(output_format != "rmd") {
+                      if (output_format != "rmd") {
                            rmarkdown::render(rmd_document,
                                              output_file = file,
                                              output_dir  = output_dir,
@@ -1432,9 +1416,9 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
      if(!bold_headers){
           var_labels <- names(col_names)
-          col_names <- stringr::str_replace_all(col_names, pattern = "symbfup", replacement = "symup")
-          col_names <- stringr::str_replace_all(col_names, pattern = "symbfit", replacement = "symit")
-          col_names <- stringr::str_replace_all(col_names, pattern = "[*][*]", replacement = "")
+          col_names <- gsub(x = col_names, pattern = "symbfup", replacement = "symup")
+          col_names <- gsub(x = col_names, pattern = "symbfit", replacement = "symit")
+          col_names <- gsub(x = col_names, pattern = "[*][*]",  replacement = "")
           names(col_names) <- var_labels
      }
 
@@ -2691,4 +2675,31 @@ export_df_bib <- function (x, file = "", append = FALSE) {
 na_replace <- function(df) {
         df[is.na(df)] <- ""
         return(df)
+}
+
+.format_bib_df_for_printing <- function(bib_df) {
+  bib_df %>%
+    mutate(DOI = if_else(is.na(.data$DOI), .data$DOI, paste0("https://doi.org/", .data$DOI))) %>%
+    transmute(
+      author = sapply(.data$AUTHOR, function(.x) {
+        case_when(is.na(.x) ~ .x,
+                  length(.x) == 1 ~ .x,
+                  length(.x) == 2 ~ paste0(.x, collapse = ", & "),
+                  TRUE ~ paste0(.x[1], ", et al."))[1]
+      }),
+      year = if_else(is.na(.data$DATE) | !grepl(x = .data$DATE, pattern = "\\d{4}"),
+                     .data$YEAR,
+                     regmatches(x = .data$DATE,
+                                m = regexpr(text = .data$DATE,
+                                            pattern = "\\d{4}"
+                                ))
+      ),
+      title = .data$TITLE,
+      container = if_else(is.na(.data$JOURNALTITLE), .data$BOOKTITLE, .data$JOURNALTITLE),
+      publisher = if_else(.data$CATEGORY == "ARTICLE", NA_character_,
+                          if_else(!is.na(.data$PUBLISHER), .data$PUBLISHER,
+                                  if_else(!is.na(.data$INSTITUTION), .data$INSTITUTION,
+                                          if_else(!is.na(.data$SCHOOL), .data$SCHOOL,
+                                                  .data$ORGANIZATION)))),
+      access = if_else(is.na(.data$DOI), .data$URL, .data$DOI))
 }
