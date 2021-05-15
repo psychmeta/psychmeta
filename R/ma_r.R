@@ -194,7 +194,6 @@
 #' @export
 #'
 #' @importFrom tibble as_tibble
-#' @import metafor
 #' @importFrom boot boot
 #' @importFrom boot boot.ci
 #' @importFrom stats as.formula

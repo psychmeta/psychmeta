@@ -8,8 +8,8 @@
 #'
 #' @param ma_obj Meta-analysis object.
 #' @param formula_list Optional list of regression formulas to evaluate.
-#' NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly. 
-#' The function will remove spaces in the data, you only have to account for this in \code{formula_list} when you supply your own formula(s). 
+#' NOTE: If there are spaces in your moderator names, replace them with underscores (i.e., "_") so that the formula(s) will perform properly.
+#' The function will remove spaces in the data, you only have to account for this in \code{formula_list} when you supply your own formula(s).
 #' @param ... Additional arguments.
 #'
 #' @return ma_obj with meta-regression results added (see ma_obj$follow_up_analyses$metareg).
@@ -31,8 +31,8 @@
 #' ## Examine the meta-regression results for the bare-bones and corrected data:
 #' ma_obj$metareg[[1]]$barebones$`Main Effects`
 #' ma_obj$metareg[[1]]$individual_correction$true_score$`Main Effects`
-#' 
-#' 
+#'
+#'
 #' ## Meta-analyze simulated d-value data
 #' dat <- data_d_meas_multi
 #' ## Simulate a random moderator
@@ -52,10 +52,10 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
      psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
-     
+
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      ma_obj <- screen_ma(ma_obj = ma_obj)
-     
+
      es_type <- NULL
      ma_methods <- attributes(ma_obj)$ma_methods
      ma_metric <- attributes(ma_obj)$ma_metric
@@ -67,20 +67,20 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
      if(any(ma_metric == "r_as_r" | ma_metric == "d_as_r")) es_type <- "r"
      if(any(ma_metric == "d_as_d" | ma_metric == "r_as_d")) es_type <- "d"
      if(is.null(es_type)) stop("ma_obj must represent a meta-analysis of correlations, d values, or generic effect sizes", call. = FALSE)
-     
+
      out_list <- apply(ma_obj[ma_obj$analysis_type == "Overall",], 1, function(ma_obj_i){
 
           escalc <- ma_obj_i$escalc
 
           moderator_matrix <- escalc$moderator_info$moderator_matrix
-          
+
           if(!is.null(moderator_matrix)){
                moderator_names <- colnames(moderator_matrix)
                moderator_names <- gsub(x = moderator_names, pattern = " ", replacement = "_")
                colnames(moderator_matrix) <- moderator_names
-               
+
                moderator_names <- moderator_names[moderator_names != "original_order"]
-               
+
                if(is.null(formula_list)){
                     formula_list <- list(paste("~", paste(moderator_names, collapse = " + ")))
                     interaction_list <- list()
@@ -100,7 +100,7 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
 
                if("bb" %in% ma_methods){
                     data_bb <- full_join(moderator_matrix, escalc$barebones, by = "original_order")
-                    metareg_bb <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_bb))
+                    metareg_bb <- map(formula_list, ~ metafor::rma(yi = yi, vi = vi, mods = .x, data = data_bb))
                }else{
                     metareg_bb <- NULL
                }
@@ -116,10 +116,10 @@ metareg <- function(ma_obj, formula_list = NULL, ...){
                          data_vgx <- full_join(moderator_matrix, escalc$individual_correction$observedGroup_latentY, by = "original_order")
                          data_vgy <- full_join(moderator_matrix, escalc$individual_correction$latentGroup_observedY, by = "original_order")
                     }
-                 
-                    metareg_ts  <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_ts))
-                    metareg_vgx <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_vgx))
-                    metareg_vgy <- map(formula_list, ~ rma(yi = yi, vi = vi, mods = .x, data = data_vgy))
+
+                    metareg_ts  <- map(formula_list, ~ metafor::rma(yi = yi, vi = vi, mods = .x, data = data_ts))
+                    metareg_vgx <- map(formula_list, ~ metafor::rma(yi = yi, vi = vi, mods = .x, data = data_vgx))
+                    metareg_vgy <- map(formula_list, ~ metafor::rma(yi = yi, vi = vi, mods = .x, data = data_vgy))
                }else{
                     metareg_ts <- metareg_vgx <- metareg_vgy <- NULL
                }

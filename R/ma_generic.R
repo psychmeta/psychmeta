@@ -25,8 +25,6 @@
 #'
 #' @export
 #'
-#' @import metafor
-#'
 #' @examples
 #' es <- c(.3, .5, .8)
 #' n <- c(100, 200, 150)
@@ -34,7 +32,7 @@
 #' ma_obj <- ma_generic(es = es, n = n, var_e = var_e)
 #' ma_obj
 #' summary(ma_obj)
-ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL, 
+ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                        construct_x = NULL, construct_y = NULL,
                        group1 = NULL, group2 = NULL,
                        wt_type = c("sample_size", "inv_var",
@@ -42,17 +40,17 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                        moderators = NULL, cat_moderators = TRUE,
                        moderator_type = c("simple", "hierarchical", "none"),
                        data = NULL, control = control_psychmeta(), weights = NULL, ...){
-     
+
      .dplyr.show_progress <- options()$dplyr.show_progress
      .psychmeta.show_progress <- psychmeta.show_progress <- options()$psychmeta.show_progress
      if(is.null(psychmeta.show_progress)) psychmeta.show_progress <- TRUE
      options(dplyr.show_progress = psychmeta.show_progress)
-     
+
      call <- match.call()
      warn_obj1 <- record_warnings()
-     
+
      moderator_type <- match.arg(moderator_type, choices = c("simple", "hierarchical", "none"))
-     
+
      control <- control_psychmeta(.psychmeta_ellipse_args = list(...),
                                   .control_psychmeta_arg = control)
      conf_level <- control$conf_level
@@ -61,7 +59,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      cred_method <- control$cred_method
      var_unbiased <- control$var_unbiased
      hs_override <- control$hs_override
-     
+
      if(hs_override){
           wt_type <- "sample_size"
           conf_method <- cred_method <- "norm"
@@ -91,24 +89,24 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
 
           if(deparse(substitute(citekey))[1] != "NULL")
                citekey <- match_variables(call = call_full[[match("citekey",  names(call_full))]], arg = citekey, arg_name = "citekey", data = data)
-          
+
           if(deparse(substitute(construct_x))[1] != "NULL")
                construct_x <- match_variables(call = call_full[[match("construct_x",  names(call_full))]], arg = construct_x, arg_name = "construct_x", data = data)
           if(deparse(substitute(construct_y))[1] != "NULL")
                construct_y <- match_variables(call = call_full[[match("construct_y",  names(call_full))]], arg = construct_y, arg_name = "construct_y", data = data)
-          
+
           if(deparse(substitute(group1))[1] != "NULL")
                group1 <- match_variables(call = call_full[[match("group1",  names(call_full))]], arg = group1, arg_name = "group1", data = data)
           if(deparse(substitute(group2))[1] != "NULL")
                group2 <- match_variables(call = call_full[[match("group2",  names(call_full))]], arg = group2, arg_name = "group2", data = data)
-          
+
           if(deparse(substitute(moderators))[1] != "NULL")
                   moderators <- match_variables_df({{moderators}}, data = as_tibble(data, .name_repair = "minimal"), name = deparse(substitute(moderators)))
-          
+
           if(deparse(substitute(weights))[1] != "NULL")
                weights <- match_variables(call = call_full[[match("weights",  names(call_full))]], arg = weights, arg_name = "weights", data = data)
      }
-     
+
      weights <- unlist(weights)
      if(!is.null(weights)){
           wt_type <- "custom"
@@ -117,7 +115,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
                                                     "DL", "HE", "HS", "SJ", "ML", "REML", "EB", "PM"))
      }
      wt_type <- scalar_arg_warning(arg = wt_type, arg_name = "wt_type")
-     
+
      if(!is.null(moderators)){
           if(is.null(dim(moderators))){
                moderators <- as.data.frame(moderators, stringsAsFactors = FALSE)
@@ -151,8 +149,8 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
 
      additional_args <- list(...)
 
-     inputs <- list(wt_type = wt_type, 
-                    conf_level = conf_level, cred_level = cred_level, 
+     inputs <- list(wt_type = wt_type,
+                    conf_level = conf_level, cred_level = cred_level,
                     conf_method = conf_method, cred_method = cred_method,
                     var_unbiased = var_unbiased)
 
@@ -176,7 +174,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      }else{
           es_data <- cbind(construct_x = NA, es_data)
      }
-     
+
      if(!is.null(group2)){
           es_data <- cbind(group2 = group2, es_data)
      }else{
@@ -187,12 +185,12 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
      }else{
           es_data <- cbind(group1 = NA, es_data)
      }
-     
+
      infinite_value <- is.infinite(es_data$es) | is.infinite(es_data$n) | is.infinite(es_data$var_e)
      infinite_value[is.na(infinite_value)] <- FALSE
      if(any(infinite_value))
           stop("Effect sizes, sample sizes, and error variances must be finite: Please remove infinite values", call. = FALSE)
-     
+
      valid_es <- !is.na(es_data$es) & !is.na(es_data$n) & !is.na(es_data$var_e)
      if(all(!valid_es)) stop("No valid sets of effect sizes, sample sizes, and error variances were provided", call. = FALSE)
      if(sum(!valid_es) > 0)
@@ -203,52 +201,52 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
           }
      es_data <- as_tibble(es_data)[valid_es,]
      if(!is.null(moderators)) moderators <- as_tibble(moderators)[valid_es,]
-     
+
      if(!is.null(moderators))
           es_data <- cbind(es_data, moderators)
-     
+
      use_grouped_df <- !is.null(construct_x)| !is.null(construct_y) |!is.null(group1) | !is.null(group2)
      if(use_grouped_df)
           es_data <- es_data %>% group_by(.data$group1, .data$group2, .data$construct_x, .data$construct_y)
-     
-     out <- es_data %>% 
-          do(ma_wrapper(es_data = if(is.null(moderator_names$all)){.data}else{.data[,!(colnames(.data) %in% moderator_names$all)]}, 
+
+     out <- es_data %>%
+          do(ma_wrapper(es_data = if(is.null(moderator_names$all)){.data}else{.data[,!(colnames(.data) %in% moderator_names$all)]},
                         es_type = "generic", ma_type = "bb", ma_fun = .ma_generic,
-                        moderator_matrix = if(is.null(moderator_names$all)){NULL}else{as.data.frame(.data, stringsAsFactors = FALSE)[,moderator_names$all]}, 
+                        moderator_matrix = if(is.null(moderator_names$all)){NULL}else{as.data.frame(.data, stringsAsFactors = FALSE)[,moderator_names$all]},
                         moderator_type = moderator_type, cat_moderators = cat_moderators,
-                        
+
                         ma_arg_list = list(conf_level = conf_level, cred_level = cred_level,
                                            conf_method = conf_method, cred_method = cred_method, var_unbiased = var_unbiased, wt_type = wt_type),
                         presorted_data = additional_args$presorted_data, analysis_id_variables = additional_args$analysis_id_variables,
                         moderator_levels = moderator_levels, moderator_names = moderator_names) )
-     
+
      if(use_grouped_df){
           out <- ungroup(out)
           analysis_combs <- apply(out[,c("group1", "group2", "construct_x", "construct_y")], 1, function(x){
                paste(x, collapse = " ")
           })
           out <- bind_cols(pair_id = as.numeric(factor(analysis_combs, levels = unique(analysis_combs))), out)
-          
+
           if(is.null(group2)) out$group2 <- NULL
           if(is.null(group1)) out$group1 <- NULL
           if(is.null(construct_y)) out$construct_y <- NULL
           if(is.null(construct_x)) out$construct_x <- NULL
      }
-     
+
      out <- bind_cols(analysis_id = 1:nrow(out), out)
-     attributes(out) <- append(attributes(out), list(call_history = list(call), 
-                                                     inputs = inputs, 
+     attributes(out) <- append(attributes(out), list(call_history = list(call),
+                                                     inputs = inputs,
                                                      ma_methods = "bb",
-                                                     ma_metric = "generic", 
+                                                     ma_metric = "generic",
                                                      warnings = clean_warning(warn_obj1 = warn_obj1, warn_obj2 = record_warnings()),
-                                                     fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE)))) 
+                                                     fyi = record_fyis(neg_var_res = sum(unlist(map(out$meta_tables, function(x) x$barebones$var_res < 0)), na.rm = TRUE))))
      out <- namelists.ma_psychmeta(ma_obj = out)
-     
+
      class(out) <- c("ma_psychmeta", class(out))
-     
+
      options(psychmeta.show_progress = .psychmeta.show_progress)
      options(dplyr.show_progress = .dplyr.show_progress)
-     
+
      return(out)
 }
 
