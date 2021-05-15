@@ -19,7 +19,7 @@ Depends: R (>= 3.5.0)
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-Imports: dplyr, stats, boot, tibble, reshape2,
+Imports: dplyr, stats, boot, tibble,
          ggplot2, metafor, progress, tidyr (>= 1.0.0), stringi,
          rlang, curl, purrr, data.table
 Suggests: 

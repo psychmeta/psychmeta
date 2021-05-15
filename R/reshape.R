@@ -17,7 +17,6 @@
 #' @author Jack W. Kostal
 #'
 #' @importFrom tibble as_tibble
-#' @importFrom reshape2 melt
 #'
 #' @examples
 #' ## Create a hypothetical matrix of data from a small study:
@@ -102,9 +101,13 @@ reshape_mat2dat <- function(var_names, cor_data, common_data = NULL, unique_data
 
      rownames(cor_data) <- colnames(cor_data) <- rownames(common_data) <- rownames(unique_data) <- var_names
 
-     cor_data_trans <- melt(cor_data,na.rm=TRUE)
-     cor_data_trans[,1:2] <- cor_data_trans[,2:1]
-     colnames(cor_data_trans) <- c("x_name", "y_name", "rxyi")
+     cor_data_trans <- .reshape_longer_matrix(
+             cor_data,
+             na.rm = TRUE,
+             varnames = c("x_name", "y_name"),
+             value.name = "rxyi",
+             rev = TRUE
+     )
 
      common_data_out <- common_data[cor_data_trans$x_name,]
      unique_data_x <- unique_data[cor_data_trans$x_name,]
@@ -468,5 +471,35 @@ reshape_vec2mat <- function(cov = NULL, var = NULL, order = NULL, var_names = NU
           var_names <- paste("Var", 1:ncol(mat), sep = "")
      dimnames(mat) <- list(var_names, var_names)
      mat
+}
+
+.reshape_longer_matrix <- function(
+  data,
+  varnames = names(dimnames(data)),
+  na.rm = FALSE,
+  value.name = "value",
+  rev = FALSE
+) {
+  if (! inherits(data, c("array", "data.frame"))) {
+    stop("'data' must be a matrix, array, or data.frame", call. = FALSE)
+  }
+  dn <- dimnames(data)
+  if (is.null(dn)) {
+    dn <- rep(list(NULL), length(dim(data)))
+  }
+  null_names <- which(unlist(lapply(dn, is.null)))
+  dn[null_names] <- lapply(null_names, function(i) seq_len(dim(data)[i]))
+  labels <- expand.grid(dn, KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
+  if (rev) {
+    labels <- rev(labels)
+  }
+  names(labels) <- varnames
+  if (na.rm) {
+    missing <- is.na(data)
+    data <- data[!missing]
+    labels <- labels[!missing, ]
+  }
+  value_df <- setNames(data.frame(as.vector(data)), value.name)
+  cbind(labels, value_df)
 }
 
