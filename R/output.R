@@ -789,6 +789,14 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
           )
 
      } else {
+          if (!requireNamespace("stringi", quietly = TRUE)) {
+                  stop(paste("The 'stringi' package is needed to output from `metabulate()` to a file.",
+                             "Please install 'stringi' using:\n    install.packages('stringi')\n",
+                             "Alternatively, you can embed `metabulate()` output into an RMarkdown document.",
+                             "See `?metabulate` for details.",
+                             sep = "\n  ")
+                  )
+          }
           if(output_format == "rmd") save_build_files <- TRUE
           # Prevent LaTeX from removing figure space characters
           if(output_format != "text" & !is.null(meta_tables)) {
@@ -960,7 +968,9 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 
                                 "\n\n\\elandscape\n\n"
                            )
-                      } else tables_document <- NULL
+                      } else {
+                              tables_document <- NULL
+                      }
 
                       ## Create the markdown header and document
                       header <- paste(names(header), header, sep=": ", collapse="\n")

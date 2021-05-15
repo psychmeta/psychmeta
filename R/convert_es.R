@@ -71,22 +71,26 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
 
         input_es <- tryCatch(match.arg(input_es, valid_input_es), error = function(e) e)
         if (inherits(input_es, "error")) {
-                if (stringi::stri_detect(input_es$message, regex = "length 1"))
+                if (grepl(x = input_es$message, pattern = "length 1")) {
                         stop("`input_es` must be length 1.")
-                if (stringi::stri_detect(input_es$message, regex = "should be one of"))
+                }
+                if (grepl(x = input_es$message, pattern = "should be one of")) {
                         stop(paste0("Invalid `input_es` provided. Must be one of '",
                                     paste0(valid_input_es, collapse = "', '"),
                                     "'")
-                            )
+                        )
+                }
         }
         output_es <- tryCatch(match.arg(output_es, valid_output_es), error = function(e) e)
         if (inherits(output_es, "error")) {
-                if (stringi::stri_detect(output_es$message, regex = "length 1"))
+                if (grepl(x = output_es$message, pattern = "length 1")) {
                         stop("`output_es` must be length 1.")
-                if (stringi::stri_detect(output_es$message, regex = "should be one of"))
+                }
+                if (grepl(x = output_es$message, pattern = "should be one of")) {
                         stop(paste0("Invalid `output_es` provided. Must be one of '",
                                     paste0(valid_output_es, collapse = "', '"),
                                     "'"))
+                }
         }
         input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2)
 
