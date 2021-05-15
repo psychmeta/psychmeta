@@ -21,7 +21,7 @@ LazyData: true
 VignetteBuilder: knitr
 Imports: stats, boot, metafor, ggplot2, 
          progress, curl,
-         data.table, dplyr, tibble, tidyr (>= 1.0.0), rlang, purrr
+         dplyr, tibble, tidyr (>= 1.0.0), rlang, purrr
 Suggests: 
     MASS,
     mvtnorm,

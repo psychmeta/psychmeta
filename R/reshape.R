@@ -338,7 +338,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
                }
           }
 
-          new_data <- data.table::rbindlist(new_data, fill = TRUE)
+          new_data <- Reduce(rbind, new_data)
 
      } else {
           # new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)), stringsAsFactors = FALSE)
@@ -376,14 +376,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
                     }
                }
           }
-
-          new_data <- data.table::rbindlist(new_data, fill = TRUE)
-     }
-
-     if (inherits(data, "tbl_df")) {
-       new_data <- as_tibble(new_data)
-     } else if (inherits(data, "data.frame")) {
-       new_data <- as.data.frame(new_data, stringsAsFactors = FALSE)
+          new_data <- Reduce(rbind, new_data)
      }
      new_data
 }

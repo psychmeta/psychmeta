@@ -170,7 +170,7 @@
      )
 
      if (!is.null(moderators)) {
-          mod_out <- as.data.frame(data.table::rbindlist(lapply(out, function(x) x$moderators_comp)), stringsAsFactors = FALSE)
+          mod_out <- Reduce(rbind, lapply(out, function(x) x$moderators_comp))
      } else {
           mod_out <- NULL
      }

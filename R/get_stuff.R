@@ -141,7 +141,7 @@ get_stuff <- function(ma_obj, what = c("metatab", "escalc", "metafor", "ad", "fo
 get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, moderators = TRUE, ...){
 
         ma_obj <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, ..., traffic_from_get = TRUE)
-        
+
         if(!"escalc" %in% colnames(ma_obj)){
                 message("Column 'escalc' is not present in 'ma_obj'")
                 NULL
@@ -195,11 +195,11 @@ get_escalc <- function(ma_obj, analyses = "all", match = c("all", "any"), case_s
                                         }
                                 })
                 }
-                
+
                 names(out) <- paste0("analysis_id: ", ma_obj$analysis_id)
-                
+
                 class(out) <- "get_escalc"
-                out       
+                out
         }
 }
 
@@ -452,7 +452,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                ad_y <- ad_y[unlist(map(ad_y, nrow)) > 0]
 
                if(length(ad_x) > 0){
-                    ad_x <- as_tibble(data.table::rbindlist(ad_x), .name_repair = "minimal")
+                    ad_x <- Reduce(rbind, ad_x)
                     ad_x$artifact <- as.character(ad_x$artifact)
                     ad_x$description <- dplyr::recode(ad_x$artifact,
                                                       qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
@@ -472,7 +472,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                }
 
                if(length(ad_y) > 0){
-                    ad_y <- as_tibble(data.table::rbindlist(ad_y), .name_repair = "minimal")
+                    ad_y <- Reduce(rbind, ad_y)
                     ad_y$artifact <- as.character(ad_y$artifact)
                     ad_y$description <- dplyr::recode(ad_y$artifact,
                                                       qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
@@ -505,30 +505,30 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                      if("tsa" %in% ad_type){
                              ad_list_ic_x <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_x_", "tsa")]]})
                              ad_list_ic_y <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_y_", "tsa")]]})
-                             
+
                              ad$ic$tsa <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ic_x, ad_y = ad_list_ic_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
                              rm(ad_list_ic_x, ad_list_ic_y)
                      }
                      if("int" %in% ad_type){
                              ad_list_ic_x <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_x_", "int")]]})
                              ad_list_ic_y <- map(ma_obj$ad, function(x){x[["ic"]][[paste0("ad_y_", "int")]]})
-                             
+
                              ad$ic$int <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ic_x, ad_y = ad_list_ic_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
                              rm(ad_list_ic_x, ad_list_ic_y)
                      }
              }
-             
+
              if("ad" %in% ma_method){
                      ad_list_ad_x <- map(ma_obj$ad, function(x) x[["ad"]][["ad_x"]])
                      ad_list_ad_y <- map(ma_obj$ad, function(x) x[["ad"]][["ad_y"]])
-                     
+
                      ad$ad <- .get_ad(ma_obj = ma_obj, ad_x = ad_list_ad_x, ad_y = ad_list_ad_y, as_ad_obj = as_ad_obj, inputs_only = inputs_only)
                      rm(ad_list_ad_x, ad_list_ad_y)
              }
-             
+
              class(ad) <- "get_ad"
-             
-             ad       
+
+             ad
      }
 }
 
@@ -550,7 +550,7 @@ get_followup <- function(ma_obj, analyses = "all", match = c("all", "any"), case
      }else{
              class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
              .followup <- ma_obj[,follow_up]
-             
+
              out <- apply(.followup, 2, function(x){
                      as.list(x)
              })
@@ -558,10 +558,10 @@ get_followup <- function(ma_obj, analyses = "all", match = c("all", "any"), case
              if(any(names(out) == "metareg")){
                      out$metareg <- out$metareg[!unlist(map(out$metareg, is.null))]
              }
-             
+
              class(out) <- c("get_followup")
-             
-             out       
+
+             out
      }
 }
 
@@ -575,7 +575,7 @@ get_heterogeneity <- function(ma_obj, analyses = "all", match = c("all", "any"),
                 out <- get_followup(ma_obj = ma_obj, follow_up = "heterogeneity",
                                     analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
                 class(out) <- c("get_heterogeneity")
-                out       
+                out
         }
 }
 
@@ -589,7 +589,7 @@ get_leave1out <- function(ma_obj, analyses = "all", match = c("all", "any"), cas
                 out <- get_followup(ma_obj = ma_obj, follow_up = "leave1out",
                                     analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
                 class(out) <- c("get_leave1out")
-                out    
+                out
         }
 }
 
@@ -603,7 +603,7 @@ get_cumulative <- function(ma_obj, analyses = "all", match = c("all", "any"), ca
                 out <- get_followup(ma_obj = ma_obj, follow_up = "cumulative",
                                     analyses = analyses, match = match, case_sensitive = case_sensitive, ...)[[1]]
                 class(out) <- c("get_cumulative")
-                out   
+                out
         }
 }
 
@@ -782,7 +782,7 @@ get_plots <- function(ma_obj, analyses = "all", match = c("all", "any"), case_se
      }else{
              class(ma_obj) <- class(ma_obj)[class(ma_obj) != "ma_psychmeta"]
              .plots <- ma_obj[,plot_types]
-             
+
              out <- apply(.plots, 2, function(x){
                      as.list(x)
              })
@@ -790,7 +790,7 @@ get_plots <- function(ma_obj, analyses = "all", match = c("all", "any"), case_se
              if(any(names(out) == "forest")){
                      out$forest <- out$forest[!unlist(map(out$forest, is.null))]
              }
-             
+
              class(out) <- c("get_plots")
              out
      }

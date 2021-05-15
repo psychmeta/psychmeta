@@ -194,7 +194,6 @@
 #' @export
 #'
 #' @importFrom tibble as_tibble
-#' @importFrom data.table rbindlist
 #' @import metafor
 #' @importFrom boot boot
 #' @importFrom boot boot.ci
@@ -1397,7 +1396,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                      )
                   )
 
-          collapsed_data <- as.data.frame(data.table::rbindlist(collapsed_data_list), stringsAsFactors = FALSE)
+          collapsed_data <- Reduce(rbind, collapsed_data_list)
           colnames(collapsed_data)[colnames(collapsed_data) == "es"] <- "rxyi"
           collapsed_data <- collapsed_data[,colnames(full_data_mod)]
 
@@ -1598,7 +1597,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           # TODO: Drop pair_id and analyis_id, just group by construct pair and moderator
           for(i in 1:length(out)) out[[i]] <- tibble(pair_id = rep(i, nrow(out[[i]][[3]])), !!!out[[i]])
 
-          out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
+          out <- Reduce(rbind, out)
 
           # TODO: Move to get_ad()
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa, ad_obj_y = ad_obj_list_tsa)
@@ -1741,8 +1740,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                out <- map(out, function(x) x$ma_obj)
           }
 
-          for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
-          out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
+          for (i in 1:length(out)) {
+                  out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
+          }
+          out <- Reduce(rbind, out)
 
           if(es_d & treat_as_d){
                out$analysis_id <- NULL
