@@ -31,7 +31,7 @@
 
 \item{ma_method}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
 
-\item{correction_type}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
+\item{correction_type}{Types of meta-analytic corrections to be included. Valid options are: "ts", "vgx", and "vgy"}
 
 \item{conf_level}{Confidence level to define the width of confidence intervals (defaults to value set when \code{object} was fit)}
 }
@@ -43,7 +43,7 @@ This function computes Wald-type pairwise comparisons for each level of
 categorical moderators for an \code{ma_psychmeta} object, as well as an ombnibus
 one-way ANOVA test (equal variance not assumed).
 
-Currently, samples across moderator levels are assumed to be indepdent.
+Currently, samples across moderator levels are assumed to be independent.
 }
 \note{
 Currently, only simple (single) categorical moderators (one-way ANOVA) are supported.
