@@ -285,6 +285,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      ryy_type <- ryy_type[valid_r]
 
      rxyi <- rxyi[valid_r]
+     if(any(zapsmall(rxyi) == 0 & correct_rr_x & !indirect_rr_x & correct_rr_y & !indirect_rr_y))
+             stop("The correction for bivariate direct range restricton is not appropriate for `rxyi` values of zero.", call. = FALSE)
+     rxyi[rxyi == 0] <- 10^(-20) # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
      if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators, .name_repair = "minimal")[valid_r,], stringsAsFactors = FALSE)

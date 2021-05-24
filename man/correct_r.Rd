@@ -29,7 +29,7 @@ correct_r(
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"}
 
-\item{rxyi}{Vector of observed correlations.}
+\item{rxyi}{Vector of observed correlations. \emph{NOTE}: Beginning in \code{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.}
 
 \item{ux}{Vector of u ratios for X.}
 
@@ -90,21 +90,21 @@ where the \eqn{\lambda}{lambda} value allows \eqn{u_{X}}{ux} and \eqn{u_{Y}}{uy}
 }
 \examples{
 ## Correction for measurement error only
-correct_r(correction = "bvirr", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+correct_r(correction = "meas", rxyi = .3, rxx = .8, ryy = .8,
      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-correct_r(correction = "meas", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+correct_r(correction = "meas", rxyi = .3, rxx = .8, ryy = .8,
      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 
 ## Correction for direct range restriction in X
-correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 
 ## Correction for indirect range restriction in X
-correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 
 ## Correction for direct range restriction in X and Y

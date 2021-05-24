@@ -273,7 +273,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' Correct correlations for range restriction and/or measurement error
 #'
 #' @param correction Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"
-#' @param rxyi Vector of observed correlations.
+#' @param rxyi Vector of observed correlations. \emph{NOTE}: Beginning in \code{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.
 #' @param ux Vector of u ratios for X.
 #' @param uy Vector of u ratios for Y.
 #' @param rxx Vector of reliability coefficients for X.
@@ -338,21 +338,21 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #'
 #' @examples
 #' ## Correction for measurement error only
-#' correct_r(correction = "bvirr", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "meas", rxyi = .3, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-#' correct_r(correction = "meas", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "meas", rxyi = .3, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
-#'
+#' 
 #' ## Correction for direct range restriction in X
-#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 #'
 #' ## Correction for indirect range restriction in X
-#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 #'
 #' ## Correction for direct range restriction in X and Y
@@ -376,6 +376,10 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
                       n = NULL, conf_level = .95, correct_bias = FALSE){
      correction <- match.arg(correction)
 
+     if(any(zapsmall(rxyi) == 0) & correction == "bvdrr") 
+             stop("The correction for bivariate direct range restricton ('bvdrr') is not appropriate for `rxyi` values of zero.", call. = FALSE)
+     rxyi[rxyi == 0] <- 10^(-20) # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
+     
      if(correction == "meas")
           out <- correct_r_meas(rxy = rxyi, rxx = rxx, ryy = ryy,
                                 n = n, conf_level = conf_level, correct_bias = correct_bias)
