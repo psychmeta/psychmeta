@@ -29,7 +29,7 @@ correct_r(
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"}
 
-\item{rxyi}{Vector of observed correlations. \emph{NOTE}: Beginning in \code{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.}
+\item{rxyi}{Vector of observed correlations. \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.}
 
 \item{ux}{Vector of u ratios for X.}
 
