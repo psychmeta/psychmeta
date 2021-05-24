@@ -273,7 +273,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' Correct correlations for range restriction and/or measurement error
 #'
 #' @param correction Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"
-#' @param rxyi Vector of observed correlations. \emph{NOTE}: Beginning in \code{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.
+#' @param rxyi Vector of observed correlations. \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.
 #' @param ux Vector of u ratios for X.
 #' @param uy Vector of u ratios for Y.
 #' @param rxx Vector of reliability coefficients for X.
