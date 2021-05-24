@@ -134,7 +134,8 @@ ma_d_ic(
 )
 }
 \arguments{
-\item{d}{Vector or column name of observed \emph{d} values.}
+\item{d}{Vector or column name of observed \emph{d} values.
+\emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{d} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value (in the correlation metric) via the \code{zero_substitute} argument for \code{\link{control_psychmeta}} to facilitate the estimation of corrected error variances.}
 
 \item{n1}{Vector or column name of sample sizes.}
 

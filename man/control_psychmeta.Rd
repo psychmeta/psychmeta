@@ -27,6 +27,7 @@ control_psychmeta(
   estimate_pa = FALSE,
   decimals = 2,
   hs_override = FALSE,
+  zero_substitute = .Machine$double.eps,
   ...
 )
 }
@@ -93,6 +94,8 @@ If an imputation method ending in "mod" is selected but no moderators are provid
 \code{var_unbiased} (will set to \code{FALSE}), 
 \code{residual_ads} (will be set to \code{FALSE}),
 and \code{use_all_arts} (will set to \code{FALSE}).}
+
+\item{zero_substitute}{Value to be used as a functionally equivalent substitute for exactly zero effect sizes in individual-correction meta-analyses to facilitate the estimation of corrected error variances. By default, this is set to \code{.Machine$double.eps}.}
 
 \item{...}{Further arguments to be passed to functions called within the meta-analysis.}
 }

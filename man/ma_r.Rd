@@ -136,7 +136,7 @@ ma_r_ic(
 }
 \arguments{
 \item{rxyi, r}{Vector or column name of observed correlations. The \code{r} argument is used with the \code{ma_r_bb} (i.e., the barebones function) function and the \code{rxyi} argument is used with \code{ma_r} and \code{ma_r_ic} (i.e., the function in which corrections are applied).
-\emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of corrected error variances.}
+\emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{rxyi} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value via the \code{zero_substitute} argument for \code{\link{control_psychmeta}} to facilitate the estimation of corrected error variances.}
 
 \item{n}{Vector or column name of sample sizes.}
 

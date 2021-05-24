@@ -273,7 +273,8 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' Correct correlations for range restriction and/or measurement error
 #'
 #' @param correction Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"
-#' @param rxyi Vector of observed correlations. \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.
+#' @param rxyi Vector of observed correlations. 
+#' \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{rxyi} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value via the \code{zero_substitute} argument to facilitate the estimation of effective sample sizes.
 #' @param ux Vector of u ratios for X.
 #' @param uy Vector of u ratios for Y.
 #' @param rxx Vector of reliability coefficients for X.
@@ -290,6 +291,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
 #' @param correct_bias Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (\code{TRUE}) or not (\code{FALSE}).
 #' For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE}, the default).
+#' @param zero_substitute Value to be used as a functionally equivalent substitute for exactly zero effect sizes to facilitate the estimation of effective sample sizes. By default, this is set to \code{.Machine$double.eps}.
 #'
 #' @return Data frame(s) of observed correlations (\code{rxyi}), operational range-restricted correlations corrected for measurement error in Y only (\code{rxpi}), operational range-restricted correlations corrected for measurement error in X only (\code{rtyi}), and range-restricted true-score correlations (\code{rtpi}),
 #' range-corrected observed-score correlations (\code{rxya}), operational range-corrected correlations corrected for measurement error in Y only (\code{rxpa}), operational range-corrected correlations corrected for measurement error in X only (\code{rtya}), and range-corrected true-score correlations (\code{rtpa}).
@@ -373,12 +375,13 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
                       rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
                       ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                       sign_rxz = 1, sign_ryz = 1,
-                      n = NULL, conf_level = .95, correct_bias = FALSE){
+                      n = NULL, conf_level = .95, correct_bias = FALSE,
+                      zero_substitute = .Machine$double.eps){
      correction <- match.arg(correction)
 
      if(any(zapsmall(rxyi) == 0) & correction == "bvdrr") 
              stop("The correction for bivariate direct range restricton ('bvdrr') is not appropriate for `rxyi` values of zero.", call. = FALSE)
-     rxyi[rxyi == 0] <- 10^(-20) # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
+     rxyi[rxyi == 0] <- zero_substitute # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
      
      if(correction == "meas")
           out <- correct_r_meas(rxy = rxyi, rxx = rxx, ryy = ryy,

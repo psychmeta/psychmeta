@@ -23,13 +23,15 @@ correct_r(
   sign_ryz = 1,
   n = NULL,
   conf_level = 0.95,
-  correct_bias = FALSE
+  correct_bias = FALSE,
+  zero_substitute = .Machine$double.eps
 )
 }
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"}
 
-\item{rxyi}{Vector of observed correlations. \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, rxyi values of exactly 0 in individual-correction meta-analyses are replaced with the functionally equivalent value 10^(-20) to facilitate the estimation of effective sample sizes.}
+\item{rxyi}{Vector of observed correlations.
+\emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{rxyi} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value via the \code{zero_substitute} argument to facilitate the estimation of effective sample sizes.}
 
 \item{ux}{Vector of u ratios for X.}
 
@@ -61,6 +63,8 @@ correct_r(
 
 \item{correct_bias}{Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (\code{TRUE}) or not (\code{FALSE}).
 For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE}, the default).}
+
+\item{zero_substitute}{Value to be used as a functionally equivalent substitute for exactly zero effect sizes to facilitate the estimation of effective sample sizes. By default, this is set to \code{.Machine$double.eps}.}
 }
 \value{
 Data frame(s) of observed correlations (\code{rxyi}), operational range-restricted correlations corrected for measurement error in Y only (\code{rxpi}), operational range-restricted correlations corrected for measurement error in X only (\code{rtyi}), and range-restricted true-score correlations (\code{rtpi}),
