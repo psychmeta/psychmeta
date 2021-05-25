@@ -170,7 +170,7 @@
      )
 
      if (!is.null(moderators)) {
-          mod_out <- Reduce(rbind, lapply(out, function(x) x$moderators_comp))
+          mod_out <- do.call(rbind, lapply(out, function(x) x$moderators_comp))
      } else {
           mod_out <- NULL
      }

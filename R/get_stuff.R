@@ -452,7 +452,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                ad_y <- ad_y[unlist(map(ad_y, nrow)) > 0]
 
                if(length(ad_x) > 0){
-                    ad_x <- Reduce(rbind, ad_x)
+                    ad_x <- do.call(rbind, ad_x)
                     ad_x$artifact <- as.character(ad_x$artifact)
                     ad_x$description <- dplyr::recode(ad_x$artifact,
                                                       qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",
@@ -472,7 +472,7 @@ get_ad <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensi
                }
 
                if(length(ad_y) > 0){
-                    ad_y <- Reduce(rbind, ad_y)
+                    ad_y <- do.call(rbind, ad_y)
                     ad_y$artifact <- as.character(ad_y$artifact)
                     ad_y$description <- dplyr::recode(ad_y$artifact,
                                                       qxa_irr = "Applicant measurement quality (corrected for indirect range restriction)",

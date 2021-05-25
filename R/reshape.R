@@ -338,7 +338,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
                }
           }
 
-          new_data <- Reduce(rbind, new_data)
+          new_data <- do.call(rbind, new_data)
 
      } else {
           # new_data <- data.frame(matrix(NA, 0, length(common_vars) + 4 + 2 * length(other_cnames)), stringsAsFactors = FALSE)
@@ -376,7 +376,7 @@ reshape_wide2long <- function(data, common_vars = NULL, es_design = NULL, n_desi
                     }
                }
           }
-          new_data <- Reduce(rbind, new_data)
+          new_data <- do.call(rbind, new_data)
      }
      new_data
 }

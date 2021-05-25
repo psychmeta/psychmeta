@@ -452,7 +452,7 @@ create_ad_list <- create_ad_tibble
                               out
                          })
 
-                         .data <- Reduce(rbind, measure_averages)
+                         .data <- do.call(rbind, measure_averages)
 
                          if(nrow(.data) > 1){
                               if(collapse_method == "composite"){
