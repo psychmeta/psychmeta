@@ -1,3 +1,11 @@
+Changes in Version 2.6.0 (2021-05-30)
+======================================
+
+- Improved handling of effect sizes with observed magnitudes of exactly zero in individual-correction meta-analyses. To accurately account for the estimation of error variances after correcting for artifacts, effect sizes of exactly zero are substituted with functionally equivalent but computationally non-zero values via the "zero_substitute " argument of the control_psychmeta() function. The default "zero_substitute" value is .Machine$double.eps -- this permits the effect size to be treated as functionally zero while still allowing an attenuation factor to be computed, which is used to estimate a more accurate corrected error variance estimate.
+
+- Reduced number of dependencies. 
+
+
 Changes in Version 2.5.1 (2021-05-07)
 ======================================
 - Bug fix in consolidating dependent correlations when the dataset contains same-construct intercorrelations.

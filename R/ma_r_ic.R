@@ -780,8 +780,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }else{
           correction_data <- cbind(presorted_data, correction_data)
      }
-     if(!is.null(citekey)) correction_data <- cbind(citekey = citekey, correction_data) %>% mutate(citekey = as.character(citekey))
-     if(!is.null(sample_id)) correction_data <- cbind(sample_id = sample_id, correction_data) %>% mutate(sample_id = as.character(sample_id))
+     if(!is.null(citekey)) correction_data <- cbind(citekey = citekey, correction_data)
+     if(!is.null(sample_id)) correction_data <- cbind(sample_id = sample_id, correction_data)
 
      es_data <- data.frame(rxyi = rxyi_orig,
                            n = n,
@@ -1007,8 +1007,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                escalc_tp$pi <- data$pi
                escalc_tp$pa <- data$pa
 
-               if(!is.null(citekey)) escalc_tp <- cbind(citekey = citekey, escalc_tp) %>% mutate(citekey = as.character(citekey))
-               if(!is.null(sample_id)) escalc_tp <- cbind(sample_id = sample_id, escalc_tp) %>% mutate(sample_id = as.character(sample_id))
+               if(!is.null(citekey)) escalc_tp <- cbind(citekey = citekey, escalc_tp)
+               if(!is.null(sample_id)) escalc_tp <- cbind(sample_id = sample_id, escalc_tp)
                if(any(colnames(data) == "original_order")) escalc_tp <- cbind(original_order = data$original_order, escalc_tp)
                class(escalc_tp) <- c("escalc", "data.frame")
           }
@@ -1067,8 +1067,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
                escalc_xp$pi <- data$pi
                escalc_xp$pa <- data$pa
-               if(!is.null(citekey)) escalc_xp <- cbind(citekey = citekey, escalc_xp) %>% mutate(citekey = as.character(citekey))
-               if(!is.null(sample_id)) escalc_xp <- cbind(sample_id = sample_id, escalc_xp) %>% mutate(sample_id = as.character(sample_id))
+               if(!is.null(citekey)) escalc_xp <- cbind(citekey = citekey, escalc_xp)
+               if(!is.null(sample_id)) escalc_xp <- cbind(sample_id = sample_id, escalc_xp)
                if(any(colnames(data) == "original_order")) escalc_xp <- cbind(original_order = data$original_order, escalc_xp)
                class(escalc_xp) <- c("escalc", "data.frame")
           }
@@ -1126,8 +1126,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
                escalc_ty$pi <- data$pi
                escalc_ty$pa <- data$pa
-               if(!is.null(citekey)) escalc_ty <- cbind(citekey = citekey, escalc_ty) %>% mutate(citekey = as.character(citekey))
-               if(!is.null(sample_id)) escalc_ty <- cbind(sample_id = sample_id, escalc_ty) %>% mutate(sample_id = as.character(sample_id))
+               if(!is.null(citekey)) escalc_ty <- cbind(citekey = citekey, escalc_ty)
+               if(!is.null(sample_id)) escalc_ty <- cbind(sample_id = sample_id, escalc_ty)
                if(any(colnames(data) == "original_order")) escalc_ty <- cbind(original_order = data$original_order, escalc_ty)
                class(escalc_ty) <- c("escalc", "data.frame")
           }
