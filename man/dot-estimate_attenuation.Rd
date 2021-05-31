@@ -25,6 +25,6 @@ For use with all artifact corrections except the Case V correction.
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \doi{10/b6mg}. p. 144.
+Sage. \doi{10.4135/9781483398105}. p. 144.
 }
 \keyword{internal}

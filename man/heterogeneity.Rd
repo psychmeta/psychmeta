@@ -86,7 +86,7 @@ Detecting and correcting the lies that data tell.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 15, 414, 426, 533–534.
+Sage. \doi{10.4135/9781483398105}. pp. 15, 414, 426, 533–534.
 
 Wiernik, B. M., Kostal, J. W., Wilmot, M. P., Dilchert, S., & Ones, D. S. (2017).
 Empirical benchmarks for interpreting effect size variability in meta-analysis.
