@@ -70,7 +70,7 @@ A simple method for converting an odds ratio to effect size for use in meta-anal
 \emph{Statistics in Medicine, 19}(22), 3127–3131.
 \doi{10.1002/1097-0258(20001130)19:22<3127::AID-SIM784>3.0.CO;2-M}
 
-Lipsey, M. W., & Wilson, D. B. (2001). \emph{Practical meta-analysis}. SAGE Publications.
+Lipsey, M. W., & Wilson, D. B. (2001). \emph{Practical meta-analysis}. Sage.
 
 Ruscio, J. (2008).
 A probability-based measure of effect size: Robustness to base rates and other factors.
@@ -78,5 +78,5 @@ A probability-based measure of effect size: Robustness to base rates and other f
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-SAGE Publications. \doi{10.4135/9781483398105}
+Sage. \doi{10.4135/9781483398105}
 }

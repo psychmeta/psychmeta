@@ -2,12 +2,12 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_d}
 \alias{var_error_d}
-\title{Estimate the error variance Cohen's d values}
+\title{Estimate the error variance Cohen's \mjseqn{d} values}
 \usage{
 var_error_d(d, n1, n2 = NA, correct_bias = TRUE)
 }
 \arguments{
-\item{d}{Vector of Cohen's d values.}
+\item{d}{Vector of Cohen's \mjseqn{d} values.}
 
 \item{n1}{Vector of sample sizes from group 1 (or the total sample size with the assumption that groups are of equal size, if no group 2 sample size is supplied).}
 
@@ -19,19 +19,22 @@ var_error_d(d, n1, n2 = NA, correct_bias = TRUE)
 A vector of sampling-error variances.
 }
 \description{
-Allows for error variance to be estimated using total sample size of both groups being compared (in this case, supply sample sizes using only the n1 argument) or
-using separate sample sizes for group 1 and group 2 (i.e., the groups being compared; in this case, supply sample sizes using both the n1 and n2 arguments).
+\loadmathjax
+Estimates the error variance of standardized mean differences (Cohen's \mjseqn{d} values)
 }
 \details{
-The sampling variance of a \emph{d} value is:
+Allows for error variance to be estimated using total sample size of both groups being compared (in this case, supply sample sizes using only the n1 argument) or
+using separate sample sizes for group 1 and group 2 (i.e., the groups being compared; in this case, supply sample sizes using both the n1 and n2 arguments).
 
-\deqn{\left(\frac{n-1}{n-3}\right)\left(\frac{n_{1}+n_{2}}{n_{1}n_{2}}+\frac{d^{2}}{2(n_{1}+n_{2})}\right)}{var_e = ((n - 1) / (n - 3)) * ((n1 + n2) / (n1 * n2) + d^2 / (2 * (n1 + n2)))}
+The sampling variance of a \mjseqn{d} value is:
+
+\mjdeqn{\left(\frac{n-1}{n-3}\right)\left(\frac{n_{1}+n_{2}}{n_{1}n_{2}}+\frac{d^{2}}{2(n_{1}+n_{2})}\right)}{var_e = ((n - 1) / (n - 3)) * ((n1 + n2) / (n1 * n2) + d^2 / (2 * (n1 + n2)))}
 
 When groups 1 and 2 are of equal size, this reduces to
 
-\deqn{var_{e}=\left(\frac{n-1}{n-3}\right)\left(\frac{4}{n}\right)\left(1+\frac{d^{2}}{8}\right)}{var_e = ((n - 1) / (n - 3)) * (4 / n) * (1 + d^2 / 8)}
+\mjdeqn{var_{e}=\left(\frac{n-1}{n-3}\right)\left(\frac{4}{n}\right)\left(1+\frac{d^{2}}{8}\right)}{var_e = ((n - 1) / (n - 3)) * (4 / n) * (1 + d^2 / 8)}
 
-This can be corrected for bias by first correcting the \emph{d} value (see \code{\link{correct_d_bias}}) prior to estimating the error variance.
+This can be corrected for bias by first correcting the \mjseqn{d} value (see \code{\link[=correct_d_bias]{correct_d_bias()}}) prior to estimating the error variance.
 }
 \examples{
 var_error_d(d = 1, n1 = 30, n2 = 30, correct_bias = TRUE)
@@ -40,5 +43,5 @@ var_error_d(d = 1, n1 = 60, n2 = NA, correct_bias = TRUE)
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-\doi{10.4135/9781483398105}. pp. 292–295.
+Sage. \doi{10.4135/9781483398105}. pp. 292–295.
 }

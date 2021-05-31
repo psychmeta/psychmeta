@@ -4,7 +4,7 @@
 \alias{var_error_A}
 \alias{var_error_auc}
 \alias{var_error_cles}
-\title{Estimate the error variance of the probability-based effect size (A, AUC, the common language effect size [CLES])}
+\title{Estimate the error variance of the probability-based effect size (\mjseqn{A}, AUC, the common language effect size [CLES])}
 \usage{
 var_error_A(A, n1, n2 = NA)
 
@@ -23,16 +23,17 @@ var_error_cles(A, n1, n2 = NA)
 A vector of sampling-error variances.
 }
 \description{
-Estimate the error variance of the probability-based effect size (A, AUC, the common language effect size [CLES])
+\loadmathjax
+Estimates the error variance of the probability-based common language effect size (\mjseqn{A}, AUC, CLES)
 }
 \details{
-The sampling variance of a \emph{A} (also called \emph{AUC} [area under curve] or \emph{CLES} [common-language effect size]) value is:
+The sampling variance of a \mjseqn{A} (also called \emph{AUC} [area under curve] or \emph{CLES} [common-language effect size]) value is:
 
-\deqn{\frac{\left[\left(\frac{1}{n_{1}}\right)+\left(\frac{1}{n_{2}}\right)+\left(\frac{1}{n_{1}n_{2}}\right)\right]}{12}}{var_e = [ (1/n1) + (1/n2) + (1 / (n1 * n2)) ] / 12}
+\mjdeqn{\frac{\left[\left(\frac{1}{n_{1}}\right)+\left(\frac{1}{n_{2}}\right)+\left(\frac{1}{n_{1}n_{2}}\right)\right]}{12}}{var_e = [ (1/n1) + (1/n2) + (1 / (n1 * n2)) ] / 12}
 
 When groups 1 and 2 are of equal size, this reduces to
 
-\deqn{\frac{\left[\left(\frac{1}{n}\right)+\left(\frac{1}{n^{2}}\right)\right]}{3}}{var_e = [ (1/n) + (1/n^2) ] / 3}
+\mjdeqn{\frac{\left[\left(\frac{1}{n}\right)+\left(\frac{1}{n^{2}}\right)\right]}{3}}{var_e = [ (1/n) + (1/n^2) ] / 3}
 }
 \examples{
 var_error_A(A = 1, n1 = 30, n2 = 30)
@@ -42,5 +43,5 @@ var_error_cles(A = 1, n1 = 30, n2 = 30)
 \references{
 Ruscio, J. (2008).
 A probability-based measure of effect size: Robustness to base rates and other factors.
-\emph{Psychological Methods, 13}(1), 19–30. \doi{10.1037/1082-989X.13.1.19}
+*Psychological Methods, 13*(1), 19–30. \doi{10.1037/1082-989X.13.1.19}
 }

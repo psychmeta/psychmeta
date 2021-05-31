@@ -2,26 +2,27 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_delta}
 \alias{var_error_delta}
-\title{Estimate the error variance of Glass' delta values}
+\title{Estimate the error variance of Glass's \mjseqn{\Delta} values}
 \usage{
 var_error_delta(delta, nc, ne = NA, use_pooled_sd = FALSE, correct_bias = TRUE)
 }
 \arguments{
-\item{delta}{Vector of Glass' delta values.}
+\item{delta}{Vector of Glass' \mjseqn{\Delta} values.}
 
 \item{nc}{Vector of control-group sample sizes (or the total sample size with the assumption that groups are of equal size, if no experimental-group sample size is supplied).}
 
 \item{ne}{Vector of experimental-group sample sizes.}
 
-\item{use_pooled_sd}{Logical vector determining whether the pooled standard deviation was used (TRUE) or not (FALSE). FALSE by default.}
+\item{use_pooled_sd}{Logical vector determining whether the pooled standard deviation was used (`TRUE`) or not (`FALSE`, default).}
 
-\item{correct_bias}{Logical argument that determines whether to correct error-variance estimates for small-sample bias in d values (TRUE) or not (FALSE).}
+\item{correct_bias}{Logical argument that determines whether to correct error-variance estimates for small-sample bias in d values (`TRUE`) or not (`FALSE`).}
 }
 \value{
 A vector of sampling-error variances.
 }
 \description{
-Estimate the error variance of Glass' delta values
+\loadmathjax
+Estimates the error variance of standardized mean differences (Glass's \mjseqn{\Delta} values)
 }
 \examples{
 var_error_delta(delta = .3, nc = 30, ne = 30)

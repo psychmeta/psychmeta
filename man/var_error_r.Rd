@@ -17,12 +17,13 @@ var_error_r(r, n, correct_bias = TRUE)
 A vector of sampling-error variances.
 }
 \description{
-Estimate the error variance of correlations
+\loadmathjax
+Estimates the error variance of Pearson correlations (\mjseqn{r}).
 }
 \details{
 The sampling variance of a Pearson correlation is approximately:
 
-\deqn{var_{e}=\frac{(1-r^{2})^{2}}{n-1}}{var_e = (1 - r^2)^2 / (n - 1)}
+\mjdeqn{var_{e}=\frac{(1-r^{2})^{2}}{n-1}}{var_e = (1 - r^2)^2 / (n - 1)}
 
 This can be corrected for bias in the sample correlation by first correcting the correlation (see \code{\link[=correct_r_bias]{correct_r_bias()}}) prior to estimating the error variance.
 }
@@ -33,5 +34,5 @@ var_error_r(r = .3, n = 30, correct_bias = FALSE)
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. p. 99.
+Sage. \doi{10.4135/9781483398105}. p. 99.
 }

@@ -142,5 +142,5 @@ Correction for range restriction in meta-analysis revisited: Improvements and im
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 43-44, 140–141.
+Sage. \doi{10.4135/9781483398105}. pp. 43-44, 140–141.
 }

@@ -41,6 +41,6 @@ For use with Case II and Case IV range restriction (not for use with Case V).
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
-Thousand Oaks, California: SAGE Publications, Inc. p. 145.
+Sage. \doi{10.4135/9781483398105}. p. 145.
 }
 \keyword{internal}

@@ -141,5 +141,5 @@ Improvements and implications for organizational research.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-SAGE Publications. \doi{10.4135/9781483398105}. pp. 43–44, 140–141.
+Sage. \doi{10.4135/9781483398105}. pp. 43–44, 140–141.
 }

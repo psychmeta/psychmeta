@@ -30,5 +30,5 @@ adjust_n_r(r = .3, var_e = .01)
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
-SAGE. \doi{10.4135/9781483398105}. Equation 3.7.
+Sage. \doi{10.4135/9781483398105}. Equation 3.7.
 }
