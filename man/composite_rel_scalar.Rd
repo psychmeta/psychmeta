@@ -35,5 +35,5 @@ Mosier, C. I. (1943). On the reliability of a weighted composite.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 }

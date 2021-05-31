@@ -32,5 +32,5 @@ correct_r_dich(r = 0.32, px = .5, py = .5, n = 100)
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 43–44.
+Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 43–44.
 }

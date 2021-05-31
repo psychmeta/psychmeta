@@ -21,23 +21,23 @@ convert_es(
 \arguments{
 \item{es}{Vector of effect sizes to convert.}
 
-\item{input_es}{Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \emph{d}, independent samples \emph{t} values (or their \emph{p} values), two-group one-way ANOVA \emph{F} values (or their \emph{p} values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their \emph{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).}
+\item{input_es}{Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \mjseqn{d}, independent samples \mjseqn{t} values (or their \mjseqn{p} values), two-group one-way ANOVA \mjseqn{F} values (or their \mjseqn{p} values), 1-df \mjeqn{\chi^{2}}{\chi-squared} values (or their \mjseqn{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).}
 
-\item{output_es}{Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \emph{d} values, and common language effect sizes (CLES, A, AUC).}
+\item{output_es}{Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \mjseqn{d} values, and common language effect sizes (CLES, A, AUC).}
 
 \item{n1}{Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.}
 
 \item{n2}{Vector of sample sizes of group 2 of the two groups being contrasted.}
 
-\item{df1}{Vector of input test statistic degrees of freedom (for \emph{t} and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \emph{F}).}
+\item{df1}{Vector of input test statistic degrees of freedom (for \mjseqn{t} and \mjeqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \mjseqn{F}).}
 
-\item{df2}{Vector of input test statistic within-group degrees of freedom (for \emph{F}).}
+\item{df2}{Vector of input test statistic within-group degrees of freedom (for \mjseqn{F}).}
 
 \item{sd1}{Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.}
 
 \item{sd2}{Vector of standard deviations of group 2 of the two groups being contrasted.}
 
-\item{tails}{Vector of the tails for \emph{p} values when \code{input_es = "p.t"}. Can be \code{2} (default) or \code{1}.}
+\item{tails}{Vector of the tails for \mjseqn{p} values when \code{input_es = "p.t"}. Can be \code{2} (default) or \code{1}.}
 }
 \value{
 A data frame of class \code{es} with variables:
@@ -48,7 +48,8 @@ A data frame of class \code{es} with variables:
 \item{\code{var_e}}{The estimated sampling error variance}
 }
 \description{
-This function converts a variety of effect sizes to correlations, Cohen's \emph{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
+\loadmathjax
+This function converts a variety of effect sizes to correlations, Cohen's \mjseqn{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
 }
 \examples{
 convert_es(es = 1,  input_es="d", output_es="r", n1=100)

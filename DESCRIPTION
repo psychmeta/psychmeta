@@ -20,7 +20,7 @@ Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
 Imports: stats, boot, metafor, ggplot2, 
-         progress, curl,
+         progress, curl, mathjaxr,
          dplyr, tibble, tidyr (>= 1.0.0), rlang, purrr
 Suggests: 
     MASS,
@@ -45,3 +45,4 @@ Author: Jeffrey A. Dahlke [aut, cre],
   John Sakaluk [ctb] (Code for funnel and forest plots),
   Yuejia (Mandy) Teng [ctb] (Testing)
 Maintainer: Jeffrey A. Dahlke <jdahlke@humrro.org>
+RdMacros: mathjaxr

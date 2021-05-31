@@ -61,7 +61,7 @@ Correcting correlation coefficients attenuated from using coarse scales.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 287-288.
+Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 287-288.
 
 Peters, C. C., & Van Voorhis, W. R. (1940).
 \emph{Statistical procedures and their mathematical bases}.

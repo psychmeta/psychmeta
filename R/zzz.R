@@ -17,7 +17,6 @@
 }
 
 ## Messages to be displayed when the user attaches psychmeta:
-#' @importFrom rlang .data
 .onAttach <- function(libname, pkgname) {
   cli_available <- requireNamespace("cli", quietly = TRUE)
   if (requireNamespace("crayon", quietly = TRUE)) {
@@ -222,3 +221,8 @@ register_s3_method <- function(pkg, generic, class, fun = NULL) {
   )
 }
 
+#' Supplemental imports
+#'
+#' @importFrom rlang .data
+#' @import mathjaxr
+NULL
