@@ -4,18 +4,19 @@
 #' @title Taylor Series Approximation of effect-size variances corrected for psychometric artifacts
 #'
 #' @description
+#' \loadmathjax
 #' Functions to estimate the variances corrected for psychometric artifacts.
 #' These functions use Taylor series approximations (i.e., the delta method) to estimate the corrected variance of an effect-size distribution.
 #'
 #' The available Taylor-series functions include:
 #' \itemize{
-#'      \item{\code{estimate_var_tsa_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
-#'      \item{\code{estimate_var_tsa_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-#'      \item{\code{estimate_var_tsa_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
-#'      \item{\code{estimate_var_tsa_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-#'      \item{\code{estimate_var_tsa_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-#'      \item{\code{estimate_var_tsa_rb1}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
-#'      \item{\code{estimate_var_tsa_rb2}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
+#'      \item{\code{estimate_var_tsa_meas}}{\cr Variance of \mjseqn{\rho} corrected for measurement error only}
+#'      \item{\code{estimate_var_tsa_uvdrr}}{\cr Variance of \mjseqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+#'      \item{\code{estimate_var_tsa_bvdrr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate direct range restriction and measurement error}
+#'      \item{\code{estimate_var_tsa_uvirr}}{\cr Variance of \mjseqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+#'      \item{\code{estimate_var_tsa_bvirr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+#'      \item{\code{estimate_var_tsa_rb1}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
+#'      \item{\code{estimate_var_tsa_rb2}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
 #' }
 #'
 #'
@@ -39,7 +40,7 @@
 #' @return Vector of variances corrected for mean artifacts via Taylor series approximation.
 #'
 #' @section Notes:
-#' A typographical error in Raju and Burke's article has been corrected in \code{estimate_var_tsa_rb2} so as to compute appropriate partial derivatives.
+#' A typographical error in Raju and Burke's article has been corrected in [estimate_var_tsa_rb2()] so as to compute appropriate partial derivatives.
 #'
 #' @md
 #' @references
@@ -49,10 +50,10 @@
 #'
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 #' Implications of direct and indirect range restriction for meta-analysis methods and findings.
-#' \emph{Journal of Applied Psychology, 91}(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
+#' *Journal of Applied Psychology, 91*(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
+#' *Journal of Applied Psychology, 68*(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
 NULL
 
 
