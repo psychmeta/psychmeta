@@ -1,6 +1,6 @@
-library(psychmeta)
-
-if(!(as.numeric(sessionInfo()$R.version$major) < 4 & as.numeric(sessionInfo()$R.version$minor) < 0.3)){
+if( as.numeric(sessionInfo()$R.version$major) >= 4 ){
+  
+  library(psychmeta)
   
   load("data_ma_r.rda")
   

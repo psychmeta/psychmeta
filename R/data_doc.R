@@ -13,7 +13,7 @@
 #' @references
 #' Oh, I. -S. (2009).
 #' \emph{The Five-Factor Model of personality and job performance in East Asia: A cross-cultural validity generalization study}.
-#' (Doctoral dissertation) Iowa City, IA: University of Iowa. \url{https://search.proquest.com/dissertations/docview/304903943/}
+#' (Doctoral dissertation) Iowa City, IA: University of Iowa. \url{https://www.proquest.com/dissertations/docview/304903943/}
 #'
 #' Schmidt, F. L., & Oh, I.-S. (2013).
 #' Methods for second order meta-analysis and illustrative applications.
