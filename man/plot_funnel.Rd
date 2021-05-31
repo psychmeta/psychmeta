@@ -80,7 +80,11 @@ plot_cefp(
 A list of funnel plots.
 }
 \description{
-This function creates funnel plots for meta-analyses (plots of effect size versus . Both traditional funnel plots and
+This function creates funnel plots for meta-analyses (plots of effect size versus standard error).
+}
+\details{
+Both traditional funnel plots and contour-enhanced funnel plots are provided.
+Contour-enhanced funnel plots show comparison regions for varying null-hypothesis significance test levels and can be useful for detecting publication bias.
 }
 \examples{
 \dontrun{
