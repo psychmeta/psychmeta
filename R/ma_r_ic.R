@@ -52,7 +52,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      use_all_arts <- control$use_all_arts
      estimate_pa <- control$estimate_pa
      zero_substitute <- control$zero_substitute
-     
+
      control$pairwise_ads <- TRUE
 
      if(hs_override){
@@ -1170,7 +1170,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. p. 144.
+#' Sage. \doi{10.4135/9781483398105}. p. 144.
 #'
 #' @keywords internal
 #'

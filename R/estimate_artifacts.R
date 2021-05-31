@@ -39,7 +39,7 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg} p. 127.
+#' Sage. \doi{10.4135/9781483398105} p. 127.
 #'
 #' Le, H., & Schmidt, F. L. (2006).
 #' Correcting for indirect range restriction in meta-analysis: Testing a new meta-analytic procedure.

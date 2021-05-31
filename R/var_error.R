@@ -523,14 +523,15 @@ var_error_cles <- function(A, n1, n2 = NA){
 #'
 #' @return A vector of sampling-error variances.
 #' @export
+#' @md
 #'
 #' @references
 #' Cohen, J., Cohen, P., West, S. G., & Aiken, L. S. (2003).
-#' \emph{Applied multiple regression/correlation analysis for the behavioral sciences} (3rd ed.).
-#' Mahwah, NJ: Erlbaum. \doi{10/crtf}. p. 88.
+#' *Applied multiple regression/correlation analysis for the behavioral sciences* (3rd ed.).
+#' Lawrence Erlbaum and Associates. \doi{10.4324/9780203774441}. p. 88.
 #'
 #' Olkin, I., & Finn, J. D. (1995). Correlations redux.
-#' \emph{Psychological Bulletin, 118}(1), 155–164. \doi{10/bt48vd}
+#' *Psychological Bulletin, 118*(1), 155–164. \doi{10.1037/0033-2909.118.1.155}
 #'
 #' @details
 #' The sampling variance of a multiple correlation is approximately:

@@ -89,7 +89,7 @@ estimate_length_sb <- function(rel_initial, rel_desired){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+#' Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 #'
 #' @details
 #' The formula to estimate a correlation between one composite variable and one external variable is:
@@ -279,7 +279,7 @@ composite_d_matrix <- function(d_vec, r_mat, wt_vec, p = .5){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+#' Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 #'
 #' @details
 #' The Mosier composite formula is computed as:
@@ -317,7 +317,7 @@ composite_rel_scalar <- function(mean_rel, mean_intercor, k_vars){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+#' Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 #'
 #' @details
 #' The Mosier composite formula is computed as:
