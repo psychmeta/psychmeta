@@ -144,7 +144,7 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
-#' SAGE Publications. \doi{10.4135/9781483398105}. pp. 43–44, 140–141.
+#' Sage. \doi{10.4135/9781483398105}. pp. 43–44, 140–141.
 #'
 #' @md
 #'

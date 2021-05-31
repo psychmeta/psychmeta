@@ -13,7 +13,7 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
-#' SAGE. \doi{10.4135/9781483398105}. Equation 3.7.
+#' Sage. \doi{10.4135/9781483398105}. Equation 3.7.
 #'
 #' @details
 #' The adjusted sample size is computed as:
@@ -48,7 +48,7 @@ adjust_n_r <- function(r, var_e) {
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
-#' SAGE. \doi{10.4135/9781483398105}. Chapter 7 (Equations 7.23 and 7.23a).
+#' Sage. \doi{10.4135/9781483398105}. Chapter 7 (Equations 7.23 and 7.23a).
 #'
 #' @details
 #' The adjusted sample size is computed as:

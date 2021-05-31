@@ -9,7 +9,7 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 140–141.
+#' Sage. \doi{10.4135/9781483398105}. pp. 140–141.
 #'
 #' @details
 #' \deqn{r_{c}=\frac{r_{obs}}{\left(\frac{2n-2}{2n-1}\right)}}{r_c = r / ((2 * n - 2) / (2 * n - 1))}
@@ -48,7 +48,7 @@ correct_r_bias <- function(r, n){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 287-288.
+#' Sage. \doi{10.4135/9781483398105}. pp. 287-288.
 #'
 #' Peters, C. C., & Van Voorhis, W. R. (1940).
 #' \emph{Statistical procedures and their mathematical bases}.
@@ -195,7 +195,7 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 43–44.
+#' Sage. \doi{10.4135/9781483398105}. pp. 43–44.
 #'
 #' @details
 #' \deqn{r_{c}=\frac{r_{obs}}{\left[\frac{\phi\left(p_{X}\right)}{p_{X}\left(1-p_{X}\right)}\right]\left[\frac{\phi\left(p_{Y}\right)}{p_{Y}\left(1-p_{Y}\right)}\right]}}{r_c = r_obs / (ordinate(p_x) / sqrt(p_x * (1 - p_x) * ordinate(p_y) / sqrt(p_y * (1 - p_y))}
@@ -243,7 +243,7 @@ correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 287-288.
+#' Sage. \doi{10.4135/9781483398105}. pp. 287-288.
 #'
 #' @details
 #' \deqn{r_{c}=\frac{r_{obs}}{u\sqrt{\left(\frac{1}{u^{2}}-1\right)r_{obs}^{2}+1}}}{r_c = r / (sqrt((pi*(1-pi))/(pa*(1-pa))) * sqrt(((pa*(1-pa))/(pi*(1-pi)) - 1) * r^2 + 1))}
@@ -317,7 +317,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10.4135/9781483398105}. pp. 43-44, 140–141.
+#' Sage. \doi{10.4135/9781483398105}. pp. 43-44, 140–141.
 #'
 #' @details
 #' The correction for measurement error is:
