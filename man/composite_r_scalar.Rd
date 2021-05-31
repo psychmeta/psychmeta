@@ -27,21 +27,22 @@ composite_r_scalar(
 A vector of composite correlations
 }
 \description{
+\loadmathjax
 This function estimates the correlation between a set of X variables and a set of Y variables using a scalar formula.
 }
 \details{
 The formula to estimate a correlation between one composite variable and one external variable is:
 
-\deqn{\rho_{Xy}=\frac{\bar{\rho}_{x_{i}y}}{\sqrt{\frac{1}{k_{x}}+\frac{k_{x}-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x))}
+\mjdeqn{\rho_{Xy}=\frac{\bar{\rho}_{x_{i}y}}{\sqrt{\frac{1}{k_{x}}+\frac{k_{x}-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x))}
 
 and the formula to estimate the correlation between two composite variables is:
 
-\deqn{\rho_{XY}=\frac{\bar{\rho}_{x_{i}y_{j}}}{\sqrt{\frac{1}{k_{x}}+\frac{k-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}\sqrt{\frac{1}{k_{y}}+\frac{k_{y}-1}{k_{y}}\bar{\rho}_{y_{i}y_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x) * ((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))}
+\mjdeqn{\rho_{XY}=\frac{\bar{\rho}_{x_{i}y_{j}}}{\sqrt{\frac{1}{k_{x}}+\frac{k-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}\sqrt{\frac{1}{k_{y}}+\frac{k_{y}-1}{k_{y}}\bar{\rho}_{y_{i}y_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x) * ((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))}
 
-where \eqn{\bar{\rho}_{x_{i}y}}{mean_r} and \eqn{\bar{\rho}_{x_{i}y{j}}}{mean_r} are mean correlations between the x variables and the y variable(s),
-\eqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor_x} is the mean correlation among x variables,
-\eqn{\bar{\rho}_{y_{i}y_{j}}}{mean_intercor_y} is the mean correlation among y variables,
-\eqn{{k}_{x}}{k_vars_x} is the number of x variables, and \eqn{{k}_{y}}{k_vars_y} is the number of y variables.
+where \mjeqn{\bar{\rho}_{x_{i}y}}{mean_r} and \mjeqn{\bar{\rho}_{x_{i}y{j}}}{mean_r} are mean correlations between the x variables and the y variable(s),
+\mjeqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor_x} is the mean correlation among x variables,
+\mjeqn{\bar{\rho}_{y_{i}y_{j}}}{mean_intercor_y} is the mean correlation among y variables,
+\mjeqn{{k}_{x}}{k_vars_x} is the number of x variables, and \mjeqn{{k}_{y}}{k_vars_y} is the number of y variables.
 }
 \examples{
 ## Composite correlation between 4 variables and an outside variable with which
@@ -59,5 +60,5 @@ San Francisco, CA: Freeman. p. 163-164.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 }

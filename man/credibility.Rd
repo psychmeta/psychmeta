@@ -21,10 +21,11 @@ credibility(mean, sd, k = NULL, cred_level = 0.8, cred_method = c("t", "norm"))
 A matrix of credibility intervals of the specified width.
 }
 \description{
+\loadmathjax
 Function to construct a credibility interval around a mean effect size.
 }
 \details{
-\deqn{CR=mean_{es}\pm quantile\times SD_{es}}{CR = mean_es +/- quantile * SD_es}
+\mjdeqn{CR=mean_{es}\pm quantile\times SD_{es}}{CR = mean_es +/- quantile * SD_es}
 }
 \examples{
 credibility(mean = .3, sd = .15, cred_level = .8, cred_method = "norm")

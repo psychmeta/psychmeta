@@ -1,5 +1,8 @@
 #' Correct correlations for small-sample bias
 #'
+#' \loadmathjax
+#' Corrects Pearson correlations (\mjseqn{r}) for small-sample bias
+#'
 #' @param r Vector of correlations.
 #' @param n Vector of sample sizes.
 #'
@@ -9,10 +12,10 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 140–141.
+#' Sage. \doi{10.4135/9781483398105}. pp. 140–141.
 #'
 #' @details
-#' \deqn{r_{c}=\frac{r_{obs}}{\left(\frac{2n-2}{2n-1}\right)}}{r_c = r / ((2 * n - 2) / (2 * n - 1))}
+#' \mjdeqn{r_{c}=\frac{r_{obs}}{\left(\frac{2n-2}{2n-1}\right)}}{r_c = r / ((2 * n - 2) / (2 * n - 1))}
 #'
 #' @examples
 #' correct_r_bias(r = .3, n = 30)
@@ -26,6 +29,9 @@ correct_r_bias <- function(r, n){
 
 
 #' Correct correlations for scale coarseness
+#'
+#' \loadmathjax
+#' Corrects correlations for scale coarseness.
 #'
 #' @param r Observed correlation.
 #' @param kx,ky Number of scale points used to measure the x and y variables. Set to NULL to treat as continuously measured.
@@ -48,7 +54,7 @@ correct_r_bias <- function(r, n){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 287-288.
+#' Sage. \doi{10.4135/9781483398105}. pp. 287-288.
 #'
 #' Peters, C. C., & Van Voorhis, W. R. (1940).
 #' \emph{Statistical procedures and their mathematical bases}.
@@ -183,6 +189,9 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
 
 #' Correct correlations for artificial dichotomization of one or both variables
 #'
+#' \loadmathjax
+#' Correct correlations for artificial dichotomization of one or both variables.
+#'
 #' @param r Vector of correlations attenuated by artificial dichomization.
 #' @param px Vector of proportions of the distribution on either side of the split applied to X (set as NA if X is continuous).
 #' @param py Vector of proportions of the distribution on either side of the split applied to Y (set as NA if Y is continuous).
@@ -195,10 +204,10 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 43–44.
+#' Sage. \doi{10.4135/9781483398105}. pp. 43–44.
 #'
 #' @details
-#' \deqn{r_{c}=\frac{r_{obs}}{\left[\frac{\phi\left(p_{X}\right)}{p_{X}\left(1-p_{X}\right)}\right]\left[\frac{\phi\left(p_{Y}\right)}{p_{Y}\left(1-p_{Y}\right)}\right]}}{r_c = r_obs / (ordinate(p_x) / sqrt(p_x * (1 - p_x) * ordinate(p_y) / sqrt(p_y * (1 - p_y))}
+#' \mjdeqn{r_{c}=\frac{r_{obs}}{\left[\frac{\phi\left(p_{X}\right)}{p_{X}\left(1-p_{X}\right)}\right]\left[\frac{\phi\left(p_{Y}\right)}{p_{Y}\left(1-p_{Y}\right)}\right]}}{r_c = r_obs / (ordinate(p_x) / sqrt(p_x * (1 - p_x) * ordinate(p_y) / sqrt(p_y * (1 - p_y))}
 #'
 #' @examples
 #' correct_r_dich(r = 0.32, px = .5, py = .5, n = 100)
@@ -230,6 +239,7 @@ correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
 
 #' Correct correlations for uneven/unrepresentative splits
 #'
+#' \loadmathjax
 #' This correction is mathematically equivalent to correcting the correlation for direct range restriction in the split variable.
 #'
 #' @param r Vector of correlations affected by an uneven or unrepresentative split of a dichotomous variable.
@@ -243,11 +253,11 @@ correct_r_dich <- function(r, px = NA, py = NA, n = NULL, ...){
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 287-288.
+#' Sage. \doi{10.4135/9781483398105}. pp. 287-288.
 #'
 #' @details
-#' \deqn{r_{c}=\frac{r_{obs}}{u\sqrt{\left(\frac{1}{u^{2}}-1\right)r_{obs}^{2}+1}}}{r_c = r / (sqrt((pi*(1-pi))/(pa*(1-pa))) * sqrt(((pa*(1-pa))/(pi*(1-pi)) - 1) * r^2 + 1))}
-#' where \eqn{u=\sqrt{\frac{p_{i}(1-p_{i})}{p_{a}(1-p_{a})}}}{sqrt((pi*(1-pi))/(pa*(1-pa)))}, the ratio of the dichotomous variance in the sample (\eqn{p_{i}}{pi} is the incumbent/sample proportion in one of the two groups) to the dichotomous variance in the population (\eqn{p_{a}}{pa} is the applicant/population proportion in one of the two groups).
+#' \mjdeqn{r_{c}=\frac{r_{obs}}{u\sqrt{\left(\frac{1}{u^{2}}-1\right)r_{obs}^{2}+1}}}{r_c = r / (sqrt((pi*(1-pi))/(pa*(1-pa))) * sqrt(((pa*(1-pa))/(pi*(1-pi)) - 1) * r^2 + 1))}
+#' where \mjeqn{u=\sqrt{\frac{p_{i}(1-p_{i})}{p_{a}(1-p_{a})}}}{sqrt((pi*(1-pi))/(pa*(1-pa)))}, the ratio of the dichotomous variance in the sample (\mjeqn{p_{i}}{pi} is the incumbent/sample proportion in one of the two groups) to the dichotomous variance in the population (\mjeqn{p_{a}}{pa} is the applicant/population proportion in one of the two groups).
 #' This correction is identical to the correction for univariate direct range restriction, applied to a dichotomous variable.
 #'
 #' @examples
@@ -272,8 +282,12 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 
 #' Correct correlations for range restriction and/or measurement error
 #'
+#' \loadmathjax
+#' Corrects Pearson correlations (\mjseqn{r}) for range restriction and/or measurement error
+#'
 #' @param correction Type of correction to be applied. Options are "meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "uvirr_y", "bvdrr", "bvirr"
 #' @param rxyi Vector of observed correlations.
+#' \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{rxyi} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value via the \code{zero_substitute} argument to facilitate the estimation of effective sample sizes.
 #' @param ux Vector of u ratios for X.
 #' @param uy Vector of u ratios for Y.
 #' @param rxx Vector of reliability coefficients for X.
@@ -290,6 +304,7 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
 #' @param correct_bias Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (\code{TRUE}) or not (\code{FALSE}).
 #' For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE}, the default).
+#' @param zero_substitute Value to be used as a functionally equivalent substitute for exactly zero effect sizes to facilitate the estimation of effective sample sizes. By default, this is set to \code{.Machine$double.eps}.
 #'
 #' @return Data frame(s) of observed correlations (\code{rxyi}), operational range-restricted correlations corrected for measurement error in Y only (\code{rxpi}), operational range-restricted correlations corrected for measurement error in X only (\code{rtyi}), and range-restricted true-score correlations (\code{rtpi}),
 #' range-corrected observed-score correlations (\code{rxya}), operational range-corrected correlations corrected for measurement error in Y only (\code{rxpa}), operational range-corrected correlations corrected for measurement error in X only (\code{rtya}), and range-corrected true-score correlations (\code{rtpa}).
@@ -315,44 +330,44 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 43-44, 140–141.
+#' Sage. \doi{10.4135/9781483398105}. pp. 43-44, 140–141.
 #'
 #' @details
 #' The correction for measurement error is:
-#' \deqn{\rho_{TP}=\frac{\rho_{XY}}{\sqrt{\rho_{XX}\rho_{YY}}}}{rtp = rxy / sqrt(rxx * ryy)}
+#' \mjdeqn{\rho_{TP}=\frac{\rho_{XY}}{\sqrt{\rho_{XX}\rho_{YY}}}}{rtp = rxy / sqrt(rxx * ryy)}
 #'
 #' The correction for univariate direct range restriction is:
 #' \deqn{\rho_{TP_{a}}=\left[\frac{\rho_{XY_{i}}}{u_{X}\sqrt{\rho_{YY_{i}}}\sqrt{\left(\frac{1}{u_{X}^{2}}-1\right)\frac{\rho_{XY_{i}}^{2}}{\rho_{YY_{i}}}+1}}\right]/\sqrt{\rho_{XX_{a}}}}{rtpa = (rxyi / (ux * sqrt(ryyi) * sqrt((1 / ux^2 - 1) * rxyi^2 / ryyi + 1))) / sqrt(rxxa)}
 #'
 #' The correction for univariate indirect range restriction is:
-#' \deqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}}{u_{T}\sqrt{\rho_{XX_{i}}\rho_{YY_{i}}}\sqrt{\left(\frac{1}{u_{T}^{2}}-1\right)\frac{\rho_{XY_{i}}^{2}}{\rho_{XX_{i}}\rho_{YY_{i}}}+1}}}{rtpa = rxyi / (ut * sqrt(rxxi * ryyi) * sqrt((1 / ut^2 - 1) * rxyi^2 / (rxxi * ryyi) + 1))}
+#' \mjdeqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}}{u_{T}\sqrt{\rho_{XX_{i}}\rho_{YY_{i}}}\sqrt{\left(\frac{1}{u_{T}^{2}}-1\right)\frac{\rho_{XY_{i}}^{2}}{\rho_{XX_{i}}\rho_{YY_{i}}}+1}}}{rtpa = rxyi / (ut * sqrt(rxxi * ryyi) * sqrt((1 / ut^2 - 1) * rxyi^2 / (rxxi * ryyi) + 1))}
 #'
 #' The correction for bivariate direct range restriction is:
-#' \deqn{\rho_{TP_{a}}=\frac{\frac{\rho_{XY_{i}}^{2}-1}{2\rho_{XY_{i}}}u_{X}u_{Y}+\mathrm{sign}\left(\rho_{XY_{i}}\right)\sqrt{\frac{\left(1-\rho_{XY_{i}}^{2}\right)^{2}}{4\rho_{XY_{i}}}u_{X}^{2}u_{Y}^{2}+1}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (((rxyi^2 - 1)/(2 * rxyi)) * ux * uy + sign[rxyi] * sqrt(((1 - rxyi^2)^2) / (4 * rxyi) * ux^2 * uy^2 + 1)) / (sqrt(rxxa * ryya))}
+#' \mjdeqn{\rho_{TP_{a}}=\frac{\frac{\rho_{XY_{i}}^{2}-1}{2\rho_{XY_{i}}}u_{X}u_{Y}+\mathrm{sign}\left(\rho_{XY_{i}}\right)\sqrt{\frac{\left(1-\rho_{XY_{i}}^{2}\right)^{2}}{4\rho_{XY_{i}}}u_{X}^{2}u_{Y}^{2}+1}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (((rxyi^2 - 1)/(2 * rxyi)) * ux * uy + sign[rxyi] * sqrt(((1 - rxyi^2)^2) / (4 * rxyi) * ux^2 * uy^2 + 1)) / (sqrt(rxxa * ryya))}
 #'
 #' The correction for bivariate indirect range restriction is:
-#' \deqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (rxyi * ux * uy + \lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2)) / (sqrt(rxxa * ryya))}
+#' \deqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2)) / (sqrt(rxxa * ryya))}
 #'
-#' where the \eqn{\lambda}{lambda} value allows \eqn{u_{X}}{ux} and \eqn{u_{Y}}{uy} to fall on either side of unity so as to function as a two-stage correction for mixed patterns of range restriction and range enhancement. The \eqn{\lambda} value is computed as:
+#' where the \mjeqn{\lambda}{lambda} value allows \mjeqn{u_{X}}{ux} and \mjeqn{u_{Y}}{uy} to fall on either side of unity so as to function as a two-stage correction for mixed patterns of range restriction and range enhancement. The \mjseqn{\lambda} value is computed as:
 #' \deqn{\lambda=\mathrm{sign}\left[\rho_{ST_{a}}\rho_{SP_{a}}\left(1-u_{X}\right)\left(1-u_{Y}\right)\right]\frac{\mathrm{sign}\left(1-u_{X}\right)\min\left(u_{X},\frac{1}{u_{X}}\right)+\mathrm{sign}\left(1-u_{Y}\right)\min\left(u_{Y},\frac{1}{u_{Y}}\right)}{\min\left(u_{X},\frac{1}{u_{X}}\right)\min\left(u_{Y},\frac{1}{u_{Y}}\right)}}{\lambda = sign[rsta * rspa * (1 - ux) * (1 - uy)] * (sign[1 - ux ] * min(ux, 1/ux) + sign[1 - uy] * min(uy, 1/uy)) / (min(ux, 1/ux) * min(uy,1/uy))}
 #'
 #' @examples
 #' ## Correction for measurement error only
-#' correct_r(correction = "bvirr", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "meas", rxyi = .3, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-#' correct_r(correction = "meas", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "meas", rxyi = .3, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 #'
 #' ## Correction for direct range restriction in X
-#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvdrr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 #'
 #' ## Correction for indirect range restriction in X
-#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE)
-#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, uy = .8, rxx = .8, ryy = .8,
+#' correct_r(correction = "uvirr_x", rxyi = .3, ux = .8, rxx = .8, ryy = .8,
 #'      ux_observed = TRUE, uy_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE, n = 100)
 #'
 #' ## Correction for direct range restriction in X and Y
@@ -373,8 +388,13 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
                       rxx_restricted = TRUE, rxx_type = "alpha", k_items_x = NA,
                       ryy_restricted = TRUE, ryy_type = "alpha", k_items_y = NA,
                       sign_rxz = 1, sign_ryz = 1,
-                      n = NULL, conf_level = .95, correct_bias = FALSE){
+                      n = NULL, conf_level = .95, correct_bias = FALSE,
+                      zero_substitute = .Machine$double.eps){
      correction <- match.arg(correction)
+
+     if(any(zapsmall(rxyi) == 0) & correction == "bvdrr")
+             stop("The correction for bivariate direct range restricton ('bvdrr') is not appropriate for `rxyi` values of zero.", call. = FALSE)
+     rxyi[rxyi == 0] <- zero_substitute # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
 
      if(correction == "meas")
           out <- correct_r_meas(rxy = rxyi, rxx = rxx, ryy = ryy,
@@ -826,6 +846,3 @@ correct_r_bvdrr <- function(rxyi, ux = 1, uy = 1,
      class(out) <- c("correct_r", "bvdrr")
      return(out)
 }
-
-
-

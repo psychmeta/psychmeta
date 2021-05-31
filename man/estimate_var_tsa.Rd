@@ -108,23 +108,24 @@ estimate_var_tsa_rb2(
 Vector of variances corrected for mean artifacts via Taylor series approximation.
 }
 \description{
+\loadmathjax
 Functions to estimate the variances corrected for psychometric artifacts.
 These functions use Taylor series approximations (i.e., the delta method) to estimate the corrected variance of an effect-size distribution.
 
 The available Taylor-series functions include:
 \itemize{
-\item{\code{estimate_var_tsa_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
-\item{\code{estimate_var_tsa_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-\item{\code{estimate_var_tsa_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
-\item{\code{estimate_var_tsa_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-\item{\code{estimate_var_tsa_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-\item{\code{estimate_var_tsa_rb1}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
-\item{\code{estimate_var_tsa_rb2}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
+\item{\code{estimate_var_tsa_meas}}{\cr Variance of \mjseqn{\rho} corrected for measurement error only}
+\item{\code{estimate_var_tsa_uvdrr}}{\cr Variance of \mjseqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+\item{\code{estimate_var_tsa_bvdrr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate direct range restriction and measurement error}
+\item{\code{estimate_var_tsa_uvirr}}{\cr Variance of \mjseqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+\item{\code{estimate_var_tsa_bvirr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+\item{\code{estimate_var_tsa_rb1}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
+\item{\code{estimate_var_tsa_rb2}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
 }
 }
 \section{Notes}{
 
-A typographical error in Raju and Burke's article has been corrected in \code{estimate_var_tsa_rb2} so as to compute appropriate partial derivatives.
+A typographical error in Raju and Burke's article has been corrected in \code{\link[=estimate_var_tsa_rb2]{estimate_var_tsa_rb2()}} so as to compute appropriate partial derivatives.
 }
 
 \examples{

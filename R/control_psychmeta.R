@@ -43,6 +43,7 @@
 #' \code{var_unbiased} (will set to \code{FALSE}), 
 #' \code{residual_ads} (will be set to \code{FALSE}),
 #' and \code{use_all_arts} (will set to \code{FALSE}).
+#' @param zero_substitute Value to be used as a functionally equivalent substitute for exactly zero effect sizes in individual-correction meta-analyses to facilitate the estimation of corrected error variances. By default, this is set to \code{.Machine$double.eps}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
 #' @return A list of control arguments in the package environment. 
@@ -74,6 +75,7 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                               estimate_pa = FALSE,
                               decimals = 2, 
                               hs_override = FALSE,
+                              zero_substitute = .Machine$double.eps,
                               ...){
      
      control <- list(error_type = error_type,
@@ -95,7 +97,8 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
                      use_all_arts = use_all_arts, 
                      estimate_pa = estimate_pa,
                      decimals = decimals,
-                     hs_override = hs_override)
+                     hs_override = hs_override,
+                     zero_substitute = zero_substitute)
      
      additional_args <- list(...)
      .psychmeta_ellipse_args <- additional_args$.psychmeta_ellipse_args
@@ -167,6 +170,9 @@ control_psychmeta <- function(error_type = c("mean", "sample"),
      
      control$estimate_pa <- scalar_arg_warning(arg = control$estimate_pa, arg_name = "estimate_pa")
      if(!is.logical(control$estimate_pa)) stop("'estimate_pa' must be logical", call. = FALSE)
+     
+     control$zero_substitute <- scalar_arg_warning(arg = control$zero_substitute, arg_name = "zero_substitute")
+     if(!is.numeric(control$zero_substitute)) stop("'zero_substitute' must be numeric", call. = FALSE)
      
      control
 }

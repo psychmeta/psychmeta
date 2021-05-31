@@ -135,7 +135,8 @@ ma_r_ic(
 )
 }
 \arguments{
-\item{rxyi, r}{Vector or column name of observed correlations. The \code{r} argument is used with the \code{ma_r_bb} (i.e., the barebones function) function and the \code{rxyi} argument is used with \code{ma_r} and \code{ma_r_ic} (i.e., the function in which corrections are applied).}
+\item{rxyi, r}{Vector or column name of observed correlations. The \code{r} argument is used with the \code{ma_r_bb} (i.e., the barebones function) function and the \code{rxyi} argument is used with \code{ma_r} and \code{ma_r_ic} (i.e., the function in which corrections are applied).
+\emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{rxyi} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value via the \code{zero_substitute} argument for \code{\link{control_psychmeta}} to facilitate the estimation of corrected error variances.}
 
 \item{n}{Vector or column name of sample sizes.}
 
@@ -651,7 +652,7 @@ ma_obj_pairmodlist$meta_tables[[1]]$artifact_distribution$true_score
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \doi{10/b6mg}. Chapter 4.
+Sage. \doi{10.4135/9781483398105}. Chapter 4.
 
 Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.

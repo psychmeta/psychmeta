@@ -29,27 +29,27 @@ generate_bib(
 
 \item{title.bib}{The title to give to the bibliography. If \code{NULL}, defaults to "Sources Contributing to Meta-Analyses"}
 
-\item{style}{What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://www.zotero.org/styles}{Zotero Style Repository}). Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
+\item{style}{What style should references be formatted in? Can be a file path or URL for a \href{https://github.com/citation-style-language/styles}{CSL citation style} or the style ID for any style available from the \href{https://www.zotero.org/styles}{Zotero Style Repository}. Defaults to APA style. (Retrieving a style by ID requires an internet connection. If unavailable, references will be rendered in Chicago style.).}
 
 \item{additional_citekeys}{Additional citekeys to include in the reference list.}
 
-\item{file}{The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is "text", a tibble with basic citation information; if "citekeys", the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).}
+\item{file}{The filename or filepath for the output file. If \code{NULL}, function will output directly to the R console (if \code{output_format} is \code{"text"}, a tibble with basic citation information; if \code{"citekeys"}, the citekeys for included sources; otherwise, code to generate the bibliography in an RMarkdown document).}
 
 \item{output_dir}{The filepath for the output file. Defaults to the current working directory.}
 
-\item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.}
+\item{output_format}{The format of the output reference list. Available options are Word (default), HTML, PDF (requires LaTeX to be installed), ODT, or Rmarkdown, plain text, and BibLaTeX. Returning only the item citekeys is also possible. You can also specify the full name of another RMarkdown \link[rmarkdown:output_format]{output_format}.}
 
-\item{analyses}{Which analyses to extract references for? See \code{\link{filter_ma}} for details.}
+\item{analyses}{Which analyses to extract references for? See \code{\link[=filter_ma]{filter_ma()}} for details.}
 
-\item{match}{Match \code{all} or \code{any} of the filter criteria? See \code{\link{filter_ma}} for details.}
+\item{match}{Match \code{"all"} or \code{"any"} of the filter criteria? See \code{\link[=filter_ma]{filter_ma()}} for details.}
 
 \item{case_sensitive}{Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).}
 
 \item{save_build_files}{Should the BibTeX and RMarkdown files used to generate the bibliography be saved (default: \code{FALSE}; always \code{TRUE} if file is \code{NULL})?}
 
-\item{header}{A list of YAML header parameters to pass to \code{link{rmarkdown::render}}.}
+\item{header}{A list of YAML header parameters to pass to \code{\link[rmarkdown:render]{rmarkdown::render()}}.}
 
-\item{...}{Additional arguments to pass to \code{\link[rmarkdown]{render}}.}
+\item{...}{Additional arguments to pass to \code{\link[rmarkdown:render]{rmarkdown::render()}}.}
 }
 \value{
 A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").

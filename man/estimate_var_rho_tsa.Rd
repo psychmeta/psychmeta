@@ -187,11 +187,11 @@ The available Taylor-series functions include:
 The attenuation formula for measurement error is
 
 \deqn{\rho_{XY}=\rho_{TP}q_{X}q_{Y}}{rxy = rtp * qx * qy}
-where \eqn{\rho_{XY}} is an observed correlation, \eqn{\rho_{TP}} is a true-score correlation, and \eqn{q_{X}} and \eqn{q_{Y}} are the square roots of reliability coefficients for X and Y, respectively.
+where \eqn{\rho_{XY}}{rxy} is an observed correlation, \eqn{\rho_{TP}}{rtp} is a true-score correlation, and \eqn{q_{X}}{qx} and \eqn{q_{Y}}{qy} are the square roots of reliability coefficients for X and Y, respectively.
 
-The Taylor series approximation of the variance of \eqn{\rho_{TP}} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP}}{rtp} can be computed using the following linear equation,
 
-\deqn{var_{\rho_{TP}}	\approx	\left[var_{r_{XY}}-var_{e}-\left(b_{1}^{2}var_{q_{X}}+b_{2}^{2}var_{q_{Y}}\right)\right]/b_{3}^{2}}{var_rtp ~= (var_rxy - var_e - (b1^2 * var_qx + b2^2 * var_qy)) / b3^2}
+\deqn{var_{\rho_{TP}} \approx \left[var_{r_{XY}}-var_{e}-\left(b_{1}^{2}var_{q_{X}}+b_{2}^{2}var_{q_{Y}}\right)\right]/b_{3}^{2}}{var_rtp ~= (var_rxy - var_e - (b1^2 * var_qx + b2^2 * var_qy)) / b3^2}
 
 where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, and \eqn{b_{3}}{b3} are first-order partial derivatives of the attenuation formula with respect to \eqn{q_{X}}{qx}, \eqn{q_{Y}}{qy}, and \eqn{\rho_{TP}}{rtp}, respectively. The first-order partial derivatives of the attenuation formula are:
 

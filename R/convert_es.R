@@ -4,18 +4,19 @@
 #' @title Convert effect sizes
 #'
 #' @description
-#' This function converts a variety of effect sizes to correlations, Cohen's *d* values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
+#' \loadmathjax
+#' This function converts a variety of effect sizes to correlations, Cohen's \mjseqn{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
 #'
 #' @param es Vector of effect sizes to convert.
-#' @param input_es Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's *d*, independent samples *t* values (or their *p* values), two-group one-way ANOVA *F* values (or their *p* values), 1df \eqn{\chi^{2}}{\chi-squared} values (or their *p* values), odds ratios, log odds ratios, Fisher *z*, and the common language effect size (CLES, A, AUC).
-#' @param output_es Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's *d* values, and common language effect sizes (CLES, A, AUC).
+#' @param input_es Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \mjseqn{d}, independent samples \mjseqn{t} values (or their \mjseqn{p} values), two-group one-way ANOVA \mjseqn{F} values (or their \mjseqn{p} values), 1-df \mjeqn{\chi^{2}}{\chi-squared} values (or their \mjseqn{p} values), odds ratios, log odds ratios, Fisher *z*, and the common language effect size (CLES, A, AUC).
+#' @param output_es Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \mjseqn{d} values, and common language effect sizes (CLES, A, AUC).
 #' @param n1 Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.
 #' @param n2 Vector of sample sizes of group 2 of the two groups being contrasted.
-#' @param df1 Vector of input test statistic degrees of freedom (for *t* and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for *F*).
-#' @param df2 Vector of input test statistic within-group degrees of freedom (for *F*).
+#' @param df1 Vector of input test statistic degrees of freedom (for \mjseqn{t} and \mjeqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \mjseqn{F}).
+#' @param df2 Vector of input test statistic within-group degrees of freedom (for \mjseqn{F}).
 #' @param sd1 Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.
 #' @param sd2 Vector of standard deviations of group 2 of the two groups being contrasted.
-#' @param tails Vector of the tails for *p* values when `input_es = "p.t"`. Can be `2` (default) or `1`.
+#' @param tails Vector of the tails for \mjseqn{p} values when `input_es = "p.t"`. Can be `2` (default) or `1`.
 #'
 #' @return A data frame of class `es` with variables:
 #' \item{`r`, `d`, `A`}{The converted effect sizes}
@@ -40,7 +41,7 @@
 #' *Statistics in Medicine, 19*(22), 3127–3131.
 #' \doi{10.1002/1097-0258(20001130)19:22<3127::AID-SIM784>3.0.CO;2-M}
 #'
-#' Lipsey, M. W., & Wilson, D. B. (2001). *Practical meta-analysis*. SAGE Publications.
+#' Lipsey, M. W., & Wilson, D. B. (2001). *Practical meta-analysis*. Sage.
 #'
 #' Ruscio, J. (2008).
 #' A probability-based measure of effect size: Robustness to base rates and other factors.
@@ -48,7 +49,7 @@
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
-#' SAGE Publications. \doi{10.4135/9781483398105}
+#' Sage. \doi{10.4135/9781483398105}
 #'
 #' @examples
 #' convert_es(es = 1,  input_es="d", output_es="r", n1=100)
@@ -71,22 +72,26 @@ convert_es <- function(es, input_es = c("r","d","delta","g","t","p.t","F","p.F",
 
         input_es <- tryCatch(match.arg(input_es, valid_input_es), error = function(e) e)
         if (inherits(input_es, "error")) {
-                if (stringi::stri_detect(input_es$message, regex = "length 1"))
+                if (grepl(x = input_es$message, pattern = "length 1")) {
                         stop("`input_es` must be length 1.")
-                if (stringi::stri_detect(input_es$message, regex = "should be one of"))
+                }
+                if (grepl(x = input_es$message, pattern = "should be one of")) {
                         stop(paste0("Invalid `input_es` provided. Must be one of '",
                                     paste0(valid_input_es, collapse = "', '"),
                                     "'")
-                            )
+                        )
+                }
         }
         output_es <- tryCatch(match.arg(output_es, valid_output_es), error = function(e) e)
         if (inherits(output_es, "error")) {
-                if (stringi::stri_detect(output_es$message, regex = "length 1"))
+                if (grepl(x = output_es$message, pattern = "length 1")) {
                         stop("`output_es` must be length 1.")
-                if (stringi::stri_detect(output_es$message, regex = "should be one of"))
+                }
+                if (grepl(x = output_es$message, pattern = "should be one of")) {
                         stop(paste0("Invalid `output_es` provided. Must be one of '",
                                     paste0(valid_output_es, collapse = "', '"),
                                     "'"))
+                }
         }
         input <- list(es=es, input_es=input_es, output_es=output_es, n1=n1, n2=n1, df1=df1, df2=df2, sd1=sd1, sd2=sd2)
 

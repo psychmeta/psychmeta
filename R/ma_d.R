@@ -7,6 +7,7 @@
 #' The automatic compositing features in \code{ma_d} are employed when \code{sample_id}s and/or construct names are provided.
 #'
 #' @param d Vector or column name of observed \emph{d} values.
+#' \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{d} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value (in the correlation metric) via the \code{zero_substitute} argument for \code{\link{control_psychmeta}} to facilitate the estimation of corrected error variances.
 #' @param n1 Vector or column name of sample sizes.
 #' @param n2 Vector or column name of sample sizes.
 #' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
@@ -203,7 +204,7 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
-#' Thousand Oaks, California: SAGE Publications, Inc. Chapter 4.
+#' Sage. \doi{10.4135/9781483398105}. Chapter 4.
 #'
 #' Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.

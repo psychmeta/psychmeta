@@ -15,6 +15,7 @@ estimate_length_sb(rel_initial, rel_desired)
 The estimated number of times by which the number of items in the initial measure would have to be multiplied to achieve the desired reliability.
 }
 \description{
+\loadmathjax
 This function implements the inverse of the Spearman-Brown prophecy formula and answers the question: "How much would I have to increase (do decrease) the length of this measure
 to obtain a desired reliability level given the current reliability of the measure?" The result of the function is the multiplier by which the length of the original measure should be adjusted.
 The formula implemented here assumes that all items added to (or subtracted from) the measure will be parallel forms of the original items.
@@ -22,9 +23,9 @@ The formula implemented here assumes that all items added to (or subtracted from
 \details{
 This is computed as:
 
-\deqn{k^{*}=\frac{\rho_{XX}^{*}(\rho_{XX}-1)}{(\rho_{XX}^{*}-1)\rho_{XX}}}{k_predicted = (rel_desired * (rel_initial - 1)) / ((rel_desired - 1) * rel_initial)}
+\mjdeqn{k^{*}=\frac{\rho_{XX}^{*}(\rho_{XX}-1)}{(\rho_{XX}^{*}-1)\rho_{XX}}}{k_predicted = (rel_desired * (rel_initial - 1)) / ((rel_desired - 1) * rel_initial)}
 
-where \eqn{\rho_{XX}}{rel_initial} is the inital reliability, \eqn{\rho_{XX}^{*}}{rel_desired} is the predicted reliability of a measure with a different length, and \eqn{k^{*}}{k_predicted} is the number of times the measure would have to be lengthened to obtain a reliability equal to \eqn{\rho_{XX}^{*}}{rel_desired}.
+where \mjeqn{\rho_{XX}}{rel_initial} is the inital reliability, \mjeqn{\rho_{XX}^{*}}{rel_desired} is the predicted reliability of a measure with a different length, and \mjeqn{k^{*}}{k_predicted} is the number of times the measure would have to be lengthened to obtain a reliability equal to \mjeqn{\rho_{XX}^{*}}{rel_desired}.
 }
 \examples{
 ## Estimated k to achieve a reliability of .8 from a measure with an initial reliability of .7

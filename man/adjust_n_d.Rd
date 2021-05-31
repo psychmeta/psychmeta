@@ -7,7 +7,7 @@
 adjust_n_d(d, var_e, p = NA)
 }
 \arguments{
-\item{d}{Vector of non-Cohen \emph{d} standardized mean differences.}
+\item{d}{Vector of non-Cohen \mjseqn{d} standardized mean differences.}
 
 \item{var_e}{Vector of error variances of standardized mean differences.}
 
@@ -17,12 +17,13 @@ adjust_n_d(d, var_e, p = NA)
 A vector of adjusted sample sizes.
 }
 \description{
-This function is used to convert a non-Cohen \emph{d} value (e.g., Glass' \eqn{\Delta}{delta}) to a Cohen's \emph{d} value by identifying the sample size of a Cohen's \emph{d} that has the
-same standard error as the non-Cohen \emph{d}. This function permits users to account for the influence of sporadic corrections on the sampling variance of \emph{d} prior to use in a meta-analysis.
+\loadmathjax
+This function is used to convert a non-Cohen \mjseqn{d} value (e.g., Glass' \mjeqn{\Delta}{\Delta}) to a Cohen's \mjseqn{d} value by identifying the sample size of a Cohen's \mjseqn{d} that has the
+same standard error as the non-Cohen \mjseqn{d}. This function permits users to account for the influence of sporadic corrections on the sampling variance of \mjseqn{d} prior to use in a meta-analysis.
 }
 \details{
-## The adjusted sample size is computed as:
-\deqn{n_{adjusted}=\frac{d^{2}p(1-p)+2}{2p(1-p)var_{e}}}{n_adjusted = ((d^2 * p * (1 - p) + 2) / (2 * p * (1 - p) * var_e))}
+The adjusted sample size is computed as:
+\mjdeqn{n_{adjusted}=\frac{d^{2}p(1-p)+2}{2p(1-p)var_{e}}}{n_adjusted = ((d^2 * p * (1 - p) + 2) / (2 * p * (1 - p) * var_e))}
 }
 \examples{
 adjust_n_d(d = 1, var_e = .03, p = NA)
@@ -30,5 +31,5 @@ adjust_n_d(d = 1, var_e = .03, p = NA)
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \doi{10/b6mg}. Chapter 7 (Equations 7.23 and 7.23a).
+Sage. \doi{10.4135/9781483398105}. Chapter 7 (Equations 7.23 and 7.23a).
 }

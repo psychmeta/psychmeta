@@ -134,7 +134,8 @@ ma_d_ic(
 )
 }
 \arguments{
-\item{d}{Vector or column name of observed \emph{d} values.}
+\item{d}{Vector or column name of observed \emph{d} values.
+\emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{d} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value (in the correlation metric) via the \code{zero_substitute} argument for \code{\link{control_psychmeta}} to facilitate the estimation of corrected error variances.}
 
 \item{n1}{Vector or column name of sample sizes.}
 
@@ -419,7 +420,7 @@ ma_d_ic(d = d, n1 = n1, n2 = n2, ryy = ryyi, correct_rr_y = FALSE,
 \references{
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
-Thousand Oaks, California: SAGE Publications, Inc. Chapter 4.
+Sage. \doi{10.4135/9781483398105}. Chapter 4.
 
 Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.

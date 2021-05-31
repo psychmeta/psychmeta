@@ -19,7 +19,7 @@ heterogeneity(
 
 \item{conf_level}{Confidence level to define the width of confidence intervals (default is \code{conf_level} specified in \code{ma_obj}).}
 
-\item{var_res_ci_method}{Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.}
+\item{var_res_ci_method}{Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \eqn{\sigma^{2}_{es} ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.}
 
 \item{...}{Additional arguments.}
 }
@@ -45,6 +45,7 @@ ma_obj with heterogeneity statistics added. Included statistics include:
 }
 }
 \description{
+\loadmathjax
 This function computes a variety of supplemental statistics for meta-analyses. The statistics here are included for interested users. It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default \code{ma_obj} output (Wiernik et al., 2017).
 }
 \examples{
@@ -86,7 +87,7 @@ Detecting and correcting the lies that data tell.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 15, 414, 426, 533–534.
+Sage. \doi{10.4135/9781483398105}. pp. 15, 414, 426, 533–534.
 
 Wiernik, B. M., Kostal, J. W., Wilmot, M. P., Dilchert, S., & Ones, D. S. (2017).
 Empirical benchmarks for interpreting effect size variability in meta-analysis.

@@ -371,6 +371,10 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                   if(is.data.frame(x2)){
                                           if(any(colnames(x2) == "original_order"))
                                                   x2 <- x2 %>% arrange(.data$original_order)
+                                          if(any(colnames(x2) == "citekey"))
+                                                  x2 <- x2 %>% mutate(citekey = as.character(.data$citekey))
+                                          if(any(colnames(x2) == "sample_id"))
+                                                  x2 <- x2 %>% mutate(sample_id = as.character(.data$sample_id))
                                           class(x2) <- c("escalc", "data.frame")
                                           x2
                                   }else{
@@ -380,6 +384,10 @@ ma_wrapper <- function(es_data, es_type = "r", ma_type = "bb", ma_fun,
                                                   }else{
                                                           if(any(colnames(x3) == "original_order"))
                                                                   x3 <- x3 %>% arrange(.data$original_order)
+                                                          if(any(colnames(x3) == "citekey"))
+                                                                  x3 <- x3 %>% mutate(citekey = as.character(.data$citekey))
+                                                          if(any(colnames(x3) == "sample_id"))
+                                                                  x3 <- x3 %>% mutate(sample_id = as.character(.data$sample_id))
                                                           class(x3) <- c("escalc", "data.frame")
                                                           x3
                                                   }

@@ -26,20 +26,21 @@ generate_directory <- function(path){
 
 #' Generate a list of simulated sample matrices sampled from the Wishart distribution
 #'
-#' This function generates simulated sample matrices based on a population matrix and a sample size. It uses the Wishart distribution (i.e., the multivariate \eqn{\chi^2} distribution) to obtain data, rescales the data into the input metric, and can be standardized into a correlation matrix by setting \code{as_cor} to \code{TRUE}.
+#' \loadmathjax
+#' This function generates simulated sample matrices based on a population matrix and a sample size.
+#' It uses the Wishart distribution (i.e., the multivariate \mjeqn{\chi^{2}}{\chi^2} distribution) to obtain data, rescales the data into the input metric, and can be standardized into a correlation matrix by setting `as_cor` to `TRUE`.
 #' The function can produce a list of matrices for any number of samples.
 #'
 #' @param sigma Population covariance matrix. May be standardized or unstandardized.
 #' @param n Sample size for simulated sample matrices.
 #' @param k Number of sample matrices to generate.
-#' @param as_cor Should the simulated matrices be standardized (\code{TRUE}) or unstandardized (\code{FALSE})?
+#' @param as_cor Should the simulated matrices be standardized (`TRUE`) or unstandardized (`FALSE`)?
 #'
 #' @return A list of simulated sample matrices.
 #' @export
 #'
-#' @importFrom stats rWishart
-#'
 #' @keywords distribution
+#' @md
 #'
 #' @examples
 #' ## Define a hypothetical matrix:
@@ -51,7 +52,7 @@ generate_directory <- function(path){
 #' ## Simualte a list of correlation matrices:
 #' simulate_matrix(sigma = sigma, n = 50, k = 10, as_cor = TRUE)
 simulate_matrix <- function(sigma, n, k=1, as_cor = FALSE) {
-     mat_array <- rWishart(n=k, df=n-2, Sigma=sigma)
+     mat_array <- stats::rWishart(n=k, df=n-2, Sigma=sigma)
      if(as_cor){
           mat_list <- lapply(1:k, function(x){
                mat <- cov2cor(mat_array[ , , x])

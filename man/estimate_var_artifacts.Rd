@@ -216,6 +216,7 @@ estimate_var_ryyi(
 \item{cor_ryya_ux}{Correlation between ryya and ux.}
 }
 \description{
+\loadmathjax
 Taylor series approximations to estimate the variances of artifacts that have been estimated from other artifacts.
 These functions are implemented internally in the \code{\link{create_ad}} function and related functions, but are useful as general tools for manipulating artifact distributions.
 
@@ -241,12 +242,12 @@ Available functions include:
 #### Partial derivatives to estimate the variance of qxa using ux ####
 
 Indirect range restriction:
-\deqn{b_{u_{X}}=\frac{(q_{X_{i}}^{2}-1)u_{X}}{\sqrt{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}}{b_ux = ((qxi^2 - 1) * ux) / sqrt((qxi^2 - 1) * ux^2 + 1)}
-\deqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}^{2}u_{X}^{2}}{\sqrt{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}}{b_qxi = (qxi * ux^2) / sqrt((qxi^2 - 1) * ux^2 + 1)}
+\mjdeqn{b_{u_{X}}=\frac{(q_{X_{i}}^{2}-1)u_{X}}{\sqrt{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}}{b_ux = ((qxi^2 - 1) * ux) / sqrt((qxi^2 - 1) * ux^2 + 1)}
+\mjdeqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}^{2}u_{X}^{2}}{\sqrt{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}}{b_qxi = (qxi * ux^2) / sqrt((qxi^2 - 1) * ux^2 + 1)}
 
 Direct range restriction:
-\deqn{b_{u_{X}}=\frac{q_{X_{i}}^{2}(q_{X_{i}}^{2}-1)u_{X}}{\sqrt{-\frac{q_{X_{i}}^{2}}{q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2}}}(q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2})^{2}}}{b_ux = (qxi^2 * (qxi^2 - 1) * ux) / (sqrt(-qxi^2 / (qxi^2 * (ux^2 - 1) - ux^2)) * (qxi^2 * (ux^2 - 1) - ux^2)^2)}
-\deqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}u_{X}^{2}}{\sqrt{-\frac{q_{X_{i}}^{2}}{q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2}}}(q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2})^{2}}}{b_qxi = (qxi * ux^2) / (sqrt(-qxi^2 / (qxi^2 * (ux^2 - 1) - ux^2)) * (qxi^2 * (ux^2 - 1) - ux^2)^2)}
+\mjdeqn{b_{u_{X}}=\frac{q_{X_{i}}^{2}(q_{X_{i}}^{2}-1)u_{X}}{\sqrt{-\frac{q_{X_{i}}^{2}}{q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2}}}(q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2})^{2}}}{b_ux = (qxi^2 * (qxi^2 - 1) * ux) / (sqrt(-qxi^2 / (qxi^2 * (ux^2 - 1) - ux^2)) * (qxi^2 * (ux^2 - 1) - ux^2)^2)}
+\mjdeqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}u_{X}^{2}}{\sqrt{-\frac{q_{X_{i}}^{2}}{q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2}}}(q_{X_{i}}^{2}(u_{X}^{2}-1)-u_{X}^{2})^{2}}}{b_qxi = (qxi * ux^2) / (sqrt(-qxi^2 / (qxi^2 * (ux^2 - 1) - ux^2)) * (qxi^2 * (ux^2 - 1) - ux^2)^2)}
 
 
 
@@ -254,28 +255,28 @@ Direct range restriction:
 #### Partial derivatives to estimate the variance of rxxa using ux ####
 
 Indirect range restriction:
-\deqn{b_{u_{X}}=2\left(\rho_{XX_{i}}-1\right)u_{X}}{b_ux = 2 * (rxxi - 1) * ux}
-\deqn{\rho_{XX_{i}}: b_{\rho_{XX_{i}}}=u_{X}^{2}}{b_rxxi = ux^2}
+\mjdeqn{b_{u_{X}}=2\left(\rho_{XX_{i}}-1\right)u_{X}}{b_ux = 2 * (rxxi - 1) * ux}
+\mjdeqn{\rho_{XX_{i}}: b_{\rho_{XX_{i}}}=u_{X}^{2}}{b_rxxi = ux^2}
 
 Direct range restriction:
-\deqn{b_{u_{X}}=\frac{2(\rho_{XX_{i}}-1)\rho_{XX_{i}}u_{X}}{(-\rho_{XX_{i}}u_{X}^{2}+\rho_{XX_{i}}+u_{X}^{2})^{2}}}{b_ux = (2 * (rxxi - 1) * rxxi * ux) / (-rxxi * ux^2 + rxxi + ux^2)^2}
-\deqn{b_{\rho_{XX_{i}}}=\frac{u_{X}^{2}}{(-\rho_{XX_{i}}u_{X}^{2}+\rho_{XX_{i}}+u_{X}^{2})^{2}}}{b_rxxi = ux^2 / (-rxxi * ux^2 + rxxi + ux^2)^2}
+\mjdeqn{b_{u_{X}}=\frac{2(\rho_{XX_{i}}-1)\rho_{XX_{i}}u_{X}}{(-\rho_{XX_{i}}u_{X}^{2}+\rho_{XX_{i}}+u_{X}^{2})^{2}}}{b_ux = (2 * (rxxi - 1) * rxxi * ux) / (-rxxi * ux^2 + rxxi + ux^2)^2}
+\mjdeqn{b_{\rho_{XX_{i}}}=\frac{u_{X}^{2}}{(-\rho_{XX_{i}}u_{X}^{2}+\rho_{XX_{i}}+u_{X}^{2})^{2}}}{b_rxxi = ux^2 / (-rxxi * ux^2 + rxxi + ux^2)^2}
 
 
 
 
 #### Partial derivatives to estimate the variance of rxxa using ut ####
 
-\deqn{b_{u_{T}}=\frac{2(\rho_{XX_{i}}-1)*\rho_{XX_{i}}u_{T}}{(-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2})^{2}}}{b_ut = (2 * (rxxi - 1) * rxxi * ut) / (-rxxi * ut^2 + rxxi + ut^2)^2}
-\deqn{b_{\rho_{XX_{i}}}=\frac{u_{T}^{2}}{(-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2})^{2}}}{b_rxxi = ut^2 / (-rxxi * ut^2 + rxxi + ut^2)^2}
+\mjdeqn{b_{u_{T}}=\frac{2(\rho_{XX_{i}}-1)*\rho_{XX_{i}}u_{T}}{(-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2})^{2}}}{b_ut = (2 * (rxxi - 1) * rxxi * ut) / (-rxxi * ut^2 + rxxi + ut^2)^2}
+\mjdeqn{b_{\rho_{XX_{i}}}=\frac{u_{T}^{2}}{(-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2})^{2}}}{b_rxxi = ut^2 / (-rxxi * ut^2 + rxxi + ut^2)^2}
 
 
 
 
 #### Partial derivatives to estimate the variance of qxa using ut ####
 
-\deqn{b_{u_{T}}=\frac{q_{X_{i}}^{2}(q_{X_{i}}^{2}-1)u_{T}}{\sqrt{\frac{-q_{X_{i}}^{2}}{q_{X_{i}}^{2}*(u_{T}^{2}-1)-u_{T}^{2}}}(q_{X_{i}}^{2}(u_{T}^{2}-1)-u_{T}^{2})^{2}}}{b_ut = (qxi^2 * (qxi^2 - 1) * ut) / (sqrt(-qxi^2 / (qxi^2 * (ut^2 - 1) - ut^2)) * (qxi^2 * (ut^2 - 1) - ut^2)^2)}
-\deqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}u_{T}^{2}}{\sqrt{\frac{q_{X_{i}}^{2}}{u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1)}}(u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1))^{2}}}{b_qxi = (qxi * ut^2) / (sqrt(qxi^2 / (ut^2 - qxi^2 * (ut^2 - 1))) * (ut^2 - qxi^2 * (ut^2 - 1))^2)}
+\mjdeqn{b_{u_{T}}=\frac{q_{X_{i}}^{2}(q_{X_{i}}^{2}-1)u_{T}}{\sqrt{\frac{-q_{X_{i}}^{2}}{q_{X_{i}}^{2}*(u_{T}^{2}-1)-u_{T}^{2}}}(q_{X_{i}}^{2}(u_{T}^{2}-1)-u_{T}^{2})^{2}}}{b_ut = (qxi^2 * (qxi^2 - 1) * ut) / (sqrt(-qxi^2 / (qxi^2 * (ut^2 - 1) - ut^2)) * (qxi^2 * (ut^2 - 1) - ut^2)^2)}
+\mjdeqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}u_{T}^{2}}{\sqrt{\frac{q_{X_{i}}^{2}}{u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1)}}(u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1))^{2}}}{b_qxi = (qxi * ut^2) / (sqrt(qxi^2 / (ut^2 - qxi^2 * (ut^2 - 1))) * (ut^2 - qxi^2 * (ut^2 - 1))^2)}
 
 
 
@@ -283,12 +284,12 @@ Direct range restriction:
 #### Partial derivatives to estimate the variance of qxi using ux ####
 
 Indirect range restriction:
-\deqn{b_{u_{X}}=\frac{1-qxa^{2}}{u_{X}^{3}\sqrt{\frac{q_{X_{a}}^{2}+u_{X}^{2}-1}{u_{X}^{2}}}}}{b_ux = (1 - qxa^2) / (ux^3 * sqrt((qxa^2 + ux^2 - 1) / ux^2))}
-\deqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}}{u_{X}^{2}\sqrt{\frac{q_{X_{a}-1}^{2}}{u_{X}^{2}}+1}}}{b_qxa = qxa / (ux^2 * sqrt((qxa^2 - 1) / ux^2 + 1))}
+\mjdeqn{b_{u_{X}}=\frac{1-qxa^{2}}{u_{X}^{3}\sqrt{\frac{q_{X_{a}}^{2}+u_{X}^{2}-1}{u_{X}^{2}}}}}{b_ux = (1 - qxa^2) / (ux^3 * sqrt((qxa^2 + ux^2 - 1) / ux^2))}
+\mjdeqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}}{u_{X}^{2}\sqrt{\frac{q_{X_{a}-1}^{2}}{u_{X}^{2}}+1}}}{b_qxa = qxa / (ux^2 * sqrt((qxa^2 - 1) / ux^2 + 1))}
 
 Direct range restriction:
-\deqn{b_{u_{X}}=-\frac{q_{X_{a}}^{2}(q_{X_{a}}^{2}-1)u_{X}}{\sqrt{\frac{q_{X_{a}}^{2}u_{X}^{2}}{q_{X_{a}}^{2}(u_{X}^{2}-1)+1}}(q_{X_{a}}^{2}(u_{X}^{2}-1)+1)^{2}}}{b_ux = -(qxa^2 * (qxa^2 - 1) * ux) / (sqrt((qxa^2 * ux^2) / (qxa^2 * (ux^2 - 1) + 1)) * (qxa^2 * (ux^2 - 1) + 1)^2)}
-\deqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}u_{X}^{2}}{\sqrt{\frac{q_{X_{a}}^{2}u_{X}^{2}}{q_{X_{a}}^{2}(u_{X}^{2}-1)+1}}(q_{X_{a}}^{2}(u_{X}^{2}-1)+1)^{2}}}{b_qxa = (qxa * ux^2) / (sqrt((qxa^2 * ux^2) / (qxa^2 * (ux^2 - 1) + 1)) * (qxa^2 * (ux^2 - 1) + 1)^2)}
+\mjdeqn{b_{u_{X}}=-\frac{q_{X_{a}}^{2}(q_{X_{a}}^{2}-1)u_{X}}{\sqrt{\frac{q_{X_{a}}^{2}u_{X}^{2}}{q_{X_{a}}^{2}(u_{X}^{2}-1)+1}}(q_{X_{a}}^{2}(u_{X}^{2}-1)+1)^{2}}}{b_ux = -(qxa^2 * (qxa^2 - 1) * ux) / (sqrt((qxa^2 * ux^2) / (qxa^2 * (ux^2 - 1) + 1)) * (qxa^2 * (ux^2 - 1) + 1)^2)}
+\mjdeqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}u_{X}^{2}}{\sqrt{\frac{q_{X_{a}}^{2}u_{X}^{2}}{q_{X_{a}}^{2}(u_{X}^{2}-1)+1}}(q_{X_{a}}^{2}(u_{X}^{2}-1)+1)^{2}}}{b_qxa = (qxa * ux^2) / (sqrt((qxa^2 * ux^2) / (qxa^2 * (ux^2 - 1) + 1)) * (qxa^2 * (ux^2 - 1) + 1)^2)}
 
 
 
@@ -296,92 +297,92 @@ Direct range restriction:
 #### Partial derivatives to estimate the variance of rxxi using ux ####
 
 Indirect range restriction:
-\deqn{b_{u_{X}}=\frac{2-2\rho_{XX_{a}}}{u_{X}^{3}}}{b_ux = (2 - 2 * rxxa) / ux^3}
-\deqn{b_{\rho_{XX_{a}}}=\frac{1}{u_{X}^{2}}}{b_rxxa = 1 / ux^2}
+\mjdeqn{b_{u_{X}}=\frac{2-2\rho_{XX_{a}}}{u_{X}^{3}}}{b_ux = (2 - 2 * rxxa) / ux^3}
+\mjdeqn{b_{\rho_{XX_{a}}}=\frac{1}{u_{X}^{2}}}{b_rxxa = 1 / ux^2}
 
 Direct range restriction:
-\deqn{b_{u_{X}}=-\frac{2(\rho_{XX_{a}}-1)\rho_{XX_{a}}u_{X}}{(\rho_{XX_{a}}(u_{X}^{2}-1)+1)^{2}}}{b_ux = -(2 * (rxxa - 1) * rxxa * ux) / (rxxa * (ux^2 - 1) + 1)^2}
-\deqn{b_{\rho_{XX_{a}}}=\frac{u_{X}^{2}}{(\rho_{XX_{a}}(u_{X}^{2}-1)+1)^{2}}}{b_rxxa = ux^2 / (rxxa * (ux^2 - 1) + 1)^2}
+\mjdeqn{b_{u_{X}}=-\frac{2(\rho_{XX_{a}}-1)\rho_{XX_{a}}u_{X}}{(\rho_{XX_{a}}(u_{X}^{2}-1)+1)^{2}}}{b_ux = -(2 * (rxxa - 1) * rxxa * ux) / (rxxa * (ux^2 - 1) + 1)^2}
+\mjdeqn{b_{\rho_{XX_{a}}}=\frac{u_{X}^{2}}{(\rho_{XX_{a}}(u_{X}^{2}-1)+1)^{2}}}{b_rxxa = ux^2 / (rxxa * (ux^2 - 1) + 1)^2}
 
 
 
 
 #### Partial derivatives to estimate the variance of rxxi using ut ####
 
-\deqn{u_{T}: b_{u_{T}}=-\frac{2(\rho_{XX_{a}}-1)\rho_{XX_{a}}u_{T}}{(\rho_{XX_{a}}(u_{T}^{2}-1)+1)^{2}}}{u_{T}: b_ut = -(2 * (rxxa - 1) * rxxa * ut) / (rxxa * (ut^2 - 1) + 1)^2}
-\deqn{b_{\rho_{XX_{a}}}=\frac{u_{T}^{2}}{(\rho_{XX_{a}}(u_{T}^{2}-1)+1)^{2}}}{b_rxxa = ut^2 / (rxxa * (ut^2 - 1) + 1)^2}
+\mjdeqn{u_{T}: b_{u_{T}}=-\frac{2(\rho_{XX_{a}}-1)\rho_{XX_{a}}u_{T}}{(\rho_{XX_{a}}(u_{T}^{2}-1)+1)^{2}}}{u_{T}: b_ut = -(2 * (rxxa - 1) * rxxa * ut) / (rxxa * (ut^2 - 1) + 1)^2}
+\mjdeqn{b_{\rho_{XX_{a}}}=\frac{u_{T}^{2}}{(\rho_{XX_{a}}(u_{T}^{2}-1)+1)^{2}}}{b_rxxa = ut^2 / (rxxa * (ut^2 - 1) + 1)^2}
 
 
 
 
 #### Partial derivatives to estimate the variance of qxi using ut ####
 
-\deqn{b_{u_{T}}=-\frac{(q_{X_{a}}-1)q_{X_{a}}^{2}(q_{X_{a}}+1)u_{T}}{\sqrt{\frac{q_{X_{a}}^{2}u_{T}^{2}}{q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1}}(q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1)^{2}}}{b_ut = -((qxa - 1) * qxa^2 * (qxa + 1) * ut) / (sqrt((qxa^2 * ut^2) / (qxa^2 * ut^2 - qxa^2 + 1)) * (qxa^2 * ut^2 - qxa^2 + 1)^2)}
-\deqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}u_{T}^{2}}{\sqrt{\frac{q_{X_{a}}^{2}u_{T}^{2}}{q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1}}(q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1)^{2}}}{b_qxa = (qxa * ut^2) / (sqrt((qxa^2 * ut^2) / (qxa^2 * ut^2 - qxa^2 + 1)) * (qxa^2 * ut^2 - qxa^2 + 1)^2)}
+\mjdeqn{b_{u_{T}}=-\frac{(q_{X_{a}}-1)q_{X_{a}}^{2}(q_{X_{a}}+1)u_{T}}{\sqrt{\frac{q_{X_{a}}^{2}u_{T}^{2}}{q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1}}(q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1)^{2}}}{b_ut = -((qxa - 1) * qxa^2 * (qxa + 1) * ut) / (sqrt((qxa^2 * ut^2) / (qxa^2 * ut^2 - qxa^2 + 1)) * (qxa^2 * ut^2 - qxa^2 + 1)^2)}
+\mjdeqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}u_{T}^{2}}{\sqrt{\frac{q_{X_{a}}^{2}u_{T}^{2}}{q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1}}(q_{X_{a}}^{2}u_{T}^{2}-q_{X_{a}}^{2}+1)^{2}}}{b_qxa = (qxa * ut^2) / (sqrt((qxa^2 * ut^2) / (qxa^2 * ut^2 - qxa^2 + 1)) * (qxa^2 * ut^2 - qxa^2 + 1)^2)}
 
 
 
 
 #### Partial derivatives to estimate the variance of ut using qxi ####
 
-\deqn{b_{u_{X}}=\frac{q_{X_{i}}^{2}u_{X}}{\sqrt{\frac{q_{X_{i}}^{2}u_{X}^{2}}{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}((q_{X_{i}}^{2}-1)u_{X}^{2}+1)^{2}}}{b_ux = (qxi^2 * ux) / (sqrt((qxi^2 * ux^2) / ((qxi^2 - 1) * ux^2 + 1)) * ((qxi^2 - 1) * ux^2 + 1)^2)}
-\deqn{b_{q_{X_{i}}}=-\frac{u_{X}^{2}(u_{X}^{2}-1)}{\sqrt{\frac{q_{X_{i}}^{2}u_{X}^{2}}{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}((q_{X_{i}}^{2}-1)u_{X}^{2}+1)^{2}}}{b_qxi = -((ux^2 - 1) * ((qxi^2 * ux^2) / ((qxi^2 - 1) * ux^2 + 1))^(3/2)) / (qxi^3 * ux^2)}
+\mjdeqn{b_{u_{X}}=\frac{q_{X_{i}}^{2}u_{X}}{\sqrt{\frac{q_{X_{i}}^{2}u_{X}^{2}}{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}((q_{X_{i}}^{2}-1)u_{X}^{2}+1)^{2}}}{b_ux = (qxi^2 * ux) / (sqrt((qxi^2 * ux^2) / ((qxi^2 - 1) * ux^2 + 1)) * ((qxi^2 - 1) * ux^2 + 1)^2)}
+\mjdeqn{b_{q_{X_{i}}}=-\frac{u_{X}^{2}(u_{X}^{2}-1)}{\sqrt{\frac{q_{X_{i}}^{2}u_{X}^{2}}{(q_{X_{i}}^{2}-1)u_{X}^{2}+1}}((q_{X_{i}}^{2}-1)u_{X}^{2}+1)^{2}}}{b_qxi = -((ux^2 - 1) * ((qxi^2 * ux^2) / ((qxi^2 - 1) * ux^2 + 1))^(3/2)) / (qxi^3 * ux^2)}
 
 
 
 
 #### Partial derivatives to estimate the variance of ut using rxxi ####
 
-\deqn{b_{u_{X}}=\frac{\rho_{XX_{i}}u_{X}}{\sqrt{\frac{\rho_{XX_{i}}u_{X}^{2}}{(\rho_{XX_{i}}-1)u_{X}^{2}+1}}((\rho_{XX_{i}}-1)u_{X}^{2}+1)^{2}}}{b_ux = (rxxi * ux) / (sqrt((rxxi * ux^2) / ((rxxi - 1) * ux^2 + 1)) * ((rxxi - 1) * ux^2 + 1)^2)}
-\deqn{b_{\rho_{XX_{i}}}=-\frac{u_{X}^{2}(u_{X}^{2}-1)}{2\sqrt{\frac{\rho_{XX_{i}}u_{X}^{2}}{(\rho_{XX_{i}}-1)u_{X}^{2}+1}}((\rho_{XX_{i}}-1)u_{X}^{2}+1)^{2}}}{b_rxxi = -(ux^2 * (ux^2 - 1)) / (2 * sqrt((rxxi * ux^2) / ((rxxi - 1) * ux^2 + 1)) * ((rxxi - 1) * ux^2 + 1)^2)}
+\mjdeqn{b_{u_{X}}=\frac{\rho_{XX_{i}}u_{X}}{\sqrt{\frac{\rho_{XX_{i}}u_{X}^{2}}{(\rho_{XX_{i}}-1)u_{X}^{2}+1}}((\rho_{XX_{i}}-1)u_{X}^{2}+1)^{2}}}{b_ux = (rxxi * ux) / (sqrt((rxxi * ux^2) / ((rxxi - 1) * ux^2 + 1)) * ((rxxi - 1) * ux^2 + 1)^2)}
+\mjdeqn{b_{\rho_{XX_{i}}}=-\frac{u_{X}^{2}(u_{X}^{2}-1)}{2\sqrt{\frac{\rho_{XX_{i}}u_{X}^{2}}{(\rho_{XX_{i}}-1)u_{X}^{2}+1}}((\rho_{XX_{i}}-1)u_{X}^{2}+1)^{2}}}{b_rxxi = -(ux^2 * (ux^2 - 1)) / (2 * sqrt((rxxi * ux^2) / ((rxxi - 1) * ux^2 + 1)) * ((rxxi - 1) * ux^2 + 1)^2)}
 
 
 
 
 #### Partial derivatives to estimate the variance of ut using qxa ####
 
-\deqn{b_{u_{X}}=\frac{u_{X}}{q_{X_{a}}^{2}\sqrt{\frac{q_{X_{a}}^{2}+u_{X}^{2}-1}{q_{X_{a}}^{2}}}}}{b_ux = ux / (qxa^2 * sqrt((qxa^2 + ux^2 - 1) / qxa^2))}
-\deqn{b_{q_{X_{a}}}=\frac{1-u_{X}^{2}}{q_{X_{a}}^{3}\sqrt{\frac{q_{X_{a}}^{2}+u_{X}^{2}-1}{q_{X_{a}}^{2}}}}}{b_qxa = (1 - ux^2) / (qxa^3 * sqrt((qxa^2 + ux^2 - 1) / qxa^2))}
+\mjdeqn{b_{u_{X}}=\frac{u_{X}}{q_{X_{a}}^{2}\sqrt{\frac{q_{X_{a}}^{2}+u_{X}^{2}-1}{q_{X_{a}}^{2}}}}}{b_ux = ux / (qxa^2 * sqrt((qxa^2 + ux^2 - 1) / qxa^2))}
+\mjdeqn{b_{q_{X_{a}}}=\frac{1-u_{X}^{2}}{q_{X_{a}}^{3}\sqrt{\frac{q_{X_{a}}^{2}+u_{X}^{2}-1}{q_{X_{a}}^{2}}}}}{b_qxa = (1 - ux^2) / (qxa^3 * sqrt((qxa^2 + ux^2 - 1) / qxa^2))}
 
 
 
 
 #### Partial derivatives to estimate the variance of ut using rxxa ####
 
-\deqn{b_{u_{X}}=\frac{u_{X}}{\rho_{XX_{a}}\sqrt{\frac{\rho_{XX_{a}}+u_{X}^{2}-1}{\rho_{XX_{a}}}}}}{b_ux = ux / (rxxa * sqrt((rxxa + ux^2 - 1) / rxxa))}
-\deqn{b_{\rho_{XX_{a}}}=\frac{1-u_{X}^{2}}{2\rho_{XX_{a}}^{2}\sqrt{\frac{\rho_{XX_{a}}+u_{X}^{2}-1}{\rho_{XX_{a}}}}}}{b_rxxa = (1 - ux^2) / (2 * rxxa^2 * sqrt((rxxa + ux^2 - 1) / rxxa))}
+\mjdeqn{b_{u_{X}}=\frac{u_{X}}{\rho_{XX_{a}}\sqrt{\frac{\rho_{XX_{a}}+u_{X}^{2}-1}{\rho_{XX_{a}}}}}}{b_ux = ux / (rxxa * sqrt((rxxa + ux^2 - 1) / rxxa))}
+\mjdeqn{b_{\rho_{XX_{a}}}=\frac{1-u_{X}^{2}}{2\rho_{XX_{a}}^{2}\sqrt{\frac{\rho_{XX_{a}}+u_{X}^{2}-1}{\rho_{XX_{a}}}}}}{b_rxxa = (1 - ux^2) / (2 * rxxa^2 * sqrt((rxxa + ux^2 - 1) / rxxa))}
 
 
 
 
 #### Partial derivatives to estimate the variance of ux using qxi ####
 
-\deqn{b_{u_{T}}=\frac{q_{X_{i}}^{2}u_{T}}{\sqrt{\frac{u_{T}^{2}}{u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1)}}(u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1))^{2}}}{b_ut = (qxi^2 * ut) / (sqrt(ut^2 / (ut^2 - qxi^2 * (ut^2 - 1))) * (ut^2 - qxi^2 * (ut^2 - 1))^2)}
-\deqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}(u_{T}^{2}-1)\left(\frac{u_{T}^{2}}{u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1)}\right)^{1.5}}{u_{T}^{2}}}{b_qxi = (qxi * (ut^2 - 1) * (ut^2 / (ut^2 - qxi^2 * (ut^2 - 1)))^(3/2)) / ut^2}
+\mjdeqn{b_{u_{T}}=\frac{q_{X_{i}}^{2}u_{T}}{\sqrt{\frac{u_{T}^{2}}{u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1)}}(u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1))^{2}}}{b_ut = (qxi^2 * ut) / (sqrt(ut^2 / (ut^2 - qxi^2 * (ut^2 - 1))) * (ut^2 - qxi^2 * (ut^2 - 1))^2)}
+\mjdeqn{b_{q_{X_{i}}}=\frac{q_{X_{i}}(u_{T}^{2}-1)\left(\frac{u_{T}^{2}}{u_{T}^{2}-q_{X_{i}}^{2}(u_{T}^{2}-1)}\right)^{1.5}}{u_{T}^{2}}}{b_qxi = (qxi * (ut^2 - 1) * (ut^2 / (ut^2 - qxi^2 * (ut^2 - 1)))^(3/2)) / ut^2}
 
 
 
 
 #### Partial derivatives to estimate the variance of ux using rxxi ####
 
-\deqn{b_{u_{T}}=\frac{\rho_{XX_{i}}u_{T}}{\sqrt{\frac{u_{T}^{2}}{-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2}}}(-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2})^{2}}}{b_ut = (rxxi * ut) / (sqrt(ut^2 / (-rxxi * ut^2 + rxxi + ut^2)) * (-rxxi * ut^2 + rxxi + ut^2)^2)}
-\deqn{b_{\rho_{XX_{i}}}=\frac{(u_{T}^{2}-1)\left(\frac{u_{T}^{2}}{-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2}}\right)^{1.5}}{2u_{T}^{2}}}{b_rxxi = ((ut^2 - 1) * (ut^2 / (-rxxi * ut^2 + rxxi + ut^2))^1.5) / (2 * ut^2)}
+\mjdeqn{b_{u_{T}}=\frac{\rho_{XX_{i}}u_{T}}{\sqrt{\frac{u_{T}^{2}}{-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2}}}(-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2})^{2}}}{b_ut = (rxxi * ut) / (sqrt(ut^2 / (-rxxi * ut^2 + rxxi + ut^2)) * (-rxxi * ut^2 + rxxi + ut^2)^2)}
+\mjdeqn{b_{\rho_{XX_{i}}}=\frac{(u_{T}^{2}-1)\left(\frac{u_{T}^{2}}{-\rho_{XX_{i}}u_{T}^{2}+\rho_{XX_{i}}+u_{T}^{2}}\right)^{1.5}}{2u_{T}^{2}}}{b_rxxi = ((ut^2 - 1) * (ut^2 / (-rxxi * ut^2 + rxxi + ut^2))^1.5) / (2 * ut^2)}
 
 
 
 
 #### Partial derivatives to estimate the variance of ux using qxa ####
 
-\deqn{b_{u_{T}}=\frac{q_{X_{a}}^{2}u_{T}}{\sqrt{q_{X_{a}}^{2}(u_{T}^{2}-1)+1}}}{b_ut = (qxa^2 * ut) / sqrt(qxa^2 * (ut^2 - 1) + 1)}
-\deqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}(u_{T}-1)}{\sqrt{q_{X_{a}}^{2}(u_{T}^{2}-1)+1}}}{b_qxa = (qxa * (ut^2 - 1)) / sqrt(qxa^2 * (ut^2 - 1) + 1)}
+\mjdeqn{b_{u_{T}}=\frac{q_{X_{a}}^{2}u_{T}}{\sqrt{q_{X_{a}}^{2}(u_{T}^{2}-1)+1}}}{b_ut = (qxa^2 * ut) / sqrt(qxa^2 * (ut^2 - 1) + 1)}
+\mjdeqn{b_{q_{X_{a}}}=\frac{q_{X_{a}}(u_{T}-1)}{\sqrt{q_{X_{a}}^{2}(u_{T}^{2}-1)+1}}}{b_qxa = (qxa * (ut^2 - 1)) / sqrt(qxa^2 * (ut^2 - 1) + 1)}
 
 
 
 
 #### Partial derivatives to estimate the variance of ux using rxxa ####
 
-\deqn{b_{u_{T}}=\frac{\rho_{XX_{a}}u_{T}}{\sqrt{\rho_{XX_{a}}(u_{T}^{2}-1)+1}}}{b_ut = (rxxa * ut) / sqrt(rxxa * (ut^2 - 1) + 1)}
-\deqn{b_{\rho_{XX_{a}}}=\frac{u_{T}^{2}-1}{2\sqrt{\rho_{XX_{a}}(u_{T}^{2}-1)+1}}}{b_rxxa = (ut^2 - 1) / (2 * sqrt(rxxa * (ut^2 - 1) + 1))}
+\mjdeqn{b_{u_{T}}=\frac{\rho_{XX_{a}}u_{T}}{\sqrt{\rho_{XX_{a}}(u_{T}^{2}-1)+1}}}{b_ut = (rxxa * ut) / sqrt(rxxa * (ut^2 - 1) + 1)}
+\mjdeqn{b_{\rho_{XX_{a}}}=\frac{u_{T}^{2}-1}{2\sqrt{\rho_{XX_{a}}(u_{T}^{2}-1)+1}}}{b_rxxa = (ut^2 - 1) / (2 * sqrt(rxxa * (ut^2 - 1) + 1))}
 
 
 
@@ -393,36 +394,36 @@ Direct range restriction:
 
 #### Partial derivatives to estimate the variance of ryya ####
 
-\deqn{b_{\rho_{YY_{i}}}=\frac{1}{\rho_{XY_{i}}^{2}\left(\frac{1}{u_{X}^{2}}-1\right)+1}}{b_ryyi = 1 / (rxyi^2 * (1 / ux^2 - 1) + 1)}
-\deqn{b_{u_{X}}=\frac{2(\rho_{YY_{i}}-1)\rho_{XY_{i}}^{2}u_{X}}{(u_{X}^{2}-\rho_{XY_{i}}^{2}(u_{X}^{2}-1))^{2}}}{b_ux = (2 * (ryyi - 1) * rxyi^2 * ux) / (ux^2 - rxyi^2 * (ux^2 - 1))^2}
-\deqn{b_{\rho_{XY_{i}}}=\frac{2(\rho_{YY_{i}}-1)\rho_{XY_{i}}u_{X}^{2}(u_{X}^{2}-1)}{(u_{X}^{2}-\rho_{XY_{i}}^{2}(u_{X}^{2}-1))^{2}}}{b_rxyi = (2 * (ryyi - 1) * rxyi * ux^2 * (ux^2 - 1)) / (ux^2 - rxyi^2 * (ux^2 - 1))^2}
+\mjdeqn{b_{\rho_{YY_{i}}}=\frac{1}{\rho_{XY_{i}}^{2}\left(\frac{1}{u_{X}^{2}}-1\right)+1}}{b_ryyi = 1 / (rxyi^2 * (1 / ux^2 - 1) + 1)}
+\mjdeqn{b_{u_{X}}=\frac{2(\rho_{YY_{i}}-1)\rho_{XY_{i}}^{2}u_{X}}{(u_{X}^{2}-\rho_{XY_{i}}^{2}(u_{X}^{2}-1))^{2}}}{b_ux = (2 * (ryyi - 1) * rxyi^2 * ux) / (ux^2 - rxyi^2 * (ux^2 - 1))^2}
+\mjdeqn{b_{\rho_{XY_{i}}}=\frac{2(\rho_{YY_{i}}-1)\rho_{XY_{i}}u_{X}^{2}(u_{X}^{2}-1)}{(u_{X}^{2}-\rho_{XY_{i}}^{2}(u_{X}^{2}-1))^{2}}}{b_rxyi = (2 * (ryyi - 1) * rxyi * ux^2 * (ux^2 - 1)) / (ux^2 - rxyi^2 * (ux^2 - 1))^2}
 
 
 
 
 #### Partial derivatives to estimate the variance of qya ####
 
-\deqn{b_{q_{Y_{i}}}=\frac{q_{Y_{i}}}{\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]\sqrt{1-\frac{1-q_{Y_{i}}^{2}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}}}{b_qxi = qyi / ((1 - rxyi^2 * (1 - 1 / ux^2)) * sqrt(1 - (1 - qyi^2) / (1 - rxyi^2 * (1 - 1 / ux^2))))}
-\deqn{b_{u_{X}}=-\frac{(1-q_{Y_{i}}^{2})\rho_{XY_{i}}^{2}}{u_{X}^{3}\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]\sqrt{1-\frac{1-q_{Y_{i}}^{2}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}}}{b_ux = -((1 - qyi^2) * rxyi^2) / (ux^3 * (1 - rxyi^2 * (1 - 1 / ux^2))^2 * sqrt(1 - (1 - qyi^2) / (1 - rxyi^2 * (1 - 1 / ux^2))))}
-\deqn{b_{\rho_{XY_{i}}}=-\frac{(1-q_{Y_{i}}^{2})\rho_{XY_{i}}\left(1-\frac{1}{u_{X}^{2}}\right)}{\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]\sqrt{1-\frac{1-q_{Y_{i}}^{2}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}}}{b_rxyi = -((1 - qyi^2) * rxyi * (1 - 1 / ux^2)) / ((1 - rxyi^2 * (1 - 1 / ux^2))^2 * sqrt(1 - (1 - qyi^2) / (1 - rxyi^2 * (1 - 1 / ux^2))))}
+\mjdeqn{b_{q_{Y_{i}}}=\frac{q_{Y_{i}}}{\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]\sqrt{1-\frac{1-q_{Y_{i}}^{2}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}}}{b_qxi = qyi / ((1 - rxyi^2 * (1 - 1 / ux^2)) * sqrt(1 - (1 - qyi^2) / (1 - rxyi^2 * (1 - 1 / ux^2))))}
+\mjdeqn{b_{u_{X}}=-\frac{(1-q_{Y_{i}}^{2})\rho_{XY_{i}}^{2}}{u_{X}^{3}\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]\sqrt{1-\frac{1-q_{Y_{i}}^{2}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}}}{b_ux = -((1 - qyi^2) * rxyi^2) / (ux^3 * (1 - rxyi^2 * (1 - 1 / ux^2))^2 * sqrt(1 - (1 - qyi^2) / (1 - rxyi^2 * (1 - 1 / ux^2))))}
+\mjdeqn{b_{\rho_{XY_{i}}}=-\frac{(1-q_{Y_{i}}^{2})\rho_{XY_{i}}\left(1-\frac{1}{u_{X}^{2}}\right)}{\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]\sqrt{1-\frac{1-q_{Y_{i}}^{2}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}}}{b_rxyi = -((1 - qyi^2) * rxyi * (1 - 1 / ux^2)) / ((1 - rxyi^2 * (1 - 1 / ux^2))^2 * sqrt(1 - (1 - qyi^2) / (1 - rxyi^2 * (1 - 1 / ux^2))))}
 
 
 
 
 #### Partial derivatives to estimate the variance of ryyi ####
 
-\deqn{\rho_{YY_{a}}: b_{\rho_{YY_{a}}}=\rho_{XY_{i}}^{2}\left(\frac{1}{u_{X}^{2}}-1\right)+1}{b_ryya = rxyi^2 * (1 / ux^2 - 1) + 1}
-\deqn{b_{u_{X}}=-\frac{2(\rho_{YY_{a}}-1)\rho_{XY_{i}}^{2}}{u_{X}^{3}}}{u_{X}: b_ux = -(2 * (ryya - 1) * rxyi^2) / ux^3}
-\deqn{b_{\rho_{XY_{i}}}=-\frac{2(\rho_{YY_{a}}-1)\rho_{XY_{i}}(u_{X}^{2}-1)}{u_{X}^{2}}}{b_rxyi = -(2 * (ryya - 1) * rxyi * (ux^2 - 1)) / ux^2}
+\mjdeqn{\rho_{YY_{a}}: b_{\rho_{YY_{a}}}=\rho_{XY_{i}}^{2}\left(\frac{1}{u_{X}^{2}}-1\right)+1}{b_ryya = rxyi^2 * (1 / ux^2 - 1) + 1}
+\mjdeqn{b_{u_{X}}=-\frac{2(\rho_{YY_{a}}-1)\rho_{XY_{i}}^{2}}{u_{X}^{3}}}{u_{X}: b_ux = -(2 * (ryya - 1) * rxyi^2) / ux^3}
+\mjdeqn{b_{\rho_{XY_{i}}}=-\frac{2(\rho_{YY_{a}}-1)\rho_{XY_{i}}(u_{X}^{2}-1)}{u_{X}^{2}}}{b_rxyi = -(2 * (ryya - 1) * rxyi * (ux^2 - 1)) / ux^2}
 
 
 
 
 #### Partial derivatives to estimate the variance of qyi ####
 
-\deqn{b_{q_{Y_{a}}}=\frac{q_{Y_{a}}\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}{\sqrt{1-\left(1-q_{Y_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}}}{b_qya = (qya * (1 - rxyi^2 * (1 - 1 / ux^2))) / sqrt(1 - (1 - qya^2) * (1 - rxyi^2 * (1 - 1 / ux^2)))}
-\deqn{b_{u_{X}}=\frac{(1-q_{Y_{a}}^{2})\rho_{XY_{i}}\left(1-\frac{1}{u_{X}^{2}}\right)}{\sqrt{1-\left(1-q_{Y_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}}}{b_ux = ((1 - qya^2) * rxyi * (1 - 1 / ux^2)) / sqrt(1 - (1 - qya^2) * (1 - rxyi^2 * (1 - 1 / ux^2)))}
-\deqn{b_{\rho_{XY_{i}}}=\frac{(1-q_{Y_{a}}^{2})\rho_{XY_{i}}^{2}}{u_{X}^{3}\sqrt{1-\left(1-q_{Y_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}}}{b_rxyi = ((1 - qya^2) * rxyi^2) / (ux^3 * sqrt(1 - (1 - qya^2) * (1 - rxyi^2 * (1 - 1 / ux^2))))}
+\mjdeqn{b_{q_{Y_{a}}}=\frac{q_{Y_{a}}\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}{\sqrt{1-\left(1-q_{Y_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}}}{b_qya = (qya * (1 - rxyi^2 * (1 - 1 / ux^2))) / sqrt(1 - (1 - qya^2) * (1 - rxyi^2 * (1 - 1 / ux^2)))}
+\mjdeqn{b_{u_{X}}=\frac{(1-q_{Y_{a}}^{2})\rho_{XY_{i}}\left(1-\frac{1}{u_{X}^{2}}\right)}{\sqrt{1-\left(1-q_{Y_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}}}{b_ux = ((1 - qya^2) * rxyi * (1 - 1 / ux^2)) / sqrt(1 - (1 - qya^2) * (1 - rxyi^2 * (1 - 1 / ux^2)))}
+\mjdeqn{b_{\rho_{XY_{i}}}=\frac{(1-q_{Y_{a}}^{2})\rho_{XY_{i}}^{2}}{u_{X}^{3}\sqrt{1-\left(1-q_{Y_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}}}{b_rxyi = ((1 - qya^2) * rxyi^2) / (ux^3 * sqrt(1 - (1 - qya^2) * (1 - rxyi^2 * (1 - 1 / ux^2))))}
 }
 \examples{
 estimate_var_qxi(qxa = c(.8, .85, .9, .95), var_qxa = c(.02, .03, .04, .05),

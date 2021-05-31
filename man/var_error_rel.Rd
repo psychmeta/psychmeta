@@ -11,8 +11,8 @@ var_error_rel(rel, n, rel_type = "alpha", k_items = NULL)
 
 \item{n}{Vector of sample sizes.}
 
-\item{rel_type}{Character vector indicating the type(s) of reliabilities being analyzed. See documentation for \code{ma_r} for a full list of acceptable reliability types.
-NOTE: Currently, only alpha has its own dedicated error-variance estimate; the error variance of other reliability types is estimated using the generic definition of reliability as the squared correlation between observed scores and true scores.}
+\item{rel_type}{Character vector indicating the type(s) of reliabilities being analyzed. See documentation for \code{\link[=ma_r]{ma_r()}} for a full list of acceptable reliability types.
+NOTE: Currently, only \mjseqn{\alpha} has its own dedicated error-variance estimate; the error variance of other reliability types is estimated using the generic definition of reliability as the squared correlation between observed scores and true scores.}
 
 \item{k_items}{Optional numeric vector indicating the number of items in each scale for which reliabilities are being analyzed.}
 }
@@ -20,14 +20,15 @@ NOTE: Currently, only alpha has its own dedicated error-variance estimate; the e
 A vector of sampling-error variances.
 }
 \description{
-Estimate the error variance of reliability estimates
+\loadmathjax
+Estimate error variance for reliability coefficients (\mjeqn{r_{XX}}{r_XX}).
 }
 \details{
 The sampling variance of a reliability coefficient is:
 
-\deqn{var_{e}=\frac{4r_{XX}(1-r_{XX})^{2}}{n-1}}{var_e = 4 * rxx * (1 - rxx)^2 / (n - 1)}
+\mjdeqn{var_{e}=\frac{4r_{XX}(1-r_{XX})^{2}}{n-1}}{var_e = 4 * rxx * (1 - rxx)^2 / (n - 1)}
 
-For the equation to estimate the variance of coefficient alpha, see Duhachek and Iacobucci (2004).
+For the equation to estimate the variance of coefficient \mjseqn{\alpha}, see Duhachek and Iacobucci (2004).
 }
 \examples{
 var_error_rel(rel = .8, n = 100)

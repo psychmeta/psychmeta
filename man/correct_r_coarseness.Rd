@@ -46,7 +46,8 @@ correct_r_coarseness(
 Vector of correlations corrected for scale coarseness (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 }
 \description{
-Correct correlations for scale coarseness
+\loadmathjax
+Corrects correlations for scale coarseness.
 }
 \examples{
 correct_r_coarseness(r = .35, kx = 5, ky = 4, n = 100)
@@ -61,7 +62,7 @@ Correcting correlation coefficients attenuated from using coarse scales.
 
 Schmidt, F. L., & Hunter, J. E. (2015).
 \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-Thousand Oaks, CA: SAGE. \doi{10/b6mg}. pp. 287-288.
+Sage. \doi{10.4135/9781483398105}. pp. 287-288.
 
 Peters, C. C., & Van Voorhis, W. R. (1940).
 \emph{Statistical procedures and their mathematical bases}.

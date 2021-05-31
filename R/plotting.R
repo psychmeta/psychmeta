@@ -1,6 +1,9 @@
 #' Create funnel plots
 #'
-#' This function creates funnel plots for meta-analyses (plots of effect size versus . Both traditional funnel plots and
+#' This function creates funnel plots for meta-analyses (plots of effect size versus standard error).
+#'
+#' Both traditional funnel plots and contour-enhanced funnel plots are provided.
+#' Contour-enhanced funnel plots show comparison regions for varying null-hypothesis significance test levels and can be useful for detecting publication bias.
 #'
 #' @param ma_obj Meta-analysis object.
 #' @param se_type Method to calculate standard errors (y-axis). Options are `"auto"` (default) to use the same method as used to estimate the meta-analysis models, `"mean"` to calculate SEs using the mean effect size and indivdiual sample sizes, or `"sample"`` to use the SE calculated using the sample effect sizes and sample sizes.

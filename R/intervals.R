@@ -1,5 +1,6 @@
 #' Construct a confidence interval
 #'
+#' \loadmathjax
 #' Function to construct a confidence interval around an effect size or mean effect size.
 #'
 #' @param mean Mean effect size (if used in a meta-analysis) or observed effect size (if used on individual statistics).
@@ -13,7 +14,7 @@
 #' @export
 #'
 #' @details
-#' \deqn{CI=mean_{es}\pm quantile\times SE_{es}}{CI = mean_es +/- quantile * SE_es}
+#' \mjdeqn{CI=mean_{es}\pm quantile\times SE_{es}}{CI = mean_es +/- quantile * SE_es}
 #'
 #' @examples
 #' confidence(mean = c(.3, .5), se = c(.15, .2), df = c(100, 200), conf_level = .95, conf_method = "t")
@@ -65,6 +66,7 @@ confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method
 
 #' Construct a credibility interval
 #'
+#' \loadmathjax
 #' Function to construct a credibility interval around a mean effect size.
 #'
 #' @param mean Mean effect size.
@@ -77,7 +79,7 @@ confidence <- function(mean, se = NULL, df = NULL, conf_level = .95, conf_method
 #' @export
 #'
 #' @details
-#' \deqn{CR=mean_{es}\pm quantile\times SD_{es}}{CR = mean_es +/- quantile * SD_es}
+#' \mjdeqn{CR=mean_{es}\pm quantile\times SD_{es}}{CR = mean_es +/- quantile * SD_es}
 #'
 #' @examples
 #' credibility(mean = .3, sd = .15, cred_level = .8, cred_method = "norm")
@@ -123,7 +125,8 @@ credibility <- function(mean, sd, k = NULL, cred_level = .8, cred_method = c("t"
 #' confidence_r(r = .3, n = 200, conf_level = .95)
 confidence_r <- function(r, n, conf_level=.95) {
     z <- convert_es.q_r_to_Fisherz(r)
-    if (n < 4) se <- 1 else se <- 1/sqrt(n - 3)
+    se <- rep(1, length(n))
+    se[n > 3] <- 1/sqrt(n[n > 3] - 3)
     CI.z <- confidence(mean = z, se=se, conf_level=conf_level, conf_method = "norm")
     return(convert_es.q_Fisherz_to_r(CI.z))
 }

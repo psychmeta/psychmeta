@@ -2,7 +2,7 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_alpha}
 \alias{var_error_alpha}
-\title{Analytic estimate of the sampling variance of alpha}
+\title{Analytic estimate of the sampling variance of coefficient \mjseqn{\alpha}}
 \usage{
 var_error_alpha(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases)
 }
@@ -10,17 +10,18 @@ var_error_alpha(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases)
 \item{item_mat}{Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both alpha and k_items.
 If item_mat is NULL, the program will assume that all item intercorrelations are equal.}
 
-\item{alpha}{Vector of population alpha values. Must be supplied if item_mat is NULL.}
+\item{alpha}{Vector of population \mjseqn{\alpha} values. Must be supplied if item_mat is NULL.}
 
 \item{k_items}{Vector of numbers of items to be simulated. Must be supplied if item_mat is NULL.}
 
 \item{n_cases}{Vector of sample sizes to simulate in sampling distribution of alpha.}
 }
 \value{
-Vector of sampling variances of the supplied alpha(s).
+Vector of sampling variances of the supplied \mjseqn{\alpha} values.
 }
 \description{
-Analytic estimate of the sampling variance of alpha
+\loadmathjax
+Estimates the error variance of Cronbach's coefficient \mjseqn{\alpha}.
 }
 \examples{
 item_mat <- matrix(.3, 5, 5)
@@ -35,5 +36,5 @@ var_error_alpha(alpha = c(alpha, alpha), k_items = c(k_items, k_items), n_cases 
 \references{
 Duhachek, A., & Iacobucci, D. (2004).
 Alpha’s standard error (ASE): An accurate and precise confidence interval estimate.
-\emph{Journal of Applied Psychology, 89}(5), 792–808. \doi{10.1037/0021-9010.89.5.792}
+*Journal of Applied Psychology, 89*(5), 792–808. \doi{10.1037/0021-9010.89.5.792}
 }

@@ -35,16 +35,17 @@ wt_var(
 A weighted mean and variance if weights are supplied or an unweighted mean and variance if weights are not supplied.
 }
 \description{
+\loadmathjax
 Compute the weighted mean and variance of a vector of numeric values. If no weights are supplied, defaults to computing the unweighted mean and the unweighted maximum-likelihood variance.
 }
 \details{
 The weighted mean is computed as
-\deqn{\bar{x}_{w}=\frac{\Sigma_{i=1}^{k}x_{i}w_{i}}{\Sigma_{i=1}^{k}w_{i}}}{sum(x * wt) / sum(wt)}
+\mjdeqn{\bar{x}_{w}=\frac{\Sigma_{i=1}^{k}x_{i}w_{i}}{\Sigma_{i=1}^{k}w_{i}}}{sum(x * wt) / sum(wt)}
 where \emph{x} is a numeric vector and \emph{w} is a vector of weights.
 
 The weighted variance is computed as
-\deqn{var_{w}(x)=\frac{\Sigma_{i=1}^{k}\left(x_{i}-\bar{x}_{w}\right)^{2}w_{i}}{\Sigma_{i=1}^{k}w_{i}}}{var(x) = sum((x - sum(x * wt) / sum(wt))^2 * wt) / sum(wt)}
-and the unbiased weighted variance is estimated by multiplying \eqn{var_{w}(x)}{var(x)} by \eqn{\frac{k}{k-1}}{k/(k-1)}.
+\mjdeqn{var_{w}(x)=\frac{\Sigma_{i=1}^{k}\left(x_{i}-\bar{x}_{w}\right)^{2}w_{i}}{\Sigma_{i=1}^{k}w_{i}}}{var(x) = sum((x - sum(x * wt) / sum(wt))^2 * wt) / sum(wt)}
+and the unbiased weighted variance is estimated by multiplying \mjeqn{var_{w}(x)}{var(x)} by \mjeqn{\frac{k}{k-1}}{k/(k-1)}.
 }
 \examples{
 wt_dist(x = c(.1, .3, .5), wt = c(100, 200, 300))

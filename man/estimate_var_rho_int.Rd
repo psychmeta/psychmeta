@@ -8,7 +8,7 @@
 \alias{estimate_var_rho_int_bvirr}
 \alias{estimate_var_rho_int_bvdrr}
 \alias{estimate_var_rho_int_rb}
-\title{Non-linear estimate of variance of \eqn{\rho} corrected for psychometric artifacts using numeric integration}
+\title{Non-linear estimate of variance of \mjseqn{\rho} corrected for psychometric artifacts using numeric integration}
 \usage{
 estimate_var_rho_int_meas(mean_qx, mean_qy, var_res)
 
@@ -80,16 +80,17 @@ estimate_var_rho_int_rb(
 A vector of non-linear estimates of the variance of rho.
 }
 \description{
-Functions to estimate the variance of \eqn{\rho} corrected for psychometric artifacts. These functions integrate over the residual distribution of correlations from an interactive artifact-distribution meta-analysis to non-linearly estimate the variance of \eqn{\rho}{rho}.
+\loadmathjax
+Functions to estimate the variance of \mjseqn{\rho} corrected for psychometric artifacts. These functions integrate over the residual distribution of correlations from an interactive artifact-distribution meta-analysis to non-linearly estimate the variance of \mjeqn{\rho}{rho}.
 
 Available functions include:
 \itemize{
-     \item{\code{estimate_var_rho_int_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
-     \item{\code{estimate_var_rho_int_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-     \item{\code{estimate_var_rho_int_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
-     \item{\code{estimate_var_rho_int_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-     \item{\code{estimate_var_rho_int_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-     \item{\code{estimate_var_rho_int_rb}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's correction for direct range restriction and measurement error}
+     \item{\code{estimate_var_rho_int_meas}}{\cr Variance of \mjseqn{\rho} corrected for measurement error only}
+     \item{\code{estimate_var_rho_int_uvdrr}}{\cr Variance of \mjseqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+     \item{\code{estimate_var_rho_int_bvdrr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate direct range restriction and measurement error}
+     \item{\code{estimate_var_rho_int_uvirr}}{\cr Variance of \mjseqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+     \item{\code{estimate_var_rho_int_bvirr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+     \item{\code{estimate_var_rho_int_rb}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's correction for direct range restriction and measurement error}
 }
 }
 \section{Notes}{

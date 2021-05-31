@@ -51,6 +51,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      hs_override <- control$hs_override
      use_all_arts <- control$use_all_arts
      estimate_pa <- control$estimate_pa
+     zero_substitute <- control$zero_substitute
 
      control$pairwise_ads <- TRUE
 
@@ -285,6 +286,9 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      ryy_type <- ryy_type[valid_r]
 
      rxyi <- rxyi[valid_r]
+     if(any(zapsmall(rxyi) == 0 & correct_rr_x & !indirect_rr_x & correct_rr_y & !indirect_rr_y))
+             stop("The correction for bivariate direct range restricton is not appropriate for `rxyi` values of zero.", call. = FALSE)
+     rxyi[rxyi == 0] <- zero_substitute # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
      if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators, .name_repair = "minimal")[valid_r,], stringsAsFactors = FALSE)
@@ -776,8 +780,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      }else{
           correction_data <- cbind(presorted_data, correction_data)
      }
-     if(!is.null(citekey)) correction_data <- cbind(citekey = citekey, correction_data) %>% mutate(citekey = as.character(citekey))
-     if(!is.null(sample_id)) correction_data <- cbind(sample_id = sample_id, correction_data) %>% mutate(sample_id = as.character(sample_id))
+     if(!is.null(citekey)) correction_data <- cbind(citekey = citekey, correction_data)
+     if(!is.null(sample_id)) correction_data <- cbind(sample_id = sample_id, correction_data)
 
      es_data <- data.frame(rxyi = rxyi_orig,
                            n = n,
@@ -1003,8 +1007,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                escalc_tp$pi <- data$pi
                escalc_tp$pa <- data$pa
 
-               if(!is.null(citekey)) escalc_tp <- cbind(citekey = citekey, escalc_tp) %>% mutate(citekey = as.character(citekey))
-               if(!is.null(sample_id)) escalc_tp <- cbind(sample_id = sample_id, escalc_tp) %>% mutate(sample_id = as.character(sample_id))
+               if(!is.null(citekey)) escalc_tp <- cbind(citekey = citekey, escalc_tp)
+               if(!is.null(sample_id)) escalc_tp <- cbind(sample_id = sample_id, escalc_tp)
                if(any(colnames(data) == "original_order")) escalc_tp <- cbind(original_order = data$original_order, escalc_tp)
                class(escalc_tp) <- c("escalc", "data.frame")
           }
@@ -1063,8 +1067,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
                escalc_xp$pi <- data$pi
                escalc_xp$pa <- data$pa
-               if(!is.null(citekey)) escalc_xp <- cbind(citekey = citekey, escalc_xp) %>% mutate(citekey = as.character(citekey))
-               if(!is.null(sample_id)) escalc_xp <- cbind(sample_id = sample_id, escalc_xp) %>% mutate(sample_id = as.character(sample_id))
+               if(!is.null(citekey)) escalc_xp <- cbind(citekey = citekey, escalc_xp)
+               if(!is.null(sample_id)) escalc_xp <- cbind(sample_id = sample_id, escalc_xp)
                if(any(colnames(data) == "original_order")) escalc_xp <- cbind(original_order = data$original_order, escalc_xp)
                class(escalc_xp) <- c("escalc", "data.frame")
           }
@@ -1122,8 +1126,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
                escalc_ty$pi <- data$pi
                escalc_ty$pa <- data$pa
-               if(!is.null(citekey)) escalc_ty <- cbind(citekey = citekey, escalc_ty) %>% mutate(citekey = as.character(citekey))
-               if(!is.null(sample_id)) escalc_ty <- cbind(sample_id = sample_id, escalc_ty) %>% mutate(sample_id = as.character(sample_id))
+               if(!is.null(citekey)) escalc_ty <- cbind(citekey = citekey, escalc_ty)
+               if(!is.null(sample_id)) escalc_ty <- cbind(sample_id = sample_id, escalc_ty)
                if(any(colnames(data) == "original_order")) escalc_ty <- cbind(original_order = data$original_order, escalc_ty)
                class(escalc_ty) <- c("escalc", "data.frame")
           }
@@ -1166,7 +1170,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. p. 144.
+#' Sage. \doi{10.4135/9781483398105}. p. 144.
 #'
 #' @keywords internal
 #'
@@ -1196,7 +1200,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings (3rd ed.)}.
-#' Thousand Oaks, California: SAGE Publications, Inc. p. 145.
+#' Sage. \doi{10.4135/9781483398105}. p. 145.
 #'
 #' @keywords internal
 #'

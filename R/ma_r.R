@@ -9,6 +9,7 @@
 #'
 #'
 #' @param rxyi,r Vector or column name of observed correlations. The \code{r} argument is used with the \code{ma_r_bb} (i.e., the barebones function) function and the \code{rxyi} argument is used with \code{ma_r} and \code{ma_r_ic} (i.e., the function in which corrections are applied).
+#' \emph{NOTE}: Beginning in \pkg{psychmeta} version 2.5.2, \code{rxyi} values of exactly 0 in individual-correction meta-analyses are replaced with a functionally equivalent value via the \code{zero_substitute} argument for \code{\link{control_psychmeta}} to facilitate the estimation of corrected error variances.
 #' @param n Vector or column name of sample sizes.
 #' @param n_adj Optional: Vector or column name of sample sizes adjusted for sporadic artifact corrections.
 #' @param sample_id Optional vector of identification labels for samples/studies in the meta-analysis.
@@ -194,8 +195,6 @@
 #' @export
 #'
 #' @importFrom tibble as_tibble
-#' @importFrom data.table rbindlist
-#' @import metafor
 #' @importFrom boot boot
 #' @importFrom boot boot.ci
 #' @importFrom stats as.formula
@@ -226,7 +225,7 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. Chapter 4.
+#' Sage. \doi{10.4135/9781483398105}. Chapter 4.
 #'
 #' Law, K. S., Schmidt, F. L., & Hunter, J. E. (1994).
 #' Nonlinearity of range corrections in meta-analysis: Test of an improved procedure.
@@ -1397,7 +1396,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                      )
                   )
 
-          collapsed_data <- as.data.frame(data.table::rbindlist(collapsed_data_list), stringsAsFactors = FALSE)
+          collapsed_data <- do.call(rbind, collapsed_data_list)
           colnames(collapsed_data)[colnames(collapsed_data) == "es"] <- "rxyi"
           collapsed_data <- collapsed_data[,colnames(full_data_mod)]
 
@@ -1598,7 +1597,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           # TODO: Drop pair_id and analyis_id, just group by construct pair and moderator
           for(i in 1:length(out)) out[[i]] <- tibble(pair_id = rep(i, nrow(out[[i]][[3]])), !!!out[[i]])
 
-          out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
+          out <- do.call(rbind, out)
 
           # TODO: Move to get_ad()
           out <- join_maobj_adobj(ma_obj = out, ad_obj_x = ad_obj_list_tsa, ad_obj_y = ad_obj_list_tsa)
@@ -1741,8 +1740,10 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                out <- map(out, function(x) x$ma_obj)
           }
 
-          for(i in 1:length(out)) out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
-          out <- as_tibble(data.table::rbindlist(out), .name_repair = "minimal")
+          for (i in 1:length(out)) {
+                  out[[i]] <- bind_cols(pair_id = rep(i, nrow(out[[i]])), out[[i]])
+          }
+          out <- do.call(rbind, out)
 
           if(es_d & treat_as_d){
                out$analysis_id <- NULL

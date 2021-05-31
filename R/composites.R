@@ -1,5 +1,6 @@
 #' Spearman-Brown prophecy formula to estimate the reliability of a lengthened measure
 #'
+#' \loadmathjax
 #' This function implements the Spearman-Brown prophecy formula for estimating the reliability of a lengthened (or shortened) measure.
 #' The formula implemented here assumes that all items added to (or subtracted from) the measure will be parallel forms of the original items.
 #'
@@ -17,9 +18,9 @@
 #' @details
 #' This is computed as:
 #'
-#' \deqn{\rho_{XX}^{*}=\frac{k\rho_{XX}}{1+(k-1)\rho_{XX}}}{rel_predicted = (k * rel_initial) / (1 + (k - 1) * rel_initial)}
+#' \mjdeqn{\rho_{XX}^{*}=\frac{k\rho_{XX}}{1+(k-1)\rho_{XX}}}{rel_predicted = (k * rel_initial) / (1 + (k - 1) * rel_initial)}
 #'
-#' where \eqn{\rho_{XX}}{rel_initial} is the initial reliability, \emph{k} is the multiplier by which the measure is to be lengthened (or shortened), and \eqn{\rho_{XX}^{*}}{rel_predicted} is the predicted reliability of a measure with a different length.
+#' where \mjeqn{\rho_{XX}}{rel_initial} is the initial reliability, \emph{k} is the multiplier by which the measure is to be lengthened (or shortened), and \mjeqn{\rho_{XX}^{*}}{rel_predicted} is the predicted reliability of a measure with a different length.
 #'
 #' @examples
 #' ## Double the length of a measure with an initial reliability of .7
@@ -34,6 +35,7 @@ estimate_rel_sb <- function(rel_initial, k){
 
 #' Inverse Spearman-Brown formula to estimate the amount by which a measure would have to be lengthened or shorted to achieve a desired level of reliability
 #'
+#' \loadmathjax
 #' This function implements the inverse of the Spearman-Brown prophecy formula and answers the question: "How much would I have to increase (do decrease) the length of this measure
 #' to obtain a desired reliability level given the current reliability of the measure?" The result of the function is the multiplier by which the length of the original measure should be adjusted.
 #' The formula implemented here assumes that all items added to (or subtracted from) the measure will be parallel forms of the original items.
@@ -52,9 +54,9 @@ estimate_rel_sb <- function(rel_initial, k){
 #' @details
 #' This is computed as:
 #'
-#' \deqn{k^{*}=\frac{\rho_{XX}^{*}(\rho_{XX}-1)}{(\rho_{XX}^{*}-1)\rho_{XX}}}{k_predicted = (rel_desired * (rel_initial - 1)) / ((rel_desired - 1) * rel_initial)}
+#' \mjdeqn{k^{*}=\frac{\rho_{XX}^{*}(\rho_{XX}-1)}{(\rho_{XX}^{*}-1)\rho_{XX}}}{k_predicted = (rel_desired * (rel_initial - 1)) / ((rel_desired - 1) * rel_initial)}
 #'
-#' where \eqn{\rho_{XX}}{rel_initial} is the inital reliability, \eqn{\rho_{XX}^{*}}{rel_desired} is the predicted reliability of a measure with a different length, and \eqn{k^{*}}{k_predicted} is the number of times the measure would have to be lengthened to obtain a reliability equal to \eqn{\rho_{XX}^{*}}{rel_desired}.
+#' where \mjeqn{\rho_{XX}}{rel_initial} is the inital reliability, \mjeqn{\rho_{XX}^{*}}{rel_desired} is the predicted reliability of a measure with a different length, and \mjeqn{k^{*}}{k_predicted} is the number of times the measure would have to be lengthened to obtain a reliability equal to \mjeqn{\rho_{XX}^{*}}{rel_desired}.
 #'
 #' @examples
 #' ## Estimated k to achieve a reliability of .8 from a measure with an initial reliability of .7
@@ -71,6 +73,7 @@ estimate_length_sb <- function(rel_initial, rel_desired){
 
 #' Scalar formula to estimate the correlation between a composite and another variable or between two composite variables
 #'
+#' \loadmathjax
 #' This function estimates the correlation between a set of X variables and a set of Y variables using a scalar formula.
 #'
 #' @param mean_rxy Mean correlation between sets of X and Y variables.
@@ -89,21 +92,21 @@ estimate_length_sb <- function(rel_initial, rel_desired){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+#' Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 #'
 #' @details
 #' The formula to estimate a correlation between one composite variable and one external variable is:
 #'
-#' \deqn{\rho_{Xy}=\frac{\bar{\rho}_{x_{i}y}}{\sqrt{\frac{1}{k_{x}}+\frac{k_{x}-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x))}
+#' \mjdeqn{\rho_{Xy}=\frac{\bar{\rho}_{x_{i}y}}{\sqrt{\frac{1}{k_{x}}+\frac{k_{x}-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x))}
 #'
 #' and the formula to estimate the correlation between two composite variables is:
 #'
-#' \deqn{\rho_{XY}=\frac{\bar{\rho}_{x_{i}y_{j}}}{\sqrt{\frac{1}{k_{x}}+\frac{k-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}\sqrt{\frac{1}{k_{y}}+\frac{k_{y}-1}{k_{y}}\bar{\rho}_{y_{i}y_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x) * ((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))}
+#' \mjdeqn{\rho_{XY}=\frac{\bar{\rho}_{x_{i}y_{j}}}{\sqrt{\frac{1}{k_{x}}+\frac{k-1}{k_{x}}\bar{\rho}_{x_{i}x_{j}}}\sqrt{\frac{1}{k_{y}}+\frac{k_{y}-1}{k_{y}}\bar{\rho}_{y_{i}y_{j}}}}}{r_composite = mean_rxy / sqrt(((1 / k_vars_x) + ((k_vars_x - 1) / k_vars_x) * mean_intercor_x) * ((1 / k_vars_y) + ((k_vars_y - 1) / k_vars_y) * mean_intercor_y))}
 #'
-#' where \eqn{\bar{\rho}_{x_{i}y}}{mean_r} and \eqn{\bar{\rho}_{x_{i}y{j}}}{mean_r} are mean correlations between the x variables and the y variable(s),
-#' \eqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor_x} is the mean correlation among x variables,
-#' \eqn{\bar{\rho}_{y_{i}y_{j}}}{mean_intercor_y} is the mean correlation among y variables,
-#' \eqn{{k}_{x}}{k_vars_x} is the number of x variables, and \eqn{{k}_{y}}{k_vars_y} is the number of y variables.
+#' where \mjeqn{\bar{\rho}_{x_{i}y}}{mean_r} and \mjeqn{\bar{\rho}_{x_{i}y{j}}}{mean_r} are mean correlations between the x variables and the y variable(s),
+#' \mjeqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor_x} is the mean correlation among x variables,
+#' \mjeqn{\bar{\rho}_{y_{i}y_{j}}}{mean_intercor_y} is the mean correlation among y variables,
+#' \mjeqn{{k}_{x}}{k_vars_x} is the number of x variables, and \mjeqn{{k}_{y}}{k_vars_y} is the number of y variables.
 #'
 #' @examples
 #' ## Composite correlation between 4 variables and an outside variable with which
@@ -150,6 +153,7 @@ composite_r_scalar <- function(mean_rxy, k_vars_x = NULL, mean_intercor_x = NULL
 
 #' Matrix formula to estimate the correlation between two weighted or unweighted composite variables
 #'
+#' \loadmathjax
 #' This function computes the weighted (or unweighted, by default) composite correlation between a set of X variables and a set of Y variables.
 #'
 #' @param r_mat Correlation matrix from which composite correlations are to be computed.
@@ -171,9 +175,9 @@ composite_r_scalar <- function(mean_rxy, k_vars_x = NULL, mean_intercor_x = NULL
 #' @details
 #' This is computed as:
 #'
-#' \deqn{\rho_{XY}\frac{\mathbf{w}_{X}^{T}\mathbf{R}_{XY}\mathbf{w}_{Y}}{\sqrt{\left(\mathbf{w}_{X}^{T}\mathbf{R}_{XX}\mathbf{w}_{X}\right)\left(\mathbf{w}_{Y}^{T}\mathbf{R}_{YY}\mathbf{w}_{Y}\right)}}}{r_composite = (t(wt_x)  Rxy  wt_y) / (sqrt(t(wt_x)  Rxx  wt_x) * sqrt(t(wt_y) Ryy wt_y))}
+#' \mjdeqn{\rho_{XY}\frac{\mathbf{w}_{X}^{T}\mathbf{R}_{XY}\mathbf{w}_{Y}}{\sqrt{\left(\mathbf{w}_{X}^{T}\mathbf{R}_{XX}\mathbf{w}_{X}\right)\left(\mathbf{w}_{Y}^{T}\mathbf{R}_{YY}\mathbf{w}_{Y}\right)}}}{r_composite = (t(wt_x)  Rxy  wt_y) / (sqrt(t(wt_x)  Rxx  wt_x) * sqrt(t(wt_y) Ryy wt_y))}
 #'
-#' where \eqn{\rho_{XY}}{r_composite} is the composite correlation, \eqn{\mathbf{w}}{wt} is a vector of weights, and \eqn{\mathbf{R}}{R} is a correlation matrix. The subscripts of \eqn{\mathbf{w}}{wt} and \eqn{\mathbf{R}}{R} indicate the variables indexed within the vector or matrix.
+#' where \mjeqn{\rho_{XY}}{r_composite} is the composite correlation, \mjeqn{\mathbf{w}}{wt} is a vector of weights, and \mjeqn{\mathbf{R}}{R} is a correlation matrix. The subscripts of \mjeqn{\mathbf{w}}{wt} and \mjeqn{\mathbf{R}}{R} indicate the variables indexed within the vector or matrix.
 #'
 #' @examples
 #' composite_r_scalar(mean_rxy = .3, k_vars_x = 4, mean_intercor_x = .4)
@@ -191,6 +195,7 @@ composite_r_matrix <- function(r_mat, x_col, y_col, wt_vec_x = rep(1, length(x_c
 
 #' Scalar formula to estimate the standardized mean difference associated with a composite variable
 #'
+#' \loadmathjax
 #' This function estimates the \emph{d} value of a composite of X variables, given the mean \emph{d} value of the individual X values and the mean correlation among those variables.
 #'
 #' There are two different methods available for computing such a composite, one that uses the partial intercorrelation among the X variables (i.e., the average within-group correlation)
@@ -212,9 +217,9 @@ composite_r_matrix <- function(r_mat, x_col, y_col, wt_vec_x = rep(1, length(x_c
 #' @details
 #' If a partial correlation is provided for the interrelationships among variables, the following formula is used to estimate the composite \emph{d} value:
 #'
-#' \deqn{d_{X}=\frac{\bar{d}_{x_{i}}k}{\sqrt{\bar{\rho}_{x_{i}x_{j}}k^{2}+\left(1-\bar{\rho}_{x_{i}x_{j}}\right)k}}}{d_composite = (mean_d * k_vars) / sqrt(mean_intercor * k_vars^2 + (1 - mean_intercor) * k_vars)}
+#' \mjdeqn{d_{X}=\frac{\bar{d}_{x_{i}}k}{\sqrt{\bar{\rho}_{x_{i}x_{j}}k^{2}+\left(1-\bar{\rho}_{x_{i}x_{j}}\right)k}}}{d_composite = (mean_d * k_vars) / sqrt(mean_intercor * k_vars^2 + (1 - mean_intercor) * k_vars)}
 #'
-#' where \eqn{d_{X}}{d_composite} is the composite d value, \eqn{\bar{d}_{x_{i}}}{mean_d} is the mean \emph{d} value, \eqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among the variables in the composite, and \emph{k} is the number of variables in the composite.
+#' where \mjeqn{d_{X}}{d_composite} is the composite d value, \mjeqn{\bar{d}_{x_{i}}}{mean_d} is the mean \emph{d} value, \mjeqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among the variables in the composite, and \emph{k} is the number of variables in the composite.
 #' Otherwise, the composite \emph{d} value is computed by converting the mean \emph{d} value to a correlation, computing the composite correlation (see \code{\link{composite_r_scalar}} for formula), and transforming that composite back into the \emph{d} metric.
 #'
 #' @examples
@@ -264,6 +269,7 @@ composite_d_matrix <- function(d_vec, r_mat, wt_vec, p = .5){
 
 #' Scalar formula to estimate the reliability of a composite variable
 #'
+#' \loadmathjax
 #' This function computes the reliability of a variable that is a unit-weighted composite of other variables.
 #'
 #' @param mean_rel The mean reliability of variables in the composite.
@@ -279,14 +285,14 @@ composite_d_matrix <- function(d_vec, r_mat, wt_vec, p = .5){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+#' Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 #'
 #' @details
 #' The Mosier composite formula is computed as:
 #'
-#' \deqn{\rho_{XX}=\frac{\bar{\rho}_{x_{i}x_{i}}k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}{k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}}{rel_composite = (mean_rel * k_vars + k_vars * (k_vars-1) * mean_intercor) / (k_vars + k_vars * (k_vars-1) * mean_intercor)}
+#' \mjdeqn{\rho_{XX}=\frac{\bar{\rho}_{x_{i}x_{i}}k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}{k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}}{rel_composite = (mean_rel * k_vars + k_vars * (k_vars-1) * mean_intercor) / (k_vars + k_vars * (k_vars-1) * mean_intercor)}
 #'
-#' where \eqn{\bar{\rho}_{x_{i}x_{i}}}{mean_rel} is the mean reliability of variables in the composite, \eqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among variables in the composite, and \emph{k} is the number of variables in the composite.
+#' where \mjeqn{\bar{\rho}_{x_{i}x_{i}}}{mean_rel} is the mean reliability of variables in the composite, \mjeqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among variables in the composite, and \emph{k} is the number of variables in the composite.
 #'
 #' @examples
 #' composite_rel_scalar(mean_rel = .8, mean_intercor = .4, k_vars = 2)
@@ -298,6 +304,7 @@ composite_rel_scalar <- function(mean_rel, mean_intercor, k_vars){
 
 #' Matrix formula to estimate the reliability of a weighted or unweighted composite variable
 #'
+#' \loadmathjax
 #' This function computes the reliability of a variable that is a weighted or unweighted composite of other variables.
 #'
 #' This function treats measure-specific variance as reliable.
@@ -317,14 +324,14 @@ composite_rel_scalar <- function(mean_rel, mean_intercor, k_vars){
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg}. pp. 441 - 447.
+#' Thousand Oaks, CA: Sage. \doi{10.4135/9781483398105}. pp. 441 - 447.
 #'
 #' @details
 #' The Mosier composite formula is computed as:
 #'
-#' \deqn{\rho_{XX}=\frac{\mathbf{w}^{T}\left(\mathbf{r}\circ\mathbf{s}\right)+\mathbf{w}^{T}\mathbf{S}\mathbf{w}-\mathbf{w}^{T}\mathbf{s}}{\mathbf{w}^{T}\mathbf{S}\mathbf{w}}}{rel_composite = (t(wt^2) (rel_vec * var_vec) + S - var_sum) / (t(wt) S wt)}
+#' \mjdeqn{\rho_{XX}=\frac{\mathbf{w}^{T}\left(\mathbf{r}\circ\mathbf{s}\right)+\mathbf{w}^{T}\mathbf{S}\mathbf{w}-\mathbf{w}^{T}\mathbf{s}}{\mathbf{w}^{T}\mathbf{S}\mathbf{w}}}{rel_composite = (t(wt^2) (rel_vec * var_vec) + S - var_sum) / (t(wt) S wt)}
 #'
-#' where \eqn{\rho_{XX}}{rel_composite} is a composite reliability estimate, \eqn{\mathbf{r}}{rel_vec} is a vector of reliability estimates, \eqn{\mathbf{w}}{wt} is a vector of weights, \eqn{\mathbf{S}}{S} is a covariance matrix, and \eqn{\mathbf{s}}{var_vec} is a vector of variances (i.e., the diagonal elements of \eqn{\mathbf{S}}{S}).
+#' where \mjeqn{\rho_{XX}}{rel_composite} is a composite reliability estimate, \mjeqn{\mathbf{r}}{rel_vec} is a vector of reliability estimates, \mjeqn{\mathbf{w}}{wt} is a vector of weights, \mjeqn{\mathbf{S}}{S} is a covariance matrix, and \mjeqn{\mathbf{s}}{var_vec} is a vector of variances (i.e., the diagonal elements of \mjeqn{\mathbf{S}}{S}).
 #'
 #' @examples
 #' composite_rel_matrix(rel_vec = c(.8, .8),
@@ -340,6 +347,7 @@ composite_rel_matrix <- function(rel_vec, r_mat, sd_vec, wt_vec = rep(1, length(
 
 #' Scalar formula to estimate the u ratio of a composite variable
 #'
+#' \loadmathjax
 #' This function provides an approximation of the u ratio of a composite variable based on the u ratios of the component variables, the mean restricted intercorrelation among those variables,
 #' and the mean unrestricted correlation among those variables. If only one of the mean intercorrelations is known, the other will be estimated using the bivariate indirect range-restriction formula.
 #' This tends to compute a conservative estimate of the u ratio associated with a composite.
@@ -355,10 +363,10 @@ composite_rel_matrix <- function(rel_vec, r_mat, sd_vec, wt_vec = rep(1, length(
 #' @details
 #' This is computed as:
 #'
-#' \deqn{u_{composite}=\sqrt{\frac{\bar{\rho}_{i}\bar{u}^{2}k(k-1)+k\bar{u}^{2}}{\bar{\rho}_{a}k(k-1)+k}}}{u_composite = sqrt((mean_ri * mean_u^2 * k * (k - 1) + k * mean_u^2) / (mean_ra * k_vars * (k - 1) + k))}
+#' \mjdeqn{u_{composite}=\sqrt{\frac{\bar{\rho}_{i}\bar{u}^{2}k(k-1)+k\bar{u}^{2}}{\bar{\rho}_{a}k(k-1)+k}}}{u_composite = sqrt((mean_ri * mean_u^2 * k * (k - 1) + k * mean_u^2) / (mean_ra * k_vars * (k - 1) + k))}
 #'
-#' where \eqn{u_{composite}}{u_composite} is the composite u ratio, \eqn{\bar{u}}{mean_u} is the mean univariate u ratio, \eqn{\bar{\rho}_{i}}{mean_ri} is the mean restricted correlation among variables,
-#' \eqn{\bar{\rho}_{a}}{mean_ra} is the mean unrestricted correlation among variables, and \emph{k} is the number of variables in the composite.
+#' where \mjeqn{u_{composite}}{u_composite} is the composite u ratio, \mjeqn{\bar{u}}{mean_u} is the mean univariate u ratio, \mjeqn{\bar{\rho}_{i}}{mean_ri} is the mean restricted correlation among variables,
+#' \mjeqn{\bar{\rho}_{a}}{mean_ra} is the mean unrestricted correlation among variables, and \emph{k} is the number of variables in the composite.
 #'
 #' @examples
 #' composite_u_scalar(mean_ri = .3, mean_ra = .4, mean_u = .8, k_vars = 2)
@@ -371,6 +379,7 @@ composite_u_scalar <- function(mean_ri = NULL, mean_ra = NULL, mean_u, k_vars){
 
 #' Matrix formula to estimate the u ratio of a composite variable
 #'
+#' \loadmathjax
 #' This function estimates the u ratio of a composite variable when at least one matrix of correlations (restricted or unrestricted) among the variables is available.
 #'
 #' @param ri_mat Range-restricted correlation matrix from which the composite is to be computed (if \code{NULL}, \code{ri_mat} is estimated from \code{ra_mat}).
@@ -385,9 +394,9 @@ composite_u_scalar <- function(mean_ri = NULL, mean_ra = NULL, mean_u, k_vars){
 #' @details
 #' This is computed as:
 #'
-#' \deqn{u_{composite}=\sqrt{\frac{\left(\mathbf{w}\circ\mathbf{u}\right)^{T}\mathbf{R}_{i}\left(\mathbf{w}\circ\mathbf{u}\right)}{\mathbf{w}^{T}\mathbf{R}_{a}\mathbf{w}}}}{u_composite = sqrt((t(wt * u)  R_i  (wt * u) / (t(wt)  R_a  wt))}
+#' \mjdeqn{u_{composite}=\sqrt{\frac{\left(\mathbf{w}\circ\mathbf{u}\right)^{T}\mathbf{R}_{i}\left(\mathbf{w}\circ\mathbf{u}\right)}{\mathbf{w}^{T}\mathbf{R}_{a}\mathbf{w}}}}{u_composite = sqrt((t(wt * u)  R_i  (wt * u) / (t(wt)  R_a  wt))}
 #'
-#' where \eqn{u_{composite}}{u_composite} is the composite u ratio, \eqn{\mathbf{u}}{u} is a vector of u ratios, \eqn{\mathbf{R}_{i}}{R_i} is a range-restricted correlation matrix, \eqn{\mathbf{R}_{a}}{R_a} is an unrestricted correlation matrix, and \eqn{\mathbf{w}}{wt} is a vector of weights.
+#' where \mjeqn{u_{composite}}{u_composite} is the composite u ratio, \mjeqn{\mathbf{u}}{u} is a vector of u ratios, \mjeqn{\mathbf{R}_{i}}{R_i} is a range-restricted correlation matrix, \mjeqn{\mathbf{R}_{a}}{R_a} is an unrestricted correlation matrix, and \mjeqn{\mathbf{w}}{wt} is a vector of weights.
 #'
 #' @examples
 #' composite_u_matrix(ri_mat = matrix(c(1, .3, .3, 1), 2, 2), u_vec = c(.8, .8))

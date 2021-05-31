@@ -5,7 +5,7 @@
 \alias{var_error_mult_Rsq}
 \alias{var_error_R}
 \alias{var_error_Rsq}
-\title{Estimate the error variance of multiple correlations and squared multiple correlations for linear regressions}
+\title{Estimate the error variance of linear regression multiple \emph{R}(-squared)}
 \usage{
 var_error_mult_R(R, n, p)
 
@@ -28,16 +28,17 @@ var_error_Rsq(Rsq, n, p)
 A vector of sampling-error variances.
 }
 \description{
-Estimate the error variance of multiple correlations and squared multiple correlations for linear regressions
+\loadmathjax
+This function estimates the error variance for linear regression model (squared) multiple correlations (\mjseqn{R} and \mjeqn{R^{2}}{R-squared}).
 }
 \details{
 The sampling variance of a multiple correlation is approximately:
 
-\deqn{var_{e}=\frac{(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
+\mjdeqn{var_{e}=\frac{(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
 
 The sampling variance of a squared multiple correlation is approximately:
 
-\deqn{var_{e}=\frac{4R^{2}(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = 4 \* R^2 \* (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
+\mjdeqn{var_{e}=\frac{4R^{2}(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = 4 \* R^2 \* (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
 }
 \examples{
 var_error_mult_R(R = .5, n = 30, p = 4)
@@ -48,8 +49,8 @@ var_error_mult_Rsq(Rsq = .25, n = 30, p = 4)
 \references{
 Cohen, J., Cohen, P., West, S. G., & Aiken, L. S. (2003).
 \emph{Applied multiple regression/correlation analysis for the behavioral sciences} (3rd ed.).
-Mahwah, NJ: Erlbaum. \doi{10/crtf}. p. 88.
+Lawrence Erlbaum and Associates. \doi{10.4324/9780203774441}. p. 88.
 
 Olkin, I., & Finn, J. D. (1995). Correlations redux.
-\emph{Psychological Bulletin, 118}(1), 155–164. \doi{10/bt48vd}
+\emph{Psychological Bulletin, 118}(1), 155–164. \doi{10.1037/0033-2909.118.1.155}
 }

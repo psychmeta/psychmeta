@@ -1,5 +1,6 @@
 #' Taylor series approximation of the sampling variance of correlations corrected using the bivariate indirect range restriction correction (Case V)
 #'
+#' \loadmathjax
 #' This function propagates error in the bivariate indirect range-restriction correction formula to allow for the computation of a pseudo compound attenuation factor in individual-correction meta-analysis.
 #' Traditional methods for estimating compound attenuation factors (i.e., dividing the observed correlation by the corrected correlation) do not work with the BVIRR correction because BVIRR has an additive term that makes the corrected correlation inappropriate for use in estimating the effect of the correction on the variance of the sampling distribution of correlations.
 #' The equation-implied adjustment for the BVIRR correction (i.e., the first derivative of the correction equation with respect to the observed correlation) underestimates the error of corrected correlations, so this function helps to account for that additional error.
@@ -152,7 +153,13 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
           if(!is.null(var_qxa)){
                var_e_qxa <- var_qxa
           }else{
-               if(is.null(mean_qxa)) mean_qxa <- wt_mean(x = qxa, wt = ni)
+               if(is.null(mean_qxa)){
+                       if(length(mean_ux) == 1 & length(rxyi) > 1){
+                               mean_qxa <- wt_mean(x = qxa, wt = ni)
+                       }else{
+                               mean_qxa <- qxa
+                       }
+               }
                mean_qxi <- estimate_rxxi(rxxa = mean_qxa^2, ux = mean_ux)^.5
 
                var_e_qxa <- var_error_q(q = mean_qxa, n = ni, rel_type = qx_type, k_items = k_items_x)
@@ -164,7 +171,13 @@ var_error_r_bvirr <- function(rxyi, var_e = NULL, ni, na = NA,
           if(!is.null(var_qya)){
                var_e_qya <- var_qya
           }else{
-               if(is.null(mean_qya)) mean_qya <- wt_mean(x = qya, wt = ni)
+               if(is.null(mean_qya)){
+                       if(length(mean_uy) == 1 & length(rxyi) > 1){
+                               mean_qya <- wt_mean(x = qya, wt = ni)
+                       }else{
+                               mean_qya <- qya
+                       }
+               }
                mean_qyi <- estimate_rxxi(rxxa = mean_qya^2, ux = mean_uy)^.5
 
                var_e_qya <- var_error_q(q = mean_qya, n = ni, rel_type = qy_type, k_items = k_items_y)

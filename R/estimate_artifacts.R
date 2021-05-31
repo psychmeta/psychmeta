@@ -4,6 +4,7 @@
 #' @title Estimation of applicant and incumbent reliabilities and of true- and observed-score u ratios
 #'
 #' @description
+#' \loadmathjax
 #' Functions to estimate the values of artifacts from other artifacts. These functions allow for reliability estimates to be corrected/attenuated for range restriction and allow
 #' u ratios to be converted between observed-score and true-score metrics. Some functions also allow for the extrapolation of an artifact from other available information.
 #'
@@ -39,7 +40,7 @@
 #' @references
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
-#' Thousand Oaks, CA: Sage. \doi{10/b6mg} p. 127.
+#' Sage. \doi{10.4135/9781483398105} p. 127.
 #'
 #' Le, H., & Schmidt, F. L. (2006).
 #' Correcting for indirect range restriction in meta-analysis: Testing a new meta-analytic procedure.
@@ -59,64 +60,66 @@
 #' #### Formulas to estimate rxxa ####
 #'
 #' Formulas for indirect range restriction:
-#' \deqn{\rho_{XX_{a}}=1-u_{X}^{2}\left(1-\rho_{XX_{i}}\right)}{rxxa = 1 - ux^2 * (1 - rxxi)}
-#' \deqn{\rho_{XX_{a}}=\frac{\rho_{XX_{i}}}{\rho_{XX_{i}}+u_{T}^{2}-\rho_{XX_{i}}u_{T}^{2}}}{rxxa = rxxi / (rxxi + ut^2 - rxxi * ut^2)}
+#' \mjdeqn{\rho_{XX_{a}}=1-u_{X}^{2}\left(1-\rho_{XX_{i}}\right)}{rxxa = 1 - ux^2 * (1 - rxxi)}
+#' \mjdeqn{\rho_{XX_{a}}=\frac{\rho_{XX_{i}}}{\rho_{XX_{i}}+u_{T}^{2}-\rho_{XX_{i}}u_{T}^{2}}}{rxxa = rxxi / (rxxi + ut^2 - rxxi * ut^2)}
 #'
 #' Formula for direct range restriction:
-#' \deqn{\rho_{XX_{a}}=\frac{\rho_{XX_{i}}}{u_{X}^{2}\left[1+\rho_{XX_{i}}\left(\frac{1}{u_{X}^{2}}-1\right)\right]}}{rxxa = rxxi / (ux^2 * (1 + rxxi * (ux^-2 - 1)))}
+#' \mjdeqn{\rho_{XX_{a}}=\frac{\rho_{XX_{i}}}{u_{X}^{2}\left[1+\rho_{XX_{i}}\left(\frac{1}{u_{X}^{2}}-1\right)\right]}}{rxxa = rxxi / (ux^2 * (1 + rxxi * (ux^-2 - 1)))}
 #'
 #'
 #'
 #' #### Formulas to estimate rxxi ####
 #'
 #' Formulas for indirect range restriction:
-#' \deqn{\rho_{XX_{i}}=1-\frac{1-\rho_{XX_{a}}}{u_{X}^{2}}}{1 - (1 - rxxa) / ux^2}
-#' \deqn{\rho_{XX_{i}}=1-\frac{1-\rho_{XX_{a}}}{\rho_{XX_{a}}\left[u_{T}^{2}-\left(1-\frac{1}{\rho_{XX_{a}}}\right)\right]}}{rxxi = 1 - (1 - rxxa) / (rxxa * (ut^2 - (1 - 1 / rxxa)))}
+#' \mjdeqn{\rho_{XX_{i}}=1-\frac{1-\rho_{XX_{a}}}{u_{X}^{2}}}{1 - (1 - rxxa) / ux^2}
+#' \mjdeqn{\rho_{XX_{i}}=1-\frac{1-\rho_{XX_{a}}}{\rho_{XX_{a}}\left[u_{T}^{2}-\left(1-\frac{1}{\rho_{XX_{a}}}\right)\right]}}{rxxi = 1 - (1 - rxxa) / (rxxa * (ut^2 - (1 - 1 / rxxa)))}
 #'
 #' Formula for direct range restriction:
-#' \deqn{\rho_{XX_{i}}=\frac{\rho_{XX_{i}}u_{X}^{2}}{1+\rho_{XX_{i}}\left(u_{X}^{2}-1\right)}}{rxxi = (rxxa * ux^2) / (1 + rxxa * (ux^2 - 1))}
+#' \mjdeqn{\rho_{XX_{i}}=\frac{\rho_{XX_{i}}u_{X}^{2}}{1+\rho_{XX_{i}}\left(u_{X}^{2}-1\right)}}{rxxi = (rxxa * ux^2) / (1 + rxxa * (ux^2 - 1))}
 #'
 #'
 #'
 #' #### Formulas to estimate ut ####
 #'
-#' \deqn{u_{T}=\sqrt{\frac{\rho_{XX_{i}}u_{X}^{2}}{1+\rho_{XX_{i}}u_{X}^{2}-u_{X}^{2}}}}{ut = sqrt((rxxi * ux^2) / (1 + rxxi * ux^2 - ux^2))}
-#' \deqn{u_{T}=\sqrt{\frac{u_{X}^{2}-\left(1-\rho_{XX_{a}}\right)}{\rho_{XX_{a}}}}}{ut = sqrt((ux^2 - (1 - rxxa)) / rxxa)}
+#' \mjdeqn{u_{T}=\sqrt{\frac{\rho_{XX_{i}}u_{X}^{2}}{1+\rho_{XX_{i}}u_{X}^{2}-u_{X}^{2}}}}{ut = sqrt((rxxi * ux^2) / (1 + rxxi * ux^2 - ux^2))}
+#' \mjdeqn{u_{T}=\sqrt{\frac{u_{X}^{2}-\left(1-\rho_{XX_{a}}\right)}{\rho_{XX_{a}}}}}{ut = sqrt((ux^2 - (1 - rxxa)) / rxxa)}
 #'
 #'
 #'
 #' #### Formulas to estimate ux ####
-#' \deqn{u_{X}=\sqrt{\frac{u_{T}^{2}}{\rho_{XX_{i}}\left(1+\frac{u_{T}^{2}}{\rho_{XX_{i}}}-u_{T}^{2}\right)}}}{ux = sqrt(ut^2 / (rxxi * (1 + ut^2 / rxxi - ut^2)))}
-#' \deqn{u_{X}=\sqrt{\rho_{XX_{a}}\left[u_{T}^{2}-\left(1-\frac{1}{\rho_{XX_{a}}}\right)\right]}}{ux = sqrt((ut^2 - (1 - 1 / rxxa)) * rxxa)}
+#' \mjdeqn{u_{X}=\sqrt{\frac{u_{T}^{2}}{\rho_{XX_{i}}\left(1+\frac{u_{T}^{2}}{\rho_{XX_{i}}}-u_{T}^{2}\right)}}}{ux = sqrt(ut^2 / (rxxi * (1 + ut^2 / rxxi - ut^2)))}
+#' \mjdeqn{u_{X}=\sqrt{\rho_{XX_{a}}\left[u_{T}^{2}-\left(1-\frac{1}{\rho_{XX_{a}}}\right)\right]}}{ux = sqrt((ut^2 - (1 - 1 / rxxa)) * rxxa)}
 #'
 #'
 #'
 #' #### Formula to estimate ryya ####
 #'
-#' \deqn{\rho_{YY_{a}}=1-\frac{1-\rho_{YY_{i}}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}{ryya = 1 - (1 - ryyi) / (1 - rxyi^2 * (1 - ux^-2))}
+#' \mjdeqn{\rho_{YY_{a}}=1-\frac{1-\rho_{YY_{i}}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}{ryya = 1 - (1 - ryyi) / (1 - rxyi^2 * (1 - ux^-2))}
 #'
 #'
 #'
 #' #### Formula to estimate ryyi
-#' \deqn{\rho_{YY_{i}}=1-\left(1-\rho_{YY_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}{ryyi = 1 - (1 - ryya) * (1 - rxyi^2 * (1 - ux^-2))}
+#' \mjdeqn{\rho_{YY_{i}}=1-\left(1-\rho_{YY_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}{ryyi = 1 - (1 - ryya) * (1 - rxyi^2 * (1 - ux^-2))}
 #'
 #'
 #'
 #'
 #' #### Formula to estimate uy ####
-#' \deqn{u_{Y}=\sqrt{\frac{1-\rho_{YY_{a}}}{1-\rho_{YY_{i}}}}}{uy = sqrt((1 - ryya) / (1 - ryyi)}
+#' \mjdeqn{u_{Y}=\sqrt{\frac{1-\rho_{YY_{a}}}{1-\rho_{YY_{i}}}}}{uy = sqrt((1 - ryya) / (1 - ryyi)}
 #'
 #'
 #'
 #' #### Formula to estimate up ####
-#' \deqn{u_{P}=\sqrt{\frac{\frac{1-\rho_{YY_{a}}}{1-\rho_{YY_{i}}}-\left(1-\rho_{YY_{a}}\right)}{\rho_{YY_{a}}}}}{up = sqrt(((1 - ryya) / (1 - ryyi) - (1 - ryya)) / ryya)}
+#' \mjdeqn{u_{P}=\sqrt{\frac{\frac{1-\rho_{YY_{a}}}{1-\rho_{YY_{i}}}-\left(1-\rho_{YY_{a}}\right)}{\rho_{YY_{a}}}}}{up = sqrt(((1 - ryya) / (1 - ryyi) - (1 - ryya)) / ryya)}
 NULL
 
 
 
 #' @title Estimate descriptive statistics of square-root reliabilities
 #'
-#' @description Estimate descriptive statistics of square-root reliabilities from descriptive statistics of reliabilities via Taylor series approximation
+#' @description
+#' \loadmathjax
+#' Estimate descriptive statistics of square-root reliabilities from descriptive statistics of reliabilities via Taylor series approximation
 #'
 #' @param mean_rel Mean reliability value.
 #' @param var_rel Variance of reliability values.
@@ -125,7 +128,7 @@ NULL
 #' @export
 #'
 #' @details
-#' \deqn{var_{q_{X}}=\frac{var_{\rho_{XX}}}{4q_{X}^{2}}}{var_rel / (4 * mean_q^2)}
+#' \mjdeqn{var_{q_{X}}=\frac{var_{\rho_{XX}}}{4q_{X}^{2}}}{var_rel / (4 * mean_q^2)}
 #'
 #' @examples
 #' estimate_q_dist(mean_rel = .8, var_rel = .15)
@@ -139,7 +142,9 @@ estimate_q_dist <- function(mean_rel, var_rel){
 
 #' @title Estimate descriptive statistics of reliabilities
 #'
-#' @description Estimate descriptive statistics of reliabilities from descriptive statistics of square-root reliabilities via Taylor series approximation
+#' @description
+#' \loadmathjax
+#' Estimate descriptive statistics of reliabilities from descriptive statistics of square-root reliabilities via Taylor series approximation
 #'
 #' @param mean_q Mean square-root reliability value.
 #' @param var_q Variance of square-root reliability values.
@@ -148,7 +153,7 @@ estimate_q_dist <- function(mean_rel, var_rel){
 #' @export
 #'
 #' @details
-#' \deqn{var_{\rho_{XX}}=4q_{X}^{2}var_{\rho_{XX}}}{4 * mean_q^2 * var_q}
+#' \mjdeqn{var_{\rho_{XX}}=4q_{X}^{2}var_{\rho_{XX}}}{4 * mean_q^2 * var_q}
 #'
 #' @examples
 #' estimate_rel_dist(mean_q = .9, var_q = .05)
@@ -301,8 +306,6 @@ estimate_ryyi <- function(ryya, rxyi, ux){
 }
 
 
-
-
 #' @rdname estimate_artifacts
 #' @export
 #' @examples
@@ -317,7 +320,6 @@ estimate_uy <- function(ryyi, ryya, indirect_rr = TRUE, ryy_type = "alpha"){
 }
 
 
-
 #' @rdname estimate_artifacts
 #' @export
 #' @examples
@@ -329,7 +331,6 @@ estimate_up <- function(ryyi, ryya){
 }
 
 
-
 #' @rdname estimate_artifacts
 #' @export
 #' @examples
@@ -339,7 +340,6 @@ estimate_rxxa_u <- function(ux, ut){
 }
 
 
-
 #' @rdname estimate_artifacts
 #' @export
 #' @examples
@@ -347,9 +347,3 @@ estimate_rxxa_u <- function(ux, ut){
 estimate_rxxi_u <- function(ux, ut){
      (ut^2 * ux^2 - ut^2) / ((ut^2 - 1) * ux^2)
 }
-
-
-
-
-
-
