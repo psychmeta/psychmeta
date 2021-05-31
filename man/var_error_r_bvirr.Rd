@@ -125,26 +125,27 @@ var_error_r_bvirr(
 A vector of corrected correlations' sampling-error variances.
 }
 \description{
+\loadmathjax
 This function propagates error in the bivariate indirect range-restriction correction formula to allow for the computation of a pseudo compound attenuation factor in individual-correction meta-analysis.
 Traditional methods for estimating compound attenuation factors (i.e., dividing the observed correlation by the corrected correlation) do not work with the BVIRR correction because BVIRR has an additive term that makes the corrected correlation inappropriate for use in estimating the effect of the correction on the variance of the sampling distribution of correlations.
 The equation-implied adjustment for the BVIRR correction (i.e., the first derivative of the correction equation with respect to the observed correlation) underestimates the error of corrected correlations, so this function helps to account for that additional error.
 }
 \details{
-Per the principles of propagation of uncertainty and assuming that \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{a}}}{qya}, \eqn{u_{X}}{ux}, \eqn{u_{Y}}{uy}, and \eqn{\rho_{XY_{i}}}{rxyi}, are independent, we can derive a linear approximation of the sampling error of \eqn{\rho_{TP_{a}}}{rtpa}. We begin with the bivariate indirect range restriction formula,
+Per the principles of propagation of uncertainty and assuming that \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{a}}}{qya}, \mjeqn{u_{X}}{ux}, \mjeqn{u_{Y}}{uy}, and \mjeqn{\rho_{XY_{i}}}{rxyi}, are independent, we can derive a linear approximation of the sampling error of \mjeqn{\rho_{TP_{a}}}{rtpa}. We begin with the bivariate indirect range restriction formula,
 
-\deqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{q_{X_{a}}q_{Y_{a}}}}{rtpa = (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (qxa * qya)}
+\mjdeqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{q_{X_{a}}q_{Y_{a}}}}{rtpa = (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (qxa * qya)}
 
-which implies the following linear approximation of the sampling variance of \eqn{\rho_{TP_{a}}}{rtpa}:
+which implies the following linear approximation of the sampling variance of \mjeqn{\rho_{TP_{a}}}{rtpa}:
 
-\deqn{SE_{\rho_{TP_{a}}}^{2}=b_{1}^{2}SE_{q_{X_{a}}}^{2}+b_{2}^{2}SE_{q_{Y_{a}}}^{2}+b_{3}^{2}SE_{u_{X}}^{2}+b_{4}^{2}SE_{u_{Y}}^{2}+b_{5}^{2}SE_{\rho_{XY_{i}}}^{2}}{var_rtpa ~= b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy + b5^2 * var_rxyi}
+\mjdeqn{SE_{\rho_{TP_{a}}}^{2}=b_{1}^{2}SE_{q_{X_{a}}}^{2}+b_{2}^{2}SE_{q_{Y_{a}}}^{2}+b_{3}^{2}SE_{u_{X}}^{2}+b_{4}^{2}SE_{u_{Y}}^{2}+b_{5}^{2}SE_{\rho_{XY_{i}}}^{2}}{var_rtpa ~= b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy + b5^2 * var_rxyi}
 
-where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, \eqn{b_{4}}{b4}, and \eqn{b_{5}}{b5} are the first-order partial derivatives of the disattenuation formula with respect to \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{a}}}{qya}, \eqn{u_{X}}{ux}, \eqn{u_{Y}}{uy}, and \eqn{\rho_{XY_{i}}}{rxyi}, respectively. These partial derivatives are computed as follows:
+where \mjeqn{b_{1}}{b1}, \mjeqn{b_{2}}{b2}, \mjeqn{b_{3}}{b3}, \mjeqn{b_{4}}{b4}, and \mjeqn{b_{5}}{b5} are the first-order partial derivatives of the disattenuation formula with respect to \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{a}}}{qya}, \mjeqn{u_{X}}{ux}, \mjeqn{u_{Y}}{uy}, and \mjeqn{\rho_{XY_{i}}}{rxyi}, respectively. These partial derivatives are computed as follows:
 
-\deqn{b_{1}=\frac{\partial\rho_{TP_{a}}}{\partial q_{X_{a}}}=-\frac{\rho_{TP_{a}}}{q_{X_{a}}}}{b1 = -rtpa / qxa}
-\deqn{b_{2}=\frac{\partial\rho_{TP_{a}}}{\partial q_{Y_{a}}}=-\frac{\rho_{TP_{a}}}{q_{Y_{a}}}}{b2 = -rtpa / qya}
-\deqn{b_{3}=\frac{\partial\rho_{TP_{a}}}{\partial u_{X}}=\left[\rho_{XY_{i}}u_{Y}-\frac{\lambda u_{X}\left(1-u_{X}^{2}\right)\sqrt{\left|1-u_{Y}^{2}\right|}}{\left|1-u_{X}^{2}\right|^{1.5}}\right]/\left(q_{X_{a}}q_{Y_{a}}\right)}{b3 = (rxyi * uy - (lambda * ux * (1 - ux^2) * sqrt(abs(1 - uy^2))) / abs(1 - ux^2)^1.5) / (qxa * qya)}
-\deqn{b_{4}=\frac{\partial\rho_{TP_{a}}}{\partial u_{Y}}=\left[\rho_{XY_{i}}u_{X}-\frac{\lambda u_{Y}\left(1-u_{Y}^{2}\right)\sqrt{\left|1-u_{X}^{2}\right|}}{\left|1-u_{Y}^{2}\right|^{1.5}}\right]/\left(q_{X_{a}}q_{Y_{a}}\right)}{b4 = (rxyi * ux - (lambda * uy * (1 - uy^2) * sqrt(abs(1 - ux^2))) / abs(1 - uy^2)^1.5) / (qxa * qya)}
-\deqn{b_{5}=\frac{\partial\rho_{TP_{a}}}{\partial\rho_{XY_{i}}}=\frac{u_{X}u_{Y}}{q_{X_{a}}q_{Y_{a}}}}{b5 = (ux * uy) / (qxa * qya)}
+\mjdeqn{b_{1}=\frac{\partial\rho_{TP_{a}}}{\partial q_{X_{a}}}=-\frac{\rho_{TP_{a}}}{q_{X_{a}}}}{b1 = -rtpa / qxa}
+\mjdeqn{b_{2}=\frac{\partial\rho_{TP_{a}}}{\partial q_{Y_{a}}}=-\frac{\rho_{TP_{a}}}{q_{Y_{a}}}}{b2 = -rtpa / qya}
+\mjdeqn{b_{3}=\frac{\partial\rho_{TP_{a}}}{\partial u_{X}}=\left\link[=\\rho_{XY_{i}}u_{Y}-\\frac{\\lambda u_{X}\\left(1-u_{X}^{2}\\right)\\sqrt{\\left|1-u_{Y}^{2}\\right|}}{\\left|1-u_{X}^{2}\\right|^{1.5}}\\right]{\rho_{XY_{i}}u_{Y}-\frac{\lambda u_{X}\left(1-u_{X}^{2}\right)\sqrt{\left|1-u_{Y}^{2}\right|}}{\left|1-u_{X}^{2}\right|^{1.5}}\right}/\left(q_{X_{a}}q_{Y_{a}}\right)}{b3 = (rxyi * uy - (lambda * ux * (1 - ux^2) * sqrt(abs(1 - uy^2))) / abs(1 - ux^2)^1.5) / (qxa * qya)}
+\mjdeqn{b_{4}=\frac{\partial\rho_{TP_{a}}}{\partial u_{Y}}=\left\link[=\\rho_{XY_{i}}u_{X}-\\frac{\\lambda u_{Y}\\left(1-u_{Y}^{2}\\right)\\sqrt{\\left|1-u_{X}^{2}\\right|}}{\\left|1-u_{Y}^{2}\\right|^{1.5}}\\right]{\rho_{XY_{i}}u_{X}-\frac{\lambda u_{Y}\left(1-u_{Y}^{2}\right)\sqrt{\left|1-u_{X}^{2}\right|}}{\left|1-u_{Y}^{2}\right|^{1.5}}\right}/\left(q_{X_{a}}q_{Y_{a}}\right)}{b4 = (rxyi * ux - (lambda * uy * (1 - uy^2) * sqrt(abs(1 - ux^2))) / abs(1 - uy^2)^1.5) / (qxa * qya)}
+\mjdeqn{b_{5}=\frac{\partial\rho_{TP_{a}}}{\partial\rho_{XY_{i}}}=\frac{u_{X}u_{Y}}{q_{X_{a}}q_{Y_{a}}}}{b5 = (ux * uy) / (qxa * qya)}
 }
 \examples{
 var_error_r_bvirr(rxyi = .3, var_e = var_error_r(r = .3, n = 100), ni = 100,

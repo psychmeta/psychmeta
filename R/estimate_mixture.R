@@ -1,6 +1,7 @@
 #' @title Descriptive statistics for a mixture distribution
 #'
 #' @description
+#' \loadmathjax
 #' Compute descriptive statistics for a mixture distribution. This function returns the grand mean, the pooled sample variance (mean square within), variance of sample means (mean square between), portions of the total variance that are within and between groups, and mixture (total sample) variance of the mixture sample data.
 #'
 #' @param mean_vec Vector of sample means.
@@ -15,26 +16,26 @@
 #' @details
 #' The grand mean of a mixture distribution is computed as:
 #'
-#' \deqn{\mu=\frac{\Sigma_{i=1}^{k}\bar{x}_{i}n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{mu = sum(mean_vec * n_vec) / sum(n_vec)}
+#' \mjdeqn{\mu=\frac{\Sigma_{i=1}^{k}\bar{x}_{i}n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{mu = sum(mean_vec * n_vec) / sum(n_vec)}
 #'
-#' where \eqn{\mu}{mu} is the grand mean, \eqn{\bar{x}_{i}}{mean_vec} represents the sample means, and \eqn{n_{i}}{n_vec} represents the sample sizes.
+#' where \mjeqn{\mu}{mu} is the grand mean, \mjeqn{\bar{x}_{i}}{mean_vec} represents the sample means, and \mjeqn{n_{i}}{n_vec} represents the sample sizes.
 #'
 #'
 #' Maximum-likelihood mixture variances are computed as:
-#' \deqn{var_{pooled_{ML}}=MSW_{ML}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_pooled_ml = MSW_ml = sum(var_vec * n_vec) / sum(n_vec)}
-#' \deqn{var_{means_{ML}}=MSB_{ML}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{k}}{var_means_ml = MSB_ml = sum(var_vec * n_vec) / sum(n_vec)}
-#' \deqn{var_{BG_{ML}}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_bg_ml = sum((mean_vec - mean_mixture)^2 * n_vec) / sum(n_vec)}
-#' \deqn{var_{WG_{ML}}=\frac{\Sigma_{i=1}^{k}v_{i}n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_wg_ml = sum(var_vec * n_vec) / sum(n_vec)}
-#' \deqn{var_{mix_{ML}}=var_{BG_{ML}}+var_{WG_{ML}}}{var_mix_ml = var_bg_ml + var_wg_ml}
+#' \mjdeqn{var_{pooled_{ML}}=MSW_{ML}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_pooled_ml = MSW_ml = sum(var_vec * n_vec) / sum(n_vec)}
+#' \mjdeqn{var_{means_{ML}}=MSB_{ML}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{k}}{var_means_ml = MSB_ml = sum(var_vec * n_vec) / sum(n_vec)}
+#' \mjdeqn{var_{BG_{ML}}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_bg_ml = sum((mean_vec - mean_mixture)^2 * n_vec) / sum(n_vec)}
+#' \mjdeqn{var_{WG_{ML}}=\frac{\Sigma_{i=1}^{k}v_{i}n_{i}}{\Sigma_{i=1}^{k}n_{i}}}{var_wg_ml = sum(var_vec * n_vec) / sum(n_vec)}
+#' \mjdeqn{var_{mix_{ML}}=var_{BG_{ML}}+var_{WG_{ML}}}{var_mix_ml = var_bg_ml + var_wg_ml}
 #'
-#' where \eqn{v_{i}}{var_vec} represents the sample variances.
+#' where \mjeqn{v_{i}}{var_vec} represents the sample variances.
 #'
 #' Unbiased mixture variances are computed as:
-#' \deqn{var_{pooled_{Unbiased}}=MSW_{Unbiased}=\frac{\Sigma_{i=1}^{k}v_{i}\left(n_{i}-1\right)}{\left(\Sigma_{i=1}^{k}n_{i}\right)-k}}{var_pooled_unbiased = MSW_unbiased = sum(var_vec * (n_vec - 1)) / (sum(n_vec) - k)}
-#' \deqn{var_{means_{Unbiased}}=MSB_{Unbiased}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{k-1}}{var_means_unbiased = MSB_unbiased = sum((mean_vec - mean_mixture)^2 * n_vec) / (k - 1)}
-#' \deqn{var_{BG_{Unbiased}}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\left(\Sigma_{i=1}^{k}n_{i}\right)-1}}{var_bg_unbiased = sum((mean_vec - mean_mixture)^2 * n_vec) / (sum(n_vec) - 1)}
-#' \deqn{var_{WG_{Unbiased}}=\frac{\Sigma_{i=1}^{k}v_{i}\left(n_{i}-1\right)}{\left(\Sigma_{i=1}^{k}n_{i}\right)-1}}{var_wg_unbiased = sum(var_vec * (n_vec - 1)) / (sum(n_vec) - 1)}
-#' \deqn{var_{mix_{Unbiased}}=var_{BG_{Unbiased}}+var_{WG_{Unbiased}}}{var_mix_unbiased = var_bg_unbiased + var_wg_unbiased}
+#' \mjdeqn{var_{pooled_{Unbiased}}=MSW_{Unbiased}=\frac{\Sigma_{i=1}^{k}v_{i}\left(n_{i}-1\right)}{\left(\Sigma_{i=1}^{k}n_{i}\right)-k}}{var_pooled_unbiased = MSW_unbiased = sum(var_vec * (n_vec - 1)) / (sum(n_vec) - k)}
+#' \mjdeqn{var_{means_{Unbiased}}=MSB_{Unbiased}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{k-1}}{var_means_unbiased = MSB_unbiased = sum((mean_vec - mean_mixture)^2 * n_vec) / (k - 1)}
+#' \mjdeqn{var_{BG_{Unbiased}}=\frac{\Sigma_{i=1}^{k}\left(\bar{x}_{i}-\mu\right)n_{i}}{\left(\Sigma_{i=1}^{k}n_{i}\right)-1}}{var_bg_unbiased = sum((mean_vec - mean_mixture)^2 * n_vec) / (sum(n_vec) - 1)}
+#' \mjdeqn{var_{WG_{Unbiased}}=\frac{\Sigma_{i=1}^{k}v_{i}\left(n_{i}-1\right)}{\left(\Sigma_{i=1}^{k}n_{i}\right)-1}}{var_wg_unbiased = sum(var_vec * (n_vec - 1)) / (sum(n_vec) - 1)}
+#' \mjdeqn{var_{mix_{Unbiased}}=var_{BG_{Unbiased}}+var_{WG_{Unbiased}}}{var_mix_unbiased = var_bg_unbiased + var_wg_unbiased}
 #'
 #' @keywords univar
 #'
@@ -72,6 +73,9 @@ mix_dist <- function(mean_vec, var_vec, n_vec, unbiased = TRUE, na.rm = FALSE){
 
 #' Estimate the mixture correlation for two groups
 #'
+#' \loadmathjax
+#' Estimate the mixture correlation for two groups.
+#'
 #' @param rxy Average within-group correlation
 #' @param dx Standardized mean difference between groups on X.
 #' @param dy Standardized mean difference between groups on Y.
@@ -83,10 +87,10 @@ mix_dist <- function(mean_vec, var_vec, n_vec, unbiased = TRUE, na.rm = FALSE){
 #' @details
 #' The average within-group correlation is estimated as:
 #'
-#' \deqn{\rho_{xy_{WG}}=\rho_{xy_{Mix}}\sqrt{\left(d_{x}^{2}p(1-p)+1\right)\left(d_{y}^{2}p(1-p)+1\right)}-\sqrt{d_{x}^{2}d_{y}^{2}p^{2}(1-p)^{2}}}{r_wg = r_mix * sqrt((dx^2 * p * (1 - p) + 1) * (dy^2 * p * (1 - p) + 1)) - sqrt(dx^2 * dy^2 * p^2 * (1 - p)^2)}
+#' \mjdeqn{\rho_{xy_{WG}}=\rho_{xy_{Mix}}\sqrt{\left(d_{x}^{2}p(1-p)+1\right)\left(d_{y}^{2}p(1-p)+1\right)}-\sqrt{d_{x}^{2}d_{y}^{2}p^{2}(1-p)^{2}}}{r_wg = r_mix * sqrt((dx^2 * p * (1 - p) + 1) * (dy^2 * p * (1 - p) + 1)) - sqrt(dx^2 * dy^2 * p^2 * (1 - p)^2)}
 #'
-#' where \eqn{\rho_{xy_{WG}}}{r_wg} is the average within-group correlation, \eqn{\rho_{xy_{Mix}}}{r_mix} is the overall mixture correlation,
-#' \eqn{d_{x}}{dx} is the standardized mean difference between groups on X, \eqn{d_{y}}{dy} is the standardized mean difference between groups on Y, and
+#' where \mjeqn{\rho_{xy_{WG}}}{r_wg} is the average within-group correlation, \mjeqn{\rho_{xy_{Mix}}}{r_mix} is the overall mixture correlation,
+#' \mjeqn{d_{x}}{dx} is the standardized mean difference between groups on X, \mjeqn{d_{y}}{dy} is the standardized mean difference between groups on Y, and
 #' \emph{p} is the proportion of cases in one of the two groups.
 #'
 #' @examples
@@ -97,6 +101,9 @@ mix_r_2group <- function(rxy, dx, dy, p = .5){
 
 
 #' Estimate the average within-group correlation from a mixture correlation for two groups
+#'
+#' \loadmathjax
+#' Estimate the average within-group correlation from a mixture correlation for two groups.
 #'
 #' @param rxy Overall mixture correlation.
 #' @param dx Standardized mean difference between groups on X.
@@ -114,10 +121,10 @@ mix_r_2group <- function(rxy, dx, dy, p = .5){
 #' @details
 #' The mixture correlation for two groups is estimated as:
 #'
-#' \deqn{r_{xy_{Mix}}\frac{\rho_{xy_{WG}}+\sqrt{d_{x}^{2}d_{y}^{2}p^{2}(1-p)^{2}}}{\sqrt{\left(d_{x}^{2}p(1-p)+1\right)\left(d_{y}^{2}p(1-p)+1\right)}}}{r_mix = (r_wg + sqrt((p - 1)^2 * p^2 * dx^2 * dy^2)) / sqrt((1 - (p - 1) * p * dx^2) * (1 - (p - 1) * p * dy^2))}
+#' \mjdeqn{r_{xy_{Mix}}\frac{\rho_{xy_{WG}}+\sqrt{d_{x}^{2}d_{y}^{2}p^{2}(1-p)^{2}}}{\sqrt{\left(d_{x}^{2}p(1-p)+1\right)\left(d_{y}^{2}p(1-p)+1\right)}}}{r_mix = (r_wg + sqrt((p - 1)^2 * p^2 * dx^2 * dy^2)) / sqrt((1 - (p - 1) * p * dx^2) * (1 - (p - 1) * p * dy^2))}
 #'
-#' where \eqn{\rho_{xy_{WG}}}{r_wg} is the average within-group correlation, \eqn{\rho_{xy_{Mix}}}{r_mix} is the overall mixture correlation,
-#' \eqn{d_{x}}{dx} is the standardized mean difference between groups on X, \eqn{d_{y}}{dy} is the standardized mean difference between groups on Y, and
+#' where \mjeqn{\rho_{xy_{WG}}}{r_wg} is the average within-group correlation, \mjeqn{\rho_{xy_{Mix}}}{r_mix} is the overall mixture correlation,
+#' \mjeqn{d_{x}}{dx} is the standardized mean difference between groups on X, \mjeqn{d_{y}}{dy} is the standardized mean difference between groups on Y, and
 #' \emph{p} is the proportion of cases in one of the two groups.
 #'
 #' @examples

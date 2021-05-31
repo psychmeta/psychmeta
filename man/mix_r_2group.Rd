@@ -19,15 +19,16 @@ mix_r_2group(rxy, dx, dy, p = 0.5)
 A vector of two-group mixture correlations
 }
 \description{
-Estimate the mixture correlation for two groups
+\loadmathjax
+Estimate the mixture correlation for two groups.
 }
 \details{
 The average within-group correlation is estimated as:
 
-\deqn{\rho_{xy_{WG}}=\rho_{xy_{Mix}}\sqrt{\left(d_{x}^{2}p(1-p)+1\right)\left(d_{y}^{2}p(1-p)+1\right)}-\sqrt{d_{x}^{2}d_{y}^{2}p^{2}(1-p)^{2}}}{r_wg = r_mix * sqrt((dx^2 * p * (1 - p) + 1) * (dy^2 * p * (1 - p) + 1)) - sqrt(dx^2 * dy^2 * p^2 * (1 - p)^2)}
+\mjdeqn{\rho_{xy_{WG}}=\rho_{xy_{Mix}}\sqrt{\left(d_{x}^{2}p(1-p)+1\right)\left(d_{y}^{2}p(1-p)+1\right)}-\sqrt{d_{x}^{2}d_{y}^{2}p^{2}(1-p)^{2}}}{r_wg = r_mix * sqrt((dx^2 * p * (1 - p) + 1) * (dy^2 * p * (1 - p) + 1)) - sqrt(dx^2 * dy^2 * p^2 * (1 - p)^2)}
 
-where \eqn{\rho_{xy_{WG}}}{r_wg} is the average within-group correlation, \eqn{\rho_{xy_{Mix}}}{r_mix} is the overall mixture correlation,
-\eqn{d_{x}}{dx} is the standardized mean difference between groups on X, \eqn{d_{y}}{dy} is the standardized mean difference between groups on Y, and
+where \mjeqn{\rho_{xy_{WG}}}{r_wg} is the average within-group correlation, \mjeqn{\rho_{xy_{Mix}}}{r_mix} is the overall mixture correlation,
+\mjeqn{d_{x}}{dx} is the standardized mean difference between groups on X, \mjeqn{d_{y}}{dy} is the standardized mean difference between groups on Y, and
 \emph{p} is the proportion of cases in one of the two groups.
 }
 \examples{

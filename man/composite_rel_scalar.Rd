@@ -17,14 +17,15 @@ composite_rel_scalar(mean_rel, mean_intercor, k_vars)
 The estimated reliability of the composite variable.
 }
 \description{
+\loadmathjax
 This function computes the reliability of a variable that is a unit-weighted composite of other variables.
 }
 \details{
 The Mosier composite formula is computed as:
 
-\deqn{\rho_{XX}=\frac{\bar{\rho}_{x_{i}x_{i}}k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}{k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}}{rel_composite = (mean_rel * k_vars + k_vars * (k_vars-1) * mean_intercor) / (k_vars + k_vars * (k_vars-1) * mean_intercor)}
+\mjdeqn{\rho_{XX}=\frac{\bar{\rho}_{x_{i}x_{i}}k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}{k+k\left(k-1\right)\bar{\rho}_{x_{i}x_{j}}}}{rel_composite = (mean_rel * k_vars + k_vars * (k_vars-1) * mean_intercor) / (k_vars + k_vars * (k_vars-1) * mean_intercor)}
 
-where \eqn{\bar{\rho}_{x_{i}x_{i}}}{mean_rel} is the mean reliability of variables in the composite, \eqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among variables in the composite, and \emph{k} is the number of variables in the composite.
+where \mjeqn{\bar{\rho}_{x_{i}x_{i}}}{mean_rel} is the mean reliability of variables in the composite, \mjeqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among variables in the composite, and \emph{k} is the number of variables in the composite.
 }
 \examples{
 composite_rel_scalar(mean_rel = .8, mean_intercor = .4, k_vars = 2)

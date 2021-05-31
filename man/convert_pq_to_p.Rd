@@ -2,7 +2,7 @@
 % Please edit documentation in R/convert_ma.R
 \name{convert_pq_to_p}
 \alias{convert_pq_to_p}
-\title{Convert the variance of a dichotomous variable (i.d., pq) to the proportion of one of the categories in the variable (i.e., p)}
+\title{Convert the dichotomous variable variance to a proportion}
 \usage{
 convert_pq_to_p(pq)
 }
@@ -13,6 +13,7 @@ convert_pq_to_p(pq)
 The proportion of cases in one of the dichotomous groups.
 }
 \description{
-Convert the variance of a dichotomous variable (i.d., pq) to the proportion of one of the categories in the variable (i.e., p)
+\loadmathjax
+Converts the variance of a dichotomous variable (i.e., \mjseqn{pq}) to the proportion of one of the categories in the variable (i.e., \mjseqn{p})
 }
 \keyword{internal}

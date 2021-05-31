@@ -21,10 +21,11 @@ correct_r_dich(r, px = NA, py = NA, n = NULL, ...)
 Vector of correlations corrected for artificial dichomization (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 }
 \description{
-Correct correlations for artificial dichotomization of one or both variables
+\loadmathjax
+Correct correlations for artificial dichotomization of one or both variables.
 }
 \details{
-\deqn{r_{c}=\frac{r_{obs}}{\left[\frac{\phi\left(p_{X}\right)}{p_{X}\left(1-p_{X}\right)}\right]\left[\frac{\phi\left(p_{Y}\right)}{p_{Y}\left(1-p_{Y}\right)}\right]}}{r_c = r_obs / (ordinate(p_x) / sqrt(p_x * (1 - p_x) * ordinate(p_y) / sqrt(p_y * (1 - p_y))}
+\mjdeqn{r_{c}=\frac{r_{obs}}{\left[\frac{\phi\left(p_{X}\right)}{p_{X}\left(1-p_{X}\right)}\right]\left[\frac{\phi\left(p_{Y}\right)}{p_{Y}\left(1-p_{Y}\right)}\right]}}{r_c = r_obs / (ordinate(p_x) / sqrt(p_x * (1 - p_x) * ordinate(p_y) / sqrt(p_y * (1 - p_y))}
 }
 \examples{
 correct_r_dich(r = 0.32, px = .5, py = .5, n = 100)

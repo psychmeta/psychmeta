@@ -1,22 +1,23 @@
 #' Correct for small-sample bias in Cohen's *d* values
 #'
+#' \loadmathjax
 #' Corrects a vector of Cohen's *d* values for small-sample bias, as Cohen's *d*
 #' has a slight positive bias. The bias-corrected *d* value is often called
 #' Hedges's *g*.
 #'
 #' The bias correction is:
-#' \deqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
+#' \mjdeqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
 #'
 #' where
-#' \deqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = gamma((n - 2) / 2) / (sqrt(n - 2) * gamm((n - 2) / 2))}
+#' \mjdeqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = \Gamma((n - 2) / 2) / (sqrt(n - 2) * \Gamma((n - 2) / 2))}
 #'
-#' and \eqn{d_{obs}}{d} is the observed effect size, \eqn{g = d_{c}}{g = d_c} is the
-#' corrected (unbiased) estimate, \eqn{n}{n} is the total sample size, and
-#' \eqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
+#' and \mjeqn{d_{obs}}{d} is the observed effect size, \mjeqn{g = d_{c}}{g = d_c} is the
+#' corrected (unbiased) estimate, \mjseqn{n} is the total sample size, and
+#' \mjeqn{\Gamma()}{\Gamma()} is the [gamma function][base::gamma()].
 #'
 #' Historically, using the gamma function was computationally intensive, so an
-#' approximation for \eqn{J} was used (Borenstein et al., 2009):
-#' \deqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
+#' approximation for \mjseqn{J} was used (Borenstein et al., 2009):
+#' \mjdeqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
 #'
 #' This approximation is no longer necessary with modern computers.
 #'
@@ -49,9 +50,12 @@ correct_d_bias <- function(d, n){
      out
 }
 
-#' Correct for small-sample bias in Glass' \ifelse{latex}{\eqn{\Delta}}{\ifelse{html}{\out{&#916;}}{delta}} values
+#' Correct for small-sample bias in Glass' \mjseqn{\Delta} values
 #'
-#' @param delta Vector of Glass' \ifelse{latex}{\eqn{\Delta}}{\ifelse{html}{\out{&#916;}}{delta}} values.
+#' \loadmathjax
+#' Correct for small-sample bias in Glass' \mjseqn{\Delta} values.
+#'
+#' @param delta Vector of Glass' \mjseqn{\Delta} values.
 #' @param nc Vector of control-group sample sizes.
 #' @param ne Vector of experimental-group sample sizes.
 #' @param use_pooled_sd Logical vector determining whether the pooled standard deviation was used (`TRUE`) or not (`FALSE`; default).
@@ -67,12 +71,12 @@ correct_d_bias <- function(d, n){
 #' @details
 #' The bias correction is estimated as:
 #'
-#' \deqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
+#' \mjdeqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
 #'
-#' where \eqn{\Delta}{delta} is the observed effect size, \eqn{\Delta_{c}}{delta_c} is the
-#' corrected estimate of \ifelse{latex}{\eqn{\Delta}}{\ifelse{html}{\out{&#916;}}{delta}},
-#' \eqn{n_{control}}{nc} is the control-group sample size, and
-#' \eqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
+#' where \mjseqn{\Delta} is the observed effect size, \mjeqn{\Delta_{c}}{\Delta_c} is the
+#' corrected estimate of \mjseqn{\Delta},
+#' \mjeqn{n_{control}}{nc} is the control-group sample size, and
+#' \mjeqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
 #'
 #' @encoding UTF-8
 #' @md
@@ -92,6 +96,7 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' Correct *d* values for measurement error and/or range restriction
 #'
 #' @description
+#' \loadmathjax
 #' This function is a wrapper for the [correct_r()] function to correct *d* values
 #' for statistical and psychometric artifacts.
 #'
@@ -118,9 +123,9 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' range-corrected observed-score *d* values (\code{dgya}), operational range-corrected *d* values corrected for measurement error in Y only (`dgpa`), operational range-corrected *d* values corrected for measurement error in the grouping only (`dGya`), and range-corrected true-score *d* values (`dGpa`).
 #'
 #' @export
-#'
 #' @encoding UTF-8
 #' @md
+#'
 #' @references
 #' Alexander, R. A., Carson, K. P., Alliger, G. M., & Carr, L. (1987).
 #' Correcting doubly truncated correlations: An improved approximation for
@@ -145,8 +150,6 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' Schmidt, F. L., & Hunter, J. E. (2015).
 #' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
 #' Sage. \doi{10.4135/9781483398105}. pp. 43–44, 140–141.
-#'
-#' @md
 #'
 #' @examples
 #' ## Correction for measurement error only

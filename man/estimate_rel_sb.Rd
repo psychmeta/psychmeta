@@ -15,15 +15,16 @@ estimate_rel_sb(rel_initial, k)
 The estimated reliability of the lengthened (or shortened) measure.
 }
 \description{
+\loadmathjax
 This function implements the Spearman-Brown prophecy formula for estimating the reliability of a lengthened (or shortened) measure.
 The formula implemented here assumes that all items added to (or subtracted from) the measure will be parallel forms of the original items.
 }
 \details{
 This is computed as:
 
-\deqn{\rho_{XX}^{*}=\frac{k\rho_{XX}}{1+(k-1)\rho_{XX}}}{rel_predicted = (k * rel_initial) / (1 + (k - 1) * rel_initial)}
+\mjdeqn{\rho_{XX}^{*}=\frac{k\rho_{XX}}{1+(k-1)\rho_{XX}}}{rel_predicted = (k * rel_initial) / (1 + (k - 1) * rel_initial)}
 
-where \eqn{\rho_{XX}}{rel_initial} is the initial reliability, \emph{k} is the multiplier by which the measure is to be lengthened (or shortened), and \eqn{\rho_{XX}^{*}}{rel_predicted} is the predicted reliability of a measure with a different length.
+where \mjeqn{\rho_{XX}}{rel_initial} is the initial reliability, \emph{k} is the multiplier by which the measure is to be lengthened (or shortened), and \mjeqn{\rho_{XX}^{*}}{rel_predicted} is the predicted reliability of a measure with a different length.
 }
 \examples{
 ## Double the length of a measure with an initial reliability of .7

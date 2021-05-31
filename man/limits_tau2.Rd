@@ -20,7 +20,7 @@ limits_tau2(
 
 \item{k}{The number of studies in a meta-analysis.}
 
-\item{method}{Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.}
+\item{method}{Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \mjeqn{\sigma^{2}\emph{es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum}{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.}
 
 \item{conf_level}{Confidence level.}
 

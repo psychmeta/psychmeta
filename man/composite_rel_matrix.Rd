@@ -19,6 +19,7 @@ composite_rel_matrix(rel_vec, r_mat, sd_vec, wt_vec = rep(1, length(rel_vec)))
 The estimated reliability of the composite variable.
 }
 \description{
+\loadmathjax
 This function computes the reliability of a variable that is a weighted or unweighted composite of other variables.
 }
 \details{
@@ -27,9 +28,9 @@ This function treats measure-specific variance as reliable.
 
 The Mosier composite formula is computed as:
 
-\deqn{\rho_{XX}=\frac{\mathbf{w}^{T}\left(\mathbf{r}\circ\mathbf{s}\right)+\mathbf{w}^{T}\mathbf{S}\mathbf{w}-\mathbf{w}^{T}\mathbf{s}}{\mathbf{w}^{T}\mathbf{S}\mathbf{w}}}{rel_composite = (t(wt^2) (rel_vec * var_vec) + S - var_sum) / (t(wt) S wt)}
+\mjdeqn{\rho_{XX}=\frac{\mathbf{w}^{T}\left(\mathbf{r}\circ\mathbf{s}\right)+\mathbf{w}^{T}\mathbf{S}\mathbf{w}-\mathbf{w}^{T}\mathbf{s}}{\mathbf{w}^{T}\mathbf{S}\mathbf{w}}}{rel_composite = (t(wt^2) (rel_vec * var_vec) + S - var_sum) / (t(wt) S wt)}
 
-where \eqn{\rho_{XX}}{rel_composite} is a composite reliability estimate, \eqn{\mathbf{r}}{rel_vec} is a vector of reliability estimates, \eqn{\mathbf{w}}{wt} is a vector of weights, \eqn{\mathbf{S}}{S} is a covariance matrix, and \eqn{\mathbf{s}}{var_vec} is a vector of variances (i.e., the diagonal elements of \eqn{\mathbf{S}}{S}).
+where \mjeqn{\rho_{XX}}{rel_composite} is a composite reliability estimate, \mjeqn{\mathbf{r}}{rel_vec} is a vector of reliability estimates, \mjeqn{\mathbf{w}}{wt} is a vector of weights, \mjeqn{\mathbf{S}}{S} is a covariance matrix, and \mjeqn{\mathbf{s}}{var_vec} is a vector of variances (i.e., the diagonal elements of \mjeqn{\mathbf{S}}{S}).
 }
 \examples{
 composite_rel_matrix(rel_vec = c(.8, .8),

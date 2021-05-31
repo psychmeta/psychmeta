@@ -66,6 +66,7 @@ Data frame(s) of observed \emph{d} values (\code{dgyi}), operational range-restr
 range-corrected observed-score \emph{d} values (\code{dgya}), operational range-corrected \emph{d} values corrected for measurement error in Y only (\code{dgpa}), operational range-corrected \emph{d} values corrected for measurement error in the grouping only (\code{dGya}), and range-corrected true-score \emph{d} values (\code{dGpa}).
 }
 \description{
+\loadmathjax
 This function is a wrapper for the \code{\link[=correct_r]{correct_r()}} function to correct \emph{d} values
 for statistical and psychometric artifacts.
 }

@@ -27,14 +27,15 @@ composite_r_matrix(
 A composite correlation
 }
 \description{
+\loadmathjax
 This function computes the weighted (or unweighted, by default) composite correlation between a set of X variables and a set of Y variables.
 }
 \details{
 This is computed as:
 
-\deqn{\rho_{XY}\frac{\mathbf{w}_{X}^{T}\mathbf{R}_{XY}\mathbf{w}_{Y}}{\sqrt{\left(\mathbf{w}_{X}^{T}\mathbf{R}_{XX}\mathbf{w}_{X}\right)\left(\mathbf{w}_{Y}^{T}\mathbf{R}_{YY}\mathbf{w}_{Y}\right)}}}{r_composite = (t(wt_x)  Rxy  wt_y) / (sqrt(t(wt_x)  Rxx  wt_x) * sqrt(t(wt_y) Ryy wt_y))}
+\mjdeqn{\rho_{XY}\frac{\mathbf{w}_{X}^{T}\mathbf{R}_{XY}\mathbf{w}_{Y}}{\sqrt{\left(\mathbf{w}_{X}^{T}\mathbf{R}_{XX}\mathbf{w}_{X}\right)\left(\mathbf{w}_{Y}^{T}\mathbf{R}_{YY}\mathbf{w}_{Y}\right)}}}{r_composite = (t(wt_x)  Rxy  wt_y) / (sqrt(t(wt_x)  Rxx  wt_x) * sqrt(t(wt_y) Ryy wt_y))}
 
-where \eqn{\rho_{XY}}{r_composite} is the composite correlation, \eqn{\mathbf{w}}{wt} is a vector of weights, and \eqn{\mathbf{R}}{R} is a correlation matrix. The subscripts of \eqn{\mathbf{w}}{wt} and \eqn{\mathbf{R}}{R} indicate the variables indexed within the vector or matrix.
+where \mjeqn{\rho_{XY}}{r_composite} is the composite correlation, \mjeqn{\mathbf{w}}{wt} is a vector of weights, and \mjeqn{\mathbf{R}}{R} is a correlation matrix. The subscripts of \mjeqn{\mathbf{w}}{wt} and \mjeqn{\mathbf{R}}{R} indicate the variables indexed within the vector or matrix.
 }
 \examples{
 composite_r_scalar(mean_rxy = .3, k_vars_x = 4, mean_intercor_x = .4)

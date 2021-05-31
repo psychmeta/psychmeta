@@ -27,14 +27,15 @@ composite_u_matrix(
 The estimated \emph{u} ratio of the composite variable.
 }
 \description{
+\loadmathjax
 This function estimates the u ratio of a composite variable when at least one matrix of correlations (restricted or unrestricted) among the variables is available.
 }
 \details{
 This is computed as:
 
-\deqn{u_{composite}=\sqrt{\frac{\left(\mathbf{w}\circ\mathbf{u}\right)^{T}\mathbf{R}_{i}\left(\mathbf{w}\circ\mathbf{u}\right)}{\mathbf{w}^{T}\mathbf{R}_{a}\mathbf{w}}}}{u_composite = sqrt((t(wt * u)  R_i  (wt * u) / (t(wt)  R_a  wt))}
+\mjdeqn{u_{composite}=\sqrt{\frac{\left(\mathbf{w}\circ\mathbf{u}\right)^{T}\mathbf{R}_{i}\left(\mathbf{w}\circ\mathbf{u}\right)}{\mathbf{w}^{T}\mathbf{R}_{a}\mathbf{w}}}}{u_composite = sqrt((t(wt * u)  R_i  (wt * u) / (t(wt)  R_a  wt))}
 
-where \eqn{u_{composite}}{u_composite} is the composite u ratio, \eqn{\mathbf{u}}{u} is a vector of u ratios, \eqn{\mathbf{R}_{i}}{R_i} is a range-restricted correlation matrix, \eqn{\mathbf{R}_{a}}{R_a} is an unrestricted correlation matrix, and \eqn{\mathbf{w}}{wt} is a vector of weights.
+where \mjeqn{u_{composite}}{u_composite} is the composite u ratio, \mjeqn{\mathbf{u}}{u} is a vector of u ratios, \mjeqn{\mathbf{R}_{i}}{R_i} is a range-restricted correlation matrix, \mjeqn{\mathbf{R}_{a}}{R_a} is an unrestricted correlation matrix, and \mjeqn{\mathbf{w}}{wt} is a vector of weights.
 }
 \examples{
 composite_u_matrix(ri_mat = matrix(c(1, .3, .3, 1), 2, 2), u_vec = c(.8, .8))

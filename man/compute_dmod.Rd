@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_dmod.R
 \name{compute_dmod}
 \alias{compute_dmod}
-\title{Comprehensive \eqn{d_{Mod}}{d_Mod} calculator}
+\title{Comprehensive \mjeqn{d_{Mod}}{d_Mod} calculator}
 \usage{
 compute_dmod(
   data,
@@ -28,7 +28,7 @@ The data set must contain a criterion variable, at least one predictor variable,
 \item{group}{Name or column-index number of the variable that identifies group membership in the data set.}
 
 \item{predictors}{Name(s) or column-index number(s) of the predictor variable(s) in the data set. No predictor can be a factor-type variable.
-If multiple predictors are specified, they will be combined into a regression-weighted composite that will be carried forward to compute \eqn{d_{Mod}}{d_Mod} effect sizes.
+If multiple predictors are specified, they will be combined into a regression-weighted composite that will be carried forward to compute \mjeqn{d_{Mod}}{d_Mod} effect sizes.
 \itemize{
   \item {\emph{Note}: If weights other than regression weights should be used to combine the predictors into a composite, the user must manually compute such a composite,
   include the composite in the \code{dat} data set, and identify the composite variable in \code{predictors}.}
@@ -42,11 +42,11 @@ If multiple predictors are specified, they will be combined into a regression-we
 
 \item{conf_level}{Confidence level (between \code{0} and \code{1}) to be used in generating confidence intervals. Default is \code{.95}}
 
-\item{rescale_cdf}{Logical argument that indicates whether parametric \eqn{d_{Mod}}{d_Mod} results should be rescaled to account for using a cumulative density < 1 in the computations (\code{TRUE}; default) or not (\code{FALSE}).}
+\item{rescale_cdf}{Logical argument that indicates whether parametric \mjeqn{d_{Mod}}{d_Mod} results should be rescaled to account for using a cumulative density < 1 in the computations (\code{TRUE}; default) or not (\code{FALSE}).}
 
-\item{parametric}{Logical argument that indicates whether \eqn{d_{Mod}}{d_Mod} should be computed using an assumed normal distribution (\code{TRUE}; default) or observed frequencies (\code{FALSE}).}
+\item{parametric}{Logical argument that indicates whether \mjeqn{d_{Mod}}{d_Mod} should be computed using an assumed normal distribution (\code{TRUE}; default) or observed frequencies (\code{FALSE}).}
 
-\item{bootstrap}{Logical argument that indicates whether \eqn{d_{Mod}}{d_Mod} should be bootstrapped (\code{TRUE}; default) or not (\code{FALSE}).}
+\item{bootstrap}{Logical argument that indicates whether \mjeqn{d_{Mod}}{d_Mod} should be bootstrapped (\code{TRUE}; default) or not (\code{FALSE}).}
 
 \item{boot_iter}{Number of bootstrap iterations to compute (default = \code{1000}).}
 
@@ -62,9 +62,9 @@ or if a new set of weights should be derived during each iteration of the bootst
 \value{
 If bootstrapping is selected, the list will include:
   \itemize{
-    \item {\code{point_estimate}} {A matrix of effect sizes (\eqn{d_{Mod_{Signed}}}{d_Mod_Signed},
-    \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}, \eqn{d_{Mod_{Under}}}{d_Mod_Under},
-    \eqn{d_{Mod_{Over}}}{d_Mod_Over}), proportions of under- and over-predicted criterion scores,
+    \item {\code{point_estimate}} {A matrix of effect sizes (\mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed},
+    \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}, \mjeqn{d_{Mod_{Under}}}{d_Mod_Under},
+    \mjeqn{d_{Mod_{Over}}}{d_Mod_Over}), proportions of under- and over-predicted criterion scores,
     minimum and maximum differences, and the scores associated with minimum and maximum differences.
     All of these values are computed using the full data set.}
     \item {\code{bootstrap_mean}} {A matrix of the same statistics as the \code{point_estimate} matrix,
@@ -79,9 +79,10 @@ If bootstrapping is selected, the list will include:
   If no bootstrapping is performed, the output will be limited to the \code{point_estimate} matrix.
 }
 \description{
-This is a general-purpose function to compute \eqn{d_{Mod}}{d_Mod} effect sizes from raw data and to perform bootstrapping.
+\loadmathjax
+This is a general-purpose function to compute \mjeqn{d_{Mod}}{d_Mod} effect sizes from raw data and to perform bootstrapping.
 It subsumes the functionalities of the \code{compute_dmod_par} (for parametric computations) and \code{compute_dmod_npar} (for non-parametric computations)
-functions and automates the generation of regression equations and descriptive statistics for computing \eqn{d_{Mod}}{d_Mod} effect sizes. Please see documentation
+functions and automates the generation of regression equations and descriptive statistics for computing \mjeqn{d_{Mod}}{d_Mod} effect sizes. Please see documentation
 for \code{compute_dmod_par} and \code{compute_dmod_npar} for details about how the effect sizes are computed.
 }
 \examples{

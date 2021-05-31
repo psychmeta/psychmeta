@@ -1,6 +1,7 @@
 #' @title Function to convert meta-analysis of correlations to d values or vice-versa
 #'
-#' @description 
+#' @description
+#' \loadmathjax
 #' Takes a meta-analysis class object of \emph{d} values or correlations (classes \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, and \code{d_as_r}; second-order meta-analyses are currently not supported) as an input and uses conversion formulas and Taylor series approximations to convert effect sizes and variance estimates, respectively.
 #'
 #' @param ma_obj A meta-analysis object of class \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, or \code{d_as_r}
@@ -11,25 +12,25 @@
 #'
 #' @details
 #' The formula used to convert correlations to \emph{d} values is:
-#' \deqn{d=\frac{r\sqrt{\frac{1}{p\left(1-p\right)}}}{\sqrt{1-r^{2}}}}{(sqrt(1 / (p * (1-p))) * r) / sqrt(1 - r^2)}
+#' \mjdeqn{d=\frac{r\sqrt{\frac{1}{p\left(1-p\right)}}}{\sqrt{1-r^{2}}}}{(sqrt(1 / (p * (1-p))) * r) / sqrt(1 - r^2)}
 #'
 #' The formula used to convert \emph{d} values to correlations is:
-#' \deqn{r=\frac{d}{\sqrt{d^{2}+\frac{1}{p\left(1-p\right)}}}}{d / sqrt(1 / (p * (1-p)) + d^2)}
+#' \mjdeqn{r=\frac{d}{\sqrt{d^{2}+\frac{1}{p\left(1-p\right)}}}}{d / sqrt(1 / (p * (1-p)) + d^2)}
 #'
 #' To approximate the variance of correlations from the variance of \emph{d} values, the function computes:
-#' \deqn{var_{r}\approx a_{d}^{2}var_{d}}{var_r ~= a_d^2 * var_d}
-#' where \eqn{a_{d}}{a_d} is the first partial derivative of the \emph{d}-to-\emph{r} transformation with respect to \emph{d}:
-#' \deqn{a_{d}=-\frac{1}{\left[d^{2}p\left(1-p\right)-1\right]\sqrt{d^{2}+\frac{1}{p-p^{2}}}}}{a_d = -1 / ((d^2 * (p - 1) * p - 1) * sqrt(d^2 + 1 / (p - p^2)))}
+#' \mjdeqn{var_{r}\approx a_{d}^{2}var_{d}}{var_r ~= a_d^2 * var_d}
+#' where \mjeqn{a_{d}}{a_d} is the first partial derivative of the \emph{d}-to-\emph{r} transformation with respect to \emph{d}:
+#' \mjdeqn{a_{d}=-\frac{1}{\left[d^{2}p\left(1-p\right)-1\right]\sqrt{d^{2}+\frac{1}{p-p^{2}}}}}{a_d = -1 / ((d^2 * (p - 1) * p - 1) * sqrt(d^2 + 1 / (p - p^2)))}
 #'
 #' To approximate the variance of \emph{d} values from the variance of correlations, the function computes:
-#' \deqn{var_{d}\approx a_{r}^{2}var_{r}}{var_d ~= a_r^2 * var_r}
-#' where \eqn{a_{r}}{a_r} is the first partial derivative of the \emph{r}-to-\emph{d} transformation with respect to \emph{r}:
-#' \deqn{a_{r}=\frac{\sqrt{\frac{1}{p-p^{2}}}}{\left(1-r^{2}\right)^{1.5}}}{a_r = sqrt(1 / (p - p^2)) / (1 - r^2)^1.5}
+#' \mjdeqn{var_{d}\approx a_{r}^{2}var_{r}}{var_d ~= a_r^2 * var_r}
+#' where \mjeqn{a_{r}}{a_r} is the first partial derivative of the \emph{r}-to-\emph{d} transformation with respect to \emph{r}:
+#' \mjdeqn{a_{r}=\frac{\sqrt{\frac{1}{p-p^{2}}}}{\left(1-r^{2}\right)^{1.5}}}{a_r = sqrt(1 / (p - p^2)) / (1 - r^2)^1.5}
 convert_ma <- function(ma_obj, ...){
 
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
      if(flag_summary) ma_obj <- ma_obj$ma_obj
-     
+
      additional_args <- list(...)
      .attributes <- attributes(ma_obj)
 
@@ -50,10 +51,10 @@ convert_ma <- function(ma_obj, ...){
      }else{
           record_call <- TRUE
      }
-          
+
      ma_obj <- ma_obj %>% group_by(.data$analysis_id) %>%
           do(.convert_ma(ma_obj_i = .data, ma_obj = ma_obj, ma_metric = ma_metric, ma_methods = ma_methods))
-     
+
      if(ma_metric == "r_as_r") .ma_metric <- "r_as_d"
      if(ma_metric == "d_as_r") .ma_metric <- "d_as_d"
 
@@ -76,7 +77,7 @@ convert_ma <- function(ma_obj, ...){
                                                     list(match.call()))
 
      if(flag_summary) ma_obj <- summary(ma_obj)
-     
+
      ma_obj
 }
 
@@ -94,7 +95,7 @@ convert_meta <- convert_ma
      conf_method <- att$inputs$conf_method
      cred_method <- att$inputs$cred_method
      error_type <- att$inputs$error_type
-     
+
      if("pi" %in% colnames(ma_obj_i$escalc[[1]]$barebones)){
           pi_list <- ma_obj_i$escalc[[1]]$barebones$pi
           pi_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pi, wt = ma_obj_i$escalc[[1]]$barebones$weight)
@@ -102,7 +103,7 @@ convert_meta <- convert_ma
           pi_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
           pi_vec <- rep(.5, length(k))
      }
-     
+
      if("pa" %in% colnames(ma_obj_i$escalc[[1]]$barebones)){
           pa_list <- ma_obj_i$escalc[[1]]$barebones$pa
           pa_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pa, wt = ma_obj_i$escalc[[1]]$barebones$weight)
@@ -110,13 +111,13 @@ convert_meta <- convert_ma
           pa_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
           pa_vec <- rep(.5, length(k))
      }
-     
+
      if("pa_ad" %in% colnames(ma_obj_i$escalc[[1]]$barebones)){
           pa_ad_list <- ma_obj_i$escalc[[1]]$barebones$pa_ad
           pa_ad_vec <- wt_mean(x = ma_obj_i$escalc[[1]]$barebones$pa_ad, wt = ma_obj_i$escalc[[1]]$barebones$weight)
      }else{
           pa_ad_list <- rep(.5, nrow(ma_obj_i$escalc[[1]]$barebones))
-          pa_ad_vec <- rep(.5, length(k))  
+          pa_ad_vec <- rep(.5, length(k))
      }
 
      correction_names_r <- c("true_score", "validity_generalization_x", "validity_generalization_y")
@@ -136,8 +137,8 @@ convert_meta <- convert_ma
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }
 
-               ma_obj_i$meta_tables[[1]]$barebones <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$barebones, 
-                                                                       p_vec = pi_vec, conf_level = conf_level, cred_level = cred_level, 
+               ma_obj_i$meta_tables[[1]]$barebones <- .convert_metatab(ma_table = ma_obj_i$meta_tables[[1]]$barebones,
+                                                                       p_vec = pi_vec, conf_level = conf_level, cred_level = cred_level,
                                                                        conf_method = conf_method, cred_method = cred_method)
           }
 
@@ -313,7 +314,10 @@ convert_meta <- convert_ma
      ma_obj_i
 }
 
-#' Convert the variance of a dichotomous variable (i.d., pq) to the proportion of one of the categories in the variable (i.e., p)
+#' Convert the dichotomous variable variance to a proportion
+#'
+#' \loadmathjax
+#' Converts the variance of a dichotomous variable (i.e., \mjseqn{pq}) to the proportion of one of the categories in the variable (i.e., \mjseqn{p})
 #'
 #' @param pq The variance of a dichotomous variable.
 #'
@@ -633,7 +637,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
           ma_table <- cbind(col1, ma_table)
           .attributes$names <- .colnames
      }
-     
+
      ma_table <- fix_df(ma_table)
      attributes(ma_table) <- .attributes
      class(ma_table) <- .class
