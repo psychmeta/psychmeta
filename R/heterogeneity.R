@@ -1,5 +1,4 @@
 #' @name heterogeneity
-#' @rdname heterogeneity
 #'
 #' @title Supplemental heterogeneity statistics for meta-analyses
 #'
@@ -7,30 +6,28 @@
 #' \loadmathjax
 #' This function computes a variety of supplemental statistics for meta-analyses.
 #' The statistics here are included for interested users.
-#' It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \mjeqn{SD_{res}}{SD_res}, \mjeqn{SD_{\rho}}{SD_\rho}, and \mjeqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default `ma_obj` output (Wiernik et al., 2017).
+#' It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \mjeqn{SD_{res}}{SD_res}, \mjeqn{SD_{\rho}}{SD_\rho}, and \mjeqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default \code{ma_obj} output (Wiernik et al., 2017).
 #'
 #' @param ma_obj Meta-analysis object.
 #' @param es_failsafe Failsafe effect-size value for file-drawer analyses.
-#' @param conf_level Confidence level to define the width of confidence intervals (default is `conf_level` specified in `ma_obj`).
-#' @param var_res_ci_method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_{es} ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param conf_level Confidence level to define the width of confidence intervals (default is \code{conf_level} specified in \code{ma_obj}).
+#' @param var_res_ci_method Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_{es} ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum_{i=1}^{k}{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.
 #' @param ... Additional arguments.
 #'
-#  TODO: profile_Q latex equation in all 3 functions should be once mathjaxr compilation is fixed: \lambda = \sum_{i = 1}^{k}{w_i(\theta - \bar{\theta})^{2}}
-#'
 #' @return ma_obj with heterogeneity statistics added. Included statistics include:
-#'      \item{`es_type`}{The effect size metric used.}
-#'      \item{`percent_var_accounted`}{Percent variance accounted for statistics (by sampling error, by other artifacts, and total). These statistics are widely reported, but not recommended, as they tend to be misinterpreted as suggesting only a small portion of the observed variance is accounted for by sampling error and other artifacts (Schmidt, 2010; Schmidt & Hunter, 2015, p. 15, 425). The square roots of these values are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts (see \code{cor(es, perturbations)}).}
-#'      \item{`cor(es, perturbations)`}{The correlation between observed effect sizes and statistical artifacts in each sample (with sampling error, with other artifacts, and with artifacts in total), computed as \mjeqn{\sqrt{percent\;var\;accounted}}{sqrt(percent_var_accounted)}. These indices are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts than \code{percent_var_accounted}.}
-#'      \item{`rel_es_obs`}{\mjeqn{1-\frac{var_{pre}}{var_{es}}}{1 - (var_pre / var_es)}, the reliability of observed effect size differences as indicators of true effect sizes differences in the sampled studies. This value is useful for correcting correlations between moderators and effect sizes in meta-regression.}
-#'      \item{`H_squared`}{The ratio of the observed effect size variance to the predicted (error) variance. Also the square root of \code{Q} divided by its degrees of freedom.}
-#'      \item{`H`}{The ratio of the observed effect size standard deviation to the predicted (error) standard deviation.}
-#'      \item{`I_squared`}{The estimated percent variance not accounted for by sampling error or other artifacts (attributable to moderators and uncorrected artifacts). This statistic is simply `rel_es_obs` expressed as a percentage rather than a decimal.}
-#'      \item{`Q`}{Cochran's \mjeqn{\chi^{2}}{\chi-squared} statistic. Significance tests using this statistic are strongly discouraged; heterogeneity should instead be determined by examining the width of the credibility interval and the practical differences between effect sizes contained within it (Wiernik et al., 2017). This value is not accurate when artifact distribution methods are used for corrections.}
-#'      \item{`tau_squared`}{\mjeqn{\tau^{2}}{\tau-squared}, an estimator of the random effects variance component (analogous to the Hunter-Schmidt \mjeqn{SD_{res}^{2}}{var_res}, \mjeqn{SD_{\rho}^{2}}{var_\rho}, or \mjeqn{SD_{\delta}^{2}}{var_\delta} statistics), with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
-#'      \item{`tau`}{\mjeqn{\sqrt{\tau^{2}}}{sqrt(\tau-squared)}, analogous to the Hunter-Schmidt \mjeqn{SD_{res}}{SD_res}, \mjeqn{SD_{\rho}}{SD_\rho}, and \mjeqn{SD_{\delta}}{SD_\delta} statistics, with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
-#'      \item{`Q_r`, `H_r_squared`, `H_r`, `I_r_squared`, `tau_r_squared`, `tau_r`}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted *mean* effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
-#'      \item{`Q_m`, `H_m_squared`, `H_m`, `I_m_squared`, `tau_m_squared`, `tau_m`}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted *median* effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
-#'      \item{`file_drawer`}{Fail-safe \mjseqn{N} and \mjseqn{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest *less* when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
+#'      \item{\code{es_type}}{The effect size metric used.}
+#'      \item{\code{percent_var_accounted}}{Percent variance accounted for statistics (by sampling error, by other artifacts, and total). These statistics are widely reported, but not recommended, as they tend to be misinterpreted as suggesting only a small portion of the observed variance is accounted for by sampling error and other artifacts (Schmidt, 2010; Schmidt & Hunter, 2015, p. 15, 425). The square roots of these values are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts (see \code{cor(es, perturbations)}).}
+#'      \item{\code{cor(es, perturbations)}}{The correlation between observed effect sizes and statistical artifacts in each sample (with sampling error, with other artifacts, and with artifacts in total), computed as \mjeqn{\sqrt{percent\;var\;accounted}}{sqrt(percent_var_accounted)}. These indices are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts than \code{percent_var_accounted}.}
+#'      \item{\code{rel_es_obs}}{\mjeqn{1-\frac{var_{pre}}{var_{es}}}{1 - (var_pre / var_es)}, the reliability of observed effect size differences as indicators of true effect sizes differences in the sampled studies. This value is useful for correcting correlations between moderators and effect sizes in meta-regression.}
+#'      \item{\code{H_squared}}{The ratio of the observed effect size variance to the predicted (error) variance. Also the square root of \code{Q} divided by its degrees of freedom.}
+#'      \item{\code{H}}{The ratio of the observed effect size standard deviation to the predicted (error) standard deviation.}
+#'      \item{\code{I_squared}}{The estimated percent variance not accounted for by sampling error or other artifacts (attributable to moderators and uncorrected artifacts). This statistic is simply \code{rel_es_obs} expressed as a percentage rather than a decimal.}
+#'      \item{\code{Q}}{Cochran's \mjeqn{\chi^{2}}{\chi-squared} statistic. Significance tests using this statistic are strongly discouraged; heterogeneity should instead be determined by examining the width of the credibility interval and the practical differences between effect sizes contained within it (Wiernik et al., 2017). This value is not accurate when artifact distribution methods are used for corrections.}
+#'      \item{\code{tau_squared}}{\mjeqn{\tau^{2}}{\tau-squared}, an estimator of the random effects variance component (analogous to the Hunter-Schmidt \mjeqn{SD_{res}^{2}}{var_res}, \mjeqn{SD_{\rho}^{2}}{var_\rho}, or \mjeqn{SD_{\delta}^{2}}{var_\delta} statistics), with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
+#'      \item{\code{tau}}{\mjeqn{\sqrt{\tau^{2}}}{sqrt(\tau-squared)}, analogous to the Hunter-Schmidt \mjeqn{SD_{res}}{SD_res}, \mjeqn{SD_{\rho}}{SD_\rho}, and \mjeqn{SD_{\delta}}{SD_\delta} statistics, with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
+#'      \item{\code{Q_r}, \code{H_r_squared}, \code{H_r}, \code{I_r_squared}, \code{tau_r_squared}, \code{tau_r}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted \emph{mean} effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
+#'      \item{\code{Q_m}, \code{H_m_squared}, \code{H_m}, \code{I_m_squared}, \code{tau_m_squared}, \code{tau_m}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted \emph{median} effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
+#'      \item{\code{file_drawer}}{Fail-safe \mjseqn{N} and \mjseqn{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
 #'
 #'      Results are reported using computation methods described by Schmidt and Hunter.
 #'      For barebones and indivdiual-correction meta-analyses, results are also
@@ -39,34 +36,34 @@
 #'      are used, heterogeneity results from \pkg{metafor}.
 #'
 #' @export
-#' @md
+#' @noMd
 #'
 #' @references
 #' Becker, B. J. (2005).
-#' Failsafe *N* or file-drawer number.
+#' Failsafe \emph{N} or file-drawer number.
 #' In H. R. Rothstein, A. J. Sutton, & M. Borenstein (Eds.),
-#' *Publication bias in meta-analysis: Prevention, assessment and adjustments* (pp. 111–125).
+#' \emph{Publication bias in meta-analysis: Prevention, assessment and adjustments} (pp. 111–125).
 #' Wiley. \doi{10.1002/0470870168.ch7}
 #'
 #' Higgins, J. P. T., & Thompson, S. G. (2002).
 #' Quantifying heterogeneity in a meta-analysis.
-#' *Statistics in Medicine, 21*(11), 1539–1558. \doi{10.1002/sim.1186}
+#' \emph{Statistics in Medicine, 21}(11), 1539–1558. \doi{10.1002/sim.1186}
 #'
 #' Lin, L., Chu, H., & Hodges, J. S. (2017).
 #' Alternative measures of between-study heterogeneity in meta-analysis: Reducing the impact of outlying studies.
-#' *Biometrics, 73*(1), 156–166. \doi{10.1111/biom.12543}
+#' \emph{Biometrics, 73}(1), 156–166. \doi{10.1111/biom.12543}
 #'
 #' Schmidt, F. (2010).
 #' Detecting and correcting the lies that data tell.
-#' *Perspectives on Psychological Science, 5*(3), 233–242. \doi{10.1177/1745691610369339}
+#' \emph{Perspectives on Psychological Science, 5}(3), 233–242. \doi{10.1177/1745691610369339}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
-#' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
+#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
 #' Sage. \doi{10.4135/9781483398105}. pp. 15, 414, 426, 533–534.
 #'
 #' Wiernik, B. M., Kostal, J. W., Wilmot, M. P., Dilchert, S., & Ones, D. S. (2017).
 #' Empirical benchmarks for interpreting effect size variability in meta-analysis.
-#' *Industrial and Organizational Psychology, 10*(3). \doi{10.1017/iop.2017.44}
+#' \emph{Industrial and Organizational Psychology, 10}(3). \doi{10.1017/iop.2017.44}
 #'
 #'
 #' @examples
@@ -463,12 +460,10 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @param wt_type Weighting method.
 #' @param ma_method What artifact correction method is used. Options are "bb", "ic", and "ad".
 #' @param var_unbiased Are variances calculated using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
-#' @param var_res_ci_method Method to use to estimate a confidence interval for `var_res`. See \link{heterogeneity} for details.
+#' @param var_res_ci_method Method to use to estimate a confidence interval for `var_res`. See [heterogeneity()] for details.
 #'
 #' @return A list of heterogeneity statistics.
-#'
-#' @importFrom stats pchisq
-#' @importFrom stats uniroot
+#' @md
 #'
 #' @keywords internal
 .heterogeneity <- function(mean_es, var_es, var_pre, var_res,
@@ -521,7 +516,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 
      ## Q
      Q <- H_squared * ifelse(var_unbiased == TRUE, df, k)
-     p_Q <- pchisq(q = Q, df = df, lower.tail = FALSE)
+     p_Q <- stats::pchisq(q = Q, df = df, lower.tail = FALSE)
 
      ## Tau
      tau_squared <- var_res
@@ -590,7 +585,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
        ## Outlier-robust estimators (median)
        expit <- function(x) ifelse(x >= 0, 1/(1 + exp(-x/0.0001)), exp(x/0.0001)/(1 + exp(x/0.001)))
        psi   <- function(x, es_vec, wt_vec) sum(wt_vec * (expit(x - es_vec) - 0.5))
-       median_es <- uniroot(psi, interval = c(min(es_vec) - 0.001, max(es_vec) + 0.001), wt_vec = wt_vec, es_vec = es_vec)$root
+       median_es <- stats::uniroot(psi, interval = c(min(es_vec) - 0.001, max(es_vec) + 0.001), wt_vec = wt_vec, es_vec = es_vec)$root
        Q_m <- sum(sqrt(1/vare_vec) * abs(es_vec - median_es))
        H_squared_m <- (pi / 2) * (Q_m^2 / k^2)
        I_squared_m <- (Q_m^2 - (2 * k^2) / pi) / Q_m^2
@@ -691,7 +686,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
      tau_squared_upp <- tau_upp^2
      f_low <- f(0, Q_r, wi)
      f_upp <- f(tau_squared_upp, Q_r, wi)
-     if (f_low * f_upp > 0) tau_squared_r <- 0 else tau_squared_r <- uniroot(f, interval = c(0, tau_squared_upp), Q_r = Q_r, wi = wi)$root
+     if (f_low * f_upp > 0) tau_squared_r <- 0 else tau_squared_r <- stats::uniroot(f, interval = c(0, tau_squared_upp), Q_r = Q_r, wi = wi)$root
 
      return(tau_squared_r)
 }
@@ -714,7 +709,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
      tau_squared_upp <- max(tau_squared_upp, 0.01)
      f_low <- f(0, Q_m, wi)
      f_upp <- f(tau_squared_upp, Q_m, wi)
-     if (f_low * f_upp > 0) tau_squared_m <- 0 else tau_squared_m <- uniroot(f, interval = c(0, tau_squared_upp), Q_m = Q_m, wi = wi)$root
+     if (f_low * f_upp > 0) tau_squared_m <- 0 else tau_squared_m <- stats::uniroot(f, interval = c(0, tau_squared_upp), Q_m = Q_m, wi = wi)$root
 
      return(tau_squared_m)
 }
@@ -728,12 +723,11 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @param var_es The observed variance of effect sizes.
 #' @param var_pre The predicted variance of effect sizes due to artifacts.
 #' @param k The number of studies in a meta-analysis.
-#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param method Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum_{i=1}{k}{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.
 #' @param conf_level Confidence level.
-#' @param var_unbiased Are variances computed using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
+#' @param var_unbiased Are variances computed using the unbiased (\code{TRUE}) or maximum likelihood (\code{FALSE}) estimator?
 #'
 #' @return The confidence limits of tau-squared
-#' @md
 #'
 #' @export
 #'
@@ -779,12 +773,11 @@ limits_tau2 <- function(var_es, var_pre, k, method = c("profile_var_es", "profil
 #' @param var_es The observed variance of effect sizes.
 #' @param var_pre The predicted variance of effect sizes due to artifacts.
 #' @param k The number of studies in a meta-analysis.
-#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param method Which method to use to estimate the limits. Options are \code{profile_var_es} for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, \code{profile_Q} for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum_{i=1}{k}{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and \code{normal_logQ} for a delta method assuming log(Q) follows a standard normal distribution.
 #' @param conf_level Confidence level.
-#' @param var_unbiased Are variances computed using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
+#' @param var_unbiased Are variances computed using the unbiased (\code{TRUE}) or maximum likelihood (\code{FALSE}) estimator?
 #'
 #' @return The confidence limits of tau
-#' @md
 #'
 #' @export
 #'
@@ -851,14 +844,14 @@ conf.limits.nc.chisq <- function (Chi.Square = NULL, conf.level = 0.95, df = NUL
      FAILED <- NULL
      if (alpha.lower > 0) {
           LL.0 <- 0.01
-          Diff <- pchisq(q = Chi.Square, df = df, ncp = LL.0) -
+          Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = LL.0) -
                (1 - alpha.lower)
-          if (pchisq(q = Chi.Square, df = df, ncp = LL.0) < (1 -
+          if (stats::pchisq(q = Chi.Square, df = df, ncp = LL.0) < (1 -
                                                              alpha.lower)) {
-               FAILED <- if (pchisq(q = Chi.Square, df = df, ncp = 0) <
+               FAILED <- if (stats::pchisq(q = Chi.Square, df = df, ncp = 0) <
                              1 - alpha.lower)
                     LL.0 <- 1e-08
-               if (pchisq(q = Chi.Square, df = df, ncp = LL.0) <
+               if (stats::pchisq(q = Chi.Square, df = df, ncp = LL.0) <
                    1 - alpha.lower)
                     FAILED <- TRUE
                if (FAILED == TRUE)
@@ -869,20 +862,20 @@ conf.limits.nc.chisq <- function (Chi.Square = NULL, conf.level = 0.95, df = NUL
                LL.1 <- LL.2 <- LL.0
                while (Diff > tol) {
                     LL.2 <- LL.1 * (1 + Jumping.Prop)
-                    Diff <- pchisq(q = Chi.Square, df = df, ncp = LL.2) -
+                    Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = LL.2) -
                          (1 - alpha.lower)
                     LL.1 <- LL.2
                }
                LL.1 <- LL.2/(1 + Jumping.Prop)
                LL.Bounds <- c(LL.1, (LL.1 + LL.2)/2, LL.2)
-               Diff <- pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[2]) -
+               Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[2]) -
                     (1 - alpha.lower)
                while (abs(Diff) > tol) {
-                    Diff.1 <- pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[1]) -
+                    Diff.1 <- stats::pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[1]) -
                          (1 - alpha.lower) > tol
-                    Diff.2 <- pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[2]) -
+                    Diff.2 <- stats::pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[2]) -
                          (1 - alpha.lower) > tol
-                    Diff.3 <- pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[3]) -
+                    Diff.3 <- stats::pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[3]) -
                          (1 - alpha.lower) > tol
                     if (Diff.1 == TRUE & Diff.2 == TRUE & Diff.3 ==
                         FALSE) {
@@ -894,7 +887,7 @@ conf.limits.nc.chisq <- function (Chi.Square = NULL, conf.level = 0.95, df = NUL
                          LL.Bounds <- c(LL.Bounds[1], (LL.Bounds[1] +
                                                             LL.Bounds[2])/2, LL.Bounds[2])
                     }
-                    Diff <- pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[2]) -
+                    Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = LL.Bounds[2]) -
                          (1 - alpha.lower)
                }
                LL <- LL.Bounds[2]
@@ -905,11 +898,11 @@ conf.limits.nc.chisq <- function (Chi.Square = NULL, conf.level = 0.95, df = NUL
      if (alpha.upper > 0) {
           FAILED.Up <- NULL
           UL.0 <- LL + 0.01
-          Diff <- pchisq(q = Chi.Square, df = df, ncp = UL.0) -
+          Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.0) -
                alpha.upper
           if (Diff < 0)
                UL.0 <- 1e-08
-          Diff <- pchisq(q = Chi.Square, df = df, ncp = UL.0) -
+          Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.0) -
                alpha.upper
           if (Diff < 0) {
                FAILED.Up <- TRUE
@@ -920,18 +913,18 @@ conf.limits.nc.chisq <- function (Chi.Square = NULL, conf.level = 0.95, df = NUL
                UL.1 <- UL.2 <- UL.0
                while (Diff > tol) {
                     UL.2 <- UL.1 * (1 + Jumping.Prop)
-                    Diff <- pchisq(q = Chi.Square, df = df, ncp = UL.2) -
+                    Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.2) -
                          alpha.upper
                     UL.1 <- UL.2
                }
                UL.1 <- UL.2/(1 + Jumping.Prop)
                UL.Bounds <- c(UL.1, (UL.1 + UL.2)/2, UL.2)
-               Diff <- pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[2]) -
+               Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[2]) -
                     alpha.upper
                while (abs(Diff) > tol) {
-                    Diff.1 <- pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[1]) -
+                    Diff.1 <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[1]) -
                          alpha.upper > tol
-                    Diff.2 <- pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[2]) -
+                    Diff.2 <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[2]) -
                          alpha.upper > tol
                     Diff.3 <- pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[3]) -
                          alpha.upper > tol
@@ -945,7 +938,7 @@ conf.limits.nc.chisq <- function (Chi.Square = NULL, conf.level = 0.95, df = NUL
                          UL.Bounds <- c(UL.Bounds[1], (UL.Bounds[1] +
                                                             UL.Bounds[2])/2, UL.Bounds[2])
                     }
-                    Diff <- pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[2]) -
+                    Diff <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[2]) -
                          alpha.upper
                }
                UL <- UL.Bounds[2]
