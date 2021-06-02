@@ -5,28 +5,32 @@
 #'
 #' @description
 #' \loadmathjax
-#' This function computes a variety of supplemental statistics for meta-analyses. The statistics here are included for interested users. It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default \code{ma_obj} output (Wiernik et al., 2017).
+#' This function computes a variety of supplemental statistics for meta-analyses.
+#' The statistics here are included for interested users.
+#' It is strongly recommended that heterogeneity in meta-analysis be interpreted using the \mjeqn{SD_{res}}{SD_res}, \mjeqn{SD_{\rho}}{SD_\rho}, and \mjeqn{SD_{\delta}}{SD_\delta} statistics, along with corresponding credibility intervals, which are reported in the default `ma_obj` output (Wiernik et al., 2017).
 #'
 #' @param ma_obj Meta-analysis object.
 #' @param es_failsafe Failsafe effect-size value for file-drawer analyses.
 #' @param conf_level Confidence level to define the width of confidence intervals (default is `conf_level` specified in `ma_obj`).
-#' @param var_res_ci_method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \eqn{\sigma^{2}_{es} ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param var_res_ci_method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_{es} ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
 #' @param ... Additional arguments.
 #'
+#  TODO: profile_Q latex equation in all 3 functions should be once mathjaxr compilation is fixed: \lambda = \sum_{i = 1}^{k}{w_i(\theta - \bar{\theta})^{2}}
+#'
 #' @return ma_obj with heterogeneity statistics added. Included statistics include:
-#'      \item{\code{es_type}}{The effect size metric used.}
-#'      \item{\code{percent_var_accounted}}{Percent variance accounted for statistics (by sampling error, by other artifacts, and total). These statistics are widely reported, but not recommended, as they tend to be misinterpreted as suggesting only a small portion of the observed variance is accounted for by sampling error and other artifacts (Schmidt, 2010; Schmidt & Hunter, 2015, p. 15, 425). The square roots of these values are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts (see \code{cor(es, perturbations)}).}
-#'      \item{\code{cor(es, perturbations)}}{The correlation between observed effect sizes and statistical artifacts in each sample (with sampling error, with other artifacts, and with artifacts in total), computed as \eqn{\sqrt{percent\;var\;accounted}}{sqrt(percent_var_accounted)}. These indices are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts than \code{percent_var_accounted}.}
-#'      \item{\code{rel_es_obs}}{\eqn{1-\frac{var_{pre}}{var_{es}}}{1 - (var_pre / var_es)}, the reliability of observed effect size differences as indicators of true effect sizes differences in the sampled studies. This value is useful for correcting correlations between moderators and effect sizes in meta-regression.}
-#'      \item{\code{H_squared}}{The ratio of the observed effect size variance to the predicted (error) variance. Also the square root of \code{Q} divided by its degrees of freedom.}
-#'      \item{\code{H}}{The ratio of the observed effect size standard deviation to the predicted (error) standard deviation.}
-#'      \item{\code{I_squared}}{The estimated percent variance not accounted for by sampling error or other artifacts (attributable to moderators and uncorrected artifacts). This statistic is simply \code{rel_es_obs} expressed as a percentage rather than a decimal.}
-#'      \item{\code{Q}}{Cochran's \eqn{\chi^{2}}{\chi-squared} statistic. Significance tests using this statistic are strongly discouraged; heterogeneity should instead be determined by examining the width of the credibility interval and the practical differences between effect sizes contained within it (Wiernik et al., 2017). This value is not accurate when artifact distribution methods are used for corrections.}
-#'      \item{\code{tau_squared}}{\eqn{\tau^{2}}{\tau-squared}, an estimator of the random effects variance component (analogous to the Hunter-Schmidt \eqn{SD_{res}^{2}}{var_res}, \eqn{SD_{\rho}^{2}}{var_\rho}, or \eqn{SD_{\delta}^{2}}{var_\delta} statistics), with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
-#'      \item{\code{tau}}{\eqn{\sqrt{\tau^{2}}}{sqrt(\tau-squared)}, analogous to the Hunter-Schmidt \eqn{SD_{res}}{SD_res}, \eqn{SD_{\rho}}{SD_\rho}, and \eqn{SD_{\delta}}{SD_\delta} statistics, with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
-#'      \item{\code{Q_r}, \code{H_r_squared}, \code{H_r}, \code{I_r_squared}, \code{tau_r_squared}, \code{tau_r}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted mean effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
-#'      \item{\code{Q_m}, \code{H_m_squared}, \code{H_m}, \code{I_m_squared}, \code{tau_m_squared}, \code{tau_m}}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted median effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
-#'      \item{\code{file_drawer}}{Fail-safe \emph{N} and \emph{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
+#'      \item{`es_type`}{The effect size metric used.}
+#'      \item{`percent_var_accounted`}{Percent variance accounted for statistics (by sampling error, by other artifacts, and total). These statistics are widely reported, but not recommended, as they tend to be misinterpreted as suggesting only a small portion of the observed variance is accounted for by sampling error and other artifacts (Schmidt, 2010; Schmidt & Hunter, 2015, p. 15, 425). The square roots of these values are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts (see \code{cor(es, perturbations)}).}
+#'      \item{`cor(es, perturbations)`}{The correlation between observed effect sizes and statistical artifacts in each sample (with sampling error, with other artifacts, and with artifacts in total), computed as \mjeqn{\sqrt{percent\;var\;accounted}}{sqrt(percent_var_accounted)}. These indices are more interpretable and appropriate indices of the relations between observed effect sizes and statistical artifacts than \code{percent_var_accounted}.}
+#'      \item{`rel_es_obs`}{\mjeqn{1-\frac{var_{pre}}{var_{es}}}{1 - (var_pre / var_es)}, the reliability of observed effect size differences as indicators of true effect sizes differences in the sampled studies. This value is useful for correcting correlations between moderators and effect sizes in meta-regression.}
+#'      \item{`H_squared`}{The ratio of the observed effect size variance to the predicted (error) variance. Also the square root of \code{Q} divided by its degrees of freedom.}
+#'      \item{`H`}{The ratio of the observed effect size standard deviation to the predicted (error) standard deviation.}
+#'      \item{`I_squared`}{The estimated percent variance not accounted for by sampling error or other artifacts (attributable to moderators and uncorrected artifacts). This statistic is simply `rel_es_obs` expressed as a percentage rather than a decimal.}
+#'      \item{`Q`}{Cochran's \mjeqn{\chi^{2}}{\chi-squared} statistic. Significance tests using this statistic are strongly discouraged; heterogeneity should instead be determined by examining the width of the credibility interval and the practical differences between effect sizes contained within it (Wiernik et al., 2017). This value is not accurate when artifact distribution methods are used for corrections.}
+#'      \item{`tau_squared`}{\mjeqn{\tau^{2}}{\tau-squared}, an estimator of the random effects variance component (analogous to the Hunter-Schmidt \mjeqn{SD_{res}^{2}}{var_res}, \mjeqn{SD_{\rho}^{2}}{var_\rho}, or \mjeqn{SD_{\delta}^{2}}{var_\delta} statistics), with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
+#'      \item{`tau`}{\mjeqn{\sqrt{\tau^{2}}}{sqrt(\tau-squared)}, analogous to the Hunter-Schmidt \mjeqn{SD_{res}}{SD_res}, \mjeqn{SD_{\rho}}{SD_\rho}, and \mjeqn{SD_{\delta}}{SD_\delta} statistics, with its confidence interval. This value is not accurate when artifact distribution methods are used for corrections.}
+#'      \item{`Q_r`, `H_r_squared`, `H_r`, `I_r_squared`, `tau_r_squared`, `tau_r`}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted *mean* effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
+#'      \item{`Q_m`, `H_m_squared`, `H_m`, `I_m_squared`, `tau_m_squared`, `tau_m`}{Outlier-robust versions of these statistics, computed based on absolute deviations from the weighted *median* effect size (see Lin et al., 2017). These values are not accurate when artifact distribution methods are used for corrections.}
+#'      \item{`file_drawer`}{Fail-safe \mjseqn{N} and \mjseqn{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest *less* when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
 #'
 #'      Results are reported using computation methods described by Schmidt and Hunter.
 #'      For barebones and indivdiual-correction meta-analyses, results are also
@@ -39,29 +43,30 @@
 #'
 #' @references
 #' Becker, B. J. (2005).
-#' Failsafe \emph{N} or file-drawer number.
+#' Failsafe *N* or file-drawer number.
 #' In H. R. Rothstein, A. J. Sutton, & M. Borenstein (Eds.),
-#' \emph{Publication bias in meta-analysis: Prevention, assessment and adjustments} (pp. 111–125). Hoboken, NJ: Wiley. \doi{10.1002/0470870168.ch7}
+#' *Publication bias in meta-analysis: Prevention, assessment and adjustments* (pp. 111–125).
+#' Wiley. \doi{10.1002/0470870168.ch7}
 #'
 #' Higgins, J. P. T., & Thompson, S. G. (2002).
 #' Quantifying heterogeneity in a meta-analysis.
-#' \emph{Statistics in Medicine, 21}(11), 1539–1558. \doi{10.1002/sim.1186}
+#' *Statistics in Medicine, 21*(11), 1539–1558. \doi{10.1002/sim.1186}
 #'
 #' Lin, L., Chu, H., & Hodges, J. S. (2017).
 #' Alternative measures of between-study heterogeneity in meta-analysis: Reducing the impact of outlying studies.
-#' \emph{Biometrics, 73}(1), 156–166. \doi{10.1111/biom.12543}
+#' *Biometrics, 73*(1), 156–166. \doi{10.1111/biom.12543}
 #'
 #' Schmidt, F. (2010).
 #' Detecting and correcting the lies that data tell.
-#' \emph{Perspectives on Psychological Science, 5}(3), 233–242. \doi{10.1177/1745691610369339}
+#' *Perspectives on Psychological Science, 5*(3), 233–242. \doi{10.1177/1745691610369339}
 #'
 #' Schmidt, F. L., & Hunter, J. E. (2015).
-#' \emph{Methods of meta-analysis: Correcting error and bias in research findings} (3rd ed.).
+#' *Methods of meta-analysis: Correcting error and bias in research findings* (3rd ed.).
 #' Sage. \doi{10.4135/9781483398105}. pp. 15, 414, 426, 533–534.
 #'
 #' Wiernik, B. M., Kostal, J. W., Wilmot, M. P., Dilchert, S., & Ones, D. S. (2017).
 #' Empirical benchmarks for interpreting effect size variability in meta-analysis.
-#' \emph{Industrial and Organizational Psychology, 10}(3). \doi{10.1017/iop.2017.44}
+#' *Industrial and Organizational Psychology, 10*(3). \doi{10.1017/iop.2017.44}
 #'
 #'
 #' @examples
@@ -723,7 +728,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @param var_es The observed variance of effect sizes.
 #' @param var_pre The predicted variance of effect sizes due to artifacts.
 #' @param k The number of studies in a meta-analysis.
-#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
 #' @param conf_level Confidence level.
 #' @param var_unbiased Are variances computed using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
 #'
@@ -774,7 +779,7 @@ limits_tau2 <- function(var_es, var_pre, k, method = c("profile_var_es", "profil
 #' @param var_es The observed variance of effect sizes.
 #' @param var_pre The predicted variance of effect sizes due to artifacts.
 #' @param k The number of studies in a meta-analysis.
-#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \eqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \eqn{Q ~ \chi^{2}(k-1, \lambda), \lambda = \sum_{i=1}^{k} w_i(\theta - \bar{\theta})^{2}}{Q ~ chi-squared (k - 1, lambda), lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
+#' @param method Which method to use to estimate the limits. Options are `profile_var_es` for a profile-likelihood interval assuming \mjeqn{\sigma^{2}_es ~ \chi^{2}(k-1)}{var_es ~ chi-squared (k - 1)}, `profile_Q` for a profile-likelihood interval assuming \mjeqn{Q ~ \chi^{2}(k-1, \lambda)}{Q ~ chi-squared (k - 1, lambda)}, \mjeqn{\lambda = \sum{w_i(\theta - \bar{\theta})^{2}}}{lambda = true_Q = sum(wi * (true_es - mean_true_es)^2)}, and `normal_logQ` for a delta method assuming log(Q) follows a standard normal distribution.
 #' @param conf_level Confidence level.
 #' @param var_unbiased Are variances computed using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
 #'
