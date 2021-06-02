@@ -59,8 +59,6 @@
 \item{ma_method}{What artifact correction method is used. Options are "bb", "ic", and "ad".}
 
 \item{var_unbiased}{Are variances calculated using the unbiased (\code{TRUE}) or maximum likelihood (\code{FALSE}) estimator?}
-
-\item{var_res_ci_method}{Method to use to estimate a confidence interval for \code{var_res}. See \code{\link[=heterogeneity]{heterogeneity()}} for details.}
 }
 \value{
 A list of heterogeneity statistics.

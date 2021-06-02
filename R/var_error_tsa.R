@@ -17,7 +17,7 @@
 #' @param qx_restricted Logical vector determining whether each element of qx is derived from an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
 #' @param qy  Vector of square roots of reliability estimates for X.
 #' @param qy_restricted Logical vector determining whether each element of qy is derived from an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).
-#' @param qx_type,qy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.
+#' @param qx_type,qy_type String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link[=ma_r]{ma_r()}} for a full list of acceptable reliability types.
 #' @param k_items_x,k_items_y Numeric vector identifying the number of items in each scale.
 #' @param mean_rxyi Mean observed correlation.
 #' @param mean_ux Mean observed-score u ratio for X (for use in estimating sampling errors in the context of a meta-analysis).
@@ -47,27 +47,27 @@
 #' @export
 #'
 #' @details
-#' Per the principles of propagation of uncertainty and assuming that \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{a}}}{qya}, \eqn{u_{X}}{ux}, \eqn{u_{Y}}{uy}, and \eqn{\rho_{XY_{i}}}{rxyi}, are independent, we can derive a linear approximation of the sampling error of \eqn{\rho_{TP_{a}}}{rtpa}. We begin with the bivariate indirect range restriction formula,
+#' Per the principles of propagation of uncertainty and assuming that \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{a}}}{qya}, \mjeqn{u_{X}}{ux}, \mjeqn{u_{Y}}{uy}, and \mjeqn{\rho_{XY_{i}}}{rxyi}, are independent, we can derive a linear approximation of the sampling error of \mjeqn{\rho_{TP_{a}}}{rtpa}. We begin with the bivariate indirect range restriction formula,
 #'
-#' \deqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{q_{X_{a}}q_{Y_{a}}}}{rtpa = (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (qxa * qya)}
+#' \mjdeqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{q_{X_{a}}q_{Y_{a}}}}{rtpa = (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (qxa * qya)}
 #'
-#' which implies the following linear approximation of the sampling variance of \eqn{\rho_{TP_{a}}}{rtpa}:
+#' which implies the following linear approximation of the sampling variance of \mjeqn{\rho_{TP_{a}}}{rtpa}:
 #'
-#' \deqn{SE_{\rho_{TP_{a}}}^{2}=b_{1}^{2}SE_{q_{X_{a}}}^{2}+b_{2}^{2}SE_{q_{Y_{a}}}^{2}+b_{3}^{2}SE_{u_{X}}^{2}+b_{4}^{2}SE_{u_{Y}}^{2}+b_{5}^{2}SE_{\rho_{XY_{i}}}^{2}}{var_rtpa ~= b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy + b5^2 * var_rxyi}
+#' \mjdeqn{SE_{\rho_{TP_{a}}}^{2}=b_{1}^{2}SE_{q_{X_{a}}}^{2}+b_{2}^{2}SE_{q_{Y_{a}}}^{2}+b_{3}^{2}SE_{u_{X}}^{2}+b_{4}^{2}SE_{u_{Y}}^{2}+b_{5}^{2}SE_{\rho_{XY_{i}}}^{2}}{var_rtpa ~= b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy + b5^2 * var_rxyi}
 #'
-#' where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, \eqn{b_{4}}{b4}, and \eqn{b_{5}}{b5} are the first-order partial derivatives of the disattenuation formula with respect to \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{a}}}{qya}, \eqn{u_{X}}{ux}, \eqn{u_{Y}}{uy}, and \eqn{\rho_{XY_{i}}}{rxyi}, respectively. These partial derivatives are computed as follows:
+#' where \mjeqn{b_{1}}{b1}, \mjeqn{b_{2}}{b2}, \mjeqn{b_{3}}{b3}, \mjeqn{b_{4}}{b4}, and \mjeqn{b_{5}}{b5} are the first-order partial derivatives of the disattenuation formula with respect to \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{a}}}{qya}, \mjeqn{u_{X}}{ux}, \mjeqn{u_{Y}}{uy}, and \mjeqn{\rho_{XY_{i}}}{rxyi}, respectively. These partial derivatives are computed as follows:
 #'
-#' \deqn{b_{1}=\frac{\partial\rho_{TP_{a}}}{\partial q_{X_{a}}}=-\frac{\rho_{TP_{a}}}{q_{X_{a}}}}{b1 = -rtpa / qxa}
-#' \deqn{b_{2}=\frac{\partial\rho_{TP_{a}}}{\partial q_{Y_{a}}}=-\frac{\rho_{TP_{a}}}{q_{Y_{a}}}}{b2 = -rtpa / qya}
-#' \deqn{b_{3}=\frac{\partial\rho_{TP_{a}}}{\partial u_{X}}=\left[\rho_{XY_{i}}u_{Y}-\frac{\lambda u_{X}\left(1-u_{X}^{2}\right)\sqrt{\left|1-u_{Y}^{2}\right|}}{\left|1-u_{X}^{2}\right|^{1.5}}\right]/\left(q_{X_{a}}q_{Y_{a}}\right)}{b3 = (rxyi * uy - (lambda * ux * (1 - ux^2) * sqrt(abs(1 - uy^2))) / abs(1 - ux^2)^1.5) / (qxa * qya)}
-#' \deqn{b_{4}=\frac{\partial\rho_{TP_{a}}}{\partial u_{Y}}=\left[\rho_{XY_{i}}u_{X}-\frac{\lambda u_{Y}\left(1-u_{Y}^{2}\right)\sqrt{\left|1-u_{X}^{2}\right|}}{\left|1-u_{Y}^{2}\right|^{1.5}}\right]/\left(q_{X_{a}}q_{Y_{a}}\right)}{b4 = (rxyi * ux - (lambda * uy * (1 - uy^2) * sqrt(abs(1 - ux^2))) / abs(1 - uy^2)^1.5) / (qxa * qya)}
-#' \deqn{b_{5}=\frac{\partial\rho_{TP_{a}}}{\partial\rho_{XY_{i}}}=\frac{u_{X}u_{Y}}{q_{X_{a}}q_{Y_{a}}}}{b5 = (ux * uy) / (qxa * qya)}
+#' \mjdeqn{b_{1}=\frac{\partial\rho_{TP_{a}}}{\partial q_{X_{a}}}=-\frac{\rho_{TP_{a}}}{q_{X_{a}}}}{b1 = -rtpa / qxa}
+#' \mjdeqn{b_{2}=\frac{\partial\rho_{TP_{a}}}{\partial q_{Y_{a}}}=-\frac{\rho_{TP_{a}}}{q_{Y_{a}}}}{b2 = -rtpa / qya}
+#' \mjdeqn{b_{3}=\frac{\partial\rho_{TP_{a}}}{\partial u_{X}}=\left[\rho_{XY_{i}}u_{Y}-\frac{\lambda u_{X}\left(1-u_{X}^{2}\right)\sqrt{\left|1-u_{Y}^{2}\right|}}{\left|1-u_{X}^{2}\right|^{1.5}}\right]/\left(q_{X_{a}}q_{Y_{a}}\right)}{b3 = (rxyi * uy - (lambda * ux * (1 - ux^2) * sqrt(abs(1 - uy^2))) / abs(1 - ux^2)^1.5) / (qxa * qya)}
+#' \mjdeqn{b_{4}=\frac{\partial\rho_{TP_{a}}}{\partial u_{Y}}=\left[\rho_{XY_{i}}u_{X}-\frac{\lambda u_{Y}\left(1-u_{Y}^{2}\right)\sqrt{\left|1-u_{X}^{2}\right|}}{\left|1-u_{Y}^{2}\right|^{1.5}}\right]/\left(q_{X_{a}}q_{Y_{a}}\right)}{b4 = (rxyi * ux - (lambda * uy * (1 - uy^2) * sqrt(abs(1 - ux^2))) / abs(1 - uy^2)^1.5) / (qxa * qya)}
+#' \mjdeqn{b_{5}=\frac{\partial\rho_{TP_{a}}}{\partial\rho_{XY_{i}}}=\frac{u_{X}u_{Y}}{q_{X_{a}}q_{Y_{a}}}}{b5 = (ux * uy) / (qxa * qya)}
 #'
-#' @md
+#' @noMd
 #' @references
 #' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
+#' \emph{Organizational Research Methods, 23}(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' @examples
 #' var_error_r_bvirr(rxyi = .3, var_e = var_error_r(r = .3, n = 100), ni = 100,
