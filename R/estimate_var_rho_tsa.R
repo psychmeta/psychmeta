@@ -10,13 +10,13 @@
 #'
 #' The available Taylor-series functions include:
 #' \itemize{
-#'      \item{`estimate_var_rho_tsa_meas`}{\cr Variance of \mjseqn{\rho} corrected for measurement error only}
-#'      \item{`estimate_var_rho_tsa_uvdrr`}{\cr Variance of \mjseqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-#'      \item{`estimate_var_rho_tsa_bvdrr`}{\cr Variance of \mjseqn{\rho} corrected for bivariate direct range restriction and measurement error}
-#'      \item{`estimate_var_rho_tsa_uvirr`}{\cr Variance of \mjseqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-#'      \item{`estimate_var_rho_tsa_bvirr`}{\cr Variance of \mjseqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-#'      \item{`estimate_var_rho_tsa_rb1`}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
-#'      \item{`estimate_var_rho_tsa_rb2`}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
+#'      \item{\code{estimate_var_rho_tsa_meas}}{\cr Variance of \mjseqn{\rho} corrected for measurement error only}
+#'      \item{\code{estimate_var_rho_tsa_uvdrr}}{\cr Variance of \mjseqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+#'      \item{\code{estimate_var_rho_tsa_bvdrr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate direct range restriction and measurement error}
+#'      \item{\code{estimate_var_rho_tsa_uvirr}}{\cr Variance of \mjseqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+#'      \item{\code{estimate_var_rho_tsa_bvirr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+#'      \item{\code{estimate_var_rho_tsa_rb1}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
+#'      \item{\code{estimate_var_rho_tsa_rb2}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
 #' }
 #'
 #' @param mean_rtp Mean corrected correlation.
@@ -51,20 +51,20 @@
 #' @return Vector of meta-analytic variances estimated via Taylor series approximation.
 #'
 #' @section Notes:
-#' A typographical error in Raju and Burke's article has been corrected in `estimate_var_rho_tsa_rb2` so as to compute appropriate partial derivatives.
+#' A typographical error in Raju and Burke's article has been corrected in \code{estimate_var_rho_tsa_rb2} so as to compute appropriate partial derivatives.
 #'
-#' @md
+#' @noMd
 #' @references
 #' Dahlke, J. A., & Wiernik, B. M. (2020). Not restricted to selection research:
 #' Accounting for indirect range restriction in organizational research.
-#' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
+#' \emph{Organizational Research Methods, 23}(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' Hunter, J. E., Schmidt, F. L., & Le, H. (2006).
 #' Implications of direct and indirect range restriction for meta-analysis methods and findings.
-#' *Journal of Applied Psychology, 91*(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
+#' \emph{Journal of Applied Psychology, 91}(3), 594–612. \doi{10.1037/0021-9010.91.3.594}
 #'
 #' Raju, N. S., & Burke, M. J. (1983). Two new procedures for studying validity generalization.
-#' *Journal of Applied Psychology, 68*(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
+#' \emph{Journal of Applied Psychology, 68}(3), 382–395. \doi{10.1037/0021-9010.68.3.382}
 #'
 #'
 #' @details

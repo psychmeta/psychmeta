@@ -730,6 +730,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @return The confidence limits of tau-squared
 #'
 #' @export
+#' @noMd
 #'
 #' @examples
 #' limits_tau2(var_es = 0.008372902, var_pre = 0.004778935, k = 20)
@@ -780,6 +781,7 @@ limits_tau2 <- function(var_es, var_pre, k, method = c("profile_var_es", "profil
 #' @return The confidence limits of tau
 #'
 #' @export
+#' @noMd
 #'
 #' @examples
 #' limits_tau(var_es = 0.008372902, var_pre = 0.004778935, k = 20)
