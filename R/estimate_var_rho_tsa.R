@@ -233,7 +233,7 @@
 #'
 #' \mjdeqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}u_{X}}{\sqrt{\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}u_{X}^{2}-\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1}}}{rxyi = (rtpa * qya * qxa * ux) / sqrt(rtpa^2 * qya^2 * qxa^2 * ux^2 - rtpa^2 * qya^2 * qxa^2 + 1)}
 #'
-#' The Taylor series approximation of the variance of \eqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
+#' The Taylor series approximation of the variance of \mjeqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
 #'
 #' \mjdeqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(F^{2}var_{q_{Y_{a}}}+G^{2}var_{q_{X_{a}}}+H^{2}var_{u_{X}}\right)\right]/E^{2}}{var_rtpa ~= (var_rxyi - var_e - (F^2 * var_qya + G^2 * var_qxa + H^2 * var_ux)) / E^2}
 #'
