@@ -460,7 +460,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @param wt_type Weighting method.
 #' @param ma_method What artifact correction method is used. Options are "bb", "ic", and "ad".
 #' @param var_unbiased Are variances calculated using the unbiased (`TRUE`) or maximum likelihood (`FALSE`) estimator?
-#' @param var_res_ci_method Method to use to estimate a confidence interval for `var_res`. See \code\link[=heterogeneity]{heterogeneity()}} for details.
+#' @param var_res_ci_method Method to use to estimate a confidence interval for `var_res`. See \code{\link[=heterogeneity]{heterogeneity()}} for details.
 #'
 #' @return A list of heterogeneity statistics.
 #' @md
@@ -928,7 +928,7 @@ conf.limits.nc.chisq <- function (Chi.Square = NULL, conf.level = 0.95, df = NUL
                          alpha.upper > tol
                     Diff.2 <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[2]) -
                          alpha.upper > tol
-                    Diff.3 <- pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[3]) -
+                    Diff.3 <- stats::pchisq(q = Chi.Square, df = df, ncp = UL.Bounds[3]) -
                          alpha.upper > tol
                     if (Diff.1 == TRUE & Diff.2 == TRUE & Diff.3 ==
                         FALSE) {
