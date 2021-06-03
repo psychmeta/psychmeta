@@ -748,7 +748,7 @@ limits_tau2 <- function(var_es, var_pre, k, method = c("profile_var_es", "profil
              ci_var_es <- c(var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = FALSE),
                             var_es * df / qchisq((1 - conf_level)/2, df, lower.tail = TRUE))
              ci_var_res <- ci_var_es - var_pre
-     } else if (method == "normal_log") {
+     } else if (method == "normal_logQ") {
              Q <- (var_es / var_pre) * ifelse(var_unbiased == TRUE, df, k)
              se_log_Q <- rep(NA, length(Q))
              se_log_Q[Q > df]  <- ((log(Q) - log(df)) / (sqrt(2 * Q) - sqrt(2 * df - 1)))[Q > df]
@@ -756,7 +756,7 @@ limits_tau2 <- function(var_es, var_pre, k, method = c("profile_var_es", "profil
 
              ci_log_Q <- log(Q) + c(-1, 1) * qnorm((1 - conf_level) / 2, lower.tail = FALSE) * se_log_Q
              ci_Q <- exp(ci_log_Q)
-             ci_var_es <- ci_Q * var_pre / ifelse(var_unbiased == TRUE, df, k) - var_pre
+             ci_var_res <- ci_Q * var_pre / ifelse(var_unbiased == TRUE, df, k) - var_pre
      }
 
      ci_var_res[ci_var_res < 0] <- 0
