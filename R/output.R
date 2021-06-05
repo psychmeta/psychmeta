@@ -761,26 +761,23 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
                       return(meta_tables)
                  }
 
-                      # TODO: If the bug with `bibliography: ` YAML metadata gets fixed, move this line to
-                      # the same metadata block as citations and style below.
                       if (!is.null(bib)) {
                            # Write the bibliography file
                            # Ignore save_build_files
-                           bib_file <- file.path(output_dir, sub(x = file, pattern = "\\.(rmd|pdf|docx|html|odt)$", replacement = "\\.bib", ignore.case = TRUE))
+                           bib_file <- file.path(output_dir, ifelse(is.null(file), "bibliography.bib", sub(x = file, pattern = "\\.(rmd|pdf|docx|html|odt)$", replacement = "\\.bib", ignore.case = TRUE)))
                            file.copy(bib, bib_file, overwrite = TRUE)
-
-                           sprintf("---\n### These metadata lines must be placed in your RMarkdown document main YAML header! ###\nbibliography: %s",
-                                   bib_file)
 
                            if (is.null(title.bib)) title.bib <- "# Sources Contributing to Meta-Analyses"
 
-                           cat(rep("\n", 2*as.numeric(is.null(meta_tables))),
-                               title.bib,
-                               "\n\n---\n"
-                           )
+                           cat(rep("\n", 2*as.numeric(is.null(meta_tables))))
+                           cat(title.bib)
+                           cat("\n\n---\n")
 
-                           if (!is.null(style)) sprintf("csl: %s\n", style )
-                           sprintf('nocite: |\n  %s\n---\n', citations)
+                           if (!is.null(style)) {
+                             cat(sprintf("csl: %s\n", style))
+                           }
+                           cat(sprintf('bibliography:\n  - %s\n', bib_file))
+                           cat(sprintf('nocite: |\n  %s\n---\n', citations))
 
                            invisible(bib_df)
                       }

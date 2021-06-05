@@ -3,6 +3,9 @@ Changes in development version
 
 - Bug fix in limits_tau2() when method == "normal_logQ".
 
+- Update generate_bib() and metabulate() to permit direct rendering of bibliographies in RMarkdown documents
+  (after https://github.com/rstudio/rmarkdown/issues/1364)
+
 Changes in Version 2.6.0 (2021-05-31)
 ======================================
 
