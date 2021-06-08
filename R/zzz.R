@@ -188,12 +188,14 @@
 #'
 #' @export
 #'
-#' @importFrom utils news
-#'
 #' @examples
 #' psychmeta_news()
 psychmeta_news <- function(){
-     news(package = "psychmeta")
+  if (requireNamespace("commonmark", quietly = TRUE)) {
+    utils::news(package = "psychmeta")
+  } else {
+    message("Run install.packages('commonmark') to view psychmeta news.")
+  }
 }
 
 register_s3_method <- function(pkg, generic, class, fun = NULL) {
