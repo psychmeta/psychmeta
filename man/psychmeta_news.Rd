@@ -2,12 +2,12 @@
 % Please edit documentation in R/zzz.R
 \name{psychmeta_news}
 \alias{psychmeta_news}
-\title{Retrieve the NEWS file for the psychmeta package}
+\title{Retrieve the \code{NEWS} file for the \emph{psychmeta} package}
 \usage{
 psychmeta_news()
 }
 \description{
-This function gives a shortcut to the \code{utils::news(package = "psychmeta")} function and displays psychmeta's NEWS file, which contains version information, outlines additions and changes to the package, and describes other updates.
+Displays \emph{psychmeta}'s \code{NEWS} file, which contains version information, outlines additions and changes to the package, and describes other updates.
 }
 \examples{
 psychmeta_news()
