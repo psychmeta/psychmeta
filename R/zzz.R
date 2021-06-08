@@ -224,3 +224,4 @@ register_s3_method <- function(pkg, generic, class, fun = NULL) {
 # Supplemental imports
 #' @importFrom rlang .data
 #' @import mathjaxr
+NULL
