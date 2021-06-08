@@ -5,7 +5,6 @@
 
 <!-- badges: start -->
 [![CRAN Version](https://r-pkg.org/badges/version/psychmeta)](https://cran.r-project.org/package=psychmeta "CRAN version")
-[![Build Status](https://travis-ci.org/psychmeta/psychmeta.svg?branch=master)](https://travis-ci.org/psychmeta/psychmeta "Build status")
 [![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/psychmeta)](https://cranlogs.r-pkg.org/badges/grand-total/psychmeta "Total downloads")
 [![Monthly Downloads](https://cranlogs.r-pkg.org/badges/psychmeta)](https://cranlogs.r-pkg.org/badges/psychmeta "Monthly downloads")
 [![R-CMD-check](https://github.com/psychmeta/psychmeta/workflows/R-CMD-check/badge.svg)](https://github.com/psychmeta/psychmeta/actions)
