@@ -2,7 +2,7 @@
 
 - Bug fix in `limits_tau2()` when `method == "normal_logQ"`.
 
-- Update `generate_bib()` and `metabulate()` to permit direct rendering of bibliographies in RMarkdown documents (after https://github.com/rstudio/rmarkdown/issues/1364)
+- Update `generate_bib()` and `metabulate()` to permit direct rendering of bibliographies in RMarkdown documents ([rmarkdown #1364](https://github.com/rstudio/rmarkdown/issues/1364))
   
 - Changed the *psychmeta* NEWS file to NEWS.md for easier viewing.
 
@@ -456,7 +456,7 @@ Hotfix for missing object in the dependency resolution procedure when no moderat
 
 - A new `ma_generic()` function has been added that allow users to do a *psychmeta*-style meta-analysis for any effect size for which the user has error-variance estimates. This function is supported by *psychmeta*'s `sensitivity()` and `heterogeneity()` functions.
 
-- Taylor series methods for estimating the variance of converted artifact values (e.g., a $r_xx_i$ distribution converted to a $r_xx_a$ distribution) have been expanded to account for the correlation between artifact distributions when such information is available. Correlations among artifacts' sampling distributions can also be passed to the `var_error_r_bvirr()` function when it is called outside of a meta-analysis routine.
+- Taylor series methods for estimating the variance of converted artifact values (e.g., a *r<sub>xxi</sub>* distribution converted to a *r<sub>xxa</sub>* distribution) have been expanded to account for the correlation between artifact distributions when such information is available. Correlations among artifacts' sampling distributions can also be passed to the `var_error_r_bvirr()` function when it is called outside of a meta-analysis routine.
 
 - The implementation of corrections of bivariate range restriction in individual-correction meta-analyses have been updated. Corrections for bivariate direct range restriction now use conventional compound attenuation factors, while the attenuation factors for bivariate indirect range restriction are now computed using mean effect sizes and artifacts to estimate sampling variances.
 
