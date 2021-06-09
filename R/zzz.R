@@ -181,19 +181,20 @@
 }
 
 
-#' Retrieve the NEWS file for the psychmeta package
+#' Retrieve the `NEWS` file for the *psychmeta* package
 #'
 #' @description
-#' This function gives a shortcut to the \code{utils::news(package = "psychmeta")} function and displays psychmeta's NEWS file, which contains version information, outlines additions and changes to the package, and describes other updates.
+#' Displays *psychmeta*'s `NEWS` file, which contains version information, outlines additions and changes to the package, and describes other updates.
 #'
 #' @export
-#'
-#' @importFrom utils news
+#' @md
 #'
 #' @examples
 #' psychmeta_news()
 psychmeta_news <- function(){
-     news(package = "psychmeta")
+  # TODO: Once the pkgdown site is running, change this to:
+  # utils::browseURL("https://psychmeta.com/news/index.html")
+  utils::browseURL("https://github.com/psychmeta/psychmeta/blob/master/NEWS.md")
 }
 
 register_s3_method <- function(pkg, generic, class, fun = NULL) {
