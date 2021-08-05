@@ -33,7 +33,7 @@ Suggests:
     cli, 
     crayon,
     testthat (>= 2.1.0)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.1.9001
 NeedsCompilation: no
 Packaged: 2020-09-07 17:03:30 UTC; jeffreydahlke
 Author: Jeffrey A. Dahlke [aut, cre],

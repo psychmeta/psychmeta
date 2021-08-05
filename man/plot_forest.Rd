@@ -12,8 +12,8 @@ plot_forest(
   show_filtered = FALSE,
   ma_facetname = "Summary",
   facet_levels = NULL,
-  conf_level = 0.95,
-  conf_method = "t",
+  conf_level = NULL,
+  conf_method = NULL,
   x_limits = NULL,
   x_breaks = NULL,
   x_lab = NULL,
@@ -23,7 +23,7 @@ plot_forest(
 \arguments{
 \item{ma_obj}{Meta-analysis object.}
 
-\item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing arguments for [filter_ma].}
+\item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing arguments for \code{\link[=filter_ma]{filter_ma()}}.}
 
 \item{match}{Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?}
 
@@ -31,13 +31,13 @@ plot_forest(
 
 \item{show_filtered}{Logical scalar that determines whether the meta-analysis object given in the output should be the modified input object (\code{FALSE}, default) or the filtered object (\code{TRUE}).}
 
-\item{ma_facetname}{Label to use for meta-analysis results in the \code{facet_grid()} function from \code{ggplot2}.}
+\item{ma_facetname}{Label to use for meta-analysis results in the \code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}} function.}
 
 \item{facet_levels}{Order in which moderator levels should be displayed.}
 
-\item{conf_level}{Confidence level to define the width of the confidence interval (default = .95).}
+\item{conf_level}{Confidence level to define the width of the confidence interval. If \code{NULL} (default), uses the level set when \code{ma_obj} was estimated.}
 
-\item{conf_method}{Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.}
+\item{conf_method}{Distribution to be used to compute confidence intervals (either \code{"t"} for \emph{t} distribution or \code{"norm"} for normal distribution). If \code{NULL} (default), uses the method set when \code{ma_obj} was estimated.}
 
 \item{x_limits}{Span of the X values to be plotted.}
 

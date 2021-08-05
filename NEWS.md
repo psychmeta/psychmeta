@@ -6,6 +6,8 @@
   
 - Changed the *psychmeta* NEWS file to NEWS.md for easier viewing.
 
+- In `plot_forest()`, by default, use the same `conf_method` and `conf_level` values as used when the meta-analysis model was fit.
+
 
 # psychmeta 2.6.0 (2021-05-31)
 
