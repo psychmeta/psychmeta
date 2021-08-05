@@ -297,18 +297,20 @@ plot_cefp <- function(ma_obj,
 #' Create forest plots
 #'
 #' @param ma_obj Meta-analysis object.
-#' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing arguments for [filter_ma].
-#' @param match Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?
-#' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
-#' @param show_filtered Logical scalar that determines whether the meta-analysis object given in the output should be the modified input object (\code{FALSE}, default) or the filtered object (\code{TRUE}).
-#' @param ma_facetname Label to use for meta-analysis results in the \code{facet_grid()} function from \code{ggplot2}.
+#' @param analyses Which analyses to extract? Can be either `"all"` to extract references for all meta-analyses in the object (default) or a list containing arguments for [filter_ma()].
+#' @param match Should extracted meta-analyses match all (default) or any of the criteria given in `analyses`?
+#' @param case_sensitive Logical scalar that determines whether character values supplied in `analyses` should be treated as case sensitive (`TRUE`, default) or not (`FALSE`).
+#' @param show_filtered Logical scalar that determines whether the meta-analysis object given in the output should be the modified input object (`FALSE`, default) or the filtered object (`TRUE`).
+#' @param ma_facetname Label to use for meta-analysis results in the [ggplot2::facet_grid()] function.
 #' @param facet_levels Order in which moderator levels should be displayed.
-#' @param conf_level Confidence level to define the width of the confidence interval (default = .95).
-#' @param conf_method Distribution to be used to compute the width of confidence intervals. Available options are "t" for \emph{t} distribution or "norm" for normal distribution.
+#' @param conf_level Confidence level to define the width of the confidence interval. If `NULL` (default), uses the level set when `ma_obj` was estimated.
+#' @param conf_method Distribution to be used to compute confidence intervals (either `"t"` for *t* distribution or `"norm"` for normal distribution). If `NULL` (default), uses the method set when `ma_obj` was estimated.
 #' @param x_limits Span of the X values to be plotted.
 #' @param x_breaks Breaks for the X values to be plotted.
 #' @param x_lab Label to use for the X axis.
 #' @param y_lab Label to use for the Y axis.
+#'
+#' @md
 #'
 #' @return A list of forest plots.
 #' @export
@@ -334,7 +336,7 @@ plot_cefp <- function(ma_obj,
 #' }
 plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_sensitive = TRUE, show_filtered = FALSE,
                         ma_facetname = "Summary", facet_levels = NULL,
-                        conf_level = .95, conf_method = "t",
+                        conf_level = NULL, conf_method = NULL,
                         x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference"){
 
      psychmeta.show_progress <- options()$psychmeta.show_progress
@@ -357,7 +359,24 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      }
 
      ma_obj_filtered <- filter_ma(ma_obj = ma_obj, analyses = analyses, match = match, case_sensitive = case_sensitive, leave_as_master = TRUE)
-     if(show_filtered) ma_obj <- ma_obj_filtered
+     if (show_filtered) {
+       ma_obj <- ma_obj_filtered
+     }
+
+     if (is.null(conf_method) & is.null(conf_level)) {
+       recompute_ci <- FALSE
+     } else {
+       recompute_ci <- TRUE
+     }
+
+     if (is.null(conf_method)) {
+       conf_method <- attr(ma_obj, "inputs")$conf_method
+       recompute_CI <- FALSE
+     }
+
+     if (is.null(conf_level)) {
+       conf_level <- attr(ma_obj, "inputs")$conf_level
+     }
 
      analysis_id <- as.list(ma_obj_filtered$analysis_id)
      names(analysis_id) <- unlist(analysis_id)
@@ -372,24 +391,28 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                barebones <- .plot_forest(ma_obj = x, ma_method = "bb", ma_metric = ma_metric,
                                          ma_facetname = ma_facetname, facet_levels = facet_levels,
                                          conf_level = conf_level, conf_method = conf_method,
-                                         x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab)
+                                         x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
+                                         recompute_ci = recompute_ci)
 
 
                if("ic" %in% ma_methods){
                     individual_correction <- list(ts = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "ts", ma_metric = ma_metric,
                                                                ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                                conf_level = conf_level, conf_method = conf_method,
-                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
+                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
+                                                               recompute_ci = recompute_ci),
 
                                                   vgx = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgx", ma_metric = ma_metric,
                                                                ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                                conf_level = conf_level, conf_method = conf_method,
-                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
+                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
+                                                               recompute_ci = recompute_ci),
 
                                                   vgy = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgy", ma_metric = ma_metric,
                                                                ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                                conf_level = conf_level, conf_method = conf_method,
-                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab))
+                                                               x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
+                                                               recompute_ci = recompute_ci))
 
                }else{
                     individual_correction <- NULL
@@ -411,24 +434,28 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
           barebones <- .plot_forest(ma_obj = x, ma_method = "bb", ma_metric = ma_metric,
                                     ma_facetname = ma_facetname, facet_levels = facet_levels,
                                     conf_level = conf_level, conf_method = conf_method,
-                                    x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab)
+                                    x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
+                                    recompute_ci = recompute_ci)
 
 
           if("ic" %in% ma_methods){
                individual_correction <- list(ts = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "ts", ma_metric = ma_metric,
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
-                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
+                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
+                                                          recompute_ci = recompute_ci),
 
                                              vgx = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgx", ma_metric = ma_metric,
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
-                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab),
+                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_la,
+                                                          recompute_ci = recompute_ci),
 
                                              vgy = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgy", ma_metric = ma_metric,
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
-                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab))
+                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
+                                                          recompute_ci = recompute_ci))
 
           }else{
                individual_correction <- NULL
@@ -702,7 +729,8 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 .plot_forest <- function(ma_obj, ma_method = "bb", correction_type = "ts",  ma_metric = "r_as_r",
                          pair_id = NULL, ma_facetname = "Summary", facet_levels = NULL,
                          conf_level = .95, conf_method = "t",
-                         x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference", ...){
+                         x_limits = NULL, x_breaks = NULL, x_lab = NULL, y_lab = "Reference",
+                         recompute_ci = TRUE, ...){
      .ma_method <- ma_method
      ma_method[ma_method == "bb"] <- "barebones"
      ma_method[ma_method == "ic"] <- "individual_correction"
@@ -762,15 +790,23 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 
 
      mat <- as.data.frame(mat, stringsAsFactors = FALSE)
-     conf_out <- confidence(mean = unlist(mat[,mean_es]),
-                            sd = unlist(mat[,sd_es]),
-                            k = unlist(mat[,"k"]),
-                            conf_level = conf_level, conf_method = conf_method)
+     if (isFALSE(recompute_ci)) {
+       conf_out <- mat[, paste("CI", c("LL", "UL"), conf_level * 100, sep = "_")]
+     } else {
+       conf_out <- confidence(
+         mean = mat[, mean_es, drop = TRUE],
+         sd = mat[, sd_es, drop = TRUE],
+         k = mat[, "k", drop = TRUE],
+         conf_level = conf_level,
+         conf_method = conf_method
+       )
+     }
      colnames(conf_out) <- c("lowerci", "upperci")
      mat <- data.frame(tester = "Summary",
                        setting = ma_facetname,
                        cite = setting,
                        yi = unlist(mat[,mean_es]), stringsAsFactors = FALSE)
+     # TODO: Give better names to these columns...
      colnames(mat) <- c("tester", "setting", "cite", "yi")
      mat <- cbind(mat, conf_out)
 
