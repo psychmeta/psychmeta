@@ -448,7 +448,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                                              vgx = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgx", ma_metric = ma_metric,
                                                           ma_facetname = ma_facetname, facet_levels = facet_levels,
                                                           conf_level = conf_level, conf_method = conf_method,
-                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_la,
+                                                          x_limits = x_limits, x_breaks = x_breaks, x_lab = x_lab, y_lab = y_lab,
                                                           recompute_ci = recompute_ci),
 
                                              vgy = .plot_forest(ma_obj = x, ma_method = "ic", correction_type = "vgy", ma_metric = ma_metric,
