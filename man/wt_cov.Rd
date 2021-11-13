@@ -11,8 +11,7 @@ wt_cov(
   wt = NULL,
   as_cor = FALSE,
   use = c("everything", "listwise", "pairwise"),
-  unbiased = TRUE,
-  df_type = c("count", "sum_wts")
+  unbiased = TRUE
 )
 
 wt_cor(x, y = NULL, wt = NULL, use = "everything")
@@ -29,8 +28,6 @@ wt_cor(x, y = NULL, wt = NULL, use = "everything")
 \item{use}{Method for handling missing values. "everything" uses all values and does not account for missingness, "listwise" uses only complete cases, and "pairwise" uses pairwise deletion.}
 
 \item{unbiased}{Logical scalar determining whether variance should be unbiased (TRUE) or maximum-likelihood (FALSE).}
-
-\item{df_type}{Character scalar determining whether the degrees of freedom for unbiased estimates should be based on numbers of cases (n - 1; "count"; default) or squared sums of weights (1 - sum(w^2); "sum_wts").}
 }
 \value{
 Scalar, vector, or matrix of covariances.

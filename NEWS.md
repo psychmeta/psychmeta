@@ -8,6 +8,8 @@
 
 - In `plot_forest()`, by default, use the same `conf_method` and `conf_level` values as used when the meta-analysis model was fit.
 
+- Fix bug in `wt_cor()` where it always returned 1 when correlating only 2 variables.
+
 
 # psychmeta 2.6.0 (2021-05-31)
 
