@@ -134,16 +134,17 @@ wt_cov <- function(x, y = NULL, wt = NULL, as_cor = FALSE,
 
   if (use == "listwise") {
     d <- na.omit(d)
+    wt <- wt[-attr(d, "na.action")]
   }
 
   if (use != "pairwise") {
-    out <- cov.wt(d, wt = wt, cor = as_cor, center = TRUE, method = method)[[metric]]
+    out <- stats::cov.wt(d, wt = wt, cor = as_cor, center = TRUE, method = method)[[metric]]
   } else {
     out <- matrix(NA, nrow = ncol(d), ncol = ncol(d))
     for (i in seq_along(d)) {
       for (j in seq_along(d)) {
         .d <- na.omit(d[,c(i, j)])
-        .res <- cov.wt(
+        .res <- stats::cov.wt(
           .d,
           wt = wt[-attr(.d, "na.action")],
           cor = as_cor, center = TRUE, method = method
