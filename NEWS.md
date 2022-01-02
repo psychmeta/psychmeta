@@ -1,4 +1,4 @@
-# psychmeta (development version)
+# psychmeta 2.6.1 (2022-01-01)
 
 - Bug fix in `limits_tau2()` when `method == "normal_logQ"`.
 
@@ -9,6 +9,8 @@
 - In `plot_forest()`, by default, use the same `conf_method` and `conf_level` values as used when the meta-analysis model was fit.
 
 - Fix bug in `wt_cor()` where it always returned 1 when correlating only 2 variables.
+
+- Added a local copy of "apa.csl" to the vignette resources to avoid build issues if zotero.org's style templates are unavailable due to AWS downtime.
 
 
 # psychmeta 2.6.0 (2021-05-31)
