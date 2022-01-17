@@ -1,3 +1,8 @@
+# psychmeta 2.6.2 (2022-01-17)
+
+- Made a superficial update to the overview vignette to satisfy CRAN's requirements.
+
+
 # psychmeta 2.6.1 (2022-01-01)
 
 - Bug fix in `limits_tau2()` when `method == "normal_logQ"`.

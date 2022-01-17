@@ -9,7 +9,7 @@ vignette: >
   %\VignetteIndexEntry{Welcome to psychmeta!}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc}
-csl: https://zotero.org/styles/apa
+csl: "apa.csl"
 bibliography: vignette.yaml
 ---
 
