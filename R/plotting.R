@@ -776,6 +776,10 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                sd_es <- "sd_r_c"
                if(is.null(x_lab)) x_lab <- expression(Corrected~~Correlation~~(italic(r)))
           }
+     }else if(ma_metric == "generic"){
+       mean_es <- "mean_es"
+       sd_es <- "sd_es"
+       if(is.null(x_lab)) x_lab <- expression(Effect~~Size)
      }else{
           if(ma_method == "barebones"){
                mean_es <- "mean_d"
@@ -787,7 +791,6 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
                if(is.null(x_lab)) x_lab <- expression(Corrected~~Standardized~~Mean~~Difference~~(italic(d)))
           }
      }
-
 
      mat <- as.data.frame(mat, stringsAsFactors = FALSE)
      if (isFALSE(recompute_ci)) {
