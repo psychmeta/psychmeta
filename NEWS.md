@@ -1,3 +1,8 @@
+# psychmeta development version
+
+- Bugfix in SE for tau for models with `var_biased = TRUE`
+
+
 # psychmeta 2.6.2 (2022-01-17)
 
 - Made a superficial update to the overview vignette to satisfy CRAN's requirements.
