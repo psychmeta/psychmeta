@@ -525,19 +525,11 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
        diag(wi) %*% rep(1, k) %*%
        tcrossprod(qr.solve(sqrt(wi), diag(k))) %*%
        crossprod(rep(1, k), diag(wi))
-     if (var_unbiased) {
-       tau_squared_se <- sqrt(1/(sum(wi) * (k - 1) * k)^2 *
-                                (2 * df +
-                                   4 * max(tau_squared, 0) * sum(diag(P)) +
-                                   2 * max(tau_squared, 0)^2 * sum(P * P))
-       )
-     } else {
-       tau_squared_se <- sqrt(1/sum(wi)^2 *
-                                (2 * df +
-                                   4 * max(tau_squared, 0) * sum(diag(P)) +
-                                   2 * max(tau_squared, 0)^2 * sum(P * P))
-       )
-     }
+     tau_squared_se <- sqrt(1/sum(wi)^2 *
+                              (2 * df +
+                                 4 * max(tau_squared, 0) * sum(diag(P)) +
+                                 2 * max(tau_squared, 0)^2 * sum(P * P))
+     )
      tau_squared_ci <- limits_tau2(var_es = var_es, var_pre = var_pre, k = k,
                                    conf_level = conf_level,
                                    var_unbiased = var_unbiased,
