@@ -1,6 +1,8 @@
 # psychmeta development version
 
-- Bugfix in SE for tau for models with `var_biased = TRUE`
+- Bug fix in SE for tau for models with `var_biased = TRUE`.
+
+- Bug fix for forest plots generated from the results of ma_generic().
 
 
 # psychmeta 2.6.2 (2022-01-17)
