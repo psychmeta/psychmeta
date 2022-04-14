@@ -1,4 +1,4 @@
-# psychmeta development version
+# psychmeta 2.6.3 (2022-04-13)
 
 - Bug fix in SE for tau for models with `var_biased = TRUE`.
 
