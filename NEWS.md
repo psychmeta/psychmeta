@@ -1,3 +1,8 @@
+# psychmeta 2.6.4 (2022-07-03)
+
+- Minor maintenance update. Per feedback from CRAN, we updated the notation for the univariate indirect range restriction attenuation formula in the `estimate_var_rho_tsa` documentation to include a plaintext version of the formula.
+
+
 # psychmeta 2.6.3 (2022-04-13)
 
 - Bug fix in SE for tau for models with `var_biased = TRUE`.

@@ -122,7 +122,7 @@
 #'
 #' Under univariate indirect range restriction, the attenuation formula yielding \mjeqn{\rho_{XY_{i}}}{rxyi} is:
 #'
-#' \mjdeqn{\rho_{XY_{i}}=\frac{u_{T}q_{X_{a}}}{\sqrt{u_{T}^{2}q_{X_{a}}^{2}+1-q_{X_{a}}^{2}}}\frac{u_{T}\rho_{TP_{a}}}{\sqrt{u_{T}^{2}\rho_{TP_{a}}^{2}+1-\rho_{TP_{a}}^{2}}}}{}
+#' \mjdeqn{\rho_{XY_{i}}=\frac{u_{T}q_{X_{a}}}{\sqrt{u_{T}^{2}q_{X_{a}}^{2}+1-q_{X_{a}}^{2}}}\frac{u_{T}\rho_{TP_{a}}}{\sqrt{u_{T}^{2}\rho_{TP_{a}}^{2}+1-\rho_{TP_{a}}^{2}}}}{rxyi = (ut * qxa) / (sqrt(ut^2 * qxa^2 + 1 - qxa^2)) * (ut * rtpa) / (sqrt(ut^2 * rtpa^2 + 1 - rtpa^2))}
 #'
 #' The attenuation formula can also be represented as:
 #'
