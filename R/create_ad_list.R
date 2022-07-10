@@ -230,8 +230,8 @@ create_ad_tibble <- function(ad_type = c("tsa", "int"),
 
           moderator_levels <- NULL
      }
-
-     if(class(intercor) != "control_intercor"){
+     
+     if(!inherits(intercor, "control_intercor")){
           if(is.list(intercor)){
                intercor <- do.call(control_intercor, args = intercor)
           }else{
