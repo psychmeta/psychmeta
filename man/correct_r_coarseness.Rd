@@ -46,7 +46,6 @@ correct_r_coarseness(
 Vector of correlations corrected for scale coarseness (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 }
 \description{
-\loadmathjax
 Corrects correlations for scale coarseness.
 }
 \examples{

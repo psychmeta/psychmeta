@@ -2,7 +2,7 @@
 % Please edit documentation in R/correct_d.R
 \name{correct_d_bias}
 \alias{correct_d_bias}
-\title{Correct for small-sample bias in Cohen's \emph{d} values}
+\title{Correct for small-sample bias in Cohen's \eqn{d} values}
 \usage{
 correct_d_bias(d, n)
 }
@@ -15,25 +15,24 @@ correct_d_bias(d, n)
 Vector of g values (d values corrected for small-sample bias).
 }
 \description{
-\loadmathjax
-Corrects a vector of Cohen's \emph{d} values for small-sample bias, as Cohen's \emph{d}
-has a slight positive bias. The bias-corrected \emph{d} value is often called
-Hedges's \emph{g}.
+Corrects a vector of Cohen's \eqn{d} values for small-sample bias, as Cohen's \eqn{d}
+has a slight positive bias. The bias-corrected \eqn{d} value is often called
+Hedges's \eqn{g}.
 }
 \details{
 The bias correction is:
-\mjdeqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
+\deqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
 
 where
-\mjdeqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = \Gamma((n - 2) / 2) / (sqrt(n - 2) * \Gamma((n - 2) / 2))}
+\deqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = \Gamma((n - 2) / 2) / (sqrt(n - 2) * \Gamma((n - 2) / 2))}
 
-and \mjeqn{d_{obs}}{d} is the observed effect size, \mjeqn{g = d_{c}}{g = d_c} is the
-corrected (unbiased) estimate, \mjseqn{n} is the total sample size, and
-\mjeqn{\Gamma()}{\Gamma()} is the \link[base:Special]{gamma function}.
+and \eqn{d_{obs}}{d} is the observed effect size, \eqn{g = d_{c}}{g = d_c} is the
+corrected (unbiased) estimate, \eqn{n} is the total sample size, and
+\eqn{\Gamma()}{\Gamma()} is the \link[base:Special]{gamma function}.
 
 Historically, using the gamma function was computationally intensive, so an
-approximation for \mjseqn{J} was used (Borenstein et al., 2009):
-\mjdeqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
+approximation for \eqn{J} was used (Borenstein et al., 2009):
+\deqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
 
 This approximation is no longer necessary with modern computers.
 }

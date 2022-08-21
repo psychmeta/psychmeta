@@ -17,13 +17,12 @@ var_error_r(r, n, correct_bias = TRUE)
 A vector of sampling-error variances.
 }
 \description{
-\loadmathjax
-Estimates the error variance of Pearson correlations (\mjseqn{r}).
+Estimates the error variance of Pearson correlations (\eqn{r}).
 }
 \details{
 The sampling variance of a Pearson correlation is approximately:
 
-\mjdeqn{var_{e}=\frac{(1-r^{2})^{2}}{n-1}}{var_e = (1 - r^2)^2 / (n - 1)}
+\deqn{var_{e}=\frac{(1-r^{2})^{2}}{n-1}}{var_e = (1 - r^2)^2 / (n - 1)}
 
 This can be corrected for bias in the sample correlation by first correcting the correlation (see \code{\link[=correct_r_bias]{correct_r_bias()}}) prior to estimating the error variance.
 }

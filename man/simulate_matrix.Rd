@@ -19,9 +19,8 @@ simulate_matrix(sigma, n, k = 1, as_cor = FALSE)
 A list of simulated sample matrices.
 }
 \description{
-\loadmathjax
 This function generates simulated sample matrices based on a population matrix and a sample size.
-It uses the Wishart distribution (i.e., the multivariate \mjeqn{\chi^{2}}{\chi^2} distribution) to obtain data, rescales the data into the input metric, and can be standardized into a correlation matrix by setting \code{as_cor} to \code{TRUE}.
+It uses the Wishart distribution (i.e., the multivariate \eqn{\chi^{2}}{\chi^2} distribution) to obtain data, rescales the data into the input metric, and can be standardized into a correlation matrix by setting \code{as_cor} to \code{TRUE}.
 The function can produce a list of matrices for any number of samples.
 }
 \examples{

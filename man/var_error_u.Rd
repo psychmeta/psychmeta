@@ -2,39 +2,38 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_u}
 \alias{var_error_u}
-\title{Estimate the error variance of \mjseqn{u} ratios}
+\title{Estimate the error variance of \eqn{u} ratios}
 \usage{
 var_error_u(u, ni, na = NA, dependent_sds = FALSE)
 }
 \arguments{
-\item{u}{Vector of \mjseqn{u} ratios.}
+\item{u}{Vector of \eqn{u} ratios.}
 
 \item{ni}{Vector of incumbent-group sample sizes.}
 
 \item{na}{Vector of applicant-group sample sizes.}
 
-\item{dependent_sds}{Logical vector identifying whether each \mjseqn{u} ratio is based on standard deviations from independent samples (\code{FALSE}) or based on
+\item{dependent_sds}{Logical vector identifying whether each \eqn{u} ratio is based on standard deviations from independent samples (\code{FALSE}) or based on
 standard deviations from an applicant sample and an incumbent sample that is a subset of that applicant sample (\code{TRUE}).}
 }
 \value{
 A vector of sampling-error variances.
 }
 \description{
-\loadmathjax
-Estimates the error variance of standard deviation (\mjseqn{u}) ratios.
+Estimates the error variance of standard deviation (\eqn{u}) ratios.
 }
 \details{
 The sampling variance of a u ratio is computed differently for independent samples (i.e., settings where the referent unrestricted standard deviation comes from an different sample than the range-restricted standard deviation) than for dependent samples (i.e., unrestricted samples from which a subset of individuals are selected to be in the incumbent sample).
 
 The sampling variance for independent samples (the more common case) is:
 
-\mjdeqn{var_{e}=\frac{u^{2}}{2}\left(\frac{1}{n_{i}-1}+\frac{1}{n_{a}-1}\right)}{var_e = .5 * u^2 * (1 / (ni - 1) + 1 / (na - 1))}
+\deqn{var_{e}=\frac{u^{2}}{2}\left(\frac{1}{n_{i}-1}+\frac{1}{n_{a}-1}\right)}{var_e = .5 * u^2 * (1 / (ni - 1) + 1 / (na - 1))}
 
 and the sampling variance for dependent samples is:
 
-\mjdeqn{var_{e}=\frac{u^{2}}{2}\left(\frac{1}{n_{i}-1}-\frac{1}{n_{a}-1}\right)}{var_e = .5 * u^2 * (1 / (ni - 1) - 1 / (na - 1))}
+\deqn{var_{e}=\frac{u^{2}}{2}\left(\frac{1}{n_{i}-1}-\frac{1}{n_{a}-1}\right)}{var_e = .5 * u^2 * (1 / (ni - 1) - 1 / (na - 1))}
 
-where \mjseqn{u} is the u ratio, \mjeqn{n_{i}}{ni} is the incumbent sample size, and \mjeqn{n_{a}}{na} is the applicant sample size.
+where \eqn{u} is the u ratio, \eqn{n_{i}}{ni} is the incumbent sample size, and \eqn{n_{a}}{na} is the applicant sample size.
 }
 \examples{
 var_error_u(u = .8, ni = 100, na = 200)

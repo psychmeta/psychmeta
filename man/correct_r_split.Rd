@@ -19,12 +19,11 @@ correct_r_split(r, pi, pa = 0.5, n = NULL)
 Vector of correlations corrected for unrepresentative splits (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 }
 \description{
-\loadmathjax
 This correction is mathematically equivalent to correcting the correlation for direct range restriction in the split variable.
 }
 \details{
-\mjdeqn{r_{c}=\frac{r_{obs}}{u\sqrt{\left(\frac{1}{u^{2}}-1\right)r_{obs}^{2}+1}}}{r_c = r / (sqrt((pi*(1-pi))/(pa*(1-pa))) * sqrt(((pa*(1-pa))/(pi*(1-pi)) - 1) * r^2 + 1))}
-where \mjeqn{u=\sqrt{\frac{p_{i}(1-p_{i})}{p_{a}(1-p_{a})}}}{sqrt((pi*(1-pi))/(pa*(1-pa)))}, the ratio of the dichotomous variance in the sample (\mjeqn{p_{i}}{pi} is the incumbent/sample proportion in one of the two groups) to the dichotomous variance in the population (\mjeqn{p_{a}}{pa} is the applicant/population proportion in one of the two groups).
+\deqn{r_{c}=\frac{r_{obs}}{u\sqrt{\left(\frac{1}{u^{2}}-1\right)r_{obs}^{2}+1}}}{r_c = r / (sqrt((pi*(1-pi))/(pa*(1-pa))) * sqrt(((pa*(1-pa))/(pi*(1-pi)) - 1) * r^2 + 1))}
+where \eqn{u=\sqrt{\frac{p_{i}(1-p_{i})}{p_{a}(1-p_{a})}}}{sqrt((pi*(1-pi))/(pa*(1-pa)))}, the ratio of the dichotomous variance in the sample (\eqn{p_{i}}{pi} is the incumbent/sample proportion in one of the two groups) to the dichotomous variance in the population (\eqn{p_{a}}{pa} is the applicant/population proportion in one of the two groups).
 This correction is identical to the correction for univariate direct range restriction, applied to a dichotomous variable.
 }
 \examples{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_dmod.R
 \name{compute_dmod_npar}
 \alias{compute_dmod_npar}
-\title{Function for computing non-parametric \mjeqn{d_{Mod}}{d_Mod} effect sizes for a single focal group}
+\title{Function for computing non-parametric \eqn{d_{Mod}}{d_Mod} effect sizes for a single focal group}
 \usage{
 compute_dmod_npar(
   referent_int,
@@ -27,15 +27,14 @@ compute_dmod_npar(
 \item{referent_sd_y}{Referent group's criterion standard deviation.}
 }
 \value{
-A vector of effect sizes (\mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed},
-    \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}, \mjeqn{d_{Mod_{Under}}}{d_Mod_Under},
-    \mjeqn{d_{Mod_{Over}}}{d_Mod_Over}), proportions of under- and over-predicted criterion scores,
-    minimum and maximum differences (i.e., \mjeqn{d_{Mod_{Under}}}{d_Mod_Under} and \mjeqn{d_{Mod_{Over}}}{d_Mod_Over}),
+A vector of effect sizes (\eqn{d_{Mod_{Signed}}}{d_Mod_Signed},
+    \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}, \eqn{d_{Mod_{Under}}}{d_Mod_Under},
+    \eqn{d_{Mod_{Over}}}{d_Mod_Over}), proportions of under- and over-predicted criterion scores,
+    minimum and maximum differences (i.e., \eqn{d_{Mod_{Under}}}{d_Mod_Under} and \eqn{d_{Mod_{Over}}}{d_Mod_Over}),
     and the scores associated with minimum and maximum differences.
 }
 \description{
-\loadmathjax
-This function computes non-parametric \mjeqn{d_{Mod}}{d_Mod} effect sizes from user-defined descriptive statistics
+This function computes non-parametric \eqn{d_{Mod}}{d_Mod} effect sizes from user-defined descriptive statistics
 and regression coefficients, using a distribution of observed scores as weights.
 This non-parametric function is best used when the assumption of normally distributed predictor
 scores is not reasonable and/or the distribution of scores observed in a sample is likely to represent the
@@ -45,39 +44,39 @@ as a wrapper to this function so that the regression equations and descriptive s
 be computed automatically within the program.
 }
 \details{
-The \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed} effect size (i.e., the average of differences in prediction over
+The \eqn{d_{Mod_{Signed}}}{d_Mod_Signed} effect size (i.e., the average of differences in prediction over
 the range of predictor scores) is computed as
-\mjdeqn{d_{Mod_{Signed}}=\frac{\sum_{i=1}^{m}n_{i}\left[X_{i}\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right]}{SD_{Y_{1}}\sum_{i=1}^{m}n_{i}},}{d_Mod_Signed = sum(n_i * [X_i * (b_1_1 - b_1_2) + b_0_1 - b_0_2]) / (SD_Y_1 * sum(n_i)),}
+\deqn{d_{Mod_{Signed}}=\frac{\sum_{i=1}^{m}n_{i}\left[X_{i}\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right]}{SD_{Y_{1}}\sum_{i=1}^{m}n_{i}},}{d_Mod_Signed = sum(n_i * [X_i * (b_1_1 - b_1_2) + b_0_1 - b_0_2]) / (SD_Y_1 * sum(n_i)),}
 where
   \itemize{
-    \item {\mjeqn{SD_{Y_{1}}}{SD_Y_1} is the referent group's criterion standard deviation;}
-    \item {\mjeqn{m}{m} is the number of unique scores in the distribution of focal-group predictor scores;}
-    \item {\mjeqn{X}{X} is the vector of unique focal-group predictor scores, indexed \mjseqn{i=1} through \mjseqn{m};}
-    \item {\mjeqn{X_{i}}{X_i} is the \mjeqn{i^{th}}{ith} unique score value;}
-    \item {\mjeqn{n}{n} is the vector of frequencies associated with the elements of \mjeqn{X}{X};}
-    \item {\mjeqn{n_{i}}{n_i} is the number of cases with a score equal to \mjeqn{X_{i}}{X_i};}
-    \item {\mjeqn{b_{1_{1}}}{b_1_1} and \mjeqn{b_{1_{2}}}{b_1_2} are the slopes of the regression of \mjeqn{Y}{Y} on \mjeqn{X}{X} for the referent and focal groups, respectively; and}
-    \item {\mjeqn{b_{0_{1}}}{b_0_1} and \mjeqn{b_{0_{2}}}{b_0_2} are the intercepts of the regression of \mjeqn{Y}{Y} on \mjeqn{X}{X} for the referent and focal groups, respectively.}
+    \item {\eqn{SD_{Y_{1}}}{SD_Y_1} is the referent group's criterion standard deviation;}
+    \item {\eqn{m}{m} is the number of unique scores in the distribution of focal-group predictor scores;}
+    \item {\eqn{X}{X} is the vector of unique focal-group predictor scores, indexed \eqn{i=1} through \eqn{m};}
+    \item {\eqn{X_{i}}{X_i} is the \eqn{i^{th}}{ith} unique score value;}
+    \item {\eqn{n}{n} is the vector of frequencies associated with the elements of \eqn{X}{X};}
+    \item {\eqn{n_{i}}{n_i} is the number of cases with a score equal to \eqn{X_{i}}{X_i};}
+    \item {\eqn{b_{1_{1}}}{b_1_1} and \eqn{b_{1_{2}}}{b_1_2} are the slopes of the regression of \eqn{Y}{Y} on \eqn{X}{X} for the referent and focal groups, respectively; and}
+    \item {\eqn{b_{0_{1}}}{b_0_1} and \eqn{b_{0_{2}}}{b_0_2} are the intercepts of the regression of \eqn{Y}{Y} on \eqn{X}{X} for the referent and focal groups, respectively.}
   }
 
-The \mjeqn{d_{Mod_{Under}}}{d_Mod_Under} and \mjeqn{d_{Mod_{Over}}}{d_Mod_Over} effect sizes are computed
-using the same equation as \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed}, but \mjeqn{d_{Mod_{Under}}}{d_Mod_Under} is
+The \eqn{d_{Mod_{Under}}}{d_Mod_Under} and \eqn{d_{Mod_{Over}}}{d_Mod_Over} effect sizes are computed
+using the same equation as \eqn{d_{Mod_{Signed}}}{d_Mod_Signed}, but \eqn{d_{Mod_{Under}}}{d_Mod_Under} is
 the weighted average of all scores in the area of underprediction (i.e., the differences in prediction with
-negative signs) and \mjeqn{d_{Mod_{Over}}}{d_Mod_Over} is the weighted average of all scores in the area of
+negative signs) and \eqn{d_{Mod_{Over}}}{d_Mod_Over} is the weighted average of all scores in the area of
 overprediction (i.e., the differences in prediction with negative signs).
 
-The \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size (i.e., the average of absolute differences in prediction over
+The \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size (i.e., the average of absolute differences in prediction over
 the range of predictor scores) is computed as
-\mjdeqn{d_{Mod_{Unsigned}}=\frac{\sum_{i=1}^{m}n_{i}\left|X_{i}\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|}{SD_{Y_{1}}\sum_{i=1}^{m}n_{i}}.}{d_Mod_Unsigned = sum(n_i * |X_i * (b_1_1 - b_1_2) + b_0_1 - b_0_2]| / (SD_Y_1 * sum(n_i)).}
+\deqn{d_{Mod_{Unsigned}}=\frac{\sum_{i=1}^{m}n_{i}\left|X_{i}\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|}{SD_{Y_{1}}\sum_{i=1}^{m}n_{i}}.}{d_Mod_Unsigned = sum(n_i * |X_i * (b_1_1 - b_1_2) + b_0_1 - b_0_2]| / (SD_Y_1 * sum(n_i)).}
 
-The \mjeqn{d_{Min}}{d_Min} effect size (i.e., the smallest absolute difference in prediction observed over the
+The \eqn{d_{Min}}{d_Min} effect size (i.e., the smallest absolute difference in prediction observed over the
 range of predictor scores) is computed as
-\mjdeqn{d_{Min}=\frac{1}{SD_{Y_{1}}}Min\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Min = 1/SD_Y_1 * Min[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
+\deqn{d_{Min}=\frac{1}{SD_{Y_{1}}}Min\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Min = 1/SD_Y_1 * Min[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
 
-The \mjeqn{d_{Max}}{d_Max} effect size (i.e., the largest absolute difference in prediction observed over the
+The \eqn{d_{Max}}{d_Max} effect size (i.e., the largest absolute difference in prediction observed over the
 range of predictor scores)is computed as
-\mjdeqn{d_{Max}=\frac{1}{SD_{Y_{1}}}Max\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Max = 1/SD_Y_1 * Max[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
-\emph{Note}: When \mjeqn{d_{Min}}{d_Min} and \mjeqn{d_{Max}}{d_Max} are computed in this package, the output will display the
+\deqn{d_{Max}=\frac{1}{SD_{Y_{1}}}Max\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Max = 1/SD_Y_1 * Max[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
+\emph{Note}: When \eqn{d_{Min}}{d_Min} and \eqn{d_{Max}}{d_Max} are computed in this package, the output will display the
 signs of the differences (rather than the absolute values of the differences) to aid in interpretation.
 }
 \examples{

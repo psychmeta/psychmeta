@@ -1,7 +1,6 @@
 #' @title Function to convert meta-analysis of correlations to d values or vice-versa
 #'
 #' @description
-#' \loadmathjax
 #' Takes a meta-analysis class object of \emph{d} values or correlations (classes \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, and \code{d_as_r}; second-order meta-analyses are currently not supported) as an input and uses conversion formulas and Taylor series approximations to convert effect sizes and variance estimates, respectively.
 #'
 #' @param ma_obj A meta-analysis object of class \code{r_as_r}, \code{d_as_d}, \code{r_as_d}, or \code{d_as_r}
@@ -12,20 +11,20 @@
 #'
 #' @details
 #' The formula used to convert correlations to \emph{d} values is:
-#' \mjdeqn{d=\frac{r\sqrt{\frac{1}{p\left(1-p\right)}}}{\sqrt{1-r^{2}}}}{(sqrt(1 / (p * (1-p))) * r) / sqrt(1 - r^2)}
+#' \deqn{d=\frac{r\sqrt{\frac{1}{p\left(1-p\right)}}}{\sqrt{1-r^{2}}}}{(sqrt(1 / (p * (1-p))) * r) / sqrt(1 - r^2)}
 #'
 #' The formula used to convert \emph{d} values to correlations is:
-#' \mjdeqn{r=\frac{d}{\sqrt{d^{2}+\frac{1}{p\left(1-p\right)}}}}{d / sqrt(1 / (p * (1-p)) + d^2)}
+#' \deqn{r=\frac{d}{\sqrt{d^{2}+\frac{1}{p\left(1-p\right)}}}}{d / sqrt(1 / (p * (1-p)) + d^2)}
 #'
 #' To approximate the variance of correlations from the variance of \emph{d} values, the function computes:
-#' \mjdeqn{var_{r}\approx a_{d}^{2}var_{d}}{var_r ~= a_d^2 * var_d}
-#' where \mjeqn{a_{d}}{a_d} is the first partial derivative of the \emph{d}-to-\emph{r} transformation with respect to \emph{d}:
-#' \mjdeqn{a_{d}=-\frac{1}{\left[d^{2}p\left(1-p\right)-1\right]\sqrt{d^{2}+\frac{1}{p-p^{2}}}}}{a_d = -1 / ((d^2 * (p - 1) * p - 1) * sqrt(d^2 + 1 / (p - p^2)))}
+#' \deqn{var_{r}\approx a_{d}^{2}var_{d}}{var_r ~= a_d^2 * var_d}
+#' where \eqn{a_{d}}{a_d} is the first partial derivative of the \emph{d}-to-\emph{r} transformation with respect to \emph{d}:
+#' \deqn{a_{d}=-\frac{1}{\left[d^{2}p\left(1-p\right)-1\right]\sqrt{d^{2}+\frac{1}{p-p^{2}}}}}{a_d = -1 / ((d^2 * (p - 1) * p - 1) * sqrt(d^2 + 1 / (p - p^2)))}
 #'
 #' To approximate the variance of \emph{d} values from the variance of correlations, the function computes:
-#' \mjdeqn{var_{d}\approx a_{r}^{2}var_{r}}{var_d ~= a_r^2 * var_r}
-#' where \mjeqn{a_{r}}{a_r} is the first partial derivative of the \emph{r}-to-\emph{d} transformation with respect to \emph{r}:
-#' \mjdeqn{a_{r}=\frac{\sqrt{\frac{1}{p-p^{2}}}}{\left(1-r^{2}\right)^{1.5}}}{a_r = sqrt(1 / (p - p^2)) / (1 - r^2)^1.5}
+#' \deqn{var_{d}\approx a_{r}^{2}var_{r}}{var_d ~= a_r^2 * var_r}
+#' where \eqn{a_{r}}{a_r} is the first partial derivative of the \emph{r}-to-\emph{d} transformation with respect to \emph{r}:
+#' \deqn{a_{r}=\frac{\sqrt{\frac{1}{p-p^{2}}}}{\left(1-r^{2}\right)^{1.5}}}{a_r = sqrt(1 / (p - p^2)) / (1 - r^2)^1.5}
 convert_ma <- function(ma_obj, ...){
 
      flag_summary <- "summary.ma_psychmeta" %in% class(ma_obj)
@@ -316,8 +315,7 @@ convert_meta <- convert_ma
 
 #' Convert the dichotomous variable variance to a proportion
 #'
-#' \loadmathjax
-#' Converts the variance of a dichotomous variable (i.e., \mjseqn{pq}) to the proportion of one of the categories in the variable (i.e., \mjseqn{p})
+#' Converts the variance of a dichotomous variable (i.e., \eqn{pq}) to the proportion of one of the categories in the variable (i.e., \eqn{p})
 #'
 #' @param pq The variance of a dichotomous variable.
 #'

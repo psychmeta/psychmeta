@@ -13,7 +13,6 @@ convert_pq_to_p(pq)
 The proportion of cases in one of the dichotomous groups.
 }
 \description{
-\loadmathjax
-Converts the variance of a dichotomous variable (i.e., \mjseqn{pq}) to the proportion of one of the categories in the variable (i.e., \mjseqn{p})
+Converts the variance of a dichotomous variable (i.e., \eqn{pq}) to the proportion of one of the categories in the variable (i.e., \eqn{p})
 }
 \keyword{internal}

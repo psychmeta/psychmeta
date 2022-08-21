@@ -15,11 +15,10 @@ estimate_q_dist(mean_rel, var_rel)
 The estimated mean and variance of a distribution of square-root reliability values.
 }
 \description{
-\loadmathjax
 Estimate descriptive statistics of square-root reliabilities from descriptive statistics of reliabilities via Taylor series approximation
 }
 \details{
-\mjdeqn{var_{q_{X}}=\frac{var_{\rho_{XX}}}{4q_{X}^{2}}}{var_rel / (4 * mean_q^2)}
+\deqn{var_{q_{X}}=\frac{var_{\rho_{XX}}}{4q_{X}^{2}}}{var_rel / (4 * mean_q^2)}
 }
 \examples{
 estimate_q_dist(mean_rel = .8, var_rel = .15)

@@ -30,11 +30,10 @@ confidence(
 A matrix of confidence intervals of the specified width.
 }
 \description{
-\loadmathjax
 Function to construct a confidence interval around an effect size or mean effect size.
 }
 \details{
-\mjdeqn{CI=mean_{es}\pm quantile\times SE_{es}}{CI = mean_es +/- quantile * SE_es}
+\deqn{CI=mean_{es}\pm quantile\times SE_{es}}{CI = mean_es +/- quantile * SE_es}
 }
 \examples{
 confidence(mean = c(.3, .5), se = c(.15, .2), df = c(100, 200), conf_level = .95, conf_method = "t")

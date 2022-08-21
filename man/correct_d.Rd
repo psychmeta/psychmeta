@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{correct_d}
 \alias{correct_d}
-\title{Correct \emph{d} values for measurement error and/or range restriction}
+\title{Correct \eqn{d} values for measurement error and/or range restriction}
 \usage{
 correct_d(
   correction = c("meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"),
@@ -28,7 +28,7 @@ correct_d(
 \arguments{
 \item{correction}{Type of correction to be applied. Options are "meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"}
 
-\item{d}{Vector of \emph{d} values.}
+\item{d}{Vector of \eqn{d} values.}
 
 \item{ryy}{Vector of reliability coefficients for Y (the continuous variable).}
 
@@ -62,12 +62,11 @@ correct_d(
 For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE} (the default).}
 }
 \value{
-Data frame(s) of observed \emph{d} values (\code{dgyi}), operational range-restricted \emph{d} values corrected for measurement error in Y only (\code{dgpi}), operational range-restricted \emph{d} values corrected for measurement error in the grouping only (\code{dGyi}), and range-restricted true-score \emph{d} values (\code{dGpi}),
-range-corrected observed-score \emph{d} values (\code{dgya}), operational range-corrected \emph{d} values corrected for measurement error in Y only (\code{dgpa}), operational range-corrected \emph{d} values corrected for measurement error in the grouping only (\code{dGya}), and range-corrected true-score \emph{d} values (\code{dGpa}).
+Data frame(s) of observed \eqn{d} values (\code{dgyi}), operational range-restricted \eqn{d} values corrected for measurement error in Y only (\code{dgpi}), operational range-restricted \eqn{d} values corrected for measurement error in the grouping only (\code{dGyi}), and range-restricted true-score \eqn{d} values (\code{dGpi}),
+range-corrected observed-score \eqn{d} values (\code{dgya}), operational range-corrected \eqn{d} values corrected for measurement error in Y only (\code{dgpa}), operational range-corrected \eqn{d} values corrected for measurement error in the grouping only (\code{dGya}), and range-corrected true-score \eqn{d} values (\code{dGpa}).
 }
 \description{
-\loadmathjax
-This function is a wrapper for the \code{\link[=correct_r]{correct_r()}} function to correct \emph{d} values
+This function is a wrapper for the \code{\link[=correct_r]{correct_r()}} function to correct \eqn{d} values
 for statistical and psychometric artifacts.
 }
 \examples{

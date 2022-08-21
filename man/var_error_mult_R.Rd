@@ -28,17 +28,16 @@ var_error_Rsq(Rsq, n, p)
 A vector of sampling-error variances.
 }
 \description{
-\loadmathjax
-This function estimates the error variance for linear regression model (squared) multiple correlations (\mjseqn{R} and \mjeqn{R^{2}}{R-squared}).
+This function estimates the error variance for linear regression model (squared) multiple correlations (\eqn{R} and \eqn{R^{2}}{R-squared}).
 }
 \details{
 The sampling variance of a multiple correlation is approximately:
 
-\mjdeqn{var_{e}=\frac{(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
+\deqn{var_{e}=\frac{(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
 
 The sampling variance of a squared multiple correlation is approximately:
 
-\mjdeqn{var_{e}=\frac{4R^{2}(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = 4 \* R^2 \* (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
+\deqn{var_{e}=\frac{4R^{2}(1-R^{2})^{2}(n-p-1)^{2}}{(n^{2}-1)(n+3)}}{var_e = 4 \* R^2 \* (1 - R^2)^2 \* (n - p - 1)^2 / ((n^2 - 1) \* (n + 3))}
 }
 \examples{
 var_error_mult_R(R = .5, n = 30, p = 4)

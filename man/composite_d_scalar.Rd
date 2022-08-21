@@ -27,7 +27,6 @@ composite_d_scalar(
 The estimated standardized mean difference associated with the composite variable.
 }
 \description{
-\loadmathjax
 This function estimates the \emph{d} value of a composite of X variables, given the mean \emph{d} value of the individual X values and the mean correlation among those variables.
 }
 \details{
@@ -37,9 +36,9 @@ and one that uses the overall correlation among the X variables (i.e., the total
 
 If a partial correlation is provided for the interrelationships among variables, the following formula is used to estimate the composite \emph{d} value:
 
-\mjdeqn{d_{X}=\frac{\bar{d}_{x_{i}}k}{\sqrt{\bar{\rho}_{x_{i}x_{j}}k^{2}+\left(1-\bar{\rho}_{x_{i}x_{j}}\right)k}}}{d_composite = (mean_d * k_vars) / sqrt(mean_intercor * k_vars^2 + (1 - mean_intercor) * k_vars)}
+\deqn{d_{X}=\frac{\bar{d}_{x_{i}}k}{\sqrt{\bar{\rho}_{x_{i}x_{j}}k^{2}+\left(1-\bar{\rho}_{x_{i}x_{j}}\right)k}}}{d_composite = (mean_d * k_vars) / sqrt(mean_intercor * k_vars^2 + (1 - mean_intercor) * k_vars)}
 
-where \mjeqn{d_{X}}{d_composite} is the composite d value, \mjeqn{\bar{d}_{x_{i}}}{mean_d} is the mean \emph{d} value, \mjeqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among the variables in the composite, and \emph{k} is the number of variables in the composite.
+where \eqn{d_{X}}{d_composite} is the composite d value, \eqn{\bar{d}_{x_{i}}}{mean_d} is the mean \emph{d} value, \eqn{\bar{\rho}_{x_{i}x_{j}}}{mean_intercor} is the mean intercorrelation among the variables in the composite, and \emph{k} is the number of variables in the composite.
 Otherwise, the composite \emph{d} value is computed by converting the mean \emph{d} value to a correlation, computing the composite correlation (see \code{\link{composite_r_scalar}} for formula), and transforming that composite back into the \emph{d} metric.
 }
 \examples{

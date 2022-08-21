@@ -1,3 +1,9 @@
+# psychmeta 2.6.5 (2022-08-21)
+
+- Minor maintenance update. Per feedback from CRAN, we replaced `{mathjaxr}`-based equations with katex-based questions, which R >= 4.2.0 supports natively for HTML documentation.
+- Removed `psychmeta_news()` function. Use `news(package = "psychmeta")` instead.
+
+
 # psychmeta 2.6.4 (2022-07-03)
 
 - Minor maintenance update. Per feedback from CRAN, we updated the notation for the univariate indirect range restriction attenuation formula in the `estimate_var_rho_tsa` documentation to include a plaintext version of the formula.

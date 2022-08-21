@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_dmod.R
 \name{.integrate_dmod}
 \alias{.integrate_dmod}
-\title{Integration function for computing parametric signed or unsigned \mjeqn{d_{Mod}}{d_Mod} effect sizes
+\title{Integration function for computing parametric signed or unsigned \eqn{d_{Mod}}{d_Mod} effect sizes
 for a single focal group}
 \usage{
 .integrate_dmod(
@@ -37,43 +37,42 @@ for a single focal group}
 
 \item{focal_max_x}{Focal group's maximum predictor score.}
 
-\item{signed}{Logical argument that indicates whether the function should compute \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed} (\code{TRUE}; default) or \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} (\code{FALSE}).}
+\item{signed}{Logical argument that indicates whether the function should compute \eqn{d_{Mod_{Signed}}}{d_Mod_Signed} (\code{TRUE}; default) or \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} (\code{FALSE}).}
 }
 \value{
-A \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed} or \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size, depending on the \code{signed} argument.
+A \eqn{d_{Mod_{Signed}}}{d_Mod_Signed} or \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size, depending on the \code{signed} argument.
 }
 \description{
-\loadmathjax
-This internal function exists to support the \code{\link[=compute_dmod_par]{compute_dmod_par()}} function, but may also be useful as a bare-bones tool for computing signed and unsigned \mjeqn{d_{Mod}}{d_Mod} effect sizes.
+This internal function exists to support the \code{\link[=compute_dmod_par]{compute_dmod_par()}} function, but may also be useful as a bare-bones tool for computing signed and unsigned \eqn{d_{Mod}}{d_Mod} effect sizes.
 Please note that this function does not include an option for re-scaling its result to compensate for cumulative densities smaller than 1.
 }
 \details{
-The \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed} effect size (i.e., the average of differences in prediction over
+The \eqn{d_{Mod_{Signed}}}{d_Mod_Signed} effect size (i.e., the average of differences in prediction over
 the range of predictor scores) is computed as
-\mjdeqn{d_{Mod_{Signed}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left\link[=X\\left(b_{1_{1}}-b_{1_{2}}\\right)+b_{0_{1}}-b_{0_{2}}\\right]{X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right} dX}{d_Mod_Signed = 1/SD_Y_1 * integrate(f_2(X) * \link{X * (b_1_1 - b_1_2) + b_0_1 - b_0_2})},
+\deqn{d_{Mod_{Signed}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left[X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right] dX}{d_Mod_Signed = 1/SD_Y_1 * integrate(f_2(X) * [X * (b_1_1 - b_1_2) + b_0_1 - b_0_2])},
 where
 \itemize{
-\item {\mjeqn{SD_{Y_{1}}}{SD_Y_1} is the referent group's criterion standard deviation;}
-\item {\mjeqn{f_{2}(X)}{f_2(X)} is the normal-density function for the distribution of focal-group predictor scores;}
-\item {\mjeqn{b_{1_{1}}}{b_1_1} and \mjeqn{b_{1_{2}}}{b_1_2} are the slopes of the regression of \mjeqn{Y}{Y} on \mjeqn{X}{X} for the referent and focal groups, respectively;}
-\item {\mjeqn{b_{0_{1}}}{b_0_1} and \mjeqn{b_{0_{2}}}{b_0_2} are the intercepts of the regression of \mjeqn{Y}{Y} on \mjeqn{X}{X} for the referent and focal groups, respectively; and}
-\item {the integral spans all \mjseqn{X} scores within the operational range of predictor scores for the focal group.}
+\item {\eqn{SD_{Y_{1}}}{SD_Y_1} is the referent group's criterion standard deviation;}
+\item {\eqn{f_{2}(X)}{f_2(X)} is the normal-density function for the distribution of focal-group predictor scores;}
+\item {\eqn{b_{1_{1}}}{b_1_1} and \eqn{b_{1_{2}}}{b_1_2} are the slopes of the regression of \eqn{Y}{Y} on \eqn{X}{X} for the referent and focal groups, respectively;}
+\item {\eqn{b_{0_{1}}}{b_0_1} and \eqn{b_{0_{2}}}{b_0_2} are the intercepts of the regression of \eqn{Y}{Y} on \eqn{X}{X} for the referent and focal groups, respectively; and}
+\item {the integral spans all \eqn{X} scores within the operational range of predictor scores for the focal group.}
 }
 
-The \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size (i.e., the average of absolute differences in prediction over
+The \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size (i.e., the average of absolute differences in prediction over
 the range of predictor scores) is computed as
-\mjdeqn{d_{Mod_{Unsigned}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|dX.}{d_Mod_Unsigned = 1/SD_Y_1 * integrate(f_2(X) * |X * (b_1_1 - b_1_2) + b_0_1 - b_0_2|).}
+\deqn{d_{Mod_{Unsigned}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|dX.}{d_Mod_Unsigned = 1/SD_Y_1 * integrate(f_2(X) * |X * (b_1_1 - b_1_2) + b_0_1 - b_0_2|).}
 }
 \examples{
 \dontrun{
-# Example for computing \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed}
+# Example for computing \eqn{d_{Mod_{Signed}}}{d_Mod_Signed}
 .integrate_dmod(referent_int = -.05, referent_slope = .5,
               focal_int = -.05, focal_slope = .3,
               focal_mean_x = -.5, focal_sd_x = 1,
               referent_sd_y = 1, focal_min_x = -Inf, focal_max_x = Inf,
               signed = TRUE)
 
-# Example for computing \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}
+# Example for computing \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}
 .integrate_dmod(referent_int = -.05, referent_slope = .5,
               focal_int = -.05, focal_slope = .3,
               focal_mean_x = -.5, focal_sd_x = 1,

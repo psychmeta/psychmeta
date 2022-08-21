@@ -19,7 +19,6 @@ composite_u_scalar(mean_ri = NULL, mean_ra = NULL, mean_u, k_vars)
 The estimated \emph{u} ratio of the composite variable.
 }
 \description{
-\loadmathjax
 This function provides an approximation of the u ratio of a composite variable based on the u ratios of the component variables, the mean restricted intercorrelation among those variables,
 and the mean unrestricted correlation among those variables. If only one of the mean intercorrelations is known, the other will be estimated using the bivariate indirect range-restriction formula.
 This tends to compute a conservative estimate of the u ratio associated with a composite.
@@ -27,10 +26,10 @@ This tends to compute a conservative estimate of the u ratio associated with a c
 \details{
 This is computed as:
 
-\mjdeqn{u_{composite}=\sqrt{\frac{\bar{\rho}_{i}\bar{u}^{2}k(k-1)+k\bar{u}^{2}}{\bar{\rho}_{a}k(k-1)+k}}}{u_composite = sqrt((mean_ri * mean_u^2 * k * (k - 1) + k * mean_u^2) / (mean_ra * k_vars * (k - 1) + k))}
+\deqn{u_{composite}=\sqrt{\frac{\bar{\rho}_{i}\bar{u}^{2}k(k-1)+k\bar{u}^{2}}{\bar{\rho}_{a}k(k-1)+k}}}{u_composite = sqrt((mean_ri * mean_u^2 * k * (k - 1) + k * mean_u^2) / (mean_ra * k_vars * (k - 1) + k))}
 
-where \mjeqn{u_{composite}}{u_composite} is the composite u ratio, \mjeqn{\bar{u}}{mean_u} is the mean univariate u ratio, \mjeqn{\bar{\rho}_{i}}{mean_ri} is the mean restricted correlation among variables,
-\mjeqn{\bar{\rho}_{a}}{mean_ra} is the mean unrestricted correlation among variables, and \emph{k} is the number of variables in the composite.
+where \eqn{u_{composite}}{u_composite} is the composite u ratio, \eqn{\bar{u}}{mean_u} is the mean univariate u ratio, \eqn{\bar{\rho}_{i}}{mean_ri} is the mean restricted correlation among variables,
+\eqn{\bar{\rho}_{a}}{mean_ra} is the mean unrestricted correlation among variables, and \emph{k} is the number of variables in the composite.
 }
 \examples{
 composite_u_scalar(mean_ri = .3, mean_ra = .4, mean_u = .8, k_vars = 2)

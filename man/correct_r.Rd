@@ -71,27 +71,26 @@ Data frame(s) of observed correlations (\code{rxyi}), operational range-restrict
 range-corrected observed-score correlations (\code{rxya}), operational range-corrected correlations corrected for measurement error in Y only (\code{rxpa}), operational range-corrected correlations corrected for measurement error in X only (\code{rtya}), and range-corrected true-score correlations (\code{rtpa}).
 }
 \description{
-\loadmathjax
-Corrects Pearson correlations (\mjseqn{r}) for range restriction and/or measurement error
+Corrects Pearson correlations (\eqn{r}) for range restriction and/or measurement error
 }
 \details{
 The correction for measurement error is:
-\mjdeqn{\rho_{TP}=\frac{\rho_{XY}}{\sqrt{\rho_{XX}\rho_{YY}}}}{rtp = rxy / sqrt(rxx * ryy)}
+\deqn{\rho_{TP}=\frac{\rho_{XY}}{\sqrt{\rho_{XX}\rho_{YY}}}}{rtp = rxy / sqrt(rxx * ryy)}
 
 The correction for univariate direct range restriction is:
-\mjdeqn{\rho_{TP_{a}}=\left[\frac{\rho_{XY_{i}}}{u_{X}\sqrt{\rho_{YY_{i}}}\sqrt{\left(\frac{1}{u_{X}^{2}}-1\right)\frac{\rho_{XY_{i}}^{2}}{\rho_{YY_{i}}}+1}}\right]/\sqrt{\rho_{XX_{a}}}}{rtpa = (rxyi / (ux * sqrt(ryyi) * sqrt((1 / ux^2 - 1) * rxyi^2 / ryyi + 1))) / sqrt(rxxa)}
+\deqn{\rho_{TP_{a}}=\left[\frac{\rho_{XY_{i}}}{u_{X}\sqrt{\rho_{YY_{i}}}\sqrt{\left(\frac{1}{u_{X}^{2}}-1\right)\frac{\rho_{XY_{i}}^{2}}{\rho_{YY_{i}}}+1}}\right]/\sqrt{\rho_{XX_{a}}}}{rtpa = (rxyi / (ux * sqrt(ryyi) * sqrt((1 / ux^2 - 1) * rxyi^2 / ryyi + 1))) / sqrt(rxxa)}
 
 The correction for univariate indirect range restriction is:
-\mjdeqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}}{u_{T}\sqrt{\rho_{XX_{i}}\rho_{YY_{i}}}\sqrt{\left(\frac{1}{u_{T}^{2}}-1\right)\frac{\rho_{XY_{i}}^{2}}{\rho_{XX_{i}}\rho_{YY_{i}}}+1}}}{rtpa = rxyi / (ut * sqrt(rxxi * ryyi) * sqrt((1 / ut^2 - 1) * rxyi^2 / (rxxi * ryyi) + 1))}
+\deqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}}{u_{T}\sqrt{\rho_{XX_{i}}\rho_{YY_{i}}}\sqrt{\left(\frac{1}{u_{T}^{2}}-1\right)\frac{\rho_{XY_{i}}^{2}}{\rho_{XX_{i}}\rho_{YY_{i}}}+1}}}{rtpa = rxyi / (ut * sqrt(rxxi * ryyi) * sqrt((1 / ut^2 - 1) * rxyi^2 / (rxxi * ryyi) + 1))}
 
 The correction for bivariate direct range restriction is:
-\mjdeqn{\rho_{TP_{a}}=\frac{\frac{\rho_{XY_{i}}^{2}-1}{2\rho_{XY_{i}}}u_{X}u_{Y}+\mathrm{sign}\left(\rho_{XY_{i}}\right)\sqrt{\frac{\left(1-\rho_{XY_{i}}^{2}\right)^{2}}{4\rho_{XY_{i}}}u_{X}^{2}u_{Y}^{2}+1}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (((rxyi^2 - 1)/(2 * rxyi)) * ux * uy + sign[rxyi] * sqrt(((1 - rxyi^2)^2) / (4 * rxyi) * ux^2 * uy^2 + 1)) / (sqrt(rxxa * ryya))}
+\deqn{\rho_{TP_{a}}=\frac{\frac{\rho_{XY_{i}}^{2}-1}{2\rho_{XY_{i}}}u_{X}u_{Y}+\mathrm{sign}\left(\rho_{XY_{i}}\right)\sqrt{\frac{\left(1-\rho_{XY_{i}}^{2}\right)^{2}}{4\rho_{XY_{i}}}u_{X}^{2}u_{Y}^{2}+1}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (((rxyi^2 - 1)/(2 * rxyi)) * ux * uy + sign[rxyi] * sqrt(((1 - rxyi^2)^2) / (4 * rxyi) * ux^2 * uy^2 + 1)) / (sqrt(rxxa * ryya))}
 
 The correction for bivariate indirect range restriction is:
-\mjdeqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2)) / (sqrt(rxxa * ryya))}
+\deqn{\rho_{TP_{a}}=\frac{\rho_{XY_{i}}u_{X}u_{Y}+\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}}{rtpa = (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2)) / (sqrt(rxxa * ryya))}
 
-where the \mjeqn{\lambda}{lambda} value allows \mjeqn{u_{X}}{ux} and \mjeqn{u_{Y}}{uy} to fall on either side of unity so as to function as a two-stage correction for mixed patterns of range restriction and range enhancement. The \mjseqn{\lambda} value is computed as:
-\mjdeqn{\lambda=\mathrm{sign}\left[\rho_{ST_{a}}\rho_{SP_{a}}\left(1-u_{X}\right)\left(1-u_{Y}\right)\right]\frac{\mathrm{sign}\left(1-u_{X}\right)\min\left(u_{X},\frac{1}{u_{X}}\right)+\mathrm{sign}\left(1-u_{Y}\right)\min\left(u_{Y},\frac{1}{u_{Y}}\right)}{\min\left(u_{X},\frac{1}{u_{X}}\right)\min\left(u_{Y},\frac{1}{u_{Y}}\right)}}{\lambda = sign[rsta * rspa * (1 - ux) * (1 - uy)] * (sign[1 - ux ] * min(ux, 1/ux) + sign[1 - uy] * min(uy, 1/uy)) / (min(ux, 1/ux) * min(uy,1/uy))}
+where the \eqn{\lambda}{lambda} value allows \eqn{u_{X}}{ux} and \eqn{u_{Y}}{uy} to fall on either side of unity so as to function as a two-stage correction for mixed patterns of range restriction and range enhancement. The \eqn{\lambda} value is computed as:
+\deqn{\lambda=\mathrm{sign}\left[\rho_{ST_{a}}\rho_{SP_{a}}\left(1-u_{X}\right)\left(1-u_{Y}\right)\right]\frac{\mathrm{sign}\left(1-u_{X}\right)\min\left(u_{X},\frac{1}{u_{X}}\right)+\mathrm{sign}\left(1-u_{Y}\right)\min\left(u_{Y},\frac{1}{u_{Y}}\right)}{\min\left(u_{X},\frac{1}{u_{X}}\right)\min\left(u_{Y},\frac{1}{u_{Y}}\right)}}{\lambda = sign[rsta * rspa * (1 - ux) * (1 - uy)] * (sign[1 - ux ] * min(ux, 1/ux) + sign[1 - uy] * min(uy, 1/uy)) / (min(ux, 1/ux) * min(uy,1/uy))}
 }
 \examples{
 ## Correction for measurement error only

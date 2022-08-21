@@ -2,7 +2,7 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_alpha}
 \alias{var_error_alpha}
-\title{Analytic estimate of the sampling variance of coefficient \mjseqn{\alpha}}
+\title{Analytic estimate of the sampling variance of coefficient \eqn{\alpha}}
 \usage{
 var_error_alpha(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases)
 }
@@ -10,18 +10,17 @@ var_error_alpha(item_mat = NULL, alpha = NULL, k_items = NULL, n_cases)
 \item{item_mat}{Item correlation/covariance matrix. If item_mat is not supplied, the user must supply both alpha and k_items.
 If item_mat is NULL, the program will assume that all item intercorrelations are equal.}
 
-\item{alpha}{Vector of population \mjseqn{\alpha} values. Must be supplied if item_mat is NULL.}
+\item{alpha}{Vector of population \eqn{\alpha} values. Must be supplied if item_mat is NULL.}
 
 \item{k_items}{Vector of numbers of items to be simulated. Must be supplied if item_mat is NULL.}
 
 \item{n_cases}{Vector of sample sizes to simulate in sampling distribution of alpha.}
 }
 \value{
-Vector of sampling variances of the supplied \mjseqn{\alpha} values.
+Vector of sampling variances of the supplied \eqn{\alpha} values.
 }
 \description{
-\loadmathjax
-Estimates the error variance of Cronbach's coefficient \mjseqn{\alpha}.
+Estimates the error variance of Cronbach's coefficient \eqn{\alpha}.
 }
 \examples{
 item_mat <- matrix(.3, 5, 5)
