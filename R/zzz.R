@@ -181,22 +181,6 @@
 }
 
 
-#' Retrieve the `NEWS` file for the *psychmeta* package
-#'
-#' @description
-#' Displays *psychmeta*'s `NEWS` file, which contains version information, outlines additions and changes to the package, and describes other updates.
-#'
-#' @export
-#' @md
-#'
-#' @examples
-#' psychmeta_news()
-psychmeta_news <- function(){
-  # TODO: Once the pkgdown site is running, change this to:
-  # utils::browseURL("https://psychmeta.com/news/index.html")
-  utils::browseURL("https://github.com/psychmeta/psychmeta/blob/master/NEWS.md")
-}
-
 register_s3_method <- function(pkg, generic, class, fun = NULL) {
   stopifnot(is.character(pkg), length(pkg) == 1)
   envir <- asNamespace(pkg)
