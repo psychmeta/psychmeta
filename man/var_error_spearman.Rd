@@ -17,13 +17,12 @@ var_error_spearman(r, n, correct_bias = TRUE)
 A vector of sampling-error variances.
 }
 \description{
-\loadmathjax
-Estimates the variance of Spearman rank correlations (\mjseqn{\rho}) using the Fieller correction.
+Estimates the variance of Spearman rank correlations (\eqn{\rho}) using the Fieller correction.
 }
 \details{
 The sampling variance of a Spearman rank correlation is approximately:
 
-\mjdeqn{var_{e}=\frac{1.06 \times (1-r^{2})^{2}}{n-1}}{var_e = 1.06 * (1 - r^2)^2 / (n - 1)}
+\deqn{var_{e}=\frac{1.06 \times (1-r^{2})^{2}}{n-1}}{var_e = 1.06 * (1 - r^2)^2 / (n - 1)}
 
 This can be corrected for bias in the sample correlation by first correcting the correlation (see \code{\link[=correct_r_bias]{correct_r_bias()}}) prior to estimating the error variance.
 }

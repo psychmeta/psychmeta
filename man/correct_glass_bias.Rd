@@ -3,12 +3,12 @@
 \encoding{UTF-8}
 \name{correct_glass_bias}
 \alias{correct_glass_bias}
-\title{Correct for small-sample bias in Glass' \mjseqn{\Delta} values}
+\title{Correct for small-sample bias in Glass' \eqn{\Delta} values}
 \usage{
 correct_glass_bias(delta, nc, ne, use_pooled_sd = rep(FALSE, length(delta)))
 }
 \arguments{
-\item{delta}{Vector of Glass' \mjseqn{\Delta} values.}
+\item{delta}{Vector of Glass' \eqn{\Delta} values.}
 
 \item{nc}{Vector of control-group sample sizes.}
 
@@ -20,18 +20,17 @@ correct_glass_bias(delta, nc, ne, use_pooled_sd = rep(FALSE, length(delta)))
 Vector of d values corrected for small-sample bias.
 }
 \description{
-\loadmathjax
-Correct for small-sample bias in Glass' \mjseqn{\Delta} values.
+Correct for small-sample bias in Glass' \eqn{\Delta} values.
 }
 \details{
 The bias correction is estimated as:
 
-\mjdeqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
+\deqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
 
-where \mjseqn{\Delta} is the observed effect size, \mjeqn{\Delta_{c}}{\Delta_c} is the
-corrected estimate of \mjseqn{\Delta},
-\mjeqn{n_{control}}{nc} is the control-group sample size, and
-\mjeqn{\Gamma()}{gamma()} is the \link[base:Special]{gamma function}.
+where \eqn{\Delta} is the observed effect size, \eqn{\Delta_{c}}{\Delta_c} is the
+corrected estimate of \eqn{\Delta},
+\eqn{n_{control}}{nc} is the control-group sample size, and
+\eqn{\Gamma()}{gamma()} is the \link[base:Special]{gamma function}.
 }
 \examples{
 correct_glass_bias(delta = .3, nc = 30, ne = 30)
@@ -39,5 +38,5 @@ correct_glass_bias(delta = .3, nc = 30, ne = 30)
 \references{
 Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect
 size and related estimators. \emph{Journal of Educational Statistics, 6}(2),
-107–128. doi: 10.2307/1164588
+107–128. \doi{10.2307/1164588}
 }

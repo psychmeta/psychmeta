@@ -15,11 +15,10 @@ correct_r_bias(r, n)
 Vector of correlations corrected for small-sample bias.
 }
 \description{
-\loadmathjax
-Corrects Pearson correlations (\mjseqn{r}) for small-sample bias
+Corrects Pearson correlations (\eqn{r}) for small-sample bias
 }
 \details{
-\mjdeqn{r_{c}=\frac{r_{obs}}{\left(\frac{2n-2}{2n-1}\right)}}{r_c = r / ((2 * n - 2) / (2 * n - 1))}
+\deqn{r_{c}=\frac{r_{obs}}{\left(\frac{2n-2}{2n-1}\right)}}{r_c = r / ((2 * n - 2) / (2 * n - 1))}
 }
 \examples{
 correct_r_bias(r = .3, n = 30)

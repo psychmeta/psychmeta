@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_dmod.R
 \name{compute_dmod_par}
 \alias{compute_dmod_par}
-\title{Function for computing parametric \mjeqn{d_{Mod}}{d_Mod} effect sizes for any number of focal groups}
+\title{Function for computing parametric \eqn{d_{Mod}}{d_Mod} effect sizes for any number of focal groups}
 \usage{
 compute_dmod_par(
   referent_int,
@@ -39,58 +39,58 @@ compute_dmod_par(
 
 \item{focal_names}{Focal-group names. If \code{NULL} (the default), the focal groups will be given numeric labels ranging from 1 through the number of groups.}
 
-\item{rescale_cdf}{Logical argument that indicates whether parametric \mjeqn{d_{Mod}}{d_Mod} results
+\item{rescale_cdf}{Logical argument that indicates whether parametric \eqn{d_{Mod}}{d_Mod} results
 should be rescaled to account for using a cumulative density < 1 in the computations (\code{TRUE}; default) or not (\code{FALSE}).}
 }
 \value{
-A matrix of effect sizes (\mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed},
-    \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}, \mjeqn{d_{Mod_{Under}}}{d_Mod_Under},
-    \mjeqn{d_{Mod_{Over}}}{d_Mod_Over}), proportions of under- and over-predicted criterion scores,
-    minimum and maximum differences (i.e., \mjeqn{d_{Mod_{Under}}}{d_Mod_Under} and \mjeqn{d_{Mod_{Over}}}{d_Mod_Over}),
+A matrix of effect sizes (\eqn{d_{Mod_{Signed}}}{d_Mod_Signed},
+    \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned}, \eqn{d_{Mod_{Under}}}{d_Mod_Under},
+    \eqn{d_{Mod_{Over}}}{d_Mod_Over}), proportions of under- and over-predicted criterion scores,
+    minimum and maximum differences (i.e., \eqn{d_{Mod_{Under}}}{d_Mod_Under} and \eqn{d_{Mod_{Over}}}{d_Mod_Over}),
     and the scores associated with minimum and maximum differences.
     Note that if the regression lines are parallel and infinite \code{focal_min_x} and \code{focal_max_x} values were
     specified, the extrema will be defined using the scores 3 focal-group SDs above and below the corresponding focal-group means.
 }
 \description{
-This function computes \mjeqn{d_{Mod}}{d_Mod} effect sizes from user-defined descriptive statistics
+This function computes \eqn{d_{Mod}}{d_Mod} effect sizes from user-defined descriptive statistics
 and regression coefficients. If one has access to a raw data set, the \code{dMod} function may be used
 as a wrapper to this function so that the regression equations and descriptive statistics can
 be computed automatically within the program.
 }
 \details{
-The \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed} effect size (i.e., the average of differences in prediction over
+The \eqn{d_{Mod_{Signed}}}{d_Mod_Signed} effect size (i.e., the average of differences in prediction over
 the range of predictor scores) is computed as
-\mjdeqn{d_{Mod_{Signed}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left[X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right] dX,}{d_Mod_Signed = 1/SD_Y_1 * integrate(f_2(X) * [X * (b_1_1 - b_1_2) + b_0_1 - b_0_2]),}
+\deqn{d_{Mod_{Signed}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left[X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right] dX,}{d_Mod_Signed = 1/SD_Y_1 * integrate(f_2(X) * [X * (b_1_1 - b_1_2) + b_0_1 - b_0_2]),}
 where
   \itemize{
-    \item {\mjeqn{SD_{Y_{1}}}{Y_1} is the referent group's criterion standard deviation;}
-    \item {\mjeqn{f_{2}(X)}{f_2(X)} is the normal-density function for the distribution of focal-group predictor scores;}
-    \item {\mjeqn{b_{1_{1}}}{b_1_1} and \mjeqn{b_{1_{0}}}{b_1_0} are the slopes of the regression of \mjseqn{Y} on \mjseqn{X} for the referent and focal groups, respectively;}
-    \item {\mjeqn{b_{0_{1}}}{b_0_1} and \mjeqn{b_{0_{0}}}{b_0_0} are the intercepts of the regression of \mjseqn{Y} on \mjseqn{X} for the referent and focal groups, respectively; and}
-    \item {the integral spans all \mjseqn{X} scores within the operational range of predictor scores for the focal group.}
+    \item {\eqn{SD_{Y_{1}}}{Y_1} is the referent group's criterion standard deviation;}
+    \item {\eqn{f_{2}(X)}{f_2(X)} is the normal-density function for the distribution of focal-group predictor scores;}
+    \item {\eqn{b_{1_{1}}}{b_1_1} and \eqn{b_{1_{0}}}{b_1_0} are the slopes of the regression of \eqn{Y} on \eqn{X} for the referent and focal groups, respectively;}
+    \item {\eqn{b_{0_{1}}}{b_0_1} and \eqn{b_{0_{0}}}{b_0_0} are the intercepts of the regression of \eqn{Y} on \eqn{X} for the referent and focal groups, respectively; and}
+    \item {the integral spans all \eqn{X} scores within the operational range of predictor scores for the focal group.}
   }
 
-The \mjeqn{d_{Mod_{Under}}}{d_Mod_Under} and \mjeqn{d_{Mod_{Over}}}{d_Mod_Over} effect sizes are computed
-using the same equation as \mjeqn{d_{Mod_{Signed}}}{d_Mod_Signed}, but \mjeqn{d_{Mod_{Under}}}{d_Mod_Under} is
+The \eqn{d_{Mod_{Under}}}{d_Mod_Under} and \eqn{d_{Mod_{Over}}}{d_Mod_Over} effect sizes are computed
+using the same equation as \eqn{d_{Mod_{Signed}}}{d_Mod_Signed}, but \eqn{d_{Mod_{Under}}}{d_Mod_Under} is
 the weighted average of all scores in the area of underprediction (i.e., the differences in prediction with
-negative signs) and \mjeqn{d_{Mod_{Over}}}{d_Mod_Over} is the weighted average of all scores in the area of
+negative signs) and \eqn{d_{Mod_{Over}}}{d_Mod_Over} is the weighted average of all scores in the area of
 overprediction (i.e., the differences in prediction with negative signs).
 
-The \mjeqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size (i.e., the average of absolute differences in prediction over
+The \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size (i.e., the average of absolute differences in prediction over
 the range of predictor scores) is computed as
-\mjdeqn{d_{Mod_{Unsigned}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|dX.}{d_Mod_Unsigned = 1/SD_Y_1 * integrate(f_2(X) * |X * (b_1_1 - b_1_2) + b_0_1 - b_0_2|).}
+\deqn{d_{Mod_{Unsigned}}=\frac{1}{SD_{Y_{1}}}\intop f_{2}(X)\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|dX.}{d_Mod_Unsigned = 1/SD_Y_1 * integrate(f_2(X) * |X * (b_1_1 - b_1_2) + b_0_1 - b_0_2|).}
 
-The \mjeqn{d_{Min}}{d_Min} effect size (i.e., the smallest absolute difference in prediction observed over the
+The \eqn{d_{Min}}{d_Min} effect size (i.e., the smallest absolute difference in prediction observed over the
 range of predictor scores) is computed as
-\mjdeqn{d_{Min}=\frac{1}{SD_{Y_{1}}}Min\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Min = 1/SD_Y_1 * Min[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
+\deqn{d_{Min}=\frac{1}{SD_{Y_{1}}}Min\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Min = 1/SD_Y_1 * Min[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
 
-The \mjeqn{d_{Max}}{d_Max} effect size (i.e., the largest absolute difference in prediction observed over the
+The \eqn{d_{Max}}{d_Max} effect size (i.e., the largest absolute difference in prediction observed over the
 range of predictor scores)is computed as
-\mjdeqn{d_{Max}=\frac{1}{SD_{Y_{1}}}Max\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Max = 1/SD_Y_1 * Max[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
-\emph{Note}: When \mjeqn{d_{Min}}{d_Min} and \mjeqn{d_{Max}}{d_Max} are computed in this package, the output will display the
+\deqn{d_{Max}=\frac{1}{SD_{Y_{1}}}Max\left[\left|X\left(b_{1_{1}}-b_{1_{2}}\right)+b_{0_{1}}-b_{0_{2}}\right|\right].}{d_Max = 1/SD_Y_1 * Max[X * (b_1_1 - b_1_2) + b_0_1 - b_0_2].}
+\emph{Note}: When \eqn{d_{Min}}{d_Min} and \eqn{d_{Max}}{d_Max} are computed in this package, the output will display the
 signs of the differences (rather than the absolute values of the differences) to aid in interpretation.
 
-If \mjeqn{d_{Mod}}{d_Mod} effect sizes are to be rescaled to compensate for a cumulative density less than 1 (see the \code{rescale_cdf} argument), the result of each
+If \eqn{d_{Mod}}{d_Mod} effect sizes are to be rescaled to compensate for a cumulative density less than 1 (see the \code{rescale_cdf} argument), the result of each
 effect size involving integration will be divided by the ratio of the cumulative density of the observed range of scores (i.e., the range bounded by the \code{focal_min_x}
 and \code{focal_max_x} arguments) to the cumulative density of scores bounded by \code{-Inf} and \code{Inf}.
 }

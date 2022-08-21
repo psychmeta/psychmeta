@@ -2,12 +2,12 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_delta}
 \alias{var_error_delta}
-\title{Estimate the error variance of Glass's \mjseqn{\Delta} values}
+\title{Estimate the error variance of Glass's \eqn{\Delta} values}
 \usage{
 var_error_delta(delta, nc, ne = NA, use_pooled_sd = FALSE, correct_bias = TRUE)
 }
 \arguments{
-\item{delta}{Vector of Glass' \mjseqn{\Delta} values.}
+\item{delta}{Vector of Glass' \eqn{\Delta} values.}
 
 \item{nc}{Vector of control-group sample sizes (or the total sample size with the assumption that groups are of equal size, if no experimental-group sample size is supplied).}
 
@@ -21,8 +21,7 @@ var_error_delta(delta, nc, ne = NA, use_pooled_sd = FALSE, correct_bias = TRUE)
 A vector of sampling-error variances.
 }
 \description{
-\loadmathjax
-Estimates the error variance of standardized mean differences (Glass's \mjseqn{\Delta} values)
+Estimates the error variance of standardized mean differences (Glass's \eqn{\Delta} values)
 }
 \examples{
 var_error_delta(delta = .3, nc = 30, ne = 30)

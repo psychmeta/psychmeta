@@ -20,13 +20,12 @@ NOTE: Currently, only alpha has its own dedicated error-variance estimate; the e
 A vector of sampling-error variances.
 }
 \description{
-\loadmathjax
-Estimate error variance for square-root reliability coefficients (measure quality indices; \mjeqn{\sqrt{r_{xx}}}{\sqrt(r_XX)} or \mjeqn{q_{XX}}{q_XX}).
+Estimate error variance for square-root reliability coefficients (measure quality indices; \eqn{\sqrt{r_{xx}}}{\sqrt(r_XX)} or \eqn{q_{XX}}{q_XX}).
 }
 \details{
 The sampling variance of the square root of a reliability coefficient is:
 
-\mjdeqn{var_{e}=\frac{(1-q_{X}^{2})^{2}}{n-1}}{var_e = (1 - qx^2)^2 / (n - 1)}
+\deqn{var_{e}=\frac{(1-q_{X}^{2})^{2}}{n-1}}{var_e = (1 - qx^2)^2 / (n - 1)}
 
 For the equation to estimate the variance of coefficient alpha, see Duhachek and Iacobucci (2004).
 }

@@ -1,6 +1,5 @@
 #' Adjusted sample size for a non-Pearson correlation coefficient for use in a meta-analysis of Pearson correlations
 #'
-#' \loadmathjax
 #' This function is used to compute the adjusted sample size of a non-Pearson correlation (e.g., a tetrachoric correlation) based on the correlation and its estimated error variance.
 #' This function allows users to adjust the sample size of a correlation corrected for sporadic artifacts (e.g., unequal splits of dichotomous variables, artificial dichotomization of continuous variables) prior to use in a meta-analysis.
 #'
@@ -18,7 +17,7 @@
 #' @details
 #' The adjusted sample size is computed as:
 #'
-#' \mjdeqn{n_{adjusted}=\frac{(r^{2}-1)^{2}+var_{e}}{var_{e}}}{n_adjusted = ((r^2 - 1)^2 + var_e) / var_e}
+#' \deqn{n_{adjusted}=\frac{(r^{2}-1)^{2}+var_{e}}{var_{e}}}{n_adjusted = ((r^2 - 1)^2 + var_e) / var_e}
 #'
 #' @examples
 #' adjust_n_r(r = .3, var_e = .01)
@@ -33,11 +32,10 @@ adjust_n_r <- function(r, var_e) {
 
 #' Adjusted sample size for a non-Cohen *d* value for use in a meta-analysis of Cohen's *d* values
 #'
-#' \loadmathjax
-#' This function is used to convert a non-Cohen \mjseqn{d} value (e.g., Glass' \mjeqn{\Delta}{\Delta}) to a Cohen's \mjseqn{d} value by identifying the sample size of a Cohen's \mjseqn{d} that has the
-#' same standard error as the non-Cohen \mjseqn{d}. This function permits users to account for the influence of sporadic corrections on the sampling variance of \mjseqn{d} prior to use in a meta-analysis.
+#' This function is used to convert a non-Cohen \eqn{d} value (e.g., Glass' \eqn{\Delta}{\Delta}) to a Cohen's \eqn{d} value by identifying the sample size of a Cohen's \eqn{d} that has the
+#' same standard error as the non-Cohen \eqn{d}. This function permits users to account for the influence of sporadic corrections on the sampling variance of \eqn{d} prior to use in a meta-analysis.
 #'
-#' @param d Vector of non-Cohen \mjseqn{d} standardized mean differences.
+#' @param d Vector of non-Cohen \eqn{d} standardized mean differences.
 #' @param var_e Vector of error variances of standardized mean differences.
 #' @param p Proportion of participants in a study belonging to one of the two groups being contrasted.
 #'
@@ -52,7 +50,7 @@ adjust_n_r <- function(r, var_e) {
 #'
 #' @details
 #' The adjusted sample size is computed as:
-#' \mjdeqn{n_{adjusted}=\frac{d^{2}p(1-p)+2}{2p(1-p)var_{e}}}{n_adjusted = ((d^2 * p * (1 - p) + 2) / (2 * p * (1 - p) * var_e))}
+#' \deqn{n_{adjusted}=\frac{d^{2}p(1-p)+2}{2p(1-p)var_{e}}}{n_adjusted = ((d^2 * p * (1 - p) + 2) / (2 * p * (1 - p) * var_e))}
 #'
 #' @examples
 #' adjust_n_d(d = 1, var_e = .03, p = NA)

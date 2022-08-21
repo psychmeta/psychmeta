@@ -4,19 +4,18 @@
 #' @title Convert effect sizes
 #'
 #' @description
-#' \loadmathjax
-#' This function converts a variety of effect sizes to correlations, Cohen's \mjseqn{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
+#' This function converts a variety of effect sizes to correlations, Cohen's \eqn{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
 #'
 #' @param es Vector of effect sizes to convert.
-#' @param input_es Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \mjseqn{d}, independent samples \mjseqn{t} values (or their \mjseqn{p} values), two-group one-way ANOVA \mjseqn{F} values (or their \mjseqn{p} values), 1-df \mjeqn{\chi^{2}}{\chi-squared} values (or their \mjseqn{p} values), odds ratios, log odds ratios, Fisher *z*, and the common language effect size (CLES, A, AUC).
-#' @param output_es Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \mjseqn{d} values, and common language effect sizes (CLES, A, AUC).
+#' @param input_es Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \eqn{d}, independent samples \eqn{t} values (or their \eqn{p} values), two-group one-way ANOVA \eqn{F} values (or their \eqn{p} values), 1-df \eqn{\chi^{2}}{\chi-squared} values (or their \eqn{p} values), odds ratios, log odds ratios, Fisher *z*, and the common language effect size (CLES, A, AUC).
+#' @param output_es Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \eqn{d} values, and common language effect sizes (CLES, A, AUC).
 #' @param n1 Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.
 #' @param n2 Vector of sample sizes of group 2 of the two groups being contrasted.
-#' @param df1 Vector of input test statistic degrees of freedom (for \mjseqn{t} and \mjeqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \mjseqn{F}).
-#' @param df2 Vector of input test statistic within-group degrees of freedom (for \mjseqn{F}).
+#' @param df1 Vector of input test statistic degrees of freedom (for \eqn{t} and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \eqn{F}).
+#' @param df2 Vector of input test statistic within-group degrees of freedom (for \eqn{F}).
 #' @param sd1 Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.
 #' @param sd2 Vector of standard deviations of group 2 of the two groups being contrasted.
-#' @param tails Vector of the tails for \mjseqn{p} values when `input_es = "p.t"`. Can be `2` (default) or `1`.
+#' @param tails Vector of the tails for \eqn{p} values when `input_es = "p.t"`. Can be `2` (default) or `1`.
 #'
 #' @return A data frame of class `es` with variables:
 #' \item{`r`, `d`, `A`}{The converted effect sizes}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/var_error.R
 \name{var_error_g}
 \alias{var_error_g}
-\title{Estimate the error variance Hedges's \mjseqn{g} values}
+\title{Estimate the error variance Hedges's \eqn{g} values}
 \usage{
 var_error_g(g, n1, n2 = NA, a_method = c("gamma", "approx"))
 }
 \arguments{
-\item{g}{Vector of Hedges's \mjseqn{g} values.}
+\item{g}{Vector of Hedges's \eqn{g} values.}
 
 \item{n1}{Vector of sample sizes from group 1 (or the total sample size with the assumption that groups are of equal size, if no group 2 sample size is supplied).}
 
@@ -19,7 +19,6 @@ var_error_g(g, n1, n2 = NA, a_method = c("gamma", "approx"))
 A vector of sampling-error variances.
 }
 \description{
-\loadmathjax
 Allows for error variance to be estimated using total sample size of both groups being compared (in this case, supply sample sizes using only the n1 argument) or
 using separate sample sizes for group 1 and group 2 (i.e., the groups being compared; in this case, supply sample sizes using both the n1 and n2 arguments).
 }

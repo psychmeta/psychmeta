@@ -6,8 +6,8 @@
 \usage{
 convert_es(
   es,
-  input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F", "chisq", "p.chisq",
-    "or", "lor", "Fisherz", "A", "auc", "cles"),
+  input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F", "chisq", "p.chisq", "or",
+    "lor", "Fisherz", "A", "auc", "cles"),
   output_es = c("r", "d", "A", "auc", "cles"),
   n1 = NULL,
   n2 = NULL,
@@ -21,23 +21,23 @@ convert_es(
 \arguments{
 \item{es}{Vector of effect sizes to convert.}
 
-\item{input_es}{Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \mjseqn{d}, independent samples \mjseqn{t} values (or their \mjseqn{p} values), two-group one-way ANOVA \mjseqn{F} values (or their \mjseqn{p} values), 1-df \mjeqn{\chi^{2}}{\chi-squared} values (or their \mjseqn{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).}
+\item{input_es}{Scalar. Metric of input effect sizes. Currently supports correlations, Cohen's \eqn{d}, independent samples \eqn{t} values (or their \eqn{p} values), two-group one-way ANOVA \eqn{F} values (or their \eqn{p} values), 1-df \eqn{\chi^{2}}{\chi-squared} values (or their \eqn{p} values), odds ratios, log odds ratios, Fisher \emph{z}, and the common language effect size (CLES, A, AUC).}
 
-\item{output_es}{Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \mjseqn{d} values, and common language effect sizes (CLES, A, AUC).}
+\item{output_es}{Scalar. Metric of output effect sizes. Currently supports correlations, Cohen's \eqn{d} values, and common language effect sizes (CLES, A, AUC).}
 
 \item{n1}{Vector of total sample sizes or sample sizes of group 1 of the two groups being contrasted.}
 
 \item{n2}{Vector of sample sizes of group 2 of the two groups being contrasted.}
 
-\item{df1}{Vector of input test statistic degrees of freedom (for \mjseqn{t} and \mjeqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \mjseqn{F}).}
+\item{df1}{Vector of input test statistic degrees of freedom (for \eqn{t} and \eqn{\chi^{2}}{\chi-squared}) or between-groups degree of freedom (for \eqn{F}).}
 
-\item{df2}{Vector of input test statistic within-group degrees of freedom (for \mjseqn{F}).}
+\item{df2}{Vector of input test statistic within-group degrees of freedom (for \eqn{F}).}
 
 \item{sd1}{Vector of pooled (within-group) standard deviations or standard deviations of group 1 of the two groups being contrasted.}
 
 \item{sd2}{Vector of standard deviations of group 2 of the two groups being contrasted.}
 
-\item{tails}{Vector of the tails for \mjseqn{p} values when \code{input_es = "p.t"}. Can be \code{2} (default) or \code{1}.}
+\item{tails}{Vector of the tails for \eqn{p} values when \code{input_es = "p.t"}. Can be \code{2} (default) or \code{1}.}
 }
 \value{
 A data frame of class \code{es} with variables:
@@ -48,8 +48,7 @@ A data frame of class \code{es} with variables:
 \item{\code{var_e}}{The estimated sampling error variance}
 }
 \description{
-\loadmathjax
-This function converts a variety of effect sizes to correlations, Cohen's \mjseqn{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
+This function converts a variety of effect sizes to correlations, Cohen's \eqn{d} values, or common language effect sizes, and calculates sampling error variances and effective sample sizes.
 }
 \examples{
 convert_es(es = 1,  input_es="d", output_es="r", n1=100)

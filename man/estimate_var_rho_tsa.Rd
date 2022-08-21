@@ -9,7 +9,7 @@
 \alias{estimate_var_rho_tsa_bvirr}
 \alias{estimate_var_rho_tsa_rb1}
 \alias{estimate_var_rho_tsa_rb2}
-\title{Taylor Series Approximation of variance of \mjseqn{\rho} corrected for psychometric artifacts}
+\title{Taylor Series Approximation of variance of \eqn{\rho} corrected for psychometric artifacts}
 \usage{
 estimate_var_rho_tsa_meas(
   mean_rtp,
@@ -167,19 +167,18 @@ estimate_var_rho_tsa_rb2(
 Vector of meta-analytic variances estimated via Taylor series approximation.
 }
 \description{
-\loadmathjax
-Functions to estimate the variance of \mjseqn{\rho} corrected for psychometric artifacts.
+Functions to estimate the variance of \eqn{\rho} corrected for psychometric artifacts.
 These functions use Taylor series approximations (i.e., the delta method) to estimate the variance in observed effect sizes predictable from the variance in artifact distributions based on the partial derivatives.
 
 The available Taylor-series functions include:
 \itemize{
-     \item{\code{estimate_var_rho_tsa_meas}}{\cr Variance of \mjseqn{\rho} corrected for measurement error only}
-     \item{\code{estimate_var_rho_tsa_uvdrr}}{\cr Variance of \mjseqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-     \item{\code{estimate_var_rho_tsa_bvdrr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate direct range restriction and measurement error}
-     \item{\code{estimate_var_rho_tsa_uvirr}}{\cr Variance of \mjseqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-     \item{\code{estimate_var_rho_tsa_bvirr}}{\cr Variance of \mjseqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-     \item{\code{estimate_var_rho_tsa_rb1}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
-     \item{\code{estimate_var_rho_tsa_rb2}}{\cr Variance of \mjseqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
+     \item{\code{estimate_var_rho_tsa_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
+     \item{\code{estimate_var_rho_tsa_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+     \item{\code{estimate_var_rho_tsa_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
+     \item{\code{estimate_var_rho_tsa_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+     \item{\code{estimate_var_rho_tsa_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+     \item{\code{estimate_var_rho_tsa_rb1}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA1 correction for direct range restriction and measurement error}
+     \item{\code{estimate_var_rho_tsa_rb2}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's TSA2 correction for direct range restriction and measurement error. Note that a typographical error in Raju and Burke's article has been corrected in this function so as to compute appropriate partial derivatives.}
 }
 }
 \details{
@@ -187,19 +186,19 @@ The available Taylor-series functions include:
 
 The attenuation formula for measurement error is
 
-\mjdeqn{\rho_{XY}=\rho_{TP}q_{X}q_{Y}}{rxy = rtp * qx * qy}
-where \mjeqn{\rho_{XY}}{rxy} is an observed correlation, \mjeqn{\rho_{TP}}{rtp} is a true-score correlation, and \mjeqn{q_{X}}{qx} and \mjeqn{q_{Y}}{qy} are the square roots of reliability coefficients for X and Y, respectively.
+\deqn{\rho_{XY}=\rho_{TP}q_{X}q_{Y}}{rxy = rtp * qx * qy}
+where \eqn{\rho_{XY}}{rxy} is an observed correlation, \eqn{\rho_{TP}}{rtp} is a true-score correlation, and \eqn{q_{X}}{qx} and \eqn{q_{Y}}{qy} are the square roots of reliability coefficients for X and Y, respectively.
 
-The Taylor series approximation of the variance of \mjeqn{\rho_{TP}}{rtp} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP}}{rtp} can be computed using the following linear equation,
 
-\mjdeqn{var_{\rho_{TP}} \approx \left[var_{r_{XY}}-var_{e}-\left(b_{1}^{2}var_{q_{X}}+b_{2}^{2}var_{q_{Y}}\right)\right]/b_{3}^{2}}{var_rtp ~= (var_rxy - var_e - (b1^2 * var_qx + b2^2 * var_qy)) / b3^2}
+\deqn{var_{\rho_{TP}} \approx \left[var_{r_{XY}}-var_{e}-\left(b_{1}^{2}var_{q_{X}}+b_{2}^{2}var_{q_{Y}}\right)\right]/b_{3}^{2}}{var_rtp ~= (var_rxy - var_e - (b1^2 * var_qx + b2^2 * var_qy)) / b3^2}
 
-where \mjeqn{b_{1}}{b1}, \mjeqn{b_{2}}{b2}, and \mjeqn{b_{3}}{b3} are first-order partial derivatives of the attenuation formula with respect to \mjeqn{q_{X}}{qx}, \mjeqn{q_{Y}}{qy}, and \mjeqn{\rho_{TP}}{rtp}, respectively.
+where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, and \eqn{b_{3}}{b3} are first-order partial derivatives of the attenuation formula with respect to \eqn{q_{X}}{qx}, \eqn{q_{Y}}{qy}, and \eqn{\rho_{TP}}{rtp}, respectively.
 The first-order partial derivatives of the attenuation formula are:
 
-\mjdeqn{b_{1}=\frac{\partial\rho_{XY}}{\partial q_{X}}=\rho_{TP}q_{Y}}{b1 = rtp * qy}
-\mjdeqn{b_{2}=\frac{\partial\rho_{XY}}{\partial q_{Y}}=\rho_{TP}q_{X}}{b2 = rtp * qx }
-\mjdeqn{b_{3}=\frac{\partial\rho_{XY}}{\partial\rho_{TP}}=q_{X}q_{Y}}{b3 = qx * qy}
+\deqn{b_{1}=\frac{\partial\rho_{XY}}{\partial q_{X}}=\rho_{TP}q_{Y}}{b1 = rtp * qy}
+\deqn{b_{2}=\frac{\partial\rho_{XY}}{\partial q_{Y}}=\rho_{TP}q_{X}}{b2 = rtp * qx }
+\deqn{b_{3}=\frac{\partial\rho_{XY}}{\partial\rho_{TP}}=q_{X}q_{Y}}{b3 = qx * qy}
 
 
 
@@ -208,114 +207,114 @@ The first-order partial derivatives of the attenuation formula are:
 
 The UVDRR attenuation procedure may be represented as
 
-\mjdeqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}q_{Y_{i}}q_{X_{a}}u_{X}}{\sqrt{\rho_{TP_{a}}^{2}q_{X_{a}}^{2}\left(u_{X}^{2}-1\right)+1}}}{rxyi = ux * rxpa * qxa / sqrt((ux^2 - 1) * rxpa^2 * qxa^2 + 1) * qyi}
+\deqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}q_{Y_{i}}q_{X_{a}}u_{X}}{\sqrt{\rho_{TP_{a}}^{2}q_{X_{a}}^{2}\left(u_{X}^{2}-1\right)+1}}}{rxyi = ux * rxpa * qxa / sqrt((ux^2 - 1) * rxpa^2 * qxa^2 + 1) * qyi}
 
 The attenuation formula can also be represented as:
 
-\mjdeqn{\rho_{XY_{i}}=\rho_{TP_{a}}q_{Y_{i}}q_{X_{a}}u_{X}A}{rxyi = qxa * qyi * rtpa * ux * A}
+\deqn{\rho_{XY_{i}}=\rho_{TP_{a}}q_{Y_{i}}q_{X_{a}}u_{X}A}{rxyi = qxa * qyi * rtpa * ux * A}
 
 where
 
-\mjdeqn{A=\frac{1}{\sqrt{\rho_{TP_{a}}^{2}q_{X_{a}}^{2}\left(u_{X}^{2}-1\right)+1}}}{A = 1 / sqrt(rtpa^2 * qxa^2* (ux^2 - 1) + 1)}
+\deqn{A=\frac{1}{\sqrt{\rho_{TP_{a}}^{2}q_{X_{a}}^{2}\left(u_{X}^{2}-1\right)+1}}}{A = 1 / sqrt(rtpa^2 * qxa^2* (ux^2 - 1) + 1)}
 
-The Taylor series approximation of the variance of \mjeqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
 
-\mjdeqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{X}}\right)\right]/b_{4}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qyi + b3^2 * var_ux)) / b4^2}
+\deqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{X}}\right)\right]/b_{4}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qyi + b3^2 * var_ux)) / b4^2}
 
-where \mjeqn{b_{1}}{b1}, \mjeqn{b_{2}}{b2}, \mjeqn{b_{3}}{b3}, and \mjeqn{b_{4}}{b4} are first-order partial derivatives of the attenuation formula with respect to \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{i}}}{qyi}, \mjeqn{u_{X}}{ux}, and \mjeqn{\rho_{TP_{a}}}{rtpa}, respectively.
+where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, and \eqn{b_{4}}{b4} are first-order partial derivatives of the attenuation formula with respect to \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{i}}}{qyi}, \eqn{u_{X}}{ux}, and \eqn{\rho_{TP_{a}}}{rtpa}, respectively.
 The first-order partial derivatives of the attenuation formula are:
 
-\mjdeqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\rho_{TP_{a}}q_{Y_{i}}u_{X}A^{3}}{b1 = qyi * rtpa * ux * A^3 }
-\mjdeqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\rho_{XY_{i}}}{q_{Y_{i}}}}{b2 = qxa * qyi * rtpa * ux * A / qyi }
-\mjdeqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=-\rho_{TP_{a}}q_{Y_{i}}q_{X_{a}}\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}-1\right)A^{3}}{b3 = -(qyi * rtpa * qxa * (rtpa^2 * qxa^2 - 1)) * A^3 }
-\mjdeqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=q_{Y_{i}}q_{X_{a}}u_{X}A^{3}}{b4 = (qyi * qxa * ux) * A^3}
+\deqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\rho_{TP_{a}}q_{Y_{i}}u_{X}A^{3}}{b1 = qyi * rtpa * ux * A^3 }
+\deqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\rho_{XY_{i}}}{q_{Y_{i}}}}{b2 = qxa * qyi * rtpa * ux * A / qyi }
+\deqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=-\rho_{TP_{a}}q_{Y_{i}}q_{X_{a}}\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}-1\right)A^{3}}{b3 = -(qyi * rtpa * qxa * (rtpa^2 * qxa^2 - 1)) * A^3 }
+\deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=q_{Y_{i}}q_{X_{a}}u_{X}A^{3}}{b4 = (qyi * qxa * ux) * A^3}
 
 
 
 
 ######## Univariate indirect range restriction (UVIRR; i.e., Case IV) ########
 
-Under univariate indirect range restriction, the attenuation formula yielding \mjeqn{\rho_{XY_{i}}}{rxyi} is:
+Under univariate indirect range restriction, the attenuation formula yielding \eqn{\rho_{XY_{i}}}{rxyi} is:
 
-\mjdeqn{\rho_{XY_{i}}=\frac{u_{T}q_{X_{a}}}{\sqrt{u_{T}^{2}q_{X_{a}}^{2}+1-q_{X_{a}}^{2}}}\frac{u_{T}\rho_{TP_{a}}}{\sqrt{u_{T}^{2}\rho_{TP_{a}}^{2}+1-\rho_{TP_{a}}^{2}}}}{rxyi = (ut * qxa) / (sqrt(ut^2 * qxa^2 + 1 - qxa^2)) * (ut * rtpa) / (sqrt(ut^2 * rtpa^2 + 1 - rtpa^2))}
+\deqn{\rho_{XY_{i}}=\frac{u_{T}q_{X_{a}}}{\sqrt{u_{T}^{2}q_{X_{a}}^{2}+1-q_{X_{a}}^{2}}}\frac{u_{T}\rho_{TP_{a}}}{\sqrt{u_{T}^{2}\rho_{TP_{a}}^{2}+1-\rho_{TP_{a}}^{2}}}}{rxyi = (ut * qxa) / (sqrt(ut^2 * qxa^2 + 1 - qxa^2)) * (ut * rtpa) / (sqrt(ut^2 * rtpa^2 + 1 - rtpa^2))}
 
 The attenuation formula can also be represented as:
 
-\mjdeqn{\rho_{XY_{i}}=q_{X_{a}}q_{Y_{i}}\rho_{TP_{a}}u_{T}^{2}AB}{rxyi = qxa * qyi * rtpa * ut^2 * A * B}
+\deqn{\rho_{XY_{i}}=q_{X_{a}}q_{Y_{i}}\rho_{TP_{a}}u_{T}^{2}AB}{rxyi = qxa * qyi * rtpa * ut^2 * A * B}
 
 where
 
-\mjdeqn{A=\frac{1}{\sqrt{u_{T}^{2}q_{X_{a}}^{2}+1-q_{X_{a}}^{2}}}}{A = 1 / sqrt(ut^2 * rtpa^2 - rtpa^2 + 1)}
+\deqn{A=\frac{1}{\sqrt{u_{T}^{2}q_{X_{a}}^{2}+1-q_{X_{a}}^{2}}}}{A = 1 / sqrt(ut^2 * rtpa^2 - rtpa^2 + 1)}
 
 and
 
-\mjdeqn{B=\frac{1}{\sqrt{u_{T}^{2}\rho_{TP_{a}}^{2}+1-\rho_{TP_{a}}^{2}}}}{B = 1 / sqrt(ut^2 * qxa^2 - qxa^2 + 1)}
+\deqn{B=\frac{1}{\sqrt{u_{T}^{2}\rho_{TP_{a}}^{2}+1-\rho_{TP_{a}}^{2}}}}{B = 1 / sqrt(ut^2 * qxa^2 - qxa^2 + 1)}
 
-The Taylor series approximation of the variance of \mjeqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
 
-\mjdeqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{T}}\right)\right]/b_{4}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qyi + b3^2 * var_ut)) / b4^2}
+\deqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{T}}\right)\right]/b_{4}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qyi + b3^2 * var_ut)) / b4^2}
 
-where \mjeqn{b_{1}}{b1}, \mjeqn{b_{2}}{b2}, \mjeqn{b_{3}}{b3}, and \mjeqn{b_{4}}{b4} are first-order partial derivatives of the attenuation formula with respect to \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{i}}}{qyi}, \mjeqn{u_{T}}{ut}, and \mjeqn{\rho_{TP_{a}}}{rtpa}, respectively.
+where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, and \eqn{b_{4}}{b4} are first-order partial derivatives of the attenuation formula with respect to \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{i}}}{qyi}, \eqn{u_{T}}{ut}, and \eqn{\rho_{TP_{a}}}{rtpa}, respectively.
 The first-order partial derivatives of the attenuation formula are:
 
-\mjdeqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\rho_{XY_{i}}}{q_{X_{a}}}-\rho_{XY_{i}}q_{X_{a}}B^{2}\left(u_{T}^{2}-1\right)}{b1 = rxyi / qxa - rxyi * qxa * B^2 * (ut^2 - 1)}
-\mjdeqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\rho_{XY_{i}}}{q_{Y_{i}}}}{b2 = rxyi / qyi}
-\mjdeqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{T}}=\frac{2\rho_{XY_{i}}}{u_{T}}-\rho_{XY_{i}}u_{T}q_{X_{a}}^{2}B^{2}-\rho_{XY_{i}}u_{T}\rho_{TP_{a}}^{2}A^{2}}{b3 = (2 * rxyi) / ut - rxyi * ut * qxa^2 * B^2 - rxyi * ut * rtpa^2 * A^2}
-\mjdeqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\rho_{XY_{i}}}{\rho_{TP_{a}}}-\rho_{XY_{i}}\rho_{TP_{a}}A^{2}\left(u_{T}^{2}-1\right)}{b4 = rxyi / rtpa - rxyi * rtpa * A^2 * (ut^2 - 1)}
+\deqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\rho_{XY_{i}}}{q_{X_{a}}}-\rho_{XY_{i}}q_{X_{a}}B^{2}\left(u_{T}^{2}-1\right)}{b1 = rxyi / qxa - rxyi * qxa * B^2 * (ut^2 - 1)}
+\deqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\rho_{XY_{i}}}{q_{Y_{i}}}}{b2 = rxyi / qyi}
+\deqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{T}}=\frac{2\rho_{XY_{i}}}{u_{T}}-\rho_{XY_{i}}u_{T}q_{X_{a}}^{2}B^{2}-\rho_{XY_{i}}u_{T}\rho_{TP_{a}}^{2}A^{2}}{b3 = (2 * rxyi) / ut - rxyi * ut * qxa^2 * B^2 - rxyi * ut * rtpa^2 * A^2}
+\deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\rho_{XY_{i}}}{\rho_{TP_{a}}}-\rho_{XY_{i}}\rho_{TP_{a}}A^{2}\left(u_{T}^{2}-1\right)}{b4 = rxyi / rtpa - rxyi * rtpa * A^2 * (ut^2 - 1)}
 
 
 
 
 ######## Bivariate direct range restriction (BVDRR) ########
 
-Under bivariate direct range restriction, the attenuation formula yielding \mjeqn{\rho_{XY_{i}}}{rxyi} is:
+Under bivariate direct range restriction, the attenuation formula yielding \eqn{\rho_{XY_{i}}}{rxyi} is:
 
-\mjdeqn{\rho_{XY_{i}}=\frac{A+\rho_{TP_{a}}^{2}q_{X_{a}}q_{Y_{a}}-\frac{1}{q_{X_{a}}q_{Y_{a}}}}{2\rho_{TP_{a}}u_{X}u_{Y}}}{rxyi = (sqrt((1/(qya * qxa) - rtpa^2 * qya * qxa)^2 + 4 * rtpa^2 * ux^2 * uy^2) + rtpa^2 * qya * qxa - 1/(qya * qxa))/(2 * rtpa * ux * uy)}
+\deqn{\rho_{XY_{i}}=\frac{A+\rho_{TP_{a}}^{2}q_{X_{a}}q_{Y_{a}}-\frac{1}{q_{X_{a}}q_{Y_{a}}}}{2\rho_{TP_{a}}u_{X}u_{Y}}}{rxyi = (sqrt((1/(qya * qxa) - rtpa^2 * qya * qxa)^2 + 4 * rtpa^2 * ux^2 * uy^2) + rtpa^2 * qya * qxa - 1/(qya * qxa))/(2 * rtpa * ux * uy)}
 
 where
 
-\mjdeqn{A=\sqrt{\left(\frac{1}{q_{X_{a}}q_{Y_{a}}}-\rho_{TP_{a}}^{2}q_{X_{a}}q_{Y_{a}}\right)^{2}+4\rho_{TP_{a}}u_{X}^{2}u_{Y}^{2}}}{A = sqrt((1/(qya * qxa) - qya * rtpa^2 * qxa)^2 + 4 * rtpa^2 * ux^2 * uy^2)}
+\deqn{A=\sqrt{\left(\frac{1}{q_{X_{a}}q_{Y_{a}}}-\rho_{TP_{a}}^{2}q_{X_{a}}q_{Y_{a}}\right)^{2}+4\rho_{TP_{a}}u_{X}^{2}u_{Y}^{2}}}{A = sqrt((1/(qya * qxa) - qya * rtpa^2 * qxa)^2 + 4 * rtpa^2 * ux^2 * uy^2)}
 
-The Taylor series approximation of the variance of \mjeqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
 
-\mjdeqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{X}}+b_{4}^{2}var_{u_{Y}}\right)\right]/b_{5}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy)) / b5^2}
+\deqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{X}}+b_{4}^{2}var_{u_{Y}}\right)\right]/b_{5}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy)) / b5^2}
 
-where \mjeqn{b_{1}}{b1}, \mjeqn{b_{2}}{b2}, \mjeqn{b_{3}}{b3}, \mjeqn{b_{4}}{b4}, and \mjeqn{b_{5}}{b5} are first-order partial derivatives of the attenuation formula with respect to \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{a}}}{qya}, \mjeqn{u_{X}}{ux}, \mjeqn{u_{Y}}{uy}, and \mjeqn{\rho_{TP_{a}}}{rtpa}, respectively.
+where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, \eqn{b_{4}}{b4}, and \eqn{b_{5}}{b5} are first-order partial derivatives of the attenuation formula with respect to \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{a}}}{qya}, \eqn{u_{X}}{ux}, \eqn{u_{Y}}{uy}, and \eqn{\rho_{TP_{a}}}{rtpa}, respectively.
 First, we define terms to simplify the computation of partial derivatives:
 
-\mjdeqn{B=\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+q_{X_{a}}q_{Y_{a}}A-1\right)}{B = (qya^2 * rtpa^2 * qxa^2 + qya * qxa * A - 1)}
+\deqn{B=\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+q_{X_{a}}q_{Y_{a}}A-1\right)}{B = (qya^2 * rtpa^2 * qxa^2 + qya * qxa * A - 1)}
 
-\mjdeqn{C=2\rho_{TP_{a}}q_{X_{a}}^{2}q_{Y_{a}}^{2}u_{X}u_{Y}A}{C = 2 * qya^2 * rtpa * qxa^2 * ux * uy * sqrt((1/(qya * qxa) - qya * rtpa^2 * qxa)^2 + 4 * rtpa^2 * ux^2 * uy^2)}
+\deqn{C=2\rho_{TP_{a}}q_{X_{a}}^{2}q_{Y_{a}}^{2}u_{X}u_{Y}A}{C = 2 * qya^2 * rtpa * qxa^2 * ux * uy * sqrt((1/(qya * qxa) - qya * rtpa^2 * qxa)^2 + 4 * rtpa^2 * ux^2 * uy^2)}
 
 The first-order partial derivatives of the attenuation formula are:
 
-\mjdeqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1\right)B}{q_{X_{a}}C}}{b1 = ((rtpa^2 * qxa^2 * qya^2 + 1) * B) / (qxa * C)}
-\mjdeqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1\right)B}{q_{Y_{a}}C}}{b2 = ((rtpa^2 * qxa^2 * qya^2 + 1) * B) / (qya * C)}
-\mjdeqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=-\frac{\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}-1\right)\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}+1\right)B}{u_{X}C}}{b3 = -((qya * rtpa * qxa - 1) * (qya * rtpa * qxa + 1) * B) / (ux * C)}
-\mjdeqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial u_{Y}}=-\frac{\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}-1\right)\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}+1\right)B}{u_{Y}C}}{b4 = -((qya * rtpa * qxa - 1) * (qya * rtpa * qxa + 1) * B) / (uy * C)}
-\mjdeqn{b_{5}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1\right)B}{\rho_{TP_{a}}C}}{b5 = ((rtpa^2 * qxa^2 * qya^2 + 1) * B) / (rtpa * C)}
+\deqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1\right)B}{q_{X_{a}}C}}{b1 = ((rtpa^2 * qxa^2 * qya^2 + 1) * B) / (qxa * C)}
+\deqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1\right)B}{q_{Y_{a}}C}}{b2 = ((rtpa^2 * qxa^2 * qya^2 + 1) * B) / (qya * C)}
+\deqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=-\frac{\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}-1\right)\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}+1\right)B}{u_{X}C}}{b3 = -((qya * rtpa * qxa - 1) * (qya * rtpa * qxa + 1) * B) / (ux * C)}
+\deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial u_{Y}}=-\frac{\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}-1\right)\left(\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}+1\right)B}{u_{Y}C}}{b4 = -((qya * rtpa * qxa - 1) * (qya * rtpa * qxa + 1) * B) / (uy * C)}
+\deqn{b_{5}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\left(\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1\right)B}{\rho_{TP_{a}}C}}{b5 = ((rtpa^2 * qxa^2 * qya^2 + 1) * B) / (rtpa * C)}
 
 
 
 
 ######## Bivariate indirect range restriction (BVIRR; i.e., Case V) ########
 
-Under bivariate indirect range restriction, the attenuation formula yielding \mjeqn{\rho_{XY_{i}}}{rxyi} is:
+Under bivariate indirect range restriction, the attenuation formula yielding \eqn{\rho_{XY_{i}}}{rxyi} is:
 
-\mjdeqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}-\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{u_{X}u_{Y}}}{rxyi = (rtpa * qxa * qya - lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (uy * ux)}
+\deqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}-\lambda\sqrt{\left|1-u_{X}^{2}\right|\left|1-u_{Y}^{2}\right|}}{u_{X}u_{Y}}}{rxyi = (rtpa * qxa * qya - lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (uy * ux)}
 
-The Taylor series approximation of the variance of \mjeqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
 
-\mjdeqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{X}}+b_{4}^{2}var_{u_{Y}}\right)\right]/b_{5}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy)) / b5^2}
+\deqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(b_{1}^{2}var_{q_{X_{a}}}+b_{2}^{2}var_{q_{Y_{i}}}+b_{3}^{2}var_{u_{X}}+b_{4}^{2}var_{u_{Y}}\right)\right]/b_{5}^{2}}{var_rtpa ~= (var_rxyi - var_e - (b1^2 * var_qxa + b2^2 * var_qya + b3^2 * var_ux + b4^2 * var_uy)) / b5^2}
 
-where \mjeqn{b_{1}}{b1}, \mjeqn{b_{2}}{b2}, \mjeqn{b_{3}}{b3}, \mjeqn{b_{4}}{b4}, and \mjeqn{b_{5}}{b5} are first-order partial derivatives of the attenuation formula with respect to \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{a}}}{qya}, \mjeqn{u_{X}}{ux}, \mjeqn{u_{Y}}{uy}, and \mjeqn{\rho_{TP_{a}}}{rtpa}, respectively.
+where \eqn{b_{1}}{b1}, \eqn{b_{2}}{b2}, \eqn{b_{3}}{b3}, \eqn{b_{4}}{b4}, and \eqn{b_{5}}{b5} are first-order partial derivatives of the attenuation formula with respect to \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{a}}}{qya}, \eqn{u_{X}}{ux}, \eqn{u_{Y}}{uy}, and \eqn{\rho_{TP_{a}}}{rtpa}, respectively.
 First, we define terms to simplify the computation of partial derivatives:
 
-\mjdeqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\rho_{TP_{a}}q_{Y_{a}}}{u_{X}u_{Y}}}{b1 = rtpa * qya / (ux * uy)}
-\mjdeqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\rho_{TP_{a}}q_{X_{a}}}{u_{X}u_{Y}}}{b2 = rtpa * qxa / (ux * uy)}
-\mjdeqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\lambda\left(1-u_{X}^{2}\right)\sqrt{\left|1-u_{Y}^{2}\right|}}{u_{Y}\left|1-u_{X}^{2}\right|^{1.5}}-\frac{\rho_{XY_{i}}}{u_{X}}}{b3 = (lambda * (1 - ux^2) * sqrt(abs(1 - uy^2))) / (uy * abs(1 - ux^2)^1.5) - rxyi / ux}
-\mjdeqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial u_{Y}}=\frac{\lambda\left(1-u_{Y}^{2}\right)\sqrt{\left|1-u_{X}^{2}\right|}}{u_{X}\left|1-u_{Y}^{2}\right|^{1.5}}-\frac{\rho_{XY_{i}}}{u_{Y}}}{b4 = (lambda * (1 - uy^2) * sqrt(abs(1 - ux^2))) / (ux * abs(1 - uy^2)^1.5) - rxyi / uy}
-\mjdeqn{b_{5}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{q_{X_{a}}q_{Y_{a}}}{u_{X}u_{Y}}}{b5 = (qxa * qya) / (ux * uy)}
+\deqn{b_{1}=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\rho_{TP_{a}}q_{Y_{a}}}{u_{X}u_{Y}}}{b1 = rtpa * qya / (ux * uy)}
+\deqn{b_{2}=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{i}}}=\frac{\rho_{TP_{a}}q_{X_{a}}}{u_{X}u_{Y}}}{b2 = rtpa * qxa / (ux * uy)}
+\deqn{b_{3}=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\lambda\left(1-u_{X}^{2}\right)\sqrt{\left|1-u_{Y}^{2}\right|}}{u_{Y}\left|1-u_{X}^{2}\right|^{1.5}}-\frac{\rho_{XY_{i}}}{u_{X}}}{b3 = (lambda * (1 - ux^2) * sqrt(abs(1 - uy^2))) / (uy * abs(1 - ux^2)^1.5) - rxyi / ux}
+\deqn{b_{4}=\frac{\partial\rho_{XY_{i}}}{\partial u_{Y}}=\frac{\lambda\left(1-u_{Y}^{2}\right)\sqrt{\left|1-u_{X}^{2}\right|}}{u_{X}\left|1-u_{Y}^{2}\right|^{1.5}}-\frac{\rho_{XY_{i}}}{u_{Y}}}{b4 = (lambda * (1 - uy^2) * sqrt(abs(1 - ux^2))) / (ux * abs(1 - uy^2)^1.5) - rxyi / uy}
+\deqn{b_{5}=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{q_{X_{a}}q_{Y_{a}}}{u_{X}u_{Y}}}{b5 = (qxa * qya) / (ux * uy)}
 
 
 
@@ -325,19 +324,19 @@ First, we define terms to simplify the computation of partial derivatives:
 
 Raju and Burke's attenuation formula may be represented as
 
-\mjdeqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}u_{X}\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}{\sqrt{\rho_{TP_{a}}^{2}\rho_{XX_{a}}\rho_{YY_{a}}u_{X}^{2}-\rho_{TP_{a}}^{2}\rho_{XX_{a}}\rho_{YY_{a}}+1}}}{rxyi = (rtpa * ux * sqrt(ryya * rxxa)) / sqrt(rtpa^2 * ryya * rxxa * ux^2 - rtpa^2 * ryya * rxxa + 1)}
+\deqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}u_{X}\sqrt{\rho_{XX_{a}}\rho_{YY_{a}}}}{\sqrt{\rho_{TP_{a}}^{2}\rho_{XX_{a}}\rho_{YY_{a}}u_{X}^{2}-\rho_{TP_{a}}^{2}\rho_{XX_{a}}\rho_{YY_{a}}+1}}}{rxyi = (rtpa * ux * sqrt(ryya * rxxa)) / sqrt(rtpa^2 * ryya * rxxa * ux^2 - rtpa^2 * ryya * rxxa + 1)}
 
-The Taylor series approximation of the variance of \mjeqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
 
-\mjdeqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(B^{2}var_{\rho_{YY_{a}}}+C^{2}var_{\rho_{XX_{a}}}+D^{2}var_{u_{X}}\right)\right]/A^{2}}{var_rtpa ~= (var_rxyi - var_e - (B^2 * var_ryya + C^2 * var_rxxa + D^2 * var_ux)) / A^2}
+\deqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(B^{2}var_{\rho_{YY_{a}}}+C^{2}var_{\rho_{XX_{a}}}+D^{2}var_{u_{X}}\right)\right]/A^{2}}{var_rtpa ~= (var_rxyi - var_e - (B^2 * var_ryya + C^2 * var_rxxa + D^2 * var_ux)) / A^2}
 
-where A, B, C, and D are first-order partial derivatives of the attenuation formula with respect to \mjeqn{\rho_{TP_{a}}}{rtpa}, \mjeqn{\rho_{XX_{a}}}{rxxa}, \mjeqn{\rho_{YY_{a}}}{ryya}, and \mjeqn{u_{X}}{ux}, respectively.
+where A, B, C, and D are first-order partial derivatives of the attenuation formula with respect to \eqn{\rho_{TP_{a}}}{rtpa}, \eqn{\rho_{XX_{a}}}{rxxa}, \eqn{\rho_{YY_{a}}}{ryya}, and \eqn{u_{X}}{ux}, respectively.
 The first-order partial derivatives of the attenuation formula are:
 
-\mjdeqn{A=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\rho_{XY_{i}}}{\rho_{TP_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{TP_{a}}u_{X}^{2}}}{A = rxyi / rtpa + (rxyi^3 * (1 - ux^2)) / (rtpa * ux^2)}
-\mjdeqn{B=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{YY_{a}}}=\frac{1}{2}\left(\frac{\rho_{XY_{i}}}{\rho_{YY_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{YY_{a}}u_{X}^{2}}\right)}{B = .5 * (rxyi / ryya + (rxyi^3 * (1 - ux^2)) / (ryya * ux^2))}
-\mjdeqn{C=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{XX_{a}}}=\frac{1}{2}\left(\frac{\rho_{XY_{i}}}{\rho_{XX_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{XX_{a}}u_{X}^{2}}\right)}{C = .5 * (rxyi / rxxa + (rxyi^3 * (1 - ux^2)) / (rxxa * ux^2))}
-\mjdeqn{D=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\rho_{XY_{i}}-\rho_{XY_{i}}^{3}}{u_{X}}}{D = (rxyi - rxyi^3) / ux}
+\deqn{A=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\rho_{XY_{i}}}{\rho_{TP_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{TP_{a}}u_{X}^{2}}}{A = rxyi / rtpa + (rxyi^3 * (1 - ux^2)) / (rtpa * ux^2)}
+\deqn{B=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{YY_{a}}}=\frac{1}{2}\left(\frac{\rho_{XY_{i}}}{\rho_{YY_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{YY_{a}}u_{X}^{2}}\right)}{B = .5 * (rxyi / ryya + (rxyi^3 * (1 - ux^2)) / (ryya * ux^2))}
+\deqn{C=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{XX_{a}}}=\frac{1}{2}\left(\frac{\rho_{XY_{i}}}{\rho_{XX_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{XX_{a}}u_{X}^{2}}\right)}{C = .5 * (rxyi / rxxa + (rxyi^3 * (1 - ux^2)) / (rxxa * ux^2))}
+\deqn{D=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\rho_{XY_{i}}-\rho_{XY_{i}}^{3}}{u_{X}}}{D = (rxyi - rxyi^3) / ux}
 
 
 
@@ -346,19 +345,19 @@ The first-order partial derivatives of the attenuation formula are:
 
 Raju and Burke's attenuation formula may be represented as
 
-\mjdeqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}u_{X}}{\sqrt{\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}u_{X}^{2}-\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1}}}{rxyi = (rtpa * qya * qxa * ux) / sqrt(rtpa^2 * qya^2 * qxa^2 * ux^2 - rtpa^2 * qya^2 * qxa^2 + 1)}
+\deqn{\rho_{XY_{i}}=\frac{\rho_{TP_{a}}q_{X_{a}}q_{Y_{a}}u_{X}}{\sqrt{\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}u_{X}^{2}-\rho_{TP_{a}}^{2}q_{X_{a}}^{2}q_{Y_{a}}^{2}+1}}}{rxyi = (rtpa * qya * qxa * ux) / sqrt(rtpa^2 * qya^2 * qxa^2 * ux^2 - rtpa^2 * qya^2 * qxa^2 + 1)}
 
-The Taylor series approximation of the variance of \mjeqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
+The Taylor series approximation of the variance of \eqn{\rho_{TP_{a}}}{rtpa} can be computed using the following linear equation,
 
-\mjdeqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(F^{2}var_{q_{Y_{a}}}+G^{2}var_{q_{X_{a}}}+H^{2}var_{u_{X}}\right)\right]/E^{2}}{var_rtpa ~= (var_rxyi - var_e - (F^2 * var_qya + G^2 * var_qxa + H^2 * var_ux)) / E^2}
+\deqn{var_{\rho_{TP_{a}}}	\approx	\left[var_{r_{XY_{i}}}-var_{e}-\left(F^{2}var_{q_{Y_{a}}}+G^{2}var_{q_{X_{a}}}+H^{2}var_{u_{X}}\right)\right]/E^{2}}{var_rtpa ~= (var_rxyi - var_e - (F^2 * var_qya + G^2 * var_qxa + H^2 * var_ux)) / E^2}
 
-where E, F, G, and H are first-order partial derivatives of the attenuation formula with respect to \mjeqn{\rho_{TP_{a}}}{rtpa}, \mjeqn{q_{X_{a}}}{qxa}, \mjeqn{q_{Y_{a}}}{qya}, and \mjeqn{u_{X}}{ux}, respectively.
+where E, F, G, and H are first-order partial derivatives of the attenuation formula with respect to \eqn{\rho_{TP_{a}}}{rtpa}, \eqn{q_{X_{a}}}{qxa}, \eqn{q_{Y_{a}}}{qya}, and \eqn{u_{X}}{ux}, respectively.
 The first-order partial derivatives of the attenuation formula (with typographic errors in the original article corrected) are:
 
-\mjdeqn{E=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\rho_{XY_{i}}}{\rho_{TP_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{TP_{a}}u_{X}^{2}}}{E = rxyi / rtpa + (rxyi^3 * (1 - ux^2)) / (rtpa * ux^2)}
-\mjdeqn{F=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{a}}}=\frac{\rho_{XY_{i}}}{q_{Y_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{q_{Y_{a}}u_{X}^{2}}}{F = (rxyi / qya + (rxyi^3 * (1 - ux^2)) / (qya * ux^2))}
-\mjdeqn{G=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\rho_{XY_{i}}}{q_{X_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{q_{X_{a}}u_{X}^{2}}}{G = (rxyi / qxa + (rxyi^3 * (1 - ux^2)) / (qxa * ux^2))}
-\mjdeqn{H=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\rho_{XY_{i}}-\rho_{XY_{i}}^{3}}{u_{X}}}{H = (rxyi - rxyi^3) / ux }
+\deqn{E=\frac{\partial\rho_{XY_{i}}}{\partial\rho_{TP_{a}}}=\frac{\rho_{XY_{i}}}{\rho_{TP_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{\rho_{TP_{a}}u_{X}^{2}}}{E = rxyi / rtpa + (rxyi^3 * (1 - ux^2)) / (rtpa * ux^2)}
+\deqn{F=\frac{\partial\rho_{XY_{i}}}{\partial q_{Y_{a}}}=\frac{\rho_{XY_{i}}}{q_{Y_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{q_{Y_{a}}u_{X}^{2}}}{F = (rxyi / qya + (rxyi^3 * (1 - ux^2)) / (qya * ux^2))}
+\deqn{G=\frac{\partial\rho_{XY_{i}}}{\partial q_{X_{a}}}=\frac{\rho_{XY_{i}}}{q_{X_{a}}}+\frac{\rho_{XY_{i}\left(1-u_{X}^{2}\right)}^{3}}{q_{X_{a}}u_{X}^{2}}}{G = (rxyi / qxa + (rxyi^3 * (1 - ux^2)) / (qxa * ux^2))}
+\deqn{H=\frac{\partial\rho_{XY_{i}}}{\partial u_{X}}=\frac{\rho_{XY_{i}}-\rho_{XY_{i}}^{3}}{u_{X}}}{H = (rxyi - rxyi^3) / ux }
 }
 \section{Notes}{
 

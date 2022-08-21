@@ -26,9 +26,8 @@ generate_directory <- function(path){
 
 #' Generate a list of simulated sample matrices sampled from the Wishart distribution
 #'
-#' \loadmathjax
 #' This function generates simulated sample matrices based on a population matrix and a sample size.
-#' It uses the Wishart distribution (i.e., the multivariate \mjeqn{\chi^{2}}{\chi^2} distribution) to obtain data, rescales the data into the input metric, and can be standardized into a correlation matrix by setting `as_cor` to `TRUE`.
+#' It uses the Wishart distribution (i.e., the multivariate \eqn{\chi^{2}}{\chi^2} distribution) to obtain data, rescales the data into the input metric, and can be standardized into a correlation matrix by setting `as_cor` to `TRUE`.
 #' The function can produce a list of matrices for any number of samples.
 #'
 #' @param sigma Population covariance matrix. May be standardized or unstandardized.

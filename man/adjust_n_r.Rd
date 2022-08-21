@@ -15,14 +15,13 @@ adjust_n_r(r, var_e)
 A vector of adjusted sample sizes.
 }
 \description{
-\loadmathjax
 This function is used to compute the adjusted sample size of a non-Pearson correlation (e.g., a tetrachoric correlation) based on the correlation and its estimated error variance.
 This function allows users to adjust the sample size of a correlation corrected for sporadic artifacts (e.g., unequal splits of dichotomous variables, artificial dichotomization of continuous variables) prior to use in a meta-analysis.
 }
 \details{
 The adjusted sample size is computed as:
 
-\mjdeqn{n_{adjusted}=\frac{(r^{2}-1)^{2}+var_{e}}{var_{e}}}{n_adjusted = ((r^2 - 1)^2 + var_e) / var_e}
+\deqn{n_{adjusted}=\frac{(r^{2}-1)^{2}+var_{e}}{var_{e}}}{n_adjusted = ((r^2 - 1)^2 + var_e) / var_e}
 }
 \examples{
 adjust_n_r(r = .3, var_e = .01)

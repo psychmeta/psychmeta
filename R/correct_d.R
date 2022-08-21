@@ -1,23 +1,22 @@
-#' Correct for small-sample bias in Cohen's *d* values
+#' Correct for small-sample bias in Cohen's \eqn{d} values
 #'
-#' \loadmathjax
-#' Corrects a vector of Cohen's *d* values for small-sample bias, as Cohen's *d*
-#' has a slight positive bias. The bias-corrected *d* value is often called
-#' Hedges's *g*.
+#' Corrects a vector of Cohen's \eqn{d} values for small-sample bias, as Cohen's \eqn{d}
+#' has a slight positive bias. The bias-corrected \eqn{d} value is often called
+#' Hedges's \eqn{g}.
 #'
 #' The bias correction is:
-#' \mjdeqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
+#' \deqn{g = d_{c} = d_{obs} \times J}{g = d_c = d * J}
 #'
 #' where
-#' \mjdeqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = \Gamma((n - 2) / 2) / (sqrt(n - 2) * \Gamma((n - 2) / 2))}
+#' \deqn{J = \frac{\Gamma(\frac{n - 2}{2})}{\sqrt{\frac{n - 2}{2}} \times \Gamma(\frac{n - 3}{2})}}{J = \Gamma((n - 2) / 2) / (sqrt(n - 2) * \Gamma((n - 2) / 2))}
 #'
-#' and \mjeqn{d_{obs}}{d} is the observed effect size, \mjeqn{g = d_{c}}{g = d_c} is the
-#' corrected (unbiased) estimate, \mjseqn{n} is the total sample size, and
-#' \mjeqn{\Gamma()}{\Gamma()} is the [gamma function][base::gamma()].
+#' and \eqn{d_{obs}}{d} is the observed effect size, \eqn{g = d_{c}}{g = d_c} is the
+#' corrected (unbiased) estimate, \eqn{n} is the total sample size, and
+#' \eqn{\Gamma()}{\Gamma()} is the [gamma function][base::gamma()].
 #'
 #' Historically, using the gamma function was computationally intensive, so an
-#' approximation for \mjseqn{J} was used (Borenstein et al., 2009):
-#' \mjdeqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
+#' approximation for \eqn{J} was used (Borenstein et al., 2009):
+#' \deqn{J = 1 - 3 / (4 * (n - 2) - 1)}{J = 1 - 3 / (4 * (n - 2) - 1}
 #'
 #' This approximation is no longer necessary with modern computers.
 #'
@@ -50,12 +49,11 @@ correct_d_bias <- function(d, n){
      out
 }
 
-#' Correct for small-sample bias in Glass' \mjseqn{\Delta} values
+#' Correct for small-sample bias in Glass' \eqn{\Delta} values
 #'
-#' \loadmathjax
-#' Correct for small-sample bias in Glass' \mjseqn{\Delta} values.
+#' Correct for small-sample bias in Glass' \eqn{\Delta} values.
 #'
-#' @param delta Vector of Glass' \mjseqn{\Delta} values.
+#' @param delta Vector of Glass' \eqn{\Delta} values.
 #' @param nc Vector of control-group sample sizes.
 #' @param ne Vector of experimental-group sample sizes.
 #' @param use_pooled_sd Logical vector determining whether the pooled standard deviation was used (`TRUE`) or not (`FALSE`; default).
@@ -66,17 +64,17 @@ correct_d_bias <- function(d, n){
 #' @references
 #' Hedges, L. V. (1981). Distribution theory for Glass’s estimator of effect
 #' size and related estimators. *Journal of Educational Statistics, 6*(2),
-#' 107–128. doi: 10.2307/1164588
+#' 107–128. \doi{10.2307/1164588}
 #'
 #' @details
 #' The bias correction is estimated as:
 #'
-#' \mjdeqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
+#' \deqn{\Delta_{c}=\Delta_{obs}\frac{\Gamma\left(\frac{n_{control}-1}{2}\right)}{\Gamma\left(\frac{n_{control}-1}{2}\right)\Gamma\left(\frac{n_{control}-2}{2}\right)}}{delta_c = delta * gamma((nc - 1) / 2) / (sqrt((nc - 1) / 2) * gamma((nc - 2) / 2))}
 #'
-#' where \mjseqn{\Delta} is the observed effect size, \mjeqn{\Delta_{c}}{\Delta_c} is the
-#' corrected estimate of \mjseqn{\Delta},
-#' \mjeqn{n_{control}}{nc} is the control-group sample size, and
-#' \mjeqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
+#' where \eqn{\Delta} is the observed effect size, \eqn{\Delta_{c}}{\Delta_c} is the
+#' corrected estimate of \eqn{\Delta},
+#' \eqn{n_{control}}{nc} is the control-group sample size, and
+#' \eqn{\Gamma()}{gamma()} is the [gamma function][base::gamma()].
 #'
 #' @encoding UTF-8
 #' @md
@@ -93,15 +91,14 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 
 
 
-#' Correct *d* values for measurement error and/or range restriction
+#' Correct \eqn{d} values for measurement error and/or range restriction
 #'
 #' @description
-#' \loadmathjax
-#' This function is a wrapper for the [correct_r()] function to correct *d* values
+#' This function is a wrapper for the [correct_r()] function to correct \eqn{d} values
 #' for statistical and psychometric artifacts.
 #'
 #' @param correction Type of correction to be applied. Options are "meas", "uvdrr_g", "uvdrr_y", "uvirr_g", "uvirr_y", "bvdrr", "bvirr"
-#' @param d Vector of *d* values.
+#' @param d Vector of \eqn{d} values.
 #' @param ryy Vector of reliability coefficients for Y (the continuous variable).
 #' @param uy Vector of u ratios for Y (the continuous variable).
 #' @param uy_observed Logical vector in which each entry specifies whether the corresponding uy value is an observed-score u ratio (`TRUE`) or a true-score u ratio. All entries are `TRUE` by default.
@@ -119,8 +116,8 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @param correct_bias Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (`TRUE`) or not (`FALSE`).
 #' For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE} (the default).
 #'
-#' @return Data frame(s) of observed *d* values (`dgyi`), operational range-restricted *d* values corrected for measurement error in Y only (`dgpi`), operational range-restricted *d* values corrected for measurement error in the grouping only (`dGyi`), and range-restricted true-score *d* values (`dGpi`),
-#' range-corrected observed-score *d* values (\code{dgya}), operational range-corrected *d* values corrected for measurement error in Y only (`dgpa`), operational range-corrected *d* values corrected for measurement error in the grouping only (`dGya`), and range-corrected true-score *d* values (`dGpa`).
+#' @return Data frame(s) of observed \eqn{d} values (`dgyi`), operational range-restricted \eqn{d} values corrected for measurement error in Y only (`dgpi`), operational range-restricted \eqn{d} values corrected for measurement error in the grouping only (`dGyi`), and range-restricted true-score \eqn{d} values (`dGpi`),
+#' range-corrected observed-score \eqn{d} values (\code{dgya}), operational range-corrected \eqn{d} values corrected for measurement error in Y only (`dgpa`), operational range-corrected \eqn{d} values corrected for measurement error in the grouping only (`dGya`), and range-corrected true-score \eqn{d} values (`dGpa`).
 #'
 #' @export
 #' @encoding UTF-8
