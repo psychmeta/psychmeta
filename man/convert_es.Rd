@@ -6,8 +6,8 @@
 \usage{
 convert_es(
   es,
-  input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F", "chisq", "p.chisq", "or",
-    "lor", "Fisherz", "A", "auc", "cles"),
+  input_es = c("r", "d", "delta", "g", "t", "p.t", "F", "p.F", "chisq", "p.chisq",
+    "or", "lor", "Fisherz", "A", "auc", "cles"),
   output_es = c("r", "d", "A", "auc", "cles"),
   n1 = NULL,
   n2 = NULL,
