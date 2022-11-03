@@ -280,6 +280,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @param ma_arg_list List of arguments to be used in the meta-analysis function.
 #'
 #' @return A meta-analytic table and a data frame.
+#' @keywords internal
 .ma_r_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
 
      conf_level <- ma_arg_list$conf_level

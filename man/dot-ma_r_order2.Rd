@@ -22,3 +22,4 @@ A meta-analytic table and a data frame.
 \description{
 Internal function for computing individual-correction meta-analyses of correlations
 }
+\keyword{internal}

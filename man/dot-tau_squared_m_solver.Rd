@@ -22,3 +22,4 @@ Function to solve for tau_m_squared (outlier-robust estimator of tau_squared bas
 \author{
 Lifeng Lin and Haitao Chu
 }
+\keyword{internal}
