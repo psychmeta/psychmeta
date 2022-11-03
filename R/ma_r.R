@@ -1728,6 +1728,7 @@ ma_r <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
           })
 
           if(ma_method == "ad"){
+                attributes(out) <- NULL
                .correction_method <- unlist(map(out, function(x) rep(x$correction_method, nrow(x$ma_obj))))
                .correct_rxx <- unlist(map(out, function(x) rep(x$correct_rxx, nrow(x$ma_obj))))
                .correct_ryy <- unlist(map(out, function(x) rep(x$correct_ryy, nrow(x$ma_obj))))
