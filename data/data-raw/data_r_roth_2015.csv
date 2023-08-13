@@ -1,1 +1,241 @@
-
+"","Author (year)","Description of the sample","Country","n","Intelligence test","Type of intelligence test","Subject domain","Grade level","Gender","Age","rxyi","rxxi","ux"
+"1","Adkins (1937)","High school sample","USA",77,"Point Subject Ratio",NA,NA,8,NA,NA,0.56,0.89,NA
+"2","Agnoli et al. (2012)","Bolognia sample","Italy",352,"Raven's Progressive Matrices","Nonverbal",NA,4,43.4,9.4,0.38,0.8,NA
+"3","Al-Ghamri (2012)","Arab sample I","Yemen",682,"Otis-Lennon Mental Ability Test",NA,NA,10,48,16.9,0.81,0.83,NA
+"4","Al-Ghamri (2012)","Arab sample II","Yemen",466,"Otis-Lennon Mental Ability Test",NA,NA,11,48.1,16.9,0.81,0.83,NA
+"5","Al-Ghamri (2012)","Arab sample III","Yemen",413,"Otis-Lennon Mental Ability Test",NA,NA,12,50.6,16.9,0.8,0.83,NA
+"6","Allana (2010)","Private School sample I","Dubai",15,"Raven's Standard Progessive Matrices","Nonverbal",NA,5,NA,9.5,0.98,0.87,NA
+"7","Allana (2010)","Private School sample II","Dubai",15,"Raven's Standard Progressive Matrices","Nonverbal",NA,6,NA,9.5,0.88,0.87,NA
+"8","Ames (1943)","1939 sample","USA",256,"Otis S-A Intelligence Test","Mixed",NA,9,NA,NA,0.59,NA,NA
+"9","Ames (1943)","1940 sample","USA",277,"Otis S-A Intelligence Test","Mixed",NA,9,NA,NA,0.59,NA,NA
+"10","Ames (1943)","1941 sample","USA",281,"Otis S-A Intelligence Test","Mixed",NA,9,NA,NA,0.54,NA,NA
+"11","Anonymous","Anonymous sample",NA,93,"Performance Test System 1-2 (German version); Intelligenz-Struktur-Test 2000 R",NA,NA,13,NA,NA,0.23,0.97,NA
+"12","Anonymous","Anonymous sample",NA,58,"Performance Test System 1-2(German version); Intelligenz-Struktur-Test 2000 R",NA,NA,13,NA,NA,0.24,0.97,NA
+"13","Anonymous","Anonymous sample",NA,1508,"German Cognitive Ability Test -- 4-12 -- Revision","Nonverbal",NA,5,49,10.9,0.25,0.87,1.13
+"14","Anonymous","Anonymous sample",NA,529,"Culture Fair Intelligence Test-20 (German adaptation)","Nonverbal",NA,3,49.2,8.9,0.33,0.9,1.13
+"15","Anonymous","Anonymous sample",NA,718,"Culture Fair Intelligence Test-20 (German adaptation)","Nonverbal",NA,3,49.5,9.5,0.35,0.9,1.12
+"16","Anonymous","Anonymous sample",NA,700,"Culture Fair Intelligence Test-20 (German adaptation)","Nonverbal",NA,4,48.9,10.4,0.36,0.9,1.07
+"17","Anonymous","Anonymous sample",NA,710,"Culture Fair Intelligence Test-20 (German adaptation)","Nonverbal",NA,5,49.5,11.4,0.33,0.9,1.08
+"18","Anonymous","Anonymous sample",NA,715,NA,"Verbal",NA,NA,NA,NA,0.25,NA,NA
+"19","Anonymous","Anonymous sample",NA,1389,"Berlin Structure of Intelligence Test for Youth: Assessment of Talent and Giftedness","Mixed",NA,9,59,14.5,0.29,0.74,0.69
+"20","Anonymous","Anonymous sample",NA,85,"Berlin Structure of Intelligence Test","Mixed",NA,11,46.5,16.7,0.44,0.83,0.55
+"21","Anonymous","Anonymous sample",NA,277,"Analyse des Schlussfolgernden und Kreativen Denkens","Verbal",NA,12,61.1,17.6,0.46,0.89,0.66
+"22","Anonymous","Anonymous sample",NA,312,"Wonderlic Personal Test (German version)","Verbal",NA,12,59.9,17.4,0.07,0.9,0.66
+"23","Aswal (2001)","P.I.C. Tehri College students sample","India",65,"General Mental Ability Group Test by Jolata and Singh",NA,NA,11,NA,NA,0.58,NA,NA
+"24","Aswal (2001)","G.G.I.C. Tehri College students sample","India",25,"General Mental Ability Group Test by Jolata and Singh",NA,"Mathematics and Science",11,NA,NA,0.61,NA,NA
+"25","Aswal (2001)","V.H.S. Koti College students sample","India",50,"General Mental Ability Group Test by Jolata and Singh",NA,"Mathematics and Science",11,NA,NA,0.39,NA,NA
+"26","Aswal (2001)","G.I.C. Pokhal College students sample","India",35,"General Mental Ability Group Test by Jolata and Singh",NA,"Mathematics and Science",11,NA,NA,0.46,NA,NA
+"27","Aswal (2001)","G.I.C. Sirai College students sample","India",25,"General Mental Ability Group Test by Jolata and Singh",NA,"Mathematics and Science",11,NA,NA,0.35,NA,NA
+"28","Axelsson (2009)","Sweden sample","Sweden",124,"Raven's Progressive matrices; Deltatest -- submodule Number Series",NA,"Mathematics and Science",NA,100,29.9,0.5,NA,NA
+"29","Barton, Dielman, and Cattell (1971)","Sixth grade sample","USA",169,"Culture Fair Intelligence Test","Nonverbal",NA,6,50,NA,0.43,NA,NA
+"30","Barton et al. (1971)","Seventh grade sample","USA",142,"Culture Fair Intelligence Test","Nonverbal",NA,7,50,NA,0.49,NA,NA
+"31","Beckett, Castle, Rutter, and Sonuga-Barke (2010)","GCSE-sample","Great Britain",161,"Wechsler Intelligence Scale for Children",NA,NA,NA,NA,15,0.64,0.97,1.09
+"32","Bipp, Steinmayr, and Spinath (2012)","Goal orientation sample","Germany",164,"Intelligenz Struktur Test 2000 R","Mixed",NA,11,53.1,16.5,0.35,0.89,0.84
+"33","Bloeschl (1966)","Bloeschl's sample","Germany",125,"Performance Test System (German version); Hamburger-Wechsler-Intelligence Test for Children",NA,NA,NA,41.6,10.9,-0.03,0.92,NA
+"34","Blue (2009)","Blue's sample","USA",452,"Cognitive Abilities Test",NA,NA,7,50.7,NA,0.32,0.95,NA
+"35","Bose (1982)","Calcutta sample","India",250,"Culture Fair Intelligence Test","Nonverbal",NA,NA,NA,NA,0.18,0.9,NA
+"36","Bouffard, Vezeau, Roy, and Lengele (2011)","Quebec sample","Canada",462,"Mental Ability Test (French version)","Mixed",NA,NA,43.3,8.6,0.77,0.85,NA
+"37","Boulon-Diaz (1992)","Puerto Rican sample","USA",65,"Wechsler Intelligence Scale for Children -- Revised, Puerto Rican version","Mixed",NA,5,NA,10,0.66,0.89,NA
+"38","Bowers (1966)","Bowers' sample","USA",278,"Otis Quick Scoring Mental Ability Test","Mixed",NA,9,NA,NA,0.57,0.86,0.77
+"39","Bratko, Chamorro-Premuzic, and Saks (2006)","Bratko et al.'s sample","Croatia",255,"Multifactor Test Battery; Serial Numbers; Surface Development Test-Vz 3; Adaptation of Thurstone First Letter Test",NA,NA,NA,NA,NA,0.49,0.91,NA
+"40","Brucks (1978)","Hollfeld sample","Germany",185,"Frankfurter Analogietest 4-6","Mixed",NA,5,54.6,11,0.61,0.93,NA
+"41","Burgert (1937)","San Diego sample","USA",191,"Terman Group Test",NA,NA,6,NA,NA,0.48,0.93,0.86
+"42","Carter (1959)","Grade 11 small California High School sample","USA",116,"Hemnon-Nelson Intelligence Test","Verbal",NA,11,NA,NA,0.66,NA,NA
+"43","Carter (1959)","Grade 11 large California High School sample","USA",239,"ACE Intelligence Test",NA,NA,10,NA,NA,0.53,NA,NA
+"44","Carter (1959)","Grade 11 California High School sample","USA",211,"ACE Intelligence Test",NA,NA,10,NA,NA,0.5,NA,NA
+"45","Chamorro-Premuzic, Quiroga, and Colom (2009)","Madrid sample","Spain",248,"Raven's Advanced Progressive Matrices; Solid figures; Primary Mental Ability Battery; Differential Aptitude Test Battery",NA,NA,NA,81,20.1,0.01,NA,NA
+"46","Cocking and Holy (1927)","Iowa sample","USA",266,"Thorndike Intelligence Examination for High School Graduates",NA,NA,NA,40.2,NA,0.42,0.92,NA
+"47","Cooper (1974)","Ottawa sample","Canada",527,"Hemnon-Nelson Tests; Differential Aptitude Test",NA,NA,10,NA,NA,0.2,NA,NA
+"48","Craig (1988)","Craig's sample","USA",105,"Test of Cognitive Skills",NA,NA,NA,NA,NA,0.5,0.81,NA
+"49","Daley et al. (2005)","Female sample","Kenya",243,"Adaptation of the Peabody Picture Vocabulary Test; Adaptation of the Wechsler Intelligence Scale for Children -- Revised",NA,NA,1,NA,NA,0.34,NA,NA
+"50","Daley et al. (2005)","Male sample","Kenya",234,"Adaptation of the Peabody Picture Vocabulary Test; Adaptation of the Wechsler Intelligence Scale for Children -- Revised",NA,NA,1,NA,7.5,0.4,NA,NA
+"51","Dash, Mohanty, and Kar (1989)","Orissa sample","India",60,"Compound-Stimulus Visual Information Test; Serial-Stimulus Visual Information Test; Forward Digit Span Test; Backward Digit Span Test; Adaptation of the Wechsler Intelligence Scale for Children: Similarities subtest & Vocabulary subtest; Raven's Colored Progressive Matrices; Wechsler Intelligence Test: Block Design subtest",NA,NA,5,NA,10,0.31,0.82,NA
+"52","Day, Hanson, Maltby, Proctor, and Wood (2010)","A-level sample","GB",129,"Raven's Progressive Matrices","Nonverbal",NA,NA,59.7,18.6,0.43,0.92,NA
+"53","Di Fabio and Palazzeschi (2009)","Toscana sample","Italy",124,"Advanced Progressive Matrices","Nonverbal",NA,NA,72.6,17.5,0.32,NA,1.09
+"54","Dodonova and Dodonov (2012)","Moscow sample","Russia",184,"Raven's Advanced Progressive Matrices; Intelligence-Structure-Test",NA,NA,NA,62,16,0.19,NA,0.74
+"55","Downey, Lomas, Billings, Hansen, and Stough (2013)","Victoria sample","Australia",243,"Raven's Standard Progressive Matrices","Nonverbal",NA,9,100,14.6,0.46,NA,1.44
+"56","Dresel, Fasching, Steuer, and Berner (2010)","Dresel et al.'s sample","Germany",796,"Culture Fair Test-20x","Nonverbal","Languages",4,54,9.8,0.23,0.69,0.74
+"57","Duckworth, Quinn, and Tsukayama (2012)","Texas sample I","USA",706,"Wechsler Abbreviated Scale of Intelligence","Mixed",NA,8,48,NA,0.48,NA,0.96
+"58","Duckworth et al. (2012)","Texas sample II","USA",510,"Raven's Progressive Matrices","Nonverbal",NA,NA,NA,11.7,0.41,0.8,NA
+"59","Edds and McCall (1933)","Edd and McCall's sample","USA",85,"Otis Group Intelligence Scale","Mixed",NA,NA,NA,NA,0.32,NA,NA
+"60","Edminston and Rhoades (1959)","Edminston and Rhoades's sample","USA",94,"California Test of Mental Maturity","Mixed",NA,NA,NA,NA,0.56,NA,NA
+"61","Falch and Sandgren Massih (2011)","Malmo sample","Sweden",637,"Raven's Matrices","Nonverbal",NA,3,0,15,0.62,0.8,NA
+"62","Fischbach, Baudson, Preckel, Martin, and Brunner (2013)","MAGRIP sample","Luxembourg",1601,"Performance Test System (German version)","Mixed",NA,6,49.7,11.9,0.51,0.83,NA
+"63","Fischer, Schult, and Hell (2013)","Female sample","Germany",232,"Intelligenz-Struktur-Test 2000 R","Mixed",NA,13,100,20.3,0.37,0.9,0.62
+"64","Fischer et al. (2013)","Male sample","Germany",220,"Intelligenz-Struktur-Test 2000 R","Mixed",NA,13,0,NA,0.43,0.9,0.64
+"65","Flere, Krajnc, Klanjsek, Musil, and Kirbi (2010)","Flere et al.'s sample","Slovenia",1308,"POGACIK Test","Nonverbal",NA,NA,48.9,17,0.48,0.84,NA
+"66","Frandsen (1950)","Frandsen's sample","USA",83,"Wechsler-Bellevue; Henmon-Nelson",NA,NA,12,NA,17,0.6,0.87,0.8
+"67","Freudenthaler et al. (2008)","Female sample","Austria",779,"Intelligenz-Struktur-Analyse","Mixed",NA,8,100,14.5,0.55,0.84,NA
+"68","Freudenthaler et al. (2008)","Male sample","Austria",526,"Intelligenz-Struktur-Analyse","Mixed",NA,8,0,14.5,0.53,0.84,NA
+"69","Freund and Holling (2011)","Matrices sample","Germany",646,"MatrixDeveloper","Nonverbal",NA,10,34,15.7,0.36,0.74,NA
+"70","Freund, Holling, and Preckel (2007)","Freund et al.'s sample","Germany",1135,"Berlin Structure of Intelligence Test for Youth: Assessment of Talent and Giftedness","Mixed",NA,NA,46.2,14.5,0.48,0.89,NA
+"71","Friedhoff (1955)","Female Boone sample","USA",48,"Otis Quick Scoring Mental Ability Test; Science Research Associates Test of Primary Mental Abilities",NA,NA,7,100,NA,0.61,0.88,0.86
+"72","Friedhoff (1955)","Male Boone sample","USA",59,"Otis Quick Scoring Mental Ability Test; Science Research Associates Test of Primary Mental Abilities",NA,NA,7,0,NA,0.49,0.88,0.96
+"73","Friedhoff (1955)","Female Mason City sample","USA",103,"Otis Quick Scoring Mental Ability Testx; Science Research Associates Test of Primary Mental Abilities",NA,NA,7,100,NA,0.5,0.88,0.9
+"74","Friedhoff (1955)","Male Mason City sample","USA",99,"Otis Quick Scoring Mental Ability Test; Science Research Associates Test of Primary Mental Abilities",NA,NA,7,0,NA,0.51,0.88,0.96
+"75","Furnham and Monsen (2009)","South East of England sample","Great Britain",265,"Wonderlic Personnel Test; Baddeley Reasoning Test","Verbal",NA,10,41.3,15.6,0.35,0.86,NA
+"76","Furnham, Monsen, and Ahmetoglu (2009)","Furnham et al.'s Sample","Great Britain",212,"Wonderlic Personnel Test","Mixed",NA,10,58,15.8,0.49,0.9,1
+"77","Gagne and St. Pere (2002)","Greater Montreal sample","Canada",156,"Raven's Progressive Matrices; Otis-Lennon Mental Ability Test",NA,NA,8,100,13.5,0.46,0.87,NA
+"78","Ghosh (1960)","1956 sample","India",120,"Viva",NA,NA,3,0,NA,0.29,0.54,NA
+"79","Ghosh (1960)","1957 sample","India",120,"Viva",NA,NA,3,0,NA,0.39,0.54,NA
+"80","Gilles and Bailleux (2001)","Gilles and Bailleux's sample","France",122,"Culture Fair Test: subtest 3; Ability Factor Battery: Numerical Addition subtest, Mental Rotation subtest",NA,NA,6,49.2,12,0.27,0.88,NA
+"81","Gralewski and Karwowski (2012)","Creativity sample","Poland",589,"Raven's Progressive Matrices","Nonverbal",NA,3,51.8,17.6,0.15,0.85,NA
+"82","Hartlage and Steele (1977)","Hartlage and Steele's sample","USA",36,"Wechsler Intelligence Scale; Wechsler Intelligence Scale for Children -- Revised","Mixed",NA,NA,32,8,0.59,0.89,NA
+"83","Hartson (1939)","Ohio sample","USA",2121,NA,NA,NA,NA,NA,NA,0,NA,NA
+"84","Haugwitz, Nesbit, and Sandmann (2010)","Biology sample","Germany",248,"German Cognitive Ability Test -- 4-12 -- Revision",NA,"Mathematics and Science",NA,56,13.9,0.17,0.73,0.68
+"85","Heaven and Ciarrochi (2012)","Sydney sample","Australia",786,"Standardized Australian test","Mixed",NA,10,53.2,NA,0.46,NA,NA
+"86","Hinkelman (1955)","Hinkelman's sample","USA",29,"Kuhlmann-Anderson intelligence rating",NA,NA,NA,50,NA,0.57,NA,NA
+"87","Hintsanen et al. (2012)","Helsinki sample","Finnland",309,"Three standardized tests",NA,"Mathematics and Science",8,46.6,15,0.62,0.74,NA
+"88","Hofer, Kuhnle, Kilian, and Fries (2012)","Bielefeld sample","Germany",697,"Berlin Structure of Intelligence Tes: Reasoning subtest","Mixed",NA,8,52,13.4,0.34,0.68,NA
+"89","Irwin, Engle, Yarbrough, Klein, and Townsend (1978)","Female sample","Guatemala",125,"Adaptation of the 22-test INCAP Preschool Battery",NA,NA,NA,100,7,0.34,NA,NA
+"90","Irwin et al. (1978)","Male sample","Guatemala",130,"Adaptation of the 22-test INCAP Preschool Battery",NA,NA,NA,0,7,0.42,NA,NA
+"91","Johnson and McGowan (1984)","Houston Parent-Child Development Center sample","USA",51,"Stanford-Binet; McCarthy Scales of Childrens Ability; Wechsler Intelligence Scale for Children -- Revised",NA,NA,NA,NA,NA,0.17,0.9,NA
+"92","Johnson (1967)","Minnesota sample","USA",126,"Lorge-Thorndike Intelligence Test","Mixed",NA,NA,NA,NA,0.63,NA,NA
+"93","Johnson, Deary, and Iacono (2009)","Twin sample","Germany",1648,"Wechsler Intelligence Scale for Children -- Revised","Mixed",NA,NA,53.8,11,0.4,0.97,0.92
+"94","Jordan (1922)","Arkansas sample","USA",67,"Otis; Army Alpha; Miller; Terman",NA,NA,NA,NA,NA,0.47,0.94,NA
+"95","Kanderian (1970)","Kanderian's sample","Iraq",304,"Cattell Culture Fair Intelligence Test; Modification of Thurstone Primary Mental Abilities",NA,NA,6,NA,NA,0.3,0.86,NA
+"96","Karbach, Gottschling, Spengler, Hegewald, and Spinath (2013)","Cosmos sample","Germany",334,"German Cognitive Ability Test -- 4-12 -- Revision (German version); Wechsler Intelligence Scale-III",NA,NA,NA,50.6,12.4,0.38,NA,NA
+"97","Kaufman et al. (2010)","Implicit sample","Great Britain",109,"Raven's Advanced Progressive Matrices; Differential Aptitudes Test (The Psychological Corporation, 1995); Mental Rotation Test",NA,NA,10,69.3,NA,0.23,0.79,1.19
+"98","Keehn and Prothro (1955)","Section secondaire sample","Lebanon",54,"Cattell's Culture-Free Test; Raven's Progressive Matrices; Dominoe's Test D 48 (French version); number series test","Nonverbal",NA,10,NA,NA,0.35,0.7,NA
+"99","Keehn and Prothro (1955)","Preparatory section 2 sample","Lebanon",48,"Cattell's Culture-Free Test; Raven's Progressive Matrices; Dominoe's Test D 48 (French version); number series test","Nonverbal",NA,10,NA,NA,0.19,0.85,NA
+"100","Keehn and Prothro (1955)","Preparatory section 3 sample","Lebanon",48,"Cattell's Culture-Free Test; Raven's Progressive Matrices; Dominoe's Test D 48 (French version); number series test","Nonverbal",NA,11,NA,NA,0.16,0.85,NA
+"101","Keehn and Prothro (1955)","Preparatory section 4 sample","Lebanon",56,"Cattell's Culture-Free Test; Raven's Progressive Matrices; Dominoe's Test D 48 (French version); number series test","Nonverbal",NA,12,NA,NA,0.35,0.85,NA
+"102","Kessels and Steinmayr (2013)","Macho sample","Germany",180,"Intelligence-Structure-Test 2000R","Mixed",NA,11,45.6,16.4,0.3,0.89,0.8
+"103","Kleitman and Moscrop (2010)","Kleitman and Moscrop's sample","Australia",184,"Raven's Progressive Matrices","Nonverbal",NA,5,NA,10.4,0.35,0.88,0.88
+"104","Krumm, Lipnevich, Schmidt-Atzert, and Buehner (2012)","Krumm et al.'s sample","Germany",161,"Intelligence-Structure-Test 2000R","Mixed",NA,NA,67,21,0.27,0.76,NA
+"105","Kundu (1962)","Calcutta sample","India",58,"Self-developed test including items from M- and L-form from the Terman-Merrill Intelligence Scale (1955)",NA,NA,8,0,NA,0.31,NA,NA
+"106","Kundu (1975)","Female Science stream sample","India",50,"Self-developed test including items from M- and L-form from the Terman-Merrill Intelligence Scale (1955)",NA,NA,10,100,NA,0.68,NA,0.65
+"107","Kundu (1975)","Male Science stream sample","India",50,"Self-developed test including items from M- and L-form from the Terman-Merrill Intelligence Scale (1955)",NA,NA,10,0,NA,0.63,NA,0.75
+"108","Kundu (1975)","Female Humanities stream sample","India",50,"Self-developed test including items from M- and L-form from the Terman-Merrill Intelligence Scale (1955)",NA,NA,10,100,NA,0.31,NA,0.62
+"109","Kundu (1975)","Male Humanities stream sample","India",50,"Self-developed test including items from M- and L-form from the Terman-Merrill Intelligence Scale (1955)",NA,NA,10,0,NA,0.57,NA,0.69
+"110","Kuusinen and Leskinen (1988)","Kuusinen and Leskinen's sample","Finland",234,"Illinois Test of Psycholiguistic Abilities","Verbal",NA,9,50,15,0.3,0.95,NA
+"111","Kwall and Lackner (1966)","Kwall and Lackner's sample","USA",100,"Otis Quick-Scoring Mental Abilities Test",NA,NA,4,50,NA,0.77,0.88,NA
+"112","Lemos et al. (2014)","Old sample","Portugal",1101,"Reasoning Tests Battery -- Elementry School",NA,NA,11,NA,16.8,0.32,0.74,1
+"113","Lemos et al. (2014)","Young sample","Portugal",1695,"Reasoning Tests Battery -- Secondary School",NA,NA,8,NA,13.5,0.37,0.74,1
+"114","Levpuscek, Zupancic, and Socan (2013)","Slovenia sample","Slovenia",400,"Raven's Standard Progressive Matrices","Nonverbal","Mathematics and Science",9,51.9,13.5,0.51,0.93,0.86
+"115","Lindgren and De Almeida Guedes (1963)","Elementary school sample","Brazil",88,"Two 60-item multiple-choice, paper-pencile intelligence tests","Verbal",NA,4,NA,10.7,0.61,0.66,NA
+"116","Lindgren and De Almeida Guedes (1963)","Secondary school sample","Brazil",55,"Two 60-item multiple-choice, paper-pencile intelligence tests","Verbal",NA,7,NA,14.9,0.61,0.64,NA
+"117","Line and Glen (1935)","Second grade sample","Canada",61,"National Intelligence Test",NA,NA,NA,NA,NA,0.57,NA,NA
+"118","Line and Glen (1935)","Junior third grade sample","Canada",129,"National Intelligence Test",NA,NA,NA,NA,NA,0.46,NA,NA
+"119","Line and Glen (1935)","Senior third grade sample","Canada",119,"National Intelligence Test",NA,NA,NA,NA,NA,0.39,NA,NA
+"120","Line and Glen (1935)","Junior forth grade sample","Canada",91,"National Intelligence Test",NA,NA,NA,NA,NA,0.15,NA,NA
+"121","Line and Glen (1935)","Senior forth grade sample","Canada",124,"National Intelligence Test",NA,NA,NA,NA,NA,0.47,NA,NA
+"122","Lu, Weber, Spinath, and Shi (2011)","German-Chinese sample","China",179,"Culture Fair Intelligence Test","Nonverbal",NA,4,NA,NA,0.45,0.78,0.96
+"123","Lubbers, Van Der Werf, Kuyper, and Hendriks (2010)","Dutch sample","Netherlands",9776,"Entry Test",NA,NA,7,52,13,0.25,0.79,NA
+"124","Marcus (2000)","Marcus's sample",NA,210,"Wonderlic Personnel Test (German version)","Verbal",NA,13,41.8,23.9,0.36,0.9,NA
+"125","Marcus, Wagner, Poole, Powell, and Carswell (2009)","Butchers sample",NA,50,"Wonderlic Personnel Test (German version)","Verbal",NA,NA,NA,NA,0.39,0.9,0.56
+"126","Marcus et al. (2009)","Butchery shop assistant sample",NA,115,"Wonderlic Personnel Test (German version)","Verbal",NA,NA,NA,NA,0.45,0.9,0.58
+"127","Marcus et al. (2009)","Bakery shop assistant sample",NA,99,"Wonderlic Personnel Test (German version)","Verbal",NA,NA,NA,NA,0.21,0.9,0.54
+"128","Matlin and Mendelsohn (1965)","Matlin and Mendelsohn's sample","USA",68,"Otis Quick-Scoring Mental Abilities Test","Mixed",NA,5,NA,NA,0.6,0.86,NA
+"129","Matthews, Marulis, and Williford (2014)","NICHD SECCYD sample","USA",923,"Woodcock-Johnson Picture Vocabulary","Verbal",NA,5,NA,4.5,0.42,0.76,NA
+"130","Mayer (1958)","Delaware sample","US",100,"Wechsler Intelligence Scale for Children","Mixed",NA,7,NA,NA,0.73,0.89,NA
+"131","Meili, Aebi, Heizmann, and Schoefer (1977)","Lucerne 1970 sample","Switzerland",185,"Self-developed test battery",NA,NA,NA,100,NA,0.34,NA,NA
+"132","Meili et al. (1977)","Lucerne 1971 sample","Switzerland",153,"Self-developed test battery",NA,NA,NA,100,NA,0.32,NA,NA
+"133","Meili et al. (1977)","Zurich 1971 sample","Switzerland",128,"Self-developed test battery",NA,NA,NA,100,NA,0.38,NA,NA
+"134","Meili et al. (1977)","Winterthur 1971 sample","Switzerland",104,"Self-developed test battery",NA,NA,NA,100,NA,0.39,NA,NA
+"135","Meili et al. (1977)","Winterthur 1972 sample","Switzerland",87,"Self-developed test battery",NA,NA,NA,NA,NA,0.51,NA,NA
+"136","Meili et al. (1977)","Basel 1971 sample I","Switzerland",175,"Self-developed test battery",NA,NA,NA,100,NA,0.39,NA,NA
+"137","Meili et al. (1977)","Basel 1971 sample II","Switzerland",209,"Self-developed test battery",NA,NA,NA,100,NA,0.44,NA,NA
+"138","Meili et al. (1977)","Basel 1972 sample I","Switzerland",139,"Self-developed test battery",NA,NA,NA,100,NA,0.45,NA,NA
+"139","Meili et al. (1977)","Basel 1972 sample II","Switzerland",281,"Self-developed test battery",NA,NA,NA,100,NA,0.38,NA,NA
+"140","Millikin (1976)","South Texas sample","USA",306,"Differential Aptitude Test","Mixed",NA,11,54.6,NA,0.68,NA,NA
+"141","Moenikia and Zahed-Babelan (2010)","Iran sample","Iran",1670,"Raven's Intelligence Test","Nonverbal","Mathematics and Science",NA,44.2,NA,0.45,0.86,NA
+"142","Moore (1939)","Moore's sample","USA",174,"Otis Group Intelligence Scale","Mixed",NA,6,NA,NA,0.69,NA,NA
+"143","Mottus, Guljajev, Allik, Laidra, and Pullmann (2012)","Mottus et al.'s sample","Estonia",1159,"Raven's Standard Progessive Matrices","Nonverbal",NA,NA,0,14.6,0.43,0.8,NA
+"144","Myburgh, Grobler, and Niehaus (1999)","Roodepoort sample","South Africa",656,NA,NA,NA,NA,NA,NA,0.56,NA,NA
+"145","Neuenschwander (2013)","PSB sample","Switzerland",187,"Prufsystem fur Schul- und Bildungsberatung 6-13",NA,NA,6,49.7,NA,0.63,0.9,1.12
+"146","Neuenschwander, R_thlisberger, Cimeli, and Roebers (2012)","Mixed-class-sample","Switzerland",459,"Test of Nonverbal Intelligence -- Third Edition","Nonverbal",NA,1,49,7.4,0.35,NA,NA
+"147","Oates (1929)","Form IIa sample","Great Britain",35,"Self-developed test battery",NA,NA,2,0,NA,0.34,NA,NA
+"148","Oates (1929)","Form IIb sample","Great Britain",35,"Self-developed test battery",NA,NA,2,0,NA,0.32,NA,NA
+"149","Oates (1929)","Form IIIa sample","Great Britain",34,"Self-developed test battery",NA,NA,3,0,NA,0.63,NA,NA
+"150","Oates (1929)","Form IIIb sample","Great Britain",33,"Self-developed test battery",NA,NA,3,0,NA,0.21,NA,NA
+"151","Oates (1929)","Form IVa sample","Great Britain",34,"Self-developed test battery",NA,NA,4,0,NA,0.34,NA,NA
+"152","Oates (1929)","Form IVb sample","Great Britain",33,"Self-developed test battery",NA,NA,4,0,NA,0.15,NA,NA
+"153","Oates (1929)","Form R sample","Great Britain",16,"Self-developed test battery",NA,NA,NA,0,NA,-0.13,NA,NA
+"154","Oates (1929)","Form Va sample","Great Britain",28,"Self-developed test battery",NA,NA,5,0,NA,0.26,NA,NA
+"155","Oates (1929)","Form Vb sample","Great Britain",29,"Self-developed test battery",NA,NA,5,0,NA,0.62,NA,NA
+"156","Peterson, Pihl, Higgins, Seguin, and Tremblay (2003)","Peterson et al.'s sample","Canada",148,"Wechsler Intelligence Scale for Children -- Revised","Mixed",NA,NA,0,14,0.46,0.91,NA
+"157","Petrides, Chamorro-Premuzic, Frederickson, and Furnham (2005)","Female sample","Great Britain",297,"Verbal Reasoning Test (Department of Assessment and Measurement at the National Foundation for Educational Research)","Verbal",NA,11,100,NA,0.85,0.97,1.01
+"158","Petrides et al. (2005)","Male sample","Great Britain",321,"Verbal Reasoning Test (Department of Assessment and Measurement at the National Foundation for Educational Research)","Verbal",NA,11,0,NA,0.84,0.97,1
+"159","Phillipson and Phillipson (2012)","Hong-Kong sample","China",780,"Raven's Progressive Matrices","Nonverbal",NA,NA,52.5,NA,0.28,0.8,NA
+"160","Powell and Nettelbeck (2014)","Curiosity sample","Australia",160,"Raven's Advanced Progressive Matrices-Short Form","Nonverbal",NA,12,68.8,19.4,0.49,0.75,0.61
+"161","Preckel and Brull (2010)","Trier sample","Germany",678,"German Cognitive Ability Test -- 4-12 -- Revision",NA,"Mathematics and Science",5,52.1,10.4,0.43,0.92,NA
+"162","Preckel, G_tz, and Frenzel (2010)","Boredom sample","Germany",144,"German Cognitive Ability Test -- 4-12 -- Revision",NA,NA,9,43,14.8,0.62,0.93,0.9
+"163","Preckel et al. (2013)","Morning sample","Germany",237,"Culture Fair Intelligence Test-20 (German adaptation)","Nonverbal",NA,10,46.7,15.6,0.44,0.93,1.41
+"164","Qualter, Gardner, Pope, Hutchinson, and Whiteley (2012)","Female sample","Great Britain",214,"Cognitive Ability Test",NA,NA,11,100,11.2,0.43,NA,NA
+"165","Qualter et al. (2012)","Male sample","Great Britain",199,"Cognitive Ability Test",NA,NA,11,0,11.2,0.64,NA,NA
+"166","Rauh (1977)","Rauh's sample",NA,42,"Wechsler Preschool and Primary Scale of Intelligence; Hamburg-Wechsler-Intelligence tests for Children-1; Hamburg-Wechsler-Intelligence tests for Chrildren-2; Picture Test for 2. and 3. grade; Aufgaben zum Nachdenken 4 +; Prufsystem fur Schul- und Bildungsberatung",NA,NA,NA,NA,NA,0.72,0.95,0.91
+"167","Rindermann and Neubauer (2000)","Rindermann and Neubauer's sample","Germany",157,"German Cognitive Ability Test; Advanced Progressive Matrices",NA,NA,10,NA,NA,0.44,0.83,NA
+"168","Rindermann and Neubauer (2004)","Rindermann and Neubauer's sample","Germany",271,"Raven's Advanced Progressive Matrices; German Cognitive Ability Test",NA,NA,10,NA,15.5,0.52,0.83,NA
+"169","Rogers (1933)","Public school sample","Canada",80,"Pintner Group Test","Verbal",NA,4,NA,NA,0.62,0.97,NA
+"170","Rosander and Backstrom (2012)","Female sample","Sweden",245,"Wonderlic Personnel Test","Mixed",NA,NA,100,17.2,0.49,0.9,0.79
+"171","Rosander and Backstrom (2012)","Male sample","Sweden",197,"Wonderlic Personnel Test","Mixed",NA,NA,0,17.2,0.49,0.9,0.79
+"172","Rosander et al. (2011)","Lund sample","Sweden",297,"Wonderlic Personnel Test","Mixed",NA,NA,53,17.6,0.38,0.9,0.9
+"173","Sauer and Gamsjaeger (1996)","Sauer and Gamsjaeger's sample","Austria",651,"Pruefsystem fuer die Schul- und Bildungsberatung","Mixed",NA,4,47.8,NA,0.56,0.98,NA
+"174","Sauer and Gamsjaeger (1996)","Salzburg sample","Austria",599,"Pruefsystem fuer die Schul- und Bildungsberatung","Mixed",NA,4,50,NA,0.66,0.98,NA
+"175","Scarr, Caparlo, Ferndman, Tower, and Caplan (1983)","British Midlands sample","Great Britain",639,"Young Nonreaders' IQ Test; Nonverbal (National Foundation for Educational Research) f","Nonverbal",NA,12,NA,NA,0.73,NA,NA
+"176","Schaefer and McDermott (1999)","Supplementary national sample","USA",420,"Differential Ability Scales",NA,NA,NA,50,NA,0.4,0.82,NA
+"177","Schneider, Grabner, and Paetsch (2009)","MPI Sample","Germany",195,"German Cognitive Ability Test -- 4-12 -- Revision","Mixed","Mathematics and Science",6,51.2,11.3,0.6,0.95,NA
+"178","Schult (2013)","Female sample I","Germany",41,"Berlin Structure of Intelligence",NA,NA,NA,100,NA,0.36,0.82,NA
+"179","Schult (2013)","Female sample II","Germany",435,"Berlin Structure of Intelligence",NA,NA,NA,100,NA,0.33,0.82,NA
+"180","Schult (2013)","Female sample III","Germany",1033,"Berlin Structure of Intelligence",NA,NA,NA,100,NA,0.51,0.73,NA
+"181","Schult (2013)","Male sample I","Germany",46,"Berlin Structure of Intelligence",NA,NA,NA,0,NA,0.63,0.82,NA
+"182","Schult (2013)","Male sample II","Germany",293,"Berlin Structure of Intelligence",NA,NA,NA,0,NA,0.35,0.82,NA
+"183","Schult (2013)","Male sample III","Germany",768,"Berlin Structure of Intelligence",NA,NA,NA,0,NA,0.43,0.73,NA
+"184","Schwinger, Steinmayr, and Spinath (2009)","Giessen Sample","Germany",231,"Culture Fair Test-3","Nonverbal",NA,12,60.2,16.8,0.23,0.78,0.62
+"185","Seitz (1971)","Wuerzburg sample","Germany",99,"Analytischer Intelligenztest; Culture Fair Intelligence Test; Frankfurter Schultestg",NA,NA,6,52.5,12.3,0.18,0.78,NA
+"186","Sharma, Sharma, and Sharma (2011)","Female sample","India",100,"General Mental Ability Test; Standard Progressive Matrices",NA,NA,11,100,NA,0.45,0.91,NA
+"187","Sharma et al. (2011)","Male sample","India",100,"General Mental Ability Test; Standard Progressive Matrices",NA,NA,11,0,NA,0.52,0.91,NA
+"188","Singh and Varma (1995)","Rural sample","India",200,"Raven's Standard Progressive Matrices (1960)","Nonverbal",NA,11,50,NA,0.02,0.93,NA
+"189","Singh and Varma (1995)","Urban sample","India",200,"Raven's Standard Progressive Matrices (1960)","Nonverbal",NA,11,50,NA,0.02,0.93,NA
+"190","Sonnleitner, Keller, Martin, and Brunner (2013)","Problem solving sample","Luxembourg",563,"Intelligence-Structure-Test 2000R","Mixed",NA,10,48.7,17.4,0.51,0.73,NA
+"191","Spinath, Harald Freudenthaler, and Neubauer (2010)","Female sample","Austria",801,"Intelligenz Struktur Analyse",NA,NA,8,100,13.7,0.41,0.9,NA
+"192","Spinath et al. (2010)","Male sample","Austria",522,"Intelligenz Struktur Analyse",NA,NA,8,0,13.7,0.47,0.9,NA
+"193","Spinath, Spinath, and Plomin (2008)","Twin sample","Great Britain",4492,"Wechsler Intelligence Scale for Children-III; Cognitive Ability Test -- Third Version",NA,NA,4,NA,NA,0.43,NA,NA
+"194","St. John (1930)","Female sample","USA",455,"Standford-Binet-Test; Dearborn General; Otis Primary; Myers Mental Measure",NA,NA,NA,100,NA,0.55,NA,NA
+"195","St. John (1930)","Male sample","USA",503,"Standford-Binet-Test; Dearborn General; Otis Primary; Myers Mental Measure",NA,NA,NA,0,NA,0.44,NA,NA
+"196","Steinmayr, Dinger, and Spinath (2010)","Personality sample","Germany",548,"Intelligence-Structure-Test-2000-R",NA,NA,12,61.2,17,0.27,0.9,0.84
+"197","Steinmayr and Meissner (2013)","Realschule sample","Germany",187,"Culture Fair Test-20-Revision","Nonverbal","Mathematics and Science",8,48.8,13.6,0.26,0.86,0.62
+"198","Steinmayr and Meissner (2013)","Gymnasium sample","Germany",276,"Culture Fair Test-20-Revision","Nonverbal","Mathematics and Science",8,48.8,13.6,0.39,0.86,0.62
+"199","Steinmayr and Spinath (2009)","Steinmayr and Spinath's sample","Germany",328,"Intelligence-Structure-Test",NA,NA,12,59.7,16.9,0.35,0.9,NA
+"200","Steinmayr, Wirthwein, and Schoene (2014)","Math sample","Germany",301,"Intelligence-Structure-Test-2000-R","Mixed","Mathematics and Science",12,49.2,17.5,0.41,0.92,0.53
+"201","Stejskal (1935)","Prague sample","Czech Republic",3214,NA,NA,NA,NA,NA,NA,0.66,NA,NA
+"202","Suess (2001)","Suess's sample","Germany",137,"Berlin Structure of Intelligence-Test","Mixed",NA,12,NA,NA,0.16,0.82,NA
+"203","Svensson (1971)","Elementary school sample","Sweden",1500,NA,NA,NA,NA,NA,13,0.66,0.9,NA
+"204","Svensson (1971)","Comprehensive school sample","Sweden",6144,NA,NA,NA,NA,NA,13,0.69,0.9,NA
+"205","Svensson (1971)","Elementary school sample","Sweden",8905,NA,NA,NA,NA,NA,13,0.67,0.86,NA
+"206","Nijenhuis, Resing, Tolboom, and Bleichrodt (2004)","7.8 year old Dutch sample","Netherlands",196,"Amsterdam Intelligence Test for Children -- Revised",NA,NA,NA,NA,7.8,0.54,NA,NA
+"207","Nijenhuis et al. (2004)","9.8 year old Dutch sample","Netherlands",204,"Amsterdam Intelligence Test for Children -- Revised",NA,NA,NA,NA,9.8,0.43,NA,NA
+"208","Nijenhuis et al. (2004)","7.8 year old immigrants sample","Netherlands",192,"Amsterdam Intelligence Test for Children -- Revised",NA,NA,NA,NA,7.8,0.5,NA,NA
+"209","Nijenhuis et al. (2004)","9.8 year old immigrants sample","Netherlands",184,"Amsterdam Intelligence Test for Children -- Revised",NA,NA,NA,NA,9.8,0.4,NA,NA
+"210","Telles Da Silva, Borges Osorio, and Salzano (1975)","Monozygotic twins sample","Brazil",79,"Dominoes Test (Anstey, 1967); Differential Aptitude Test",NA,NA,NA,65,20,0.27,0.7,NA
+"211","Telles Da Silva et al. (1975)","Dizygotic twins sample","Brazi",75,"Dominoes Test (Anstey, 1967); Differential Aptitude Test",NA,NA,NA,77.3,19,0.25,0.7,NA
+"212","Tiedemann and Faber (1992)","Tiedemann and Faber's sample","Germany",96,"Columbia Mental Maturity Scale (German version)","Nonverbal",NA,NA,77.3,7.3,0.19,0.88,NA
+"213","Todt (1966)","Language stream sample","Germany",95,"Wilde Intelligence Test","Mixed",NA,12,0,NA,0.33,0.81,NA
+"214","Todt (1966)","Science stream sample","Germany",113,"Wilde Intelligence Test","Mixed",NA,12,0,NA,0.43,0.81,NA
+"215","Trautwein, Luedtke, Roberts, Schnyder, and Niggli (2009)","Trautwein et al.'s sample I","Germany",571,"German Cognitive Ability Test -- 4-12 -- Revision","Nonverbal",NA,8,51.4,14.7,0.16,0.87,NA
+"216","Trautwein et al. (2009)","Trautwein et al.'s sample II","Germany",415,"German Cognitive Ability Test -- 4-12 -- Revision","Nonverbal","Mathematics and Science",8,58.5,13.5,0.29,0.9,NA
+"217","Trautwein et al. (2009)","Trautwein et al.'s sample III","Switzerland",1535,"German Cognitive Ability Test 4-13","Verbal","Languages",7,53,23.8,0.22,0.89,NA
+"218","Trost and Bickel (1979)","Female sample",NA,113,"Test der akademischen Bef_higung","Verbal",NA,13,100,NA,0.31,0.89,NA
+"219","Trost and Bickel (1979)","Male sample",NA,526,"Test der akademischen Bef_higung","Verbal",NA,13,0,NA,0.26,0.89,NA
+"220","Turney (1930)","Freshmen sample","USA",68,"Army Group Examination Alpha; Pressey Senior Classification Test; Haggerty Intelligence Examination; Terman Group Test of Mental Ability; Miller Mental Ability Test",NA,NA,9,NA,NA,0.65,0.92,NA
+"221","Turney (1930)","Sophomore sample","USA",70,"Army Group Examination Alpha; Haggerty Intelligence Examination; Terman Group Test of Mental Ability; Miller Mental Ability Test",NA,NA,10,NA,NA,0.56,0.93,NA
+"222","Turney (1930)","Juniors sample","USA",65,"Army Group Examination Alpha; Pressey Senior Classification Test; Haggerty Intelligence Examination; Terman Group Test of Mental Ability; Miller Mental Ability",NA,NA,11,NA,NA,0.61,0.92,NA
+"223","Turney (1930)","Seniors sample","USA",65,"Terman Group Test of Mental Ability; Otis Self-Administering Tests of Mental Ability, Higher Examination; Army Group Examination Alpha; Stanford-Binet Individual Examination",NA,NA,12,NA,NA,0.69,0.94,NA
+"224","Valenzuela (1971)","Spanish-American sample","USA",20,NA,NA,NA,11,NA,17,0.19,NA,NA
+"225","Valenzuela (1971)","Anglo-American sample","USA",20,NA,NA,NA,11,NA,17,0.48,NA,NA
+"226","Vecchione, Alessandri, and Marsicano (2014)","Female sample","Italy",54,"Culture Fair Test","Nonverbal",NA,12,100,NA,0.09,0.78,NA
+"227","Vecchione et al. (2014)","Male sample","Italy",47,"Culture Fair Test","Nonverbal",NA,12,0,NA,0.26,0.78,NA
+"228","Vock, Preckel, and Holling (2011)","BIS sample","Germany",1135,"Berlin Structure of Intelligence Test for Youth: Assessment of Talent and Giftedness","Mixed",NA,NA,46.2,14.5,0.4,0.88,1.03
+"229","Vrdoljak and Velki (2012)","Croatia sample","Croatia",161,"Cognitive-nonverbal test","Nonverbal",NA,8,47.7,13.1,0.45,0.93,NA
+"230","Watkins and Astilla (1980)","Watkins and Astilla's sample","Central Philippines",187,"Otis-Lennon Mental Abilities Test","Mixed",NA,NA,100,NA,0.63,0.86,0.65
+"231","Watterson, Schuerger, and Melnyk (1976)","Watterson et al.'s sample","USA",163,"Culture Fair Intelligence Test","Nonverbal",NA,NA,0,NA,0.31,NA,NA
+"232","Weber, Lu, Shi, and Spinath (2013)","German-Chinese sample","Germany",320,"Culture Fair Test-20-Revised","Nonverbal",NA,4,54,9.7,0.32,NA,NA
+"233","Wellman (1957)","Iowa sample","USA",120,"Otis Quick Scoring Mental Ability Tests; SRA Primary Mental Abilities Test",NA,NA,12,50,NA,0.74,0.89,NA
+"234","Wright and Parker (1978)","Aboriginal sample","Australia",35,"ACER Intermediate Test D (Australian Council for Educational Research, 1958)","Verbal",NA,8,51.4,13.8,0.27,0.93,NA
+"235","Wright and Parker (1978)","Non-aboriginal sample","Australia",58,"ACER Intermediate Test D (Australian Council for Educational Research, 1958)","Verbal",NA,8,44.8,13.4,0.52,0.93,NA
+"236","Xin and Zhang (2009)","Chinese math sample","China",119,"Revised Raven's Standard Progressive Matrices","Nonverbal","Mathematics and Science",5,52.1,11.5,0.45,0.85,NA
+"237","Zaunbauer, Retelsdorf, and M_ller (2009)","Realschule Zaunbauer","Germany",292,"German Cognitive Ability Test -- 4-12 -- Revision","Nonverbal","Languages",5,50.3,10.9,0.14,0.83,NA
+"238","Zaunbauer et al. (2009)","Gymnasium Zaunbauer","Germany",418,"German Cognitive Ability Test -- 4-12 -- Revision","Nonverbal","Languages",5,51.4,10.9,0.12,0.83,NA
+"239","Ziegler, Knogler, and Buehner (2009)","Psychology sample","Germany",271,"Intelligence-Structure-Test-2000-Revised","Mixed",NA,NA,82,20,0.22,0.92,0.87
+"240","Zuffiano et al. (2013)","Rom sample","Italy",170,"Culture Fair Test","Nonverbal",NA,7,51.2,13.5,0.3,0.77,0.71
