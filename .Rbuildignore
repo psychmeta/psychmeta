@@ -9,3 +9,5 @@
 ^Meta$
 ^\.github$
 ^cran-comments.md$
+^data-raw$
+^data-raw/*$
