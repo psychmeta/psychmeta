@@ -1,124 +1,66 @@
-# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
-# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
-on:
-  push:
-    branches:
-      - main
-      - master
-  pull_request:
-    branches:
-      - main
-      - master
+name: 'check-r-package'
+description: 'Action to check R package with rcmdcheck. Assumes that rcmdcheck has already been installed.'
+author: 'Jim Hester'
+inputs:
+  args:
+    description: 'Arguments to pass to the `args` parameter of rcmdcheck. Must be an R expression. Note that it often needs to be quoted in YAML, see the README for details.'
+    default: 'c("--no-manual", "--as-cran")'
+  build_args:
+    description: 'Arguments to pass to the `build_args` parameter of rcmdcheck. Note that it often needs to be quoted in YAML, see the README for details.'
+    default: '"--no-manual"'
+  error-on:
+    description: 'What type of result should cause a build error? Note that it often needs to be quoted in YAML, see the README for details.'
+    default: '"warning"'
+  check-dir:
+    description: 'Where should the check output go? Note that it often needs to be quoted in YAML, see the README for details.'
+    default: '"check"'
+  working-directory:
+    description: 'Using the working-directory keyword, you can specify the working directory of where "rcmdcheck::rcmdcheck" is run.'
+    default: '.'
+  upload-snapshots:
+    description: 'Whether to upload all testthat snapshots as an artifact.'
+    default: false
+  upload-results:
+    description: 'Whether to upload check results for successful runs too.'
+    default: false
 
-name: R-CMD-check
+runs:
+  using: "composite"
+  steps:
+    - name: Check
+      id: rcmdcheck
+      run: |
+        ## --------------------------------------------------------------------
+        options(crayon.enabled = TRUE)
+        cat("LOGNAME=", Sys.info()[["user"]], "\n", sep = "", file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+        if (Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "") == "") Sys.setenv("_R_CHECK_FORCE_SUGGESTS_" = "false")
+        if (Sys.getenv("_R_CHECK_CRAN_INCOMING_", "") == "") Sys.setenv("_R_CHECK_CRAN_INCOMING_" = "false")
+        cat("check-dir-path=", file.path(getwd(), (${{ inputs.check-dir }})), "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+        check_results <- rcmdcheck::rcmdcheck(args = (${{ inputs.args }}), build_args = (${{ inputs.build_args }}), error_on = (${{ inputs.error-on }}), check_dir = (${{ inputs.check-dir }}))
+      shell: Rscript {0}
+      working-directory: ${{ inputs.working-directory }}
 
-jobs:
-  R-CMD-check:
-    runs-on: macOS-latest
-    if: "! contains(github.event.head_commit.message, 'v\\d') && !contains(github.event.head_commit.message, '[ci skip]')"
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v2
+    - name: Show testthat output
+      if: always()
+      run: |
+        ## --------------------------------------------------------------------
+        echo ::group::Show testthat output
+        find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        echo ::endgroup::
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
-      - uses: r-lib/actions/setup-r@v1
+    - name: Upload check results
+      if: failure() || inputs.upload-results != 'false'
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+        path: ${{ steps.rcmdcheck.outputs.check-dir-path }}
 
-      - uses: r-lib/actions/setup-pandoc@master
-      
-      - name: Query dependencies
-        run: |
-          install.packages('remotes', repos = "https://cran.rstudio.com/")
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
-      - name: Restore R package cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
-
-      - name: Install dependencies
-        run: |
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-        shell: Rscript {0}
-
-      - name: Check
-        run: |
-          options(crayon.enabled = TRUE)
-          rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
-
-  R-CMD-check-release:
-    runs-on: ${{ matrix.config.os }}
-    if: "contains(github.event.head_commit.message, 'v\\d') && !contains(github.event.head_commit.message, '[ci skip]')"
-
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - {os: windows-latest, r: 'release'}
-          - {os: macOS-latest, r: 'release'}
-          - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
-          - {os: ubuntu-20.04,   r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest", http-user-agent: "R/4.1.0 (ubuntu-20.04) R (4.1.0 x86_64-pc-linux-gnu x86_64 linux-gnu) on GitHub Actions" }
-
-    env:
-      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      RSPM: ${{ matrix.config.rspm }}
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: r-lib/actions/setup-r@v1
-        with:
-          r-version: ${{ matrix.config.r }}
-
-      - uses: r-lib/actions/setup-pandoc@v1
-
-      - name: Query dependencies
-        run: |
-          install.packages('remotes', repos = "https://cran.rstudio.com/")
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
-      - name: Restore R package cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
-
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
-
-      - name: Install dependencies
-        run: |
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-        shell: Rscript {0}
-
-      - name: Check
-        env:
-          _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: |
-          options(crayon.enabled = TRUE)
-          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
-        shell: Rscript {0}
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
+    - name: Upload snapshots
+      if: inputs.upload-snapshots != 'false'
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ runner.os }}-r${{ matrix.config.r }}-testthat-snapshots
+        path: ${{ steps.rcmdcheck.outputs.check-dir-path }}/**/tests*/testthat/_snaps
+        if-no-files-found: ignore
