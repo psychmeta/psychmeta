@@ -1,6 +1,5 @@
-citHeader("To cite ‘psychmeta’ in publications, use:")
-
-citEntry(entry = "Article",
+bibentry(heade = "To cite ‘psychmeta’ in publications, use:",
+  bibtype = "Article",
   author       = c(person("Jeffrey A.", "Dahlke"),
                    person("Brenton M.", "Wiernik")),
   year         = "2019",

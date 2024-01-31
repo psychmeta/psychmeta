@@ -35,4 +35,4 @@ citation("psychmeta")
 ```
 
 ## Reporting Issues
-To report a bug or other issue, [tell us about it on GitHub](https://github.com/psychmeta/psychmeta/issues) or email [issues@psychmeta.com](mailto:issues@psychmeta.com). For more general questions and inquiries about the package, reach out to us via [Twitter](https://twitter.com/psychmetaR) or email [psychmeta@psychmeta.com](mailto:psychmeta@psychmeta.com).
+To report a bug or other issue, [tell us about it on GitHub](https://github.com/psychmeta/psychmeta/issues) or email [issues@psychmeta.com](mailto:issues@psychmeta.com). For more general questions and inquiries about the package, email [psychmeta@psychmeta.com](mailto:psychmeta@psychmeta.com).

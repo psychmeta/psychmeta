@@ -10,7 +10,7 @@
 \item{data}{Data frame of individual-correction information.}
 
 \item{type}{Type of correlation to be meta-analyzed: "ts" for true score, "vgx" for validity generalization with "X" as the predictor,
-"vgy" for for validity generalization with "X" as the predictor, and "all" for the complete set of results.}
+"vgy" for for validity generalization with "Y" as the predictor, and "all" for the complete set of results.}
 
 \item{run_lean}{If TRUE, the meta-analysis will not generate a data object. Meant to speed up bootstrap analyses that do not require supplemental output.}
 
@@ -22,3 +22,4 @@ A meta-analytic table and a data frame.
 \description{
 Internal function for computing individual-correction meta-analyses of correlations
 }
+\keyword{internal}

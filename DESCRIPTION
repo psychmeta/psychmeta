@@ -1,8 +1,8 @@
 Package: psychmeta
 Type: Package
 Title: Psychometric Meta-Analysis Toolkit
-Version: 2.6.5
-Date: 2022-08-25
+Version: 2.6.5.99
+Date: 2024-01-30
 Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
                      email = "jdahlke@humrro.org"),
               person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
@@ -33,7 +33,7 @@ Suggests:
     cli, 
     crayon,
     testthat (>= 2.1.0)
-RoxygenNote: 7.2.1.9000
+RoxygenNote: 7.2.3
 NeedsCompilation: no
 Packaged: 2020-09-07 17:03:30 UTC; jeffreydahlke
 Author: Jeffrey A. Dahlke [aut, cre],
