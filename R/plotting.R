@@ -856,8 +856,8 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
      if(nrow(mat) == 1) plot_dat$cite <- factor(plot_dat$cite, levels = c(levels(mat$cite), levels(dat$cite)))
 
      if(!is.null(x_limits)){
-          plot_dat$upperci[dat$upperci > max(x_limits)] <- max(x_limits)
-          plot_dat$lowerci[dat$lowerci < min(x_limits)] <- min(x_limits)
+          plot_dat$upperci[plot_dat$upperci > max(x_limits)] <- max(x_limits)
+          plot_dat$lowerci[plot_dat$lowerci < min(x_limits)] <- min(x_limits)
      }
 
      if(is.null(x_limits)){
