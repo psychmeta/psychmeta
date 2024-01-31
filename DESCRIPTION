@@ -3,15 +3,31 @@ Type: Package
 Title: Psychometric Meta-Analysis Toolkit
 Version: 2.6.5.99
 Date: 2024-01-30
-Authors@R: c(person("Jeffrey A.", "Dahlke", role = c("aut", "cre"),
-                     email = "jdahlke@humrro.org"),
-              person("Brenton M.", "Wiernik", role = "aut", email = "brenton@psychmeta.com"),
-              person("Wesley", "Gardiner", role = "ctb", comment = "Unit tests"),
-              person("Michael T.", "Brannick", role = "ctb", comment = "Testing"),
-              person("Jack", "Kostal", role = "ctb", comment = "Code for reshape_mat2dat function"),
-              person("Sean", "Potter", role = "ctb", comment = "Testing; Code for cumulative and leave1out plots"),
-              person("John", "Sakaluk", role = "ctb", comment = "Code for funnel and forest plots"),
-              person("Yuejia (Mandy)", "Teng", role = "ctb", comment = "Testing"))
+Authors@R: c(person("Jeffrey A.", "Dahlke",
+                    role = c("aut", "cre"),
+                    email = "jeff.dahlke.phd@gmail.com"),
+             person("Brenton M.", "Wiernik",
+                    role = "aut",
+                    email = "brenton@psychmeta.com"),
+             person("Wesley", "Gardiner",
+                    role = "ctb",
+                    comment = "Unit tests"),
+             person("Michael T.", "Brannick",
+                    role = "ctb", 
+                    comment = "Testing"),
+             person("Jack", "Kostal",
+                    role = "ctb", 
+                    comment = "Code for reshape_mat2dat function"),
+             person("Sean", "Potter",
+                    role = "ctb", 
+                    comment = "Testing; Code for cumulative and leave1out plots"),
+             person("John", "Sakaluk", 
+                    role = "ctb",
+                    comment = "Code for funnel and forest plots"),
+             person("Yuejia (Mandy)", "Teng",
+                    role = "ctb",
+                    comment = "Testing"))
+Maintainer: Jeffrey A. Dahlke <jeff.dahlke.phd@gmail.com>
 BugReports: https://github.com/psychmeta/psychmeta/issues
 Description: Tools for computing bare-bones and psychometric meta-analyses and for generating psychometric data for use in meta-analysis simulations. Supports bare-bones, individual-correction, and artifact-distribution methods for meta-analyzing correlations and d values. Includes tools for converting effect sizes, computing sporadic artifact corrections, reshaping meta-analytic databases, computing multivariate corrections for range variation, and more. Bugs can be reported to <https://github.com/psychmeta/psychmeta/issues> or <issues@psychmeta.com>.
 License: GPL (>= 3)
@@ -35,7 +51,6 @@ Suggests:
     testthat (>= 2.1.0)
 RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2020-09-07 17:03:30 UTC; jeffreydahlke
 Author: Jeffrey A. Dahlke [aut, cre],
   Brenton M. Wiernik [aut],
   Wesley Gardiner [ctb] (Unit tests),
@@ -44,4 +59,3 @@ Author: Jeffrey A. Dahlke [aut, cre],
   Sean Potter [ctb] (Testing; Code for cumulative and leave1out plots),
   John Sakaluk [ctb] (Code for funnel and forest plots),
   Yuejia (Mandy) Teng [ctb] (Testing)
-Maintainer: Jeffrey A. Dahlke <jdahlke@humrro.org>
