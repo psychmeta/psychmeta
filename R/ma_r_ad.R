@@ -318,13 +318,13 @@ gather_ma_ad <- function(x){
      uvrr_var <- ifelse(x$flip_xy, "Y", "X")
      if(correction_method == "uvdrr")   range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "(i.e., Case II)")
      if(correction_method == "uvirr")   range_restriction <- paste("Corrected for univariate indirect range restriction in", uvrr_var, "(i.e., Case IV)")
-     if(correction_method == "rbOrig")      range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "interactively using the original Raju and Burke's correction")
-     if(correction_method == "rb1Orig")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using Raju and Burke's original TSA1 approach")
-     if(correction_method == "rb2Orig")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using Raju and Burke's original TSA2 approach")
+     if(correction_method == "rbOrig")      range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "interactively using the original Raju and Burke correction")
+     if(correction_method == "rb1Orig")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using the original Raju and Burke TSA1 approach")
+     if(correction_method == "rb2Orig")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using the original Raju and Burke TSA2 approach")
      
-     if(correction_method == "rbAdj")      range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "interactively using the adjusted Raju and Burke's correction")
-     if(correction_method == "rb1Adj")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using Raju and Burke's adjusted TSA1 approach")
-     if(correction_method == "rb2Adj")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using Raju and Burke's adjusted TSA2 approach")
+     if(correction_method == "rbAdj")      range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "interactively using the adjusted Raju and Burke correction")
+     if(correction_method == "rb1Adj")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using the adjusted Raju and Burke TSA1 approach")
+     if(correction_method == "rb2Adj")     range_restriction <- paste("Corrected for univariate direct range restriction in", uvrr_var, "using the adjusted Raju and Burke adjusted TSA2 approach")
      
      if(!(x$correct_meas_x | x$correct_meas_y)){
           meas_correction <- "Made no corrections for measurement error"

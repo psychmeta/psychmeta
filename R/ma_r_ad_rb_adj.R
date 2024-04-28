@@ -336,8 +336,8 @@
      ##
 
      if(flip_xy){
-          correct_meas_x <- .mean_rxxa != 1
-          correct_meas_y <- .mean_ryyi != 1
+          correct_meas_y <- .mean_rxxa != 1
+          correct_meas_x <- .mean_ryyi != 1
           correct_drr <- .mean_ux != 1
 
           mean_rxpa <- .mean_rtya
@@ -360,8 +360,8 @@
           var_pre_ty <- .var_pre_xp
           se_r_ty <- .se_r_xp
      }else{
-          correct_meas_y <- .mean_rxxa != 1
-          correct_meas_x <- .mean_ryyi != 1
+          correct_meas_x <- .mean_rxxa != 1
+          correct_meas_y <- .mean_ryyi != 1
           correct_drr <- .mean_ux != 1
 
           mean_rxpa <- .mean_rxpa
@@ -532,8 +532,8 @@
      ##
 
      if(flip_xy){
-          correct_meas_x <- .mean_qxa != 1
-          correct_meas_y <- .mean_qyi != 1
+          correct_meas_y <- .mean_qxa != 1
+          correct_meas_x <- .mean_qyi != 1
           correct_drr <- .mean_ux != 1
 
           mean_rxpa <- .mean_rtya
@@ -556,8 +556,8 @@
           var_pre_ty <- .var_pre_xp
           se_r_ty <- .se_r_xp
      }else{
-          correct_meas_y <- .mean_qxa != 1
-          correct_meas_x <- .mean_qyi != 1
+          correct_meas_x <- .mean_qxa != 1
+          correct_meas_y <- .mean_qyi != 1
           correct_drr <- .mean_ux != 1
 
           mean_rxpa <- .mean_rxpa
