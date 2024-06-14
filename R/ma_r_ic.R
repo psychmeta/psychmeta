@@ -679,8 +679,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rtpa_vec[do_uvdrr_y] <- .correct_r_uvdrr(rxyi = rxyi[do_uvdrr_y], qxa = ryya_vec[do_uvdrr_y]^.5, qyi = rxxi_vec[do_uvdrr_y]^.5, ux = uy_vec[do_uvdrr_y])
 
      rtpa_vec[do_uvirr_x] <- .correct_r_uvirr(rxyi = rxyi[do_uvirr_x], qxi = rxxi_vec[do_uvirr_x]^.5, qyi = ryyi_vec[do_uvirr_x]^.5, ut = ut_vec[do_uvirr_x])
-     rtpa_vec[do_uvirr_y] <- .correct_r_uvirr(rxyi = rxyi[do_uvirr_y], qxi = ryyi_vec[do_uvirr_y]^.5, qyi = ryyi_vec[do_uvirr_y]^.5, ut = up_vec[do_uvirr_y])
-
+     rtpa_vec[do_uvirr_y] <- .correct_r_uvirr(rxyi = rxyi[do_uvirr_y], qxi = ryyi_vec[do_uvirr_y]^.5, qyi = rxxi_vec[do_uvirr_y]^.5, ut = up_vec[do_uvirr_y])
+     
      rtpa_vec[do_bvirr] <- .correct_r_bvirr(rxyi = rxyi[do_bvirr], qxa = rxxa_vec[do_bvirr]^.5, qya = ryya_vec[do_bvirr]^.5,
                                             ux = ux_vec[do_bvirr], uy = uy_vec[do_bvirr], sign_rxz = sign_rxz, sign_ryz = sign_ryz)
 
