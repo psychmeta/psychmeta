@@ -23,7 +23,7 @@ as the regression weights estimated from this matrix are expected to be invarian
 
 \item{x_col}{The row/column indices of the variables in \code{Sigma} that correspond, in order, to the variables in means_x_a}
 
-\item{y_col}{Optional: The variables in \code{Sigma} not listed in \code{x_col} that are to be manipuated by the multivariate range-restriction formula.}
+\item{y_col}{Optional: The variables in \code{Sigma} not listed in \code{x_col} that are to be manipulated by the multivariate range-restriction formula.}
 
 \item{var_names}{Optional vector of names for the variables in \code{Sigma}, in order of appearance in the matrix.}
 }

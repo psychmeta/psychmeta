@@ -29,7 +29,7 @@
 #'      \item{\code{file_drawer}}{Fail-safe \eqn{N} and \eqn{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
 #'
 #'      Results are reported using computation methods described by Schmidt and Hunter.
-#'      For barebones and indivdiual-correction meta-analyses, results are also
+#'      For barebones and individual-correction meta-analyses, results are also
 #'      reported using computation methods described by DerSimonian and Laird,
 #'      outlier-robust computation methods, and, if weights from \pkg{metafor}
 #'      are used, heterogeneity results from \pkg{metafor}.
@@ -665,7 +665,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @param Q_r The Q_r statistic.
 #' @param wi Vector of inverse within-study sampling variances.
 #'
-#' @author  Lifeng Lin and Haitao Chu
+#' @author  Lifeng Lin achind Haitao Chu
 #'
 #' @return tau_r_squared
 #' 
@@ -788,7 +788,7 @@ limits_tau <- function(var_es, var_pre, k, method = c("profile_var_es", "profile
 
 #' Confidence limits for noncentral chi square parameters (function and documentation from package 'MBESS' version 4.4.3)
 #' Function to determine the noncentral parameter that leads to the observed \code{Chi.Square}-value,
-#' so that a confidence interval for the population noncentral chi-squrae value can be formed.
+#' so that a confidence interval for the population noncentral chi-square value can be formed.
 #'
 #' @param Chi.Square the observed chi-square value
 #' @param conf.level the desired degree of confidence for the interval

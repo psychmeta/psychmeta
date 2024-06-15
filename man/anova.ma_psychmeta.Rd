@@ -21,7 +21,7 @@
 
 \item{...}{Additional arguments.}
 
-\item{analyses}{Which analyses to to test moderators for? Can be either \code{"all"} to test moderators for all meta-analyses in the object (default) or a list containing one or more of the arguments \code{construct}, \code{construct_pair}, \code{pair_id}, \code{k_min}, and \code{N_min}. See \code{\link[=filter_ma]{filter_ma()}} for details. Note that \code{analysis_id} should not be used. If \code{k_min} is not supplied, it is set to 2.}
+\item{analyses}{Which analyses to test moderators for? Can be either \code{"all"} to test moderators for all meta-analyses in the object (default) or a list containing one or more of the arguments \code{construct}, \code{construct_pair}, \code{pair_id}, \code{k_min}, and \code{N_min}. See \code{\link[=filter_ma]{filter_ma()}} for details. Note that \code{analysis_id} should not be used. If \code{k_min} is not supplied, it is set to 2.}
 
 \item{moderators}{A character vector of moderators to test. If \code{NULL}, all categorical moderators are tested.}
 

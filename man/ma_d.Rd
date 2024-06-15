@@ -186,7 +186,7 @@ To avoid double-compositing, any observation with one of these reserved names wi
 
 \item{correct_rel}{Optional named vector that supersedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.}
 
-\item{correct_rGg}{Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
+\item{correct_rGg}{Logical scalar or vector that determines whether to correct the grouping variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{correct_ryy}{Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).}
 

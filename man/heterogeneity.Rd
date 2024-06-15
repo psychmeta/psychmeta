@@ -40,7 +40,7 @@ ma_obj with heterogeneity statistics added. Included statistics include:
      \item{\code{file_drawer}}{Fail-safe \eqn{N} and \eqn{k} statistics (file-drawer analyses). These statistics should not be used to evaluate publication bias, as they counterintuitively suggest \emph{less} when publication bias is strong (Becker, 2005). However, in the absence of publication bias, they can be used as an index of second-order sampling error (how likely is a mean effect to reduce to the specified value with additional studies?). The confidence interval around the mean effect can be used more directly for the same purpose.}
 
      Results are reported using computation methods described by Schmidt and Hunter.
-     For barebones and indivdiual-correction meta-analyses, results are also
+     For barebones and individual-correction meta-analyses, results are also
      reported using computation methods described by DerSimonian and Laird,
      outlier-robust computation methods, and, if weights from \pkg{metafor}
      are used, heterogeneity results from \pkg{metafor}.

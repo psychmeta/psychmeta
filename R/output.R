@@ -10,13 +10,13 @@
 #' @param x A vector, matrix, or data.frame of numbers to format
 #' @param digits The number of decimal digits desired (used strictly; default: 2)
 #' @param decimal.mark The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})
-#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://symbl.cc/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).
+#' @param leading0 How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to substitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://symbl.cc/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).
 #' @param drop0integer Logical. Should trailing decimal zeros be dropped for integers?
 #' @param neg.sign Character to use as negative sign. Defaults to minus-sign (\href{https://symbl.cc/en/2212/}{\code{U+2212}}).
 #' @param pos.sign Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\href{https://symbl.cc/en/2007/}{\code{U+2007}}) if a column contains any negative numbers and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).
-#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).
+#' @param big.mark Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommended thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).
 #' @param big.interval See \code{big.mark} above; defaults to 3.
-#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).
+#' @param small.mark Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommended thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).
 #' @param small.interval See \code{small.mark} above; defaults to 3.
 #' @param na.mark Character to replace \code{NA} and \code{NaN} values. Defaults to em-dash (\href{https://symbl.cc/en/2014/}{\code{U+2014}}))
 #' @param lgl.mark A length 2 vector containing characters to replace \code{TRUE} and \code{FALSE}. Defaults to c("+", "\href{https://symbl.cc/en/2212/}{\code{U+2212}}").
@@ -46,9 +46,9 @@
 #'
 #' # By default, format_num() separates groups of large digits using thin spaces.
 #' # This is following the international standard for scientific communication (SI/ISO 31-0),
-#' # which advises against using "." or "," to seprate digits because doing so can lead
+#' # which advises against using "." or "," to separate digits because doing so can lead
 #' # to confusion for human and computer readers because "." and "," are also used
-#' # as decimal marks in various countries. If you prefer to use commmas to separate
+#' # as decimal marks in various countries. If you prefer to use commas to separate
 #' # large digit groups, set big.mark = ",":
 #' format_num(x = 10000, big.mark = ",")
 format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
@@ -309,8 +309,8 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).
 #' @param output_format The format of the output tables. Available options are Word (default), HTML, PDF (requires LaTeX and the \code{unicode-math} LaTeX package to be installed), ODT, rmd (Rmarkdown), and text (plain text). You can also specify the full name of another RMarkdown \code{\link[rmarkdown]{output_format}}.
 #' @param ma_method Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.
-#' @param correction_type Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
-#' @param collapse_construct_labels  Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).
+#' @param correction_type Type of meta-analytic corrections to be included. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.
+#' @param collapse_construct_labels  Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurrence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).
 #' @param bold_headers Logical. Should column headers be bolded (default: \code{TRUE})?
 #' @param digits,decimal.mark,leading0,drop0integer,neg.sign,pos.sign,big.mark,big.interval,small.mark,small.interval,na.mark,lgl.mark,inf.mark Number formatting arguments. See \code{\link{format_num}} for details.
 #' @param conf_format How should confidence intervals be formatted? Options are:
@@ -319,7 +319,7 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' \item{\code{brackets}}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
 #' \item{\code{columns}}{: Bounds are shown in individual columns.}
 #' }
-#' @param cred_format How should credility intervals be formatted? Options are the same as for \code{conf_format} above.
+#' @param cred_format How should credibility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).
 #' @param caption Caption to print before tables. Either a character scalar or a named character vector with names corresponding to combinations of \code{ma_method} and \code{correction_type} (i.e., \code{bb}, \code{ic_ts}, \code{ad_vgx}, etc.).
 #' @param header A list of YAML header parameters to pass to \code{\link[rmarkdown]{render}}.
@@ -549,7 +549,7 @@ metabulate <- function(ma_obj, file = NULL, output_dir = getwd(),
 #' @param header A list of YAML header parameters to pass to [rmarkdown::render()].
 #' @param ... Additional arguments to pass to [rmarkdown::render()].
 #'
-#' @return A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
+#' @return A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested `style` and `output_format` is exported (or printed if file is "console").
 #'
 #' @export
 #' @md

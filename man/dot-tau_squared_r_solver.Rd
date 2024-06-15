@@ -18,6 +18,6 @@ tau_r_squared
 Function to solve for tau_r_squared (outlier-robust estimator of tau_squared based on absolute deviations from mean)
 }
 \author{
-Lifeng Lin and Haitao Chu
+Lifeng Lin achind Haitao Chu
 }
 \keyword{internal}

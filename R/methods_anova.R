@@ -69,7 +69,7 @@ anova.summary.lm_mat <- function(...){
 #' Currently, samples across moderator levels are assumed to be independent.
 #'
 #' @param object A psychmeta meta-analysis object.
-#' @param analyses Which analyses to to test moderators for? Can be either `"all"` to test moderators for all meta-analyses in the object (default) or a list containing one or more of the arguments `construct`, `construct_pair`, `pair_id`, `k_min`, and `N_min`. See [filter_ma()] for details. Note that `analysis_id` should not be used. If `k_min` is not supplied, it is set to 2.
+#' @param analyses Which analyses to test moderators for? Can be either `"all"` to test moderators for all meta-analyses in the object (default) or a list containing one or more of the arguments `construct`, `construct_pair`, `pair_id`, `k_min`, and `N_min`. See [filter_ma()] for details. Note that `analysis_id` should not be used. If `k_min` is not supplied, it is set to 2.
 #' @param moderators A character vector of moderators to test. If `NULL`, all categorical moderators are tested.
 #' @param L A named list with with elements specifying set of linear contrasts for each variable in `moderators`. (Not yet implemented.)
 #' @param ma_obj2 A second psychmeta meta-analysis object to compare to `object` (Not yet implemented.)

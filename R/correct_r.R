@@ -189,13 +189,13 @@ correct_r_coarseness <- function(r, kx = NULL, ky = NULL, n = NULL, dist_x = "no
 #'
 #' Correct correlations for artificial dichotomization of one or both variables.
 #'
-#' @param r Vector of correlations attenuated by artificial dichomization.
+#' @param r Vector of correlations attenuated by artificial dichotomization.
 #' @param px Vector of proportions of the distribution on either side of the split applied to X (set as NA if X is continuous).
 #' @param py Vector of proportions of the distribution on either side of the split applied to Y (set as NA if Y is continuous).
 #' @param n Optional vector of sample sizes.
 #' @param ... Additional arguments.
 #'
-#' @return Vector of correlations corrected for artificial dichomization (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
+#' @return Vector of correlations corrected for artificial dichotomization (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 #' @export
 #'
 #' @references

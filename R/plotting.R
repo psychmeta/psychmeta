@@ -10,8 +10,8 @@
 #' @param label_es Label for effect size (x-axis). Defaults to "Correlation (*r*)" for correlation meta-analyses, "Cohen's *d* (Hedges's *g*)" for d value meta-analyses, and "Effect size" for generic meta-analyses.
 #' @param conf_level Confidence regions levels to be plotted (default: .95, .99).
 #' @param conf_linetype Line types for confidence region boundaries. Length should be either 1 or equal to the length of conf_level.
-#' @param conf_fill Colors for confidence regions. Set to `NA` for transparent. Length should be either 1 or equal to to the length of conf_level.
-#' @param conf_alpha Transparency level for confidence regions. Length should be either 1 or equal to to the length of conf_level.
+#' @param conf_fill Colors for confidence regions. Set to `NA` for transparent. Length should be either 1 or equal to the length of conf_level.
+#' @param conf_alpha Transparency level for confidence regions. Length should be either 1 or equal to the length of conf_level.
 #' @param null_effect Null effect to be plotted for contour-enhanced funnel plots. If `NA`, not shown. If `NULL`, set to the null value for the effect size metric (0 for correlations and d values).
 #' @param null_conf_level Null-effect confidence regions levels to be plotted (default: .90, .95, .99).
 #' @param null_conf_linetype Line types for null-effect confidence region boundaries. Length should be either 1 or equal to the length of null_conf_level.

@@ -4,7 +4,7 @@
 \alias{conf.limits.nc.chisq}
 \title{Confidence limits for noncentral chi square parameters (function and documentation from package 'MBESS' version 4.4.3)
 Function to determine the noncentral parameter that leads to the observed \code{Chi.Square}-value,
-so that a confidence interval for the population noncentral chi-squrae value can be formed.}
+so that a confidence interval for the population noncentral chi-square value can be formed.}
 \usage{
 conf.limits.nc.chisq(
   Chi.Square = NULL,
@@ -42,7 +42,7 @@ conf.limits.nc.chisq(
 \description{
 Confidence limits for noncentral chi square parameters (function and documentation from package 'MBESS' version 4.4.3)
 Function to determine the noncentral parameter that leads to the observed \code{Chi.Square}-value,
-so that a confidence interval for the population noncentral chi-squrae value can be formed.
+so that a confidence interval for the population noncentral chi-square value can be formed.
 }
 \details{
 If the function fails (or if a function relying upon this function fails), adjust the \code{Jumping.Prop} (to a smaller value).

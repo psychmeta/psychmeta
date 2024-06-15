@@ -154,7 +154,7 @@ ma_r_ic(
 Select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.}
+be used when interactive artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.}
 
 \item{construct_x, construct_y}{Vector of construct names for constructs initially designated as "X" or as "Y".}
 
@@ -268,7 +268,7 @@ corresponding to the "Y" constructs in the meta-analyses contained within \code{
 Only evaluated when \code{ad_obj_x} or \code{ad_obj_y} is NULL and \code{ma_obj} does not contain individual correction results.
 Use one of the following commands: \code{tsa} to use the Taylor series method or \code{int} to use the interactive method.}
 
-\item{supplemental_ads_x, supplemental_ads_y}{For \code{ma_r_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.}
+\item{supplemental_ads_x, supplemental_ads_y}{For \code{ma_r_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.}
 }
 \value{
 A nested tabular object of the class "ma_psychmeta".
@@ -605,7 +605,7 @@ summary(ma_obj_pair)
 ma_obj_pair$meta_tables[[1]]$artifact_distribution$true_score
 
 
-# Sometimes moderators have important influcnces on artifact distributions as well as
+# Sometimes moderators have important influences on artifact distributions as well as
 # distributions of effect sizes. When this occurs, moderated artifact distributions
 # can be created to make more appropriate corrections.
 ad_tibble_mod <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,

@@ -7,7 +7,7 @@
 correct_r_dich(r, px = NA, py = NA, n = NULL, ...)
 }
 \arguments{
-\item{r}{Vector of correlations attenuated by artificial dichomization.}
+\item{r}{Vector of correlations attenuated by artificial dichotomization.}
 
 \item{px}{Vector of proportions of the distribution on either side of the split applied to X (set as NA if X is continuous).}
 
@@ -18,7 +18,7 @@ correct_r_dich(r, px = NA, py = NA, n = NULL, ...)
 \item{...}{Additional arguments.}
 }
 \value{
-Vector of correlations corrected for artificial dichomization (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
+Vector of correlations corrected for artificial dichotomization (if \code{n} is supplied, corrected error variance and adjusted sample size is also reported).
 }
 \description{
 Correct correlations for artificial dichotomization of one or both variables.

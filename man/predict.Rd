@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods_predict.R
 \name{predict}
 \alias{predict}
-\title{Prediction method for objects of classes deriving from "lm_mat"}
+\title{Prediction method for objects of classes deriving from \code{lm_mat}}
 \arguments{
 \item{object}{Object of class inheriting from "lm_mat"}
 
@@ -22,5 +22,5 @@
 An set of predicted values
 }
 \description{
-Prediction method for objects of classes deriving from "lm_mat"
+Prediction method for objects of classes deriving from \code{lm_mat}
 }

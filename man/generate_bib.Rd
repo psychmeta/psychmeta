@@ -51,7 +51,7 @@ generate_bib(
 \item{...}{Additional arguments to pass to \code{\link[rmarkdown:render]{rmarkdown::render()}}.}
 }
 \value{
-A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested style and output_format is exported (or printed if file is "console").
+A list containing a tibble of bibtex reference data. Additionally, a reference list formatted in the requested \code{style} and \code{output_format} is exported (or printed if file is "console").
 }
 \description{
 This function generates a list of studies contributing to a meta-analysis

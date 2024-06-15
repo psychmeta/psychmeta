@@ -1,9 +1,9 @@
 #' @name predict
 #' 
-#' @title Prediction method for objects of classes deriving from "lm_mat"
+#' @title Prediction method for objects of classes deriving from \code{lm_mat}
 #'
 #' @description
-#' Prediction method for objects of classes deriving from "lm_mat"
+#' Prediction method for objects of classes deriving from \code{lm_mat}
 #'
 #' @param object Object of class inheriting from "lm_mat"
 #' @param newdata An optional data frame in which to look for variables with which to predict. If omitted, the fitted values are used.

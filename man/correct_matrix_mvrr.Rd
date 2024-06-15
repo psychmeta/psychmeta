@@ -20,7 +20,7 @@ correct_matrix_mvrr(
 
 \item{x_col}{The row/column indices of the variables in \code{Sigma_i} that correspond, in order, to the variables in \code{Sigma_xx_a}.}
 
-\item{y_col}{Optional: The variables in \code{Sigma_i} not listed in \code{x_col} that are to be manipuated by the multivariate range-restriction formula.}
+\item{y_col}{Optional: The variables in \code{Sigma_i} not listed in \code{x_col} that are to be manipulated by the multivariate range-restriction formula.}
 
 \item{standardize}{Should the function's output matrix be returned in standardized form (\code{TRUE}) or in unstandardized form (\code{FALSE}; the default).}
 

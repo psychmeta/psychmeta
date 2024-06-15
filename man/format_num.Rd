@@ -20,7 +20,7 @@ format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
 \item{decimal.mark}{The character to use for the decimal point (defaults to locale default: \code{getOption("OutDec")})}
 
-\item{leading0}{How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to subsitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://symbl.cc/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).}
+\item{leading0}{How to print leading zeros on decimals. Can be logical to print (\code{TRUE}) or suppress (\code{FALSE}) leading zeros or a character string to substitute for leading zeros. If \code{"conditional"} (default), leading zeros are shown if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure"}, leading zeros are replaced with a figure space (\href{https://symbl.cc/en/2007/}{\code{U+2007}}) if a column contains any absolute values greater than 1 and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).}
 
 \item{drop0integer}{Logical. Should trailing decimal zeros be dropped for integers?}
 
@@ -28,11 +28,11 @@ format_num(x, digits = 2L, decimal.mark = getOption("OutDec"),
 
 \item{pos.sign}{Character to use as positive sign. Set to \code{FALSE} to suppress. If \code{"figure"} (default), the positive sign is a figure-space (\href{https://symbl.cc/en/2007/}{\code{U+2007}}) if a column contains any negative numbers and suppressed otherwise. If \code{"figure_html"}, the same as \code{"figure"}, but using the HTML entity for figure space (useful for Windows users in some locales).}
 
-\item{big.mark}{Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).}
+\item{big.mark}{Character to mark between each \code{big.interval} digits \emph{before} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommended thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).}
 
 \item{big.interval}{See \code{big.mark} above; defaults to 3.}
 
-\item{small.mark}{Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommened thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).}
+\item{small.mark}{Character to mark between each \code{small.interval} digits \emph{after} the decimal point. Set to \code{FALSE} to suppress. Defaults to the SI/ISO 31-0 standard-recommended thin-spaces (\href{https://symbl.cc/en/202F/}{\code{U+202F}}).}
 
 \item{small.interval}{See \code{small.mark} above; defaults to 3.}
 
@@ -63,9 +63,9 @@ format_num(x = .41, decimal.mark = ".")
 
 # By default, format_num() separates groups of large digits using thin spaces.
 # This is following the international standard for scientific communication (SI/ISO 31-0),
-# which advises against using "." or "," to seprate digits because doing so can lead
+# which advises against using "." or "," to separate digits because doing so can lead
 # to confusion for human and computer readers because "." and "," are also used
-# as decimal marks in various countries. If you prefer to use commmas to separate
+# as decimal marks in various countries. If you prefer to use commas to separate
 # large digit groups, set big.mark = ",":
 format_num(x = 10000, big.mark = ",")
 }

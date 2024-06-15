@@ -76,9 +76,9 @@ metabulate(
 
 \item{ma_method}{Meta-analytic methods to be included. Valid options are: \code{"ad"}, \code{"ic"}, and \code{"bb"}. Multiple methods are permitted. By default, results are given for one method with order of priority: 1. \code{"ad"}, 2. \code{"ic"}, 3. \code{"bb"}.}
 
-\item{correction_type}{Type of meta-analytic corrections to be incldued. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.}
+\item{correction_type}{Type of meta-analytic corrections to be included. Valid options are: "ts" (default), "vgx", and "vgy". Multiple options are permitted.}
 
-\item{collapse_construct_labels}{Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).}
+\item{collapse_construct_labels}{Should the construct labels for construct pairs with multiple rows of results be simplified so that only the first occurrence of each set of construct names is shown (\code{TRUE}; default) or should construct labels be shown for each row of the table (\code{FALSE}).}
 
 \item{bold_headers}{Logical. Should column headers be bolded (default: \code{TRUE})?}
 
@@ -91,7 +91,7 @@ metabulate(
 \item{\code{columns}}{: Bounds are shown in individual columns.}
 }}
 
-\item{cred_format}{How should credility intervals be formatted? Options are the same as for \code{conf_format} above.}
+\item{cred_format}{How should credibility intervals be formatted? Options are the same as for \code{conf_format} above.}
 
 \item{symbol_es}{For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).}
 

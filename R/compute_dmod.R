@@ -538,7 +538,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
 #' functions and automates the generation of regression equations and descriptive statistics for computing \eqn{d_{Mod}}{d_Mod} effect sizes. Please see documentation
 #' for \code{compute_dmod_par} and \code{compute_dmod_npar} for details about how the effect sizes are computed.
 #'
-#' @param data Data frame containing the data to be analyzed (if not a data frame, must be an object convertible to a data frame via the as.data.frame function).
+#' @param data Data frame containing the data to be analyzed (if not a data frame, must be an object convertible to a data frame via the \code{as.data.frame()} function).
 #' The data set must contain a criterion variable, at least one predictor variable, and a categorical variable that identifies the group to which each case (i.e., row) in the data set belongs.
 #' @param group Name or column-index number of the variable that identifies group membership in the data set.
 #' @param predictors Name(s) or column-index number(s) of the predictor variable(s) in the data set. No predictor can be a factor-type variable.
@@ -556,7 +556,7 @@ compute_dmod_par <- function(referent_int, referent_slope,
 #' @param bootstrap Logical argument that indicates whether \eqn{d_{Mod}}{d_Mod} should be bootstrapped (\code{TRUE}; default) or not (\code{FALSE}).
 #' @param boot_iter Number of bootstrap iterations to compute (default = \code{1000}).
 #' @param stratify Logical argument that indicates whether the random bootstrap sampling should be stratified (\code{TRUE}) or unstratified (\code{FALSE}; default).
-#' @param empirical_ci Logical argument that indicates whether the bootstrapped confidence invervals should be computed from the observed empirical distributions (\code{TRUE}) or computed using
+#' @param empirical_ci Logical argument that indicates whether the bootstrapped confidence intervals should be computed from the observed empirical distributions (\code{TRUE}) or computed using
 #' bootstrapped means and standard errors via the normal-theory approach (\code{FALSE}).
 #' @param cross_validate_wts Only relevant when multiple predictors are specified and bootstrapping is performed.
 #' Logical argument that indicates whether regression weights derived from the full sample should be used to combine predictors in the bootstrapped samples (\code{TRUE})

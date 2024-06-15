@@ -54,9 +54,9 @@ plot_cefp(
 
 \item{conf_linetype}{Line types for confidence region boundaries. Length should be either 1 or equal to the length of conf_level.}
 
-\item{conf_fill}{Colors for confidence regions. Set to \code{NA} for transparent. Length should be either 1 or equal to to the length of conf_level.}
+\item{conf_fill}{Colors for confidence regions. Set to \code{NA} for transparent. Length should be either 1 or equal to the length of conf_level.}
 
-\item{conf_alpha}{Transparency level for confidence regions. Length should be either 1 or equal to to the length of conf_level.}
+\item{conf_alpha}{Transparency level for confidence regions. Length should be either 1 or equal to the length of conf_level.}
 
 \item{null_effect}{Null effect to be plotted for contour-enhanced funnel plots. If \code{NA}, not shown. If \code{NULL}, set to the null value for the effect size metric (0 for correlations and d values).}
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods_confint.R
 \name{confint}
 \alias{confint}
-\title{Confidence interval method for objects of classes deriving from "lm_mat"}
+\title{Confidence interval method for objects of classes deriving from \code{lm_mat}}
 \arguments{
 \item{object}{Matrix regression object.}
 
@@ -13,6 +13,6 @@
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-Confidence interval method for objects of classes deriving from "lm_mat."
+Confidence interval method for objects of classes deriving from \code{lm_mat}
 Returns lower and upper bounds of confidence intervals for regression coefficients.
 }

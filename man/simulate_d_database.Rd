@@ -77,14 +77,14 @@ A database of simulated primary studies' statistics and analytically determined 
 The \code{simulate_d_database} function generates databases of psychometric d value data from sample-size parameters, correlation parameters, mean parameters, standard deviation parameters, reliability parameters, and selection-ratio parameters.
 The output database can be provided in a long format.
 If composite variables are to be formed, parameters can also be defined for the weights used to form the composites as well as the selection ratios applied to the composites.
-This function will return a database of statistics as well as a database of parameters - the parameter database contains the actual study parameters for each simulated sample (without sampleing error) to allow comparisons between meta-analytic results computed from the statistics and the actual means and variances of parameters.
+This function will return a database of statistics as well as a database of parameters - the parameter database contains the actual study parameters for each simulated sample (without sampling error) to allow comparisons between meta-analytic results computed from the statistics and the actual means and variances of parameters.
 The \code{\link{merge_simdat_d}} function can be used to merge multiple simulated databases and the \code{\link{sparsify_simdat_d}} function can be used to randomly delete artifact information (a procedure commonly done in simulations of artifact-distribution methods).
 }
 \details{
 Values supplied as any argument with the suffix "params" can take any of three forms (see Examples for a demonstration of usage):
 \itemize{
 \item A vector of values from which study parameters should be sampled.
-\item A vector containing a mean with a variance or standard deviation. These values must be named "mean," "var," and "sd", respectively, for the program to recognize which value is which.
+\item A vector containing a mean with a variance or standard deviation. These values must be named "mean," "var," and "sd," respectively, for the program to recognize which value is which.
 \item A matrix containing a row of values (this row must be named "values") from which study parameters should be sampled and a row of weights (this row must be labeled 'weights') associated
 with the values to be sampled.
 \item A matrix containing a column of values (this column must be named "values") from which study parameters should be sampled and a column of weights (this column must be labeled 'weights') associated

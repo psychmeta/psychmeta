@@ -20,7 +20,7 @@
 #' Select one of the following methods for correcting artifacts: "auto", "meas", "uvdrr", "uvirr", "bvdrr", "bvirr",
 #' "rbOrig", "rb1Orig", "rb2Orig", "rbAdj", "rb1Adj", and "rb2Adj".
 #' (note: "rb1Orig", "rb2Orig", "rb1Adj", and "rb2Adj" can only be used when Taylor series artifact distributions are provided and "rbOrig" and "rbAdj" can only
-#' be used when interative artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.
+#' be used when interactive artifact distributions are provided). See "Details" of \code{\link{ma_r_ad}} for descriptions of the available methods.
 #' @param construct_x,construct_y Vector of construct names for constructs initially designated as "X" or as "Y".
 #' @param facet_x,facet_y Vector of facet names for constructs initially designated as "X" or as "Y".
 #' Facet names "global", "overall", and "total" are reserved to indicate observations that represent effect sizes that have already been composited or that represent construct-level measurements rather than facet-level measurements.
@@ -86,7 +86,7 @@
 #' @param control Output from the \code{control_psychmeta()} function or a list of arguments controlled by the \code{control_psychmeta()} function. Ellipsis arguments will be screened for internal inclusion in \code{control}.
 #' @param ... Further arguments to be passed to functions called within the meta-analysis.
 #'
-#' @param supplemental_ads_x,supplemental_ads_y For \code{ma_r_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list  are named like the arguments of the \code{create_ad()} function.
+#' @param supplemental_ads_x,supplemental_ads_y For \code{ma_r_ic} only: List supplemental artifact distribution information from studies not included in the meta-analysis. The elements of this list are named like the arguments of the \code{create_ad()} function.
 #' @param ma_obj For \code{ma_r_ad} only: Meta-analysis object of correlations or \emph{d} values (regardless of input metric, output metric will be \emph{r}).
 #' @param ad_obj_x For \code{ma_r_ad} only: Artifact-distribution object for the X variable (output of the \code{\link{create_ad}} function).
 #' If ma_obj is of the class \code{ma_master} (i.e,. the output of \code{\link{ma_r}} or \code{\link{ma_d}}), the object supplied for
@@ -448,7 +448,7 @@
 #' ma_obj_pair$meta_tables[[1]]$artifact_distribution$true_score
 #'
 #'
-#' # Sometimes moderators have important influcnces on artifact distributions as well as
+#' # Sometimes moderators have important influences on artifact distributions as well as
 #' # distributions of effect sizes. When this occurs, moderated artifact distributions
 #' # can be created to make more appropriate corrections.
 #' ad_tibble_mod <- create_ad_list(n = n, rxx = rxxi, ryy = ryyi,

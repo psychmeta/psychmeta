@@ -1,9 +1,9 @@
 #' @name confint
 #' 
-#' @title Confidence interval method for objects of classes deriving from "lm_mat"
+#' @title Confidence interval method for objects of classes deriving from \code{lm_mat}
 #'
 #' @description
-#' Confidence interval method for objects of classes deriving from "lm_mat."
+#' Confidence interval method for objects of classes deriving from \code{lm_mat}
 #' Returns lower and upper bounds of confidence intervals for regression coefficients.
 #' 
 #' @param object Matrix regression object.

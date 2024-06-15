@@ -5,7 +5,7 @@
 #' @param Sigma_i The complete range-restricted (unrestricted) covariance matrix to be corrected (selected upon).
 #' @param Sigma_xx_a The matrix of unrestricted (range-restricted) covariances among of selection variables.
 #' @param x_col The row/column indices of the variables in \code{Sigma_i} that correspond, in order, to the variables in \code{Sigma_xx_a}.
-#' @param y_col Optional: The variables in \code{Sigma_i} not listed in \code{x_col} that are to be manipuated by the multivariate range-restriction formula.
+#' @param y_col Optional: The variables in \code{Sigma_i} not listed in \code{x_col} that are to be manipulated by the multivariate range-restriction formula.
 #' @param standardize Should the function's output matrix be returned in standardized form (\code{TRUE}) or in unstandardized form (\code{FALSE}; the default).
 #' @param var_names Optional vector of names for the variables in \code{Sigma_i}, in order of appearance in the matrix.
 #'
@@ -104,7 +104,7 @@ correct_matrix_mvrr <- function(Sigma_i, Sigma_xx_a, x_col, y_col = NULL, standa
 #' @param means_i The complete range-restricted (unrestricted) vector of means to be corrected (selected upon).
 #' @param means_x_a The vector of unrestricted (range-restricted) means of selection variables
 #' @param x_col The row/column indices of the variables in \code{Sigma} that correspond, in order, to the variables in means_x_a
-#' @param y_col Optional: The variables in \code{Sigma} not listed in \code{x_col} that are to be manipuated by the multivariate range-restriction formula.
+#' @param y_col Optional: The variables in \code{Sigma} not listed in \code{x_col} that are to be manipulated by the multivariate range-restriction formula.
 #' @param var_names Optional vector of names for the variables in \code{Sigma}, in order of appearance in the matrix.
 #'
 #' @return A vector of means that has been manipulated by the multivariate range-restriction formula.

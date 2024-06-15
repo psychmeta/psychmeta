@@ -38,7 +38,7 @@
 #' (see \pkg{metafor} documentation for details about the \pkg{metafor} methods).
 #' @param correct_bias Logical scalar that determines whether to correct correlations for small-sample bias (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rel Optional named vector that supersedes \code{correct_rGg} and \code{correct_ryy}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for unreliability.
-#' @param correct_rGg Logical scalar or vector that determines whether to correct the grouping variable variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
+#' @param correct_rGg Logical scalar or vector that determines whether to correct the grouping variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_ryy Logical scalar or vector that determines whether to correct the Y variable for measurement error (\code{TRUE}) or not (\code{FALSE}).
 #' @param correct_rr Optional named vector that supersedes \code{correct_rr_g} and \code{correct_rr_y}. Names should correspond to construct names in \code{group_id} and \code{construct_y} to determine which constructs should be corrected for range restriction.
 #' @param correct_rr_g Logical scalar or vector or column name determining whether each \emph{d} value should be corrected for range restriction in the grouping variable (\code{TRUE}) or not (\code{FALSE}).
