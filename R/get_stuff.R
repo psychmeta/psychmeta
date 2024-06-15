@@ -47,7 +47,7 @@
 #' @param inputs_only Used only if \code{as_ad_obj = TRUE}: Logical scalar that determines whether artifact information should be returned as summaries of the raw input values (\code{TRUE}) or artifact values that may have been cross-corrected for range restriction and measurement error (\code{FALSE}; default).
 #' @param ad_type Used only if \code{ma_method} = "ic": Character value(s) indicating whether Taylor-series approximation artifact distributions ("tsa") and/or interactive artifact distributions ("int") should be retrieved.
 #' @param ma_method Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"
-#' @param correction_type Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"
+#' @param correction_type Types of meta-analytic corrections to be included. Valid options are: "ts", "vgx", and "vgy"
 #' @param ... Additional arguments.
 #'
 #' @return Selected set of results.

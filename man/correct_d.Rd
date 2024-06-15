@@ -62,8 +62,8 @@ correct_d(
 For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE} (the default).}
 }
 \value{
-Data frame(s) of observed \eqn{d} values (\code{dgyi}), operational range-restricted \eqn{d} values corrected for measurement error in Y only (\code{dgpi}), operational range-restricted \eqn{d} values corrected for measurement error in the grouping only (\code{dGyi}), and range-restricted true-score \eqn{d} values (\code{dGpi}),
-range-corrected observed-score \eqn{d} values (\code{dgya}), operational range-corrected \eqn{d} values corrected for measurement error in Y only (\code{dgpa}), operational range-corrected \eqn{d} values corrected for measurement error in the grouping only (\code{dGya}), and range-corrected true-score \eqn{d} values (\code{dGpa}).
+Data frame(s) of observed \eqn{d} values (\code{dgyi}), range-restricted \eqn{d} values corrected for measurement error in Y only (\code{dgpi}), range-restricted \eqn{d} values corrected for measurement error in the grouping variable only (\code{dGyi}), and range-restricted true-score \eqn{d} values (\code{dGpi}),
+range-corrected observed-score \eqn{d} values (\code{dgya}), range-corrected \eqn{d} values corrected for measurement error in Y only (\code{dgpa}), range-corrected \eqn{d} values corrected for measurement error in the grouping variable only (\code{dGya}), and range-corrected true-score \eqn{d} values (\code{dGpa}).
 }
 \description{
 This function is a wrapper for the \code{\link[=correct_r]{correct_r()}} function to correct \eqn{d} values

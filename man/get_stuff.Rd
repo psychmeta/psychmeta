@@ -164,7 +164,7 @@ All suffixes from functions in the "get_" family can be passed as arguments to \
 
 \item{ma_method}{Meta-analytic methods to be included. Valid options are: "bb", "ic", and "ad"}
 
-\item{correction_type}{Types of meta-analytic corrections to be incldued. Valid options are: "ts", "vgx", and "vgy"}
+\item{correction_type}{Types of meta-analytic corrections to be included. Valid options are: "ts", "vgx", and "vgy"}
 
 \item{moderators}{Logical scalar that determines whether moderator variables should be included in escalc objects (\code{TRUE}; default) or not (\code{FALSE}).}
 

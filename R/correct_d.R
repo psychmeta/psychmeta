@@ -116,8 +116,8 @@ correct_glass_bias <- function(delta, nc, ne, use_pooled_sd = rep(FALSE, length(
 #' @param correct_bias Logical argument that determines whether to correct error-variance estimates for small-sample bias in correlations (`TRUE`) or not (`FALSE`).
 #' For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE} (the default).
 #'
-#' @return Data frame(s) of observed \eqn{d} values (`dgyi`), operational range-restricted \eqn{d} values corrected for measurement error in Y only (`dgpi`), operational range-restricted \eqn{d} values corrected for measurement error in the grouping only (`dGyi`), and range-restricted true-score \eqn{d} values (`dGpi`),
-#' range-corrected observed-score \eqn{d} values (\code{dgya}), operational range-corrected \eqn{d} values corrected for measurement error in Y only (`dgpa`), operational range-corrected \eqn{d} values corrected for measurement error in the grouping only (`dGya`), and range-corrected true-score \eqn{d} values (`dGpa`).
+#' @return Data frame(s) of observed \eqn{d} values (`dgyi`), range-restricted \eqn{d} values corrected for measurement error in Y only (`dgpi`), range-restricted \eqn{d} values corrected for measurement error in the grouping variable only (`dGyi`), and range-restricted true-score \eqn{d} values (`dGpi`),
+#' range-corrected observed-score \eqn{d} values (\code{dgya}), range-corrected \eqn{d} values corrected for measurement error in Y only (`dgpa`), range-corrected \eqn{d} values corrected for measurement error in the grouping variable only (`dGya`), and range-corrected true-score \eqn{d} values (`dGpa`).
 #'
 #' @export
 #' @encoding UTF-8

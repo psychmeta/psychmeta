@@ -301,8 +301,8 @@ correct_r_split <- function(r, pi, pa = .5, n = NULL){
 #' For sporadic corrections (e.g., in mixed artifact-distribution meta-analyses), this should be set to \code{FALSE}, the default).
 #' @param zero_substitute Value to be used as a functionally equivalent substitute for exactly zero effect sizes to facilitate the estimation of effective sample sizes. By default, this is set to \code{.Machine$double.eps}.
 #'
-#' @return Data frame(s) of observed correlations (\code{rxyi}), operational range-restricted correlations corrected for measurement error in Y only (\code{rxpi}), operational range-restricted correlations corrected for measurement error in X only (\code{rtyi}), and range-restricted true-score correlations (\code{rtpi}),
-#' range-corrected observed-score correlations (\code{rxya}), operational range-corrected correlations corrected for measurement error in Y only (\code{rxpa}), operational range-corrected correlations corrected for measurement error in X only (\code{rtya}), and range-corrected true-score correlations (\code{rtpa}).
+#' @return Data frame(s) of observed correlations (\code{rxyi}), range-restricted correlations corrected for measurement error in Y only (\code{rxpi}), range-restricted correlations corrected for measurement error in X only (\code{rtyi}), and range-restricted true-score correlations (\code{rtpi}),
+#' range-corrected observed-score correlations (\code{rxya}), range-corrected correlations corrected for measurement error in Y only (\code{rxpa}), range-corrected correlations corrected for measurement error in X only (\code{rtya}), and range-corrected true-score correlations (\code{rtpa}).
 #' @export
 #'
 #' @noMd
