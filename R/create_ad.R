@@ -2356,6 +2356,7 @@ create_ad_tsa <- function(rxxi = NULL, n_rxxi = NULL, wt_rxxi = n_rxxi, rxxi_typ
 #' # .create_ad_int(art_vec = c(.8, .8, .9), wt_vec = c(100, 200, 100), decimals = 2)
 #'
 #' @keywords internal
+#' @noRd
 .create_ad_int <- function(art_vec, wt_vec = rep(1, length(art_vec)), decimals = Inf){
      if(is.null(art_vec) | is.null(wt_vec) | length(art_vec) == 0 | length(wt_vec) == 0){
           data.frame(Value = 1, Weight = 1, stringsAsFactors = FALSE)

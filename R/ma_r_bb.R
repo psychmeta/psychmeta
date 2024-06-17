@@ -169,6 +169,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
 #' @return A list object containing the results of bare-bones meta-analyses of correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_bb <- function(data, run_lean = FALSE, ma_arg_list){
 
      if(any(colnames(data) == "r")){
@@ -309,6 +310,7 @@ ma_r_bb <- ma_r_barebones <- function(r, n, n_adj = NULL, sample_id = NULL, cite
 #' @return A list object containing the results of bootstrapped bare-bones meta-analyses of correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_bb_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_bb(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)

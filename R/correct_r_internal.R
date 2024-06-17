@@ -7,6 +7,7 @@
 #'
 #' @return A vector of corrected correlations.
 #' @keywords internal
+#' @noRd
 .correct_r_uvdrr <- function(rxyi, qxa = 1, qyi = 1, ux = 1){
      rxpi <- rxyi / qyi
      (rxpi / (ux * sqrt((1 / ux^2 - 1) * rxpi^2 + 1))) / qxa
@@ -22,6 +23,7 @@
 #'
 #' @return A vector of attenuated correlations.
 #' @keywords internal
+#' @noRd
 .attenuate_r_uvdrr <- function(rtpa, qxa = 1, qyi = 1, ux = 1){
      rxpa <- rtpa * qxa
      ux * rxpa / sqrt((ux^2 - 1) * rxpa^2 + 1) * qyi
@@ -37,6 +39,7 @@
 #'
 #' @return A vector of corrected correlations.
 #' @keywords internal
+#' @noRd
 .correct_r_uvirr <- function(rxyi, qxi = 1, qyi = 1, ut = 1){
      rtpi <- rxyi / (qxi * qyi)
      rtpi / (ut * sqrt((1 / ut^2 - 1) * rtpi^2 + 1))
@@ -52,6 +55,7 @@
 #'
 #' @return A vector of attenuated correlations.
 #' @keywords internal
+#' @noRd
 .attenuate_r_uvirr <- function(rtpa, qxi = 1, qyi = 1, ut = 1){
      ut * rtpa / sqrt((ut^2 - 1) * rtpa^2 + 1) * (qxi * qyi)
 }
@@ -67,6 +71,7 @@
 #'
 #' @return A vector of corrected correlations.
 #' @keywords internal
+#' @noRd
 .correct_r_bvdrr <- function(rxyi, qxa = 1, qya = 1, ux = 1, uy = 1){
      rtpa <- ((rxyi^2 - 1) / (2 * rxyi) * ux * uy + sign(rxyi) * sqrt((1 - rxyi^2)^2 / (4 * rxyi^2) * ux^2 * uy^2 + 1)) / (qxa * qya)
      rtpa[is.na(rtpa)] <- 0
@@ -84,6 +89,7 @@
 #'
 #' @return A vector of attenuated correlations.
 #' @keywords internal
+#' @noRd
 .attenuate_r_bvdrr <- function(rtpa, qxa = 1, qya = 1, ux = 1, uy = 1){
      (sqrt((1/(qya * qxa) - rtpa^2 * qya * qxa)^2 + 4 * rtpa^2 * ux^2 * uy^2) + rtpa^2 * qya * qxa - 1/(qya * qxa))/(2 * rtpa * ux * uy)
 }
@@ -105,6 +111,7 @@
 #' *Organizational Research Methods, 23*(4), 717–749. \doi{10.1177/1094428119859398}
 #'
 #' @keywords internal
+#' @noRd
 .lambda_bvirr <- function(ux, uy, sign_rxz = 1, sign_ryz = 1){
      ux_prime <- ux
      uy_prime <- uy
@@ -134,6 +141,7 @@
 #'
 #' @return A vector of corrected correlations.
 #' @keywords internal
+#' @noRd
 .correct_r_bvirr <- function(rxyi, qxa = 1, qya = 1, ux = 1, uy = 1, sign_rxz = 1, sign_ryz = 1){
      lambda <- .lambda_bvirr(ux = ux, uy = uy, sign_rxz = sign_rxz, sign_ryz = sign_ryz)
      (rxyi * ux * uy + lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (qxa * qya)
@@ -153,6 +161,7 @@
 #'
 #' @return A vector of attenuated correlations.
 #' @keywords internal
+#' @noRd
 .attenuate_r_bvirr <- function(rtpa, qxa = 1, qya = 1, ux = 1, uy = 1, sign_rxz = 1, sign_ryz = 1){
      lambda <- .lambda_bvirr(ux = ux, uy = uy, sign_rxz = sign_rxz, sign_ryz = sign_ryz)
      (rtpa * qxa * qya - lambda * sqrt(abs(1 - ux^2) * abs(1 - uy^2))) / (ux * uy)
@@ -168,6 +177,7 @@
 #'
 #' @return A vector of corrected correlations.
 #' @keywords internal
+#' @noRd
 .correct_r_rb <- function(rxyi, qx = 1, qy = 1, ux = 1){
      rxyi / (qx * qy * sqrt(ux + rxyi^2 * (1 - ux^2)))
 }
@@ -182,6 +192,7 @@
 #'
 #' @return A vector of corrected correlations.
 #' @keywords internal
+#' @noRd
 .attenuate_r_rb <- function(rtpa, qx = 1, qy = 1, ux = 1){
      (rtpa * qy * qx * ux) / sqrt(rtpa^2 * qy^2 * qx^2 * ux^2 - rtpa^2 * qy^2 * qx^2 + 1)
 }

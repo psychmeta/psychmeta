@@ -128,10 +128,10 @@ convert_meta <- convert_ma
                if(error_type == "mean"){
                     mean_r <- ma_obj_i$meta_tables[[1]]$barebones$mean_r
 
-                    ma_obj_i$escalc[[1]]$barebones$vi <- convert_varr_to_vard(r = mean_r, var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
+                    ma_obj_i$escalc[[1]]$barebones$vi <- .convert_varr_to_vard(r = mean_r, var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_r_to_d(r =  ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }else{
-                    ma_obj_i$escalc[[1]]$barebones$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$barebones$yi,
+                    ma_obj_i$escalc[[1]]$barebones$vi <- .convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$barebones$yi,
                                                                               var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }
@@ -157,29 +157,29 @@ convert_meta <- convert_ma
 
                if(error_type == "mean"){
                     ## Deal with true-score data
-                    ma_obj_i$escalc[[1]]$individual_correction$true_score$vi <- convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$true_score$vi, p = pa_list)
+                    ma_obj_i$escalc[[1]]$individual_correction$true_score$vi <- .convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$true_score$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$true_score$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi, p = pa_list)
 
                     ## Deal with vgx data
-                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi <- convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi, p = pa_list)
+                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi <- .convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi, p = pa_list)
 
                     ## Deal with vgy data
-                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi <- convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi, p = pa_list)
+                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi <- .convert_varr_to_vard(r = mean_rtpa, var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi, p = pa_list)
                }else{
                     ## Deal with true-score data
-                    ma_obj_i$escalc[[1]]$individual_correction$true_score$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi,
+                    ma_obj_i$escalc[[1]]$individual_correction$true_score$vi <- .convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi,
                                                                                                      var = ma_obj_i$escalc[[1]]$individual_correction$true_score$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$true_score$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$true_score$yi, p = pa_list)
 
                     ## Deal with vgx data
-                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi,
+                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi <- .convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi,
                                                                                                                     var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_x$yi, p = pa_list)
 
                     ## Deal with vgy data
-                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi <- convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi,
+                    ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi <- .convert_varr_to_vard(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi,
                                                                                                                     var = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi <- .convert_r_to_d(r = ma_obj_i$escalc[[1]]$individual_correction$validity_generalization_y$yi, p = pa_list)
                }
@@ -201,10 +201,10 @@ convert_meta <- convert_ma
                if(error_type == "mean"){
                     mean_d <- ma_obj_i$meta_tables[[1]]$barebones$mean_d
 
-                    ma_obj_i$escalc[[1]]$barebones$vi <- convert_vard_to_varr(d = mean_d, var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
+                    ma_obj_i$escalc[[1]]$barebones$vi <- .convert_vard_to_varr(d = mean_d, var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }else{
-                    ma_obj_i$escalc[[1]]$barebones$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$barebones$yi,
+                    ma_obj_i$escalc[[1]]$barebones$vi <- .convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$barebones$yi,
                                                                               var = ma_obj_i$escalc[[1]]$barebones$vi, p = pi_list)
                     ma_obj_i$escalc[[1]]$barebones$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$barebones$yi, p = pi_list)
                }
@@ -227,29 +227,29 @@ convert_meta <- convert_ma
 
                if(error_type == "mean"){
                     ## Deal with true-score data
-                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi <- convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi, p = pa_list)
+                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi <- .convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi, p = pa_list)
 
                     ## Deal with vgx data
-                    ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi <- convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi, p = pa_list)
+                    ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi <- .convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi, p = pa_list)
 
                     ## Deal with vgy data
-                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi <- convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi, p = pa_list)
+                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi <- .convert_vard_to_varr(d = mean_dtpa, var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi, p = pa_list)
                }else{
                     ## Deal with true-score data
-                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi,
+                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi <- .convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi,
                                                                                                               var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_latentY$yi, p = pa_list)
 
                     ## Deal with vgx data
-                    ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi,
+                    ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi <- .convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi,
                                                                                                                 var = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$observedGroup_latentY$yi, p = pa_list)
 
                     ## Deal with vgy data
-                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi <- convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi,
+                    ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi <- .convert_vard_to_varr(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi,
                                                                                                                 var = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$vi, p = pa_list)
                     ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi <- .convert_d_to_r(d = ma_obj_i$escalc[[1]]$individual_correction$latentGroup_observedY$yi, p = pa_list)
                }
@@ -322,6 +322,7 @@ convert_meta <- convert_ma
 #' @return The proportion of cases in one of the dichotomous groups.
 #'
 #' @keywords internal
+#' @noRd
 convert_pq_to_p <- function(pq){
      if(any(pq > .25)) stop("Supplied 'pq' value is not a valid dichotomous variance", call. = FALSE)
      .5 * (1 - sqrt(1 - 4 * pq))
@@ -353,7 +354,8 @@ convert_r_to_d <- function(r, p = .5){
 #' @export
 #'
 #' @keywords internal
-convert_varr_to_vard <- function(r, var, p){
+#' @noRd
+.convert_varr_to_vard <- function(r, var, p){
      a_1 <- sqrt(1 / (p - p^2)) / (1 - r^2)^(3/2)
      a_1^2 * var
 }
@@ -369,8 +371,9 @@ convert_varr_to_vard <- function(r, var, p){
 #' @export
 #'
 #' @keywords internal
-convert_sdr_to_sdd <- function(r, sd, p = .5){
-     convert_varr_to_vard(r = r, var = sd^2, p = p)^.5
+#' @noRd
+.convert_sdr_to_sdd <- function(r, sd, p = .5){
+     .convert_varr_to_vard(r = r, var = sd^2, p = p)^.5
 }
 
 
@@ -383,7 +386,8 @@ convert_sdr_to_sdd <- function(r, sd, p = .5){
 #' @return An approximated variance in the correlation metric.
 #'
 #' @keywords internal
-convert_vard_to_varr <- function(d, var, p){
+#' @noRd
+.convert_vard_to_varr <- function(d, var, p){
      a_1 <- -1 / ((d^2 * (p - 1) * p - 1) * sqrt(d^2 + 1 / (p - p^2)))
      a_1^2 * var
 }
@@ -398,8 +402,9 @@ convert_vard_to_varr <- function(d, var, p){
 #' @return An approximated standard deviation in the correlation metric.
 #'
 #' @keywords internal
-convert_sdd_to_sdr <- function(d, sd, p = .5){
-     convert_vard_to_varr(d = d, var = sd^2, p = p)^.5
+#' @noRd
+.convert_sdd_to_sdr <- function(d, sd, p = .5){
+     .convert_vard_to_varr(d = d, var = sd^2, p = p)^.5
 }
 
 
@@ -410,6 +415,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 #' @return Meta-analysis type, old column names of table, column names of table after effect-size conversion, and a vector categorizing the types of entries supplied in the table.
 #'
 #' @keywords internal
+#' @noRd
 .identify_ma_cols <- function(col_names){
 
      ## Column names from meta-analyses of correlations
@@ -501,6 +507,7 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
 #' @return Meta-analysis table converted to a new metric
 #'
 #' @keywords internal
+#' @noRd
 .convert_metatab <- function(ma_table, p_vec = rep(.5, nrow(ma_table)), conf_level = .95, cred_level = .8, conf_method = "t", cred_method = "t"){
 
      .attributes <- attributes(ma_table)
@@ -533,27 +540,27 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
      es4_col <- which(col_ids$col_type == "es4")
 
      if(any(col_ids$method == c("r_bb", "r_ad", "r_ic"))){
-          ma_table_subset[,var1_col] <- convert_varr_to_vard(r = matrix(ma_table_subset[,es1_col], length(p_vec), length(var1_col)),
+          ma_table_subset[,var1_col] <- .convert_varr_to_vard(r = matrix(ma_table_subset[,es1_col], length(p_vec), length(var1_col)),
                                                              var = ma_table_subset[,var1_col],
                                                              p = matrix(p_vec, length(p_vec), length(var1_col)))
-          ma_table_subset[,sd1_col] <- convert_sdr_to_sdd(r = matrix(ma_table_subset[,es1_col], length(p_vec), length(sd1_col)),
+          ma_table_subset[,sd1_col] <- .convert_sdr_to_sdd(r = matrix(ma_table_subset[,es1_col], length(p_vec), length(sd1_col)),
                                                           sd = ma_table_subset[,sd1_col],
                                                           p = matrix(p_vec, length(p_vec), length(sd1_col)))
           ma_table_subset[,es1_col] <- .convert_r_to_d(r = ma_table_subset[,es1_col],
                                                        p = matrix(p_vec, length(p_vec), length(es1_col)))
 
-          ma_table_subset[,se1_col] <- convert_sdr_to_sdd(r = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
+          ma_table_subset[,se1_col] <- .convert_sdr_to_sdd(r = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
                                                           sd = ma_table_subset[,se1_col],
                                                           p = matrix(p_vec, length(p_vec), length(se1_col)))
 
           if(col_ids$method != "r_bb"){
-               ma_table_subset[,se2_col] <- convert_sdr_to_sdd(r = matrix(ma_table_subset[,es2_col], length(p_vec), length(se2_col)),
+               ma_table_subset[,se2_col] <- .convert_sdr_to_sdd(r = matrix(ma_table_subset[,es2_col], length(p_vec), length(se2_col)),
                                                                sd = ma_table_subset[,se2_col],
                                                                p = matrix(p_vec, length(p_vec), length(se2_col)))
-               ma_table_subset[,var2_col] <- convert_varr_to_vard(r = matrix(ma_table_subset[,es2_col], length(p_vec), length(var2_col)),
+               ma_table_subset[,var2_col] <- .convert_varr_to_vard(r = matrix(ma_table_subset[,es2_col], length(p_vec), length(var2_col)),
                                                                   var = ma_table_subset[,var2_col],
                                                                   p = matrix(p_vec, length(p_vec), length(var2_col)))
-               ma_table_subset[,sd2_col] <- convert_sdr_to_sdd(r = matrix(ma_table_subset[,es2_col], length(p_vec), length(sd2_col)),
+               ma_table_subset[,sd2_col] <- .convert_sdr_to_sdd(r = matrix(ma_table_subset[,es2_col], length(p_vec), length(sd2_col)),
                                                                sd = ma_table_subset[,sd2_col],
                                                                p = matrix(p_vec, length(p_vec), length(sd2_col)))
                ma_table_subset[,es2_col] <- .convert_r_to_d(r = ma_table_subset[,es2_col],
@@ -577,27 +584,27 @@ convert_sdd_to_sdr <- function(d, sd, p = .5){
      }
 
      if(any(col_ids$method == c("d_bb", "d_ad", "d_ic"))){
-          ma_table_subset[,var1_col] <- convert_vard_to_varr(d = matrix(ma_table_subset[,es1_col], length(p_vec), length(var1_col)),
+          ma_table_subset[,var1_col] <- .convert_vard_to_varr(d = matrix(ma_table_subset[,es1_col], length(p_vec), length(var1_col)),
                                                              var = ma_table_subset[,var1_col],
                                                              p = matrix(p_vec, length(p_vec), length(var1_col)))
-          ma_table_subset[,sd1_col] <- convert_sdd_to_sdr(d = matrix(ma_table_subset[,es1_col], length(p_vec), length(sd1_col)),
+          ma_table_subset[,sd1_col] <- .convert_sdd_to_sdr(d = matrix(ma_table_subset[,es1_col], length(p_vec), length(sd1_col)),
                                                           sd = ma_table_subset[,sd1_col],
                                                           p = matrix(p_vec, length(p_vec), length(sd1_col)))
           ma_table_subset[,es1_col] <- .convert_d_to_r(d = ma_table_subset[,es1_col],
                                                        p = matrix(p_vec, length(p_vec), length(es1_col)))
 
-          ma_table_subset[,se1_col] <- convert_sdd_to_sdr(d = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
+          ma_table_subset[,se1_col] <- .convert_sdd_to_sdr(d = matrix(ma_table_subset[,se1_col], length(p_vec), length(se1_col)),
                                                           sd = ma_table_subset[,se1_col],
                                                           p = matrix(p_vec, length(p_vec), length(se1_col)))
 
           if(col_ids$method != "d_bb"){
-               ma_table_subset[,se2_col] <- convert_sdd_to_sdr(d = matrix(ma_table_subset[,es2_col], length(p_vec), length(se2_col)),
+               ma_table_subset[,se2_col] <- .convert_sdd_to_sdr(d = matrix(ma_table_subset[,es2_col], length(p_vec), length(se2_col)),
                                                                sd = ma_table_subset[,se2_col],
                                                                p = matrix(p_vec, length(p_vec), length(se2_col)))
-               ma_table_subset[,var2_col] <- convert_vard_to_varr(d = matrix(ma_table_subset[,es2_col], length(p_vec), length(var2_col)),
+               ma_table_subset[,var2_col] <- .convert_vard_to_varr(d = matrix(ma_table_subset[,es2_col], length(p_vec), length(var2_col)),
                                                                   var = ma_table_subset[,var2_col],
                                                                   p = matrix(p_vec, length(p_vec), length(var2_col)))
-               ma_table_subset[,sd2_col] <- convert_sdd_to_sdr(d = matrix(ma_table_subset[,es2_col], length(p_vec), length(sd2_col)),
+               ma_table_subset[,sd2_col] <- .convert_sdd_to_sdr(d = matrix(ma_table_subset[,es2_col], length(p_vec), length(sd2_col)),
                                                                sd = ma_table_subset[,sd2_col],
                                                                p = matrix(p_vec, length(p_vec), length(sd2_col)))
                ma_table_subset[,es2_col] <- .convert_d_to_r(d = ma_table_subset[,es2_col],

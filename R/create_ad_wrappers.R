@@ -393,6 +393,7 @@ prepare_ad_int <- function(ad_obj, residual_ads = TRUE, decimals = Inf){
 #' #                                               wt_vec = c(100, 200, 100), decimals = 2)))
 #'
 #' @keywords internal
+#' @noRd
 create_ad_array <- function(ad_list, name_vec = NULL){
      expand_grid_1 <- function(x1, name_vec = NULL){
           out <- data.frame(x1, stringsAsFactors = FALSE)

@@ -30,57 +30,107 @@
 
 
 
-.colsolidate_dependent_rel <- function(rxx, ux, uy, n, n_adj, rxyi = NULL, rxx_restricted, ux_observed, indirect_rr = TRUE){
-     if(length(indirect_rr) == 1) indirect_rr <- rep(indirect_rr, length(rxx))
-
-     if(any(rxx_restricted) & any(!rxx_restricted)){
-          if(!is.null(ux)){
-               ux_i <- ux
-
-               if(any(!is.na(ux_i))){
-                    if(any(is.na(ux_i[!rxx_restricted]))){
-                         ux_i[is.na(ux_i)] <- wt_mean(x = ux_i[!is.na(ux_i)], wt = n[!is.na(ux_i)])
-                    }
-                    rxxi_i <- estimate_rxxi(rxxa = rxx[!rxx_restricted],
-                                            ux = ux_i[!rxx_restricted],
-                                            ux_observed = ux_observed[!rxx_restricted],
-                                            indirect_rr = indirect_rr[!rxx_restricted])
-                    rxx[!rxx_restricted][!is.na(rxxi_i)] <- rxxi_i[!is.na(rxxi_i)]
-                    rxx_restricted[!rxx_restricted][!is.na(rxxi_i)] <- TRUE
-               }else{
-                    if(!is.null(uy)){
-                         uy_i <- uy
-
-                         if(any(!is.na(uy_i))){
-                              if(any(is.na(uy_i[!rxx_restricted]))){
-                                   uy_i[is.na(uy_i)] <- wt_mean(x = uy_i[!is.na(uy_i)], wt = n[!is.na(uy_i)])
-                              }
-                              rxxi_i <- estimate_ryyi(ryya = rxx[!rxx_restricted],
-                                                      rxyi = wt_mean(x = rxyi, wt = n_adj),
-                                                      ux = uy_i[!rxx_restricted])
-                              rxx[!rxx_restricted][!is.na(rxxi_i)] <- rxxi_i[!is.na(rxxi_i)]
-                              rxx_restricted[!rxx_restricted][!is.na(rxxi_i)] <- TRUE
-                         }
-                    }
-               }
-               rxx[!rxx_restricted] <- NA
-               rxx_restricted[!rxx_restricted] <- TRUE
-               rxx_restricted_comp <- TRUE
+.colsolidate_dependent_rel <- function(rxx, ryy, ux, uy, n, n_adj, rxyi = NULL,
+                                       rxx_restricted, ryy_restricted,
+                                       ux_observed, uy_observed, 
+                                       indirect_rr_x = TRUE, indirect_rr_y = TRUE,
+                                       rxx_type = "alpha", ryy_type = "alpha"){
+  if(length(indirect_rr_x) == 1) indirect_rr_x <- rep(indirect_rr_x, length(rxx))
+  if(length(indirect_rr_y) == 1) indirect_rr_y <- rep(indirect_rr_y, length(rxx))
+  if(length(rxx_type) == 1) rxx_type <- rep(rxx_type, length(rxx))
+  if(length(ryy_type) == 1) ryy_type <- rep(ryy_type, length(rxx))
+  
+  if(any(!rxx_restricted)){
+    if(!is.null(ux)){
+      ux_i <- ux
+      if(any(!is.na(ux_i))){
+        if(any(is.na(ux_i[!rxx_restricted]))){
+          ux_i[is.na(ux_i)] <- wt_mean(x = ux_i[!is.na(ux_i)], wt = n[!is.na(ux_i)])
+        }
+        rxxi_i <- estimate_rxxi(rxxa = rxx[!rxx_restricted],
+                                ux = ux_i[!rxx_restricted],
+                                ux_observed = ux_observed[!rxx_restricted],
+                                indirect_rr = indirect_rr_x[!rxx_restricted])
+        rxx[!rxx_restricted][!is.na(rxxi_i)] <- rxxi_i[!is.na(rxxi_i)]
+        rxx_restricted[!rxx_restricted][!is.na(rxxi_i)] <- TRUE
+      }else{
+        if(!is.null(uy)){
+          uy_i <- uy
+          if(any(!is.na(uy_i))){
+            if(any(is.na(uy_i[!rxx_restricted]))){
+              uy_i[is.na(uy_i)] <- wt_mean(x = uy_i[!is.na(uy_i)], wt = n[!is.na(uy_i)])
+            }
+            rxxi_i <- estimate_ryyi(ryya = rxx[!rxx_restricted],
+                                    rxyi = rep(wt_mean(x = rxyi, wt = n_adj), sum(!rxx_restricted)),
+                                    ux = uy_i[!rxx_restricted],
+                                    rxx_restricted = ryy_restricted[!rxx_restricted],
+                                    ux_observed = ux_observed[!rxx_restricted],
+                                    indirect_rr = indirect_rr_y[!rxx_restricted],
+                                    rxx_type = rxx_type[!rxx_restricted])
+            rxx[!rxx_restricted][!is.na(rxxi_i)] <- rxxi_i[!is.na(rxxi_i)]
+            rxx_restricted[!rxx_restricted][!is.na(rxxi_i)] <- TRUE
           }
-     }else{
-          rxx_restricted_comp <- rxx_restricted[1]
-     }
-     list(rxx = rxx, rxx_restricted = rxx_restricted, rxx_restricted_comp = rxx_restricted_comp)
+        }
+      }
+      rxx[!rxx_restricted] <- NA
+      rxx_restricted[!rxx_restricted] <- TRUE
+      rxx_restricted_comp <- TRUE
+    }
+  }else{
+    rxx_restricted_comp <- rxx_restricted[1]
+  }
+  list(rxx = rxx, rxx_restricted = rxx_restricted, rxx_restricted_comp = rxx_restricted_comp)
 }
 
-.consolidate_dependent_artifacts <- function(n, n_adj, p = rep(.5, length(es)), es, es_metric, rxx, ryy, ux, uy, rxx_restricted, ryy_restricted, ux_observed, uy_observed){
-     ux_out <- .consolidate_dependent_u(ux = ux, rxx = rxx, n = n, ux_observed = ux_observed, rxx_restricted = rxx_restricted)
-     uy_out <- .consolidate_dependent_u(ux = uy, rxx = ryy, n = n, ux_observed = uy_observed, rxx_restricted = ryy_restricted)
+.consolidate_dependent_artifacts <- function(n, n_adj, p = rep(.5, length(es)), es, es_metric,
+                                             rxx, ryy, ux, uy, 
+                                             rxx_restricted, ryy_restricted, 
+                                             ux_observed, uy_observed,
+                                             indirect_rr_x = TRUE, indirect_rr_y = TRUE,
+                                             rxx_type = "alpha", ryy_type = "alpha"){
+     ux_out <- .consolidate_dependent_u(ux = ux,
+                                        rxx = rxx,
+                                        n = n, 
+                                        ux_observed = ux_observed,
+                                        rxx_restricted = rxx_restricted)
+     uy_out <- .consolidate_dependent_u(ux = uy,
+                                        rxx = ryy,
+                                        n = n, 
+                                        ux_observed = uy_observed,
+                                        rxx_restricted = ryy_restricted)
 
      if(es_metric == "d") es <- convert_es.q_d_to_r(d = es, p = p)
 
-     rxx_out <- .colsolidate_dependent_rel(rxx = rxx, ux = ux_out$ux, uy = uy_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = rxx_restricted, ux_observed = ux_out$ux_observed)
-     ryy_out <- .colsolidate_dependent_rel(rxx = ryy, ux = uy_out$ux, uy = ux_out$ux, n = n, n_adj = n_adj, rxyi = es, rxx_restricted = ryy_restricted, ux_observed = uy_out$ux_observed)
+     rxx_out <- .colsolidate_dependent_rel(rxx = rxx,
+                                           ryy = ryy,
+                                           ux = ux_out$ux,
+                                           uy = uy_out$ux,
+                                           n = n,
+                                           n_adj = n_adj,
+                                           rxyi = es, 
+                                           rxx_restricted = rxx_restricted,
+                                           ryy_restricted = ryy_restricted,
+                                           ux_observed = ux_out$ux_observed,
+                                           uy_observed = uy_out$ux_observed,
+                                           indirect_rr_x = indirect_rr_x,
+                                           indirect_rr_y = indirect_rr_y,
+                                           rxx_type = rxx_type,
+                                           ryy_type = ryy_type)
+     ryy_out <- .colsolidate_dependent_rel(rxx = ryy,
+                                           ryy = rxx,
+                                           ux = uy_out$ux,
+                                           uy = ux_out$ux,
+                                           n = n,
+                                           n_adj = n_adj,
+                                           rxyi = es, 
+                                           rxx_restricted = ryy_restricted,
+                                           ryy_restricted = rxx_restricted,
+                                           ux_observed = uy_out$ux_observed,
+                                           uy_observed = ux_out$ux_observed,
+                                           indirect_rr_x = indirect_rr_y,
+                                           indirect_rr_y = indirect_rr_x,
+                                           rxx_type = ryy_type,
+                                           ryy_type = rxx_type)
 
      list(ux = ux_out,
           uy = uy_out,
@@ -322,7 +372,11 @@
                                                 rxx_restricted = .data$data_x$rxx_restricted[i],
                                                 ryy_restricted = .data$data_y$ryy_restricted[i],
                                                 ux_observed = .data$data_x$ux_observed[i],
-                                                uy_observed = .data$data_y$uy_observed[i])
+                                                uy_observed = .data$data_y$uy_observed[i],
+                                                indirect_rr_x = .data$data_x$indirect_rr_x[i],
+                                                indirect_rr_y = .data$data_y$indirect_rr_y[i],
+                                                rxx_type = .data$data_x$rxx_type[i],
+                                                ryy_type = .data$data_y$ryy_type[i])
 
     .data$data_x$ux[i] <- art_out$ux$ux
     .data$data_x$ux_observed[i] <- art_out$ux$ux_observed

@@ -34,7 +34,7 @@
 #' @return A \eqn{d_{Mod_{Signed}}}{d_Mod_Signed} or \eqn{d_{Mod_{Unsigned}}}{d_Mod_Unsigned} effect size, depending on the \code{signed} argument.
 #'
 #' @keywords internal
-#' @md
+#' @noRd
 #'
 #' @references
 #' Nye, C. D., & Sackett, P. R. (2017).

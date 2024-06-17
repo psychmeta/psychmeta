@@ -32,6 +32,7 @@ print.lm_mat <- function(x, ..., digits = max(3L, getOption("digits") - 3L)){
 
 #' Print method for objects of the class "summary.lm_mat"
 #' @keywords internal
+#' @noRd
 .print.summary.lm_mat <- stats:::print.summary.lm
 
 
@@ -50,6 +51,7 @@ print.summary.lm_mat <- function(x, digits = max(3L, getOption("digits") - 3L), 
 
 #' Print method for objects of the class "lm_mat"
 #' @keywords internal
+#' @noRd
 .print.lm_mat <- stats:::print.lm
 
 

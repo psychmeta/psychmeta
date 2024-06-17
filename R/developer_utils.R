@@ -8,6 +8,7 @@
 #' @return A vector of rounded numbers converted to characters
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' # round2char(x = .50000005)

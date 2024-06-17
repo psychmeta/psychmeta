@@ -7,6 +7,7 @@
 #' @return List of filtered correlations and sample sizes.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -36,6 +37,7 @@ screen_r <- function(r_vec, n_vec){
 #' @return List of filtered correlations and sample sizes.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -72,6 +74,7 @@ filter_r <- function(r_vec, n_vec){
 #' @return List of filtered correlations and numbers of studies.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -108,6 +111,7 @@ filter_r_bar <- function(r_bar_vec, k_vec){
 #' @return Does not return values; stops processes if improper values are used.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -131,6 +135,7 @@ screen_rel <- function(rel_vec, art_name = "Reliability"){
 #' @return Does not return values; stops processes if improper values are used.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -156,6 +161,7 @@ screen_u <- function(u_vec, art_name = "u ratio"){
 #' @return List of filtered reliabilities and weights.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -193,6 +199,7 @@ filter_rel <- function(rel_vec, wt_vec){
 #' @return List of filtered u ratios and weights.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -231,6 +238,7 @@ filter_u <- function(u_vec, wt_vec){
 #' @return Does not return a value; will trigger a warning if ad_obj_tsa is not a valid artifact distribution.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{
@@ -300,6 +308,7 @@ screen_ad_int <- function(x, obj_name = "x"){
 #' @return Does not return a value; will trigger a warning if ad_obj_tsa is not a valid artifact distribution.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' ## Not run
@@ -354,6 +363,7 @@ screen_ad_tsa <- function(x, obj_name = "x"){
 #' @return A data frame containing a summary of warning messages and their frequencies.
 #'
 #' @keywords internal
+#' @noRd
 record_warnings <- function(){
      warning_out <- names(warnings())
      if(length(warning_out) == 0){
@@ -385,6 +395,7 @@ record_warnings <- function(){
 #' @return Table of FYI messages and message frequencies.
 #'
 #' @keywords internal
+#' @noRd
 record_fyis <- function(es_metric = "r", fyi_messages = NULL, neg_var_res = 0, neg_var_rtpa = 0, neg_var_rxpa = 0, neg_var_rtya = 0,
                         neg_var_r_order2 = 0, neg_var_rho_ic_order2 = 0, neg_var_rho_ad_order2 = 0,
                         neg_var_d_order2 = 0, neg_var_delta_ic_order2 = 0, neg_var_delta_ad_order2 = 0){
@@ -429,6 +440,7 @@ record_fyis <- function(es_metric = "r", fyi_messages = NULL, neg_var_res = 0, n
 #' @return A warning, if the supplied variance does not produce a valid standard deviation
 #'
 #' @keywords internal
+#' @noRd
 warning_variance <- function(var, var_name = NULL, sd_warning = TRUE){
      if(is.null(var_name)) var_name <- deparse(substitute(var))
 
@@ -468,6 +480,7 @@ warning_variance <- function(var, var_name = NULL, sd_warning = TRUE){
 #' @return Warning if length of arg is greater than 1 and the first element of arg.
 #'
 #' @keywords internal
+#' @noRd
 scalar_arg_warning <- function(arg, arg_name = NULL){
      if(is.null(arg_name)) arg_name <- deparse(substitute(arg))
 
@@ -488,6 +501,7 @@ scalar_arg_warning <- function(arg, arg_name = NULL){
 #' @return Warning if length of 'interval' takes on impossible values and the revised value of 'interval'.
 #'
 #' @keywords internal
+#' @noRd
 interval_warning <- function(interval, interval_name = NULL, default){
      if(is.null(interval_name)) interval_name <- deparse(substitute(interval))
 
@@ -522,6 +536,7 @@ interval_warning <- function(interval, interval_name = NULL, default){
 #' @return Character object determining which package should be used to compute weights
 #'
 #' @keywords internal
+#' @noRd
 check_wt_type <- function(wt_type, generic = FALSE){
      if(generic){
           psychmeta_wt_options <- c("sample_size", "inv_var", "custom", "manual")
@@ -551,6 +566,7 @@ check_wt_type <- function(wt_type, generic = FALSE){
 #' @return Error message or vector of values
 #'
 #' @keywords internal
+#' @noRd
 manage_arglength <- function(x, y){
      x_name <- deparse(substitute(x))
      y_name <- deparse(substitute(y))
@@ -573,6 +589,7 @@ manage_arglength <- function(x, y){
 #' @return Cleaned warning table
 #'
 #' @keywords internal
+#' @noRd
 clean_warning <- function(warn_obj1, warn_obj2){
      if(!is.null(warn_obj1) & !is.null(warn_obj2)){
           colnames(warn_obj1)[2] <- "Frequency1"
@@ -607,6 +624,7 @@ clean_warning <- function(warn_obj1, warn_obj2){
 #' @return Logical internal-consistency indicators.
 #'
 #' @keywords internal
+#' @noRd
 convert_reltype2consistency <- function(rel_type, arg_name = NULL){
      if(length(rel_type) == 0){
           NULL

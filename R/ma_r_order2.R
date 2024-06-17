@@ -282,6 +282,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @return A meta-analytic table and a data frame.
 #' 
 #' @keywords internal
+#' @noRd
 .ma_r_order2 <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
 
      conf_level <- ma_arg_list$conf_level
@@ -637,6 +638,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @return A list object containing the results of bootstrapped second-order bare-bones meta-analyses of correlations
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_order2_bb_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_order2(data = data, type = "bb", run_lean = TRUE, ma_arg_list = ma_arg_list)
@@ -655,6 +657,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @return A list object containing the results of bootstrapped second-order individual-correction meta-analyses of correlations
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_order2_ic_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_order2(data = data, type = "ic", run_lean = TRUE, ma_arg_list = ma_arg_list)
@@ -672,6 +675,7 @@ ma_r_order2 <- function(k, N = NULL, r = NULL, rho = NULL, var_r = NULL, var_r_c
 #' @return A list object containing the results of bootstrapped second-order artifact-distribution meta-analyses of correlations
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_order2_ad_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_order2(data = data, type = "ad", run_lean = TRUE, ma_arg_list = ma_arg_list)
