@@ -465,6 +465,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @md
 #'
 #' @keywords internal
+#' @noRd
 .heterogeneity <- function(mean_es, var_es, var_pre, var_res,
                            var_e = NA, var_art = NA,
                            wt_vec, N, k, es_vec, vare_vec,
@@ -670,6 +671,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @return tau_r_squared
 #' 
 #' @keywords internal
+#' @noRd
 .tau_squared_r_solver <- function(Q_r, wi) {
      f <- function(tau_squared, Q_r, wi) {
        sum(sqrt(1 - wi / sum(wi) + tau_squared * (wi - 2 * wi^2 / sum(wi) + wi * sum(wi^2) / (sum(wi))^2))) - Q_r * sqrt(pi / 2)
@@ -697,6 +699,7 @@ heterogeneity <- function(ma_obj, es_failsafe = NULL,
 #' @return tau_r_squared
 #' 
 #' @keywords internal
+#' @noRd
 .tau_squared_m_solver <- function(Q_m, wi, k) {
      f <- function(tau_squared, Q_m, wi) sum(sqrt(1 + wi * tau_squared)) - Q_m * sqrt(pi / 2)
 

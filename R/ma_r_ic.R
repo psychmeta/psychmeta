@@ -907,6 +907,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @return A list object containing the results of individual-correction meta-analyses of correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_ic <- function(data, type = "all", run_lean = FALSE, ma_arg_list){
 
      conf_level <- ma_arg_list$conf_level
@@ -933,8 +934,8 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
      if(es_d & treat_as_d){
           out <- .ma_d_bb(data = data, ma_arg_list = ma_arg_list)
-          var_e_xy_vec <- convert_vard_to_varr(d = out$escalc$barebones[,"yi"], var = out$escalc$barebones[,"vi"], p = data$pi)
-          out$escalc$barebones$vi <- convert_vard_to_varr(d = out$escalc$barebones$yi, var = out$escalc$barebones$vi, p = data$pi)
+          var_e_xy_vec <- .convert_vard_to_varr(d = out$escalc$barebones[,"yi"], var = out$escalc$barebones[,"vi"], p = data$pi)
+          out$escalc$barebones$vi <- .convert_vard_to_varr(d = out$escalc$barebones$yi, var = out$escalc$barebones$vi, p = data$pi)
           out$escalc$barebones$yi <- convert_es.q_d_to_r(d = out$escalc$barebones$yi, p = data$pi)
           out$meta$barebones <- .convert_metatab(ma_table = out$meta$barebones, p_vec = wt_mean(x = data$pi, wt = out$escalc$barebones$weight),
                                                  conf_level = conf_level, cred_level = cred_level, conf_method = conf_method, cred_method = cred_method)
@@ -1185,6 +1186,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' Sage. \doi{10.4135/9781483398105}. p. 144.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{
@@ -1215,6 +1217,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' Sage. \doi{10.4135/9781483398105}. p. 145.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{
@@ -1238,6 +1241,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @return A list object containing the results of bootstrapped individual-correction meta-analyses of true-score correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_ic_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_ic(data = data, type = "all", run_lean = TRUE, ma_arg_list = ma_arg_list)
@@ -1296,6 +1300,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @return A list object containing the results of bootstrapped individual-correction meta-analyses of true-score correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_icts_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_ic(data = data, type = "ts", run_lean = TRUE, ma_arg_list = ma_arg_list)$meta$individual_correction$true_score
@@ -1322,6 +1327,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @return A list object containing the results of bootstrapped individual-correction meta-analyses of validity generalization correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_icvgx_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_ic(data = data, type = "vgx", run_lean = TRUE, ma_arg_list = ma_arg_list)$meta$individual_correction$validity_generalization_x
@@ -1347,6 +1353,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 #' @return A list object containing the results of bootstrapped individual-correction meta-analyses of validity generalization correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_r_icvgy_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_r_ic(data = data, type = "vgy", run_lean = TRUE, ma_arg_list = ma_arg_list)$meta$individual_correction$validity_generalization_y

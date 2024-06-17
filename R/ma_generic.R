@@ -262,6 +262,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
 #' @return A list object containing the results of bare-bones meta-analyses of generic effect sizes.
 #'
 #' @keywords internal
+#' @noRd
 .ma_generic <- function(data, run_lean = FALSE, ma_arg_list){
 
      es <- data$es
@@ -363,6 +364,7 @@ ma_generic <- function(es, n, var_e, sample_id = NULL, citekey = NULL,
 #' @return A list object containing the results of bootstrapped bare-bones meta-analyses of generic effect sizes.
 #'
 #' @keywords internal
+#' @noRd
 .ma_generic_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_generic(data = data, run_lean = TRUE, ma_arg_list = ma_arg_list)

@@ -385,6 +385,7 @@ create_ad_list <- create_ad_tibble
 #' @return A list object containing the results of bare-bones meta-analyses of correlations.
 #'
 #' @keywords internal
+#' @noRd
 .ma_artifacts <- function(data, ma_arg_list){
 
      ad_obj <- .create_ad_list_internal(full_data = data,

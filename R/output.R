@@ -1005,6 +1005,7 @@ generate_bib <- function(ma_obj=NULL, bib=NULL, title.bib = NULL, style="apa",
 #' Internal function for .metabulating results tables
 #'
 #' @keywords internal
+#' @noRd
 .metabulate <- function(meta_tables, ma_type = "ad_ts", output_format = "word",
                         caption = caption, show_msd = TRUE, show_conf = TRUE,
                         show_cred = TRUE, show_se = FALSE, show_var = FALSE,

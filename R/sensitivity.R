@@ -111,6 +111,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #'
 #' @return A list of forest plots
 #' @keywords internal
+#' @noRd
 .plot_forest_meta <-function(ma_mat, ma_vec = NULL, analysis = "leave1out"){
      label <- ma_mat[,1]
 
@@ -270,6 +271,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #' output of the bootstrapping function.
 #'
 #' @keywords internal
+#' @noRd
 .ma_bootstrap <- function(data, ma_fun_boot, boot_iter = 1000, boot_conf_level = .95, boot_ci_type = "norm", ma_arg_list, convert_ma = FALSE){
      boot_out <- suppressWarnings(boot(data = data, statistic = ma_fun_boot, stype = "i", R = boot_iter, ma_arg_list = ma_arg_list))
      boot_names <- names(boot_out$t0)
@@ -301,6 +303,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #' @examples
 #' ## Analysis TBD
 #' @keywords internal
+#' @noRd
 .ma_leave1out <- function(data, ma_fun_boot, ma_arg_list){
      if(is.null(data$sample_id)) {
           if(!is.null(row.names(data))) {
@@ -333,6 +336,7 @@ sensitivity <- function(ma_obj, leave1out = TRUE, bootstrap = TRUE, cumulative =
 #' @examples
 #' ## Analysis TBD
 #' @keywords internal
+#' @noRd
 .ma_cumulative <- function(data, sort_method = c("n", "inv_var", "weight"), ma_fun_boot, ma_arg_list){
 
      if(sort_method == "n")       data <- data[order(data$n_adj, decreasing = TRUE),]

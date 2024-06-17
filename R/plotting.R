@@ -494,6 +494,7 @@ plot_forest <- function(ma_obj, analyses = "all", match = c("all", "any"), case_
 #' @author John Sakaluk and Brenton Wiernik
 #'
 #' @keywords internal
+#' @noRd
 .plot_funnel <- function(x,
                          label_es = "Effect Size",
                          conf_level = c(.95, .99),

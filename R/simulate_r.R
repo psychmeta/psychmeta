@@ -1388,6 +1388,7 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
 #' @return A vector of simulated values from a distribution bounded at 0 and 1
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{
@@ -1412,6 +1413,7 @@ sample_params <- function(param_list, k, as_desc, as_weights_rows, as_weights_co
 #' @return A matrix of weighted descriptive statistics
 #'
 #' @keywords internal
+#' @noRd
 .descriptives_database <- function(dat, wt){
      desc_mat <- data.frame(apply(dat, 2, function(x) wt_dist(x = x, wt = wt, unbiased = FALSE)), stringsAsFactors = FALSE)
 

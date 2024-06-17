@@ -156,6 +156,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 #' @return A list object containing the results of bare-bones meta-analyses of d values.
 #'
 #' @keywords internal
+#' @noRd
 .ma_d_bb <- function(data, ma_arg_list, run_lean = FALSE){
      sample_id <- data$sample_id
      citekey <- data$citekey
@@ -314,6 +315,7 @@ ma_d_bb <- ma_d_barebones <- function(d, n1, n2 = rep(NA, length(d)), n_adj = NU
 #' @return A list object containing the results of bootstrapped bare-bones meta-analyses of d values.
 #'
 #' @keywords internal
+#' @noRd
 .ma_d_bb_boot <- function(data, i, ma_arg_list){
      data <- data[i,]
      out <- .ma_d_bb(data = data, ma_arg_list = ma_arg_list, run_lean = TRUE)
