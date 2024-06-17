@@ -288,7 +288,7 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      rxyi <- rxyi[valid_r]
      if(any(zapsmall(rxyi) == 0 & correct_rr_x & !indirect_rr_x & correct_rr_y & !indirect_rr_y))
              stop("The correction for bivariate direct range restricton is not appropriate for `rxyi` values of zero.", call. = FALSE)
-     rxyi[rxyi == 0] <- zero_substitute # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
+     rxyi[rxyi == 0] <- zero_substitute # Correlations of exactly zero get replaced with minuscule values to help estimate corrected error variances more accurately
      n <- n[valid_r]
      n_adj <- n_adj[valid_r]
      if(!is.null(moderators) & is.null(presorted_data)) moderators <- data.frame(as_tibble(moderators, .name_repair = "minimal")[valid_r,], stringsAsFactors = FALSE)
@@ -475,16 +475,22 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                ## Estimate the necessary incumbent reliabilities for X
                ## If the u ratio for X is known:
                subset_vec1 <- valid_rxxa & !rxx_restricted & rr_eligible_x & (do_uvirr_x | do_uvdrr_y | do_uvirr_y)
-               rxxi_vec[subset_vec1] <- estimate_rxxi(rxxa = rxx[subset_vec1], ux = ux[subset_vec1], ux_observed = ux_observed[subset_vec1], indirect_rr = indirect_rr_x[subset_vec1], rxxa_type = rxx_type[subset_vec1])
+               rxxi_vec[subset_vec1] <- estimate_rxxi(rxxa = rxx[subset_vec1],
+                                                      ux = ux[subset_vec1],
+                                                      ux_observed = ux_observed[subset_vec1],
+                                                      indirect_rr = indirect_rr_x[subset_vec1],
+                                                      rxxa_type = rxx_type[subset_vec1])
 
                ## If the u ratio for X is unknown, but the u ratio for Y is known:
                subset_vec2 <- valid_rxxa & !rxx_restricted & !rr_eligible_x & rr_eligible_y & (do_uvdrr_y | do_uvirr_y)
-               uy_temp <- uy[subset_vec2]
-               uy_temp[!uy_observed[subset_vec2]] <- estimate_ux(ut = uy_temp[!uy_observed[subset_vec2]],
-                                                                 rxx = ryy[subset_vec2][!uy_observed[subset_vec2]],
-                                                                 rxx_restricted = ryy_restricted[subset_vec2][!uy_observed[subset_vec2]])
-               rxxi_vec[subset_vec2] <- estimate_ryya(ryyi = ryy[subset_vec2], rxyi = rxyi[subset_vec2], ux = uy_temp)
-
+               rxxi_vec[subset_vec2] <- suppressMessages(estimate_ryyi(ryya = rxx[subset_vec2],
+                                                                       rxyi = rxyi[subset_vec2],
+                                                                       ux = uy[subset_vec2],
+                                                                       rxx = ryy[subset_vec2],
+                                                                       rxx_restricted = ryy_restricted[subset_vec2],
+                                                                       ux_observed = uy_observed[subset_vec2],
+                                                                       indirect_rr = indirect_rr_y[subset_vec2]))
+               
                ## If any of the necessary reliabilities are missing, run the imputation subroutine
                subset_vec <- correct_rxx & (do_uvirr_x | do_uvdrr_y | do_uvirr_y)
                if(any(is.na(rxxi_vec[subset_vec])))
@@ -526,15 +532,21 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
                ## Estimate the necessary incumbent reliabilities for Y
                ## If the u ratio for Y is known:
                subset_vec1 <- valid_ryya & !ryy_restricted & rr_eligible_y & (do_uvirr_y | do_uvdrr_x | do_uvirr_x)
-               ryyi_vec[subset_vec1] <- estimate_rxxi(rxxa = ryy[subset_vec1], ux = uy[subset_vec1], ux_observed = uy_observed[subset_vec1], indirect_rr = indirect_rr_y[subset_vec1], rxxa_type = ryy_type[subset_vec1])
+               ryyi_vec[subset_vec1] <- estimate_rxxi(rxxa = ryy[subset_vec1],
+                                                      ux = uy[subset_vec1],
+                                                      ux_observed = uy_observed[subset_vec1],
+                                                      indirect_rr = indirect_rr_y[subset_vec1],
+                                                      rxxa_type = ryy_type[subset_vec1])
 
                ## If the u ratio for Y is unknown, but the u ratio for X is known:
                subset_vec2 <- valid_ryya & !ryy_restricted & !rr_eligible_y & rr_eligible_x & (do_uvdrr_x | do_uvirr_x)
-               ux_temp <- ux[subset_vec2]
-               ux_temp[!ux_observed[subset_vec2]] <- estimate_ux(ut = ux_temp[!ux_observed[subset_vec2]],
-                                                                 rxx = rxx[subset_vec2][!ux_observed[subset_vec2]],
-                                                                 rxx_restricted = rxx_restricted[subset_vec2][!ux_observed[subset_vec2]])
-               ryyi_vec[subset_vec2] <- estimate_ryya(ryyi = ryy[subset_vec2], rxyi = rxyi[subset_vec2], ux = ux_temp)
+               ryyi_vec[subset_vec2] <- suppressMessages(estimate_ryyi(ryya = ryy[subset_vec2],
+                                                                       rxyi = rxyi[subset_vec2],
+                                                                       ux = ux[subset_vec2],
+                                                                       rxx = rxx[subset_vec2],
+                                                                       rxx_restricted = rxx_restricted[subset_vec2],
+                                                                       ux_observed = ux_observed[subset_vec2],
+                                                                       indirect_rr = indirect_rr_x[subset_vec2]))
 
                ## If any of the necessary reliabilities are missing, run the imputation subroutine
                subset_vec <- correct_ryy & (do_uvirr_y | do_uvdrr_x | do_uvirr_x)
@@ -570,25 +582,25 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
 
           subset_vec <- correct_rxx & is.na(rxxi_vec) & (do_meas | do_uvdrr_y | do_uvirr_y)
           if(any(subset_vec)){
-               warning("Some necessary rxxi values were undefined after consolidating artifacts. Missing values set to 1 - interpret results with caution", call. = FALSE)
+               warning("Some necessary rxxi values were undefined after consolidating artifacts. Missing values set to 1: Interpret results with caution", call. = FALSE)
                rxxi_vec[subset_vec] <- 1
           }
 
           subset_vec <- correct_rxx & is.na(rxxa_vec) & (do_uvdrr_x | do_uvirr_x | do_bvdrr | do_bvirr)
           if(any(subset_vec)){
-               warning("Some necessary rxxa values were undefined after consolidating artifacts. Missing values set to 1 - interpret results with caution", call. = FALSE)
+               warning("Some necessary rxxa values were undefined after consolidating artifacts. Missing values set to 1: Interpret results with caution", call. = FALSE)
                rxxa_vec[subset_vec] <- 1
           }
 
           subset_vec <- correct_ryy & is.na(ryyi_vec) & (do_meas | do_uvdrr_x | do_uvirr_x)
           if(any(subset_vec)){
-               warning("Some necessary ryyi values were undefined after consolidating artifacts. Missing values set to 1 - interpret results with caution", call. = FALSE)
+               warning("Some necessary ryyi values were undefined after consolidating artifacts. Missing values set to 1: Interpret results with caution", call. = FALSE)
                ryyi_vec[subset_vec] <- 1
           }
 
           subset_vec <- correct_ryy & is.na(ryya_vec) & (do_uvdrr_y | do_uvirr_y | do_bvdrr | do_bvirr)
           if(any(subset_vec)){
-               warning("Some necessary ryya values were undefined after consolidating artifacts. Missing values set to 1 - interpret results with caution", call. = FALSE)
+               warning("Some necessary ryya values were undefined after consolidating artifacts. Missing values set to 1: Interpret results with caution", call. = FALSE)
                ryya_vec[subset_vec] <- 1
           }
 
@@ -693,15 +705,15 @@ ma_r_ic <- function(rxyi, n, n_adj = NULL, sample_id = NULL, citekey = NULL,
      subset_vec <- do_uvdrr_x | do_uvirr_x | do_bvirr | do_bvdrr
      .rxxa_vec[subset_vec] <- rxxa_vec[subset_vec]
      .rxxa_vec[do_uvdrr_y] <- estimate_ryya(ryyi = rxxi_vec[do_uvdrr_y], rxyi = rxyi[do_uvdrr_y], ux = uy_vec[do_uvdrr_y])
-     .rxxa_vec[do_uvirr_y] <- estimate_ryya(ryyi = rxxi_vec[do_uvirr_y], rxyi = rxyi[do_uvirr_y], ux = up_vec[do_uvirr_y])
+     .rxxa_vec[do_uvirr_y] <- estimate_ryya(ryyi = rxxi_vec[do_uvirr_y], rxyi = rxyi[do_uvirr_y] / sqrt(ryyi_vec[do_uvirr_y]), ux = up_vec[do_uvirr_y])
 
      ## Validity generalization with Y as the predictor
      .ryya_vec <- rep(1, length(rxyi))
      .ryya_vec[do_meas] <- ryyi_vec[do_meas]
      subset_vec <- do_uvdrr_y | do_uvirr_y | do_bvirr | do_bvdrr
      .ryya_vec[subset_vec] <- ryya_vec[subset_vec]
-     .ryya_vec[do_uvirr_x] <- estimate_ryya(ryyi = ryyi_vec[do_uvirr_x], rxyi = rxyi[do_uvirr_x], ux = ut_vec[do_uvirr_x])
      .ryya_vec[do_uvdrr_x] <- estimate_ryya(ryyi = ryyi_vec[do_uvdrr_x], rxyi = rxyi[do_uvdrr_x], ux = ux_vec[do_uvdrr_x])
+     .ryya_vec[do_uvirr_x] <- estimate_ryya(ryyi = ryyi_vec[do_uvirr_x], rxyi = rxyi[do_uvirr_x] / sqrt(rxxi_vec[do_uvirr_x]), ux = ut_vec[do_uvirr_x])
 
      ## Determine attenuation factors for conventional corrections
      a_vec <- A_vec <- rep(1, length(rxyi))

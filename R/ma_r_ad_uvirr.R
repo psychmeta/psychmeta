@@ -61,7 +61,10 @@
      .mean_ut <- wt_mean(x = .ad_obj_x$ut$Value, wt = .ad_obj_x$ut$Weight)
      .mean_qyi <- wt_mean(x = .ad_obj_y$qxi_irr$Value, wt = .ad_obj_y$qxi_irr$Weight)
      .mean_qya <- NULL
-     for(i in 1:length(mean_rxyi)) .mean_qya[i] <- wt_mean(x = estimate_ryya(ryyi = .ad_obj_y$qxi_irr$Value^2, rxyi = mean_rxyi[i], ux = .mean_ut)^.5, wt = .ad_obj_y$qxi_irr$Weight)
+     for(i in 1:length(mean_rxyi)) .mean_qya[i] <- wt_mean(x = estimate_ryya(ryyi = .ad_obj_y$qxi_irr$Value^2, 
+                                                                             rxyi = mean_rxyi[i] / .mean_qxi, 
+                                                                             ux = .mean_ut)^.5,
+                                                           wt = .ad_obj_y$qxi_irr$Weight)
 
      ad_list <- list(.qxi = .ad_obj_x$qxi_irr,
                      .qyi = .ad_obj_y$qxi_irr,
@@ -279,7 +282,7 @@
      .mean_ut <- .ad_obj_x["ut", "mean"]
      .var_ut <- .ad_obj_x["ut", var_label]
 
-     .mean_qya <- estimate_ryya(ryyi = .mean_qyi^2, rxyi = mean_rxyi, ux = .mean_ut)^.5
+     .mean_qya <- estimate_ryya(ryyi = .mean_qyi^2, rxyi = mean_rxyi / .mean_qxi, ux = .mean_ut)^.5
 
      mean_rtpa <- .correct_r_uvirr(rxyi = mean_rxyi, qxi = .mean_qxi, qyi = .mean_qyi, ut = .mean_ut)
      ci_tp <- .correct_r_uvirr(rxyi = ci_xy_i, qxi = .mean_qxi, qyi = .mean_qyi, ut = .mean_ut)

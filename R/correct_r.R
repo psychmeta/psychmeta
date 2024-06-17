@@ -389,7 +389,7 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
 
      if(any(zapsmall(rxyi) == 0) & correction == "bvdrr")
              stop("The correction for bivariate direct range restricton ('bvdrr') is not appropriate for `rxyi` values of zero.", call. = FALSE)
-     rxyi[rxyi == 0] <- zero_substitute # Correlations of exactly zero get replaced with miniscule values to help estimate corrected error variances more accurately
+     rxyi[rxyi == 0] <- zero_substitute # Correlations of exactly zero get replaced with minuscule values to help estimate corrected error variances more accurately
 
      if(correction == "meas")
           out <- correct_r_meas(rxy = rxyi, rxx = rxx, ryy = ryy,
@@ -410,16 +410,17 @@ correct_r <- function(correction = c("meas", "uvdrr_x", "uvdrr_y", "uvirr_x", "u
                                  n = n, conf_level = conf_level, correct_bias = correct_bias)
 
      if(correction == "uvirr_x")
-          out <- correct_r_uvirr(rxyi = rxyi, ux = ux, rxx = rxx, ryy = ryy,
-                     ux_observed = ux_observed, rxx_restricted = rxx_restricted, ryy_restricted = ryy_restricted,
-                     n = n, conf_level = conf_level, correct_bias = correct_bias)
-
+             out <- correct_r_uvirr(rxyi = rxyi, ux = ux, rxx = rxx, ryy = ryy,
+                                    ux_observed = ux_observed, rxx_restricted = rxx_restricted, rxx_type = rxx_type,
+                                    ryy_restricted = ryy_restricted,
+                                    n = n, conf_level = conf_level, correct_bias = correct_bias)
+     
      if(correction == "uvirr_y")
-          out <- correct_r_uvirr(rxyi = rxyi, ux = uy, rxx = ryy, ryy = rxx,
-                                 ux_observed = uy_observed,
-                                 rxx_restricted = ryy_restricted, ryy_restricted = rxx_restricted,
-                                 n = n, conf_level = conf_level, correct_bias = correct_bias)
-
+             out <- correct_r_uvirr(rxyi = rxyi, ux = uy, rxx = ryy, ryy = rxx,
+                                    ux_observed = uy_observed, rxx_restricted = ryy_restricted, rxx_type = ryy_type,
+                                    ryy_restricted = rxx_restricted,
+                                    n = n, conf_level = conf_level, correct_bias = correct_bias)
+     
      if(correction == "bvdrr")
           out <- correct_r_bvdrr(rxyi = rxyi, ux = ux, uy = uy,
                      rxx = rxx, ryy = ryy,
@@ -516,12 +517,12 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      ux[!ux_observed] <- estimate_ux(ut = ux[!ux_observed], rxx = rxx[!ux_observed], rxx_restricted = rxx_restricted[!ux_observed])
 
      rxxi <- rxxa <- rxx
-     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted], rxxi_type = rxx_type[rxx_restricted]))
-     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted], rxxa_type = rxx_type[!rxx_restricted]))
+     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted], rxxi_type = rxx_type[rxx_restricted], indirect_rr = FALSE))
+     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted], rxxa_type = rxx_type[!rxx_restricted], indirect_rr = FALSE))
 
      ryyi <- ryy
      ryyi[!ryy_restricted] <- suppressWarnings(estimate_ryyi(ryya = ryyi[!ryy_restricted], rxyi = rxyi[!ryy_restricted], ux = ux[!ryy_restricted]))
-     ryya <- suppressWarnings(estimate_ryyi(ryya = ryyi, rxyi = rxyi, ux = ux))
+     ryya <- suppressWarnings(estimate_ryya(ryyi = ryyi, rxyi = rxyi, ux = ux))
 
      if(any(is.na(rxxa))) warning("Some rxxa values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(rxxi))) warning("Some rxxi values were undefined: Interpret results accordingly", call. = FALSE)
@@ -583,7 +584,8 @@ correct_r_uvdrr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
 
 
 correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
-                            ux_observed = TRUE, rxx_restricted = TRUE, ryy_restricted = TRUE,
+                            ux_observed = TRUE, rxx_restricted = TRUE, rxx_type = "alpha",
+                            ryy_restricted = TRUE,
                             n = NULL, conf_level = .95, correct_bias = FALSE){
      warn_obj1 <- record_warnings()
      screen_rel(rel_vec = rxx, art_name = "rxx")
@@ -595,12 +597,12 @@ correct_r_uvirr <- function(rxyi, ux = 1, rxx = 1, ryy = 1,
      ux[!ux_observed] <- suppressWarnings(estimate_ux(ut = ux[!ux_observed], rxx = rxx[!ux_observed], rxx_restricted = rxx_restricted[!ux_observed]))
 
      rxxa <- rxxi <- rxx
-     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted]))
-     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted]))
+     rxxa[rxx_restricted] <- suppressWarnings(estimate_rxxa(ux = ux[rxx_restricted], rxxi = rxx[rxx_restricted], rxxi_type = rxx_type[rxx_restricted], indirect_rr = TRUE))
+     rxxi[!rxx_restricted] <- suppressWarnings(estimate_rxxi(ux = ux[!rxx_restricted], rxxa = rxx[!rxx_restricted], rxxa_type = rxx_type[!rxx_restricted], indirect_rr = TRUE))
 
      ryyi <- ryy
-     ryyi[!ryy_restricted] <- suppressWarnings(estimate_ryyi(ryya = ryyi[!ryy_restricted], rxyi = rxyi[!ryy_restricted], ux = ux[!ryy_restricted]))
-     ryya <- suppressWarnings(estimate_ryyi(ryya = ryyi, rxyi = rxyi, ux = ut))
+     ryyi[!ryy_restricted] <- suppressWarnings(estimate_ryyi(ryya = ryyi[!ryy_restricted], rxyi = rxyi[!ryy_restricted] / sqrt(rxxi[!ryy_restricted]), ux = ut[!ryy_restricted]))
+     ryya <- suppressWarnings(estimate_ryya(ryyi = ryyi, rxyi = rxyi / sqrt(rxxi), ux = ut))
 
      if(any(is.na(rxxa))) warning("Some rxxa values were undefined: Interpret results accordingly", call. = FALSE)
      if(any(is.na(rxxi))) warning("Some rxxi values were undefined: Interpret results accordingly", call. = FALSE)

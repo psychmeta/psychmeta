@@ -34,9 +34,27 @@ estimate_ut(ux, rxx, rxx_restricted = TRUE)
 
 estimate_ux(ut, rxx, rxx_restricted = TRUE)
 
-estimate_ryya(ryyi, rxyi, ux)
+estimate_ryya(
+  ryyi,
+  rxyi,
+  ux,
+  rxx = 1,
+  rxx_restricted = FALSE,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  rxx_type = "alpha"
+)
 
-estimate_ryyi(ryya, rxyi, ux)
+estimate_ryyi(
+  ryya,
+  rxyi,
+  ux,
+  rxx = 1,
+  rxx_restricted = FALSE,
+  ux_observed = TRUE,
+  indirect_rr = TRUE,
+  rxx_type = "alpha"
+)
 
 estimate_uy(ryyi, ryya, indirect_rr = TRUE, ryy_type = "alpha")
 
@@ -53,9 +71,9 @@ estimate_rxxi_u(ux, ut)
 
 \item{ux_observed}{Logical vector determining whether each element of ux is an observed-score u ratio (\code{TRUE}) or a true-score u ratio (\code{FALSE}).}
 
-\item{indirect_rr}{Logical vector determining whether each reliability value is associated with indirect range restriction (\code{TRUE}) or direct range restriction (\code{FALSE}).}
+\item{indirect_rr}{Logical vector determining whether each reliability value is associated with indirect range restriction (\code{TRUE}) or direct range restriction (\code{FALSE}). Note #1: For \code{estimate_ryya} and \code{estimate_ryyi}, this argument refers to whether X is indirectly or directly range restricted (Y is assumed to always be indirectly range restricted via selection on X or another variable). Note #2: When rxxi_type, rxxa_type, or rxx_type refers to an internal consistency reliability method, the corresponding reliability estimates will be treated as being impacted by indirect range restriction because, even when X is directly range restricted, the inter-item relations used to evaluate internal consistency reliability are indirectly range restricted via selection on X's total scores.}
 
-\item{rxxi_type, rxxa_type, ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
+\item{rxxi_type, rxxa_type, rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied (e.g., "alpha", "retest", "interrater_r", "splithalf"). See the documentation for \code{\link{ma_r}} for a full list of acceptable reliability types.}
 
 \item{rxxa}{Vector of applicant reliability estimates for X.}
 
@@ -128,15 +146,21 @@ Formula for direct range restriction:
 
 
 
-#### Formula to estimate ryya ####
-
+#### Formulas to estimate ryya ####
+Formula for direct range restriction (i.e., when selection is based on X):
 \deqn{\rho_{YY_{a}}=1-\frac{1-\rho_{YY_{i}}}{1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)}}{ryya = 1 - (1 - ryyi) / (1 - rxyi^2 * (1 - ux^-2))}
 
+Formula for indirect range restriction (i.e., when selection is based on a variable other than X):
+\deqn{\rho_{YY_{a}}=1-\frac{1-\rho_{YY_{i}}}{1-\rho_{TY_{i}}^{2}\left(1-\frac{1}{u_{T}^{2}}\right)}}{ryya = 1 - (1 - ryyi) / (1 - rtyi^2 * (1 - ut^-2))}
 
 
-#### Formula to estimate ryyi
+
+#### Formulas to estimate ryyi ####
+Formula for direct range restriction (i.e., when selection is based on X):
 \deqn{\rho_{YY_{i}}=1-\left(1-\rho_{YY_{a}}\right)\left[1-\rho_{XY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}{ryyi = 1 - (1 - ryya) * (1 - rxyi^2 * (1 - ux^-2))}
 
+Formula for indirect range restriction (i.e., when selection is based on a variable other than X):
+\deqn{\rho_{YY_{i}}=1-\left(1-\rho_{YY_{a}}\right)\left[1-\rho_{TY_{i}}^{2}\left(1-\frac{1}{u_{X}^{2}}\right)\right]}{ryyi = 1 - (1 - ryya) * (1 - rtyi^2 * (1 - ut^-2))}
 
 
 
