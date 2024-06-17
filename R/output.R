@@ -237,10 +237,10 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #' \code{\link[knitr:output_type]{knitr::is_html_output}}, the following LaTeX
 #' math commands are defined:
 #' \itemize{
-#'   \item{\code{symit}}{}
-#'   \item{\code{symup}}{}
-#'   \item{\code{symbfit}}{}
-#'   \item{\code{symbfup}}{}
+#'   \item{\code{symit}}
+#'   \item{\code{symup}}
+#'   \item{\code{symbfit}}
+#'   \item{\code{symbfup}}
 #' }
 #'
 #' If you define your own LaTeX or MathJax macros for these commands, set
@@ -250,10 +250,10 @@ format_num <- function(x, digits = 2L, decimal.mark = getOption("OutDec"),
 #' If \code{word_proc} is \code{TRUE} and you render to Word or ODT (or related
 #' formats such as PowerPoint), the following LaTeX math commands are defined:
 #' \itemize{
-#'   \item{\code{symit}}{}
-#'   \item{\code{symup}}{}
-#'   \item{\code{symbfit}}{}
-#'   \item{\code{symbfup}}{}
+#'   \item{\code{symit}}
+#'   \item{\code{symup}}
+#'   \item{\code{symbfit}}
+#'   \item{\code{symbfup}}
 #' }
 #'
 #' If you define your own LaTeX, Office, or OpenDocument macros for these commands,
@@ -315,9 +315,9 @@ metabulate_rmd_helper <- function(latex = TRUE, html = TRUE,
 #' @param digits,decimal.mark,leading0,drop0integer,neg.sign,pos.sign,big.mark,big.interval,small.mark,small.interval,na.mark,lgl.mark,inf.mark Number formatting arguments. See \code{\link{format_num}} for details.
 #' @param conf_format How should confidence intervals be formatted? Options are:
 #' \itemize{
-#' \item{\code{parentheses}}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
-#' \item{\code{brackets}}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
-#' \item{\code{columns}}{: Bounds are shown in individual columns.}
+#' \item{\code{parentheses}: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+#' \item{\code{brackets}: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+#' \item{\code{columns}: Bounds are shown in individual columns.}
 #' }
 #' @param cred_format How should credibility intervals be formatted? Options are the same as for \code{conf_format} above.
 #' @param symbol_es For meta-analyses of generic (non-r, non-d) effect sizes, the symbol used for the effect sizes (default: \code{symbol_es = "ES"}).

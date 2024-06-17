@@ -26,13 +26,13 @@ filter_meta(
 
 \item{analyses}{Which analyses to extract? Can be either \code{"all"} to extract all meta-analyses in the object (default) or a list containing one or more of the following arguments:
 \itemize{
-\item{construct:}{ A list or vector of construct names to search for.}
-\item{construct_pair:}{ A list of vectors of construct pairs to search for. \cr
+\item{\code{construct}: A list or vector of construct names to search for.}
+\item{\code{construct_pair}: A list of vectors of construct pairs to search for. \cr
 (e.g., \code{list(c("X", "Y"), c("X", "Z"))} ).}
-\item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
-\item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
-\item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-\item{N_min:}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
+\item{\code{pair_id}: A list or vector of numeric construct pair IDs (unique construct-pair indices).}
+\item{\code{analysis_id}: A list or vector of numeric analysis IDs (unique analysis indexes).}
+\item{\code{k_min}: A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
+\item{\code{N_min}: A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 }}
 
 \item{match}{Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?}

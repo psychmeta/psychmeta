@@ -9,19 +9,19 @@
 #'
 #' Available functions include:
 #' \itemize{
-#' \item{\code{get_stuff}}{\cr Wrapper function for all other "get_" functions.}
-#' \item{\code{get_metatab}}{\cr Retrieve list of meta-analytic tables.}
-#' \item{\code{get_ad}}{\cr Retrieve list of artifact-distribution objects or a summary table of artifact descriptive statistics.}
-#' \item{\code{get_plots}}{\cr Retrieve list of meta-analytic plots.}
-#' \item{\code{get_escalc}}{\cr Retrieve list of escalc objects (i.e., effect-size data) for use with \pkg{metafor}.}
-#' \item{\code{get_metafor}}{\cr Alias for \code{get_escalc}.}
-#' \item{\code{get_followup}}{\cr Retrieve list of follow-up analyses.}
-#' \item{\code{get_leave1out}}{\cr Retrieve list of leave-one-out meta-analyses (special case of \code{get_followup}).}
-#' \item{\code{get_cumulative}}{\cr Retrieve list of cumulative meta-analyses (special case of \code{get_followup}).}
-#' \item{\code{get_bootstrap}}{\cr Retrieve list of bootstrap meta-analyses (special case of \code{get_followup}).}
-#' \item{\code{get_metareg}}{\cr Retrieve list of meta-regression analyses (special case of \code{get_followup}).}
-#' \item{\code{get_heterogeneity}}{\cr Retrieve list of heterogeneity analyses (special case of \code{get_followup}).}
-#' \item{\code{get_matrix}}{\cr Retrieve a tibble of matrices summarizing the relationships among constructs (only applicable to meta-analyses with multiple constructs).}
+#' \item{\code{get_stuff}: Wrapper function for all other "get_" functions.}
+#' \item{\code{get_metatab}: Retrieve list of meta-analytic tables.}
+#' \item{\code{get_ad}: Retrieve list of artifact-distribution objects or a summary table of artifact descriptive statistics.}
+#' \item{\code{get_plots}: Retrieve list of meta-analytic plots.}
+#' \item{\code{get_escalc}: Retrieve list of escalc objects (i.e., effect-size data) for use with \pkg{metafor}.}
+#' \item{\code{get_metafor}: Alias for \code{get_escalc}.}
+#' \item{\code{get_followup}: Retrieve list of follow-up analyses.}
+#' \item{\code{get_leave1out}: Retrieve list of leave-one-out meta-analyses (special case of \code{get_followup}).}
+#' \item{\code{get_cumulative}: Retrieve list of cumulative meta-analyses (special case of \code{get_followup}).}
+#' \item{\code{get_bootstrap}: Retrieve list of bootstrap meta-analyses (special case of \code{get_followup}).}
+#' \item{\code{get_metareg}: Retrieve list of meta-regression analyses (special case of \code{get_followup}).}
+#' \item{\code{get_heterogeneity}: Retrieve list of heterogeneity analyses (special case of \code{get_followup}).}
+#' \item{\code{get_matrix}: Retrieve a tibble of matrices summarizing the relationships among constructs (only applicable to meta-analyses with multiple constructs).}
 #' }
 #'
 #' @param ma_obj A psychmeta meta-analysis object.
@@ -33,13 +33,13 @@
 #' @param plot_types Vector of plot types (options are: "funnel", "forest", "leave1out", "cumulative"; multiple allowed).
 #' @param analyses Which analyses to extract? Can be either \code{"all"} to extract references for all meta-analyses in the object (default) or a list containing one or more of the following arguments:
 #' \itemize{
-#' \item{construct:}{ A list or vector of construct names to search for.}
-#' \item{construct_pair:}{ A list of vectors of construct pairs to search for. \cr
+#' \item{\code{construct}: A list or vector of construct names to search for.}
+#' \item{\code{construct_pair}: A list of vectors of construct pairs to search for. \cr
 #' (e.g., \code{list(c("X", "Y"), c("X", "Z"))}).}
-#' \item{pair_id:}{ A list or vector of numeric construct pair IDs (unique construct-pair indices).}
-#' \item{analysis_id:}{ A list or vector of numeric analysis IDs (unique analysis indexes).}
-#' \item{k_min:}{ A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
-#' \item{N_min:}{ A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
+#' \item{\code{pair_id}: A list or vector of numeric construct pair IDs (unique construct-pair indices).}
+#' \item{\code{analysis_id}: A list or vector of numeric analysis IDs (unique analysis indexes).}
+#' \item{\code{k_min}: A numeric value specifying the minimum \code{k} for extracted meta-analyses.}
+#' \item{\code{N_min}: A numeric value specifying the minimum \code{N} for extracted meta-analyses.}
 #' }
 #' @param match Should extracted meta-analyses match all (default) or any of the criteria given in \code{analyses}?
 #' @param case_sensitive Logical scalar that determines whether character values supplied in \code{analyses} should be treated as case sensitive (\code{TRUE}, default) or not (\code{FALSE}).

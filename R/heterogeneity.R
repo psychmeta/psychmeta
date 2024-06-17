@@ -806,10 +806,10 @@ limits_tau <- function(var_es, var_pre, k, method = c("profile_var_es", "profile
 #'
 #' @return
 #' \itemize{
-#'      \item{Lower.Limit}{Value of the distribution with \code{Lower.Limit} noncentral value that has at its specified quantile \code{Chi.Square}}
-#'      \item{Prob.Less.Lower}{Proportion of cases falling below \code{Lower.Limit}}
-#'      \item{Upper.Limit}{Value of the distribution with \code{Upper.Limit} noncentral value that has at its specified quantile \code{Chi.Square}}
-#'      \item{Prob.Greater.Upper}{Proportion of cases falling above \code{Upper.Limit}}
+#'      \item{\code{Lower.Limit}: Value of the distribution with \code{Lower.Limit} noncentral value that has at its specified quantile \code{Chi.Square}}
+#'      \item{\code{Prob.Less.Lower}: Proportion of cases falling below \code{Lower.Limit}}
+#'      \item{\code{Upper.Limit}: Value of the distribution with \code{Upper.Limit} noncentral value that has at its specified quantile \code{Chi.Square}}
+#'      \item{\code{Prob.Greater.Upper}: Proportion of cases falling above \code{Upper.Limit}}
 #' }
 #'
 #' @author Ken Kelley (University of Notre Dame; \email{KKelley@@ND.edu}), Keke Lai (University of California--Merced)

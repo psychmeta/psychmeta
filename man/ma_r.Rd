@@ -196,34 +196,34 @@ Superseded in evaluation by \code{correct_rr_y} (i.e., if \code{correct_rr_y} ==
 
 \item{rxx_type, ryy_type}{String vector identifying the types of reliability estimates supplied. Acceptable reliability types are:
 \itemize{
-\item{internal_consistency}{\cr A generic designation for internal-consistency reliability estimates derived from responses to a single test administration.}
-\item{multiple_administrations}{\cr A generic designation for reliability estimates derived from multiple administrations of a test.}
-\item{alpha}{\cr Coefficient alpha.}
-\item{lambda}{\cr Generic designation for a Guttman's lambda coefficient.}
-\item{lambda1}{\cr Guttman's lambda 1 coefficient.}
-\item{lambda2}{\cr Guttman's lambda 2 coefficient.}
-\item{lambda3}{\cr Guttman's lambda 3 coefficient.}
-\item{lambda4}{\cr Guttman's lambda 4 coefficient.}
-\item{lambda5}{\cr Guttman's lambda 5 coefficient.}
-\item{lambda6}{\cr Guttman's lambda 6 coefficient.}
-\item{omega}{\cr Omega coefficient indicating the proportion variance in a variable accounted for by modeled latent factors.}
-\item{icc}{\cr Intraclass correlation coefficient.}
-\item{interrater_r}{\cr Inter-rater correlation coefficient.}
-\item{interrater_r_sb}{\cr Inter-rater correlation coefficient, stepped up with the Spearman-Brown formula.}
-\item{splithalf}{\cr Split-half reliability coefficient.}
-\item{splithalf_sb}{\cr Split-half reliability coefficient, corrected toward the full test length with the Spearman-Brown formula.}
-\item{retest}{\cr Test-retest reliability coefficient.}
-\item{parallel}{\cr Parallel-forms reliability coefficient with tests taken during the same testing session.}
-\item{alternate}{\cr Alternate-forms reliability coefficient with tests taken during the same testing session.}
-\item{parallel_delayed}{\cr Parallel-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
-\item{alternate_delayed}{\cr Alternate-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
+\item{"internal_consistency": A generic designation for internal-consistency reliability estimates derived from responses to a single test administration.}
+\item{"multiple_administrations": A generic designation for reliability estimates derived from multiple administrations of a test.}
+\item{"alpha": Coefficient alpha.}
+\item{"lambda": Generic designation for a Guttman's lambda coefficient.}
+\item{"lambda1": Guttman's lambda 1 coefficient.}
+\item{"lambda2": Guttman's lambda 2 coefficient.}
+\item{"lambda3": Guttman's lambda 3 coefficient.}
+\item{"lambda4": Guttman's lambda 4 coefficient.}
+\item{"lambda5": Guttman's lambda 5 coefficient.}
+\item{"lambda6": Guttman's lambda 6 coefficient.}
+\item{"omega": Omega coefficient indicating the proportion variance in a variable accounted for by modeled latent factors.}
+\item{"icc": Intraclass correlation coefficient.}
+\item{"interrater_r": Inter-rater correlation coefficient.}
+\item{"interrater_r_sb": Inter-rater correlation coefficient, stepped up with the Spearman-Brown formula.}
+\item{"splithalf": Split-half reliability coefficient.}
+\item{"splithalf_sb": Split-half reliability coefficient, corrected toward the full test length with the Spearman-Brown formula.}
+\item{"retest": Test-retest reliability coefficient.}
+\item{"parallel": Parallel-forms reliability coefficient with tests taken during the same testing session.}
+\item{"alternate": Alternate-forms reliability coefficient with tests taken during the same testing session.}
+\item{"parallel_delayed": Parallel-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
+\item{"alternate_delayed": Alternate-forms reliability coefficient with tests taken during separate testing sessions with a time delay in between.}
 }}
 
 \item{k_items_x, k_items_y}{Numeric vector identifying the number of items in each scale.}
 
 \item{ryy}{Vector or column name of reliability estimates for Y.}
 
-\item{ryy_restricted}{Logical vector or column name determining whether each element of code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
+\item{ryy_restricted}{Logical vector or column name determining whether each element of \code{ryy} is an incumbent reliability (\code{TRUE}) or an applicant reliability (\code{FALSE}).}
 
 \item{ux}{Vector or column name of u ratios for X.}
 
@@ -274,95 +274,95 @@ Use one of the following commands: \code{tsa} to use the Taylor series method or
 A nested tabular object of the class "ma_psychmeta".
 Components of output tables for bare-bones meta-analyses:
 \itemize{
-\item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
-\item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
-\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
-\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
-\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
-\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
-\item{\code{mean_r}}{\cr Mean observed correlation.}
-\item{\code{var_r}}{\cr Weighted variance of observed correlations.}
-\item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
-\item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance.}
-\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
-\item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
-\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
-\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
-\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
-\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
-\item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
-\item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
+\item{\code{pair_id}: Unique identification number for each construct pairing.}
+\item{\code{construct_x}: Name of the variable analyzed as construct X.}
+\item{\code{construct_y}: Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}: Unique identification number for each analysis.}
+\item{\code{analysis_type}: Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}: Number of effect sizes meta-analyzed.}
+\item{\code{N}: Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_r}: Mean observed correlation.}
+\item{\code{var_r}: Weighted variance of observed correlations.}
+\item{\code{var_e}: Predicted sampling-error variance of observed correlations.}
+\item{\code{var_res}: Variance of observed correlations after removing predicted sampling-error variance.}
+\item{\code{sd_r}: Square root of \code{var_r}.}
+\item{\code{se_r}: Standard error of \code{mean_r}.}
+\item{\code{sd_e}: Square root of \code{var_e}.}
+\item{\code{sd_res}: Square root of \code{var_res}.}
+\item{\code{CI_LL_XX}: Lower limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}: Upper limit of the confidence interval around \code{mean_r}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CR_LL_XX}: Lower limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CR_UL_XX}: Upper limit of the credibility interval around \code{mean_r}, where "XX" represents the credibility level as a percentage.}
 }
 
 Components of output tables for individual-correction meta-analyses:
 \itemize{
-\item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
-\item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
-\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
-\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
-\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
-\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
-\item{\code{mean_r}}{\cr Mean observed correlation.}
-\item{\code{var_r}}{\cr Weighted variance of observed correlations.}
-\item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
-\item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance.}
-\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
-\item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
-\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
-\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
-\item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
-\item{\code{var_r_c}}{\cr Variance of artifact-corrected correlations.}
-\item{\code{var_e_c}}{\cr Predicted sampling-error variance of artifact-corrected correlations.}
-\item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance.}
-\item{\code{sd_r_c}}{\cr Square root of \code{var_r_c}.}
-\item{\code{se_r_c}}{\cr Standard error of \code{mean_rho}.}
-\item{\code{sd_e_c}}{\cr Square root of \code{var_e_c}.}
-\item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
-\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
-\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
-\item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
-\item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+\item{\code{pair_id}: Unique identification number for each construct pairing.}
+\item{\code{construct_x}: Name of the variable analyzed as construct X.}
+\item{\code{construct_y}: Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}: Unique identification number for each analysis.}
+\item{\code{analysis_type}: Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}: Number of effect sizes meta-analyzed.}
+\item{\code{N}: Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_r}: Mean observed correlation.}
+\item{\code{var_r}: Weighted variance of observed correlations.}
+\item{\code{var_e}: Predicted sampling-error variance of observed correlations.}
+\item{\code{var_res}: Variance of observed correlations after removing predicted sampling-error variance.}
+\item{\code{sd_r}: Square root of \code{var_r}.}
+\item{\code{se_r}: Standard error of \code{mean_r}.}
+\item{\code{sd_e}: Square root of \code{var_e}.}
+\item{\code{sd_res}: Square root of \code{var_res}.}
+\item{\code{mean_rho}: Mean artifact-corrected correlation.}
+\item{\code{var_r_c}: Variance of artifact-corrected correlations.}
+\item{\code{var_e_c}: Predicted sampling-error variance of artifact-corrected correlations.}
+\item{\code{var_rho}: Variance of artifact-corrected correlations after removing predicted sampling-error variance.}
+\item{\code{sd_r_c}: Square root of \code{var_r_c}.}
+\item{\code{se_r_c}: Standard error of \code{mean_rho}.}
+\item{\code{sd_e_c}: Square root of \code{var_e_c}.}
+\item{\code{sd_rho}: Square root of \code{var_rho}.}
+\item{\code{CI_LL_XX}: Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}: Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CR_LL_XX}: Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CR_UL_XX}: Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
 }
 
 Components of output tables for artifact-distribution meta-analyses:
 \itemize{
-\item{\code{pair_id}}{\cr Unique identification number for each construct pairing.}
-\item{\code{construct_x}}{\cr Name of the variable analyzed as construct X.}
-\item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-\item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
-\item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
-\item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
-\item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
-\item{\code{mean_r}}{\cr Mean observed correlation.}
-\item{\code{var_r}}{\cr Weighted variance of observed correlations.}
-\item{\code{var_e}}{\cr Predicted sampling-error variance of observed correlations.}
-\item{\code{var_art}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts.}
-\item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}).}
-\item{\code{var_res}}{\cr Variance of observed correlations after removing predicted sampling-error variance and predicted artifact variance.}
-\item{\code{sd_r}}{\cr Square root of \code{var_r}.}
-\item{\code{se_r}}{\cr Standard error of \code{mean_r}.}
-\item{\code{sd_e}}{\cr Square root of \code{var_e}.}
-\item{\code{sd_art}}{\cr Square root of \code{var_art}.}
-\item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
-\item{\code{sd_res}}{\cr Square root of \code{var_res}.}
-\item{\code{mean_rho}}{\cr Mean artifact-corrected correlation.}
-\item{\code{var_r_c}}{\cr Weighted variance of observed correlations corrected to the metric of rho.}
-\item{\code{var_e_c}}{\cr Predicted sampling-error variance of observed correlations corrected to the metric of rho.}
-\item{\code{var_art_c}}{\cr Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts corrected to the metric of rho.}
-\item{\code{var_pre_c}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}) corrected to the metric of rho.}
-\item{\code{var_rho}}{\cr Variance of artifact-corrected correlations after removing predicted sampling-error variance and predicted artifact variance.}
-\item{\code{sd_r_c}}{\cr Square root of \code{var_r} corrected to the metric of rho.}
-\item{\code{se_r_c}}{\cr Standard error of \code{mean_r} corrected to the metric of rho.}
-\item{\code{sd_e_c}}{\cr Square root of \code{var_e} corrected to the metric of rho.}
-\item{\code{sd_art_c}}{\cr Square root of \code{var_art} corrected to the metric of rho.}
-\item{\code{sd_pre_c}}{\cr Square root of \code{var_pre} corrected to the metric of rho.}
-\item{\code{sd_rho}}{\cr Square root of \code{var_rho}.}
-\item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
-\item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
-\item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
-\item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+\item{\code{pair_id}: Unique identification number for each construct pairing.}
+\item{\code{construct_x}: Name of the variable analyzed as construct X.}
+\item{\code{construct_y}: Name of the variable analyzed as construct Y.}
+\item{\code{analysis_id}: Unique identification number for each analysis.}
+\item{\code{analysis_type}: Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+\item{\code{k}: Number of effect sizes meta-analyzed.}
+\item{\code{N}: Total sample size of all effect sizes in the meta-analysis.}
+\item{\code{mean_r}: Mean observed correlation.}
+\item{\code{var_r}: Weighted variance of observed correlations.}
+\item{\code{var_e}: Predicted sampling-error variance of observed correlations.}
+\item{\code{var_art}: Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts.}
+\item{\code{var_pre}: Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}).}
+\item{\code{var_res}: Variance of observed correlations after removing predicted sampling-error variance and predicted artifact variance.}
+\item{\code{sd_r}: Square root of \code{var_r}.}
+\item{\code{se_r}: Standard error of \code{mean_r}.}
+\item{\code{sd_e}: Square root of \code{var_e}.}
+\item{\code{sd_art}: Square root of \code{var_art}.}
+\item{\code{sd_pre}: Square root of \code{var_pre}.}
+\item{\code{sd_res}: Square root of \code{var_res}.}
+\item{\code{mean_rho}: Mean artifact-corrected correlation.}
+\item{\code{var_r_c}: Weighted variance of observed correlations corrected to the metric of rho.}
+\item{\code{var_e_c}: Predicted sampling-error variance of observed correlations corrected to the metric of rho.}
+\item{\code{var_art_c}: Amount of variance in observed correlations that is attributable to measurement-error and range-restriction artifacts corrected to the metric of rho.}
+\item{\code{var_pre_c}: Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}) corrected to the metric of rho.}
+\item{\code{var_rho}: Variance of artifact-corrected correlations after removing predicted sampling-error variance and predicted artifact variance.}
+\item{\code{sd_r_c}: Square root of \code{var_r} corrected to the metric of rho.}
+\item{\code{se_r_c}: Standard error of \code{mean_r} corrected to the metric of rho.}
+\item{\code{sd_e_c}: Square root of \code{var_e} corrected to the metric of rho.}
+\item{\code{sd_art_c}: Square root of \code{var_art} corrected to the metric of rho.}
+\item{\code{sd_pre_c}: Square root of \code{var_pre} corrected to the metric of rho.}
+\item{\code{sd_rho}: Square root of \code{var_rho}.}
+\item{\code{CI_LL_XX}: Lower limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CI_UL_XX}: Upper limit of the confidence interval around \code{mean_rho}, where "XX" represents the confidence level as a percentage.}
+\item{\code{CR_LL_XX}: Lower limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
+\item{\code{CR_UL_XX}: Upper limit of the credibility interval around \code{mean_rho}, where "XX" represents the credibility level as a percentage.}
 }
 }
 \description{
@@ -375,18 +375,18 @@ The automatic compositing features in \code{ma_r} are employed when \code{sample
 \details{
 The options for \code{correction_method} are:
 \itemize{
-\item{"auto"}{\cr Automatic selection of the most appropriate correction procedure, based on the available artifacts and the logical arguments provided to the function. (default)}
-\item{"meas"}{\cr Correction for measurement error only.}
-\item{"uvdrr"}{\cr Correction for univariate direct range restriction (i.e., Case II). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
-\item{"uvirr"}{\cr Correction for univariate indirect range restriction (i.e., Case IV). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
-\item{"bvdrr"}{\cr Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
-\item{"bvirr"}{\cr Correction for bivariate indirect range restriction (i.e., Case V).}
-\item{"rbOrig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. We recommend using "uvdrr" instead.}
-\item{"rbAdj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
-\item{"rb1Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. We recommend using "uvdrr" instead.}
-\item{"rb1Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
-\item{"rb2Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. We recommend using "uvdrr" instead.}
-\item{"rb2Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+\item{"auto": Automatic selection of the most appropriate correction procedure, based on the available artifacts and the logical arguments provided to the function. (default)}
+\item{"meas": Correction for measurement error only.}
+\item{"uvdrr": Correction for univariate direct range restriction (i.e., Case II). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+\item{"uvirr": Correction for univariate indirect range restriction (i.e., Case IV). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+\item{"bvdrr": Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
+\item{"bvirr": Correction for bivariate indirect range restriction (i.e., Case V).}
+\item{"rbOrig": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. We recommend using "uvdrr" instead.}
+\item{"rbAdj": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+\item{"rb1Orig": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. We recommend using "uvdrr" instead.}
+\item{"rb1Adj": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+\item{"rb2Orig": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. We recommend using "uvdrr" instead.}
+\item{"rb2Adj": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
 }
 }
 \section{Note}{

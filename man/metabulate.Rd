@@ -86,9 +86,9 @@ metabulate(
 
 \item{conf_format}{How should confidence intervals be formatted? Options are:
 \itemize{
-\item{\code{parentheses}}{: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
-\item{\code{brackets}}{: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
-\item{\code{columns}}{: Bounds are shown in individual columns.}
+\item{\code{parentheses}: Bounds are enclosed in parentheses and separated by a comma: (LO, UP).}
+\item{\code{brackets}: Bounds are enclosed in square brackets and separated by a comma: [LO, UP].}
+\item{\code{columns}: Bounds are shown in individual columns.}
 }}
 
 \item{cred_format}{How should credibility intervals be formatted? Options are the same as for \code{conf_format} above.}

@@ -41,10 +41,10 @@ If \code{html} is \code{TRUE} and you render to HTML (or related formats, see
 \code{\link[knitr:output_type]{knitr::is_html_output}}, the following LaTeX
 math commands are defined:
 \itemize{
-  \item{\code{symit}}{}
-  \item{\code{symup}}{}
-  \item{\code{symbfit}}{}
-  \item{\code{symbfup}}{}
+  \item{\code{symit}}
+  \item{\code{symup}}
+  \item{\code{symbfit}}
+  \item{\code{symbfup}}
 }
 
 If you define your own LaTeX or MathJax macros for these commands, set
@@ -56,10 +56,10 @@ If you define your own LaTeX or MathJax macros for these commands, set
 If \code{word_proc} is \code{TRUE} and you render to Word or ODT (or related
 formats such as PowerPoint), the following LaTeX math commands are defined:
 \itemize{
-  \item{\code{symit}}{}
-  \item{\code{symup}}{}
-  \item{\code{symbfit}}{}
-  \item{\code{symbfup}}{}
+  \item{\code{symit}}
+  \item{\code{symup}}
+  \item{\code{symbfit}}
+  \item{\code{symbfup}}
 }
 
 If you define your own LaTeX, Office, or OpenDocument macros for these commands,

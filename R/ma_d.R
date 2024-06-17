@@ -85,95 +85,95 @@
 #' @return A nested tabular object of the class "ma_psychmeta".
 #' Components of output tables for bare-bones meta-analyses:
 #' \itemize{
-#' \item{\code{Pair_ID}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
-#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
-#' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
-#' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
-#' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
-#' \item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
-#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
-#' \item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance.}
-#' \item{\code{sd_d}}{\cr Square root of \code{var_r}.}
-#' \item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
-#' \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
-#' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
-#' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
-#' \item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{Pair_ID}: Unique identification number for each construct-contrast pairing.}
+#' \item{\code{group_contrast}: Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}: Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}: Unique identification number for each analysis.}
+#' \item{\code{analysis_type}: Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{k}: Number of effect sizes meta-analyzed.}
+#' \item{\code{N}: Total sample size of all effect sizes in the meta-analysis.}
+#' \item{\code{mean_d}: Mean observed \emph{d} value.}
+#' \item{\code{var_d}: Weighted variance of observed \emph{d} values.}
+#' \item{\code{var_e}: Predicted sampling-error variance of observed \emph{d} values.}
+#' \item{\code{var_res}: Variance of observed \emph{d} values after removing predicted sampling-error variance.}
+#' \item{\code{sd_d}: Square root of \code{var_r}.}
+#' \item{\code{se_d}: Standard error of \code{mean_d}.}
+#' \item{\code{sd_e}: Square root of \code{var_e}.}
+#' \item{\code{sd_res}: Square root of \code{var_res}.}
+#' \item{\code{CI_LL_XX}: Lower limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CI_UL_XX}: Upper limit of the confidence interval around \code{mean_d}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CR_LL_XX}: Lower limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_UL_XX}: Upper limit of the credibility interval around \code{mean_d}, where "XX" represents the credibility level as a percentage.}
 #' }
 #'
 #' Components of output tables for individual-correction meta-analyses:
 #' \itemize{
-#' \item{\code{pair_id}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
-#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
-#' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
-#' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
-#' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
-#' \item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
-#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
-#' \item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance.}
-#' \item{\code{sd_d}}{\cr Square root of \code{var_r}.}
-#' \item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
-#' \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
-#' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
-#' \item{\code{mean_delta}}{\cr Mean artifact-corrected \emph{d} value.}
-#' \item{\code{var_d_c}}{\cr Variance of artifact-corrected \emph{d} values.}
-#' \item{\code{var_e_c}}{\cr Predicted sampling-error variance of artifact-corrected \emph{d} values.}
-#' \item{\code{var_delta}}{\cr Variance of artifact-corrected \emph{d} values after removing predicted sampling-error variance.}
-#' \item{\code{sd_d_c}}{\cr Square root of \code{var_r_c}.}
-#' \item{\code{se_d_c}}{\cr Standard error of \code{mean_delta}.}
-#' \item{\code{sd_e_c}}{\cr Square root of \code{var_e_c}.}
-#' \item{\code{sd_delta}}{\cr Square root of \code{var_delta}.}
-#' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
-#' \item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{pair_id}: Unique identification number for each construct-contrast pairing.}
+#' \item{\code{group_contrast}: Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}: Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}: Unique identification number for each analysis.}
+#' \item{\code{analysis_type}: Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{k}: Number of effect sizes meta-analyzed.}
+#' \item{\code{N}: Total sample size of all effect sizes in the meta-analysis.}
+#' \item{\code{mean_d}: Mean observed \emph{d} value.}
+#' \item{\code{var_d}: Weighted variance of observed \emph{d} values.}
+#' \item{\code{var_e}: Predicted sampling-error variance of observed \emph{d} values.}
+#' \item{\code{var_res}: Variance of observed \emph{d} values after removing predicted sampling-error variance.}
+#' \item{\code{sd_d}: Square root of \code{var_r}.}
+#' \item{\code{se_d}: Standard error of \code{mean_d}.}
+#' \item{\code{sd_e}: Square root of \code{var_e}.}
+#' \item{\code{sd_res}: Square root of \code{var_res}.}
+#' \item{\code{mean_delta}: Mean artifact-corrected \emph{d} value.}
+#' \item{\code{var_d_c}: Variance of artifact-corrected \emph{d} values.}
+#' \item{\code{var_e_c}: Predicted sampling-error variance of artifact-corrected \emph{d} values.}
+#' \item{\code{var_delta}: Variance of artifact-corrected \emph{d} values after removing predicted sampling-error variance.}
+#' \item{\code{sd_d_c}: Square root of \code{var_r_c}.}
+#' \item{\code{se_d_c}: Standard error of \code{mean_delta}.}
+#' \item{\code{sd_e_c}: Square root of \code{var_e_c}.}
+#' \item{\code{sd_delta}: Square root of \code{var_delta}.}
+#' \item{\code{CI_LL_XX}: Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CI_UL_XX}: Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CR_LL_XX}: Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_UL_XX}: Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
 #' }
 #'
 #' Components of output tables for artifact-distribution meta-analyses:
 #' \itemize{
-#' \item{\code{pair_id}}{\cr Unique identification number for each construct-contrast pairing.}
-#' \item{\code{group_contrast}}{\cr Name of the variable analyzed as the group-contrast variable.}
-#' \item{\code{construct_y}}{\cr Name of the variable analyzed as construct Y.}
-#' \item{\code{analysis_id}}{\cr Unique identification number for each analysis.}
-#' \item{\code{analysis_type}}{\cr Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
-#' \item{\code{k}}{\cr Number of effect sizes meta-analyzed.}
-#' \item{\code{N}}{\cr Total sample size of all effect sizes in the meta-analysis.}
-#' \item{\code{mean_d}}{\cr Mean observed \emph{d} value.}
-#' \item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values.}
-#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values.}
-#' \item{\code{var_art}}{\cr Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts.}
-#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}).}
-#' \item{\code{var_res}}{\cr Variance of observed \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
-#' \item{\code{sd_d}}{\cr Square root of \code{var_d}.}
-#' \item{\code{se_d}}{\cr Standard error of \code{mean_d}.}
-#' \item{\code{sd_e}}{\cr Square root of \code{var_e}.}
-#' \item{\code{sd_art}}{\cr Square root of \code{var_art}.}
-#' \item{\code{sd_pre}}{\cr Square root of \code{var_pre}.}
-#' \item{\code{sd_res}}{\cr Square root of \code{var_res}.}
-#' \item{\code{mean_delta}}{\cr Mean artifact-corrected \emph{d} value.}
-#' \item{\code{var_d}}{\cr Weighted variance of observed \emph{d} values corrected to the metric of delta.}
-#' \item{\code{var_e}}{\cr Predicted sampling-error variance of observed \emph{d} values corrected to the metric of delta.}
-#' \item{\code{var_art}}{\cr Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts corrected to the metric of delta.}
-#' \item{\code{var_pre}}{\cr Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}) corrected to the metric of delta.}
-#' \item{\code{var_delta}}{\cr Variance of artifact-corrected \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
-#' \item{\code{sd_d}}{\cr Square root of \code{var_d} corrected to the metric of delta.}
-#' \item{\code{se_d}}{\cr Standard error of \code{mean_d} corrected to the metric of delta.}
-#' \item{\code{sd_e}}{\cr Square root of \code{var_e} corrected to the metric of delta.}
-#' \item{\code{sd_art}}{\cr Square root of \code{var_art} corrected to the metric of delta.}
-#' \item{\code{sd_pre}}{\cr Square root of \code{var_pre} corrected to the metric of delta.}
-#' \item{\code{sd_delta}}{\cr Square root of \code{var_delta}.}
-#' \item{\code{CI_LL_XX}}{\cr Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CI_UL_XX}}{\cr Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
-#' \item{\code{CR_LL_XX}}{\cr Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
-#' \item{\code{CR_UL_XX}}{\cr Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{pair_id}: Unique identification number for each construct-contrast pairing.}
+#' \item{\code{group_contrast}: Name of the variable analyzed as the group-contrast variable.}
+#' \item{\code{construct_y}: Name of the variable analyzed as construct Y.}
+#' \item{\code{analysis_id}: Unique identification number for each analysis.}
+#' \item{\code{analysis_type}: Type of moderator analyses: Overall, Simple Moderator, or Hierarchical Moderator.}
+#' \item{\code{k}: Number of effect sizes meta-analyzed.}
+#' \item{\code{N}: Total sample size of all effect sizes in the meta-analysis.}
+#' \item{\code{mean_d}: Mean observed \emph{d} value.}
+#' \item{\code{var_d}: Weighted variance of observed \emph{d} values.}
+#' \item{\code{var_e}: Predicted sampling-error variance of observed \emph{d} values.}
+#' \item{\code{var_art}: Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts.}
+#' \item{\code{var_pre}: Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}).}
+#' \item{\code{var_res}: Variance of observed \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
+#' \item{\code{sd_d}: Square root of \code{var_d}.}
+#' \item{\code{se_d}: Standard error of \code{mean_d}.}
+#' \item{\code{sd_e}: Square root of \code{var_e}.}
+#' \item{\code{sd_art}: Square root of \code{var_art}.}
+#' \item{\code{sd_pre}: Square root of \code{var_pre}.}
+#' \item{\code{sd_res}: Square root of \code{var_res}.}
+#' \item{\code{mean_delta}: Mean artifact-corrected \emph{d} value.}
+#' \item{\code{var_d}: Weighted variance of observed \emph{d} values corrected to the metric of delta.}
+#' \item{\code{var_e}: Predicted sampling-error variance of observed \emph{d} values corrected to the metric of delta.}
+#' \item{\code{var_art}: Amount of variance in observed \emph{d} values that is attributable to measurement-error and range-restriction artifacts corrected to the metric of delta.}
+#' \item{\code{var_pre}: Total predicted artifactual variance (i.e., the sum of \code{var_e} and \code{var_art}) corrected to the metric of delta.}
+#' \item{\code{var_delta}: Variance of artifact-corrected \emph{d} values after removing predicted sampling-error variance and predicted artifact variance.}
+#' \item{\code{sd_d}: Square root of \code{var_d} corrected to the metric of delta.}
+#' \item{\code{se_d}: Standard error of \code{mean_d} corrected to the metric of delta.}
+#' \item{\code{sd_e}: Square root of \code{var_e} corrected to the metric of delta.}
+#' \item{\code{sd_art}: Square root of \code{var_art} corrected to the metric of delta.}
+#' \item{\code{sd_pre}: Square root of \code{var_pre} corrected to the metric of delta.}
+#' \item{\code{sd_delta}: Square root of \code{var_delta}.}
+#' \item{\code{CI_LL_XX}: Lower limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CI_UL_XX}: Upper limit of the confidence interval around \code{mean_delta}, where "XX" represents the confidence level as a percentage.}
+#' \item{\code{CR_LL_XX}: Lower limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
+#' \item{\code{CR_UL_XX}: Upper limit of the credibility interval around \code{mean_delta}, where "XX" represents the credibility level as a percentage.}
 #' }
 #'
 #' @export
@@ -181,18 +181,18 @@
 #' @details
 #' The options for \code{correction_method} are:
 #' \itemize{
-#' \item{"auto"}{\cr Automatic selection of the most appropriate correction procedure, based on the available artifacts and the logical arguments provided to the function. (default)}
-#' \item{"meas"}{\cr Correction for measurement error only.}
-#' \item{"uvdrr"}{\cr Correction for univariate direct range restriction (i.e., Case II). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
-#' \item{"uvirr"}{\cr Correction for univariate indirect range restriction (i.e., Case IV). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
-#' \item{"bvdrr"}{\cr Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
-#' \item{"bvirr"}{\cr Correction for bivariate indirect range restriction (i.e., Case V).}
-#' \item{"rbOrig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. We recommend using "uvdrr" instead.}
-#' \item{"rbAdj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
-#' \item{"rb1Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. We recommend using "uvdrr" instead.}
-#' \item{"rb1Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
-#' \item{"rb2Orig"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. We recommend using "uvdrr" instead.}
-#' \item{"rb2Adj"}{\cr Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' \item{"auto": Automatic selection of the most appropriate correction procedure, based on the available artifacts and the logical arguments provided to the function. (default)}
+#' \item{"meas": Correction for measurement error only.}
+#' \item{"uvdrr": Correction for univariate direct range restriction (i.e., Case II). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+#' \item{"uvirr": Correction for univariate indirect range restriction (i.e., Case IV). The choice of which variable to correct for range restriction is made using the \code{correct_rr_x} and \code{correct_rr_y} arguments.}
+#' \item{"bvdrr": Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
+#' \item{"bvirr": Correction for bivariate indirect range restriction (i.e., Case V).}
+#' \item{"rbOrig": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. We recommend using "uvdrr" instead.}
+#' \item{"rbAdj": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied interactively. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' \item{"rb1Orig": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. We recommend using "uvdrr" instead.}
+#' \item{"rb1Adj": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA1 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
+#' \item{"rb2Orig": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. We recommend using "uvdrr" instead.}
+#' \item{"rb2Adj": Not recommended: Raju and Burke's version of the correction for direct range restriction, applied using their TSA2 method. Adjusted to account for range restriction in the reliability of the Y variable. We recommend using "uvdrr" instead.}
 #' }
 #'
 #' @section Note:

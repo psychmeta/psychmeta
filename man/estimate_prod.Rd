@@ -69,10 +69,10 @@ the covariance between the products of "x" and "y" and of "u" and "v" (e.g., cov
 
 Available functions include:
 \itemize{
-\item{estimate_mean_prod}{\cr Estimate the mean of the product of two variables: x * y.}
-\item{estimate_var_prod}{\cr Estimate the variance of the product of two variables: x * y.}
-\item{estimate_cov_prods}{\cr Estimate the covariance between the products of two pairs of variables: x * y and u * v.}
-\item{estimate_cor_prods}{\cr Estimate the correlation between the products of two pairs of variables: x * y and u * v.}
+\item{\code{estimate_mean_prod}: Estimate the mean of the product of two variables: x * y.}
+\item{\code{estimate_var_prod}: Estimate the variance of the product of two variables: x * y.}
+\item{\code{estimate_cov_prods}: Estimate the covariance between the products of two pairs of variables: x * y and u * v.}
+\item{\code{estimate_cor_prods}: Estimate the correlation between the products of two pairs of variables: x * y and u * v.}
 }
 }
 \references{

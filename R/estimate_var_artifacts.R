@@ -9,20 +9,20 @@
 #'
 #' Available functions include:
 #' \itemize{
-#' \item{estimate_var_qxi}{\cr Estimate the variance of a qxi distribution from a qxa distribution and a distribution of u ratios.}
-#' \item{estimate_var_rxxi}{\cr Estimate the variance of an rxxi distribution from an rxxa distribution and a distribution of u ratios.}
+#' \item{\code{estimate_var_qxi}: Estimate the variance of a qxi distribution from a qxa distribution and a distribution of u ratios.}
+#' \item{\code{estimate_var_rxxi}: Estimate the variance of an rxxi distribution from an rxxa distribution and a distribution of u ratios.}
 #'
-#' \item{estimate_var_qxa}{\cr Estimate the variance of a qxa distribution from a qxi distribution and a distribution of u ratios.}
-#' \item{estimate_var_rxxa}{\cr Estimate the variance of an rxxa distribution from an rxxi distribution and a distribution of u ratios.}
+#' \item{\code{estimate_var_qxa}: Estimate the variance of a qxa distribution from a qxi distribution and a distribution of u ratios.}
+#' \item{\code{estimate_var_rxxa}: Estimate the variance of an rxxa distribution from an rxxi distribution and a distribution of u ratios.}
 #'
-#' \item{estimate_var_ut}{\cr Estimate the variance of a true-score u ratio distribution from an observed-score u ratio distribution and a reliability distribution.}
-#' \item{estimate_var_ux}{\cr Estimate the variance of an observed-score u ratio distribution from a true-score u ratio distribution and a reliability distribution.}
+#' \item{\code{estimate_var_ut}: Estimate the variance of a true-score u ratio distribution from an observed-score u ratio distribution and a reliability distribution.}
+#' \item{\code{estimate_var_ux}: Estimate the variance of an observed-score u ratio distribution from a true-score u ratio distribution and a reliability distribution.}
 #'
-#' \item{estimate_var_qyi}{\cr Estimate the variance of a qyi distribution from the following distributions: qya, rxyi, and ux.}
-#' \item{estimate_var_ryyi}{\cr Estimate the variance of an ryyi distribution from the following distributions: ryya, rxyi, and ux.}
+#' \item{\code{estimate_var_qyi}: Estimate the variance of a qyi distribution from the following distributions: qya, rxyi, and ux.}
+#' \item{\code{estimate_var_ryyi}: Estimate the variance of an ryyi distribution from the following distributions: ryya, rxyi, and ux.}
 #'
-#' \item{estimate_var_qya}{\cr Estimate the variance of a qya distribution from the following distributions: qyi, rxyi, and ux.}
-#' \item{estimate_var_ryya}{\cr Estimate the variance of an ryya distribution from the following distributions: ryyi, rxyi, and ux.}
+#' \item{\code{estimate_var_qya}: Estimate the variance of a qya distribution from the following distributions: qyi, rxyi, and ux.}
+#' \item{\code{estimate_var_ryya}: Estimate the variance of an ryya distribution from the following distributions: ryyi, rxyi, and ux.}
 #' }
 #'
 #' @param qxi Square-root of incumbent reliability estimate.

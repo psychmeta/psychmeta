@@ -9,16 +9,16 @@
 #'
 #' Available functions include:
 #' \itemize{
-#' \item{estimate_rxxa}{\cr Estimate the applicant reliability of variable X from X's incumbent reliability value and X's observed-score or true-score u ratio.}
-#' \item{estimate_rxxa_u}{\cr Estimate the applicant reliability of variable X from X's observed-score and true-score u ratios.}
-#' \item{estimate_rxxi}{\cr Estimate the incumbent reliability of variable X from X's applicant reliability value and X's observed-score or true-score u ratio.}
-#' \item{estimate_rxxi_u}{\cr Estimate the incumbent reliability of variable X from X's observed-score and true-score u ratios.}
-#' \item{estimate_ux}{\cr Estimate the true-score u ratio for variable X from X's reliability coefficient and X's observed-score u ratio.}
-#' \item{estimate_uy}{\cr Estimate the observed-score u ratio for variable X from X's reliability coefficient and X's true-score u ratio.}
-#' \item{estimate_ryya}{\cr Estimate the applicant reliability of variable Y from Y's incumbent reliability value, Y's correlation with X, and X's u ratio.}
-#' \item{estimate_ryyi}{\cr Estimate the incumbent reliability of variable Y from Y's applicant reliability value, Y's correlation with X, and X's u ratio.}
-#' \item{estimate_uy}{\cr Estimate the observed-score u ratio for variable Y from Y's applicant and incumbent reliability coefficients.}
-#' \item{estimate_up}{\cr Estimate the true-score u ratio for variable Y from Y's applicant and incumbent reliability coefficients.}
+#' \item{\code{estimate_rxxa}: Estimate the applicant reliability of variable X from X's incumbent reliability value and X's observed-score or true-score u ratio.}
+#' \item{\code{estimate_rxxa_u}: Estimate the applicant reliability of variable X from X's observed-score and true-score u ratios.}
+#' \item{\code{estimate_rxxi}: Estimate the incumbent reliability of variable X from X's applicant reliability value and X's observed-score or true-score u ratio.}
+#' \item{\code{estimate_rxxi_u}: Estimate the incumbent reliability of variable X from X's observed-score and true-score u ratios.}
+#' \item{\code{estimate_ux}: Estimate the true-score u ratio for variable X from X's reliability coefficient and X's observed-score u ratio.}
+#' \item{\code{estimate_uy}: Estimate the observed-score u ratio for variable X from X's reliability coefficient and X's true-score u ratio.}
+#' \item{\code{estimate_ryya}: Estimate the applicant reliability of variable Y from Y's incumbent reliability value, Y's correlation with X, and X's u ratio.}
+#' \item{\code{estimate_ryyi}: Estimate the incumbent reliability of variable Y from Y's applicant reliability value, Y's correlation with X, and X's u ratio.}
+#' \item{\code{estimate_uy}: Estimate the observed-score u ratio for variable Y from Y's applicant and incumbent reliability coefficients.}
+#' \item{\code{estimate_up}: Estimate the true-score u ratio for variable Y from Y's applicant and incumbent reliability coefficients.}
 #' }
 #'
 #' @param rxx Vector of reliability estimates for X (used in the context of estimating ux and ut - specify that reliability is an incumbent value by setting rxx_restricted to \code{FALSE}).

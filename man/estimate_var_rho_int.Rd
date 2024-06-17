@@ -84,12 +84,12 @@ Functions to estimate the variance of \eqn{\rho} corrected for psychometric arti
 
 Available functions include:
 \itemize{
-     \item{\code{estimate_var_rho_int_meas}}{\cr Variance of \eqn{\rho} corrected for measurement error only}
-     \item{\code{estimate_var_rho_int_uvdrr}}{\cr Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
-     \item{\code{estimate_var_rho_int_bvdrr}}{\cr Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
-     \item{\code{estimate_var_rho_int_uvirr}}{\cr Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
-     \item{\code{estimate_var_rho_int_bvirr}}{\cr Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
-     \item{\code{estimate_var_rho_int_rb}}{\cr Variance of \eqn{\rho} corrected using Raju and Burke's correction for direct range restriction and measurement error}
+     \item{\code{estimate_var_rho_int_meas}: Variance of \eqn{\rho} corrected for measurement error only}
+     \item{\code{estimate_var_rho_int_uvdrr}: Variance of \eqn{\rho} corrected for univariate direct range restriction (i.e., Case II) and measurement error}
+     \item{\code{estimate_var_rho_int_bvdrr}: Variance of \eqn{\rho} corrected for bivariate direct range restriction and measurement error}
+     \item{\code{estimate_var_rho_int_uvirr}: Variance of \eqn{\rho} corrected for univariate indirect range restriction (i.e., Case IV) and measurement error}
+     \item{\code{estimate_var_rho_int_bvirr}: Variance of \eqn{\rho} corrected for bivariate indirect range restriction (i.e., Case V) and measurement error}
+     \item{\code{estimate_var_rho_int_rb}: Variance of \eqn{\rho} corrected using Raju and Burke's correction for direct range restriction and measurement error}
 }
 }
 \section{Notes}{
