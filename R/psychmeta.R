@@ -32,68 +32,68 @@
 #' 
 #' \bold{Abbreviations for meta-analytic methods:}
 #' \itemize{
-#' \item{\bold{bb}}{:  Bare-bones meta-analysis.}
-#' \item{\bold{ic}}{:  Individual-correction meta-analysis.}
-#' \item{\bold{ad}}{:  Artifact-distribution meta-analysis.}
+#' \item{\bold{bb}: Bare-bones meta-analysis.}
+#' \item{\bold{ic}: Individual-correction meta-analysis.}
+#' \item{\bold{ad}: Artifact-distribution meta-analysis.}
 #' }
 #' 
 #' \bold{Abbreviations for types of artifact distributions and artifact-distribution meta-analyses:}
 #' \itemize{
-#' \item{\bold{int}}{:  Interactive approach.}
-#' \item{\bold{tsa}}{:  Taylor series approximation approach.}
+#' \item{\bold{int}: Interactive approach.}
+#' \item{\bold{tsa}: Taylor series approximation approach.}
 #' }
 #' 
 #' \bold{Notation used for variables involved in correlations:}
 #' \itemize{
-#' \item{\bold{x} or \bold{X}}{:  Scores on the observed variable designated as X by the analyst (i.e., scores containing measurement error). By convention, X typically represents a predictor variable.}
-#' \item{\bold{t} or \bold{T}}{:  Scores on the construct associated with X (i.e., scores free from measurement error).}
-#' \item{\bold{y} or \bold{Y}}{:  Scores on the observed variable designated as Y by the analyst (i.e., scores containing measurement error). By convention, Y typically represents a criterion variable.}
-#' \item{\bold{p} or \bold{P}}{:  Scores on the construct associated with Y (i.e., scores free from measurement error).}
+#' \item{\bold{x} or \bold{X}: Scores on the observed variable designated as X by the analyst (i.e., scores containing measurement error). By convention, X typically represents a predictor variable.}
+#' \item{\bold{t} or \bold{T}: Scores on the construct associated with X (i.e., scores free from measurement error).}
+#' \item{\bold{y} or \bold{Y}: Scores on the observed variable designated as Y by the analyst (i.e., scores containing measurement error). By convention, Y typically represents a criterion variable.}
+#' \item{\bold{p} or \bold{P}: Scores on the construct associated with Y (i.e., scores free from measurement error).}
 #' }
 #' \emph{Note}: The use of lowercase or uppercase labels does not alter the meaning of the notation.
 #' 
 #' \bold{Notation used for variables involved in \emph{d} values:}
 #' \itemize{
-#' \item{\bold{g}}{:  Group membership status based on the observed group membership variable (i.e., statuses containing measurement/classification error).}
-#' \item{\bold{G}}{:  Group membership status based on the group membership construct (i.e., statuses free from measurement/classification error).}
-#' \item{\bold{y} or \bold{Y}}{:  Scores on the observed variable being compared between groups (i.e., scores containing measurement error).}
-#' \item{\bold{p} or \bold{P}}{:  Scores on the criterion construct being compared between groups (i.e., scores free from measurement error).}
+#' \item{\bold{g}: Group membership status based on the observed group membership variable (i.e., statuses containing measurement/classification error).}
+#' \item{\bold{G}: Group membership status based on the group membership construct (i.e., statuses free from measurement/classification error).}
+#' \item{\bold{y} or \bold{Y}: Scores on the observed variable being compared between groups (i.e., scores containing measurement error).}
+#' \item{\bold{p} or \bold{P}: Scores on the criterion construct being compared between groups (i.e., scores free from measurement error).}
 #' }
 #' \emph{Note}: There is always a distinction between the g and G labels because they differ in case. The use of lowercase or uppercase labels for y/Y or p/P does not alter the meaning of the notation.
 #' 
 #' \bold{Notation used for types of correlations:}
 #' \itemize{
-#' \item{\bold{rxy}}{:  Observed correlation.}
-#' \item{\bold{rxp}}{:  Correlation corrected for measurement error in Y only.}
-#' \item{\bold{rty}}{:  Correlation corrected for measurement error in X only.}
-#' \item{\bold{rtp}}{:  True-score correlation corrected for measurement error in both X and Y.}
+#' \item{\bold{rxy}: Observed correlation.}
+#' \item{\bold{rxp}: Correlation corrected for measurement error in Y only.}
+#' \item{\bold{rty}: Correlation corrected for measurement error in X only.}
+#' \item{\bold{rtp}: True-score correlation corrected for measurement error in both X and Y.}
 #' }
 #' \emph{Note}: Correlations with labels that include "i" suffixes are range-restricted, and those with "a" suffixes are unrestricted or corrected for range restriction.
 #' 
 #' \bold{Notation used for types of \emph{d} values:}
 #' \itemize{
-#' \item{\bold{dgy}}{:  Observed \emph{d} value.}
-#' \item{\bold{dgp}}{:  \emph{d} value corrected for measurement error in Y only.}
-#' \item{\bold{dGy}}{:  \emph{d} value corrected for measurement/classification error in the grouping variable only.}
-#' \item{\bold{dGp}}{:  True-score \emph{d} value corrected for measurement/classification error in both X and the grouping variable.}
+#' \item{\bold{dgy}: Observed \emph{d} value.}
+#' \item{\bold{dgp}: \emph{d} value corrected for measurement error in Y only.}
+#' \item{\bold{dGy}: \emph{d} value corrected for measurement/classification error in the grouping variable only.}
+#' \item{\bold{dGp}: True-score \emph{d} value corrected for measurement/classification error in both X and the grouping variable.}
 #' }
 #' \emph{Note}: \emph{d} values with labels that include "i" suffixes are range-restricted, and those with "a" suffixes are unrestricted or corrected for range restriction.
 #' 
 #' \bold{Types of correction methods (excluding sporadic corrections and outdated corrections implemented for posterity):}
 #' \itemize{
-#'  \item{\bold{meas}}{:  Correction for measurement error only.}
-#'  \item{\bold{uvdrr}}{:  Correction for univariate direct range restriction (i.e., Case II). Can be applied to using range restriction information for either X or Y.}
-#'  \item{\bold{uvirr}}{:  Correction for univariate indirect range restriction (i.e., Case IV). Can be applied to using range restriction information for either X or Y.}
-#'  \item{\bold{bvdrr}}{:  Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
-#'  \item{\bold{bvirr}}{:  Correction for bivariate indirect range restriction (i.e., Case V).}
+#'  \item{\bold{meas}: Correction for measurement error only.}
+#'  \item{\bold{uvdrr}: Correction for univariate direct range restriction (i.e., Case II). Can be applied to using range restriction information for either X or Y.}
+#'  \item{\bold{uvirr}: Correction for univariate indirect range restriction (i.e., Case IV). Can be applied to using range restriction information for either X or Y.}
+#'  \item{\bold{bvdrr}: Correction for bivariate direct range restriction. Use with caution: This correction is an approximation only and is known to have a positive bias.}
+#'  \item{\bold{bvirr}: Correction for bivariate indirect range restriction (i.e., Case V).}
 #' }
 #' \emph{Note}: Meta-analyses of \emph{d} values that involve range-restriction corrections treat the grouping variable as "X."
 #' 
 #' \bold{Labels for types of output from psychometric meta-analyses:}
 #' \itemize{
-#' \item{\bold{ts}}{:  True-score meta-analysis output. Represents fully corrected estimates.}
-#' \item{\bold{vgx}}{:  Validity generalization meta-analysis output with X treated as the predictor. Represents estimates corrected for all artifacts except measurement error in X. Artifact distributions will still account for variance in effects explained by measurement error in X.}
-#' \item{\bold{vgy}}{:  Validity generalization meta-analysis output with Y treated as the predictor. Represents estimates corrected for all artifacts except measurement error in Y. Artifact distributions will still account for variance in effects explained by measurement error in Y.}
+#' \item{\bold{ts}: True-score meta-analysis output. Represents fully corrected estimates.}
+#' \item{\bold{vgx}: Validity generalization meta-analysis output with X treated as the predictor. Represents estimates corrected for all artifacts except measurement error in X. Artifact distributions will still account for variance in effects explained by measurement error in X.}
+#' \item{\bold{vgy}: Validity generalization meta-analysis output with Y treated as the predictor. Represents estimates corrected for all artifacts except measurement error in Y. Artifact distributions will still account for variance in effects explained by measurement error in Y.}
 #' }
 #'
 "_PACKAGE"

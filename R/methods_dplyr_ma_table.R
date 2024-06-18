@@ -5,19 +5,19 @@ filter.ma_table <- function(.data, ...){
 
 #' @export
 #' @method filter_all ma_table
-filter_all.ma_table <- function(.tbl, vars_predicate){
+filter_all.ma_table <- function(.tbl, ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
 #' @method filter_at ma_table
-filter_at.ma_table <- function(.tbl, .vars, .vars_predicate){
+filter_at.ma_table <- function(.tbl, ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
 #' @method filter_if ma_table
-filter_if.ma_table <- function(.tbl, predicate, .vars_predicate){
+filter_if.ma_table <- function(.tbl, ...){
      reattribute(.tbl, NextMethod())
 }
 

@@ -7,21 +7,21 @@ filter.ma_psychmeta <- function(.data, ...){
 #' @export
 #' @importFrom dplyr filter_all
 #' @method filter_all ma_psychmeta
-filter_all.ma_psychmeta <- function(.tbl, vars_predicate){
+filter_all.ma_psychmeta <- function(.tbl, ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
 #' @importFrom dplyr filter_at
 #' @method filter_at ma_psychmeta
-filter_at.ma_psychmeta <- function(.tbl, .vars, .vars_predicate){
+filter_at.ma_psychmeta <- function(.tbl, ...){
      reattribute(.tbl, NextMethod())
 }
 
 #' @export
 #' @importFrom dplyr filter_if
 #' @method filter_if ma_psychmeta
-filter_if.ma_psychmeta <- function(.tbl, predicate, .vars_predicate){
+filter_if.ma_psychmeta <- function(.tbl, ...){
      reattribute(.tbl, NextMethod())
 }
 

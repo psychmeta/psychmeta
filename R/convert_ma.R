@@ -313,16 +313,16 @@ convert_meta <- convert_ma
      ma_obj_i
 }
 
-#' Convert the dichotomous variable variance to a proportion
-#'
-#' Converts the variance of a dichotomous variable (i.e., \eqn{pq}) to the proportion of one of the categories in the variable (i.e., \eqn{p})
-#'
-#' @param pq The variance of a dichotomous variable.
-#'
-#' @return The proportion of cases in one of the dichotomous groups.
-#'
-#' @keywords internal
-#' @noRd
+# Convert the dichotomous variable variance to a proportion
+#
+# Converts the variance of a dichotomous variable (i.e., \eqn{pq}) to the proportion of one of the categories in the variable (i.e., \eqn{p})
+#
+# @param pq The variance of a dichotomous variable.
+#
+# @return The proportion of cases in one of the dichotomous groups.
+#
+# @keywords internal
+# @noRd
 convert_pq_to_p <- function(pq){
      if(any(pq > .25)) stop("Supplied 'pq' value is not a valid dichotomous variance", call. = FALSE)
      .5 * (1 - sqrt(1 - 4 * pq))
@@ -344,78 +344,78 @@ convert_r_to_d <- function(r, p = .5){
      d / sqrt(1 / (p * (1-p)) + d^2)
 }
 
-#' Convert the variance of r to the variance of d via TSA
-#'
-#' @param r Correlation coefficient.
-#' @param var Variance of the correlation.
-#' @param p Proportion of the dichotomous variable involved in the correlation.
-#'
-#' @return An approximated variance in the d value metric.
-#' @export
-#'
-#' @keywords internal
-#' @noRd
+# Convert the variance of r to the variance of d via TSA
+#
+# @param r Correlation coefficient.
+# @param var Variance of the correlation.
+# @param p Proportion of the dichotomous variable involved in the correlation.
+#
+# @return An approximated variance in the d value metric.
+# @export
+#
+# @keywords internal
+# @noRd
 .convert_varr_to_vard <- function(r, var, p){
      a_1 <- sqrt(1 / (p - p^2)) / (1 - r^2)^(3/2)
      a_1^2 * var
 }
 
 
-#' Convert the SD of r to the SD of d via TSA
-#'
-#' @param r Correlation coefficient.
-#' @param sd Standard deviation of the correlation.
-#' @param p Proportion of the dichotomous variable involved in the correlation.
-#'
-#' @return An approximated standard deviation in the d value metric.
-#' @export
-#'
-#' @keywords internal
-#' @noRd
+# Convert the SD of r to the SD of d via TSA
+#
+# @param r Correlation coefficient.
+# @param sd Standard deviation of the correlation.
+# @param p Proportion of the dichotomous variable involved in the correlation.
+#
+# @return An approximated standard deviation in the d value metric.
+# @export
+#
+# @keywords internal
+# @noRd
 .convert_sdr_to_sdd <- function(r, sd, p = .5){
      .convert_varr_to_vard(r = r, var = sd^2, p = p)^.5
 }
 
 
-#' Convert the variance of d to the variance of r via TSA
-#'
-#' @param d Standardized mean difference in the d-value metric.
-#' @param var Variance of the d value.
-#' @param p Proportion of the dichotomous variable involved in the d value.
-#'
-#' @return An approximated variance in the correlation metric.
-#'
-#' @keywords internal
-#' @noRd
+# Convert the variance of d to the variance of r via TSA
+#
+# @param d Standardized mean difference in the d-value metric.
+# @param var Variance of the d value.
+# @param p Proportion of the dichotomous variable involved in the d value.
+#
+# @return An approximated variance in the correlation metric.
+#
+# @keywords internal
+# @noRd
 .convert_vard_to_varr <- function(d, var, p){
      a_1 <- -1 / ((d^2 * (p - 1) * p - 1) * sqrt(d^2 + 1 / (p - p^2)))
      a_1^2 * var
 }
 
 
-#' Convert the SD of d to the SD of r via TSA
-#'
-#' @param d Standardized mean difference in the d-value metric.
-#' @param sd Standard deviation of the d value.
-#' @param p Proportion of the dichotomous variable involved in the d value.
-#'
-#' @return An approximated standard deviation in the correlation metric.
-#'
-#' @keywords internal
-#' @noRd
+# Convert the SD of d to the SD of r via TSA
+#
+# @param d Standardized mean difference in the d-value metric.
+# @param sd Standard deviation of the d value.
+# @param p Proportion of the dichotomous variable involved in the d value.
+#
+# @return An approximated standard deviation in the correlation metric.
+#
+# @keywords internal
+# @noRd
 .convert_sdd_to_sdr <- function(d, sd, p = .5){
      .convert_vard_to_varr(d = d, var = sd^2, p = p)^.5
 }
 
 
-#' Identify meta-analysis type and provide new column names for a meta-analysis
-#'
-#' @param col_names Column names of a meta-analysis table.
-#'
-#' @return Meta-analysis type, old column names of table, column names of table after effect-size conversion, and a vector categorizing the types of entries supplied in the table.
-#'
-#' @keywords internal
-#' @noRd
+# Identify meta-analysis type and provide new column names for a meta-analysis
+#
+# @param col_names Column names of a meta-analysis table.
+#
+# @return Meta-analysis type, old column names of table, column names of table after effect-size conversion, and a vector categorizing the types of entries supplied in the table.
+#
+# @keywords internal
+# @noRd
 .identify_ma_cols <- function(col_names){
 
      ## Column names from meta-analyses of correlations
