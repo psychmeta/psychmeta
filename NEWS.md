@@ -1,4 +1,4 @@
-# psychmeta 2.7.0 (2024-06-17)
+# psychmeta 2.7.0 (2024-06-19)
 
 - Updates to documentation.
 
